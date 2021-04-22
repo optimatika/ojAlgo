@@ -12,6 +12,28 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 > Corresponds to changes in the `develop` branch since the last release
 
 
+## [48.4.2] – 2021-04-22
+
+### Added
+
+#### org.ojalgo.function
+
+- Additional default methods for primitive arguments
+
+### Deprecated
+
+#### org.ojalgo.structure
+
+- The various `operateOn*(...)` methods have been deprecated and replaced by simply `on*(...)`
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed bug in LowerTriangularStore and UpperTriangularStore regarding shape/range information: https://github.com/optimatika/ojAlgo/issues/330
+- Fixed problem regarding extraction of the Q and R matrices from QR decomposition for fat matrices. (One of the QR decomposition implementations had this problem.)
+
+
 ## [48.4.1] – 2021-03-18
 
 ### Added
@@ -28,7 +50,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - ExpressionsBasedModel now calls `dispose` on solvers it created, when done
-- Optimisation model on file, for test, are now loaded using `getResourceAsStream` which makes it easier these from the ojAlgo-test jar
+- Optimisation model on file, for test, are now loaded using `getResourceAsStream` which makes it easier to access these from the ojAlgo-test jar
 
 
 ## [48.4.0] – 2020-12-27

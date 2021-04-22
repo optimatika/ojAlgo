@@ -34,7 +34,7 @@ public interface NumberDefinition {
 
         Objects.requireNonNull(number);
 
-        return NumberDefinition.intValue(number) == 0 ? false : true;
+        return NumberDefinition.toBoolean(NumberDefinition.intValue(number));
     }
 
     static byte byteValue(final Comparable<?> number) {
@@ -115,8 +115,24 @@ public interface NumberDefinition {
         }
     }
 
+    static boolean toBoolean(final int value) {
+        return value != 0;
+    }
+
+    static int toInt(final double value) {
+        return Math.round((float) value);
+    }
+
+    static int toInt(final float value) {
+        return Math.round(value);
+    }
+
+    static long toLong(final double value) {
+        return Math.round(value);
+    }
+
     default boolean booleanValue() {
-        return this.intValue() != 0;
+        return NumberDefinition.toBoolean(this.intValue());
     }
 
     default byte byteValue() {
@@ -130,11 +146,11 @@ public interface NumberDefinition {
     }
 
     default int intValue() {
-        return Math.round(this.floatValue());
+        return NumberDefinition.toInt(this.floatValue());
     }
 
     default long longValue() {
-        return Math.round(this.doubleValue());
+        return NumberDefinition.toLong(this.doubleValue());
     }
 
     default short shortValue() {

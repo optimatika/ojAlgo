@@ -152,6 +152,44 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/330 That issue was actually regarding something completely
+     * different, but discovered a problem with extracting the QR components.
+     */
+    @Test
+    public void testExtractingComponentsOfWideQR() {
+
+        double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
+
+        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
+        Primitive64Store m = storeFactory.rows(data);
+
+        if (DEBUG) {
+            BasicLogger.debug("Original", m);
+        }
+
+        QR<Double> qr1 = new QRDecomposition.Primitive(false);
+        qr1.decompose(m);
+
+        if (DEBUG) {
+            BasicLogger.debug("new QRDecomposition.Primitive(false)");
+            BasicLogger.debug("Q", qr1.getQ());
+            BasicLogger.debug("R", qr1.getR());
+        }
+
+        QR<Double> qr2 = new RawQR(); // This was the implementation with the issue
+        qr2.decompose(m);
+
+        if (DEBUG) {
+            BasicLogger.debug("new RawQR()");
+            BasicLogger.debug("Q", qr2.getQ());
+            BasicLogger.debug("R", qr2.getR());
+        }
+
+        TestUtils.assertEquals(m, qr1, NumberContext.of(8));
+        TestUtils.assertEquals(m, qr2, NumberContext.of(8));
+    }
+
+    /**
      * https://github.com/optimatika/ojAlgo/issues/214
      */
     @Test

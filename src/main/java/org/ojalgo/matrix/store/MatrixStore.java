@@ -750,7 +750,7 @@ public interface MatrixStore<N extends Comparable<N>>
     }
 
     default MatrixStore<N> add(final MatrixStore<N> addend) {
-        return this.operateOnMatching(this.physical().function().add(), addend).get();
+        return this.onMatching(this.physical().function().add(), addend).get();
     }
 
     default N aggregateAll(final Aggregator aggregator) {
@@ -955,7 +955,7 @@ public interface MatrixStore<N extends Comparable<N>>
     }
 
     default MatrixStore<N> multiply(final N scalar) {
-        return this.operateOnAll(this.physical().function().multiply().second(scalar)).get();
+        return this.onAll(this.physical().function().multiply().second(scalar)).get();
     }
 
     /**
@@ -979,7 +979,7 @@ public interface MatrixStore<N extends Comparable<N>>
     }
 
     default MatrixStore<N> negate() {
-        return this.operateOnAll(this.physical().function().negate()).get();
+        return this.onAll(this.physical().function().negate()).get();
     }
 
     default double norm() {
@@ -995,7 +995,7 @@ public interface MatrixStore<N extends Comparable<N>>
         }
     }
 
-    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+    default MatrixStore<N> onAll(final UnaryFunction<N> operator) {
         return new UnaryOperatoStore<>(this, operator);
     }
 
@@ -1175,7 +1175,7 @@ public interface MatrixStore<N extends Comparable<N>>
     }
 
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.operateOnMatching(this.physical().function().subtract(), subtrahend).get();
+        return this.onMatching(this.physical().function().subtract(), subtrahend).get();
     }
 
     default void supplyTo(final TransformableRegion<N> receiver) {

@@ -41,29 +41,28 @@ abstract class ShadingStore<N extends Comparable<N>> extends LogicalStore<N> {
 
         consumer.reset();
 
-        final int tmpColDim = this.getColDim();
+        int numberOfColumns = this.getColDim();
 
         if (this.isPrimitive()) {
 
-            for (int j = 0; j < tmpColDim; j++) {
-                final int tmpFirst = this.firstInColumn(j);
-                final int tmpLimit = this.limitOfColumn(j);
-                for (int i = tmpFirst; i < tmpLimit; i++) {
+            for (int j = 0; j < numberOfColumns; j++) {
+                int first = this.firstInColumn(j);
+                int limit = this.limitOfColumn(j);
+                for (int i = first; i < limit; i++) {
                     consumer.set(i, j, this.doubleValue(i, j));
                 }
             }
 
         } else {
 
-            for (int j = 0; j < tmpColDim; j++) {
-                final int tmpFirst = this.firstInColumn(j);
-                final int tmpLimit = this.limitOfColumn(j);
-                for (int i = tmpFirst; i < tmpLimit; i++) {
+            for (int j = 0; j < numberOfColumns; j++) {
+                int first = this.firstInColumn(j);
+                int limit = this.limitOfColumn(j);
+                for (int i = first; i < limit; i++) {
                     consumer.fillOne(i, j, this.get(i, j));
                 }
             }
         }
-
     }
 
 }

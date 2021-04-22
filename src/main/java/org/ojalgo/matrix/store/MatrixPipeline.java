@@ -239,16 +239,16 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
             return retVal;
         }
 
-        public ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
-            return this.getContext().operateOnAll(operator);
+        public ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
+            return this.getContext().onAll(operator);
         }
 
-        public ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-            return this.getContext().operateOnMatching(operator, right.transpose());
+        public ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+            return this.getContext().onMatching(operator, right.transpose());
         }
 
-        public ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-            return this.getContext().operateOnMatching(left.transpose(), operator);
+        public ElementsSupplier<N> onMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+            return this.getContext().onMatching(left.transpose(), operator);
         }
 
         @Override

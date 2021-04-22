@@ -300,7 +300,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).get();
             MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
             TestUtils.assertEquals(values, averages, accuracy);
 
@@ -308,7 +308,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             MatrixStore<Double> leftZ = mtrxA.multiply(vectorsZ);
             MatrixStore<Double> rightZ = mtrxB.multiply(vectorsZ);
-            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).get(), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
             generalised.decompose(mtrxA, mtrxB);
@@ -347,7 +347,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).get();
             MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
             TestUtils.assertEquals(values, averages, accuracy);
 
@@ -355,7 +355,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             MatrixStore<Double> leftZ = mtrxA.multiply(mtrxB).multiply(vectorsZ);
             MatrixStore<Double> rightZ = vectorsZ;
-            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).get(), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.AB);
             generalised.decompose(mtrxA, mtrxB);
@@ -398,7 +398,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).get();
             MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
             TestUtils.assertEquals(values, averages, accuracy);
 
@@ -406,7 +406,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             MatrixStore<Double> leftZ = mtrxB.multiply(mtrxA).multiply(vectorsZ);
             MatrixStore<Double> rightZ = vectorsZ;
-            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).get(), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.BA);
             generalised.decompose(mtrxA, mtrxB);

@@ -237,8 +237,8 @@ final class IterativeASS extends ActiveSetSolver {
 
                 if (solved = ACCURACY.isZero(relativeError)) {
 
-                    ElementsSupplier<Double> rhs = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
-                            .operateOnMatching(this.getIterationC(), SUBTRACT);
+                    ElementsSupplier<Double> rhs = this.getIterationL(incl).premultiply(this.getIterationA().transpose()).onMatching(this.getIterationC(),
+                            SUBTRACT);
 
                     this.getSolutionQ(rhs, iterX);
                 }
@@ -285,7 +285,7 @@ final class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> iterB = this.getIterationB();
 
             final MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
-            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB).get();
+            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).get();
 
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);

@@ -28,6 +28,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -193,6 +194,38 @@ public class StoreProblems extends MatrixStoreTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/330
+     */
+    @Test
+    public void testGitHubIssue330() {
+
+        double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
+
+        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
+        Primitive64Store m = storeFactory.rows(data);
+        Primitive64Store r = storeFactory.make(m.countRows(), m.countColumns());
+
+        QR<Double> qr = QR.PRIMITIVE.make(true);
+        qr.decompose(m);
+
+        if (DEBUG) {
+            BasicLogger.debug("Original", m);
+            BasicLogger.debug("Q", qr.getQ());
+            BasicLogger.debug("R", qr.getR());
+            BasicLogger.debug("Receiver (before)", r);
+        }
+
+        // java.lang.ArrayIndexOutOfBoundsException was thrown here
+        qr.getR().supplyTo(r);
+
+        if (DEBUG) {
+            BasicLogger.debug("Receiver (after)", r);
+        }
+
+        TestUtils.assertEquals(qr.getR(), r);
+    }
+
+    /**
      * https://github.com/optimatika/ojAlgo/issues/55
      */
     @Test
@@ -248,7 +281,7 @@ public class StoreProblems extends MatrixStoreTests {
         Primitive64Store x = Primitive64Store.FACTORY.rows(_x);
         Primitive64Store y = Primitive64Store.FACTORY.rows(_y);
 
-        ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveMath.SUBTRACT);
+        ElementsSupplier<Double> diff = y.onMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
         TestUtils.assertEquals(Primitive64Store.FACTORY.rows(exp), diff.get());

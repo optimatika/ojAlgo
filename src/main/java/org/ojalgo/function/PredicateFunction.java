@@ -26,11 +26,29 @@ import java.util.function.Predicate;
 
 public interface PredicateFunction<N extends Comparable<N>> extends BasicFunction, Predicate<N>, DoublePredicate {
 
+    default boolean invoke(final byte arg) {
+        return this.invoke((double) arg);
+    }
+
     boolean invoke(double arg);
 
-    boolean invoke(float arg);
+    default boolean invoke(final float arg) {
+        return this.invoke((double) arg);
+    }
+
+    default boolean invoke(final int arg) {
+        return this.invoke((double) arg);
+    }
+
+    default boolean invoke(final long arg) {
+        return this.invoke((double) arg);
+    }
 
     boolean invoke(N arg);
+
+    default boolean invoke(final short arg) {
+        return this.invoke((double) arg);
+    }
 
     default PredicateFunction<N> negate() {
         return new PredicateFunction<N>() {
