@@ -11,11 +11,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+
+## [48.4.2] – 2021-04-22
+
 ### Added
 
 #### org.ojalgo.function
 
 - Additional default methods for primitive arguments
+
+### Deprecated
+
+#### org.ojalgo.structure
+
+- The various `operateOn*(...)` methods have been deprecated and replaced by simply `on*(...)`
 
 ### Fixed
 
@@ -23,6 +32,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Fixed bug in LowerTriangularStore and UpperTriangularStore regarding shape/range information: https://github.com/optimatika/ojAlgo/issues/330
 - Fixed problem regarding extraction of the Q and R matrices from QR decomposition for fat matrices. (One of the QR decomposition implementations had this problem.)
+
 
 ## [48.4.1] – 2021-03-18
 
