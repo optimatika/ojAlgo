@@ -11,6 +11,23 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.matrix
+
+- New interface `Matrix2D` common to both `BasicMatrix` (implements it) and `MatrixStore` (extends it).
+
+### Removed
+
+#### org.ojalgo.matrix
+
+- The entire package `org.ojalgo.matrix.geometry` has been removed. Not deprecated, removed directly. It was never finished, not tested, and now it was in the way of refactoring other matrix stuff. Anything it did can just as well be done with the normal matrix classes.
+
+### Changed
+
+#### org.ojalgo.structure
+
+- The nested interfaces `Mutate1D.ModifiableReceiver`, `Mutate2D.ModifiableReceiver` and `MutateAnyD.ModifiableReceiver` now also extend `Access*D` which makes them aligned with the requirements of the `Transformation*D` interfaces.
 
 ## [48.4.2] – 2021-04-22
 
@@ -1175,7 +1192,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 The first version to require Java 8!
 
 
-## [37.0.0] / [37.1.0]
+## [37.0.0] / [37.1.0] / [37.1.1]
 
 ### Changed
 

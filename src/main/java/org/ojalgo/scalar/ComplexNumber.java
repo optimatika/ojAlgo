@@ -754,7 +754,7 @@ public final class ComplexNumber
     }
 
     @Override
-    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
+    public <T extends ModifiableReceiver<Double>> void transform(final T transformable) {
 
         final double s = myRealValue;
 
@@ -802,7 +802,7 @@ public final class ComplexNumber
         }
     }
 
-    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformWhenUnit(final T transformable) {
+    <T extends ModifiableReceiver<Double>> void transformWhenUnit(final T transformable) {
 
         final double s = this.doubleValue();
 

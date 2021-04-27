@@ -50,7 +50,7 @@ import org.ojalgo.structure.Structure2D;
 public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
     public static final class DenseReceiver extends
-            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.DenseReceiver {
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Mutator<PhysicalStore<ComplexNumber>> {
 
         DenseReceiver(final Factory enclosing, final PhysicalStore<ComplexNumber> delegate) {
             enclosing.super(delegate);
@@ -101,7 +101,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     public static final class SparseReceiver extends
-            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.SparseReceiver {
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Mutator<SparseStore<ComplexNumber>> {
 
         SparseReceiver(final Factory enclosing, final SparseStore<ComplexNumber> delegate) {
             enclosing.super(delegate);
@@ -118,6 +118,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
         super(aStore);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ComplexMatrix.DenseReceiver copy() {
         return new ComplexMatrix.DenseReceiver(FACTORY, this.getStore().copy());

@@ -50,7 +50,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD.Receiver<N>> extends StructureAnyD {
+    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD> extends StructureAnyD {
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 

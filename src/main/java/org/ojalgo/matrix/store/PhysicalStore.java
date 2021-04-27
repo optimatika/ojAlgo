@@ -49,7 +49,7 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
 
@@ -147,7 +147,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
         if (this != receiver) {
             receiver.fillMatching(this);
         } else {
-            BasicLogger.error("Why do you this!");
+            BasicLogger.error("Why do you do this!");
         }
     }
 

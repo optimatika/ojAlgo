@@ -246,11 +246,13 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     /**
-     * A utility interface to simplify declaring to implement "everything mutable".
+     * Apart from extending {@link Receiver} this interface extends {@link Modifiable} and
+     * {@link Exchangeable} which both imply access to existing elements as well as {@link Access2D} that
+     * dictates explicit access.
      *
      * @author apete
      */
-    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Exchangeable {
+    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Exchangeable, Access2D<N> {
 
         void modifyAny(Transformation2D<N> modifier);
 

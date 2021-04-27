@@ -135,11 +135,10 @@ public interface Mutate1D extends Structure1D {
     }
 
     /**
-     * A utility interface to simplify declaring to implement "everything mutable".
-     *
+     * @see Mutate2D.ModifiableReceiver
      * @author apete
      */
-    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N> {
+    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Access1D<N> {
 
         void modifyAny(Transformation1D<N> modifier);
 

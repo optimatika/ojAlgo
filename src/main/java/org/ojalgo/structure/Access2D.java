@@ -69,7 +69,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends Mutate2D.Receiver<N>> extends Structure2D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate2D> extends Structure2D {
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 

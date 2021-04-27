@@ -19,16 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.structure;
+package org.ojalgo.matrix;
+
+import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.algebra.Operation;
+import org.ojalgo.algebra.ScalarOperation;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.structure.Access2D;
 
 /**
- * Represents an in-place transformation of a 2D data structure – the transformable is mutated.
+ * Definition of what's common to {@link BasicMatrix} and {@link MatrixStore}. At this point, at least, it is
+ * not recommended to write any code in terms of this interface. It's new, the definition may change and it
+ * may even be removed again.
  *
  * @author apete
  */
-@FunctionalInterface
-public interface Transformation2D<N extends Comparable<N>> {
-
-    <T extends Mutate2D.ModifiableReceiver<N>> void transform(T transformable);
+public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
+        extends Access2D<N>, Access2D.Aggregatable<N>, NormedVectorSpace<M, N>, Operation.Subtraction<M>, Operation.Multiplication<M>,
+        ScalarOperation.Addition<M, N>, ScalarOperation.Subtraction<M, N>, ScalarOperation.Division<M, N> {
 
 }

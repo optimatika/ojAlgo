@@ -949,23 +949,23 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public TransformableRegion<N> regionByColumns(final int... columns) {
-        return new TransformableRegion.ColumnsRegion<>(this, multiplyBoth, columns);
+        return new Subregion2D.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new TransformableRegion.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new TransformableRegion.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public TransformableRegion<N> regionByRows(final int... rows) {
-        return new TransformableRegion.RowsRegion<>(this, multiplyBoth, rows);
+        return new Subregion2D.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public TransformableRegion<N> regionByTransposing() {
-        return new TransformableRegion.TransposedRegion<>(this, multiplyBoth);
+        return new Subregion2D.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {

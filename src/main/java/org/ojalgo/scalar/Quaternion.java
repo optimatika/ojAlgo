@@ -46,7 +46,7 @@ public final class Quaternion
         private final int myIndex;
         private final double[] myVector;
 
-        private RotationAxis(final int index, final double[] axis) {
+        RotationAxis(final int index, final double[] axis) {
             myIndex = index;
             myVector = axis;
         }
@@ -942,7 +942,7 @@ public final class Quaternion
     }
 
     @Override
-    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
+    public <T extends ModifiableReceiver<Double>> void transform(final T transformable) {
 
         final double s = myScalar;
 
@@ -1104,7 +1104,7 @@ public final class Quaternion
         return retVal;
     }
 
-    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformVersor(final T transformable) {
+    <T extends ModifiableReceiver<Double>> void transformVersor(final T transformable) {
 
         final double s = this.doubleValue();
 

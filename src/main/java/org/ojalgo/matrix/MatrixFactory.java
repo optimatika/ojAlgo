@@ -24,6 +24,7 @@ package org.ojalgo.matrix;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
@@ -47,16 +48,8 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
+public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, LB extends BasicMatrix.LogicalBuilder<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>, SR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>>
         implements Factory2D.MayBeSparse<M, DR, SR> {
-
-    abstract class DenseReceiver extends Physical<PhysicalStore<N>> {
-
-        DenseReceiver(final PhysicalStore<N> delegate) {
-            super(delegate);
-        }
-
-    }
 
     @SuppressWarnings("unchecked")
     abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
@@ -72,22 +65,22 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             this(store.logical());
         }
 
-        public B above(final long numberOfRows) {
+        public LB above(final long numberOfRows) {
             myDelegate.above(numberOfRows);
             return this.self();
         }
 
-        public B above(final M... above) {
+        public LB above(final M... above) {
             myDelegate.above(this.cast(above));
             return this.self();
         }
 
-        public B above(final M matrix) {
+        public LB above(final M matrix) {
             myDelegate.above(this.cast(matrix));
             return this.self();
         }
 
-        public B above(final M above1, final M above2) {
+        public LB above(final M above1, final M above2) {
             myDelegate.above(this.cast(above1, above2));
             return this.self();
         }
@@ -96,27 +89,27 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B above(final N... elements) {
+        public LB above(final N... elements) {
             myDelegate.above(elements);
             return this.self();
         }
 
-        public B below(final long numberOfRows) {
+        public LB below(final long numberOfRows) {
             myDelegate.below(numberOfRows);
             return this.self();
         }
 
-        public B below(final M... below) {
+        public LB below(final M... below) {
             myDelegate.below(this.cast(below));
             return this.self();
         }
 
-        public B below(final M matrix) {
+        public LB below(final M matrix) {
             myDelegate.below(this.cast(matrix));
             return this.self();
         }
 
-        public B below(final M below1, final M below2) {
+        public LB below(final M below1, final M below2) {
             myDelegate.below(this.cast(below1, below2));
             return this.self();
         }
@@ -125,12 +118,12 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B below(final N... elements) {
+        public LB below(final N... elements) {
             myDelegate.below(elements);
             return this.self();
         }
 
-        public B bidiagonal(final boolean upper) {
+        public LB bidiagonal(final boolean upper) {
             myDelegate.bidiagonal(upper);
             return this.self();
         }
@@ -139,12 +132,12 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
          */
         @Deprecated
-        public B bidiagonal(final boolean upper, final boolean assumeOne) {
+        public LB bidiagonal(final boolean upper, final boolean assumeOne) {
             myDelegate.bidiagonal(upper, assumeOne);
             return this.self();
         }
 
-        public B columns(final int[] columns) {
+        public LB columns(final int[] columns) {
             myDelegate.column(columns);
             return this.self();
         }
@@ -153,7 +146,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48 Use {@link BasicMatrix#conjugate()} instead
          */
         @Deprecated
-        public B conjugate() {
+        public LB conjugate() {
             myDelegate.conjugate();
             return this.self();
         }
@@ -166,12 +159,12 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return myDelegate.countRows();
         }
 
-        public B diagonal() {
+        public LB diagonal() {
             myDelegate.diagonal();
             return this.self();
         }
 
-        public B diagonally(final M... diagonally) {
+        public LB diagonally(final M... diagonally) {
             myDelegate.diagonally(this.cast(diagonally));
             return this.self();
         }
@@ -184,32 +177,32 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B hermitian(final boolean upper) {
+        public LB hermitian(final boolean upper) {
             myDelegate.hermitian(upper);
             return this.self();
         }
 
-        public B hessenberg(final boolean upper) {
+        public LB hessenberg(final boolean upper) {
             myDelegate.hessenberg(upper);
             return this.self();
         }
 
-        public B left(final long numberOfColumns) {
+        public LB left(final long numberOfColumns) {
             myDelegate.left(numberOfColumns);
             return this.self();
         }
 
-        public B left(final M... left) {
+        public LB left(final M... left) {
             myDelegate.left(this.cast(left));
             return this.self();
         }
 
-        public B left(final M matrix) {
+        public LB left(final M matrix) {
             myDelegate.left(this.cast(matrix));
             return this.self();
         }
 
-        public B left(final M left1, final M left2) {
+        public LB left(final M left1, final M left2) {
             myDelegate.left(this.cast(left1, left2));
             return this.self();
         }
@@ -218,42 +211,42 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B left(final N... elements) {
+        public LB left(final N... elements) {
             myDelegate.left(elements);
             return this.self();
         }
 
-        public B limits(final long rowLimit, final long columnLimit) {
+        public LB limits(final long rowLimit, final long columnLimit) {
             myDelegate.limits(rowLimit, columnLimit);
             return this.self();
         }
 
-        public B offsets(final long rowOffset, final long columnOffset) {
+        public LB offsets(final long rowOffset, final long columnOffset) {
             myDelegate.offsets(rowOffset, columnOffset);
             return this.self();
         }
 
-        public B repeat(final int rowsRepetitions, final int columnsRepetitions) {
+        public LB repeat(final int rowsRepetitions, final int columnsRepetitions) {
             myDelegate.repeat(rowsRepetitions, columnsRepetitions);
             return this.self();
         }
 
-        public B right(final long numberOfColumns) {
+        public LB right(final long numberOfColumns) {
             myDelegate.right(numberOfColumns);
             return this.self();
         }
 
-        public B right(final M... right) {
+        public LB right(final M... right) {
             myDelegate.right(this.cast(right));
             return this.self();
         }
 
-        public B right(final M matrix) {
+        public LB right(final M matrix) {
             myDelegate.right(this.cast(matrix));
             return this.self();
         }
 
-        public B right(final M right1, final M right2) {
+        public LB right(final M right1, final M right2) {
             myDelegate.right(this.cast(right1, right2));
             return this.self();
         }
@@ -262,12 +255,12 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B right(final N... elements) {
+        public LB right(final N... elements) {
             myDelegate.right(elements);
             return this.self();
         }
 
-        public B rows(final int[] rows) {
+        public LB rows(final int[] rows) {
             myDelegate.row(rows);
             return this.self();
         }
@@ -276,7 +269,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B superimpose(final int row, final int col, final M matrix) {
+        public LB superimpose(final int row, final int col, final M matrix) {
             myDelegate.superimpose(row, col, matrix.getStore());
             return this.self();
         }
@@ -285,7 +278,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B superimpose(final int row, final int col, final N matrix) {
+        public LB superimpose(final int row, final int col, final N matrix) {
             myDelegate.superimpose(row, col, matrix);
             return this.self();
         }
@@ -294,7 +287,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48
          */
         @Deprecated
-        public B superimpose(final M matrix) {
+        public LB superimpose(final M matrix) {
             myDelegate.superimpose(matrix.getStore());
             return this.self();
         }
@@ -307,17 +300,17 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
          * @deprecated v48 Use {@link BasicMatrix#transpose()} instead
          */
         @Deprecated
-        public B transpose() {
+        public LB transpose() {
             myDelegate.transpose();
             return this.self();
         }
 
-        public B triangular(final boolean upper, final boolean assumeOne) {
+        public LB triangular(final boolean upper, final boolean assumeOne) {
             myDelegate.triangular(upper, assumeOne);
             return this.self();
         }
 
-        public B tridiagonal() {
+        public LB tridiagonal() {
             myDelegate.tridiagonal();
             return this.self();
         }
@@ -341,16 +334,16 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return retVal;
         }
 
-        abstract B self();
+        abstract LB self();
 
     }
 
-    abstract class Physical<PR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>> implements BasicMatrix.PhysicalReceiver<N, M> {
+    abstract class Mutator<PR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>> implements Mutate2D.ModifiableReceiver<N>, Supplier<M> {
 
         private final PR myDelegate;
         private boolean mySafe = true;
 
-        Physical(final PR delegate) {
+        Mutator(final PR delegate) {
 
             super();
 
@@ -465,6 +458,14 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             }
         }
 
+        /**
+         * @deprecated v49 Just use {@link #get()} instead
+         */
+        @Deprecated
+        public M build() {
+            return this.get();
+        }
+
         public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillColumn(row, col, supplier);
@@ -507,7 +508,23 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         public void fillDiagonal(final long row, final long column, final N value) {
             if (mySafe) {
-                myDelegate.fillDiagonal((int) row, (int) column, myDelegate.physical().scalar().cast(value));
+                myDelegate.fillDiagonal(row, column, myDelegate.physical().scalar().cast(value));
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public double doubleValue(final long row, final long col) {
+            if (mySafe) {
+                return myDelegate.doubleValue(row, col);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public N get(final long row, final long col) {
+            if (mySafe) {
+                return myDelegate.get(row, col);
             } else {
                 throw new IllegalStateException();
             }
@@ -855,17 +872,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             }
         }
 
-        public final void supplyTo(final PhysicalStore<N> receiver) {
-            myDelegate.supplyTo(receiver);
-        }
-    }
-
-    abstract class SparseReceiver extends Physical<SparseStore<N>> {
-
-        SparseReceiver(final SparseStore<N> delegate) {
-            super(delegate);
-        }
-
     }
 
     private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> aTemplate) {
@@ -1026,7 +1032,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         }
     }
 
-    abstract B logical(final MatrixStore<N> delegate);
+    abstract LB logical(final MatrixStore<N> delegate);
 
     abstract DR physical(final PhysicalStore<N> delegate);
 
