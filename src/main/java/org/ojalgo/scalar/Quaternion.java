@@ -36,8 +36,7 @@ import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-public final class Quaternion
-        implements SelfDeclaringScalar<Quaternion>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D> {
 
     public enum RotationAxis {
 
@@ -763,7 +762,7 @@ public final class Quaternion
     }
 
     @Override
-    public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
+    public void supplyTo(final Mutate2D receiver) {
         receiver.set(0L, myScalar);
         receiver.set(1L, i);
         receiver.set(2L, j);

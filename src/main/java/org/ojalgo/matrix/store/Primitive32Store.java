@@ -746,6 +746,30 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.modifyRow(row, modifier);
     }
 
+    public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
+
+        Primitive32Store retVal = FACTORY.make(myRowDim, right.countColumns());
+
+        if (right instanceof Primitive32Store) {
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, Primitive32Store.cast(right).data);
+        } else {
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+        }
+
+        return retVal;
+    }
+
+    public Double multiplyBoth(final Access1D<Double> leftAndRight) {
+
+        PhysicalStore<Double> tmpStep1 = FACTORY.make(1L, leftAndRight.count());
+        PhysicalStore<Double> tmpStep2 = FACTORY.make(1L, 1L);
+
+        tmpStep1.fillByMultiplying(leftAndRight, this);
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
+
     public ElementView1D<Double, ?> nonzeros() {
         return myUtility.nonzeros();
     }

@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Transformation2D;
 
@@ -230,15 +229,6 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
             return this.getContext().countColumns();
         }
 
-        public MatrixStore<N> get() {
-
-            final PhysicalStore<N> retVal = this.physical().makeZero(this.getContext().countRows(), this.getContext().countColumns());
-
-            this.supplyTo(retVal);
-
-            return retVal;
-        }
-
         public ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
             return this.getContext().onAll(operator);
         }
@@ -290,10 +280,6 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
     public long countRows() {
         return myContext.countRows();
-    }
-
-    public final Factory<N, ?> physical() {
-        return myContext.physical();
     }
 
     @Override

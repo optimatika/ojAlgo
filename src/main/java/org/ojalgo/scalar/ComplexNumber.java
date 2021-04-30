@@ -43,7 +43,7 @@ import org.ojalgo.type.context.NumberContext;
  * @see org.ojalgo.function.ComplexFunction
  */
 public final class ComplexNumber
-        implements SelfDeclaringScalar<ComplexNumber>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+        implements SelfDeclaringScalar<ComplexNumber>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D> {
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
@@ -662,7 +662,7 @@ public final class ComplexNumber
     }
 
     @Override
-    public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
+    public void supplyTo(final Mutate2D receiver) {
         receiver.set(0L, myRealValue);
         receiver.set(1L, i);
         receiver.set(2L, -i);

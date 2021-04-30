@@ -130,7 +130,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         clock.reset();
 
-        SparsePerformance.touchNonzeros(mtrx.premultiply(ones).get());
+        SparsePerformance.touchNonzeros(mtrx.premultiply(ones).collect(Primitive64Store.FACTORY));
 
         TestUtils.assertFasterThan(5, CalendarDateUnit.SECOND, clock);
     }

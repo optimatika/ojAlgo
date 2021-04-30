@@ -29,6 +29,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -247,7 +248,7 @@ public class StoreProblems extends MatrixStoreTests {
         m2.set(0, 0, 1.0);
 
         TestUtils.assertEquals(mAdd, m2.multiply(eye));
-        TestUtils.assertEquals(mAdd, eye.premultiply(m2).get());
+        TestUtils.assertEquals(mAdd, eye.premultiply(m2).collect(Primitive64Store.FACTORY));
 
         final SparseStore<Double> a = SparseStore.PRIMITIVE64.make(3, 3);
         a.set(1, 1, 1.0);
@@ -278,14 +279,16 @@ public class StoreProblems extends MatrixStoreTests {
         double[][] _y = { { 0, 0, 0 }, { 1, 1, 1 }, { 2, 2, 2 } };
         double[][] exp = { { 1.0, 2.0, 3.0 }, { 3.0, 4.0, 5.0 }, { 5.0, 6.0, 7.0 } };
 
-        Primitive64Store x = Primitive64Store.FACTORY.rows(_x);
-        Primitive64Store y = Primitive64Store.FACTORY.rows(_y);
+        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+
+        Primitive64Store x = factory.rows(_x);
+        Primitive64Store y = factory.rows(_y);
 
         ElementsSupplier<Double> diff = y.onMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
-        TestUtils.assertEquals(Primitive64Store.FACTORY.rows(exp), diff.get());
-        TestUtils.assertEquals(Primitive64Store.FACTORY.columns(exp), transp.get());
+        TestUtils.assertEquals(factory.rows(exp), diff.collect(factory));
+        TestUtils.assertEquals(factory.columns(exp), transp.collect(factory));
     }
 
 }

@@ -45,6 +45,8 @@ import org.ojalgo.type.context.NumberContext;
 
 public class LinearProblems extends OptimisationLinearTests {
 
+    private static final NumberContext ACCURACY = NumberContext.of(7, 6);
+
     /**
      * https://github.com/optimatika/ojAlgo/issues/117 <br>
      * Problem was getting different state after second solve.
@@ -94,115 +96,93 @@ public class LinearProblems extends OptimisationLinearTests {
         Variable tmpX5 = new Variable("X5").weight(TENTH.multiply(SIX)).lower(FIVE);
         Variable tmpX6 = new Variable("X6").weight(TENTH.multiply(FOUR)).lower(ZERO);
 
-        Variable[] tmpFullVars = new Variable[] { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
-        Variable[] tmpOddVars = new Variable[] { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
-        Variable[] tmpEvenVars = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
+        Variable[] varsFull = new Variable[] { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
+        Variable[] varsOdd = new Variable[] { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
+        Variable[] varsEven = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
 
-        ExpressionsBasedModel tmpFullModel = new ExpressionsBasedModel(tmpFullVars);
-        //tmpFullModel.setMaximisation();
+        ExpressionsBasedModel modFull = new ExpressionsBasedModel(varsFull);
+        ExpressionsBasedModel modOdd = new ExpressionsBasedModel(varsOdd);
+        ExpressionsBasedModel modEven = new ExpressionsBasedModel(varsEven);
 
-        ExpressionsBasedModel tmpOddModel = new ExpressionsBasedModel(tmpOddVars);
-        //tmpOddModel.setMaximisation();
-
-        ExpressionsBasedModel tmpEvenModel = new ExpressionsBasedModel(tmpEvenVars);
-        //tmpEvenModel.setMaximisation();
-
-        //        tmpFullModel.options.debug(LinearSolver.class);
-        //        tmpOddModel.options.debug(LinearSolver.class);
-        //        tmpEvenModel.options.debug(LinearSolver.class);
+        //        modFull.options.debug(LinearSolver.class);
+        //        modOdd.options.debug(LinearSolver.class);
+        //        modEven.options.debug(LinearSolver.class);
 
         BigDecimal tmpRHS = new BigDecimal("23.0");
-        int tmpLength = tmpFullModel.countVariables();
 
-        Expression retVal = tmpFullModel.addExpression("C1");
-
-        for (int i = 0; i < tmpLength; i++) {
-            retVal.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
+        Expression constr1Full = modFull.addExpression("C1");
+        for (int i = 0; i < modFull.countVariables(); i++) {
+            constr1Full.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
         }
+        constr1Full.level(tmpRHS);
 
-        Expression tmpAddWeightExpression = retVal;
-        tmpAddWeightExpression.level(tmpRHS);
-        int tmpLength1 = tmpOddModel.countVariables();
-
-        Expression retVal1 = tmpOddModel.addExpression("C1");
-
-        for (int i = 0; i < tmpLength1; i++) {
-            retVal1.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+        Expression constr1Odd = modOdd.addExpression("C1");
+        for (int i = 0; i < modOdd.countVariables(); i++) {
+            constr1Odd.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
-        Expression tmpAddWeightExpression2 = retVal1;
-        tmpAddWeightExpression2.level(tmpRHS);
-        int tmpLength2 = tmpFullModel.countVariables();
+        constr1Odd.level(tmpRHS);
 
-        Expression retVal2 = tmpFullModel.addExpression("C2");
-
-        for (int i = 0; i < tmpLength2; i++) {
-            retVal2.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
+        Expression constr2Full = modFull.addExpression("C2");
+        for (int i = 0; i < modFull.countVariables(); i++) {
+            constr2Full.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
         }
+        constr2Full.level(tmpRHS);
 
-        Expression tmpAddWeightExpression3 = retVal2;
-        tmpAddWeightExpression3.level(tmpRHS);
-        int tmpLength3 = tmpEvenModel.countVariables();
-
-        Expression retVal3 = tmpEvenModel.addExpression("C2");
-
-        for (int i = 0; i < tmpLength3; i++) {
-            retVal3.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+        Expression constr2Even = modEven.addExpression("C2");
+        for (int i = 0; i < modEven.countVariables(); i++) {
+            constr2Even.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
-        Expression tmpAddWeightExpression4 = retVal3;
-        tmpAddWeightExpression4.level(tmpRHS);
-
-        Expression tmpFullObjective = tmpFullModel.objective();
-        Expression tmpOddObjective = tmpOddModel.objective();
-        Expression tmpEvenObjective = tmpEvenModel.objective();
+        constr2Even.level(tmpRHS);
 
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
-        BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        Primitive64Matrix.DenseReceiver tmpBuilder = Primitive64Matrix.FACTORY.makeDense(6, 1);
-        tmpBuilder.set(0, 0, 10);
-        tmpBuilder.set(2, 0, 8);
-        tmpBuilder.set(4, 0, 5);
-        tmpBuilder.set(5, 0, 23);
-        Primitive64Matrix tmpFullSolution = tmpBuilder.build();
-        int[] someRows = { 0, 2, 4 };
-        Primitive64Matrix tmpOddSolution = tmpFullSolution.logical().rows(someRows).get();
-        int[] someRows1 = { 1, 3, 5 };
-        Primitive64Matrix tmpEvenSolution = tmpFullSolution.logical().rows(someRows1).get();
-        TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
-        Double tmpActualValue = tmpFullObjective.toFunction().invoke(Primitive64Store.FACTORY.copy(tmpFullSolution));
+        BigDecimal claimedValue = new BigDecimal("25.8");
+
+        Primitive64Matrix.DenseReceiver solutionBuilder = Primitive64Matrix.FACTORY.makeDense(6, 1);
+        solutionBuilder.set(0, 0, 10);
+        solutionBuilder.set(2, 0, 8);
+        solutionBuilder.set(4, 0, 5);
+        solutionBuilder.set(5, 0, 23);
+        Primitive64Matrix claimedSolutionFull = solutionBuilder.get();
+        Primitive64Matrix claimedSolutionOdd = claimedSolutionFull.logical().rows(new int[] { 0, 2, 4 }).get();
+        Primitive64Matrix claimedSolutionEven = claimedSolutionFull.logical().rows(new int[] { 1, 3, 5 }).get();
+
+        TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(BigArray.FACTORY.copy(claimedSolutionFull), ACCURACY));
+
+        Double tmpActualValue = modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(claimedSolutionFull));
         //  BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
         //JUnitUtils.assertEquals("Claimed objective value wrong!", 0, tmpClaimedValue.compareTo(tmpActualValue));
-        TestUtils.assertEquals(tmpClaimedValue, tmpActualValue, new NumberContext(7, 6));
+        TestUtils.assertEquals(claimedValue, tmpActualValue, ACCURACY);
 
         // Start validating ojAlgo results
 
-        Optimisation.Result tmpEvenResult = tmpEvenModel.maximise();
-        Optimisation.Result tmpOddResult = tmpOddModel.maximise();
-        Optimisation.Result tmpFullResult = tmpFullModel.maximise();
+        Optimisation.Result tmpEvenResult = modEven.maximise();
+        Optimisation.Result tmpOddResult = modOdd.maximise();
+        Optimisation.Result tmpFullResult = modFull.maximise();
 
-        TestUtils.assertEquals(true, tmpEvenModel.validate(tmpEvenResult, new NumberContext(7, 6)));
-        TestUtils.assertEquals(true, tmpOddModel.validate(tmpOddResult, new NumberContext(7, 6)));
-        TestUtils.assertEquals(true, tmpFullModel.validate(tmpFullResult, new NumberContext(7, 6)));
+        TestUtils.assertEquals(true, modEven.validate(tmpEvenResult, ACCURACY));
+        TestUtils.assertEquals(true, modOdd.validate(tmpOddResult, ACCURACY));
+        TestUtils.assertEquals(true, modFull.validate(tmpFullResult, ACCURACY));
         int[] someRows2 = { 0, 1, 2 };
 
-        TestUtils.assertEquals(tmpEvenSolution, RationalMatrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows2).get(), new NumberContext(7, 6));
+        TestUtils.assertEquals(claimedSolutionEven, RationalMatrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows2).get(), ACCURACY);
         int[] someRows3 = { 0, 1, 2 };
-        TestUtils.assertEquals(tmpOddSolution, RationalMatrix.FACTORY.columns(tmpOddResult).logical().rows(someRows3).get(), new NumberContext(7, 6));
+        TestUtils.assertEquals(claimedSolutionOdd, RationalMatrix.FACTORY.columns(tmpOddResult).logical().rows(someRows3).get(), ACCURACY);
         int[] someRows4 = { 0, 1, 2, 3, 4, 5 };
-        TestUtils.assertEquals(tmpFullSolution, RationalMatrix.FACTORY.columns(tmpFullResult).logical().rows(someRows4).get(), new NumberContext(7, 6));
+        TestUtils.assertEquals(claimedSolutionFull, RationalMatrix.FACTORY.columns(tmpFullResult).logical().rows(someRows4).get(), ACCURACY);
         int[] someRows5 = { 0, 1, 2 };
 
-        BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction()
+        BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modEven.objective().toFunction()
                 .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows5).get()))));
         int[] someRows6 = { 0, 1, 2 };
-        BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction()
+        BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modOdd.objective().toFunction()
                 .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpOddResult).logical().rows(someRows6).get()))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
-        BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction()
+        BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modFull.objective().toFunction()
                 .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpFullResult).logical().rows(someRows7).get()))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
-        TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));
+        TestUtils.assertEquals(0, claimedValue.compareTo(tmpFullValue));
     }
 
     /**

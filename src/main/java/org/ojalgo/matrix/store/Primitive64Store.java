@@ -893,7 +893,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
 
-        final Primitive64Store retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
+        Primitive64Store retVal = FACTORY.make(myRowDim, right.countColumns());
 
         if (right instanceof Primitive64Store) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, Primitive64Store.cast(right).data);
@@ -906,8 +906,8 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public Double multiplyBoth(final Access1D<Double> leftAndRight) {
 
-        final PhysicalStore<Double> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
-        final PhysicalStore<Double> tmpStep2 = FACTORY.makeZero(1L, 1L);
+        PhysicalStore<Double> tmpStep1 = FACTORY.make(1L, leftAndRight.count());
+        PhysicalStore<Double> tmpStep2 = FACTORY.make(1L, 1L);
 
         tmpStep1.fillByMultiplying(leftAndRight, this);
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);

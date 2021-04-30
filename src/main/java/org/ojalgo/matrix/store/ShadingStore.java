@@ -37,6 +37,7 @@ abstract class ShadingStore<N extends Comparable<N>> extends LogicalStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
 
         consumer.reset();

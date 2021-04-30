@@ -372,9 +372,18 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         @Deprecated
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore);
+                myStore = new UpperHermitianStore<>(myStore, true);
             } else {
-                myStore = new LowerHermitianStore<>(myStore);
+                myStore = new LowerHermitianStore<>(myStore, true);
+            }
+            return this;
+        }
+
+        public LogicalBuilder<N> symmetric(final boolean upper) {
+            if (upper) {
+                myStore = new UpperHermitianStore<>(myStore, false);
+            } else {
+                myStore = new LowerHermitianStore<>(myStore, false);
             }
             return this;
         }
@@ -752,7 +761,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> add(final MatrixStore<N> addend) {
-        return this.onMatching(this.physical().function().add(), addend).get();
+        return this.onMatching(this.physical().function().add(), addend).collect(this.physical());
     }
 
     default MatrixStore<N> add(final N scalarAddend) {
@@ -1193,7 +1202,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.onMatching(this.physical().function().subtract(), subtrahend).get();
+        return this.onMatching(this.physical().function().subtract(), subtrahend).collect(this.physical());
     }
 
     default MatrixStore<N> subtract(final N scalarSubtrahend) {
@@ -1218,5 +1227,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
         visitor.invoke(this.get(row, col));
     }
+
+    PhysicalStore.Factory<N, ?> physical();
 
 }

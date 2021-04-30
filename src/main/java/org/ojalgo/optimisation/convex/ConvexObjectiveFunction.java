@@ -21,8 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
@@ -61,7 +59,7 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
     }
 
     public MatrixStore<Double> getGradient(final Access1D<Double> point) {
-        return myPureQuadratic.getGradient(point).onMatching(SUBTRACT, myLinear.getGradient(point)).get();
+        return myPureQuadratic.getGradient(point).subtract(myLinear.getGradient(point));
     }
 
     public MatrixStore<Double> getHessian(final Access1D<Double> point) {

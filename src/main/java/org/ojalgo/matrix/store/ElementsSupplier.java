@@ -21,13 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.util.function.Supplier;
-
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Stream2D;
+import org.ojalgo.structure.Operate2D;
 import org.ojalgo.structure.Transformation2D;
 
 /**
@@ -44,11 +43,7 @@ import org.ojalgo.structure.Transformation2D;
  * @author apete
  */
 public interface ElementsSupplier<N extends Comparable<N>>
-        extends Stream2D<N, MatrixStore<N>, TransformableRegion<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
-
-    default MatrixStore<N> get() {
-        return this.collect(this.physical());
-    }
+        extends Operate2D<N, MatrixStore<N>, ElementsSupplier<N>>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     default ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);
@@ -73,8 +68,6 @@ public interface ElementsSupplier<N extends Comparable<N>>
     default ElementsSupplier<N> onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
         return new MatrixPipeline.RowsModifier<>(this, operator, right);
     }
-
-    PhysicalStore.Factory<N, ?> physical();
 
     default ElementsSupplier<N> transpose() {
         return new MatrixPipeline.Transpose<>(this);

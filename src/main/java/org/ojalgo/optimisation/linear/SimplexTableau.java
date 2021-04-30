@@ -68,17 +68,18 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             super(matrices.countConstraints(), matrices.countVariables(), 0);
 
-            final int tmpConstraintsCount = this.countConstraints();
-            final int tmpVariablesCount = this.countVariables();
+            int constraintsCount = this.countConstraints();
+            int variablesCount = this.countVariables();
 
-            final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
-            tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, tmpConstraintsCount).get()).get());
+            MatrixStore.LogicalBuilder<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
+            tableauBuilder = tableauBuilder
+                    .left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, constraintsCount).get()).get());
 
-            if (tmpConstraintsCount >= 1) {
-                tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
+            if (constraintsCount >= 1) {
+                tableauBuilder = tableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(constraintsCount).get(), matrices.getBE());
             }
-            tmpTableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, tmpVariablesCount).get(),
-                    Primitive64Store.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
+            tableauBuilder = tableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, variablesCount).get(),
+                    Primitive64Store.FACTORY.makeFilled(1, constraintsCount, new NullaryFunction<Double>() {
 
                         public double doubleValue() {
                             return ONE;
@@ -90,13 +91,13 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                     }));
             //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
-            myTransposed = Primitive64Store.FACTORY.transpose(tmpTableauBuilder.get());
+            myTransposed = tableauBuilder.transpose().collect(Primitive64Store.FACTORY);
             myStructure = (int) myTransposed.countRows();
             // myTableau = LinearSolver.make(myTransposedTableau);
 
-            for (int i = 0; i < tmpConstraintsCount; i++) {
+            for (int i = 0; i < constraintsCount; i++) {
 
-                myTransposed.caxpy(NEG, i, tmpConstraintsCount + 1, 0);
+                myTransposed.caxpy(NEG, i, constraintsCount + 1, 0);
 
             }
 
