@@ -379,15 +379,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        public LogicalBuilder<N> symmetric(final boolean upper) {
-            if (upper) {
-                myStore = new UpperHermitianStore<>(myStore, false);
-            } else {
-                myStore = new LowerHermitianStore<>(myStore, false);
-            }
-            return this;
-        }
-
         public LogicalBuilder<N> hessenberg(final boolean upper) {
             if (upper) {
                 myStore = new UpperHessenbergStore<>(myStore);
@@ -444,6 +435,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public LogicalBuilder<N> offsets(final long rowOffset, final long columnOffset) {
             myStore = new OffsetStore<>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
+            return this;
+        }
+
+        public ElementsSupplier<N> operate() {
             return this;
         }
 
@@ -542,6 +537,15 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }
+        }
+
+        public LogicalBuilder<N> symmetric(final boolean upper) {
+            if (upper) {
+                myStore = new UpperHermitianStore<>(myStore, false);
+            } else {
+                myStore = new LowerHermitianStore<>(myStore, false);
+            }
+            return this;
         }
 
         @Override
@@ -1022,6 +1026,12 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new UnaryOperatoStore<>(this, operator);
     }
 
+    default ElementsSupplier<N> operate() {
+        return this;
+    }
+
+    PhysicalStore.Factory<N, ?> physical();
+
     /**
      * Multiply this matrix by itself {@code power} times.
      */
@@ -1227,7 +1237,5 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
         visitor.invoke(this.get(row, col));
     }
-
-    PhysicalStore.Factory<N, ?> physical();
 
 }

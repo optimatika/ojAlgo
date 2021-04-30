@@ -30,20 +30,18 @@ import org.ojalgo.structure.Operate2D;
 import org.ojalgo.structure.Transformation2D;
 
 /**
- * An elements supplier is not (yet) a matrix, but there are several matrix related things you can do with
- * them:
+ * An {@link ElementsSupplier} is not (yet) a matrix, but there are several matrix related things you can do
+ * with them:
  * <ol>
  * <li>You can query the size/shape of the (future) matrix.</li>
  * <li>You can supply the elements to an already existing matrix (or more precisely to an
- * {@linkplain TransformableRegion}) or collect them using a {@linkplain Factory2D}.</li>
+ * {@linkplain TransformableRegion}) or collect them into a new matrix using a {@linkplain Factory2D}.</li>
  * <li>You can define a stream of additional operations to be executed when the elements are extracted.</li>
- * <li>You can get that matrix</li>
  * </ol>
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Comparable<N>>
-        extends Operate2D<N, MatrixStore<N>, ElementsSupplier<N>>, Access2D.Collectable<N, TransformableRegion<N>> {
+public interface ElementsSupplier<N extends Comparable<N>> extends Operate2D<N, ElementsSupplier<N>>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     default ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);
@@ -57,11 +55,11 @@ public interface ElementsSupplier<N extends Comparable<N>>
         return new MatrixPipeline.ColumnsModifier<>(this, operator, right);
     }
 
-    default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+    default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
         return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
     }
 
-    default ElementsSupplier<N> onMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+    default ElementsSupplier<N> onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
         return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
     }
 

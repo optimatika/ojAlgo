@@ -104,6 +104,6 @@ public class ThresholdHouseholderLeft extends AbstractThresholdTuner {
     public Object tune() {
         decomposition.decompose(body);
         return decomposition.getSolution(rhs, allocated);
-    };
+    }
 
 }
