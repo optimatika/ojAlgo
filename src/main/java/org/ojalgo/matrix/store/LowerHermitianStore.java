@@ -25,8 +25,11 @@ import org.ojalgo.scalar.Scalar;
 
 final class LowerHermitianStore<N extends Comparable<N>> extends ShadingStore<N> {
 
-    LowerHermitianStore(final MatrixStore<N> base) {
+    private final boolean myHermitian;
+
+    LowerHermitianStore(final MatrixStore<N> base, final boolean hermitian) {
         super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));
+        myHermitian = hermitian;
     }
 
     public double doubleValue(final long row, final long col) {
@@ -38,12 +41,24 @@ final class LowerHermitianStore<N extends Comparable<N>> extends ShadingStore<N>
     }
 
     public N get(final long row, final long col) {
-        return this.toScalar(row, col).get();
+        if (myHermitian) {
+            return this.toScalar(row, col).get();
+        } else {
+            if (row < col) {
+                return this.base().get(col, row);
+            } else {
+                return this.base().get(row, col);
+            }
+        }
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row < col) {
-            return this.base().toScalar(col, row).conjugate();
+            if (myHermitian) {
+                return this.base().toScalar(col, row).conjugate();
+            } else {
+                return this.base().toScalar(col, row);
+            }
         } else {
             return this.base().toScalar(row, col);
         }

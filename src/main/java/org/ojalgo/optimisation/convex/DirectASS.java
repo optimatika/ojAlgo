@@ -102,7 +102,7 @@ final class DirectASS extends ActiveSetSolver {
                     this.getSolutionGeneral(rhs, iterL);
 
                     if (this.isLogDebug()) {
-                        this.log("RHS={}", rhs.get().toRawCopy1D());
+                        this.log("RHS={}", rhs.collect(Primitive64Store.FACTORY).toRawCopy1D());
                         this.log("Relative error {} in solution for L={}", NaN, Arrays.toString(iterL.toRawCopy1D()));
                     }
 
@@ -115,7 +115,7 @@ final class DirectASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final Primitive64Store tmpXL = Primitive64Store.FACTORY.makeZero(numbVars + numbConstr, 1L);
+            final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(numbVars + numbConstr, 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 

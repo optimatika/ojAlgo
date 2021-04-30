@@ -198,6 +198,11 @@ public interface Structure2D extends Structure1D {
 
         S get();
 
+        /**
+         * Similar to {@link #symmetric(boolean)} but in addition the mirrored elements are conjugated.
+         */
+        B hermitian(boolean upper);
+
         B hessenberg(boolean upper);
 
         B left(long numberOfColumns);
@@ -260,6 +265,23 @@ public interface Structure2D extends Structure1D {
         default B rows(final long[] rows) {
             return this.rows(Structure1D.toIntIndexes(rows));
         }
+
+        B superimpose(int row, int col, S matrix);
+
+        default B superimpose(final long row, final long col, final S matrix) {
+            return this.superimpose(Math.toIntExact(row), Math.toIntExact(col), matrix);
+        }
+
+        default B superimpose(final S matrix) {
+            return this.superimpose(0, 0, matrix);
+        }
+
+        /**
+         * Defines a symmetric {@link Structure2D} (matrix) by mirroring one half (diagonally) on the other.
+         *
+         * @param upper From where are the elements read?
+         */
+        B symmetric(boolean upper);
 
         B triangular(boolean upper, boolean assumeOne);
 

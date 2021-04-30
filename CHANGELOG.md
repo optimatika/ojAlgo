@@ -17,13 +17,25 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New interface `Matrix2D` common to both `BasicMatrix` (implements it) and `MatrixStore` (extends it).
 
+#### org.ojalgo.structure
+
+- A few additions to `Structure2D.Logical` like `symmetric(...)` and `superimpose(...)`
+
 ### Removed
 
 #### org.ojalgo.matrix
 
 - The entire package `org.ojalgo.matrix.geometry` has been removed. Not deprecated, removed directly. It was never finished, not tested, and now it was in the way of refactoring other matrix stuff. Anything it did can just as well be done with the normal matrix classes.
 
+#### org.ojalgo.structure
+
+- The interfaces `Stream*D` have been removed – they were redundant. The `Operate*D` interfaces replace them.
+
 ### Changed
+
+#### org.ojalgo.matrix
+
+- `ElementsSupplier` no longer extends `Supplier<MatrixStore<N>>` and no longer defines the method `PhysicalStore.Factory<N, ?> physical()`. Instead subinterfaces/implementors define corresponding functionality as needed.
 
 #### org.ojalgo.structure
 

@@ -87,22 +87,22 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
 
     private static <N extends Comparable<N>> void testMultiplication(final MatrixStore<N> anyStore) {
 
-        final PhysicalStore<N> tmpCopy = anyStore.copy();
+        PhysicalStore<N> tmpCopy = anyStore.copy();
 
-        final int tmpRowDim = (int) anyStore.countRows();
-        final int tmpColDim = (int) anyStore.countColumns();
-        final int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
+        int tmpRowDim = (int) anyStore.countRows();
+        int tmpColDim = (int) anyStore.countColumns();
+        int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
 
         // multiplyLeft
-        final MatrixStore<ComplexNumber> tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
-        final PhysicalStore<N> tmpLeft = anyStore.physical().copy(tmpLeftMtrx);
+        MatrixStore<ComplexNumber> tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
+        PhysicalStore<N> tmpLeft = anyStore.physical().copy(tmpLeftMtrx);
 
         MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
         MatrixStore<N> tmpActual = tmpLeft.multiply(anyStore);
         TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
-        tmpExpected = tmpCopy.premultiply(tmpLeft).get();
-        tmpActual = anyStore.premultiply(tmpLeft).get();
+        tmpExpected = tmpCopy.premultiply(tmpLeft).collect(anyStore.physical());
+        tmpActual = anyStore.premultiply(tmpLeft).collect(anyStore.physical());
         TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
         // multiplyRight
@@ -113,8 +113,8 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
         tmpActual = anyStore.multiply(tmpRight);
         TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
-        tmpExpected = tmpRight.premultiply(tmpCopy).get();
-        tmpActual = tmpRight.premultiply(anyStore).get();
+        tmpExpected = tmpRight.premultiply(tmpCopy).collect(anyStore.physical());
+        tmpActual = tmpRight.premultiply(anyStore).collect(anyStore.physical());
         TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
     }
 

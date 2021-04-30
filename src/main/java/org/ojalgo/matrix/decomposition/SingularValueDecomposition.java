@@ -385,7 +385,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         BinaryFunction<N> divide = this.function().divide();
 
-        MatrixStore<N> tmp = v.logical().limits(-1, rank).onColumns(divide, values).get();
+        MatrixStore<N> tmp = v.logical().limits(-1, rank).onColumns(divide, values).collect(v.physical());
 
         return tmp.multiply(tmp.transpose());
     }

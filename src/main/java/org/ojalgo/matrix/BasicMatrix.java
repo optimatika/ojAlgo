@@ -68,7 +68,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
+            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>>, Supplier<M> {
 
         default M build() {
             return this.get();
@@ -123,6 +123,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
     private final MatrixStore<N> myStore;
+    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient Boolean mySymmetric = null;
 
     @SuppressWarnings("unused")
@@ -138,6 +139,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         super();
 
         myStore = store;
+        myFactory = store.physical();
     }
 
     public M add(final double scalarAddend) {
@@ -505,7 +507,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
-        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
+        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).collect(myFactory)));
     }
 
     public M multiply(final N scalarMultiplicand) {
@@ -544,11 +546,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M reduceColumns(final Aggregator aggregator) {
-        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
+        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).collect(myFactory));
     }
 
     public M reduceRows(final Aggregator aggregator) {
-        return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
+        return this.getFactory().instantiate(myStore.reduceRows(aggregator).collect(myFactory));
     }
 
     public M signum() {

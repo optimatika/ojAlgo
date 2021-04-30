@@ -159,6 +159,8 @@ public interface Structure1D {
 
         B before(S before);
 
+        S get();
+
     }
 
     public final class LongIndex implements Comparable<LongIndex> {

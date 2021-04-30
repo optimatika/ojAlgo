@@ -41,10 +41,10 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
 
     AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
 
-        super(base, (int) (base.countRows() + below.countRows()), (int) base.countColumns());
+        super(base, base.countRows() + below.countRows(), base.countColumns());
 
         myBelow = below;
-        mySplit = (int) base.countRows();
+        mySplit = Math.toIntExact(base.countRows());
 
         if (base.countColumns() != below.countColumns()) {
             throw new IllegalArgumentException();

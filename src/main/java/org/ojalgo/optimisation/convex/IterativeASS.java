@@ -285,7 +285,7 @@ final class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> iterB = this.getIterationB();
 
             final MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
-            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).get();
+            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB).collect(Primitive64Store.FACTORY);
 
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);
