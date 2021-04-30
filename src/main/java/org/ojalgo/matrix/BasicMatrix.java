@@ -126,14 +126,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     private final PhysicalStore.Factory<N, ?> myFactory;
     private transient Boolean mySymmetric = null;
 
-    @SuppressWarnings("unused")
-    private BasicMatrix() {
-
-        this(null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     BasicMatrix(final MatrixStore<N> store) {
 
         super();
