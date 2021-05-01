@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
@@ -60,7 +59,7 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
         public InverterTask<N> make(final MatrixStore<N> template) {
-            return this.make(template, MatrixUtils.isHermitian(template), false);
+            return this.make(template, Access2D.isHermitian(template), false);
         }
 
         public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);

@@ -32,6 +32,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
@@ -477,10 +478,13 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20180614() {
 
+        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+
         // We start by creating a 5 x 7 matrix with rank 4.
         double[][] data = new double[][] { { 3, -6, 6, 9, 1, 3, 2 }, { -2, 4, 5, 3, 2, 7, 5 }, { -7, 14, 3, -4, 0, 0, 0 }, { 0, 0, -2, -2, 3, -5, -8 },
                 { -1, 2, 7, 6, 2, 0, -2 } };
-        MatrixStore<Double> matrixA = Primitive64Store.FACTORY.rows(data);
+
+        MatrixStore<Double> matrixA = factory.rows(data);
         // Print the matrix to verify it.
         if (DEBUG) {
             System.out.println("A matrix:\n" + matrixA);
@@ -494,8 +498,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         // Repeat this with a square matrix (padding with rows of zeros).
         int rows = data.length;
         int cols = data[0].length;
-        MatrixStore<Double> zeros = Primitive64Store.FACTORY.makeZero(cols - rows, cols);
-        MatrixStore<Double> matrixB = matrixA.logical().below(zeros).copy();
+        MatrixStore<Double> zeros = factory.make(cols - rows, cols);
+        MatrixStore<Double> matrixB = matrixA.logical().below(zeros).collect(factory);
         if (DEBUG) {
             // Print B to verify it.
             System.out.println("\nB matrix:\n" + matrixB);

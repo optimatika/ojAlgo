@@ -26,7 +26,6 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -335,7 +334,7 @@ public interface Eigenvalue<N extends Comparable<N>>
     @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical) {
-        return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
+        return Eigenvalue.make(typical, Access2D.isHermitian(typical));
     }
 
     /**

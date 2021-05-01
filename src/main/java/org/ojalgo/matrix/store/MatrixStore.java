@@ -207,17 +207,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this.above((MatrixStore<N>[]) new MatrixStore<?>[] { above1, above2 });
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> above(final N... elements) {
-            MatrixStore<N> above = LogicalBuilder.buildRow(myStore.physical(), myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(above, myStore);
-            return this;
-        }
-
         public LogicalBuilder<N> below(final long numberOfRows) {
             ZeroStore<N> below = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(myStore, below);
@@ -240,17 +229,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         @SuppressWarnings("unchecked")
         public LogicalBuilder<N> below(final MatrixStore<N> below1, final MatrixStore<N> below2) {
             return this.below((MatrixStore<N>[]) new MatrixStore<?>[] { below1, below2 });
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> below(final N... elements) {
-            MatrixStore<N> below = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(myStore, below);
-            return this;
         }
 
         public LogicalBuilder<N> bidiagonal(final boolean upper) {
@@ -303,14 +281,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 myStore = new ConjugatedStore<>(myStore);
             }
             return this;
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public PhysicalStore<N> copy() {
-            return myStore.copy();
         }
 
         public long count() {
@@ -413,17 +383,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> left(final N... elements) {
-            MatrixStore<N> left = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(left, myStore);
-            return this;
-        }
-
-        /**
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
@@ -440,10 +399,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public ElementsSupplier<N> operate() {
             return this;
-        }
-
-        public PhysicalStore.Factory<N, ?> physical() {
-            return myStore.physical();
         }
 
         public LogicalBuilder<N> repeat(final int rowsRepetitions, final int columnsRepetitions) {
@@ -481,17 +436,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         @SuppressWarnings("unchecked")
         public LogicalBuilder<N> right(final MatrixStore<N> right1, final MatrixStore<N> right2) {
             return this.right((MatrixStore<N>[]) new MatrixStore<?>[] { right1, right2 });
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> right(final N... elements) {
-            MatrixStore<N> right = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(myStore, right);
-            return this;
         }
 
         /**

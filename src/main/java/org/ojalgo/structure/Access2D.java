@@ -23,6 +23,10 @@ package org.ojalgo.structure;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -665,6 +669,45 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             }
         }
 
+        return retVal;
+    }
+
+    /**
+     * @deprecated v47 Use {@link MatrixStore#isHermitian()} instead
+     */
+    @Deprecated
+    static boolean isHermitian(final Access2D<?> matrix) {
+    
+        final long tmpRowDim = matrix.countRows();
+        final long tmpColDim = matrix.countColumns();
+    
+        final Comparable<?> tmpElement = matrix.get(0L);
+    
+        boolean retVal = tmpRowDim == tmpColDim;
+    
+        if (tmpElement instanceof ComplexNumber) {
+    
+            ComplexNumber tmpLowerLeft;
+            ComplexNumber tmpUpperRight;
+    
+            for (int j = 0; retVal && (j < tmpColDim); j++) {
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(matrix.get(j, j)).i);
+                for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
+                    tmpLowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
+                    tmpUpperRight = ComplexNumber.valueOf(matrix.get(j, i));
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpLowerLeft.subtract(tmpUpperRight).norm());
+                }
+            }
+    
+        } else {
+    
+            for (int j = 0; retVal && (j < tmpColDim); j++) {
+                for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, matrix.doubleValue(i, j) - matrix.doubleValue(j, i));
+                }
+            }
+        }
+    
         return retVal;
     }
 

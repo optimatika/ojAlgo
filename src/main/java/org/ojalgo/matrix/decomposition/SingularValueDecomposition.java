@@ -424,7 +424,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
             final int rank = this.getRank();
 
-            PhysicalStore<N> tmpMtrx = this.getV().logical().limits(-1, rank).copy();
+            MatrixStore<N> tmpV = this.getV();
+            PhysicalStore<N> tmpMtrx = tmpV.logical().limits(-1, rank).collect(tmpV.physical());
 
             Scalar.Factory<N> scalar = this.scalar();
             BinaryFunction<N> divide = this.function().divide();

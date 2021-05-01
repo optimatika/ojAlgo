@@ -225,7 +225,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return this.self();
         }
 
-        public final void supplyTo(final PhysicalStore<N> receiver) {
+        public void supplyTo(final PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
         }
 

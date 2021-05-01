@@ -372,7 +372,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = MatrixUtils.hashCode(myStore);
+            myHashCode = Access1D.hashCode(myStore);
         }
         return myHashCode;
     }
