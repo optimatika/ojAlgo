@@ -677,37 +677,50 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
      */
     @Deprecated
     static boolean isHermitian(final Access2D<?> matrix) {
-    
-        final long tmpRowDim = matrix.countRows();
-        final long tmpColDim = matrix.countColumns();
-    
-        final Comparable<?> tmpElement = matrix.get(0L);
-    
-        boolean retVal = tmpRowDim == tmpColDim;
-    
-        if (tmpElement instanceof ComplexNumber) {
-    
-            ComplexNumber tmpLowerLeft;
-            ComplexNumber tmpUpperRight;
-    
-            for (int j = 0; retVal && (j < tmpColDim); j++) {
-                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(matrix.get(j, j)).i);
-                for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
-                    tmpLowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
-                    tmpUpperRight = ComplexNumber.valueOf(matrix.get(j, i));
-                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpLowerLeft.subtract(tmpUpperRight).norm());
+
+        long rows = matrix.countRows();
+        long cols = matrix.countColumns();
+
+        Comparable<?> anyElement = matrix.get(0L);
+
+        boolean retVal = rows == cols;
+
+        if (anyElement instanceof ComplexNumber) {
+
+            for (int j = 0; retVal && (j < cols); j++) {
+
+                double imagDiag = ComplexNumber.valueOf(matrix.get(j, j)).i;
+
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, imagDiag);
+
+                for (int i = j + 1; retVal && (i < rows); i++) {
+
+                    ComplexNumber lowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
+                    ComplexNumber upperRight = ComplexNumber.valueOf(matrix.get(j, i));
+
+                    double diff = lowerLeft.subtract(upperRight).norm();
+                    double sum = lowerLeft.add(upperRight).norm();
+
+                    retVal &= PrimitiveScalar.isSmall(sum, diff);
                 }
             }
-    
+
         } else {
-    
-            for (int j = 0; retVal && (j < tmpColDim); j++) {
-                for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
-                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, matrix.doubleValue(i, j) - matrix.doubleValue(j, i));
+
+            for (int j = 0; retVal && (j < cols); j++) {
+                for (int i = j + 1; retVal && (i < rows); i++) {
+
+                    double lowerLeft = matrix.doubleValue(i, j);
+                    double upperRight = matrix.doubleValue(j, i);
+
+                    double diff = lowerLeft - upperRight;
+                    double sum = lowerLeft + upperRight;
+
+                    retVal &= PrimitiveScalar.isSmall(sum, diff);
                 }
             }
         }
-    
+
         return retVal;
     }
 
