@@ -270,10 +270,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#conjugate()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
@@ -336,10 +332,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return myStore;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
                 myStore = new UpperHermitianStore<>(myStore, true);
@@ -448,28 +440,16 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> superimpose(final int row, final int col, final N matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
@@ -497,10 +477,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return myStore.toString();
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#transpose()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();

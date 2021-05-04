@@ -190,6 +190,11 @@ public interface Structure2D extends Structure1D {
         }
 
         /**
+         * Same as {@link #transpose()} but in addition the elements are conjugated.
+         */
+        B conjugate();
+
+        /**
          * @return A diagonal matrix (main diagonal only)
          */
         B diagonal();
@@ -282,6 +287,8 @@ public interface Structure2D extends Structure1D {
          * @param upper From where are the elements read?
          */
         B symmetric(boolean upper);
+
+        B transpose();
 
         B triangular(boolean upper, boolean assumeOne);
 
