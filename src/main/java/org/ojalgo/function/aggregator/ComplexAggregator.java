@@ -50,11 +50,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
     }
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -94,11 +90,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -133,11 +125,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> LARGEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> LARGEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -170,11 +158,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> MAX = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MAX = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -207,11 +191,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> MIN = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> MIN = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -248,11 +228,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM1 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM1 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -285,11 +261,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -323,11 +295,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -360,11 +328,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -397,11 +361,9 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ComplexAggregator SET = new ComplexAggregator();
+
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -440,11 +402,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -477,11 +435,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
         protected AggregatorFunction<ComplexNumber> initialValue() {
@@ -513,8 +467,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             };
         }
     };
-
-    private static final ComplexAggregator SET = new ComplexAggregator();
 
     public static ComplexAggregator getSet() {
         return SET;

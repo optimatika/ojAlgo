@@ -52,11 +52,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
     }
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> AVERAGE = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> AVERAGE = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -96,11 +92,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -135,11 +127,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> LARGEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> LARGEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -172,11 +160,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> MAX = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MAX = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -209,11 +193,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -250,11 +230,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -287,11 +263,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -324,11 +296,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -361,11 +329,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -398,11 +362,9 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> SMALLEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final BigAggregator SET = new BigAggregator();
+
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SMALLEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -441,11 +403,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -478,11 +436,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+    private static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
         protected AggregatorFunction<BigDecimal> initialValue() {
@@ -514,8 +468,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
             };
         }
     };
-
-    private static final BigAggregator SET = new BigAggregator();
 
     public static BigAggregator getSet() {
         return SET;

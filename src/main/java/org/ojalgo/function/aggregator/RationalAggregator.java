@@ -50,11 +50,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
     }
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -95,11 +91,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -134,11 +126,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> LARGEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> LARGEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -171,11 +159,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MAX = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> MAX = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -208,11 +192,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -249,11 +229,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM1 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM1 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -286,11 +262,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -324,11 +296,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -361,11 +329,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -398,11 +362,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final RationalAggregator SET = new RationalAggregator();
+
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -441,11 +403,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -478,11 +436,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -514,8 +468,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             };
         }
     };
-
-    private static final RationalAggregator SET = new RationalAggregator();
 
     public static RationalAggregator getSet() {
         return SET;
