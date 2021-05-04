@@ -29,17 +29,6 @@ package org.ojalgo.function.special;
 public abstract class CombinatorialFunctions {
 
     /**
-     * 13! does not fit in an <code>int</code>, and 21! does not fit in a <code>long</code> - that's why this
-     * method returns a <code>double</code>.
-     *
-     * @deprecated v48 Use {@link MissingMath#factorial(int)} instead
-     */
-    @Deprecated
-    public static double factorial(final int arg) {
-        return MissingMath.factorial(arg);
-    }
-
-    /**
      * @param n The number of elements in the set
      * @param k A vector of subset sizes the sum of which must equal the size of the full set
      * @return The number of ways the set can be partitioned in to subsets of the given sizes
