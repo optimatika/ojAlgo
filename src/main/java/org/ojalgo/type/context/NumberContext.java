@@ -462,56 +462,16 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        final double tmpComparedTo = PrimitiveMath.ABS.invoke(comparedTo);
-        if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
+        double norm = PrimitiveMath.ABS.invoke(comparedTo);
+        if (NumberContext.isZero(norm, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         } else {
-            return NumberContext.isZero(value / tmpComparedTo, myEpsilon);
+            return NumberContext.isZero(value / norm, myEpsilon);
         }
     }
 
     public boolean isZero(final double value) {
         return NumberContext.isZero(value, myZeroError);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #withFormat(NumberStyle,Locale)} instead
-     */
-    @Deprecated
-    public NumberContext newFormat(final NumberStyle style, final Locale locale) {
-        return this.withFormat(style, locale);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #withMath(MathContext)} instead
-     */
-    @Deprecated
-    public NumberContext newMathContext(final MathContext context) {
-        return this.withMath(context);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #withPrecision(int)} instead
-     */
-    @Deprecated
-    public NumberContext newPrecision(final int precision) {
-        return this.withPrecision(precision);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #withMode(RoundingMode)} instead
-     */
-    @Deprecated
-    public NumberContext newRoundingMode(final RoundingMode mode) {
-        return this.withMode(mode);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #withScale(int)} instead
-     */
-    @Deprecated
-    public NumberContext newScale(final int scale) {
-        return this.withScale(scale);
     }
 
     /**
@@ -573,14 +533,6 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(format, math, myScale);
     }
 
-    /**
-     * @deprecated Use {@link #withMath(MathContext)} instead
-     */
-    @Deprecated
-    public NumberContext withMathContext(final MathContext context) {
-        return this.withMath(context);
-    }
-
     public NumberContext withMode(final RoundingMode mode) {
         NumberFormat format = (NumberFormat) this.format();
         MathContext math = new MathContext(myMathContext.getPrecision(), mode);
@@ -602,14 +554,6 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         NumberFormat format = (NumberFormat) this.format();
         MathContext math = new MathContext(precision, myMathContext.getRoundingMode());
         return new NumberContext(format, math, myScale);
-    }
-
-    /**
-     * @deprecated Use {@link #withMode(RoundingMode)} instead
-     */
-    @Deprecated
-    public NumberContext withRoundingMode(final RoundingMode mode) {
-        return this.withMode(mode);
     }
 
     public NumberContext withScale(final int scale) {
@@ -636,7 +580,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
             final DecimalFormat tmpDF = (DecimalFormat) format;
 
-            final int tmpModScale = myScale - (int) PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
+            final int tmpModScale = myScale - PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
             tmpDF.setMinimumFractionDigits(Math.min(2, tmpModScale));
