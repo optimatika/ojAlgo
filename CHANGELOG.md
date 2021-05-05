@@ -11,7 +11,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-- Many things that have been deprecateds for a while are now actually removed. Not all are mentioned specifically below.
+- Many things that have been deprecated for a while are now actually removed. Not all are mentioned specifically below.
 
 ### Added
 
