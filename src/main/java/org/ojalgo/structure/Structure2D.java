@@ -271,11 +271,7 @@ public interface Structure2D extends Structure1D {
             return this.rows(Structure1D.toIntIndexes(rows));
         }
 
-        B superimpose(int row, int col, S matrix);
-
-        default B superimpose(final long row, final long col, final S matrix) {
-            return this.superimpose(Math.toIntExact(row), Math.toIntExact(col), matrix);
-        }
+        B superimpose(long row, long col, S matrix);
 
         default B superimpose(final S matrix) {
             return this.superimpose(0, 0, matrix);

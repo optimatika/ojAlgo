@@ -221,7 +221,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             myDelegate.supplyTo(receiver);
         }
 
-        public LB superimpose(final int row, final int col, final M matrix) {
+        public LB superimpose(final long row, final long col, final M matrix) {
             myDelegate = myDelegate.superimpose(row, col, matrix.getStore());
             return this.self();
         }

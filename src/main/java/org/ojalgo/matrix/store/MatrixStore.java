@@ -416,7 +416,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
+        public LogicalBuilder<N> superimpose(final long row, final long col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
