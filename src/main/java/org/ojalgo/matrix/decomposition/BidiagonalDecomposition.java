@@ -248,7 +248,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
     }
 
     public MatrixStore<N> getD() {
-        MatrixStore<N> retVal = this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
+        MatrixStore<N> retVal = this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal()).get();
         if (myFullSize) {
             if (this.getRowDim() > retVal.countRows()) {
                 retVal = retVal.logical().below((int) (this.getRowDim() - retVal.countRows())).get();

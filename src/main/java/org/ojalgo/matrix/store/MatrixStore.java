@@ -232,30 +232,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public LogicalBuilder<N> bidiagonal(final boolean upper) {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = null;
-            Access1D<N> subdiagonal = null;
             if (upper) {
-                superdiagonal = myStore.sliceDiagonal(0, 1);
+                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
             } else {
-                subdiagonal = myStore.sliceDiagonal(1, 0);
-            }
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
-            return this;
-        }
-
-        /**
-         * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
-         */
-        @Deprecated
-        public LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
-            if (upper) {
-                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
-            } else {
-                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), assumeOne);
+                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
             }
             return this;
         }
@@ -292,11 +272,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public LogicalBuilder<N> diagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, null, null);
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
             return this;
         }
 
@@ -334,9 +310,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore, true);
+                myStore = new UpperSymmetricStore<>(myStore, true);
             } else {
-                myStore = new LowerHermitianStore<>(myStore, true);
+                myStore = new LowerSymmetricStore<>(myStore, true);
             }
             return this;
         }
@@ -445,11 +421,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        public LogicalBuilder<N> superimpose(final int row, final int col, final N matrix) {
-            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
-            return this;
-        }
-
         public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
@@ -465,9 +436,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public LogicalBuilder<N> symmetric(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore, false);
+                myStore = new UpperSymmetricStore<>(myStore, false);
             } else {
-                myStore = new LowerHermitianStore<>(myStore, false);
+                myStore = new LowerSymmetricStore<>(myStore, false);
             }
             return this;
         }
@@ -496,13 +467,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public LogicalBuilder<N> tridiagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = myStore.sliceDiagonal(0, 1);
-            Access1D<N> subdiagonal = myStore.sliceDiagonal(1, 0);
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
+            myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
             return this;
         }
 

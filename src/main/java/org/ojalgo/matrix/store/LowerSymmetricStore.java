@@ -23,17 +23,17 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.scalar.Scalar;
 
-final class UpperHermitianStore<N extends Comparable<N>> extends ShadingStore<N> {
+final class LowerSymmetricStore<N extends Comparable<N>> extends ShadingStore<N> {
 
     private final boolean myHermitian;
 
-    UpperHermitianStore(final MatrixStore<N> base, final boolean hermitian) {
-        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
+    LowerSymmetricStore(final MatrixStore<N> base, final boolean hermitian) {
+        super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));
         myHermitian = hermitian;
     }
 
     public double doubleValue(final long row, final long col) {
-        if (row > col) {
+        if (row < col) {
             return this.base().doubleValue(col, row);
         } else {
             return this.base().doubleValue(row, col);
@@ -44,7 +44,7 @@ final class UpperHermitianStore<N extends Comparable<N>> extends ShadingStore<N>
         if (myHermitian) {
             return this.toScalar(row, col).get();
         } else {
-            if (row > col) {
+            if (row < col) {
                 return this.base().get(col, row);
             } else {
                 return this.base().get(row, col);
@@ -53,7 +53,7 @@ final class UpperHermitianStore<N extends Comparable<N>> extends ShadingStore<N>
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
-        if (row > col) {
+        if (row < col) {
             if (myHermitian) {
                 return this.base().toScalar(col, row).conjugate();
             } else {
@@ -63,4 +63,5 @@ final class UpperHermitianStore<N extends Comparable<N>> extends ShadingStore<N>
             return this.base().toScalar(row, col);
         }
     }
+
 }

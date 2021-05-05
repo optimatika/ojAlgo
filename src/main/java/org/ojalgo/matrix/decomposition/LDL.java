@@ -89,14 +89,6 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         }
     }
 
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
     MatrixStore<N> getD();
 
     /**
