@@ -25,8 +25,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * A Hessenberg matrix is one that is "almost" triangular. A lower Hessenberg matrix has zero entries above
- * the first superdiagonal.
+ * A Hessenberg matrix is one that is "almost" triangular. A lower Hessenberg matrix has zeros above the first
+ * superdiagonal, and an upper Hessenberg matrix zeros below the first subdiagonal.
  *
  * @author apete
  */

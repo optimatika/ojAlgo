@@ -173,30 +173,4 @@ public abstract class PrimitiveMath {
         return PRIME[index];
     }
 
-    /**
-     * @deprecated v48 Use {@link PowerOf2#isPowerOf2(long)} instead
-     */
-    @Deprecated
-    public static final boolean isPowerOf2(final long value) {
-        return PowerOf2.isPowerOf2(value);
-    }
-
-    /**
-     * @return The smallest integer exponent so that 2^exp &gt;= value.
-     * @deprecated v48 Use {@link PowerOf2#powerOf2Larger(long)} instead
-     */
-    @Deprecated
-    public static final int powerOf2Larger(final long value) {
-        return PowerOf2.powerOf2Larger(value);
-    }
-
-    /**
-     * @return The largest integer exponent so that 2^exp &lt;= value.
-     * @deprecated v48 Use {@link PowerOf2#powerOf2Smaller(long)} instead
-     */
-    @Deprecated
-    public static final int powerOf2Smaller(final long value) {
-        return PowerOf2.powerOf2Smaller(value);
-    }
-
 }

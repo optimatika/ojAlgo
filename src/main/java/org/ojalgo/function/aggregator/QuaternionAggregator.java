@@ -50,11 +50,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
     }
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> AVERAGE = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> AVERAGE = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -95,11 +91,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> CARDINALITY = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> CARDINALITY = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -134,11 +126,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> LARGEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> LARGEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -171,11 +159,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> MAX = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> MAX = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -208,11 +192,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> MIN = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> MIN = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -249,11 +229,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> NORM1 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> NORM1 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -286,11 +262,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> NORM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> NORM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -324,11 +296,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -361,11 +329,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -398,11 +362,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> SMALLEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final QuaternionAggregator SET = new QuaternionAggregator();
+
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> SMALLEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -441,11 +403,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> SUM = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> SUM = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -478,11 +436,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<Quaternion>> SUM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+    private static final ThreadLocal<AggregatorFunction<Quaternion>> SUM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
@@ -514,8 +468,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             };
         }
     };
-
-    private static final QuaternionAggregator SET = new QuaternionAggregator();
 
     public static QuaternionAggregator getSet() {
         return SET;

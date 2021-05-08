@@ -27,22 +27,6 @@ import org.ojalgo.structure.AccessScalar;
 
 public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunction<N>, AccessScalar<N> {
 
-    /**
-     * @deprecated v48 Merging will no longer be supported
-     */
-    @Deprecated
-    default boolean isMergeable() {
-        return true;
-    }
-
-    /**
-     * Only works if {@link #isMergeable()}!
-     *
-     * @deprecated v48 Merging will no longer be supported
-     */
-    @Deprecated
-    void merge(N result);
-
     AggregatorFunction<N> reset();
 
     Scalar<N> toScalar();

@@ -76,7 +76,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     }
 
-    private static final NumberContext EQUALS = NumberContext.getGeneral(8, 12);
+    private static final NumberContext EQUALS = NumberContext.of(8, 12);
 
     /**
      * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
@@ -372,7 +372,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = MatrixUtils.hashCode(myStore);
+            myHashCode = Access1D.hashCode(myStore);
         }
         return myHashCode;
     }
@@ -460,7 +460,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isHermitian() {
         if (myHermitian == null) {
-            myHermitian = this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS);
+            myHermitian = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS));
         }
         return myHermitian.booleanValue();
     }
@@ -475,7 +475,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isSymmetric() {
         if (mySymmetric == null) {
-            mySymmetric = this.isSquare() && myStore.equals(myStore.transpose(), EQUALS);
+            mySymmetric = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.transpose(), EQUALS));
         }
         return mySymmetric.booleanValue();
     }

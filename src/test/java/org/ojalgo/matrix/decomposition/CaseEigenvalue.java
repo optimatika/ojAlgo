@@ -34,7 +34,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Generalisation;
@@ -447,7 +446,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 1; dim < 10; dim++) {
 
-            Primitive64Store matrix = MatrixUtils.makeSPD(dim);
+            final int dim1 = dim;
+            Primitive64Store matrix = Primitive64Store.FACTORY.makeSPD(dim1);
 
             for (Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
 

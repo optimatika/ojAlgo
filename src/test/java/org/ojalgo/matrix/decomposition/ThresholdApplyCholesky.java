@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.ApplyCholesky;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -71,8 +70,9 @@ public class ThresholdApplyCholesky extends AbstractThresholdTuner {
     public void setup() {
 
         ApplyCholesky.THRESHOLD = dim / z;
+        final int dim1 = dim;
 
-        matrix = MatrixUtils.makeSPD(dim);
+        matrix = Primitive64Store.FACTORY.makeSPD(dim1);
     }
 
     @Override

@@ -207,17 +207,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this.above((MatrixStore<N>[]) new MatrixStore<?>[] { above1, above2 });
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> above(final N... elements) {
-            MatrixStore<N> above = LogicalBuilder.buildRow(myStore.physical(), myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(above, myStore);
-            return this;
-        }
-
         public LogicalBuilder<N> below(final long numberOfRows) {
             ZeroStore<N> below = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(myStore, below);
@@ -242,42 +231,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this.below((MatrixStore<N>[]) new MatrixStore<?>[] { below1, below2 });
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> below(final N... elements) {
-            MatrixStore<N> below = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(myStore, below);
-            return this;
-        }
-
         public LogicalBuilder<N> bidiagonal(final boolean upper) {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = null;
-            Access1D<N> subdiagonal = null;
             if (upper) {
-                superdiagonal = myStore.sliceDiagonal(0, 1);
+                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
             } else {
-                subdiagonal = myStore.sliceDiagonal(1, 0);
-            }
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
-            return this;
-        }
-
-        /**
-         * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
-         */
-        @Deprecated
-        public LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
-            if (upper) {
-                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
-            } else {
-                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), assumeOne);
+                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
             }
             return this;
         }
@@ -292,10 +250,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#conjugate()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
@@ -303,14 +257,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 myStore = new ConjugatedStore<>(myStore);
             }
             return this;
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public PhysicalStore<N> copy() {
-            return myStore.copy();
         }
 
         public long count() {
@@ -326,11 +272,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public LogicalBuilder<N> diagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, null, null);
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
             return this;
         }
 
@@ -366,15 +308,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return myStore;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore, true);
+                myStore = new UpperSymmetricStore<>(myStore, true);
             } else {
-                myStore = new LowerHermitianStore<>(myStore, true);
+                myStore = new LowerSymmetricStore<>(myStore, true);
             }
             return this;
         }
@@ -413,17 +351,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> left(final N... elements) {
-            MatrixStore<N> left = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(left, myStore);
-            return this;
-        }
-
-        /**
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
@@ -440,10 +367,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public ElementsSupplier<N> operate() {
             return this;
-        }
-
-        public PhysicalStore.Factory<N, ?> physical() {
-            return myStore.physical();
         }
 
         public LogicalBuilder<N> repeat(final int rowsRepetitions, final int columnsRepetitions) {
@@ -484,17 +407,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> right(final N... elements) {
-            MatrixStore<N> right = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(myStore, right);
-            return this;
-        }
-
-        /**
          * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
          * and any negative row reference/index will translate to a row of zeros. The number of rows in the
          * resulting matrix is the same as the number of elements in the rows index array.
@@ -504,28 +416,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
+        public LogicalBuilder<N> superimpose(final long row, final long col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public LogicalBuilder<N> superimpose(final int row, final int col, final N matrix) {
-            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
-            return this;
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
@@ -541,9 +436,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         public LogicalBuilder<N> symmetric(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore, false);
+                myStore = new UpperSymmetricStore<>(myStore, false);
             } else {
-                myStore = new LowerHermitianStore<>(myStore, false);
+                myStore = new LowerSymmetricStore<>(myStore, false);
             }
             return this;
         }
@@ -553,10 +448,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             return myStore.toString();
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#transpose()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();
@@ -576,13 +467,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public LogicalBuilder<N> tridiagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = myStore.sliceDiagonal(0, 1);
-            Access1D<N> subdiagonal = myStore.sliceDiagonal(1, 0);
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
+            myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
             return this;
         }
 

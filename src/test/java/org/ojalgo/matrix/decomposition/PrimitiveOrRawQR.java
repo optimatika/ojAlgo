@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -113,9 +112,10 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
     public void setup() {
 
         super.setup();
+        final int dim1 = dim;
 
         // body = MatrixUtils.makeSPD(dim).builder().below(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dim)).build();
-        body = MatrixUtils.makeSPD(dim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get();
+        body = Primitive64Store.FACTORY.makeSPD(dim1).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get();
         rhs = Primitive64Store.FACTORY.makeFilled(dim + dim, 1, new Uniform());
 
         preallocated = primitive.preallocate(body, rhs);

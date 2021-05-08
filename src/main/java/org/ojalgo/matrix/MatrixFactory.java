@@ -115,10 +115,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return this.self();
         }
 
-        /**
-         * @deprecated v48 Use {@link BasicMatrix#conjugate()} instead
-         */
-        @Deprecated
         public LB conjugate() {
             myDelegate = myDelegate.conjugate();
             return this.self();
@@ -146,10 +142,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return MatrixFactory.this.instantiate(myDelegate.get());
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LB hermitian(final boolean upper) {
             myDelegate = myDelegate.hermitian(upper);
             return this.self();
@@ -225,19 +217,15 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return this.self();
         }
 
-        public final void supplyTo(final PhysicalStore<N> receiver) {
+        public void supplyTo(final PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
         }
 
-        public LB superimpose(final int row, final int col, final M matrix) {
+        public LB superimpose(final long row, final long col, final M matrix) {
             myDelegate = myDelegate.superimpose(row, col, matrix.getStore());
             return this.self();
         }
 
-        /**
-         * @deprecated v48 Use {@link BasicMatrix#transpose()} instead
-         */
-        @Deprecated
         public LB transpose() {
             myDelegate = myDelegate.transpose();
             return this.self();

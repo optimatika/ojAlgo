@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+- Many things that have been deprecated for a while are now actually removed. Not all are mentioned specifically below.
+
 ### Added
 
 #### org.ojalgo.matrix
@@ -23,9 +25,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Removed
 
+#### org.ojalgo.function
+
+- `FunctionUtils`, that only contained deprecated (moved) utility functions, has been deleted.
+
 #### org.ojalgo.matrix
 
 - The entire package `org.ojalgo.matrix.geometry` has been removed. Not deprecated, removed directly. It was never finished, not tested, and now it was in the way of refactoring other matrix stuff. Anything it did can just as well be done with the normal matrix classes.
+- `MatrixUtils`, that only contained deprecated (moved) utility functions, has been deleted.
+
+#### org.ojalgo.random
+
+- `RandomUtils`, that only contained deprecated (moved) utility functions, has been deleted.
 
 #### org.ojalgo.structure
 

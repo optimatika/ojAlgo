@@ -37,24 +37,24 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     private final int myRowFirst;
     private final int myRowLimit;
 
-    SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
+    SuperimposedStore(final MatrixStore<N> base, final long row, final long col, final MatrixStore<N> diff) {
 
-        super(base, (int) base.countRows(), (int) base.countColumns());
+        super(base, base.countRows(), base.countColumns());
 
-        myRowFirst = row;
-        myColFirst = column;
+        myRowFirst = Math.toIntExact(row);
+        myColFirst = Math.toIntExact(col);
 
-        final int tmpDiffRowDim = (int) diff.countRows();
-        final int tmpDiffColDim = (int) diff.countColumns();
+        long diffRowDim = diff.countRows();
+        long diffColDim = diff.countColumns();
 
-        myRowLimit = row + tmpDiffRowDim;
-        myColLimit = column + tmpDiffColDim;
+        myRowLimit = Math.toIntExact(row + diffRowDim);
+        myColLimit = Math.toIntExact(col + diffColDim);
 
         myDiff = diff;
     }
 
     SuperimposedStore(final MatrixStore<N> base, final MatrixStore<N> diff) {
-        this(base, 0, 0, diff);
+        this(base, 0L, 0L, diff);
     }
 
     /**
@@ -64,7 +64,7 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
 
         double retVal = this.base().doubleValue(row, col);
 
-        if (this.isCovered((int) row, (int) col)) {
+        if (this.isCovered(row, col)) {
             retVal += myDiff.doubleValue(row - myRowFirst, col - myColFirst);
         }
 
@@ -75,7 +75,7 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
 
         N retVal = this.base().get(row, col);
 
-        if (this.isCovered((int) row, (int) col)) {
+        if (this.isCovered(row, col)) {
             retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).get();
         }
 
@@ -122,15 +122,19 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
 
         Scalar<N> retVal = this.base().toScalar(row, column);
 
-        if (this.isCovered((int) row, (int) column)) {
+        if (this.isCovered(row, column)) {
             retVal = retVal.add(myDiff.get(row - myRowFirst, column - myColFirst));
         }
 
         return retVal;
     }
 
-    private boolean isCovered(final int row, final int column) {
-        return (myRowFirst <= row) && (myColFirst <= column) && (row < myRowLimit) && (column < myColLimit);
+    private boolean isCovered(final int row, final int col) {
+        return (myRowFirst <= row) && (myColFirst <= col) && (row < myRowLimit) && (col < myColLimit);
+    }
+
+    private boolean isCovered(final long row, final long col) {
+        return this.isCovered(Math.toIntExact(row), Math.toIntExact(col));
     }
 
 }

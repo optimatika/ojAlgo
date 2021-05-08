@@ -23,8 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.HouseholderRight;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -73,8 +73,9 @@ public class ThresholdHouseholderRight extends AbstractThresholdTuner {
     public void setup() {
 
         HouseholderRight.THRESHOLD = dim / z;
+        final int dim1 = dim;
 
-        matrix = MatrixUtils.makeSPD(dim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get().copy();
+        matrix = Primitive64Store.FACTORY.makeSPD(dim1).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get().copy();
     }
 
     @Override

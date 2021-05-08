@@ -190,6 +190,11 @@ public interface Structure2D extends Structure1D {
         }
 
         /**
+         * Same as {@link #transpose()} but in addition the elements are conjugated.
+         */
+        B conjugate();
+
+        /**
          * @return A diagonal matrix (main diagonal only)
          */
         B diagonal();
@@ -266,11 +271,7 @@ public interface Structure2D extends Structure1D {
             return this.rows(Structure1D.toIntIndexes(rows));
         }
 
-        B superimpose(int row, int col, S matrix);
-
-        default B superimpose(final long row, final long col, final S matrix) {
-            return this.superimpose(Math.toIntExact(row), Math.toIntExact(col), matrix);
-        }
+        B superimpose(long row, long col, S matrix);
 
         default B superimpose(final S matrix) {
             return this.superimpose(0, 0, matrix);
@@ -282,6 +283,8 @@ public interface Structure2D extends Structure1D {
          * @param upper From where are the elements read?
          */
         B symmetric(boolean upper);
+
+        B transpose();
 
         B triangular(boolean upper, boolean assumeOne);
 

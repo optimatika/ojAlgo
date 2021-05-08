@@ -62,14 +62,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
-        /**
-         * @deprecated v48 Use {@link ArrayAnyD#fillMatching(Access1D)}
-         */
-        @Deprecated
-        public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
-            return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
-        }
-
         @Override
         public FunctionSet<N> function() {
             return myDelegate.function();
@@ -82,14 +74,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
         public ArrayAnyD<N> makeDense(final long... structure) {
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
-        }
-
-        /**
-         * @deprecated v48 Use {@link ArrayAnyD#fillAll(NullaryFunction)}
-         */
-        @Deprecated
-        public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
         }
 
         public ArrayAnyD<N> makeSparse(final long... structure) {

@@ -180,14 +180,6 @@ public class TDistribution extends AbstractContinuous {
     private static final double _0_0001 = 0.0001;
     private static final Normal NORMAL = new Normal();
 
-    /**
-     * @deprecated v48
-     */
-    @Deprecated
-    public static TDistribution make(final int degreesOfFreedom) {
-        return TDistribution.of(degreesOfFreedom);
-    }
-
     public static TDistribution of(final int degreesOfFreedom) {
         switch (degreesOfFreedom) {
         case 1:

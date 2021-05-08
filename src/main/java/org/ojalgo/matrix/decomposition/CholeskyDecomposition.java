@@ -27,7 +27,6 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -271,7 +270,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
         // Check if hermitian, maybe
         if (tmpPositiveDefinite && checkHermitian) {
-            tmpPositiveDefinite &= MatrixUtils.isHermitian(tmpInPlace);
+            tmpPositiveDefinite &= Access2D.isHermitian(tmpInPlace);
         }
 
         final UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();
