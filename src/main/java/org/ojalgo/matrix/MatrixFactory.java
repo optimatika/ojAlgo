@@ -834,8 +834,8 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    @SafeVarargs
-    public final M columns(final List<? extends Comparable<?>>... source) {
+    @SuppressWarnings("unchecked")
+    public M columns(final List<? extends Comparable<?>>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
@@ -846,22 +846,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     @Override
     public FunctionSet<N> function() {
         return myPhysicalFactory.function();
-    }
-
-    /**
-     * @deprecated v47 Use {@link #makeDense(int)} instead
-     */
-    @Deprecated
-    public DR getBuilder(final int count) {
-        return this.makeDense(count);
-    }
-
-    /**
-     * @deprecated v47 Use {@link #makeDense(int,int)} instead
-     */
-    @Deprecated
-    public DR getBuilder(final int rows, final int columns) {
-        return this.makeDense(rows, columns);
     }
 
     public M make(final long rows, final long columns) {

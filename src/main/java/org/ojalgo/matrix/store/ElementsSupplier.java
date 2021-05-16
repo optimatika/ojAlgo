@@ -30,8 +30,8 @@ import org.ojalgo.structure.Operate2D;
 import org.ojalgo.structure.Transformation2D;
 
 /**
- * An {@link ElementsSupplier} is not (yet) a matrix, but there are several matrix related things you can do
- * with them:
+ * An {@link ElementsSupplier} is not necessarily (or not yet) a matrix, but something from which the elements
+ * of a matrix can be derived. There are several matrix related things you can do with them:
  * <ol>
  * <li>You can query the size/shape of the (future) matrix.</li>
  * <li>You can supply the elements to an already existing matrix (or more precisely to an
