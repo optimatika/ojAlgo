@@ -539,7 +539,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public Array1D<N> asList() {
-        return myUtility.asArray1D();
+        return myUtility.flatten();
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<N> transformationCollector, final boolean eigenvalue) {

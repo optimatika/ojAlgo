@@ -46,10 +46,12 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.tensor.Tensor;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.NumberDefinition;
@@ -85,6 +87,18 @@ public abstract class TestUtils {
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
         TestUtils.assertEquals(expected, actual, EQUALS);
+    }
+
+    public static void assertTensorEquals(final Tensor<?, ?> expected, final Tensor<?, ?> actual) {
+
+        TestUtils.assertEquals(expected.rank(), actual.rank());
+        TestUtils.assertEquals(expected.dimensions(), actual.dimensions());
+
+        if (expected.rank() == 0) {
+            TestUtils.assertEquals(((Scalar<?>) expected).doubleValue(), ((Scalar<?>) actual).doubleValue(), EQUALS);
+        } else {
+            TestUtils.assertEquals((Access1D<?>) expected, (Access1D<?>) actual, EQUALS);
+        }
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {

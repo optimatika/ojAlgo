@@ -37,6 +37,8 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.tensor.TensorFactory1D;
+import org.ojalgo.tensor.TensorFactory2D;
 
 /**
  * <p>
@@ -52,6 +54,14 @@ import org.ojalgo.structure.Transformation2D;
 public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
+
+        default TensorFactory2D<N, I> tensor2D() {
+            return TensorFactory2D.of(this);
+        }
+
+        default TensorFactory1D<N, I> tensor1D() {
+            return TensorFactory1D.of(this.asFactory1D());
+        }
 
         AggregatorSet<N> aggregator();
 

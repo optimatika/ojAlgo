@@ -15,6 +15,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.array
+
+- `Array2D` and `ArrayAnyD` are now reshapable
+
 #### org.ojalgo.matrix
 
 - New interface `Matrix2D` common to both `BasicMatrix` (implements it) and `MatrixStore` (extends it).
@@ -22,6 +26,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - A few additions to `Structure2D.Logical` like `symmetric(...)` and `superimpose(...)`
+- New interface `Structure2D.Reshapable` and `StructureAnyD.Reshapable`
+
+#### org.ojalgo.tensor
+
+- This package existed before but didn't really contain anything functional/useful – now it does. Now it contains 1D, 2D, and AnyD tensor implementations. These are not just (multi dimensional) arrays, but mathematical tensors as used by physicists and engineers. They are instatiated via special factories that implement various tensor products and direct sums. Further these factories are implemented as wrappers of (they delegate to) other 1D, 2D or AnyD factories. This means that just about any other data structure in ojAlgo can be created using the tensor product or direct sum implemenatations of these factories.
 
 ### Removed
 

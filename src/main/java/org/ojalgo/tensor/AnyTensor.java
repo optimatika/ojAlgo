@@ -25,128 +25,252 @@ import java.util.Arrays;
 
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.AccessAnyD;
+import org.ojalgo.structure.FactoryAnyD;
+import org.ojalgo.structure.MutateAnyD;
 
-final class AnyTensor<N extends Comparable<N>> implements Tensor<N> {
+public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N, AnyTensor<N>> implements AccessAnyD<N>, MutateAnyD.Receiver<N> {
 
-    private final ArrayAnyD<N> myArray;
-    private final DenseArray.Factory<N> myArrayFactory;
-    private final int myDimensions;
-    private final int myRank;
+    static final class Factory<N extends Comparable<N>> extends ArrayBasedTensor.Factory<N> implements FactoryAnyD<AnyTensor<N>> {
 
-    AnyTensor(final int rank, final int dimensions, final DenseArray.Factory<N> arrayFactory) {
+        private final ArrayAnyD.Factory<N> myFactory;
 
-        super();
+        Factory(final DenseArray.Factory<N> arrayFactory) {
 
-        myRank = rank;
-        myDimensions = dimensions;
-        final long[] shape = new long[rank];
-        Arrays.fill(shape, dimensions);
+            super(arrayFactory);
 
-        myArray = ArrayAnyD.factory(arrayFactory).make(shape);
+            myFactory = ArrayAnyD.factory(arrayFactory);
+        }
 
-        myArrayFactory = arrayFactory;
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof Factory)) {
+                return false;
+            }
+            Factory other = (Factory) obj;
+            if (myFactory == null) {
+                if (other.myFactory != null) {
+                    return false;
+                }
+            } else if (!myFactory.equals(other.myFactory)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+            return result;
+        }
+
+        public AnyTensor<N> make(final long... structure) {
+            if (structure.length <= 0) {
+                throw new IllegalArgumentException();
+            }
+            for (int i = 1; i < structure.length; i++) {
+                if (structure[i] != structure[0]) {
+                    throw new IllegalArgumentException();
+                }
+            }
+            return new AnyTensor<>(myFactory, structure.length, Math.toIntExact(structure[0]));
+        }
+
     }
 
-    public Tensor<N> add(final Tensor<N> addend) {
+    public static <N extends Comparable<N>> TensorFactoryAnyD<N, AnyTensor<N>> factory(final DenseArray.Factory<N> arrayFactory) {
+        return new TensorFactoryAnyD<>(new AnyTensor.Factory<>(arrayFactory));
+    }
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+    private final ArrayAnyD<N> myArray;
+    private final ArrayAnyD.Factory<N> myFactory;
 
-        retArray.loopAll((final long i) -> retArray.set(i, this.doubleValue(i) + addend.doubleValue(i)));
+    AnyTensor(final ArrayAnyD.Factory<N> factory, final int rank, final int dimensions) {
+
+        super(rank, dimensions, factory.function(), factory.scalar());
+
+        long[] shape = new long[rank];
+        Arrays.fill(shape, dimensions);
+
+        myFactory = factory;
+        myArray = factory.make(shape);
+    }
+
+    public AnyTensor<N> add(final AnyTensor<N> addend) {
+
+        AnyTensor<N> retVal = this.newSameShape();
+
+        this.add(retVal.getArray(), myArray, addend);
 
         return retVal;
     }
 
-    public Tensor<N> conjugate() {
+    public AnyTensor<N> conjugate() {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+        AnyTensor<N> retVal = this.newSameShape();
+        ArrayAnyD<N> array = retVal.getArray();
 
-        final long[] traspRef = retVal.shape().clone();
-        final long max = myDimensions - 1L;
+        long[] transp = retVal.shape().clone();
+        int max = this.rank() - 1;
 
-        retArray.loopAll((final long[] ref) -> {
-            for (int i = 0; i < traspRef.length; i++) {
-                traspRef[i] = max - ref[i];
+        array.loopAll((final long[] ref) -> {
+            for (int i = 0; i < transp.length; i++) {
+                transp[max - i] = ref[i];
             }
-            retArray.set(traspRef, myArray.doubleValue(ref));
+            array.set(transp, myArray.doubleValue(ref));
         });
 
         return retVal;
     }
 
-    public long count() {
-        return (long) Math.pow(myDimensions, myRank);
-    }
-
-    public int dimensions() {
-        return myDimensions;
+    public long count(final int dimension) {
+        return myArray.count(dimension);
     }
 
     public double doubleValue(final long[] ref) {
         return myArray.doubleValue(ref);
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof AnyTensor)) {
+            return false;
+        }
+        AnyTensor other = (AnyTensor) obj;
+        if (myArray == null) {
+            if (other.myArray != null) {
+                return false;
+            }
+        } else if (!myArray.equals(other.myArray)) {
+            return false;
+        }
+        if (myFactory == null) {
+            if (other.myFactory != null) {
+                return false;
+            }
+        } else if (!myFactory.equals(other.myFactory)) {
+            return false;
+        }
+        return true;
+    }
+
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        myArray.fillOne(index, values, valueIndex);
+    }
+
+    public void fillOne(final long index, final N value) {
+        myArray.fillOne(index, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
+        myArray.fillOne(index, supplier);
+    }
+
+    public void fillOne(final long[] reference, final N value) {
+        myArray.fillOne(reference, value);
+    }
+
+    public void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
+        myArray.fillOne(reference, supplier);
+    }
+
+    public void fillSet(final int dimension, final long dimensionalIndex, final N value) {
+        myArray.fillSet(dimension, dimensionalIndex, value);
+    }
+
+    public void fillSet(final int dimension, final long dimensionalIndex, final NullaryFunction<?> supplier) {
+        myArray.fillSet(dimension, dimensionalIndex, supplier);
+    }
+
+    public void fillSet(final long[] initial, final int dimension, final N value) {
+        myArray.fillSet(initial, dimension, value);
+    }
+
+    public void fillSet(final long[] initial, final int dimension, final NullaryFunction<?> supplier) {
+        myArray.fillSet(initial, dimension, supplier);
+    }
+
     public N get(final long[] ref) {
         return myArray.get(ref);
     }
 
-    public boolean isSmall(final double comparedTo) {
-        return myArray.isAllSmall(comparedTo);
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + ((myArray == null) ? 0 : myArray.hashCode());
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        return result;
     }
 
-    public Tensor<N> multiply(final double scalarMultiplicand) {
+    public AnyTensor<N> multiply(final double scalarMultiplicand) {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+        AnyTensor<N> retVal = this.newSameShape();
 
-        retArray.modifyAll(myArrayFactory.function().multiply().second(scalarMultiplicand));
+        this.multiply(retVal.getArray(), scalarMultiplicand, myArray);
 
         return retVal;
     }
 
-    public Tensor<N> multiply(final N scalarMultiplicand) {
+    public AnyTensor<N> multiply(final N scalarMultiplicand) {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+        AnyTensor<N> retVal = this.newSameShape();
 
-        retArray.modifyAll(myArrayFactory.function().multiply().second(scalarMultiplicand));
+        this.multiply(retVal.getArray(), scalarMultiplicand, myArray);
 
         return retVal;
     }
 
-    public Tensor<N> negate() {
+    public AnyTensor<N> negate() {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+        AnyTensor<N> retVal = this.newSameShape();
 
-        retArray.modifyAll(myArrayFactory.function().negate());
+        this.negate(retVal.getArray(), myArray);
 
         return retVal;
     }
 
     public double norm() {
-        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.function().aggregator().norm2();
-        myArray.visitAll(tmpNorm2);
-        return tmpNorm2.doubleValue();
+        return this.norm(myArray);
     }
 
-    public int rank() {
-        return myRank;
+    public void set(final long[] reference, final Comparable<?> value) {
+        myArray.set(reference, value);
+    }
+
+    public void set(final long[] reference, final double value) {
+        myArray.set(reference, value);
     }
 
     public long[] shape() {
         return myArray.shape();
     }
 
-    public Tensor<N> signum() {
-        return this.multiply(PrimitiveMath.ONE / this.norm());
+    @Override
+    public String toString() {
+        return AccessAnyD.toString(myArray);
     }
 
     ArrayAnyD<N> getArray() {
         return myArray;
+    }
+
+    @Override
+    AnyTensor<N> newSameShape() {
+        return new AnyTensor<>(myFactory, this.rank(), this.dimensions());
     }
 
 }

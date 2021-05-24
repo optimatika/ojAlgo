@@ -21,6 +21,8 @@
  */
 package org.ojalgo.algebra;
 
+import org.ojalgo.scalar.PrimitiveScalar;
+
 /**
  * @author apete
  */
@@ -30,7 +32,9 @@ public interface NormedVectorSpace<T, N extends Comparable<N>> extends VectorSpa
      * @param comparedTo What to compare with
      * @return true if this is small compared to the magnitude of the input reference value.
      */
-    boolean isSmall(double comparedTo);
+    default boolean isSmall(final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, this.norm());
+    }
 
     /**
      * <code>this == this.signum().multiply(this.norm())</code>

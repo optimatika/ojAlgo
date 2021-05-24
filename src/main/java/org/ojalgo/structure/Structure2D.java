@@ -410,6 +410,21 @@ public interface Structure2D extends Structure1D {
 
     }
 
+    public interface Reshapable extends Structure2D {
+
+        /**
+         * Flattens this to a 1D structure. This operation is largely redundant in ojAlgo as anything 2D is
+         * also/simultaneously 1D.
+         */
+        Structure1D flatten();
+
+        /**
+         * @see StructureAnyD.Reshapable#reshape(long...)
+         */
+        Structure2D reshape(long rows, long columns);
+
+    }
+
     @FunctionalInterface
     public interface RowColumnCallback {
 
