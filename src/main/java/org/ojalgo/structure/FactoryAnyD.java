@@ -21,7 +21,9 @@
  */
 package org.ojalgo.structure;
 
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.scalar.Scalar.Factory;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
@@ -61,6 +63,24 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
             return this.makeSparse(shape.shape());
         }
 
+    }
+
+    default Factory1D<I> asFactory1D() {
+        return new Factory1D<I>() {
+
+            public FunctionSet<?> function() {
+                return FactoryAnyD.this.function();
+            }
+
+            public I make(final long count) {
+                return FactoryAnyD.this.make(count);
+            }
+
+            public Factory<?> scalar() {
+                return FactoryAnyD.this.scalar();
+            }
+
+        };
     }
 
     I make(long... structure);

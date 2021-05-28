@@ -35,12 +35,16 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.tensor.TensorFactory1D;
+import org.ojalgo.tensor.TensorFactory2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -923,6 +927,42 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     @Override
     public Scalar.Factory<N> scalar() {
         return myPhysicalFactory.scalar();
+    }
+
+    public TensorFactory2D<N, DR> tensor2D() {
+        return TensorFactory2D.of(new Factory2D<DR>() {
+
+            public FunctionSet<N> function() {
+                return MatrixFactory.this.function();
+            }
+
+            public Factory<N> scalar() {
+                return MatrixFactory.this.scalar();
+            }
+
+            public DR make(final long rows, final long columns) {
+                return MatrixFactory.this.makeDense(rows, columns);
+            }
+
+        });
+    }
+
+    public TensorFactory1D<N, DR> tensor1D() {
+        return TensorFactory1D.of(new Factory1D<DR>() {
+
+            public FunctionSet<N> function() {
+                return MatrixFactory.this.function();
+            }
+
+            public Factory<N> scalar() {
+                return MatrixFactory.this.scalar();
+            }
+
+            public DR make(final long count) {
+                return MatrixFactory.this.makeDense(count, 1L);
+            }
+
+        });
     }
 
     /**

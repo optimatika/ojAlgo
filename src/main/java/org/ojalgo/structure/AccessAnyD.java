@@ -21,6 +21,8 @@
  */
 package org.ojalgo.structure;
 
+import java.util.Arrays;
+
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
@@ -158,6 +160,10 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         } while (retVal && ((d <= 3) || (tmpCount > 1)));
 
         return retVal && Access1D.equals(accessA, accessB, accuracy);
+    }
+
+    static String toString(final AccessAnyD<?> array) {
+        return Arrays.toString(array.shape()) + " " + Access1D.toString(array);
     }
 
     default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {

@@ -511,7 +511,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public Array1D<Double> asList() {
-        return myUtility.asArray1D();
+        return myUtility.flatten();
     }
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {

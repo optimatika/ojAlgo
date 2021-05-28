@@ -397,7 +397,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public Array1D<Double> asList() {
-        return myUtility.asArray1D();
+        return myUtility.flatten();
     }
 
     public byte byteValue(final long row, final long col) {

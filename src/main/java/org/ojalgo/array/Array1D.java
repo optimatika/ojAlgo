@@ -45,6 +45,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Transformation1D;
+import org.ojalgo.tensor.TensorFactory1D;
 
 /**
  * Array1D
@@ -104,6 +105,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
+        }
+
+        public TensorFactory1D<N, Array1D<N>> tensor() {
+            return TensorFactory1D.of(this);
         }
 
         public Array1D<N> wrap(final BasicArray<N> array) {
@@ -310,7 +315,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         return this.indexOf(obj) != -1;
     }
 
-    @SuppressWarnings("unchecked")
     public Array1D<N> copy() {
 
         BasicArray<N> retVal = null;
@@ -629,6 +633,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
         myDelegate.modify(tmpFirst, tmpLimit, myStep, modifier);
+    }
+
+    public void reset() {
+        myDelegate.reset();
     }
 
     @Override

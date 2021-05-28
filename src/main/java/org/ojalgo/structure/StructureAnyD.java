@@ -259,6 +259,33 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
+    public interface Reshapable extends StructureAnyD {
+
+        /**
+         * If necessary increase the rank to the specified number (without changing the total number of
+         * components)
+         */
+        StructureAnyD expand(int rank);
+
+        /**
+         * Flattens this to a 1D structure. This operation is largely redundant in ojAlgo as anything AnyD is
+         * also/simultaneously 1D.
+         */
+        Structure1D flatten();
+
+        /**
+         * The same array viewed/accessed with a different shape
+         */
+        StructureAnyD reshape(long... shape);
+
+        /**
+         * Squeezing removes the dimensions or axes that have a length of one. (This does not change the total
+         * number of components.)
+         */
+        StructureAnyD squeeze();
+
+    }
+
     /**
      * @param structure An access structure
      * @return The size of an access with that structure

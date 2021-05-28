@@ -42,14 +42,16 @@ import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.tensor.TensorFactory2D;
 
 /**
  * Array2D
  *
  * @author apete
  */
-public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
+public final class Array2D<N extends Comparable<N>>
+        implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
+        Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
     public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
@@ -261,6 +263,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
             return myDelegate.scalar();
         }
 
+        public TensorFactory2D<N, Array2D<N>> tensor() {
+            return TensorFactory2D.of(this);
+        }
+
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<>(BigArray.FACTORY);
@@ -348,18 +354,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         return visitor.get();
     }
 
-    /**
-     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
-     * copied, it is just accessed through a different adaptor.
-     *
-     * @deprecated v39 Not needed
-     */
-    @Deprecated
-    public Array1D<N> asArray1D() {
-        return myDelegate.wrapInArray1D();
-    }
-
-    public void clear() {
+    public void reset() {
         myDelegate.reset();
     }
 
@@ -539,6 +534,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
     }
 
+    /**
+     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
+     *
+     * @see org.ojalgo.structure.Structure2D.Reshapable#flatten()
+     */
+    public Array1D<N> flatten() {
+        return myDelegate.wrapInArray1D();
+    }
+
     @Override
     public N get(final long index) {
         return myDelegate.get(index);
@@ -711,16 +716,23 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
     @Override
     public Array1D<N> reduceColumns(final Aggregator aggregator) {
-        Array1D<N> retVal = myDelegate.factory().makeZero(myColumnsCount).wrapInArray1D();
+        Array1D<N> retVal = myDelegate.factory().make(myColumnsCount).wrapInArray1D();
         this.reduceColumns(aggregator, retVal);
         return retVal;
     }
 
     @Override
     public Array1D<N> reduceRows(final Aggregator aggregator) {
-        Array1D<N> retVal = myDelegate.factory().makeZero(myRowsCount).wrapInArray1D();
+        Array1D<N> retVal = myDelegate.factory().make(myRowsCount).wrapInArray1D();
         this.reduceRows(aggregator, retVal);
         return retVal;
+    }
+
+    public Array2D<N> reshape(final long rows, final long columns) {
+        if (Structure2D.count(rows, columns) != this.count()) {
+            throw new IllegalArgumentException();
+        }
+        return myDelegate.wrapInArray2D(rows);
     }
 
     @Override
