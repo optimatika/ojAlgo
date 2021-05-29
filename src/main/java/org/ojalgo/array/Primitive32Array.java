@@ -186,6 +186,14 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
+    public void supplyTo(final Mutate1D receiver) {
+        int limit = Math.min(data.length, receiver.size());
+        for (int i = 0; i < limit; i++) {
+            receiver.set(i, data[i]);
+        }
+    }
+
+    @Override
     protected void add(final int index, final Comparable<?> addend) {
         data[index] += NumberDefinition.floatValue(addend);
     }

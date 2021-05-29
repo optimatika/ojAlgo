@@ -51,7 +51,7 @@ import org.ojalgo.structure.Mutate1D;
  */
 public final class NumberList<N extends Comparable<N>> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
-    public static final class ListFactory<N extends Comparable<N>> extends StrategyBuilder<N, NumberList<N>, ListFactory<N>> {
+    public static final class ListFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, NumberList<N>, ListFactory<N>> {
 
         ListFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);

@@ -328,8 +328,12 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}",
-                        Array1D.PRIMITIVE64.copy(myTableau.sliceTableauRow(this.getRowObjective())).copy(tmpExcluded));
+                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(this.getRowObjective());
+                double[] exclVals = new double[tmpExcluded.length];
+                for (int i = 0; i < exclVals.length; i++) {
+                    exclVals[i] = sliceTableauRow.doubleValue(tmpExcluded[i]);
+                }
+                this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}", Arrays.toString(exclVals));
             } else {
                 this.log("\nfindNextPivotCol");
             }

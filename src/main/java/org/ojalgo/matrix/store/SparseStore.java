@@ -124,7 +124,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         super(factory, rowsCount, columnsCount);
 
-        myElements = SparseArray.factory(factory.array(), this.count()).initial(Math.max(rowsCount, columnsCount)).make();
+        myElements = SparseArray.factory(factory.array()).limit(this.count()).initial(Math.max(rowsCount, columnsCount)).make();
         myFirsts = new int[rowsCount];
         myLimits = new int[rowsCount];
         Arrays.fill(myFirsts, columnsCount);

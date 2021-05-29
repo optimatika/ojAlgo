@@ -50,8 +50,8 @@ import org.ojalgo.tensor.TensorFactory2D;
  * @author apete
  */
 public final class Array2D<N extends Comparable<N>>
-        implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
-        Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
+        implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
+        Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
     public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
@@ -352,10 +352,6 @@ public final class Array2D<N extends Comparable<N>>
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRow(row, col, visitor);
         return visitor.get();
-    }
-
-    public void reset() {
-        myDelegate.reset();
     }
 
     @Override
@@ -728,6 +724,10 @@ public final class Array2D<N extends Comparable<N>>
         return retVal;
     }
 
+    public void reset() {
+        myDelegate.reset();
+    }
+
     public Array2D<N> reshape(final long rows, final long columns) {
         if (Structure2D.count(rows, columns) != this.count()) {
             throw new IllegalArgumentException();
@@ -795,6 +795,10 @@ public final class Array2D<N extends Comparable<N>>
     @Override
     public Array1D<N> sliceRow(final long row, final long col) {
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount);
+    }
+
+    public void supplyTo(final Mutate2D receiver) {
+        myDelegate.supplyTo(receiver);
     }
 
     @Override

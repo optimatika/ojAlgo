@@ -76,7 +76,7 @@ public class Array1DTest {
         for (int i = 0; i < tmpAll.countRows(); i++) {
 
             final Array1D<Double> tmpSlice = tmpAll.sliceRow(i, 0);
-            final Array1D<Double> tmpCopy = tmpSlice.copy(); // Will result in a different (Java's built-in) sorting algorthm
+            final Array1D<Double> tmpCopy = tmpSlice.collect(Array1D.PRIMITIVE64); // Will result in a different (Java's built-in) sorting algorthm
 
             if (tmpAscending) {
                 tmpSlice.sortAscending();

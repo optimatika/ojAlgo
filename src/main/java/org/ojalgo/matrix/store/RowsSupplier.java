@@ -47,11 +47,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>,
     }
 
     public SparseArray<N> addRow() {
-        return this.addRow(SparseArray.factory(myFactory.array(), myColumnsCount).make());
+        return this.addRow(SparseArray.factory(myFactory.array()).limit(myColumnsCount).make());
     }
 
     public void addRows(final int numberToAdd) {
-        SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myColumnsCount);
+        SparseFactory<N> factory = SparseArray.factory(myFactory.array()).limit(myColumnsCount);
         for (int i = 0; i < numberToAdd; i++) {
             myRows.add(factory.make());
         }

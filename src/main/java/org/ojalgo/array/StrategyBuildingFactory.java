@@ -2,11 +2,11 @@ package org.ojalgo.array;
 
 import org.ojalgo.structure.Access1D;
 
-public abstract class StrategyBuilder<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
+public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
 
     private final DenseCapacityStrategy<N> myStrategy;
 
-    public StrategyBuilder(final DenseArray.Factory<N> denseFactory) {
+    public StrategyBuildingFactory(final DenseArray.Factory<N> denseFactory) {
 
         super();
 
@@ -18,7 +18,6 @@ public abstract class StrategyBuilder<N extends Comparable<N>, I extends Access1
      *        Above it, it is grown by adding one "chunk" at the time.
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public SB chunk(final long chunk) {
         myStrategy.chunk(chunk);
         return (SB) this;
@@ -32,7 +31,6 @@ public abstract class StrategyBuilder<N extends Comparable<N>, I extends Access1
      * @param initial Sets the initial capacity of the "arrays" to be created using this factory.
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public SB initial(final long initial) {
         myStrategy.initial(initial);
         return (SB) this;
@@ -46,7 +44,6 @@ public abstract class StrategyBuilder<N extends Comparable<N>, I extends Access1
      *        first in that case).
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public SB limit(final long limit) {
         myStrategy.limit(limit);
         return (SB) this;

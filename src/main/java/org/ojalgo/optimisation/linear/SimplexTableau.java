@@ -470,7 +470,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             myRows = new SparseArray[numberOfConstraints];
             for (int r = 0; r < numberOfConstraints; r++) {
-                myRows[r] = mySparseFactory.make(totNumbVars);
+                myRows[r] = mySparseFactory.limit(totNumbVars).make();
             }
 
             myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
@@ -620,7 +620,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             final int totNumbVars = this.countVariablesTotally();
 
-            SparseArray<Double> auxiliaryRow = mySparseFactory.make(totNumbVars);
+            SparseArray<Double> auxiliaryRow = mySparseFactory.limit(totNumbVars).make();
             double auxiliaryRHS = ZERO;
 
             if (currentRHS > value) {

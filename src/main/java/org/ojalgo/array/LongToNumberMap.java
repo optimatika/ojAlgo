@@ -27,7 +27,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
-    public static final class MapFactory<N extends Comparable<N>> extends StrategyBuilder<N, LongToNumberMap<N>, MapFactory<N>> {
+    public static final class MapFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, LongToNumberMap<N>, MapFactory<N>> {
 
         MapFactory(final Factory<N> denseFactory) {
             super(denseFactory);
@@ -51,9 +51,9 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
         super();
 
-        myStrategy = strategy;
+        myStrategy = strategy.limit(Long.MAX_VALUE);
 
-        myStorage = new SparseArray<>(Long.MAX_VALUE, strategy);
+        myStorage = new SparseArray<>(myStrategy);
     }
 
     /**
