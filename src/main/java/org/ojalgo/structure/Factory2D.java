@@ -30,7 +30,7 @@ import org.ojalgo.scalar.Scalar.Factory;
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */

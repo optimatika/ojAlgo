@@ -54,13 +54,18 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         AccessAnyD.Elements, AccessAnyD.IndexOf, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>,
         AccessAnyD.Collectable<N, MutateAnyD>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
 
-    public static final class Factory<N extends Comparable<N>> implements FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
+    public static final class Factory<N extends Comparable<N>>
+            implements FactoryAnyD.Dense<ArrayAnyD<N>>, FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
             myDelegate = new BasicArray.Factory<>(denseArray);
+        }
+
+        public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
+            return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
 
         @Override
@@ -75,6 +80,15 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         public ArrayAnyD<N> makeDense(final long... structure) {
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
+        }
+
+        public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
+
+            BasicArray<N> toBeFilled = myDelegate.makeToBeFilled(structure);
+
+            toBeFilled.fillAll(supplier);
+
+            return toBeFilled.wrapInArrayAnyD(structure);
         }
 
         public ArrayAnyD<N> makeSparse(final long... structure) {

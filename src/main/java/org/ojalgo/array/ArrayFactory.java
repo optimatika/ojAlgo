@@ -27,7 +27,6 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;

@@ -53,7 +53,8 @@ public final class Array2D<N extends Comparable<N>>
         implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
         Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
-    public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>>
+            implements Factory2D.Dense<Array2D<N>>, Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -164,7 +165,7 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
 
             long tmpIndex = 0L;
             for (long j = 0L; j < columns; j++) {
@@ -240,7 +241,6 @@ public final class Array2D<N extends Comparable<N>>
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        @SuppressWarnings("unchecked")
         public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRows = source.length;
