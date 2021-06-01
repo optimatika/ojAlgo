@@ -53,9 +53,8 @@ import org.ojalgo.tensor.TensorFactory2D;
  * @author apete
  */
 public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, LB extends BasicMatrix.LogicalBuilder<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>, SR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>>
-        implements Factory2D.MayBeSparse<M, DR, SR> {
+        implements Factory2D.Dense<M>, Factory2D.MayBeSparse<M, DR, SR> {
 
-    @SuppressWarnings("unchecked")
     abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
         private MatrixStore.LogicalBuilder<N> myDelegate;
@@ -817,7 +816,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     private final Constructor<M> myConstructor;
     private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
 
-    @SuppressWarnings("unchecked")
     MatrixFactory(final Class<M> template, final PhysicalStore.Factory<N, ?> factory) {
 
         super();
@@ -838,7 +836,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    @SuppressWarnings("unchecked")
     public M columns(final List<? extends Comparable<?>>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
@@ -919,7 +916,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
-    @SuppressWarnings("unchecked")
     public M rows(final List<? extends Comparable<?>>... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }

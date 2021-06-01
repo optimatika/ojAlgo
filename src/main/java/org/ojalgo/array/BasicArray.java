@@ -47,8 +47,8 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Comparable<N>>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N> {
+public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
 
     public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -94,7 +94,7 @@ public abstract class BasicArray<N extends Comparable<N>>
 
             } else if (strategy.isChunked(total)) {
 
-                return new SparseArray<>(total, strategy);
+                return new SparseArray<>(strategy.limit(total));
 
             } else {
 
@@ -222,6 +222,13 @@ public abstract class BasicArray<N extends Comparable<N>>
         this.modify(first, limit, 1L, modifier);
     }
 
+    public void supplyTo(final Mutate1D receiver) {
+        long limit = Math.min(this.count(), receiver.count());
+        for (long i = 0; i < limit; i++) {
+            receiver.set(i, this.get(i));
+        }
+    }
+
     @Override
     public String toString() {
         return Access1D.toString(this);
@@ -311,5 +318,4 @@ public abstract class BasicArray<N extends Comparable<N>>
     final boolean isSparse() {
         return this instanceof SparseArray;
     }
-
 }

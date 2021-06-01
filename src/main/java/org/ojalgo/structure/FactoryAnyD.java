@@ -28,7 +28,7 @@ import org.ojalgo.scalar.Scalar.Factory;
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */

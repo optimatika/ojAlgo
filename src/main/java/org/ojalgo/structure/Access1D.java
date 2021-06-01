@@ -60,7 +60,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
         default <I extends R> I collect(final Factory1D<I> factory) {
 
-            final I retVal = factory.make(this.count());
+            I retVal = factory.make(this.count());
 
             this.supplyTo(retVal);
 

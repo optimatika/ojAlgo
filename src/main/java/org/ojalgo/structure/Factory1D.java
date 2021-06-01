@@ -28,7 +28,7 @@ import org.ojalgo.function.NullaryFunction;
 public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */
