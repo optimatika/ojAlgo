@@ -77,6 +77,20 @@ public abstract class TypeUtils {
                     retVal.append(Access1D.toString((Access1D<?>) args[a]));
                 } else if (double[].class.isInstance(args[a])) {
                     retVal.append(Arrays.toString((double[]) args[a]));
+                } else if (float[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((float[]) args[a]));
+                } else if (long[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((long[]) args[a]));
+                } else if (int[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((int[]) args[a]));
+                } else if (short[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((short[]) args[a]));
+                } else if (byte[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((byte[]) args[a]));
+                } else if (boolean[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((boolean[]) args[a]));
+                } else if (char[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((char[]) args[a]));
                 } else {
                     retVal.append(args[a]);
                 }

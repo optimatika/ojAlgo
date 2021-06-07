@@ -164,6 +164,11 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             return this;
         }
 
+        @Override
+        public String toString() {
+            return myCursor + " = " + myValues.get(myCursor);
+        }
+
         public ElementView<N> trySplit() {
 
             final long remaining = myLastCursor - myCursor;
