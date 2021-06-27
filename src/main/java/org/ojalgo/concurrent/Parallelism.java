@@ -24,39 +24,30 @@ package org.ojalgo.concurrent;
 import java.util.function.IntSupplier;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.function.special.PowerOf2;
 
 /**
  * A set of standard levels of parallelsim derived from the number of available cores and optionally capped by
  * reserving a specified amount of memory per thread. The info about available cores/threads/memory comes from
  * {@link OjAlgoUtils#ENVIRONMENT}.
  */
-public enum Parallelism implements IntSupplier {
+public enum Parallelism implements ParallelismSupplier {
 
     /**
-     * Double the {@link #HIGHER} parallelism
+     * The total number of threads (incl. hyperthreads)
      */
-    OVERDRIVE(() -> 2 * Parallelism.higher()),
+    THREADS(() -> OjAlgoUtils.ENVIRONMENT.threads),
     /**
-     * If the number of cores is a power of 2, then {@link #LOWER} and {@link #HIGHER)} will be equal.
-     *
-     * @return The number of cores adjusted upwards to be power of 2
+     * The number of CPU cores
      */
-    HIGHER(Parallelism::higher),
+    CORES(() -> OjAlgoUtils.ENVIRONMENT.cores),
     /**
-     * If the number of cores is a power of 2, then {@link #LOWER} and {@link #HIGHER)} will be equal.
-     *
-     * @return The number of cores adjusted downwards to be power of 2
+     * The number of top level (L2 or L3) cache units
      */
-    LOWER(Parallelism::lower),
+    UNITS(() -> OjAlgoUtils.ENVIRONMENT.units),
     /**
-     * Half the {@link #LOWER} parallelism
+     * 8
      */
-    HALF(() -> Math.max(1, Parallelism.lower() / 2)),
-    /**
-     * A quarter of the {@link #LOWER} parallelism
-     */
-    QUARTER(() -> Math.max(1, Parallelism.lower() / 4)),
+    EIGHT(() -> 8),
     /**
      * 4
      */
@@ -70,14 +61,6 @@ public enum Parallelism implements IntSupplier {
      */
     ONE(() -> 1);
 
-    static int higher() {
-        return PowerOf2.adjustUp(OjAlgoUtils.ENVIRONMENT.cores);
-    }
-
-    static int lower() {
-        return PowerOf2.adjustDown(OjAlgoUtils.ENVIRONMENT.cores);
-    }
-
     private final IntSupplier myValue;
 
     Parallelism(final IntSupplier value) {
@@ -86,26 +69,6 @@ public enum Parallelism implements IntSupplier {
 
     public int getAsInt() {
         return myValue.getAsInt();
-    }
-
-    public IntSupplier reserveBytes(final long bytesPerThread) {
-        return () -> Math.max(1, Math.min(myValue.getAsInt(), PowerOf2.adjustDown(Math.toIntExact(OjAlgoUtils.ENVIRONMENT.memory / bytesPerThread))));
-    }
-
-    public IntSupplier reserveGigaBytes(final long gigaBytesPerThread) {
-        return this.reserveMegaBytes(1024L * gigaBytesPerThread);
-    }
-
-    public IntSupplier reserveKiloBytes(final long kiloBytesPerThread) {
-        return this.reserveBytes(1024L * kiloBytesPerThread);
-    }
-
-    public IntSupplier reserveMegaBytes(final long megaBytesPerThread) {
-        return this.reserveKiloBytes(1024L * megaBytesPerThread);
-    }
-
-    public IntSupplier reserveTeraBytes(final long teraBytesPerThread) {
-        return this.reserveGigaBytes(1024L * teraBytesPerThread);
     }
 
 }

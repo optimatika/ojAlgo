@@ -19,6 +19,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `Array2D` and `ArrayAnyD` are now reshapable
 
+#### org.ojalgo.concurrent
+
+- Additions to `DaemonPoolExecutor`: A `ThreadFactory` factory method, as well as a set of `ExecutorService` factory methods that makes use of that.
+- New utility `ProcessingService` standardise/simplify some `ExecutorService` usage.
+
 #### org.ojalgo.matrix
 
 - New interface `Matrix2D` common to both `BasicMatrix` (implements it) and `MatrixStore` (extends it).
@@ -31,6 +36,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.tensor
 
 - This package existed before but didn't really contain anything functional/useful – now it does. Now it contains 1D, 2D, and AnyD tensor implementations. These are not just (multi dimensional) arrays, but mathematical tensors as used by physicists and engineers. They are instatiated via special factories that implement various tensor products and direct sums. Further these factories are implemented as wrappers of (they delegate to) other 1D, 2D or AnyD factories. This means that just about any other data structure in ojAlgo can be created using the tensor product or direct sum implemenatations of these factories.
+
+### Changed
+
+#### org.ojalgo.concurrent
+
+- Changed the `Parallelism` enum. Changed which instances are available but increased flexibility by implemention the new `ParallelismSupplier` interface. 
+
+#### org.ojalgo.matrix
+
+- `ElementsSupplier` no longer extends `Supplier<MatrixStore<N>>` and no longer defines the method `PhysicalStore.Factory<N, ?> physical()`. Instead subinterfaces/implementors define corresponding functionality as needed.
+
+#### org.ojalgo.structure
+
+- The nested interfaces `Mutate1D.ModifiableReceiver`, `Mutate2D.ModifiableReceiver` and `MutateAnyD.ModifiableReceiver` now also extend `Access*D` which makes them aligned with the requirements of the `Transformation*D` interfaces.
 
 ### Removed
 
@@ -50,16 +69,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - The interfaces `Stream*D` have been removed – they were redundant. The `Operate*D` interfaces replace them.
-
-### Changed
-
-#### org.ojalgo.matrix
-
-- `ElementsSupplier` no longer extends `Supplier<MatrixStore<N>>` and no longer defines the method `PhysicalStore.Factory<N, ?> physical()`. Instead subinterfaces/implementors define corresponding functionality as needed.
-
-#### org.ojalgo.structure
-
-- The nested interfaces `Mutate1D.ModifiableReceiver`, `Mutate2D.ModifiableReceiver` and `MutateAnyD.ModifiableReceiver` now also extend `Access*D` which makes them aligned with the requirements of the `Transformation*D` interfaces.
 
 ## [48.4.2] – 2021-04-22
 

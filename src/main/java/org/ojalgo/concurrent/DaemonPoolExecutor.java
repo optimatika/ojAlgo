@@ -22,13 +22,17 @@
 package org.ojalgo.concurrent;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.OjAlgoUtils;
 
 public final class DaemonPoolExecutor extends ThreadPoolExecutor {
 
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+    private static final ThreadGroup GROUP = new ThreadGroup("ojAlgo-daemon-group");
+
     static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.units, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS,
-            new SynchronousQueue<Runnable>(), DaemonFactory.INSTANCE);
+            new SynchronousQueue<Runnable>(), DaemonPoolExecutor.newThreadFactory("ojAlgo-daemon-"));
 
     /**
      * @see java.util.concurrent.AbstractExecutorService#submit(java.util.concurrent.Callable)
@@ -51,8 +55,54 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
         return INSTANCE.submit(task, result);
     }
 
-    static DaemonPoolExecutor makeSingle() {
-        return new DaemonPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), DaemonFactory.INSTANCE);
+    /**
+     * Like {@link Executors#newCachedThreadPool()} but with identifiable (daemon) threads
+     */
+    public static ExecutorService newCachedThreadPool(final String name) {
+        return Executors.newCachedThreadPool(DaemonPoolExecutor.newThreadFactory(name));
+    }
+
+    /**
+     * Like {@link Executors#newFixedThreadPool(int)} but with identifiable (daemon) threads
+     */
+    public static ExecutorService newFixedThreadPool(final String name, final int nThreads) {
+        return Executors.newFixedThreadPool(nThreads, DaemonPoolExecutor.newThreadFactory(name));
+    }
+
+    /**
+     * Like {@link Executors#newScheduledThreadPool(int)} but with identifiable (daemon) threads
+     */
+    public static ExecutorService newScheduledThreadPool(final String name, final int corePoolSize) {
+        return Executors.newScheduledThreadPool(corePoolSize, DaemonPoolExecutor.newThreadFactory(name));
+    }
+
+    /**
+     * Like {@link Executors#newSingleThreadExecutor()} but with identifiable (daemon) threads
+     */
+    public static ExecutorService newSingleThreadExecutor(final String name) {
+        return Executors.newSingleThreadExecutor(DaemonPoolExecutor.newThreadFactory(name));
+    }
+
+    /**
+     * Like {@link Executors#newSingleThreadScheduledExecutor()} but with identifiable (daemon) threads
+     */
+    public static ExecutorService newSingleThreadScheduledExecutor(final String name) {
+        return Executors.newSingleThreadScheduledExecutor(DaemonPoolExecutor.newThreadFactory(name));
+    }
+
+    public static ThreadFactory newThreadFactory(final String name) {
+        return DaemonPoolExecutor.newThreadFactory(GROUP, name);
+    }
+
+    public static ThreadFactory newThreadFactory(final ThreadGroup group, final String name) {
+
+        String prefix = name.endsWith("-") ? name : name + "-";
+
+        return target -> {
+            Thread thread = new Thread(group, target, prefix + DaemonPoolExecutor.COUNTER.incrementAndGet());
+            thread.setDaemon(true);
+            return thread;
+        };
     }
 
     DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
