@@ -200,21 +200,9 @@ public final class ProcessingService {
      * @see ProcessingService#run(IntSupplier, Runnable)
      */
     public void run(final int parallelism, final Runnable processor) {
-        this.run(() -> parallelism, processor);
-    }
 
-    /**
-     * Will create precisely {@code parallelism} tasks that each execute the {@code processor}.
-     *
-     * @param parallelism The number of concurrent workers/threads that will run
-     * @param processor The processing code
-     */
-    public void run(final IntSupplier parallelism, final Runnable processor) {
-
-        int concurrency = parallelism.getAsInt();
-
-        List<Callable<Object>> tasks = new ArrayList<>(concurrency);
-        for (int i = 0; i < concurrency; i++) {
+        List<Callable<Object>> tasks = new ArrayList<>(parallelism);
+        for (int i = 0; i < parallelism; i++) {
             tasks.add(Executors.callable(processor));
         }
 
@@ -225,6 +213,16 @@ public final class ProcessingService {
         } catch (InterruptedException | ExecutionException cause) {
             throw new RuntimeException(cause);
         }
+    }
+
+    /**
+     * Will create precisely {@code parallelism} tasks that each execute the {@code processor}.
+     *
+     * @param parallelism The number of concurrent workers/threads that will run
+     * @param processor The processing code
+     */
+    public void run(final IntSupplier parallelism, final Runnable processor) {
+        this.run(parallelism.getAsInt(), processor);
     }
 
 }
