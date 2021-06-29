@@ -36,7 +36,18 @@ import org.ojalgo.TestUtils;
 
 public class ProcessingServiceTest {
 
-    private static final int _100 = 100;
+    static final int DIM = 100;
+    static final Object LOCK = new Object();
+
+    static void increment(final AtomicInteger counter) {
+        while (counter.get() < DIM) {
+            synchronized (LOCK) {
+                if (counter.get() < DIM && counter.incrementAndGet() >= DIM) {
+                    return;
+                }
+            }
+        }
+    }
 
     @Test
     public void testCompute() {
@@ -44,13 +55,13 @@ public class ProcessingServiceTest {
         ProcessingService executor = ProcessingService.newInstance("Test-compute");
 
         List<BigDecimal> inputs = new ArrayList<>();
-        for (int i = 0; i < _100; i++) {
+        for (int i = 0; i < DIM; i++) {
             inputs.add(BigDecimal.valueOf(i));
         }
 
         Map<BigDecimal, BigDecimal> results = executor.compute(inputs, Parallelism.THREADS, item -> item.movePointRight(1));
 
-        TestUtils.assertEquals(_100, results.size());
+        TestUtils.assertEquals(DIM, results.size());
         for (Entry<BigDecimal, BigDecimal> entry : results.entrySet()) {
             TestUtils.assertEquals(entry.getKey(), entry.getValue().divide(BigDecimal.TEN));
         }
@@ -62,20 +73,20 @@ public class ProcessingServiceTest {
         ProcessingService executor = ProcessingService.newInstance("Test-process");
 
         List<BigDecimal> inputs = new ArrayList<>();
-        for (int i = 0; i < _100; i++) {
+        for (int i = 0; i < DIM; i++) {
             inputs.add(BigDecimal.valueOf(i));
         }
 
         LongAdder counter = new LongAdder();
-        Set<BigDecimal> seen = ConcurrentHashMap.newKeySet(_100);
+        Set<BigDecimal> seen = ConcurrentHashMap.newKeySet(DIM);
 
         executor.process(inputs, Parallelism.THREADS, item -> {
             seen.add(item);
             counter.increment();
         });
 
-        TestUtils.assertEquals(_100, counter.sum());
-        TestUtils.assertEquals(_100, seen.size());
+        TestUtils.assertEquals(DIM, counter.sum());
+        TestUtils.assertEquals(DIM, seen.size());
 
         for (BigDecimal input : inputs) {
             TestUtils.assertTrue(seen.contains(input));
@@ -89,16 +100,15 @@ public class ProcessingServiceTest {
 
         AtomicInteger counter = new AtomicInteger();
 
-        executor.run(Parallelism.THREADS, () -> {
+        executor.run(Parallelism.THREADS, () -> ProcessingServiceTest.increment(counter));
 
-            while (counter.get() < _100) {
-                if (counter.incrementAndGet() >= _100) {
-                    return;
-                }
-            }
-        });
+        TestUtils.assertEquals(DIM, counter.get());
 
-        TestUtils.assertEquals(_100, counter.get());
+        counter.set(0);
+
+        executor.run(() -> DIM, () -> ProcessingServiceTest.increment(counter));
+
+        TestUtils.assertEquals(DIM, counter.get());
     }
 
 }
