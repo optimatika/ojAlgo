@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.junit.jupiter.api.Test;
@@ -86,21 +87,18 @@ public class ProcessingServiceTest {
 
         ProcessingService executor = ProcessingService.newInstance("Test-run");
 
-        List<BigDecimal> inputs = new ArrayList<>();
-        for (int i = 0; i < _100; i++) {
-            inputs.add(BigDecimal.valueOf(i));
-        }
+        AtomicInteger counter = new AtomicInteger();
 
-        LongAdder counter = new LongAdder();
+        executor.run(Parallelism.THREADS, () -> {
 
-        executor.run(_100, () -> {
-            counter.increment();
-            if (counter.sum() >= _100) {
-                return;
+            while (counter.get() < _100) {
+                if (counter.incrementAndGet() >= _100) {
+                    return;
+                }
             }
         });
 
-        TestUtils.assertEquals(_100, counter.sum());
+        TestUtils.assertEquals(_100, counter.get());
     }
 
 }
