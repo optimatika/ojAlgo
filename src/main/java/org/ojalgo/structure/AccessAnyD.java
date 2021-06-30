@@ -236,6 +236,10 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return new MatrixView<>(this);
     }
 
+    default Iterable<VectorView<N>> vectors() {
+        return new VectorView<>(this);
+    }
+
     default short shortValue(final long index) {
         return this.shortValue(StructureAnyD.reference(index, this.shape()));
     }
