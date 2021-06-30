@@ -32,7 +32,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - A few additions to `Structure2D.Logical` like `symmetric(...)` and `superimpose(...)`
 - New interface `Structure2D.Reshapable` and `StructureAnyD.Reshapable`
-- `AccessAnyD` is now vector-terable in the same way it was already matrix-iterable – there is a new utility class `VectorView`.
+- `AccessAnyD` is now vector-terable in the same way it was already matrix-iterable – it now has a method `vectors()` and there is a new utility class `VectorView`.
 
 #### org.ojalgo.tensor
 
