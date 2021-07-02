@@ -67,6 +67,8 @@ public final class ProcessingService {
 
     }
 
+    static final ProcessingService INSTANCE = new ProcessingService(DaemonPoolExecutor.INSTANCE);
+
     public static ProcessingService newInstance(final String name) {
         return new ProcessingService(DaemonPoolExecutor.newCachedThreadPool(name));
     }
@@ -134,6 +136,10 @@ public final class ProcessingService {
      */
     public <W, R> Map<W, R> computeTriplet(final W work1, final W work2, final W work3, final Function<W, R> processor) {
         return this.compute(Arrays.asList(work1, work2, work3), processor);
+    }
+
+    public DivideAndConquer.Divider divider() {
+        return new DivideAndConquer.Divider(myExecutor);
     }
 
     /**
