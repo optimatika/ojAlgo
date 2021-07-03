@@ -19,23 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
-
-import org.ojalgo.matrix.operation.BLAS1;
+package org.ojalgo.matrix.operation;
 
 /**
- * Given two complex vectors x and y, each vector element of these vectors is replaced as follows: xi = c*xi +
- * s*yi yi = c*yi - s*xi
+ * <p>
+ * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are
+ * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore}
+ * implementations.
+ * </p>
+ * <ul>
+ * <li>http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms</li>
+ * <li>http://www.netlib.org/blas/</li>
+ * <li>http://www.netlib.org/blas/faq.html</li>
+ * <li>http://www.netlib.org/lapack/lug/node145.html</li>
+ * </ul>
+ * Basic Linear Algebra Subprograms (BLAS) Level 3 contains matrix-matrix operations.
+ * <ul>
+ * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3">BLAS Level 3 @
+ * WikipediA</a></li>
+ * <li><a href="http://www.netlib.org/blas/#_level_3">BLAS Level 3 @ Netlib</a></li>
+ * <li><a href="https://software.intel.com/en-us/node/520774">BLAS Level 3 @ Intel</a></li>
+ * </ul>
  *
  * @author apete
  */
-public final class ROT implements BLAS1 {
-
-    public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
+public interface BLAS3 extends MatrixOperation {
 
 }

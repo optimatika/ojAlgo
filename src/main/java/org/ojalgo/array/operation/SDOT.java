@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * The ?sdot routines compute the inner product of two vectors with double precision. Both routines use double
  * precision accumulation of the intermediate results, but the sdsdot routine outputs the final result in

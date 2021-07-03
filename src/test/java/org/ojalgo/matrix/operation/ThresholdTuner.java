@@ -19,23 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
+import org.ojalgo.BenchmarkUtils;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 
-/**
- * Given two complex vectors x and y, each vector element of these vectors is replaced as follows: xi = c*xi +
- * s*yi yi = c*yi - s*xi
- *
- * @author apete
- */
-public final class ROT implements BLAS1 {
+@State(Scope.Benchmark)
+public abstract class ThresholdTuner {
 
-    public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
+    public static ChainedOptionsBuilder options() {
+        return BenchmarkUtils.options();
     }
+
+    @Param({ "1", "2" })
+    public int z;
+
+    ThresholdTuner() {
+        super();
+    }
+
+    public abstract void setup();
+
+    public abstract Object tune();
 
 }

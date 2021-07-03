@@ -67,7 +67,7 @@ public final class ProcessingService {
 
     }
 
-    static final ProcessingService INSTANCE = new ProcessingService(DaemonPoolExecutor.INSTANCE);
+    public static final ProcessingService INSTANCE = new ProcessingService(DaemonPoolExecutor.INSTANCE);
 
     public static ProcessingService newInstance(final String name) {
         return new ProcessingService(DaemonPoolExecutor.newCachedThreadPool(name));

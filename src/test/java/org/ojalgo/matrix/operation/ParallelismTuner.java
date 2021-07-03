@@ -19,30 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-/**
- * <p>
- * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are
- * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore}
- * implementations.
- * </p>
- * <ul>
- * <li>http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms</li>
- * <li>http://www.netlib.org/blas/</li>
- * <li>http://www.netlib.org/blas/faq.html</li>
- * <li>http://www.netlib.org/lapack/lug/node145.html</li>
- * </ul>
- * Basic Linear Algebra Subprograms (BLAS) Level 3 contains matrix-matrix operations.
- * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3">BLAS Level 3 @
- * WikipediA</a></li>
- * <li><a href="http://www.netlib.org/blas/#_level_3">BLAS Level 3 @ Netlib</a></li>
- * <li><a href="https://software.intel.com/en-us/node/520774">BLAS Level 3 @ Intel</a></li>
- * </ul>
- *
- * @author apete
- */
-public interface BLAS3 extends ArrayOperation {
+import java.util.concurrent.TimeUnit;
+
+import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.concurrent.Parallelism;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
+
+@State(Scope.Benchmark)
+public abstract class ParallelismTuner {
+
+    private static final TimeValue TWO_MINUTES = new TimeValue(2L, TimeUnit.MINUTES);
+
+    public static ChainedOptionsBuilder options() {
+        return BenchmarkUtils.options().warmupIterations(2).warmupTime(TWO_MINUTES).measurementTime(TWO_MINUTES);
+    }
+
+    @Param({ "UNITS", "CORES", "THREADS" })
+    public Parallelism parallelism;
+
+    ParallelismTuner() {
+        super();
+    }
+
+    public abstract void setup();
+
+    public abstract Object tune();
 
 }

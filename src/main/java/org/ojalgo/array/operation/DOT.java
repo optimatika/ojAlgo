@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 

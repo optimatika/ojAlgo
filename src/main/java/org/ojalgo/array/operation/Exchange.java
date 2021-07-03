@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 public final class Exchange implements BLAS1 {
 
     public static int THRESHOLD = 256;

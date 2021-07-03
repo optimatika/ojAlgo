@@ -19,11 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import java.math.BigDecimal;
 
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.AMIN;
+import org.ojalgo.array.operation.ASUM;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -55,7 +58,7 @@ import org.ojalgo.scalar.RationalNumber;
  *
  * @author apete
  */
-public interface BLAS1 extends ArrayOperation {
+public interface BLAS1 extends MatrixOperation {
 
     @FunctionalInterface
     public interface GenericToInt<T> {
@@ -91,7 +94,7 @@ public interface BLAS1 extends ArrayOperation {
     GenericToInt<RationalNumber> RAMAX = AMAX::invoke;
 
     static double fma(final double m1, final double m2, final double a) {
-        return (m1 * m2) + a;
+        return m1 * m2 + a;
     }
 
 }

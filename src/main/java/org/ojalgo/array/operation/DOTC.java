@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * The ?dotc routines perform a vector-vector operation defined as: Equation
  *

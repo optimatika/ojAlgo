@@ -36,7 +36,7 @@ import org.ojalgo.TestUtils;
 
 public class ProcessingServiceTest {
 
-    static final int DIM = 100;
+    static final int DIM = 1_000;
     static final Object LOCK = new Object();
 
     static void increment(final AtomicInteger counter) {

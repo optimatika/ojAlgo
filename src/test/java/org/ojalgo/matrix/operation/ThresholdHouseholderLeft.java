@@ -19,10 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.operation.HouseholderLeft;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -51,42 +52,59 @@ import org.openjdk.jmh.runner.RunnerException;
  * ThresholdHouseholderLeft.decompose   1024    2  thrpt    3     50,403 ±    1,336  ops/min
  * </pre>
  *
- * MacBook Pro: 2018-03-01 => 128
+ * MacBook Pro (16-inch, 2019): 2021-07-03 => 128, maybe 64
  *
  * <pre>
-# Run complete. Total time: 00:01:59
-
-Benchmark                      (dim)  (z)   Mode  Cnt       Score      Error    Units
-ThresholdHouseholderLeft.tune     64    1  thrpt    5  129171.723 ± 6950.436  ops/min
-ThresholdHouseholderLeft.tune     64    2  thrpt    5   86498.518 ± 7663.407  ops/min
-ThresholdHouseholderLeft.tune    128    1  thrpt    5   16699.548 ±  799.410  ops/min
-ThresholdHouseholderLeft.tune    128    2  thrpt    5   18346.822 ±  734.169  ops/min
-ThresholdHouseholderLeft.tune    256    1  thrpt    5    2160.097 ±  280.417  ops/min
-ThresholdHouseholderLeft.tune    256    2  thrpt    5    2951.479 ±  185.585  ops/min
-ThresholdHouseholderLeft.tune    512    1  thrpt    5     277.317 ±   20.545  ops/min
-ThresholdHouseholderLeft.tune    512    2  thrpt    5     432.828 ±   30.093  ops/min
+Benchmark                      (dim)  (z)   Mode  Cnt        Score       Error    Units
+ThresholdHouseholderLeft.tune     32    1  thrpt    3  1051183.673 ± 49191.323  ops/min
+ThresholdHouseholderLeft.tune     32    2  thrpt    3   305679.211 ± 16514.372  ops/min
+ThresholdHouseholderLeft.tune     64    1  thrpt    3   153534.040 ±  9529.241  ops/min
+ThresholdHouseholderLeft.tune     64    2  thrpt    3   100912.411 ±  7704.396  ops/min
+ThresholdHouseholderLeft.tune    128    1  thrpt    3    22405.663 ±   477.055  ops/min
+ThresholdHouseholderLeft.tune    128    2  thrpt    3    23413.001 ±  1091.634  ops/min
+ThresholdHouseholderLeft.tune    256    1  thrpt    3     2914.775 ±    25.036  ops/min
+ThresholdHouseholderLeft.tune    256    2  thrpt    3     3849.013 ±   212.316  ops/min
+ThresholdHouseholderLeft.tune    512    1  thrpt    3      372.784 ±    11.004  ops/min
+ThresholdHouseholderLeft.tune    512    2  thrpt    3      540.688 ±    49.843  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdHouseholderLeft extends AbstractThresholdTuner {
+public class ThresholdHouseholderLeft extends ThresholdTuner {
 
-    public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ThresholdHouseholderLeft.class);
+    static final class CodeAndData {
+
+        Primitive64Store body;
+        QR<Double> decomposition;
+        Primitive64Store preallocated;
+        Primitive64Store rhs;
+
+        CodeAndData(final int dim) {
+
+            super();
+
+            decomposition = QR.PRIMITIVE.make(true);
+
+            body = Primitive64Store.FACTORY.makeFilled(2 * dim, dim, Uniform.standard());
+            rhs = Primitive64Store.FACTORY.makeFilled(2 * dim, 1, Uniform.standard());
+            preallocated = Primitive64Store.FACTORY.make(2 * dim, 1);
+        }
+
+        MatrixStore<Double> tune() {
+            decomposition.decompose(body);
+            return decomposition.getSolution(rhs, preallocated);
+        }
     }
 
-    @Param({ "64", "128", "256", "512" })
+    public static void main(final String[] args) throws RunnerException {
+        BenchmarkUtils.run(ThresholdTuner.options(), ThresholdHouseholderLeft.class);
+    }
+
+    @Param({ "32", "64", "128", "256", "512" })
     public int dim;
 
-    @Param({ "1", "2" })
-    public int z;
-
-    QR<Double> decomposition = new QRDecomposition.Primitive();
-
-    Primitive64Store body;
-    Primitive64Store rhs;
-    Primitive64Store allocated;
+    CodeAndData benchmark;
 
     @Override
     @Setup
@@ -94,16 +112,13 @@ public class ThresholdHouseholderLeft extends AbstractThresholdTuner {
 
         HouseholderLeft.THRESHOLD = dim / z;
 
-        body = Primitive64Store.FACTORY.makeFilled(2 * dim, dim, new Uniform());
-        rhs = Primitive64Store.FACTORY.makeFilled(2 * dim, 1, new Uniform());
-        allocated = Primitive64Store.FACTORY.makeFilled(2 * dim, 1, new Uniform());
+        benchmark = new CodeAndData(dim);
     }
 
     @Override
     @Benchmark
     public Object tune() {
-        decomposition.decompose(body);
-        return decomposition.getSolution(rhs, allocated);
+        return benchmark.tune();
     }
 
 }

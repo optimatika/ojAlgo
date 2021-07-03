@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res
  * is a value containing the Euclidean norm of the elements of x.

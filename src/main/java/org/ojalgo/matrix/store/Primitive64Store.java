@@ -44,6 +44,7 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
+import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -74,7 +75,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn.doubleValue(i);
+                    tmpData[i + tmpRowDim * j] = tmpColumn.doubleValue(i);
                 }
             }
 
@@ -92,7 +93,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpColumn[i]);
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpColumn[i]);
                 }
             }
 
@@ -110,7 +111,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i];
+                    tmpData[i + tmpRowDim * j] = tmpColumn[i];
                 }
             }
 
@@ -128,7 +129,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpColumn.get(i));
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpColumn.get(i));
                 }
             }
 
@@ -187,7 +188,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow.doubleValue(j);
+                    tmpData[i + tmpRowDim * j] = tmpRow.doubleValue(j);
                 }
             }
 
@@ -205,7 +206,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpRow[j]);
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpRow[j]);
                 }
             }
 
@@ -223,7 +224,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow[j];
+                    tmpData[i + tmpRowDim * j] = tmpRow[j];
                 }
             }
 
@@ -241,7 +242,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpRow.get(j));
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpRow.get(j));
                 }
             }
 
@@ -353,29 +354,28 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     static Primitive64Store cast(final Access1D<Double> matrix) {
         if (matrix instanceof Primitive64Store) {
             return (Primitive64Store) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
         }
+        if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
+        }
+        return FACTORY.columns(matrix);
     }
 
     static Householder.Primitive64 cast(final Householder<Double> transformation) {
         if (transformation instanceof Householder.Primitive64) {
             return (Householder.Primitive64) transformation;
-        } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Primitive64) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
-        } else {
-            return new Householder.Primitive64(transformation);
         }
+        if (transformation instanceof HouseholderReference<?>) {
+            return ((Householder.Primitive64) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
+        }
+        return new Householder.Primitive64(transformation);
     }
 
     static Rotation.Primitive cast(final Rotation<Double> transformation) {
         if (transformation instanceof Rotation.Primitive) {
             return (Rotation.Primitive) transformation;
-        } else {
-            return new Rotation.Primitive(transformation);
         }
+        return new Rotation.Primitive(transformation);
     }
 
     private final MultiplyBoth.Primitive multiplyBoth;
@@ -448,7 +448,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final double[] tmpData = data;
         final double[] tmpColumn = ((Primitive64Array) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyCholesky.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -470,7 +470,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         final double[] column = ((Primitive64Array) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
 
             final DivideAndConquer conquerer = new DivideAndConquer() {
 
@@ -492,7 +492,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         final double[] column = ((Primitive64Array) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyLU.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -515,7 +515,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
-        AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, aSclrA, data, (aColX * myRowDim) + aFirstRow, 0, myRowDim - aFirstRow);
+        AXPY.invoke(data, aColY * myRowDim + aFirstRow, aSclrA, data, aColX * myRowDim + aFirstRow, 0, myRowDim - aFirstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> transformationCollector, final boolean eigenvalue) {
@@ -576,7 +576,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         final double[] tmpDestination = ((Primitive64Array) destination).data;
 
-        int tmpIndex = row + (column * tmpRowDim);
+        int tmpIndex = row + column * tmpRowDim;
         final double tmpDenominator = tmpData[tmpIndex];
 
         for (int i = row + 1; i < tmpRowDim; i++) {
@@ -593,17 +593,11 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof Primitive64Store)) {
+        if (!super.equals(obj) || !(obj instanceof Primitive64Store)) {
             return false;
         }
         Primitive64Store other = (Primitive64Store) obj;
-        if (myColDim != other.myColDim) {
-            return false;
-        }
-        if (myRowDim != other.myRowDim) {
+        if ((myColDim != other.myColDim) || (myRowDim != other.myRowDim)) {
             return false;
         }
         return true;
@@ -661,12 +655,10 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             } else {
                 multiplyRight.invoke(data, Primitive64Store.cast(left).data, complexity, right);
             }
+        } else if (right instanceof Primitive64Store) {
+            multiplyLeft.invoke(data, left, complexity, Primitive64Store.cast(right).data);
         } else {
-            if (right instanceof Primitive64Store) {
-                multiplyLeft.invoke(data, left, complexity, Primitive64Store.cast(right).data);
-            } else {
-                multiplyBoth.invoke(this, left, complexity, right);
-            }
+            multiplyBoth.invoke(this, left, complexity, right);
         }
     }
 
@@ -812,8 +804,8 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + myColDim;
-        result = (prime * result) + myRowDim;
+        result = prime * result + myColDim;
+        result = prime * result + myRowDim;
         return result;
     }
 
@@ -1034,31 +1026,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
-
-        final Householder.Primitive64 tmpTransf = Primitive64Store.cast(transformation);
-
-        final double[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    HouseholderLeft.invoke(tmpData, tmpRowDim, first, limit, tmpTransf);
-                }
-
-            };
-
-            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
-
-        } else {
-
-            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
-        }
+        HouseholderLeft.call(data, myRowDim, firstColumn, myColDim, Primitive64Store.cast(transformation));
     }
 
     public void transformLeft(final Rotation<Double> transformation) {
@@ -1074,14 +1042,12 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
-            }
+            myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
         }
     }
 
@@ -1096,7 +1062,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         final double[] tmpWorker = this.getWorkerColumn();
 
-        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
+        if (tmpRowDim - firstRow > HouseholderRight.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1128,14 +1094,12 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             } else {
                 myUtility.exchangeColumns(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
-            }
+            myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
     }
 
