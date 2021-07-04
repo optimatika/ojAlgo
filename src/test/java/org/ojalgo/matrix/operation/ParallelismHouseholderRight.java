@@ -22,27 +22,54 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.openjdk.jmh.annotations.Param;
+import org.ojalgo.OjAlgoUtils;
+import org.ojalgo.matrix.operation.ThresholdHouseholderRight.CodeAndData;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.RunnerException;
 
+/**
+ * Mac Pro:
+ *
+ * <pre>
+ * </pre>
+ *
+ * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
+ *
+ * <pre>
+Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.399 ± 0.007  ops/min
+ParallelismHouseholderRight.tune          CORES  thrpt    3  0.800 ± 0.085  ops/min
+ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.755 ± 0.111  ops/min
+ * </pre>
+ *
+ * @author apete
+ */
 @State(Scope.Benchmark)
-public abstract class ThresholdTuner {
+public class ParallelismHouseholderRight extends ParallelismTuner {
 
-    public static ChainedOptionsBuilder options() {
-        return BenchmarkUtils.options();
+    public static void main(final String[] args) throws RunnerException {
+        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderRight.class);
     }
 
-    /**
-     * 1, 2 and 4 means for each matrix size (benchmark's dim) the relevant parallelism threshold is set to
-     * dim/1, dim/2 and dim/4. Look for the dim where dim/2 is the fastest alternative.
-     */
-    @Param({ "1", "2", "4" })
-    public int z;
+    CodeAndData benchmark;
 
-    public abstract void setup();
+    @Override
+    @Setup
+    public void setup() {
 
-    public abstract Object tune();
+        HouseholderLeft.PARALLELISM = parallelism;
+
+        int dim = 2 * HouseholderLeft.THRESHOLD * OjAlgoUtils.ENVIRONMENT.threads;
+        benchmark = new CodeAndData(dim);
+    }
+
+    @Override
+    @Benchmark
+    public Object tune() {
+        return benchmark.tune();
+    }
 
 }

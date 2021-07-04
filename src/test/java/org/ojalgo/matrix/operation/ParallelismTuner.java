@@ -34,18 +34,14 @@ import org.openjdk.jmh.runner.options.TimeValue;
 @State(Scope.Benchmark)
 public abstract class ParallelismTuner {
 
-    private static final TimeValue TWO_MINUTES = new TimeValue(2L, TimeUnit.MINUTES);
+    private static final TimeValue THREE_MINUTES = new TimeValue(3L, TimeUnit.MINUTES);
 
     public static ChainedOptionsBuilder options() {
-        return BenchmarkUtils.options().warmupIterations(2).warmupTime(TWO_MINUTES).measurementTime(TWO_MINUTES);
+        return BenchmarkUtils.options().warmupIterations(2).warmupTime(THREE_MINUTES).measurementTime(THREE_MINUTES);
     }
 
     @Param({ "UNITS", "CORES", "THREADS" })
     public Parallelism parallelism;
-
-    ParallelismTuner() {
-        super();
-    }
 
     public abstract void setup();
 

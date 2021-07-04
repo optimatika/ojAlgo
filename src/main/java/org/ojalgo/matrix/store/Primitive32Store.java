@@ -40,6 +40,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -291,9 +292,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         }
         if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
         }
+        return FACTORY.columns(matrix);
     }
 
     static Householder.Primitive32 cast(final Householder<Double> transformation) {
@@ -302,9 +302,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         }
         if (transformation instanceof HouseholderReference<?>) {
             return ((Householder.Primitive32) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
-        } else {
-            return new Householder.Primitive32(transformation);
         }
+        return new Householder.Primitive32(transformation);
     }
 
     static Rotation.Primitive cast(final Rotation<Double> transformation) {
@@ -444,10 +443,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             return false;
         }
         Primitive32Store other = (Primitive32Store) obj;
-        if (myColDim != other.myColDim) {
-            return false;
-        }
-        if (myRowDim != other.myRowDim) {
+        if ((myColDim != other.myColDim) || (myRowDim != other.myRowDim)) {
             return false;
         }
         return true;
@@ -926,33 +922,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
-
-        final Householder.Primitive32 tmpTransf = Primitive32Store.cast(transformation);
-
-        final float[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        final float[] tmpWorker = this.getWorkerColumn();
-
-        if (tmpRowDim - firstRow > HouseholderRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    HouseholderRight.invoke(tmpData, tmpRowDim, first, limit, tmpColDim, tmpTransf, tmpWorker);
-                }
-
-            };
-
-            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
-
-        } else {
-
-            HouseholderRight.invoke(tmpData, tmpRowDim, firstRow, tmpRowDim, tmpColDim, tmpTransf, tmpWorker);
-        }
+        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, Primitive32Store.cast(transformation), this.getWorkerColumn());
     }
 
     public void transformRight(final Rotation<Double> transformation) {

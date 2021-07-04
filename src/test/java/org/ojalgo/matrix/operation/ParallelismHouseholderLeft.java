@@ -36,13 +36,13 @@ import org.openjdk.jmh.runner.RunnerException;
  * <pre>
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-03 => CORES
+ * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
  *
  * <pre>
-Benchmark                        (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismHouseholderLeft.tune          UNITS  thrpt    3  0.641 ± 0.065  ops/min
-ParallelismHouseholderLeft.tune          CORES  thrpt    3  2.097 ± 0.139  ops/min
-ParallelismHouseholderLeft.tune        THREADS  thrpt    3  1.991 ± 0.628  ops/min
+Benchmark                        (parallelism)   Mode  Cnt   Score   Error    Units
+ParallelismHouseholderLeft.tune          UNITS  thrpt    3   5.113 ± 4.680  ops/min
+ParallelismHouseholderLeft.tune          CORES  thrpt    3  16.535 ± 5.715  ops/min
+ParallelismHouseholderLeft.tune        THREADS  thrpt    3  15.904 ± 5.683  ops/min
  * </pre>
  *
  * @author apete
@@ -54,7 +54,7 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
         BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderLeft.class);
     }
 
-    ThresholdHouseholderLeft.CodeAndData benchmark;
+    CodeAndData benchmark;
 
     @Override
     @Setup

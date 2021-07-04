@@ -44,6 +44,7 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -1082,31 +1083,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public void transformRight(final Householder<N> transformation, final int firstRow) {
-
-        final Householder.Generic<N> tmpTransf = this.cast(transformation);
-
-        final N[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpRowDim - firstRow > HouseholderRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    HouseholderRight.invoke(tmpData, aFirst, aLimit, tmpColDim, tmpTransf, myFactory.scalar());
-                }
-
-            };
-
-            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
-
-        } else {
-
-            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf, myFactory.scalar());
-        }
+        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, this.cast(transformation), myFactory.scalar());
     }
 
     public void transformRight(final Rotation<N> transformation) {

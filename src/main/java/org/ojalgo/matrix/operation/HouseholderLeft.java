@@ -35,27 +35,21 @@ import org.ojalgo.scalar.Scalar;
 public final class HouseholderLeft implements BLAS2 {
 
     public static IntSupplier PARALLELISM = Parallelism.CORES;
-    public static int THRESHOLD = 128;
+    public static int THRESHOLD = 64;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
 
     public static void call(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {
-        HouseholderLeft.divide(first, limit, (f, l) -> {
-            HouseholderLeft.invoke(data, structure, f, l, householder);
-        });
+        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
     }
 
     public static void call(final float[] data, final int structure, final int first, final int limit, final Householder.Primitive32 householder) {
-        HouseholderLeft.divide(first, limit, (f, l) -> {
-            HouseholderLeft.invoke(data, structure, f, l, householder);
-        });
+        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
     }
 
     public static <N extends Scalar<N>> void call(final N[] data, final int structure, final int first, final int limit,
             final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
-        HouseholderLeft.divide(first, limit, (f, l) -> {
-            HouseholderLeft.invoke(data, structure, f, l, householder, scalar);
-        });
+        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder, scalar));
     }
 
     public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {

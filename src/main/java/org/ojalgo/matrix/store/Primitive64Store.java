@@ -45,6 +45,7 @@ import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -597,7 +598,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             return false;
         }
         Primitive64Store other = (Primitive64Store) obj;
-        if ((myColDim != other.myColDim) || (myRowDim != other.myRowDim)) {
+        if (myColDim != other.myColDim || myRowDim != other.myRowDim) {
             return false;
         }
         return true;
@@ -1052,33 +1053,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
-
-        final Householder.Primitive64 tmpTransf = Primitive64Store.cast(transformation);
-
-        final double[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        final double[] tmpWorker = this.getWorkerColumn();
-
-        if (tmpRowDim - firstRow > HouseholderRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    HouseholderRight.invoke(tmpData, tmpRowDim, first, limit, tmpColDim, tmpTransf, tmpWorker);
-                }
-
-            };
-
-            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
-
-        } else {
-
-            HouseholderRight.invoke(tmpData, tmpRowDim, firstRow, tmpRowDim, tmpColDim, tmpTransf, tmpWorker);
-        }
+        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, Primitive64Store.cast(transformation), this.getWorkerColumn());
     }
 
     public void transformRight(final Rotation<Double> transformation) {

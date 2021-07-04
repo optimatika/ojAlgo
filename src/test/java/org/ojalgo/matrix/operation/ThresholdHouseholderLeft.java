@@ -52,20 +52,25 @@ import org.openjdk.jmh.runner.RunnerException;
  * ThresholdHouseholderLeft.decompose   1024    2  thrpt    3     50,403 ±    1,336  ops/min
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-03 => 128, maybe 64
+ * MacBook Pro (16-inch, 2019): 2021-07-04 => 64
  *
  * <pre>
-Benchmark                      (dim)  (z)   Mode  Cnt        Score       Error    Units
-ThresholdHouseholderLeft.tune     32    1  thrpt    3  1051183.673 ± 49191.323  ops/min
-ThresholdHouseholderLeft.tune     32    2  thrpt    3   305679.211 ± 16514.372  ops/min
-ThresholdHouseholderLeft.tune     64    1  thrpt    3   153534.040 ±  9529.241  ops/min
-ThresholdHouseholderLeft.tune     64    2  thrpt    3   100912.411 ±  7704.396  ops/min
-ThresholdHouseholderLeft.tune    128    1  thrpt    3    22405.663 ±   477.055  ops/min
-ThresholdHouseholderLeft.tune    128    2  thrpt    3    23413.001 ±  1091.634  ops/min
-ThresholdHouseholderLeft.tune    256    1  thrpt    3     2914.775 ±    25.036  ops/min
-ThresholdHouseholderLeft.tune    256    2  thrpt    3     3849.013 ±   212.316  ops/min
-ThresholdHouseholderLeft.tune    512    1  thrpt    3      372.784 ±    11.004  ops/min
-ThresholdHouseholderLeft.tune    512    2  thrpt    3      540.688 ±    49.843  ops/min
+Benchmark                      (dim)  (z)   Mode  Cnt        Score        Error    Units
+ThresholdHouseholderLeft.tune     32    1  thrpt    3  1065669.953 ±  68849.504  ops/min
+ThresholdHouseholderLeft.tune     32    2  thrpt    3   301045.609 ± 116468.853  ops/min
+ThresholdHouseholderLeft.tune     32    4  thrpt    3   144178.136 ±   7511.837  ops/min
+ThresholdHouseholderLeft.tune     64    1  thrpt    3   149282.407 ±  94620.604  ops/min
+ThresholdHouseholderLeft.tune     64    2  thrpt    3   100683.021 ±   8034.743  ops/min
+ThresholdHouseholderLeft.tune     64    4  thrpt    3    56954.030 ±  14410.421  ops/min
+ThresholdHouseholderLeft.tune    128    1  thrpt    3    22527.363 ±    627.945  ops/min
+ThresholdHouseholderLeft.tune    128    2  thrpt    3    23640.128 ±   2046.596  ops/min
+ThresholdHouseholderLeft.tune    128    4  thrpt    3    19174.137 ±   3315.871  ops/min
+ThresholdHouseholderLeft.tune    256    1  thrpt    3     2890.183 ±    170.201  ops/min
+ThresholdHouseholderLeft.tune    256    2  thrpt    3     3826.749 ±    356.905  ops/min
+ThresholdHouseholderLeft.tune    256    4  thrpt    3     4380.464 ±    963.782  ops/min
+ThresholdHouseholderLeft.tune    512    1  thrpt    3      364.338 ±    220.880  ops/min
+ThresholdHouseholderLeft.tune    512    2  thrpt    3      519.076 ±     21.333  ops/min
+ThresholdHouseholderLeft.tune    512    4  thrpt    3      766.312 ±    215.441  ops/min
  * </pre>
  *
  * @author apete
