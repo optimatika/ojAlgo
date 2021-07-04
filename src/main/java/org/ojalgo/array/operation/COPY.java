@@ -23,6 +23,7 @@ package org.ojalgo.array.operation;
 
 import java.lang.reflect.Array;
 
+import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -87,11 +88,6 @@ public final class COPY implements BLAS1 {
         for (int j = first; j < limit; j++) {
             destination[j] = source.doubleValue(row, j);
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

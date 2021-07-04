@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * The ?dotc routines perform a vector-vector operation defined as: Equation
  *
@@ -29,10 +31,5 @@ package org.ojalgo.array.operation;
 public final class DOTC implements BLAS1 {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
 }

@@ -68,14 +68,14 @@ public final class FillMatchingDual implements ArrayOperation {
 
     public static void fillDiagonal(final double[][] target, final int row, final int col, final double value) {
         int limit = target.length;
-        for (int ij = 0; ((row + ij) < limit) && ((col + ij) < target[row + ij].length); ij++) {
+        for (int ij = 0; row + ij < limit && col + ij < target[row + ij].length; ij++) {
             target[row + ij][col + ij] = value;
         }
     }
 
     public static void fillDiagonal(final double[][] target, final int row, final int col, final DoubleSupplier supplier) {
         int limit = target.length;
-        for (int ij = 0; ((row + ij) < limit) && ((col + ij) < target[row + ij].length); ij++) {
+        for (int ij = 0; row + ij < limit && col + ij < target[row + ij].length; ij++) {
             target[row + ij][col + ij] = supplier.getAsDouble();
         }
     }
@@ -144,11 +144,6 @@ public final class FillMatchingDual implements ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             targetRow[j] = supplier.getAsDouble();
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

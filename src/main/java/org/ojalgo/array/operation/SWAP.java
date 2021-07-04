@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * Given two vectors x and y, the ?swap routines return vectors y and x swapped, each replacing the other.
  *
@@ -44,11 +46,6 @@ public final class SWAP implements BLAS1 {
         double[] tmpRow = target[rowA];
         target[rowA] = target[rowB];
         target[rowB] = tmpRow;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

@@ -87,9 +87,4 @@ public final class FillAll implements ArrayOperation {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

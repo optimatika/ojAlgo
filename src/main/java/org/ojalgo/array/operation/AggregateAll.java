@@ -25,9 +25,4 @@ public final class AggregateAll implements ArrayOperation {
 
     public static int THRESHOLD = 64;
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

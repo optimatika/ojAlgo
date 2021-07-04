@@ -102,8 +102,4 @@ public final class OperationUnary implements ArrayOperation {
         }
     }
 
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

@@ -45,7 +45,7 @@ public final class ModifyAll implements ArrayOperation {
 
     public static void modifyDiagonal(final double[][] target, final int row, final int col, final DoubleUnaryOperator function) {
         int tmpLength = target.length;
-        for (int ij = 0; ((row + ij) < tmpLength) && ((col + ij) < target[row + ij].length); ij++) {
+        for (int ij = 0; row + ij < tmpLength && col + ij < target[row + ij].length; ij++) {
             target[row + ij][col + ij] = function.applyAsDouble(target[row + ij][col + ij]);
         }
     }
@@ -55,11 +55,6 @@ public final class ModifyAll implements ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             targetRow[j] = function.applyAsDouble(targetRow[j]);
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

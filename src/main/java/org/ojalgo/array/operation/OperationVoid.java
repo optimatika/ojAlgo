@@ -45,8 +45,4 @@ public final class OperationVoid implements ArrayOperation {
         }
     }
 
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

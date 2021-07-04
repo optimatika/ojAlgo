@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -118,11 +119,6 @@ public final class AMAX implements BLAS1 {
             }
         }
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

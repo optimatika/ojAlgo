@@ -22,6 +22,7 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.BLAS1;
 
 /**
  * Given a vector x, the i?amin functions return the position of the vector element x[i] that has the smallest
@@ -49,11 +50,6 @@ public final class AMIN implements BLAS1 {
             }
         }
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

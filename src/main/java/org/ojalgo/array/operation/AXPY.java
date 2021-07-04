@@ -24,6 +24,7 @@ package org.ojalgo.array.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Mutate1D;
 
@@ -85,11 +86,6 @@ public final class AXPY implements BLAS1 {
         for (int i = first; i < limit; i++) {
             y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

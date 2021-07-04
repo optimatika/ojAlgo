@@ -19,28 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.BenchmarkUtils;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 
-public final class ApplyLDL implements ArrayOperation {
+@State(Scope.Benchmark)
+public abstract class ThresholdTuner {
 
-    public static int THRESHOLD = 256;
-
-    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
-            final int iterationPoint) {
-        final double diagVal = data[iterationPoint + iterationPoint * structure];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, -(diagVal * multipliers[j]), multipliers, 0, j, structure);
-        }
+    public static ChainedOptionsBuilder options() {
+        return BenchmarkUtils.options();
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
-            final int iterationPoint) {
-        final Scalar<N> diagVal = data[iterationPoint + iterationPoint * structure];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, diagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
-        }
-    }
+    /**
+     * 1, 2 and 4 means for each matrix size (benchmark's dim) the relevant parallelism threshold is set to
+     * dim/1, dim/2 and dim/4. Look for the dim where dim/2 is the fastest alternative.
+     */
+    @Param({ "1", "2", "4" })
+    public int z;
+
+    public abstract void setup();
+
+    public abstract Object tune();
 
 }

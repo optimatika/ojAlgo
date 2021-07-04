@@ -25,9 +25,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -160,7 +160,7 @@ public class CaseQR extends MatrixDecompositionTests {
     @Test
     public void testLeastSquaresInvert() {
 
-        ArrayOperation.setThresholdsMinValue(100000);
+        MatrixOperation.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
         final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(tmpDim).get()).get();

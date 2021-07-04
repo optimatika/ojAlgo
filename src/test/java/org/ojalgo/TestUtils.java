@@ -27,7 +27,6 @@ import java.util.function.IntSupplier;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -37,6 +36,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
+import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -538,7 +538,7 @@ public abstract class TestUtils {
     }
 
     public static void minimiseAllBranchLimits() {
-        ArrayOperation.setAllOperationThresholds(2);
+        MatrixOperation.setAllOperationThresholds(2);
     }
 
     static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,

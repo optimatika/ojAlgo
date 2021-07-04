@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -87,7 +88,7 @@ public final class DOT implements BLAS1 {
 
         int i = first;
 
-        for (; (i + 8) < limit; i += 8) {
+        for (; i + 8 < limit; i += 8) {
 
             final int base1 = offset1 + i;
             final int base2 = offset2 + i;
@@ -109,7 +110,7 @@ public final class DOT implements BLAS1 {
             final double a0 = s0 + s1;
             final double a1 = s2 + s3;
 
-            retVal += (a0 + a1);
+            retVal += a0 + a1;
         }
 
         switch ((limit - first) % 8) {
@@ -135,7 +136,7 @@ public final class DOT implements BLAS1 {
             final double a0 = s0 + s1;
             final double a1 = s2 + s3;
 
-            retVal += (a0 + a1);
+            retVal += a0 + a1;
         }
 
             break;
@@ -159,7 +160,7 @@ public final class DOT implements BLAS1 {
             final double a0 = s0 + s1;
             final double a1 = s2;
 
-            retVal += (a0 + a1);
+            retVal += a0 + a1;
         }
 
             break;
@@ -182,7 +183,7 @@ public final class DOT implements BLAS1 {
             final double a0 = s0 + s1;
             final double a1 = s2;
 
-            retVal += (a0 + a1);
+            retVal += a0 + a1;
         }
 
             break;
@@ -265,11 +266,6 @@ public final class DOT implements BLAS1 {
         }
 
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

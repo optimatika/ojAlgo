@@ -37,8 +37,13 @@ public abstract class BenchmarkUtils {
                 .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-Xmx6g");
     }
 
+    public static void run(final ChainedOptionsBuilder options, final Class<?> clazz) throws RunnerException {
+        Runner runner = new Runner(options.include(clazz.getName()).build());
+        runner.run();
+    }
+
     public static void run(final Class<?> clazz) throws RunnerException {
-        new Runner(BenchmarkUtils.options().include(clazz.getSimpleName()).build()).run();
+        BenchmarkUtils.run(BenchmarkUtils.options(), clazz);
     }
 
 }

@@ -19,28 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
-import org.ojalgo.scalar.Scalar;
+import java.util.concurrent.TimeUnit;
 
-public final class ApplyLDL implements ArrayOperation {
+import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.concurrent.Parallelism;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
-    public static int THRESHOLD = 256;
+@State(Scope.Benchmark)
+public abstract class ParallelismTuner {
 
-    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
-            final int iterationPoint) {
-        final double diagVal = data[iterationPoint + iterationPoint * structure];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, -(diagVal * multipliers[j]), multipliers, 0, j, structure);
-        }
+    private static final TimeValue THREE_MINUTES = new TimeValue(3L, TimeUnit.MINUTES);
+
+    public static ChainedOptionsBuilder options() {
+        return BenchmarkUtils.options().warmupIterations(2).warmupTime(THREE_MINUTES).measurementTime(THREE_MINUTES);
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
-            final int iterationPoint) {
-        final Scalar<N> diagVal = data[iterationPoint + iterationPoint * structure];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, diagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
-        }
-    }
+    @Param({ "UNITS", "CORES", "THREADS" })
+    public Parallelism parallelism;
+
+    public abstract void setup();
+
+    public abstract Object tune();
 
 }

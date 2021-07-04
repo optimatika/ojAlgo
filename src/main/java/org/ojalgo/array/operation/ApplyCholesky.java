@@ -39,9 +39,4 @@ public final class ApplyCholesky implements ArrayOperation {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

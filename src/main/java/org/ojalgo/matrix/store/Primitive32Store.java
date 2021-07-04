@@ -39,6 +39,8 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -75,7 +77,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn.floatValue(i);
+                    tmpData[i + tmpRowDim * j] = tmpColumn.floatValue(i);
                 }
             }
 
@@ -93,7 +95,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpColumn[i]);
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpColumn[i]);
                 }
             }
 
@@ -111,7 +113,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = (float) tmpColumn[i];
+                    tmpData[i + tmpRowDim * j] = (float) tmpColumn[i];
                 }
             }
 
@@ -129,7 +131,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpColumn.get(i));
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpColumn.get(i));
                 }
             }
 
@@ -193,7 +195,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow.floatValue(j);
+                    tmpData[i + tmpRowDim * j] = tmpRow.floatValue(j);
                 }
             }
 
@@ -211,7 +213,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpRow[j]);
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpRow[j]);
                 }
             }
 
@@ -229,7 +231,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = (float) tmpRow[j];
+                    tmpData[i + tmpRowDim * j] = (float) tmpRow[j];
                 }
             }
 
@@ -247,7 +249,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpRow.get(j));
+                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpRow.get(j));
                 }
             }
 
@@ -287,29 +289,28 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     static Primitive32Store cast(final Access1D<Double> matrix) {
         if (matrix instanceof Primitive32Store) {
             return (Primitive32Store) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
         }
+        if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
+        }
+        return FACTORY.columns(matrix);
     }
 
     static Householder.Primitive32 cast(final Householder<Double> transformation) {
         if (transformation instanceof Householder.Primitive32) {
             return (Householder.Primitive32) transformation;
-        } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Primitive32) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
-        } else {
-            return new Householder.Primitive32(transformation);
         }
+        if (transformation instanceof HouseholderReference<?>) {
+            return ((Householder.Primitive32) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
+        }
+        return new Householder.Primitive32(transformation);
     }
 
     static Rotation.Primitive cast(final Rotation<Double> transformation) {
         if (transformation instanceof Rotation.Primitive) {
             return (Rotation.Primitive) transformation;
-        } else {
-            return new Rotation.Primitive(transformation);
         }
+        return new Rotation.Primitive(transformation);
     }
 
     private final MultiplyBoth.Primitive multiplyBoth;
@@ -438,17 +439,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof Primitive32Store)) {
+        if (!super.equals(obj) || !(obj instanceof Primitive32Store)) {
             return false;
         }
         Primitive32Store other = (Primitive32Store) obj;
-        if (myColDim != other.myColDim) {
-            return false;
-        }
-        if (myRowDim != other.myRowDim) {
+        if ((myColDim != other.myColDim) || (myRowDim != other.myRowDim)) {
             return false;
         }
         return true;
@@ -475,12 +470,10 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             } else {
                 multiplyRight.invoke(data, Primitive32Store.cast(left).data, complexity, right);
             }
+        } else if (right instanceof Primitive32Store) {
+            multiplyLeft.invoke(data, left, complexity, Primitive32Store.cast(right).data);
         } else {
-            if (right instanceof Primitive32Store) {
-                multiplyLeft.invoke(data, left, complexity, Primitive32Store.cast(right).data);
-            } else {
-                multiplyBoth.invoke(this, left, complexity, right);
-            }
+            multiplyBoth.invoke(this, left, complexity, right);
         }
     }
 
@@ -590,8 +583,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + myColDim;
-        result = (prime * result) + myRowDim;
+        result = prime * result + myColDim;
+        result = prime * result + myRowDim;
         return result;
     }
 
@@ -903,31 +896,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
-
-        final Householder.Primitive32 tmpTransf = Primitive32Store.cast(transformation);
-
-        final float[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    HouseholderLeft.invoke(tmpData, tmpRowDim, first, limit, tmpTransf);
-                }
-
-            };
-
-            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
-
-        } else {
-
-            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
-        }
+        HouseholderLeft.call(data, myRowDim, firstColumn, myColDim, Primitive32Store.cast(transformation));
     }
 
     public void transformLeft(final Rotation<Double> transformation) {
@@ -943,45 +912,17 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
-            }
+            myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
         }
     }
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
-
-        final Householder.Primitive32 tmpTransf = Primitive32Store.cast(transformation);
-
-        final float[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        final float[] tmpWorker = this.getWorkerColumn();
-
-        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    HouseholderRight.invoke(tmpData, tmpRowDim, first, limit, tmpColDim, tmpTransf, tmpWorker);
-                }
-
-            };
-
-            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
-
-        } else {
-
-            HouseholderRight.invoke(tmpData, tmpRowDim, firstRow, tmpRowDim, tmpColDim, tmpTransf, tmpWorker);
-        }
+        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, Primitive32Store.cast(transformation), this.getWorkerColumn());
     }
 
     public void transformRight(final Rotation<Double> transformation) {
@@ -997,14 +938,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             } else {
                 myUtility.exchangeColumns(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
-            }
+            myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
     }
 

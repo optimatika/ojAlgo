@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.matrix.operation.BLAS1;
+
 /**
  * Given the Cartesian coordinates (a, b) of a point, these routines return the parameters c, s, r, and z
  * associated with the Givens rotation. The parameters c and s define a unitary matrix such that: Equation The
@@ -32,10 +34,5 @@ package org.ojalgo.array.operation;
 public final class ROTG implements BLAS1 {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
 }

@@ -30,20 +30,15 @@ public final class ApplyLU implements ArrayOperation {
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
             final int iterationPoint) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, -data[iterationPoint + (j * structure)], multipliers, 0, iterationPoint + 1, structure);
+            AXPY.invoke(data, j * structure, -data[iterationPoint + j * structure], multipliers, 0, iterationPoint + 1, structure);
         }
     }
 
     public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
             final int iterationPoint) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, data[iterationPoint + (j * structure)].negate().get(), multipliers, 0, iterationPoint + 1, structure);
+            AXPY.invoke(data, j * structure, data[iterationPoint + j * structure].negate().get(), multipliers, 0, iterationPoint + 1, structure);
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

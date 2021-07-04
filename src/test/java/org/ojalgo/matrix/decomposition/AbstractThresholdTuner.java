@@ -21,16 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-public class AbstractThresholdTuner {
+public abstract class AbstractThresholdTuner {
 
-    public void setup() {
-        // TODO Auto-generated method stub
-
+    public AbstractThresholdTuner() {
+        super();
     }
 
-    public Object tune() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public abstract void setup();
+
+    public abstract Object tune();
 
 }

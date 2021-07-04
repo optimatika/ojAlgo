@@ -40,8 +40,8 @@ public final class RotateRight implements ArrayOperation {
             oldA = data[indexA];
             oldB = data[indexB];
 
-            data[indexA] = (cos * oldA) - (sin * oldB);
-            data[indexB] = (cos * oldB) + (sin * oldA);
+            data[indexA] = cos * oldA - sin * oldB;
+            data[indexB] = cos * oldB + sin * oldA;
 
             indexA++;
             indexB++;
@@ -61,8 +61,8 @@ public final class RotateRight implements ArrayOperation {
             oldA = data[indexA];
             oldB = data[indexB];
 
-            data[indexA] = (cos * oldA) - (sin * oldB);
-            data[indexB] = (cos * oldB) + (sin * oldA);
+            data[indexA] = cos * oldA - sin * oldB;
+            data[indexB] = cos * oldB + sin * oldA;
 
             indexA++;
             indexB++;
@@ -88,11 +88,6 @@ public final class RotateRight implements ArrayOperation {
             indexA++;
             indexB++;
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

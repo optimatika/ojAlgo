@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 /**
  * <p>
@@ -43,6 +43,6 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public interface BLAS3 extends ArrayOperation {
+public interface BLAS3 extends MatrixOperation {
 
 }
