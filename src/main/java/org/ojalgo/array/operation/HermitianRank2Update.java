@@ -69,9 +69,9 @@ public final class HermitianRank2Update implements ArrayOperation {
             tmpVal1j = vector1[j];
             tmpVal2j = vector2[j];
 
-            tmpIndex = j + (j * structure);
+            tmpIndex = j + j * structure;
             for (int i = j; i < structure; i++) {
-                data[tmpIndex++] -= ((vector2[i] * tmpVal1j) + (vector1[i] * tmpVal2j));
+                data[tmpIndex++] -= vector2[i] * tmpVal1j + vector1[i] * tmpVal2j;
             }
         }
     }
@@ -89,17 +89,12 @@ public final class HermitianRank2Update implements ArrayOperation {
             tmpVal1j = vector1[j].conjugate();
             tmpVal2j = vector2[j].conjugate();
 
-            tmpIndex = j + (j * structure);
+            tmpIndex = j + j * structure;
             for (int i = j; i < structure; i++) {
                 data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j))).get();
                 tmpIndex++;
             }
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

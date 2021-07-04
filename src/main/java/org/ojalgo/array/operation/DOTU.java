@@ -33,9 +33,4 @@ public final class DOTU implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

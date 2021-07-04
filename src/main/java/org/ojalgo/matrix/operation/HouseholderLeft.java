@@ -108,9 +108,4 @@ public final class HouseholderLeft implements BLAS2 {
         DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

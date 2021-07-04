@@ -44,10 +44,10 @@ public final class MultiplyHermitianAndVector implements ArrayOperation {
         for (int i = firstRow; i < rowLimit; i++) {
             tmpVal = ZERO;
             for (int c = firstColumn; c < i; c++) {
-                tmpVal += hermitianMatrix[i + (c * structure)] * rightVector[c];
+                tmpVal += hermitianMatrix[i + c * structure] * rightVector[c];
             }
             for (int c = i; c < structure; c++) {
-                tmpVal += hermitianMatrix[c + (i * structure)] * rightVector[c];
+                tmpVal += hermitianMatrix[c + i * structure] * rightVector[c];
             }
             productMatrix[i] = tmpVal;
         }
@@ -62,18 +62,13 @@ public final class MultiplyHermitianAndVector implements ArrayOperation {
         for (int i = firstRow; i < rowLimit; i++) {
             tmpVal = scalar.zero();
             for (int c = firstColumn; c < i; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
+                tmpVal = tmpVal.add(hermitianMatrix[i + c * structure].multiply(rightVector[c]));
             }
             for (int c = i; c < structure; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].conjugate().multiply(rightVector[c]));
+                tmpVal = tmpVal.add(hermitianMatrix[c + i * structure].conjugate().multiply(rightVector[c]));
             }
             productMatrix[i] = tmpVal.get();
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

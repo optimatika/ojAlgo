@@ -181,8 +181,4 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         }
     }
 
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

@@ -178,9 +178,4 @@ public final class SubstituteBackwards implements ArrayOperation {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

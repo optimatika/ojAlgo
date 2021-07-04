@@ -35,9 +35,4 @@ public final class SDOT implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

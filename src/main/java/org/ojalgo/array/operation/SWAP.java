@@ -48,9 +48,4 @@ public final class SWAP implements BLAS1 {
         target[rowB] = tmpRow;
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

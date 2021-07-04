@@ -52,9 +52,4 @@ public final class AMIN implements BLAS1 {
         return retVal;
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

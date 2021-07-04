@@ -90,9 +90,4 @@ public final class COPY implements BLAS1 {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

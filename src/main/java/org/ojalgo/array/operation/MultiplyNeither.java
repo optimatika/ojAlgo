@@ -83,7 +83,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -132,7 +132,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                tmp0J += left[tmpIndex++] * right[c + (j * complexity)];
+                tmp0J += left[tmpIndex++] * right[c + j * complexity];
             }
 
             product[j] = tmp0J;
@@ -417,7 +417,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -452,7 +452,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -490,7 +490,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -531,7 +531,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -572,24 +572,7 @@ public final class MultiplyNeither implements ArrayOperation {
 
     public static <N extends Scalar<N>> MultiplyNeither.Generic<N> newGeneric(final long rows, final long columns) {
 
-        if (rows > THRESHOLD) {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        MultiplyNeither.invoke(product, first, limit, left, complexity, right, scalar);
-                    }
-                };
-
-                tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-            };
-
-        } else {
+        if (rows <= THRESHOLD) {
 
             return (product, left, complexity, right, scalar) -> {
 
@@ -598,6 +581,20 @@ public final class MultiplyNeither implements ArrayOperation {
                 MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
             };
         }
+        return (product, left, complexity, right, scalar) -> {
+
+            Arrays.fill(product, scalar.zero().get());
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    MultiplyNeither.invoke(product, first, limit, left, complexity, right, scalar);
+                }
+            };
+
+            tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+        };
     }
 
     public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
@@ -607,7 +604,8 @@ public final class MultiplyNeither implements ArrayOperation {
     public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
-        } else if (rows == 10) {
+        }
+        if (rows == 10) {
             return PRIMITIVE_0XN;
         } else if (rows == 9) {
             return PRIMITIVE_9XN;
@@ -617,13 +615,13 @@ public final class MultiplyNeither implements ArrayOperation {
             return PRIMITIVE_7XN;
         } else if (rows == 6) {
             return PRIMITIVE_6XN;
-        } else if ((rows == 5) && (columns == 5)) {
+        } else if (rows == 5 && columns == 5) {
             return PRIMITIVE_5X5;
-        } else if ((rows == 4) && (columns == 4)) {
+        } else if (rows == 4 && columns == 4) {
             return PRIMITIVE_4X4;
-        } else if ((rows == 3) && (columns == 3)) {
+        } else if (rows == 3 && columns == 3) {
             return PRIMITIVE_3X3;
-        } else if ((rows == 2) && (columns == 2)) {
+        } else if (rows == 2 && columns == 2) {
             return PRIMITIVE_2X2;
         } else if (rows == 1) {
             return PRIMITIVE_1XN;
@@ -641,7 +639,7 @@ public final class MultiplyNeither implements ArrayOperation {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, 0, structure);
             }
         }
     }
@@ -655,7 +653,7 @@ public final class MultiplyNeither implements ArrayOperation {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, 0, structure);
             }
         }
     }
@@ -670,14 +668,9 @@ public final class MultiplyNeither implements ArrayOperation {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, 0, structure);
             }
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

@@ -34,9 +34,4 @@ public final class CABS1 implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

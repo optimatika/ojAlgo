@@ -575,24 +575,7 @@ public final class MultiplyRight implements ArrayOperation {
 
     public static <N extends Scalar<N>> MultiplyRight.Generic<N> newGeneric(final long rows, final long columns) {
 
-        if (columns > THRESHOLD) {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        MultiplyRight.invoke(product, first, limit, left, complexity, right, scalar);
-                    }
-                };
-
-                tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
-            };
-
-        } else {
+        if (columns <= THRESHOLD) {
 
             return (product, left, complexity, right, scalar) -> {
 
@@ -601,6 +584,20 @@ public final class MultiplyRight implements ArrayOperation {
                 MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right, scalar);
             };
         }
+        return (product, left, complexity, right, scalar) -> {
+
+            Arrays.fill(product, scalar.zero().get());
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    MultiplyRight.invoke(product, first, limit, left, complexity, right, scalar);
+                }
+            };
+
+            tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
+        };
     }
 
     public static MultiplyRight.Primitive32 newPrimitive32(final long rows, final long columns) {
@@ -610,7 +607,8 @@ public final class MultiplyRight implements ArrayOperation {
     public static MultiplyRight.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (columns > THRESHOLD) {
             return PRIMITIVE_MT;
-        } else if (rows == 10) {
+        }
+        if (rows == 10) {
             return PRIMITIVE_0XN;
         } else if (rows == 9) {
             return PRIMITIVE_9XN;
@@ -620,13 +618,13 @@ public final class MultiplyRight implements ArrayOperation {
             return PRIMITIVE_7XN;
         } else if (rows == 6) {
             return PRIMITIVE_6XN;
-        } else if ((rows == 5) && (columns == 5)) {
+        } else if (rows == 5 && columns == 5) {
             return PRIMITIVE_5X5;
-        } else if ((rows == 4) && (columns == 4)) {
+        } else if (rows == 4 && columns == 4) {
             return PRIMITIVE_4X4;
-        } else if ((rows == 3) && (columns == 3)) {
+        } else if (rows == 3 && columns == 3) {
             return PRIMITIVE_3X3;
-        } else if ((rows == 2) && (columns == 2)) {
+        } else if (rows == 2 && columns == 2) {
             return PRIMITIVE_2X2;
         } else if (rows == 1) {
             return PRIMITIVE_1XN;
@@ -686,11 +684,6 @@ public final class MultiplyRight implements ArrayOperation {
                 AXPY.invoke(product, j * structure, right.get(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
             }
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

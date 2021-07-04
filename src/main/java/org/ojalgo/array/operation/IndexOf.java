@@ -43,9 +43,4 @@ public final class IndexOf implements ArrayOperation {
         return -1;
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

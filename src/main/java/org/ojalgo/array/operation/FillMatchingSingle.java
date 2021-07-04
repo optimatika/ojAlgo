@@ -126,9 +126,4 @@ public final class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

@@ -86,7 +86,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -133,7 +133,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                tmp0J += left.doubleValue(tmpIndex++) * right[c + (j * complexity)];
+                tmp0J += left.doubleValue(tmpIndex++) * right[c + j * complexity];
             }
 
             product[j] = tmp0J;
@@ -418,7 +418,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -453,7 +453,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -491,7 +491,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -532,7 +532,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + (j * complexity)];
+                final double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -573,24 +573,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
     public static <N extends Scalar<N>> MultiplyLeft.Generic<N> newGeneric(final long rows, final long columns) {
 
-        if (rows > THRESHOLD) {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        MultiplyLeft.invoke(product, first, limit, left, complexity, right, scalar);
-                    }
-                };
-
-                tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-            };
-
-        } else {
+        if (rows <= THRESHOLD) {
 
             return (product, left, complexity, right, scalar) -> {
 
@@ -599,6 +582,20 @@ public final class MultiplyLeft implements ArrayOperation {
                 MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
             };
         }
+        return (product, left, complexity, right, scalar) -> {
+
+            Arrays.fill(product, scalar.zero().get());
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    MultiplyLeft.invoke(product, first, limit, left, complexity, right, scalar);
+                }
+            };
+
+            tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+        };
     }
 
     public static MultiplyLeft.Primitive32 newPrimitive32(final long rows, final long columns) {
@@ -608,7 +605,8 @@ public final class MultiplyLeft implements ArrayOperation {
     public static MultiplyLeft.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
-        } else if (rows == 10) {
+        }
+        if (rows == 10) {
             return PRIMITIVE_0XN;
         } else if (rows == 9) {
             return PRIMITIVE_9XN;
@@ -618,13 +616,13 @@ public final class MultiplyLeft implements ArrayOperation {
             return PRIMITIVE_7XN;
         } else if (rows == 6) {
             return PRIMITIVE_6XN;
-        } else if ((rows == 5) && (columns == 5)) {
+        } else if (rows == 5 && columns == 5) {
             return PRIMITIVE_5X5;
-        } else if ((rows == 4) && (columns == 4)) {
+        } else if (rows == 4 && columns == 4) {
             return PRIMITIVE_4X4;
-        } else if ((rows == 3) && (columns == 3)) {
+        } else if (rows == 3 && columns == 3) {
             return PRIMITIVE_3X3;
-        } else if ((rows == 2) && (columns == 2)) {
+        } else if (rows == 2 && columns == 2) {
             return PRIMITIVE_2X2;
         } else if (rows == 1) {
             return PRIMITIVE_1XN;
@@ -636,7 +634,7 @@ public final class MultiplyLeft implements ArrayOperation {
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity,
             final double[] right) {
 
-        final int structure = ((int) left.count()) / complexity;
+        final int structure = (int) left.count() / complexity;
 
         final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
@@ -649,14 +647,14 @@ public final class MultiplyLeft implements ArrayOperation {
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
             }
         }
     }
 
     static void invoke(final float[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity, final float[] right) {
 
-        final int structure = ((int) left.count()) / complexity;
+        final int structure = (int) left.count() / complexity;
 
         final float[] leftColumn = new float[structure];
         for (int c = 0; c < complexity; c++) {
@@ -669,7 +667,7 @@ public final class MultiplyLeft implements ArrayOperation {
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
             }
         }
     }
@@ -677,7 +675,7 @@ public final class MultiplyLeft implements ArrayOperation {
     static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left, final int complexity,
             final N[] right, final Scalar.Factory<N> scalar) {
 
-        final int structure = ((int) left.count()) / complexity;
+        final int structure = (int) left.count() / complexity;
 
         final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
@@ -690,14 +688,9 @@ public final class MultiplyLeft implements ArrayOperation {
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
             }
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

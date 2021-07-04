@@ -26,7 +26,4 @@ package org.ojalgo.array.operation;
  */
 public interface ArrayOperation {
 
-    @Deprecated
-    int threshold();
-
 }
