@@ -698,7 +698,7 @@ public class MultiplyBoth implements BLAS3 {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                long tmpColBase = j * complexity;
+                long tmpColBase = Structure2D.index(complexity, 0, j);
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
@@ -733,7 +733,7 @@ public class MultiplyBoth implements BLAS3 {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                long tmpColBase = j * complexity;
+                long tmpColBase = Structure2D.index(complexity, 0, j);
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
@@ -770,7 +770,7 @@ public class MultiplyBoth implements BLAS3 {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                long tmpColBase = j * complexity;
+                long tmpColBase = Structure2D.index(complexity, 0, j);
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
