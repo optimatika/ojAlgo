@@ -31,7 +31,11 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive32Array;
-import org.ojalgo.array.operation.*;
+import org.ojalgo.array.operation.FillMatchingSingle;
+import org.ojalgo.array.operation.RotateLeft;
+import org.ojalgo.array.operation.RotateRight;
+import org.ojalgo.array.operation.SubstituteBackwards;
+import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -41,6 +45,10 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyLeft;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -443,7 +451,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             return false;
         }
         Primitive32Store other = (Primitive32Store) obj;
-        if ((myColDim != other.myColDim) || (myRowDim != other.myRowDim)) {
+        if (myColDim != other.myColDim || myRowDim != other.myRowDim) {
             return false;
         }
         return true;
@@ -459,7 +467,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
-        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        int complexity = Math.toIntExact(left.count() / this.countRows());
         if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
             ProgrammingError.throwForMultiplicationNotPossible();
         }
@@ -579,6 +587,22 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.get(row, col);
     }
 
+    public int getColDim() {
+        return myColDim;
+    }
+
+    public int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    public int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    public int getRowDim() {
+        return myRowDim;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -678,7 +702,26 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
-        myUtility.modifyAll(modifier);
+
+        this.modify(0, myRowDim * myColDim, 1, modifier);
+
+        //        if (myColDim > ModifyAll.THRESHOLD) {
+        //
+        //            final DivideAndConquer conquerer = new DivideAndConquer() {
+        //
+        //                @Override
+        //                public void conquer(final int first, final int limit) {
+        //                    Primitive32Store.this.modify(myRowDim * first, myRowDim * limit, 1, modifier);
+        //                }
+        //
+        //            };
+        //
+        //            conquerer.invoke(0, myColDim, ModifyAll.THRESHOLD);
+        //
+        //        } else {
+        //
+        //            this.modify(0, myRowDim * myColDim, 1, modifier);
+        //        }
     }
 
     public void modifyAny(final Transformation2D<Double> modifier) {
@@ -982,22 +1025,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             myWorkerColumn = new float[myRowDim];
         }
         return myWorkerColumn;
-    }
-
-    int getColDim() {
-        return myColDim;
-    }
-
-    int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    int getRowDim() {
-        return myRowDim;
     }
 
 }

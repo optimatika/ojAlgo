@@ -40,31 +40,56 @@ import org.openjdk.jmh.runner.RunnerException;
  * @author apete
  */
 @State(Scope.Benchmark)
-public class TestDot {
+public class TuneImplDetailDOT {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(TestDot.class);
+        BenchmarkUtils.run(TuneImplDetailDOT.class);
     }
 
     public double a0, a1, a2, a3;
-    public double b0, b1, b2, b3;
-
     public double[] aa;
+
+    public double b0, b1, b2, b3;
     public double[] bb;
 
     @Benchmark
-    public double elementsSeparated() {
+    public double arraysCombined() {
 
-        final double retVal0 = a0 * b0;
-        final double retVal1 = a1 * b1;
-        final double retVal2 = a2 * b2;
-        final double retVal3 = a3 * b3;
+        double retVal = 0.0;
 
-        return retVal0 + retVal1 + retVal2 + retVal3;
-    };
+        retVal += aa[0] * bb[0];
+        retVal += aa[1] * bb[1];
+        retVal += aa[2] * bb[2];
+        retVal += aa[3] * bb[3];
+
+        return retVal;
+    }
 
     @Benchmark
-    public double elementsUnrolled() {
+    public double arraysLoop() {
+
+        double retVal = 0.0;
+
+        for (int i = 0; i < 4; i++) {
+            retVal += aa[i] * bb[i];
+        }
+
+        return retVal;
+    }
+
+    @Benchmark
+    public double arraysSeparated() {
+
+        double retVal0 = aa[0] * bb[0];
+        double retVal1 = aa[1] * bb[1];
+        double retVal2 = aa[2] * bb[2];
+        double retVal3 = aa[3] * bb[3];
+
+        return retVal0 + retVal1 + retVal2 + retVal3;
+    }
+
+    @Benchmark
+    public double elementsCombined() {
 
         double retVal = 0.0;
 
@@ -74,12 +99,23 @@ public class TestDot {
         retVal += a3 * b3;
 
         return retVal;
-    };
+    }
+
+    @Benchmark
+    public double elementsSeparated() {
+
+        double retVal0 = a0 * b0;
+        double retVal1 = a1 * b1;
+        double retVal2 = a2 * b2;
+        double retVal3 = a3 * b3;
+
+        return retVal0 + retVal1 + retVal2 + retVal3;
+    }
 
     @Setup
     public void setup() {
 
-        final Random rnd = new Random();
+        Random rnd = new Random();
 
         a0 = rnd.nextDouble();
         a1 = rnd.nextDouble();
@@ -93,42 +129,6 @@ public class TestDot {
 
         aa = new double[] { a0, a1, a2, a3 };
         bb = new double[] { b0, b1, b2, b3 };
-
-    };
-
-    @Benchmark
-    public double vectorsLoop() {
-
-        double retVal = 0.0;
-
-        for (int i = 0; i < 4; i++) {
-            retVal += aa[i] * bb[i];
-        }
-
-        return retVal;
-    };
-
-    @Benchmark
-    public double vectorsSeparated() {
-
-        final double retVal0 = aa[0] * bb[0];
-        final double retVal1 = aa[1] * bb[1];
-        final double retVal2 = aa[2] * bb[2];
-        final double retVal3 = aa[3] * bb[3];
-
-        return retVal0 + retVal1 + retVal2 + retVal3;
-    };
-
-    @Benchmark
-    public double vectorsUnrolled() {
-
-        double retVal = 0.0;
-
-        retVal += aa[0] * bb[0];
-        retVal += aa[1] * bb[1];
-        retVal += aa[2] * bb[2];
-        retVal += aa[3] * bb[3];
-
-        return retVal;
     }
+
 }

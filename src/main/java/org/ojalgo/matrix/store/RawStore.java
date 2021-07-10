@@ -33,7 +33,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.ModifyAll;
-import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
@@ -47,6 +46,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -384,7 +384,7 @@ public final class RawStore implements PhysicalStore<Double> {
         RawStore retVal = null;
 
         if (elements instanceof RawStore) {
-            retVal = ((RawStore) elements);
+            retVal = (RawStore) elements;
         } else {
             retVal = new RawStore(elements.toRawCopy1D(), structure);
         }
@@ -397,7 +397,7 @@ public final class RawStore implements PhysicalStore<Double> {
         RawStore retVal = null;
 
         if (elements instanceof RawStore) {
-            retVal = ((RawStore) elements);
+            retVal = (RawStore) elements;
         } else {
             retVal = new RawStore(elements.toRawCopy2D(), (int) elements.countRows(), (int) elements.countColumns());
         }
@@ -419,9 +419,9 @@ public final class RawStore implements PhysicalStore<Double> {
 
         } else {
 
-            int tmpNumberOfColumns = (int) (structure != 0 ? (elements.count() / structure) : 0);
+            int tmpNumberOfColumns = (int) (structure != 0 ? elements.count() / structure : 0);
 
-            if ((structure * tmpNumberOfColumns) != elements.count()) {
+            if (structure * tmpNumberOfColumns != elements.count()) {
                 throw new IllegalArgumentException("Array length must be a multiple of structure.");
             }
 
@@ -465,9 +465,8 @@ public final class RawStore implements PhysicalStore<Double> {
     static Rotation.Primitive cast(final Rotation<Double> aTransf) {
         if (aTransf instanceof Rotation.Primitive) {
             return (Rotation.Primitive) aTransf;
-        } else {
-            return new Rotation.Primitive(aTransf);
         }
+        return new Rotation.Primitive(aTransf);
     }
 
     public final double[][] data;
@@ -500,9 +499,9 @@ public final class RawStore implements PhysicalStore<Double> {
     @Deprecated
     public RawStore(final double elements[], final int structure) {
 
-        myNumberOfColumns = (structure != 0 ? elements.length / structure : 0);
+        myNumberOfColumns = structure != 0 ? elements.length / structure : 0;
 
-        if ((structure * myNumberOfColumns) != elements.length) {
+        if (structure * myNumberOfColumns != elements.length) {
             throw new IllegalArgumentException("Array length must be a multiple of structure.");
         }
 
@@ -700,10 +699,7 @@ public final class RawStore implements PhysicalStore<Double> {
             return false;
         }
         RawStore other = (RawStore) obj;
-        if (myNumberOfColumns != other.myNumberOfColumns) {
-            return false;
-        }
-        if (!Arrays.deepEquals(data, other.data)) {
+        if (myNumberOfColumns != other.myNumberOfColumns || !Arrays.deepEquals(data, other.data)) {
             return false;
         }
         return true;
@@ -872,8 +868,8 @@ public final class RawStore implements PhysicalStore<Double> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + Arrays.deepHashCode(data);
-        result = (prime * result) + myNumberOfColumns;
+        result = prime * result + Arrays.deepHashCode(data);
+        result = prime * result + myNumberOfColumns;
         return result;
     }
 
@@ -964,11 +960,11 @@ public final class RawStore implements PhysicalStore<Double> {
 
         int tmpRowDim = data.length;
 
-        int retVal = (int) (first);
+        int retVal = (int) first;
         double tmpLargest = ZERO;
         double tmpValue;
 
-        for (int i = (int) first, j = (int) first; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
+        for (int i = (int) first, j = (int) first; i < tmpRowDim && j < myNumberOfColumns; i++, j++) {
             tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
@@ -1009,8 +1005,8 @@ public final class RawStore implements PhysicalStore<Double> {
 
         long tmpCount = Math.min(data.length - row, myNumberOfColumns - col);
 
-        int tmpFirst = (int) (row + (col * data.length));
-        int tmpLimit = (int) (row + tmpCount + ((col + tmpCount) * data.length));
+        int tmpFirst = (int) (row + col * data.length);
+        int tmpLimit = (int) (row + tmpCount + (col + tmpCount) * data.length);
         int tmpStep = 1 + data.length;
 
         for (int ij = tmpFirst; ij < tmpLimit; ij += tmpStep) {
@@ -1196,20 +1192,18 @@ public final class RawStore implements PhysicalStore<Double> {
                     tmpOldLow = tmpArray[tmpLow][j];
                     tmpOldHigh = tmpArray[tmpHigh][j];
 
-                    tmpArray[tmpLow][j] = (tmpTransf.cos * tmpOldLow) + (tmpTransf.sin * tmpOldHigh);
-                    tmpArray[tmpHigh][j] = (tmpTransf.cos * tmpOldHigh) - (tmpTransf.sin * tmpOldLow);
+                    tmpArray[tmpLow][j] = tmpTransf.cos * tmpOldLow + tmpTransf.sin * tmpOldHigh;
+                    tmpArray[tmpHigh][j] = tmpTransf.cos * tmpOldHigh - tmpTransf.sin * tmpOldLow;
                 }
             } else {
                 this.exchangeRows(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            this.modifyRow(tmpLow, 0, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            this.modifyRow(tmpLow, 0, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                this.modifyRow(tmpLow, 0, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                this.modifyRow(tmpLow, 0, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                this.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
-            }
+            this.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
         }
     }
 
@@ -1262,20 +1256,18 @@ public final class RawStore implements PhysicalStore<Double> {
                     tmpOldLow = tmpArray[i][tmpLow];
                     tmpOldHigh = tmpArray[i][tmpHigh];
 
-                    tmpArray[i][tmpLow] = (tmpTransf.cos * tmpOldLow) - (tmpTransf.sin * tmpOldHigh);
-                    tmpArray[i][tmpHigh] = (tmpTransf.cos * tmpOldHigh) + (tmpTransf.sin * tmpOldLow);
+                    tmpArray[i][tmpLow] = tmpTransf.cos * tmpOldLow - tmpTransf.sin * tmpOldHigh;
+                    tmpArray[i][tmpHigh] = tmpTransf.cos * tmpOldHigh + tmpTransf.sin * tmpOldLow;
                 }
             } else {
                 this.exchangeColumns(tmpLow, tmpHigh);
             }
+        } else if (!Double.isNaN(tmpTransf.cos)) {
+            this.modifyColumn(0, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+        } else if (!Double.isNaN(tmpTransf.sin)) {
+            this.modifyColumn(0, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
         } else {
-            if (!Double.isNaN(tmpTransf.cos)) {
-                this.modifyColumn(0, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
-            } else if (!Double.isNaN(tmpTransf.sin)) {
-                this.modifyColumn(0, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
-            } else {
-                this.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
-            }
+            this.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
     }
 

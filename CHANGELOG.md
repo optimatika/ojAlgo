@@ -33,12 +33,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - A few additions to `Structure2D.Logical` like `symmetric(...)` and `superimpose(...)`
 - New interface `Structure2D.Reshapable` and `StructureAnyD.Reshapable`
 - `AccessAnyD` is now vector-terable in the same way it was already matrix-iterable – it now has a method `vectors()` and there is a new utility class `VectorView`.
+- `Structure2D` now directlty define the `int` valued `getRowDim()`, `getColDim()`, `getMinDim()` and `getMaxDim()` methods.
 
 #### org.ojalgo.tensor
 
 - This package existed before but didn't really contain anything functional/useful – now it does. Now it contains 1D, 2D, and AnyD tensor implementations. These are not just (multi dimensional) arrays, but mathematical tensors as used by physicists and engineers. They are instatiated via special factories that implement various tensor products and direct sums. Further these factories are implemented as wrappers of (they delegate to) other 1D, 2D or AnyD factories. This means that just about any other data structure in ojAlgo can be created using the tensor product or direct sum implemenatations of these factories.
 
 ### Changed
+
+#### org.ojalgo.ann
+
+- Internal refactoring to `ArtificialNeuralNetwork` primarily to improve performance.
 
 #### org.ojalgo.concurrent
 

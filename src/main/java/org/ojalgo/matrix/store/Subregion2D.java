@@ -24,9 +24,9 @@ package org.ojalgo.matrix.store;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
 
 abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegion<N> {
@@ -121,8 +121,8 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
-            result = (prime * result) + Arrays.hashCode(myColumns);
+            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
+            result = prime * result + Arrays.hashCode(myColumns);
             return result;
         }
 
@@ -192,10 +192,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             } else if (!myBase.equals(other.myBase)) {
                 return false;
             }
-            if (myColumnLimit != other.myColumnLimit) {
-                return false;
-            }
-            if (myRowLimit != other.myRowLimit) {
+            if (myColumnLimit != other.myColumnLimit || myRowLimit != other.myRowLimit) {
                 return false;
             }
             return true;
@@ -221,9 +218,9 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
-            result = (prime * result) + myColumnLimit;
-            result = (prime * result) + myRowLimit;
+            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
+            result = prime * result + myColumnLimit;
+            result = prime * result + myRowLimit;
             return result;
         }
 
@@ -290,10 +287,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             } else if (!myBase.equals(other.myBase)) {
                 return false;
             }
-            if (myColumnOffset != other.myColumnOffset) {
-                return false;
-            }
-            if (myRowOffset != other.myRowOffset) {
+            if (myColumnOffset != other.myColumnOffset || myRowOffset != other.myRowOffset) {
                 return false;
             }
             return true;
@@ -359,9 +353,9 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
-            result = (prime * result) + myColumnOffset;
-            result = (prime * result) + myRowOffset;
+            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
+            result = prime * result + myColumnOffset;
+            result = prime * result + myRowOffset;
             return result;
         }
 
@@ -482,8 +476,8 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
-            result = (prime * result) + Arrays.hashCode(myRows);
+            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
+            result = prime * result + Arrays.hashCode(myRows);
             return result;
         }
 
@@ -597,7 +591,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
             return result;
         }
 

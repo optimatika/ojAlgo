@@ -153,11 +153,10 @@ public interface Mutate1D extends Structure1D {
 
         @Override
         default void accept(final Access1D<?> supplied) {
-            if (this.isAcceptable(supplied)) {
-                supplied.loopAll(i -> this.set(i, supplied.get(i)));
-            } else {
+            if (!this.isAcceptable(supplied)) {
                 throw new ProgrammingError("Not acceptable!");
             }
+            supplied.loopAll(i -> this.set(i, supplied.get(i)));
         }
 
         default boolean isAcceptable(final Structure1D supplier) {

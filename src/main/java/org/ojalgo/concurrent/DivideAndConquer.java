@@ -113,7 +113,8 @@ public abstract class DivideAndConquer {
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 
-        int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - DaemonPoolExecutor.INSTANCE.getActiveCount() / 2;
+        // int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - DaemonPoolExecutor.INSTANCE.getActiveCount() / 2;
+        int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads;
 
         DivideAndConquer.call(DaemonPoolExecutor.INSTANCE, first, limit, threshold, availableWorkers, this::conquer);
     }

@@ -388,10 +388,7 @@ public final class Array2D<N extends Comparable<N>>
             return false;
         }
         Array2D<?> other = (Array2D<?>) obj;
-        if (myRowsCount != other.myRowsCount) {
-            return false;
-        }
-        if (myColumnsCount != other.myColumnsCount) {
+        if (myRowsCount != other.myRowsCount || myColumnsCount != other.myColumnsCount) {
             return false;
         }
         if (myDelegate == null) {
@@ -511,11 +508,11 @@ public final class Array2D<N extends Comparable<N>>
 
         if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < limit; i++) {
-                this.set(offset + (i * myRowsCount), values.doubleValue(i));
+                this.set(offset + i * myRowsCount, values.doubleValue(i));
             }
         } else {
             for (long i = 0L; i < limit; i++) {
-                this.fillOne(offset + (i * myRowsCount), values.get(i));
+                this.fillOne(offset + i * myRowsCount, values.get(i));
             }
         }
     }
@@ -554,9 +551,9 @@ public final class Array2D<N extends Comparable<N>>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (myColumnsCount ^ (myColumnsCount >>> 32));
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        result = (prime * result) + (int) (myRowsCount ^ (myRowsCount >>> 32));
+        result = prime * result + (int) (myColumnsCount ^ myColumnsCount >>> 32);
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
+        result = prime * result + (int) (myRowsCount ^ myRowsCount >>> 32);
         return result;
     }
 

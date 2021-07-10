@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -101,7 +101,7 @@ public class MultTranspRight {
     public Primitive64Store multiplyRightDynamicInt() {
         product.fillByMultiplying(left, rightD.transpose());
         return product;
-    };
+    }
 
     @Benchmark
     public Primitive64Store multiplyRightDynamicPre() {
@@ -123,13 +123,13 @@ public class MultTranspRight {
 
     @Benchmark
     public Primitive64Store multiplyRightStandardInt() {
-        MultiplyRight.invoke(product.data, 0, complexity, left.data, complexity, rightD.transpose());
+        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, rightD.transpose());
         return product;
     }
 
     @Benchmark
     public Primitive64Store multiplyRightStandardPre() {
-        MultiplyRight.invoke(product.data, 0, complexity, left.data, complexity, rightT);
+        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, rightT);
         return product;
     }
 

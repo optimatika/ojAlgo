@@ -19,10 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -58,20 +57,38 @@ ThresholdMultiplyBoth.tune    128    1  thrpt    3      4805,198 ±     406,351 
 ThresholdMultiplyBoth.tune    128    2  thrpt    3      8763,536 ±     572,748  ops/min
  * </pre>
  *
+ * MacBook Pro (16-inch, 2019): 2021-07-08 => 8
+ *
+ * <pre>
+Benchmark                   (dim)  (z)   Mode  Cnt          Score          Error    Units
+ThresholdMultiplyBoth.tune      4    1  thrpt    3  216618439.222 ± 11873393.331  ops/min
+ThresholdMultiplyBoth.tune      4    2  thrpt    3    5983596.437 ±  3720592.577  ops/min
+ThresholdMultiplyBoth.tune      4    4  thrpt    3    2753827.167 ±  2319085.959  ops/min
+ThresholdMultiplyBoth.tune      8    1  thrpt    3   13645736.087 ±  6426679.023  ops/min
+ThresholdMultiplyBoth.tune      8    2  thrpt    3    4559637.236 ±   678795.706  ops/min
+ThresholdMultiplyBoth.tune      8    4  thrpt    3    2391485.649 ±   235221.563  ops/min
+ThresholdMultiplyBoth.tune     16    1  thrpt    3    1851686.554 ±   101602.848  ops/min
+ThresholdMultiplyBoth.tune     16    2  thrpt    3    1966505.496 ±   479966.666  ops/min
+ThresholdMultiplyBoth.tune     16    4  thrpt    3    1741386.822 ±   116972.129  ops/min
+ThresholdMultiplyBoth.tune     32    1  thrpt    3     227853.857 ±   100274.833  ops/min
+ThresholdMultiplyBoth.tune     32    2  thrpt    3     380500.664 ±    34137.501  ops/min
+ThresholdMultiplyBoth.tune     32    4  thrpt    3     517229.892 ±   142965.411  ops/min
+ThresholdMultiplyBoth.tune     64    1  thrpt    3      30466.670 ±    21871.552  ops/min
+ThresholdMultiplyBoth.tune     64    2  thrpt    3      52805.910 ±     3355.346  ops/min
+ThresholdMultiplyBoth.tune     64    4  thrpt    3      83292.909 ±     6241.039  ops/min
+ * </pre>
+ *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdMultiplyBoth extends AbstractThresholdTuner {
+public class ThresholdMultiplyBoth extends ThresholdTuner {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ThresholdMultiplyBoth.class);
+        BenchmarkUtils.run(ThresholdTuner.options(), ThresholdMultiplyBoth.class);
     }
 
-    @Param({ "8", "16", "32", "64", "128" })
+    @Param({ "4", "8", "16", "32", "64" })
     public int dim;
-
-    @Param({ "1", "2" })
-    public int z;
 
     MatrixStore<Double> left;
     MatrixStore<Double> right;
@@ -87,7 +104,7 @@ public class ThresholdMultiplyBoth extends AbstractThresholdTuner {
 
         left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier).transpose();
         right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier).transpose();
-        target = Primitive64Store.FACTORY.makeZero(dim, dim);
+        target = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Override
@@ -95,6 +112,6 @@ public class ThresholdMultiplyBoth extends AbstractThresholdTuner {
     public Object tune() {
         target.fillByMultiplying(left, right);
         return target;
-    };
+    }
 
 }

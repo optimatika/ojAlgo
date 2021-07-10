@@ -38,28 +38,28 @@ public class TuneAXPYorder {
     public static void invokeBIS(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (i * incy)] += a * x[basex + (i * incx)]; // y += a*x
+            y[basey + i * incy] += a * x[basex + i * incx]; // y += a*x
         }
     }
 
     public static void invokeBSI(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] += a * x[basex + (incx * i)]; // y += a*x
+            y[basey + incy * i] += a * x[basex + incx * i]; // y += a*x
         }
     }
 
     public static void invokeISB(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[(i * incy) + basey] += a * x[(i * incx) + basex]; // y += a*x
+            y[i * incy + basey] += a * x[i * incx + basex]; // y += a*x
         }
     }
 
     public static void invokeSIB(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[(incy * i) + basey] += a * x[(incx * i) + basex]; // y += a*x
+            y[incy * i + basey] += a * x[incx * i + basex]; // y += a*x
         }
     }
 
@@ -118,7 +118,7 @@ public class TuneAXPYorder {
         final int stride = 1;
 
         for (int i = 0; i < limit; i++) {
-            retVal += mat[base + (stride * i)] * mat[base + (stride * i)];
+            retVal += mat[base + stride * i] * mat[base + stride * i];
         }
 
         return retVal;

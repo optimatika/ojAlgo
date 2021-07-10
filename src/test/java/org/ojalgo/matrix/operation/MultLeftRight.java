@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -58,11 +58,11 @@ public class MultLeftRight {
     public Primitive64Store multiplyLeftFixed() {
         ML.invoke(product.data, left, complexity, right.data);
         return product;
-    };
+    }
 
     @Benchmark
     public Primitive64Store multiplyLeftStandard() {
-        MultiplyLeft.invoke(product.data, 0, complexity, left, complexity, right.data);
+        MultiplyLeft.addMxR(product.data, 0, complexity, left, complexity, right.data);
         return product;
     }
 
@@ -72,7 +72,7 @@ public class MultLeftRight {
     }
 
     public Primitive64Store multiplyRightStandard() {
-        MultiplyRight.invoke(product.data, 0, complexity, left.data, complexity, right);
+        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, right);
         return product;
     }
 

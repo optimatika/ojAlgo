@@ -27,23 +27,24 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.ojalgo.function.PrimitiveFunction;
 
-final class NodeDroppingActivatorFunction implements PrimitiveFunction.Unary {
+final class NodeDropper implements PrimitiveFunction.Unary {
 
-    private final PrimitiveFunction.Unary myActivator;
+    static NodeDropper of(final double probabilityToKeep) {
+        return new NodeDropper(probabilityToKeep);
+    }
+
     private final double myProbabilityToKeep;
 
-    NodeDroppingActivatorFunction(final double probabilityToKeep, final PrimitiveFunction.Unary activator) {
+    NodeDropper(final double probabilityToKeep) {
         super();
         myProbabilityToKeep = probabilityToKeep;
-        myActivator = activator;
     }
 
     public double invoke(final double arg) {
         if (ThreadLocalRandom.current().nextDouble() <= myProbabilityToKeep) {
-            return myActivator.invoke(arg);
-        } else {
-            return ZERO;
+            return arg;
         }
+        return ZERO;
     }
 
 }

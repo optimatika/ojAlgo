@@ -53,10 +53,7 @@ final class CalculationLayer {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof CalculationLayer)) {
+        if ((obj == null) || !(obj instanceof CalculationLayer)) {
             return false;
         }
         CalculationLayer other = (CalculationLayer) obj;
@@ -84,9 +81,9 @@ final class CalculationLayer {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myActivator == null) ? 0 : myActivator.hashCode());
-        result = (prime * result) + ((myBias == null) ? 0 : myBias.hashCode());
-        result = (prime * result) + ((myWeights == null) ? 0 : myWeights.hashCode());
+        result = prime * result + (myActivator == null ? 0 : myActivator.hashCode());
+        result = prime * result + (myBias == null ? 0 : myBias.hashCode());
+        result = prime * result + (myWeights == null ? 0 : myWeights.hashCode());
         return result;
     }
 
@@ -157,13 +154,13 @@ final class CalculationLayer {
 
     PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
         myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
-        output.modifyAll(myActivator.getFunction(output));
+        myActivator.activate(output);
         return output;
     }
 
     PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
         myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
-        output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
+        myActivator.activate(output, probabilityToKeep);
         return output;
     }
 
