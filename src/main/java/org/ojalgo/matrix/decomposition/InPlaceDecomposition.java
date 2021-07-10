@@ -36,6 +36,11 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
         super(factory);
     }
 
+    @Override
+    public int getColDim() {
+        return myColDim;
+    }
+
     public MatrixStore<N> getInverse() {
         return this.getInverse(this.allocate(this.getRowDim(), this.getRowDim()));
     }
@@ -46,17 +51,12 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
     }
 
     @Override
-    protected int getColDim() {
-        return myColDim;
+    public int getRowDim() {
+        return myRowDim;
     }
 
     protected DecompositionStore<N> getInPlace() {
         return myInPlace;
-    }
-
-    @Override
-    protected int getRowDim() {
-        return myRowDim;
     }
 
     DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
@@ -64,7 +64,7 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
         int tmpRowDim = (int) matrix.countRows();
         int tmpColDim = (int) matrix.countColumns();
 
-        if ((myInPlace != null) && (myRowDim == tmpRowDim) && (myColDim == tmpColDim)) {
+        if (myInPlace != null && myRowDim == tmpRowDim && myColDim == tmpColDim) {
 
         } else {
 

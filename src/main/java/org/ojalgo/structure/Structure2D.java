@@ -74,10 +74,8 @@ public interface Structure2D extends Structure1D {
 
                 return Integer.compare(row, ref.row);
 
-            } else {
-
-                return Integer.compare(column, ref.column);
             }
+            return Integer.compare(column, ref.column);
         }
 
         @Override
@@ -85,10 +83,7 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (this.getClass() != obj.getClass()) {
+            if ((obj == null) || (this.getClass() != obj.getClass())) {
                 return false;
             }
             final IntRowColumn other = (IntRowColumn) obj;
@@ -121,8 +116,8 @@ public interface Structure2D extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + column;
-            result = (prime * result) + row;
+            result = prime * result + column;
+            result = prime * result + row;
             return result;
         }
 
@@ -336,10 +331,8 @@ public interface Structure2D extends Structure1D {
 
                 return Long.compare(row, ref.row);
 
-            } else {
-
-                return Long.compare(column, ref.column);
             }
+            return Long.compare(column, ref.column);
         }
 
         @Override
@@ -347,10 +340,7 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof LongRowColumn)) {
+            if ((obj == null) || !(obj instanceof LongRowColumn)) {
                 return false;
             }
             final LongRowColumn other = (LongRowColumn) obj;
@@ -383,8 +373,8 @@ public interface Structure2D extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + (int) (column ^ (column >>> 32));
-            result = (prime * result) + (int) (row ^ (row >>> 32));
+            result = prime * result + (int) (column ^ column >>> 32);
+            result = prime * result + (int) (row ^ row >>> 32);
             return result;
         }
 
@@ -457,10 +447,7 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof RowColumnKey)) {
+            if ((obj == null) || !(obj instanceof RowColumnKey)) {
                 return false;
             }
             final RowColumnKey other = (RowColumnKey) obj;
@@ -485,8 +472,8 @@ public interface Structure2D extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((column == null) ? 0 : column.hashCode());
-            result = (prime * result) + ((row == null) ? 0 : row.hashCode());
+            result = prime * result + (column == null ? 0 : column.hashCode());
+            result = prime * result + (row == null ? 0 : row.hashCode());
             return result;
         }
 
@@ -558,7 +545,7 @@ public interface Structure2D extends Structure1D {
     }
 
     static long index(final long structure, final long row, final long column) {
-        return row + (column * structure);
+        return row + column * structure;
     }
 
     static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
@@ -613,6 +600,22 @@ public interface Structure2D extends Structure1D {
      */
     long countRows();
 
+    default int getColDim() {
+        return Math.toIntExact(this.countColumns());
+    }
+
+    default int getMaxDim() {
+        return Math.toIntExact(Math.max(this.countRows(), this.countColumns()));
+    }
+
+    default int getMinDim() {
+        return Math.toIntExact(Math.min(this.countRows(), this.countColumns()));
+    }
+
+    default int getRowDim() {
+        return Math.toIntExact(this.countRows());
+    }
+
     /**
      * 2D data structures are either square, tall, fat or empty.
      * <p>
@@ -624,7 +627,7 @@ public interface Structure2D extends Structure1D {
      * @return true if matrix is empty
      */
     default boolean isEmpty() {
-        return ((this.countRows() <= 0L) || (this.countColumns() <= 0L));
+        return this.countRows() <= 0L || this.countColumns() <= 0L;
     }
 
     /**
@@ -637,14 +640,14 @@ public interface Structure2D extends Structure1D {
      */
     default boolean isFat() {
         final long tmpCountRows = this.countRows();
-        return ((tmpCountRows > 0L) && (tmpCountRows < this.countColumns()));
+        return tmpCountRows > 0L && tmpCountRows < this.countColumns();
     }
 
     /**
      * @return true if both the row and column dimensions are equal to 1.
      */
     default boolean isScalar() {
-        return (this.countRows() == 1L) && (this.countColumns() == 1L);
+        return this.countRows() == 1L && this.countColumns() == 1L;
     }
 
     /**
@@ -657,7 +660,7 @@ public interface Structure2D extends Structure1D {
      */
     default boolean isSquare() {
         final long tmpCountRows = this.countRows();
-        return ((tmpCountRows > 0L) && (tmpCountRows == this.countColumns()));
+        return tmpCountRows > 0L && tmpCountRows == this.countColumns();
     }
 
     /**
@@ -670,14 +673,14 @@ public interface Structure2D extends Structure1D {
      */
     default boolean isTall() {
         final long tmpCountColumns = this.countColumns();
-        return ((tmpCountColumns > 0L) && (this.countRows() > tmpCountColumns));
+        return tmpCountColumns > 0L && this.countRows() > tmpCountColumns;
     }
 
     /**
      * @return true if either the row or column dimensions are equal to 1.
      */
     default boolean isVector() {
-        return ((this.countColumns() == 1L) || (this.countRows() == 1L));
+        return this.countColumns() == 1L || this.countRows() == 1L;
     }
 
     default void loopAll(final RowColumnCallback callback) {

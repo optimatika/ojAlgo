@@ -23,7 +23,6 @@ package org.ojalgo.ann;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
@@ -41,11 +40,11 @@ public class DesignTestANN extends ANNTest {
         Primitive64Store arguments = Primitive64Store.FACTORY.row(1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0);
         Primitive64Store results = Primitive64Store.FACTORY.row(0.02364054, 0.06426166, 0.1746813, 0.474833, 0.02364054, 0.06426166, 0.1746813);
 
-        Unary function = ArtificialNeuralNetwork.Activator.SOFTMAX.getFunction(arguments);
+        ArtificialNeuralNetwork.Activator.SOFTMAX.activate(arguments);
 
         for (int i = 0; i < results.count(); i++) {
             double expected = results.doubleValue(i);
-            double actual = function.invoke(arguments.doubleValue(i));
+            double actual = arguments.doubleValue(i);
             TestUtils.assertEquals(expected, actual, precision);
         }
     }

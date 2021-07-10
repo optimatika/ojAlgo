@@ -130,10 +130,7 @@ public class Primitive32Array extends PrimitiveArray {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof Primitive32Array)) {
+        if (!super.equals(obj) || !(obj instanceof Primitive32Array)) {
             return false;
         }
         Primitive32Array other = (Primitive32Array) obj;
@@ -164,7 +161,7 @@ public class Primitive32Array extends PrimitiveArray {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + Arrays.hashCode(data);
+        result = prime * result + Arrays.hashCode(data);
         return result;
     }
 

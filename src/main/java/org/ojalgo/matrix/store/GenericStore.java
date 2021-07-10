@@ -45,6 +45,10 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyLeft;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -826,6 +830,22 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         return myUtility.get(row, col);
     }
 
+    public int getColDim() {
+        return myColDim;
+    }
+
+    public int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    public int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    public int getRowDim() {
+        return myRowDim;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -1168,22 +1188,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         Arrays.fill(myWorkerColumn, myFactory.scalar().zero().get());
 
         return myWorkerColumn;
-    }
-
-    int getColDim() {
-        return myColDim;
-    }
-
-    int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    int getRowDim() {
-        return myRowDim;
     }
 
 }

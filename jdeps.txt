@@ -72,6 +72,7 @@ ojalgo-49.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> java.util                                          java.base
    org.ojalgo.array.operation                         -> org.junit.jupiter.api                              not found
    org.ojalgo.array.operation                         -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT-tests.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
@@ -85,7 +86,6 @@ ojalgo-49.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation.jmh_generated           -> java.util.concurrent                               java.base
    org.ojalgo.array.operation.jmh_generated           -> java.util.concurrent.atomic                        java.base
    org.ojalgo.array.operation.jmh_generated           -> org.ojalgo.array.operation                         ojalgo-49.0.0-SNAPSHOT-tests.jar
-   org.ojalgo.array.operation.jmh_generated           -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.infra                              not found
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.results                            not found
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.runner                             not found
@@ -247,6 +247,7 @@ ojalgo-49.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation.jmh_generated          -> java.util.concurrent.atomic                        java.base
    org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.concurrent                              ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.operation                        ojalgo-49.0.0-SNAPSHOT-tests.jar
+   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.infra                              not found
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.results                            not found
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.runner                             not found
@@ -492,19 +493,16 @@ ojalgo-49.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.array                                   -> org.ojalgo.type                                    ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array                                   -> org.ojalgo.type.context                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> java.lang                                          java.base
-   org.ojalgo.array.operation                         -> java.lang.invoke                                   java.base
    org.ojalgo.array.operation                         -> java.lang.reflect                                  java.base
    org.ojalgo.array.operation                         -> java.math                                          java.base
    org.ojalgo.array.operation                         -> java.util                                          java.base
    org.ojalgo.array.operation                         -> java.util.function                                 java.base
-   org.ojalgo.array.operation                         -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.concurrent                              ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function.constant                       ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function.special                        ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.matrix.operation                        ojalgo-49.0.0-SNAPSHOT.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.matrix.transformation                   ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.0.0-SNAPSHOT.jar
@@ -638,13 +636,18 @@ ojalgo-49.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.matrix.decomposition.function           -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.operation                        -> java.lang                                          java.base
    org.ojalgo.matrix.operation                        -> java.lang.invoke                                   java.base
+   org.ojalgo.matrix.operation                        -> java.lang.reflect                                  java.base
    org.ojalgo.matrix.operation                        -> java.math                                          java.base
+   org.ojalgo.matrix.operation                        -> java.util                                          java.base
    org.ojalgo.matrix.operation                        -> java.util.function                                 java.base
+   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.array.operation                         ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.function.constant                       ojalgo-49.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.transformation                   ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.store                            -> java.io                                            java.base
    org.ojalgo.matrix.store                            -> java.lang                                          java.base
    org.ojalgo.matrix.store                            -> java.lang.invoke                                   java.base

@@ -46,6 +46,10 @@ import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyLeft;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -801,6 +805,22 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         return myUtility.get(row, col);
     }
 
+    public int getColDim() {
+        return myColDim;
+    }
+
+    public int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    public int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    public int getRowDim() {
+        return myRowDim;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -841,25 +861,22 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
 
-        final int numberOfRows = myRowDim;
-        final int numberOfCols = myColDim;
-
-        if (numberOfCols > ModifyAll.THRESHOLD) {
+        if (myColDim > ModifyAll.THRESHOLD) {
 
             final DivideAndConquer conquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    Primitive64Store.this.modify(numberOfRows * first, numberOfRows * limit, 1, modifier);
+                    Primitive64Store.this.modify(myRowDim * first, myRowDim * limit, 1, modifier);
                 }
 
             };
 
-            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
+            conquerer.invoke(0, myColDim, ModifyAll.THRESHOLD);
 
         } else {
 
-            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
+            this.modify(0, myRowDim * myColDim, 1, modifier);
         }
     }
 
@@ -1105,22 +1122,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             myWorkerColumn = new double[myRowDim];
         }
         return myWorkerColumn;
-    }
-
-    int getColDim() {
-        return myColDim;
-    }
-
-    int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    int getRowDim() {
-        return myRowDim;
     }
 
 }

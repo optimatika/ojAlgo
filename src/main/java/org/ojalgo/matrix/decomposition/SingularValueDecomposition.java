@@ -160,25 +160,25 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         final double s_k = s[k] / scale;
         final double e_k = e[k] / scale;
 
-        final double b = (((s_p2 + s_p1) * (s_p2 - s_p1)) + (e_p2 * e_p2)) / TWO;
-        final double c = (s_p1 * e_p2) * (s_p1 * e_p2);
+        final double b = ((s_p2 + s_p1) * (s_p2 - s_p1) + e_p2 * e_p2) / TWO;
+        final double c = s_p1 * e_p2 * (s_p1 * e_p2);
 
         double shift = ZERO;
-        if ((NumberContext.compare(b, ZERO) != 0) || (NumberContext.compare(c, ZERO) != 0)) {
-            shift = SQRT.invoke((b * b) + c);
+        if (NumberContext.compare(b, ZERO) != 0 || NumberContext.compare(c, ZERO) != 0) {
+            shift = SQRT.invoke(b * b + c);
             if (b < ZERO) {
                 shift = -shift;
             }
             shift = c / (b + shift);
         }
 
-        double f = ((s_k + s_p1) * (s_k - s_p1)) + shift;
+        double f = (s_k + s_p1) * (s_k - s_p1) + shift;
         double g = s_k * e_k;
 
         double tmp, cos, sin;
 
         // Chase zeros.
-        for (int j = k; j < (p - 1); j++) {
+        for (int j = k; j < p - 1; j++) {
 
             tmp = HYPOT.invoke(f, g);
             cos = f / tmp;
@@ -188,8 +188,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
                 e[j - 1] = tmp;
             }
 
-            f = (cos * s[j]) + (sin * e[j]);
-            e[j] = (cos * e[j]) - (sin * s[j]);
+            f = cos * s[j] + sin * e[j];
+            e[j] = cos * e[j] - sin * s[j];
             g = sin * s[j + 1];
             s[j + 1] = cos * s[j + 1];
 
@@ -200,8 +200,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
             sin = g / tmp;
             s[j] = tmp;
 
-            f = (cos * e[j]) + (sin * s[j + 1]);
-            s[j + 1] = (-sin * e[j]) + (cos * s[j + 1]);
+            f = cos * e[j] + sin * s[j + 1];
+            s[j + 1] = -sin * e[j] + cos * s[j + 1];
             g = sin * e[j + 1];
             e[j + 1] = cos * e[j + 1];
 
@@ -224,7 +224,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         double tmp;
 
         // Order the singular values.
-        for (int iter = k, next = iter + 1; (next < size) && (s[iter] < s[next]); iter++, next++) {
+        for (int iter = k, next = iter + 1; next < size && s[iter] < s[next]; iter++, next++) {
 
             tmp = s[iter];
             s[iter] = s[next];
@@ -251,25 +251,25 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
             // kase = 4     if e[p-1] is negligible                                             => convergence
 
             for (k = p - 2; k >= 0; k--) {
-                if (ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
+                if (ABS.invoke(e[k]) <= TINY + MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))) {
                     e[k] = ZERO;
                     break;
                 }
             }
-            if (k == (p - 2)) {
+            if (k == p - 2) {
                 kase = 4;
             } else {
                 int ks;
                 for (ks = p - 1; ks > k; ks--) {
-                    final double t = ABS.invoke(e[ks]) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
-                    if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
+                    final double t = ABS.invoke(e[ks]) + (ks != k + 1 ? ABS.invoke(e[ks - 1]) : ZERO);
+                    if (ABS.invoke(s[ks]) <= TINY + MACHINE_EPSILON * t) {
                         s[ks] = ZERO;
                         break;
                     }
                 }
                 if (ks == k) {
                     kase = 3;
-                } else if (ks == (p - 1)) {
+                } else if (ks == p - 1) {
                     kase = 1;
                 } else {
                     kase = 2;
@@ -368,6 +368,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return this.compute(matrix, false, this.isFullSize());
     }
 
+    @Override
+    public int getColDim() {
+        return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
+    }
+
     public double getCondition() {
 
         final Array1D<Double> tmpSingularValues = this.getSingularValues();
@@ -392,7 +397,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
     public MatrixStore<N> getD() {
 
-        if (this.isComputed() && (myD == null)) {
+        if (this.isComputed() && myD == null) {
             myD = this.makeD();
         }
 
@@ -463,9 +468,14 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
 
+    @Override
+    public int getRowDim() {
+        return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
+    }
+
     public Array1D<Double> getSingularValues() {
 
-        if ((mySingularValues == null) && this.isComputed()) {
+        if (mySingularValues == null && this.isComputed()) {
             mySingularValues = this.makeSingularValues();
         }
 
@@ -487,7 +497,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
     public MatrixStore<N> getU() {
 
-        if (!myValuesOnly && this.isComputed() && (myU == null)) {
+        if (!myValuesOnly && this.isComputed() && myU == null) {
 
             if (myTransposed) {
                 myU = myBidiagonal.doGetRQ();
@@ -501,7 +511,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
     public MatrixStore<N> getV() {
 
-        if (!myValuesOnly && this.isComputed() && (myV == null)) {
+        if (!myValuesOnly && this.isComputed() && myV == null) {
             if (myTransposed) {
                 myV = myBidiagonal.doGetLQ();
             } else {
@@ -518,9 +528,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (this.isSolvable()) {
             return this.getInverse();
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -529,9 +538,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isFullRank() {
@@ -583,9 +591,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -594,9 +601,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private MatrixStore<N> getInverseOldVersion(final DecompositionStore<N> preallocated) {
@@ -677,7 +683,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         final int size = tmpBidiagonal.getDimension();
 
-        if ((s == null) || (s.length != size)) {
+        if (s == null || s.length != size) {
             s = new double[size];
             e = new double[size];
         }
@@ -694,16 +700,6 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         SingularValueDecomposition.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
-    }
-
-    @Override
-    protected int getColDim() {
-        return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
-    }
-
-    @Override
-    protected int getRowDim() {
-        return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
     }
 
     protected boolean isTransposed() {

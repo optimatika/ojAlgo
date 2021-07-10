@@ -143,7 +143,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
             long i = low, j = high;
 
-            final double pivot = myArray.doubleValue(low + ((high - low) / 2));
+            final double pivot = myArray.doubleValue(low + (high - low) / 2);
 
             while (i <= j) {
 
@@ -206,7 +206,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
             long i = low, j = high;
 
-            final double pivot = myArray.doubleValue(low + ((high - low) / 2));
+            final double pivot = myArray.doubleValue(low + (high - low) / 2);
 
             while (i <= j) {
 
@@ -324,18 +324,18 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
             return (Array1D<N>) this.collect(PRIMITIVE64);
 
-        } else if (myDelegate instanceof ComplexArray) {
+        }
+        if (myDelegate instanceof ComplexArray) {
 
             return (Array1D<N>) this.collect(COMPLEX);
 
-        } else if (myDelegate instanceof BigArray) {
+        }
+        if (myDelegate instanceof BigArray) {
 
             return (Array1D<N>) this.collect(BIG);
 
-        } else {
-
-            return null;
         }
+        return null;
     }
 
     /**
@@ -360,7 +360,8 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
             return new Array1D<>(retVal);
 
-        } else if (myDelegate instanceof ComplexArray) {
+        }
+        if (myDelegate instanceof ComplexArray) {
 
             retVal = (BasicArray<N>) new ComplexArray(tmpLength);
 
@@ -370,20 +371,18 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
             return new Array1D<>(retVal);
 
-        } else if (myDelegate instanceof BigArray) {
-
-            retVal = (BasicArray<N>) new BigArray(tmpLength);
-
-            for (int i = 0; i < tmpLength; i++) {
-                retVal.set(i, this.get(indices[i]));
-            }
-
-            return new Array1D<>(retVal);
-
-        } else {
+        }
+        if (!(myDelegate instanceof BigArray)) {
 
             return null;
         }
+        retVal = (BasicArray<N>) new BigArray(tmpLength);
+
+        for (int i = 0; i < tmpLength; i++) {
+            retVal.set(i, this.get(indices[i]));
+        }
+
+        return new Array1D<>(retVal);
     }
 
     @Override
@@ -401,23 +400,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof Array1D)) {
+        if (!super.equals(obj) || !(obj instanceof Array1D)) {
             return false;
         }
         Array1D<?> other = (Array1D<?>) obj;
-        if (length != other.length) {
-            return false;
-        }
-        if (myFirst != other.myFirst) {
-            return false;
-        }
-        if (myLimit != other.myLimit) {
-            return false;
-        }
-        if (myStep != other.myStep) {
+        if (length != other.length || myFirst != other.myFirst || myLimit != other.myLimit || myStep != other.myStep) {
             return false;
         }
         if (myDelegate == null) {
@@ -479,11 +466,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + (int) (length ^ (length >>> 32));
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        result = (prime * result) + (int) (myFirst ^ (myFirst >>> 32));
-        result = (prime * result) + (int) (myLimit ^ (myLimit >>> 32));
-        result = (prime * result) + (int) (myStep ^ (myStep >>> 32));
+        result = prime * result + (int) (length ^ length >>> 32);
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
+        result = prime * result + (int) (myFirst ^ myFirst >>> 32);
+        result = prime * result + (int) (myLimit ^ myLimit >>> 32);
+        result = prime * result + (int) (myStep ^ myStep >>> 32);
         return result;
     }
 
@@ -652,7 +639,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
     @Override
     public void sortAscending() {
 
-        if ((myDelegate instanceof Mutate1D.Sortable) && (this.count() == myDelegate.count())) {
+        if (myDelegate instanceof Mutate1D.Sortable && this.count() == myDelegate.count()) {
 
             ((Mutate1D.Sortable) myDelegate).sortAscending();
 
@@ -671,7 +658,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
     @Override
     public void sortDescending() {
 
-        if ((myDelegate instanceof Mutate1D.Sortable) && (this.count() == myDelegate.count())) {
+        if (myDelegate instanceof Mutate1D.Sortable && this.count() == myDelegate.count()) {
 
             ((Mutate1D.Sortable) myDelegate).sortDescending();
 
@@ -729,7 +716,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
      * Convert an external (public API) index to the corresponding internal
      */
     private long convert(final long index) {
-        return myFirst + (myStep * index);
+        return myFirst + myStep * index;
     }
 
     void exchange(final long indexA, final long indexB) {
@@ -756,7 +743,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
         long i = low, j = high;
 
-        final double pivot = this.doubleValue(low + ((high - low) / 2));
+        final double pivot = this.doubleValue(low + (high - low) / 2);
 
         while (i <= j) {
 
@@ -786,7 +773,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
 
         long i = low, j = high;
 
-        final double pivot = this.doubleValue(low + ((high - low) / 2));
+        final double pivot = this.doubleValue(low + (high - low) / 2);
 
         while (i <= j) {
 

@@ -28,12 +28,12 @@ import java.util.Arrays;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -163,10 +163,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof SparseStore)) {
+        if (!super.equals(obj) || !(obj instanceof SparseStore)) {
             return false;
         }
         SparseStore<?> other = (SparseStore<?>) obj;
@@ -177,10 +174,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         } else if (!myElements.equals(other.myElements)) {
             return false;
         }
-        if (!Arrays.equals(myFirsts, other.myFirsts)) {
-            return false;
-        }
-        if (!Arrays.equals(myLimits, other.myLimits)) {
+        if (!Arrays.equals(myFirsts, other.myFirsts) || !Arrays.equals(myLimits, other.myLimits)) {
             return false;
         }
         return true;
@@ -225,9 +219,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         if (rangeFirst == firstInRange) {
             return 0;
-        } else {
-            return (int) (firstInRange % structure);
         }
+        return (int) (firstInRange % structure);
     }
 
     public int firstInRow(final int row) {
@@ -242,9 +235,9 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myElements == null) ? 0 : myElements.hashCode());
-        result = (prime * result) + Arrays.hashCode(myFirsts);
-        result = (prime * result) + Arrays.hashCode(myLimits);
+        result = prime * result + (myElements == null ? 0 : myElements.hashCode());
+        result = prime * result + Arrays.hashCode(myFirsts);
+        result = prime * result + Arrays.hashCode(myLimits);
         return result;
     }
 
@@ -260,9 +253,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         if (rangeLimit == limitOfRange) {
             return (int) structure;
-        } else {
-            return (int) (limitOfRange % structure);
         }
+        return (int) (limitOfRange % structure);
     }
 
     @Override
@@ -298,15 +290,13 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
                     this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
                 }
             }
+        } else if (notModifiesZero) {
+            for (NonzeroView<N> element : myElements.nonzeros()) {
+                element.modify(left.get(element.index()), function);
+            }
         } else {
-            if (notModifiesZero) {
-                for (NonzeroView<N> element : myElements.nonzeros()) {
-                    element.modify(left.get(element.index()), function);
-                }
-            } else {
-                for (long i = 0L; i < limit; i++) {
-                    this.set(i, function.invoke(left.get(i), this.get(i)));
-                }
+            for (long i = 0L; i < limit; i++) {
+                this.set(i, function.invoke(left.get(i), this.get(i)));
             }
         }
     }
@@ -326,15 +316,13 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
                     this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
                 }
             }
+        } else if (notModifiesZero) {
+            for (NonzeroView<N> element : myElements.nonzeros()) {
+                element.modify(function, right.get(element.index()));
+            }
         } else {
-            if (notModifiesZero) {
-                for (NonzeroView<N> element : myElements.nonzeros()) {
-                    element.modify(function, right.get(element.index()));
-                }
-            } else {
-                for (long i = 0L; i < limit; i++) {
-                    this.set(i, function.invoke(this.get(i), right.get(i)));
-                }
+            for (long i = 0L; i < limit; i++) {
+                this.set(i, function.invoke(this.get(i), right.get(i)));
             }
         }
     }
@@ -418,14 +406,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
             return retVal;
 
-        } else {
-
-            final PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
-
-            this.multiply(right, retVal);
-
-            return retVal;
         }
+        final PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
+
+        this.multiply(right, retVal);
+
+        return retVal;
     }
 
     public MatrixStore<N> multiply(final N scalar) {
@@ -476,38 +462,36 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
             return retVal;
 
-        } else if (this.isPrimitive()) {
-
-            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
-
-            this.nonzeros().stream().forEach(element -> {
-
-                final long row = element.row();
-                final long col = element.column();
-                final double value = element.doubleValue();
-
-                final long first = MatrixStore.firstInColumn(left, row, 0L);
-                final long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
-                for (long i = first; i < limit; i++) {
-                    final long index = Structure2D.index(numberOfRows, i, row);
-                    final double addition = value * left.doubleValue(index);
-                    if (NumberContext.compare(addition, ZERO) != 0) {
-                        retVal.add(i, col, addition);
-                    }
-                }
-            });
-
-            return retVal;
-
-        } else {
+        }
+        if (!this.isPrimitive()) {
 
             return super.premultiply(left);
         }
+        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+
+        this.nonzeros().stream().forEach(element -> {
+
+            final long row = element.row();
+            final long col = element.column();
+            final double value = element.doubleValue();
+
+            final long first = MatrixStore.firstInColumn(left, row, 0L);
+            final long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
+            for (long i = first; i < limit; i++) {
+                final long index = Structure2D.index(numberOfRows, i, row);
+                final double addition = value * left.doubleValue(index);
+                if (NumberContext.compare(addition, ZERO) != 0) {
+                    retVal.add(i, col, addition);
+                }
+            }
+        });
+
+        return retVal;
     }
 
     @SuppressWarnings("unchecked")
     public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
-        if ((aggregator == Aggregator.SUM) && (receiver instanceof Mutate1D.Modifiable)) {
+        if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
                 this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.column(), element.doubleValue()));
             } else {
@@ -520,7 +504,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @SuppressWarnings("unchecked")
     public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
-        if ((aggregator == Aggregator.SUM) && (receiver instanceof Mutate1D.Modifiable)) {
+        if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
                 this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.row(), element.doubleValue()));
             } else {
@@ -604,7 +588,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
                 }
             }
         }
-        if ((col + counter) < this.countColumns()) {
+        if (col + counter < this.countColumns()) {
             visitor.accept(0.0);
         }
     }

@@ -19,10 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.operation.MultiplyNeither;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -64,25 +63,38 @@ ThresholdMultiplyNeither.tune    128    1  thrpt    5      21722.580 ±  26793.0
 ThresholdMultiplyNeither.tune    128    2  thrpt    5      66277.842 ±    836.778  ops/min
  * </pre>
  *
- * <h1>MacBook Air</h1>
+ * MacBook Pro (16-inch, 2019): 2021-07-08 => 16
  *
  * <pre>
+Benchmark                      (dim)  (z)   Mode  Cnt          Score           Error    Units
+ThresholdMultiplyNeither.tune      8    1  thrpt    3  320517801.752 ± 109454851.232  ops/min
+ThresholdMultiplyNeither.tune      8    2  thrpt    3    5262504.922 ±   8655895.967  ops/min
+ThresholdMultiplyNeither.tune      8    4  thrpt    3    2639780.469 ±    237580.224  ops/min
+ThresholdMultiplyNeither.tune     16    1  thrpt    3   16174533.544 ±  11892145.698  ops/min
+ThresholdMultiplyNeither.tune     16    2  thrpt    3    4401672.135 ±   2772814.674  ops/min
+ThresholdMultiplyNeither.tune     16    4  thrpt    3    2302383.934 ±    938891.592  ops/min
+ThresholdMultiplyNeither.tune     32    1  thrpt    3    2287568.482 ±   2097808.868  ops/min
+ThresholdMultiplyNeither.tune     32    2  thrpt    3    2454889.623 ±   1452680.453  ops/min
+ThresholdMultiplyNeither.tune     32    4  thrpt    3    1840110.930 ±    111883.096  ops/min
+ThresholdMultiplyNeither.tune     64    1  thrpt    3     313790.575 ±    172920.018  ops/min
+ThresholdMultiplyNeither.tune     64    2  thrpt    3     535867.427 ±    276422.663  ops/min
+ThresholdMultiplyNeither.tune     64    4  thrpt    3     656074.495 ±     18432.218  ops/min
+ThresholdMultiplyNeither.tune    128    1  thrpt    3      37724.564 ±     28104.934  ops/min
+ThresholdMultiplyNeither.tune    128    2  thrpt    3      82951.381 ±       506.592  ops/min
+ThresholdMultiplyNeither.tune    128    4  thrpt    3     129057.015 ±     60779.708  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdMultiplyNeither extends AbstractThresholdTuner {
+public class ThresholdMultiplyNeither extends ThresholdTuner {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ThresholdMultiplyNeither.class);
+        BenchmarkUtils.run(ThresholdTuner.options(), ThresholdMultiplyNeither.class);
     }
 
     @Param({ "8", "16", "32", "64", "128" })
     public int dim;
-
-    @Param({ "1", "2" })
-    public int z;
 
     MatrixStore<Double> left;
     MatrixStore<Double> right;
@@ -98,7 +110,7 @@ public class ThresholdMultiplyNeither extends AbstractThresholdTuner {
 
         left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
         right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.makeZero(dim, dim);
+        target = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Override
@@ -106,6 +118,6 @@ public class ThresholdMultiplyNeither extends AbstractThresholdTuner {
     public Object tune() {
         target.fillByMultiplying(left, right);
         return target;
-    };
+    }
 
 }

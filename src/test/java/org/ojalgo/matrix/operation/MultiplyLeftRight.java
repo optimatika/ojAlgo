@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -139,9 +139,9 @@ public class MultiplyLeftRight {
 
         for (int c = 0; c < complexity; c++) {
             for (int i = 0; i < numbRows; i++) {
-                final double a = left[i + (c * numbRows)];
+                final double a = left[i + c * numbRows];
                 for (int j = 0; j < numbCols; j++) {
-                    product[i + (j * numbRows)] += a * right[c + (j * complexity)];
+                    product[i + j * numbRows] += a * right[c + j * complexity];
                 }
             }
         }
@@ -154,9 +154,9 @@ public class MultiplyLeftRight {
 
         for (int c = 0; c < complexity; c++) {
             for (int j = 0; j < numbCols; j++) {
-                final double a = right[c + (j * complexity)];
+                final double a = right[c + j * complexity];
                 for (int i = 0; i < numbRows; i++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * a;
+                    product[i + j * numbRows] += left[i + c * numbRows] * a;
                 }
             }
         }
@@ -172,7 +172,7 @@ public class MultiplyLeftRight {
             final int j = cj / complexity;
             final double val = right[cj];
             for (int i = 0; i < numbRows; i++) {
-                product[i + (j * numbRows)] += left[i + (c * numbRows)] * val;
+                product[i + j * numbRows] += left[i + c * numbRows] * val;
             }
         }
     }
@@ -185,7 +185,7 @@ public class MultiplyLeftRight {
         for (int i = 0; i < numbRows; i++) {
             for (int c = 0; c < complexity; c++) {
                 for (int j = 0; j < numbCols; j++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -199,7 +199,7 @@ public class MultiplyLeftRight {
         for (int i = 0; i < numbRows; i++) {
             for (int j = 0; j < numbCols; j++) {
                 for (int c = 0; c < complexity; c++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -213,7 +213,7 @@ public class MultiplyLeftRight {
         for (int c = 0; c < complexity; c += 2) {
             for (int i = 0; i < numbRows; i++) {
                 for (int j = 0; j < numbCols; j++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -226,9 +226,9 @@ public class MultiplyLeftRight {
 
         for (int j = 0; j < numbCols; j++) {
             for (int c = 0; c < complexity; c++) {
-                final double tmpD = right[c + (j * complexity)];
+                final double tmpD = right[c + j * complexity];
                 for (int i = 0; i < numbRows; i++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * tmpD;
+                    product[i + j * numbRows] += left[i + c * numbRows] * tmpD;
                 }
             }
         }
@@ -242,7 +242,7 @@ public class MultiplyLeftRight {
         for (int j = 0; j < numbCols; j++) {
             for (int i = 0; i < numbRows; i++) {
                 for (int c = 0; c < complexity; c++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -258,43 +258,43 @@ public class MultiplyLeftRight {
     public Primitive64Store invokeCIJ() {
         MultiplyLeftRight.invokeCIJ(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeCJI() {
         MultiplyLeftRight.invokeCJI(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeCJI2() {
         MultiplyLeftRight.invokeCJIb(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeICJ() {
         MultiplyLeftRight.invokeICJ(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeIJC() {
         MultiplyLeftRight.invokeIJC(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeJCI() {
         MultiplyLeftRight.invokeJCI(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     public Primitive64Store invokeJIC() {
         MultiplyLeftRight.invokeJIC(product.data, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     @Benchmark
     public Primitive64Store invokeNeitherMaybe3() {
-        MultiplyNeither.invoke(product.data, 0, complexity, left.data, complexity, right.data);
+        MultiplyNeither.addMxR(product.data, 0, complexity, left.data, complexity, right.data);
         return product;
-    };
+    }
 
     @Setup
     public void setup() {

@@ -92,14 +92,13 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
                 return this.makeSegmented(structure);
 
-            } else if (strategy.isChunked(total)) {
+            }
+            if (strategy.isChunked(total)) {
 
                 return new SparseArray<>(strategy.limit(total));
 
-            } else {
-
-                return strategy.make(total);
             }
+            return strategy.make(total);
         }
 
         @Override
@@ -113,10 +112,8 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
                 return strategy.makeSegmented(total);
 
-            } else {
-
-                return strategy.make(total);
             }
+            return strategy.make(total);
         }
 
         DenseCapacityStrategy<N> strategy() {
@@ -192,7 +189,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 
@@ -318,4 +315,5 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     final boolean isSparse() {
         return this instanceof SparseArray;
     }
+
 }

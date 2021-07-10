@@ -19,57 +19,194 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.matrix.operation;
 
 import java.util.Arrays;
+import java.util.function.IntSupplier;
 
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-public final class MultiplyLeft implements ArrayOperation {
+public class MultiplyLeft implements BLAS3 {
 
+    @FunctionalInterface
     public interface Generic<N extends Scalar<N>> {
 
         void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
+    @FunctionalInterface
     public interface Primitive32 {
 
         void invoke(float[] product, Access1D<?> left, int complexity, float[] right);
 
     }
 
+    @FunctionalInterface
     public interface Primitive64 {
 
         void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
 
     }
 
+    public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 32;
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE = (product, left, complexity, right) -> {
+    private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
 
-        Arrays.fill(product, 0.0);
+    public static <N extends Scalar<N>> MultiplyLeft.Generic<N> newGeneric(final long rows, final long columns) {
+        if (rows > THRESHOLD && columns > THRESHOLD) {
+            return MultiplyLeft::fillMxN_MT;
+        }
+        return MultiplyLeft::fillMxN;
+    }
 
-        MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
+    public static MultiplyLeft.Primitive32 newPrimitive32(final long rows, final long columns) {
+        if (rows > THRESHOLD && columns > THRESHOLD) {
+            return MultiplyLeft::fillMxN_MT;
+        }
+        return MultiplyLeft::fillMxN;
+    }
 
-    static final MultiplyLeft.Primitive32 PRIMITIVE32 = (product, left, complexity, right) -> {
+    public static MultiplyLeft.Primitive64 newPrimitive64(final long rows, final long columns) {
+        if (rows > THRESHOLD && columns > THRESHOLD) {
+            return MultiplyLeft::fillMxN_MT;
+        }
+        if (rows == 10) {
+            return MultiplyLeft::fill0xN;
+        }
+        if (rows == 9) {
+            return MultiplyLeft::fill9xN;
+        }
+        if (rows == 8) {
+            return MultiplyLeft::fill8xN;
+        }
+        if (rows == 7) {
+            return MultiplyLeft::fill7xN;
+        }
+        if (rows == 6) {
+            return MultiplyLeft::fill6xN;
+        }
+        if (rows == 5 && columns == 5) {
+            return MultiplyLeft::fill5x5;
+        }
+        if (rows == 4 && columns == 4) {
+            return MultiplyLeft::fill4x4;
+        }
+        if (rows == 3 && columns == 3) {
+            return MultiplyLeft::fill3x3;
+        }
+        if (rows == 2 && columns == 2) {
+            return MultiplyLeft::fill2x2;
+        }
+        if (rows == 1) {
+            return MultiplyLeft::fill1xN;
+        }
+        return MultiplyLeft::fillMxN;
+    }
 
-        Arrays.fill(product, 0F);
+    static void add1xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
+        int firstInRow = MatrixStore.firstInRow(left, 0, 0);
+        int limitOfRow = MatrixStore.limitOfRow(left, 0, product.length);
+        for (int j = firstInRow; j < limitOfRow; j++) {
+            product[j] += DOT.invoke(left, 0, right, j * complexity, 0, complexity);
+        }
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
+    static void addMxN_MT(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxR(product, f, l, left, complexity, right));
+    }
 
-        final int tmpRowDim = 10;
-        final int tmpColDim = right.length / complexity;
+    static void addMxN_MT(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
+        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxR(product, f, l, left, complexity, right));
+    }
+
+    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
+        MultiplyLeft.divide(0, right.length / complexity, (f, l) -> MultiplyLeft.addMxR(product, f, l, left, complexity, right, scalar));
+    }
+
+    static void addMxR(final double[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity,
+            final double[] right) {
+
+        int structure = Math.toIntExact(left.count() / complexity);
+
+        double[] leftColumn = new double[structure];
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
+            }
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+            }
+        }
+    }
+
+    static void addMxR(final float[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity, final float[] right) {
+
+        int structure = Math.toIntExact(left.count() / complexity);
+
+        float[] leftColumn = new float[structure];
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
+            }
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+            }
+        }
+    }
+
+    static <N extends Scalar<N>> void addMxR(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left, final int complexity,
+            final N[] right, final Scalar.Factory<N> scalar) {
+
+        int structure = Math.toIntExact(left.count() / complexity);
+
+        N[] leftColumn = scalar.newArrayInstance(structure);
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.get(Structure2D.index(structure, i, c));
+            }
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+            }
+        }
+    }
+
+    static void divide(final int first, final int limit, final Conquerer conquerer) {
+        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    }
+
+    static void fill0xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+
+        int tmpRowDim = 10;
+        int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -86,7 +223,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + j * complexity];
+                double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -110,9 +247,9 @@ public final class MultiplyLeft implements ArrayOperation {
             product[++tmpIndex] = tmp8J;
             product[++tmpIndex] = tmp9J;
         }
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_1X1 = (product, left, complexity, right) -> {
+    static void fill1x1(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         double tmp00 = PrimitiveMath.ZERO;
 
@@ -121,26 +258,18 @@ public final class MultiplyLeft implements ArrayOperation {
         }
 
         product[0] = tmp00;
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_1XN = (product, left, complexity, right) -> {
+    static void fill1xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int tmpColDim = right.length / complexity;
-
-        for (int j = 0; j < tmpColDim; j++) {
-
-            double tmp0J = PrimitiveMath.ZERO;
-
-            int tmpIndex = 0;
-            for (int c = 0; c < complexity; c++) {
-                tmp0J += left.doubleValue(tmpIndex++) * right[c + j * complexity];
-            }
-
-            product[j] = tmp0J;
+        int firstInRow = MatrixStore.firstInRow(left, 0, 0);
+        int limitOfRow = MatrixStore.limitOfRow(left, 0, product.length);
+        for (int j = firstInRow; j < limitOfRow; j++) {
+            product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity);
         }
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_2X2 = (product, left, complexity, right) -> {
+    static void fill2x2(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -151,13 +280,13 @@ public final class MultiplyLeft implements ArrayOperation {
         for (int c = 0; c < complexity; c++) {
 
             tmpIndex = c * 2;
-            final double tmpLeft0 = left.doubleValue(tmpIndex);
+            double tmpLeft0 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft1 = left.doubleValue(tmpIndex);
+            double tmpLeft1 = left.doubleValue(tmpIndex);
             tmpIndex = c;
-            final double tmpRight0 = right[tmpIndex];
+            double tmpRight0 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight1 = right[tmpIndex];
+            double tmpRight1 = right[tmpIndex];
 
             tmp00 += tmpLeft0 * tmpRight0;
             tmp10 += tmpLeft1 * tmpRight0;
@@ -169,9 +298,9 @@ public final class MultiplyLeft implements ArrayOperation {
         product[1] = tmp10;
         product[2] = tmp01;
         product[3] = tmp11;
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_3X3 = (product, left, complexity, right) -> {
+    static void fill3x3(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -187,17 +316,17 @@ public final class MultiplyLeft implements ArrayOperation {
         for (int c = 0; c < complexity; c++) {
 
             tmpIndex = c * 3;
-            final double tmpLeft0 = left.doubleValue(tmpIndex);
+            double tmpLeft0 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft1 = left.doubleValue(tmpIndex);
+            double tmpLeft1 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft2 = left.doubleValue(tmpIndex);
+            double tmpLeft2 = left.doubleValue(tmpIndex);
             tmpIndex = c;
-            final double tmpRight0 = right[tmpIndex];
+            double tmpRight0 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight1 = right[tmpIndex];
+            double tmpRight1 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight2 = right[tmpIndex];
+            double tmpRight2 = right[tmpIndex];
 
             tmp00 += tmpLeft0 * tmpRight0;
             tmp10 += tmpLeft1 * tmpRight0;
@@ -219,9 +348,9 @@ public final class MultiplyLeft implements ArrayOperation {
         product[6] = tmp02;
         product[7] = tmp12;
         product[8] = tmp22;
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_4X4 = (product, left, complexity, right) -> {
+    static void fill4x4(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -244,21 +373,21 @@ public final class MultiplyLeft implements ArrayOperation {
         for (int c = 0; c < complexity; c++) {
 
             tmpIndex = c * 4;
-            final double tmpLeft0 = left.doubleValue(tmpIndex);
+            double tmpLeft0 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft1 = left.doubleValue(tmpIndex);
+            double tmpLeft1 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft2 = left.doubleValue(tmpIndex);
+            double tmpLeft2 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft3 = left.doubleValue(tmpIndex);
+            double tmpLeft3 = left.doubleValue(tmpIndex);
             tmpIndex = c;
-            final double tmpRight0 = right[tmpIndex];
+            double tmpRight0 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight1 = right[tmpIndex];
+            double tmpRight1 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight2 = right[tmpIndex];
+            double tmpRight2 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight3 = right[tmpIndex];
+            double tmpRight3 = right[tmpIndex];
 
             tmp00 += tmpLeft0 * tmpRight0;
             tmp10 += tmpLeft1 * tmpRight0;
@@ -294,9 +423,9 @@ public final class MultiplyLeft implements ArrayOperation {
         product[13] = tmp13;
         product[14] = tmp23;
         product[15] = tmp33;
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_5X5 = (product, left, complexity, right) -> {
+    static void fill5x5(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -328,25 +457,25 @@ public final class MultiplyLeft implements ArrayOperation {
         for (int c = 0; c < complexity; c++) {
 
             tmpIndex = c * 5;
-            final double tmpLeft0 = left.doubleValue(tmpIndex);
+            double tmpLeft0 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft1 = left.doubleValue(tmpIndex);
+            double tmpLeft1 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft2 = left.doubleValue(tmpIndex);
+            double tmpLeft2 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft3 = left.doubleValue(tmpIndex);
+            double tmpLeft3 = left.doubleValue(tmpIndex);
             tmpIndex++;
-            final double tmpLeft4 = left.doubleValue(tmpIndex);
+            double tmpLeft4 = left.doubleValue(tmpIndex);
             tmpIndex = c;
-            final double tmpRight0 = right[tmpIndex];
+            double tmpRight0 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight1 = right[tmpIndex];
+            double tmpRight1 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight2 = right[tmpIndex];
+            double tmpRight2 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight3 = right[tmpIndex];
+            double tmpRight3 = right[tmpIndex];
             tmpIndex += complexity;
-            final double tmpRight4 = right[tmpIndex];
+            double tmpRight4 = right[tmpIndex];
 
             tmp00 += tmpLeft0 * tmpRight0;
             tmp10 += tmpLeft1 * tmpRight0;
@@ -400,12 +529,12 @@ public final class MultiplyLeft implements ArrayOperation {
         product[22] = tmp24;
         product[23] = tmp34;
         product[24] = tmp44;
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_6XN = (product, left, complexity, right) -> {
+    static void fill6xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int tmpRowDim = 6;
-        final int tmpColDim = right.length / complexity;
+        int tmpRowDim = 6;
+        int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -418,7 +547,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + j * complexity];
+                double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -434,12 +563,12 @@ public final class MultiplyLeft implements ArrayOperation {
             product[++tmpIndex] = tmp4J;
             product[++tmpIndex] = tmp5J;
         }
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_7XN = (product, left, complexity, right) -> {
+    static void fill7xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int tmpRowDim = 7;
-        final int tmpColDim = right.length / complexity;
+        int tmpRowDim = 7;
+        int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -453,7 +582,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + j * complexity];
+                double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -471,12 +600,12 @@ public final class MultiplyLeft implements ArrayOperation {
             product[++tmpIndex] = tmp5J;
             product[++tmpIndex] = tmp6J;
         }
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_8XN = (product, left, complexity, right) -> {
+    static void fill8xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int tmpRowDim = 8;
-        final int tmpColDim = right.length / complexity;
+        int tmpRowDim = 8;
+        int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -491,7 +620,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + j * complexity];
+                double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -511,12 +640,12 @@ public final class MultiplyLeft implements ArrayOperation {
             product[++tmpIndex] = tmp6J;
             product[++tmpIndex] = tmp7J;
         }
-    };
+    }
 
-    static final MultiplyLeft.Primitive64 PRIMITIVE_9XN = (product, left, complexity, right) -> {
+    static void fill9xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int tmpRowDim = 9;
-        final int tmpColDim = right.length / complexity;
+        int tmpRowDim = 9;
+        int tmpColDim = right.length / complexity;
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -532,7 +661,7 @@ public final class MultiplyLeft implements ArrayOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right[c + j * complexity];
+                double tmpRightCJ = right[c + j * complexity];
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -554,143 +683,47 @@ public final class MultiplyLeft implements ArrayOperation {
             product[++tmpIndex] = tmp7J;
             product[++tmpIndex] = tmp8J;
         }
-    };
-
-    static final MultiplyLeft.Primitive64 PRIMITIVE_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, 0.0);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyLeft.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-    };
-
-    public static <N extends Scalar<N>> MultiplyLeft.Generic<N> newGeneric(final long rows, final long columns) {
-
-        if (rows <= THRESHOLD) {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
-            };
-        }
-        return (product, left, complexity, right, scalar) -> {
-
-            Arrays.fill(product, scalar.zero().get());
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    MultiplyLeft.invoke(product, first, limit, left, complexity, right, scalar);
-                }
-            };
-
-            tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-        };
     }
 
-    public static MultiplyLeft.Primitive32 newPrimitive32(final long rows, final long columns) {
-        return PRIMITIVE32;
+    static void fillMxN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+
+        Arrays.fill(product, 0D);
+
+        MultiplyLeft.addMxR(product, 0, right.length / complexity, left, complexity, right);
     }
 
-    public static MultiplyLeft.Primitive64 newPrimitive64(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return PRIMITIVE_MT;
-        }
-        if (rows == 10) {
-            return PRIMITIVE_0XN;
-        } else if (rows == 9) {
-            return PRIMITIVE_9XN;
-        } else if (rows == 8) {
-            return PRIMITIVE_8XN;
-        } else if (rows == 7) {
-            return PRIMITIVE_7XN;
-        } else if (rows == 6) {
-            return PRIMITIVE_6XN;
-        } else if (rows == 5 && columns == 5) {
-            return PRIMITIVE_5X5;
-        } else if (rows == 4 && columns == 4) {
-            return PRIMITIVE_4X4;
-        } else if (rows == 3 && columns == 3) {
-            return PRIMITIVE_3X3;
-        } else if (rows == 2 && columns == 2) {
-            return PRIMITIVE_2X2;
-        } else if (rows == 1) {
-            return PRIMITIVE_1XN;
-        } else {
-            return PRIMITIVE;
-        }
+    static void fillMxN(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
+
+        Arrays.fill(product, 0F);
+
+        MultiplyLeft.addMxR(product, 0, right.length / complexity, left, complexity, right);
     }
 
-    static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity,
-            final double[] right) {
+    static <N extends Scalar<N>> void fillMxN(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
 
-        final int structure = (int) left.count() / complexity;
+        Arrays.fill(product, scalar.zero().get());
 
-        final double[] leftColumn = new double[structure];
-        for (int c = 0; c < complexity; c++) {
-
-            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
-
-            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
-            }
-
-            for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
-            }
-        }
+        MultiplyLeft.addMxR(product, 0, right.length / complexity, left, complexity, right, scalar);
     }
 
-    static void invoke(final float[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity, final float[] right) {
+    static void fillMxN_MT(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
-        final int structure = (int) left.count() / complexity;
+        Arrays.fill(product, 0D);
 
-        final float[] leftColumn = new float[structure];
-        for (int c = 0; c < complexity; c++) {
-
-            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
-
-            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
-            }
-
-            for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
-            }
-        }
+        MultiplyLeft.addMxN_MT(product, left, complexity, right);
     }
 
-    static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left, final int complexity,
-            final N[] right, final Scalar.Factory<N> scalar) {
+    static void fillMxN_MT(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
 
-        final int structure = (int) left.count() / complexity;
+        Arrays.fill(product, 0F);
 
-        final N[] leftColumn = scalar.newArrayInstance(structure);
-        for (int c = 0; c < complexity; c++) {
-
-            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
-
-            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.get(Structure2D.index(structure, i, c));
-            }
-
-            for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
-            }
-        }
+        MultiplyLeft.addMxN_MT(product, left, complexity, right);
     }
 
+    static <N extends Scalar<N>> void fillMxN_MT(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
+
+        Arrays.fill(product, scalar.zero().get());
+
+        MultiplyLeft.addMxN_MT(product, left, complexity, right, scalar);
+    }
 }

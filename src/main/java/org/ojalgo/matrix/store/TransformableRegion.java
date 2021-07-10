@@ -35,7 +35,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Modifiable
     @FunctionalInterface
     interface FillByMultiplying<N extends Comparable<N>> {
 
-        void invoke(TransformableRegion<N> product, Access1D<N> left, long complexity, Access1D<N> right);
+        void invoke(TransformableRegion<N> product, Access1D<N> left, int complexity, Access1D<N> right);
+
+        default void invoke(final TransformableRegion<N> product, final Access1D<N> left, final long complexity, final Access1D<N> right) {
+            this.invoke(product, left, Math.toIntExact(complexity), right);
+        }
 
     }
 

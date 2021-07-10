@@ -329,8 +329,8 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        result = (prime * result) + Arrays.hashCode(myStructure);
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
+        result = prime * result + Arrays.hashCode(myStructure);
         return result;
     }
 
@@ -468,7 +468,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
                 final long rowInd = i;
 
                 visitor.reset();
-                this.loop(reference -> (reference[rowDimension] == rowInd) && (reference[columnDimension] == colInd), index -> this.visitOne(index, visitor));
+                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
                 if (primitive) {
                     retVal.set(rowInd, colInd, visitor.doubleValue());
                 } else {
@@ -560,19 +560,17 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         if (notOne == oldShape.length) {
             return this;
-        } else {
-
-            long[] shape = new long[notOne];
-
-            for (int i = 0, d = 0; i < oldShape.length; i++) {
-                long length = oldShape[i];
-                if (length > 1) {
-                    shape[d++] = length;
-                }
-            }
-
-            return this.reshape(shape);
         }
+        long[] shape = new long[notOne];
+
+        for (int i = 0, d = 0; i < oldShape.length; i++) {
+            long length = oldShape[i];
+            if (length > 1) {
+                shape[d++] = length;
+            }
+        }
+
+        return this.reshape(shape);
     }
 
     public void supplyTo(final MutateAnyD receiver) {
@@ -593,7 +591,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         retVal.append('>');
 
         final int tmpLength = (int) this.count();
-        if ((tmpLength >= 1) && (tmpLength <= 100)) {
+        if (tmpLength >= 1 && tmpLength <= 100) {
             retVal.append(' ');
             retVal.append(myDelegate.toString());
         }

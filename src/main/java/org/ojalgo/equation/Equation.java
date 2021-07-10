@@ -163,10 +163,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Equation)) {
+        if (obj == null || !(obj instanceof Equation)) {
             return false;
         }
         final Equation other = (Equation) obj;
@@ -198,7 +195,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + index;
+        result = prime * result + index;
         return result;
     }
 
