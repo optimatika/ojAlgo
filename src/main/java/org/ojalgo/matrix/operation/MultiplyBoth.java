@@ -59,6 +59,12 @@ public class MultiplyBoth implements MatrixOperation {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyBoth::fillMxN_MT_G;
         }
+        if (columns == 1) {
+            return MultiplyBoth::fillMx1_G;
+        }
+        if (rows == 1) {
+            return MultiplyBoth::fill1xN_G;
+        }
         return MultiplyBoth::fillMxN_G;
     }
 
@@ -84,6 +90,9 @@ public class MultiplyBoth implements MatrixOperation {
         }
         if (rows == 1 && columns == 1) {
             return MultiplyBoth::fill1x1_P64;
+        }
+        if (columns == 1) {
+            return MultiplyBoth::fillMx1_P64;
         }
         if (rows == 10) {
             return MultiplyBoth::fill0xN_P64;
@@ -113,7 +122,7 @@ public class MultiplyBoth implements MatrixOperation {
         for (int j = firstInRow; j < limitOfRow; j++) {
             int firstInCol = MatrixStore.firstInColumn(right, j, 0);
             int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
-            product.add(j, DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol));
+            product.add(j, DOT.invokeP64(left, 0, right, j * complexity, firstInCol, limitOfCol));
         }
     }
 
@@ -177,6 +186,43 @@ public class MultiplyBoth implements MatrixOperation {
         product.set(0L, 0L, tmp00);
     }
 
+    static <N extends Scalar<N>> void fill1xN_G(final TransformableRegion<N> product, final Access1D<N> left, final int complexity, final Access1D<N> right) {
+
+        Class<N> componenetType = (Class<N>) left.get(0L).getClass();
+        N zero;
+        try {
+            zero = componenetType.newInstance();
+        } catch (InstantiationException | IllegalAccessException exception) {
+            exception.printStackTrace();
+            throw new ProgrammingError(exception);
+        }
+
+        int tmpColDim = product.getColDim();
+
+        N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, complexity);
+        N tmpVal;
+
+        int tmpFirst = 0;
+        int tmpLimit = complexity;
+
+        for (int c = 0; c < complexity; c++) {
+            tmpLeftRow[c] = left.get(c);
+        }
+
+        for (int j = 0; j < tmpColDim; j++) {
+            long tmpColBase = Structure2D.index(complexity, 0, j);
+
+            tmpFirst = MatrixStore.firstInColumn(right, j, 0);
+            tmpLimit = MatrixStore.limitOfColumn(right, j, complexity);
+
+            tmpVal = zero;
+            for (int c = tmpFirst; c < tmpLimit; c++) {
+                tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase))).get();
+            }
+            product.set(0, j, tmpVal);
+        }
+    }
+
     static void fill1xN_P64(final TransformableRegion<Double> product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
 
         int nbCols = product.getColDim();
@@ -187,7 +233,7 @@ public class MultiplyBoth implements MatrixOperation {
         for (int j = 0; j < nbCols; j++) {
             int firstInCol = MatrixStore.firstInColumn(right, j, firstInRow);
             int limitOfCol = MatrixStore.firstInColumn(right, j, limitOfRow);
-            product.set(j, DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol));
+            product.set(j, DOT.invokeP64(left, 0, right, j * complexity, firstInCol, limitOfCol));
         }
     }
 
@@ -613,7 +659,46 @@ public class MultiplyBoth implements MatrixOperation {
         }
     }
 
-    static void fillMx1_P64_(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
+    static <N extends Scalar<N>> void fillMx1_G(final TransformableRegion<N> product, final Access1D<N> left, final int complexity, final Access1D<N> right) {
+
+        Class<N> componenetType = (Class<N>) left.get(0L).getClass();
+        N zero;
+        try {
+            zero = componenetType.newInstance();
+        } catch (InstantiationException | IllegalAccessException exception) {
+            exception.printStackTrace();
+            throw new ProgrammingError(exception);
+        }
+
+        int tmpRowDim = product.getRowDim();
+
+        N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, complexity);
+        N tmpVal;
+
+        int tmpFirst = 0;
+        int tmpLimit = complexity;
+
+        for (int i = 0; i < tmpRowDim; i++) {
+
+            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
+            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+
+            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
+                tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
+            }
+
+            tmpFirst = MatrixStore.firstInColumn(right, 0, tmpFirstInRow);
+            tmpLimit = MatrixStore.limitOfColumn(right, 0, tmpLimitOfRow);
+
+            tmpVal = zero;
+            for (int c = tmpFirst; c < tmpLimit; c++) {
+                tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c))).get();
+            }
+            product.set(i, 0, tmpVal);
+        }
+    }
+
+    static void fillMx1_P64(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
         int tmpRowDim = product.getRowDim();
         double[] tmpLeftRow = new double[complexity];

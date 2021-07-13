@@ -39,14 +39,6 @@ public final class DOT implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
-    public static double invoke(final Access1D<?> array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
-        double retVal = PrimitiveMath.ZERO;
-        for (int i = first; i < limit; i++) {
-            retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
-        }
-        return retVal;
-    }
-
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
         for (int i = first; i < limit; i++) {
@@ -126,6 +118,23 @@ public final class DOT implements ArrayOperation {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
         }
         return retVal.get();
+    }
+
+    public static <N extends Scalar<N>> N invokeG(final Access1D<N> array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> scalar) {
+        Scalar<N> retVal = scalar.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1.get(offset1 + i).multiply(array2.get(offset2 + i)));
+        }
+        return retVal.get();
+    }
+
+    public static double invokeP64(final Access1D<?> array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
+        double retVal = PrimitiveMath.ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
+        }
+        return retVal;
     }
 
     static double plain(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
