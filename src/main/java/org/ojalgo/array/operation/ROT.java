@@ -21,15 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * Given two complex vectors x and y, each vector element of these vectors is replaced as follows: xi = c*xi +
  * s*yi yi = c*yi - s*xi
  *
  * @author apete
  */
-public final class ROT implements BLAS1 {
+public final class ROT implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

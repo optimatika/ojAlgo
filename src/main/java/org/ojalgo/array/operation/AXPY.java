@@ -24,17 +24,16 @@ package org.ojalgo.array.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Mutate1D;
 
 /**
  * The ?axpy routines perform a vector-vector operation defined as y := a*x + y where: a is a scalar x and y
- * are vectors each with a number of elements that equals n. <code>y = y + a * x</code>
+ * are vectors each with a number of elements that equals n. <code>y[] += a * x[]</code>
  *
  * @author apete
  */
-public final class AXPY implements BLAS1 {
+public final class AXPY implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

@@ -21,15 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * The ?dotu routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of complex vectors x and y.
  *
  * @author apete
  */
-public final class DOTU implements BLAS1 {
+public final class DOTU implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

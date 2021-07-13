@@ -32,7 +32,7 @@ import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
-public final class HouseholderLeft implements BLAS2 {
+public final class HouseholderLeft implements MatrixOperation {
 
     public static IntSupplier PARALLELISM = Parallelism.CORES;
     public static int THRESHOLD = 64;
