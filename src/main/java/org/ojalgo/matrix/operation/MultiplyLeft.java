@@ -69,6 +69,12 @@ public class MultiplyLeft implements MatrixOperation {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyLeft::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyLeft::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyLeft::fill1xN;
+        }
         return MultiplyLeft::fillMxN;
     }
 
@@ -176,6 +182,24 @@ public class MultiplyLeft implements MatrixOperation {
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
+            }
+
+            AXPY.invoke(product, 0, right[c], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+        }
+    }
+
+    static <N extends Scalar<N>> void addMx1(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
+
+        int structure = Math.toIntExact(left.count() / complexity);
+
+        N[] leftColumn = scalar.newArrayInstance(structure);
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.get(Structure2D.index(structure, i, c));
             }
 
             AXPY.invoke(product, 0, right[c], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
@@ -332,6 +356,15 @@ public class MultiplyLeft implements MatrixOperation {
 
         for (int j = 0; j < nbCols; j++) {
             product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity);
+        }
+    }
+
+    static <N extends Scalar<N>> void fill1xN(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
+
+        int nbCols = right.length / complexity;
+
+        for (int j = 0; j < nbCols; j++) {
+            product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity, scalar);
         }
     }
 
@@ -759,6 +792,11 @@ public class MultiplyLeft implements MatrixOperation {
     static void fillMx1(final float[] product, final Access1D<?> left, final int complexity, final float[] right) {
         Arrays.fill(product, 0F);
         MultiplyLeft.addMx1(product, left, complexity, right);
+    }
+
+    static <N extends Scalar<N>> void fillMx1(final N[] product, final Access1D<N> left, final int complexity, final N[] right, final Factory<N> scalar) {
+        Arrays.fill(product, scalar.zero().get());
+        MultiplyLeft.addMx1(product, left, complexity, right, scalar);
     }
 
     static void fillMxN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {

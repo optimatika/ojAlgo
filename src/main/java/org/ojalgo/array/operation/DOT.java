@@ -63,6 +63,11 @@ public final class DOT implements ArrayOperation {
         return retVal;
     }
 
+    public static <N extends Scalar<N>> N invoke(final Access1D<N> array2, final int offset2, final N[] array1, final int offset1, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        return DOT.invoke(array1, offset1, array2, offset2, first, limit, factory);
+    }
+
     public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
             final int limit) {
         BigDecimal retVal = BigMath.ZERO;
