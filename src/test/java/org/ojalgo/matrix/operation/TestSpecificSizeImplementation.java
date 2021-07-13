@@ -23,6 +23,7 @@ package org.ojalgo.matrix.operation;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Normal;
@@ -82,6 +83,30 @@ public class TestSpecificSizeImplementation {
     }
 
     @Test
+    public void testMultiplyBothShadedP32() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
+                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> l = left.logical().tridiagonal().get();
+                    MatrixStore<Double> r = right.logical().tridiagonal().get();
+
+                    MultiplyBoth.fillMxN_P64(expected, l, c, r);
+                    MultiplyBoth.newPrimitive32(m, n).invoke(actual, l, c, r);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P32);
+                }
+            }
+        }
+    }
+
+    @Test
     public void testMultiplyLeftP32() {
 
         for (int m : DIMS) {
@@ -118,6 +143,29 @@ public class TestSpecificSizeImplementation {
                     MultiplyLeft.newPrimitive64(m, n).invoke(actual.data, left, c, right.data);
 
                     TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testMultiplyLeftShadedP32() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
+                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> l = left.logical().tridiagonal().get();
+
+                    MultiplyLeft.fillMxN(expected.data, l, c, right.data);
+                    MultiplyLeft.newPrimitive32(m, n).invoke(actual.data, l, c, right.data);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P32);
                 }
             }
         }
@@ -218,6 +266,29 @@ public class TestSpecificSizeImplementation {
                     MultiplyRight.newPrimitive64(m, n).invoke(actual.data, left.data, c, right);
 
                     TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testMultiplyRightShadedP32() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
+                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> r = right.logical().tridiagonal().get();
+
+                    MultiplyRight.fillMxN(expected.data, left.data, c, r);
+                    MultiplyRight.newPrimitive32(m, n).invoke(actual.data, left.data, c, r);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P32);
                 }
             }
         }
