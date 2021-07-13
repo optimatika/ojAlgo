@@ -69,6 +69,12 @@ public class MultiplyRight implements MatrixOperation {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyRight::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyRight::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyRight::fill1xN;
+        }
         return MultiplyRight::fillMxN;
     }
 
@@ -159,6 +165,14 @@ public class MultiplyRight implements MatrixOperation {
         int nbRows = product.length;
         for (int c = 0; c < complexity; c++) {
             AXPY.invoke(product, 0, right.floatValue(c), left, c * nbRows, 0, nbRows);
+        }
+    }
+
+    static <N extends Scalar<N>> void addMx1(final N[] product, final N[] left, final int complexity, final Access1D<N> right) {
+
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right.get(c), left, c * nbRows, 0, nbRows);
         }
     }
 
@@ -305,6 +319,15 @@ public class MultiplyRight implements MatrixOperation {
             int firstInCol = MatrixStore.firstInColumn(right, j, 0);
             int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
+        }
+    }
+
+    static <N extends Scalar<N>> void fill1xN(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
+            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol, scalar);
         }
     }
 
@@ -731,6 +754,11 @@ public class MultiplyRight implements MatrixOperation {
 
     static void fillMx1(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
         Arrays.fill(product, 0F);
+        MultiplyRight.addMx1(product, left, complexity, right);
+    }
+
+    static <N extends Scalar<N>> void fillMx1(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
+        Arrays.fill(product, scalar.zero().get());
         MultiplyRight.addMx1(product, left, complexity, right);
     }
 

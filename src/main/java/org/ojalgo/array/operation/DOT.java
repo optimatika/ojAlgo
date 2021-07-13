@@ -89,6 +89,10 @@ public final class DOT implements ArrayOperation {
         return retVal;
     }
 
+    public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+        return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
+    }
+
     public static float invoke(final float[] array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
         float retVal = 0F;
         for (int i = first; i < limit; i++) {
@@ -97,12 +101,17 @@ public final class DOT implements ArrayOperation {
         return retVal;
     }
 
-    public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+    public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
 
-    public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
-        return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
+    public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        Scalar<N> retVal = factory.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2.get(offset2 + i)));
+        }
+        return retVal.get();
     }
 
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first, final int limit,
