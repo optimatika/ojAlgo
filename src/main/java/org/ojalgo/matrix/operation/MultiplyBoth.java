@@ -25,7 +25,6 @@ import java.lang.reflect.Array;
 import java.util.function.IntSupplier;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
@@ -113,17 +112,6 @@ public class MultiplyBoth implements MatrixOperation {
             return MultiplyBoth::fill1xN_P64;
         }
         return MultiplyBoth::fillMxN_P64;
-    }
-
-    static void add1xN_P64(final TransformableRegion<Double> product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
-
-        int firstInRow = MatrixStore.firstInRow(left, 0, 0);
-        int limitOfRow = MatrixStore.limitOfRow(left, 0, product.size());
-        for (int j = firstInRow; j < limitOfRow; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
-            product.add(j, DOT.invokeP64(left, 0, right, j * complexity, firstInCol, limitOfCol));
-        }
     }
 
     static void divide(final int first, final int limit, final Conquerer conquerer) {
@@ -713,31 +701,6 @@ public class MultiplyBoth implements MatrixOperation {
             }
 
             product.set(i, 0, DOT.invoke(tmpLeftRow, 0, right, 0, tmpFirstInRow, tmpLimitOfRow));
-        }
-    }
-
-    static void fillMxC(final double[] product, final int firstColumn, final int columnLimit, final Access1D<Double> left, final int complexity,
-            final Access1D<Double> right) {
-
-        int structure = Math.toIntExact(left.count() / complexity);
-
-        double[] leftColumn = new double[structure];
-        for (int c = 0; c < complexity; c++) {
-
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
-
-            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
-            }
-
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, firstInLeftColumn,
-                        limitOfLeftColumn);
-            }
         }
     }
 
