@@ -34,7 +34,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
 
-public class MultiplyNeither implements BLAS3 {
+public class MultiplyNeither implements MatrixOperation {
 
     @FunctionalInterface
     public interface Generic<N extends Scalar<N>> {
@@ -66,12 +66,21 @@ public class MultiplyNeither implements BLAS3 {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyNeither::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyNeither::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyNeither::fill1xN;
+        }
         return MultiplyNeither::fillMxN;
     }
 
     public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyNeither::fillMxN_MT;
+        }
+        if (columns == 1) {
+            return MultiplyNeither::fillMx1;
         }
         if (rows == 1) {
             return MultiplyNeither::fill1xN;
@@ -82,6 +91,24 @@ public class MultiplyNeither implements BLAS3 {
     public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyNeither::fillMxN_MT;
+        }
+        if (rows == 5 && columns == 5) {
+            return MultiplyNeither::fill5x5;
+        }
+        if (rows == 4 && columns == 4) {
+            return MultiplyNeither::fill4x4;
+        }
+        if (rows == 3 && columns == 3) {
+            return MultiplyNeither::fill3x3;
+        }
+        if (rows == 2 && columns == 2) {
+            return MultiplyNeither::fill2x2;
+        }
+        if (rows == 1 && columns == 1) {
+            return MultiplyNeither::fill1x1;
+        }
+        if (columns == 1) {
+            return MultiplyNeither::fillMx1;
         }
         if (rows == 10) {
             return MultiplyNeither::fill0xN;
@@ -97,18 +124,6 @@ public class MultiplyNeither implements BLAS3 {
         }
         if (rows == 6) {
             return MultiplyNeither::fill6xN;
-        }
-        if (rows == 5 && columns == 5) {
-            return MultiplyNeither::fill5x5;
-        }
-        if (rows == 4 && columns == 4) {
-            return MultiplyNeither::fill4x4;
-        }
-        if (rows == 3 && columns == 3) {
-            return MultiplyNeither::fill3x3;
-        }
-        if (rows == 2 && columns == 2) {
-            return MultiplyNeither::fill2x2;
         }
         if (rows == 1) {
             return MultiplyNeither::fill1xN;
@@ -130,46 +145,31 @@ public class MultiplyNeither implements BLAS3 {
         }
     }
 
-    static void addMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
+    static void addMx1(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyNeither.addMxR(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
+        }
     }
 
-    static void addMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
+    static void addMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
 
-        DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyNeither.addMxR(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
+        }
     }
 
-    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+    static <N extends Scalar<N>> void addMx1(final N[] product, final N[] left, final int complexity, final N[] right) {
 
-        DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyNeither.addMxR(product, first, limit, left, complexity, right, scalar);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
+        }
     }
 
-    static void addMxR(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
+    static void addMxC(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
 
         int structure = left.length / complexity;
 
@@ -183,7 +183,7 @@ public class MultiplyNeither implements BLAS3 {
         }
     }
 
-    static void addMxR(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final float[] right) {
+    static void addMxC(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final float[] right) {
 
         int structure = left.length / complexity;
 
@@ -197,7 +197,7 @@ public class MultiplyNeither implements BLAS3 {
         }
     }
 
-    static <N extends Scalar<N>> void addMxR(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+    static <N extends Scalar<N>> void addMxC(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
             final N[] right, final Scalar.Factory<N> scalar) {
 
         int structure = left.length / complexity;
@@ -210,6 +210,18 @@ public class MultiplyNeither implements BLAS3 {
                 AXPY.invoke(product, j * structure, right[c + j * complexity], leftColumn, 0, 0, structure);
             }
         }
+    }
+
+    static void addMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {
+        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
+    }
+
+    static void addMxN_MT(final float[] product, final float[] left, final int complexity, final float[] right) {
+        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right));
+    }
+
+    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+        MultiplyNeither.divide(0, right.length / complexity, (f, l) -> MultiplyNeither.addMxC(product, f, l, left, complexity, right, scalar));
     }
 
     static void divide(final int first, final int limit, final Conquerer conquerer) {
@@ -287,15 +299,13 @@ public class MultiplyNeither implements BLAS3 {
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity);
         }
+    }
 
-        //        int nbCols = product.length;
-        //        float[] rightRow = new float[nbCols];
-        //        for (int c = 0; c < complexity; c++) {
-        //            for (int j = 0; j < nbCols; j++) {
-        //                rightRow[j] = right[c + j * complexity];
-        //            }
-        //            AXPY.invoke(product, 0, left[c], rightRow, 0, 0, nbCols);
-        //        }
+    static <N extends Scalar<N>> void fill1xN(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity, scalar);
+        }
     }
 
     static void fill2x2(final double[] product, final double[] left, final int complexity, final double[] right) {
@@ -714,25 +724,40 @@ public class MultiplyNeither implements BLAS3 {
         }
     }
 
+    static void fillMx1(final double[] product, final double[] left, final int complexity, final double[] right) {
+        Arrays.fill(product, 0D);
+        MultiplyNeither.addMx1(product, left, complexity, right);
+    }
+
+    static void fillMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
+        Arrays.fill(product, 0F);
+        MultiplyNeither.addMx1(product, left, complexity, right);
+    }
+
+    static <N extends Scalar<N>> void fillMx1(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+        Arrays.fill(product, scalar.zero().get());
+        MultiplyNeither.addMx1(product, left, complexity, right);
+    }
+
     static void fillMxN(final double[] product, final double[] left, final int complexity, final double[] right) {
 
         Arrays.fill(product, 0.0);
 
-        MultiplyNeither.addMxR(product, 0, right.length / complexity, left, complexity, right);
+        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final float[] right) {
 
         Arrays.fill(product, 0F);
 
-        MultiplyNeither.addMxR(product, 0, right.length / complexity, left, complexity, right);
+        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right);
     }
 
     static <N extends Scalar<N>> void fillMxN(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
 
         Arrays.fill(product, scalar.zero().get());
 
-        MultiplyNeither.addMxR(product, 0, right.length / complexity, left, complexity, right, scalar);
+        MultiplyNeither.addMxC(product, 0, right.length / complexity, left, complexity, right, scalar);
     }
 
     static void fillMxN_MT(final double[] product, final double[] left, final int complexity, final double[] right) {

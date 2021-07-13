@@ -37,7 +37,7 @@ import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-public class MultiplyRight implements BLAS3 {
+public class MultiplyRight implements MatrixOperation {
 
     @FunctionalInterface
     public interface Generic<N extends Scalar<N>> {
@@ -69,6 +69,12 @@ public class MultiplyRight implements BLAS3 {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyRight::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyRight::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyRight::fill1xN;
+        }
         return MultiplyRight::fillMxN;
     }
 
@@ -76,12 +82,36 @@ public class MultiplyRight implements BLAS3 {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyRight::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyRight::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyRight::fill1xN;
+        }
         return MultiplyRight::fillMxN;
     }
 
     public static MultiplyRight.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyRight::fillMxN_MT;
+        }
+        if (rows == 5 && columns == 5) {
+            return MultiplyRight::fill5x5;
+        }
+        if (rows == 4 && columns == 4) {
+            return MultiplyRight::fill4x4;
+        }
+        if (rows == 3 && columns == 3) {
+            return MultiplyRight::fill3x3;
+        }
+        if (rows == 2 && columns == 2) {
+            return MultiplyRight::fill2x2;
+        }
+        if (rows == 1 && columns == 1) {
+            return MultiplyRight::fill1x1;
+        }
+        if (columns == 1) {
+            return MultiplyRight::fillMx1;
         }
         if (rows == 10) {
             return MultiplyRight::fill0xN;
@@ -98,18 +128,6 @@ public class MultiplyRight implements BLAS3 {
         if (rows == 6) {
             return MultiplyRight::fill6xN;
         }
-        if (rows == 5 && columns == 5) {
-            return MultiplyRight::fill5x5;
-        }
-        if (rows == 4 && columns == 4) {
-            return MultiplyRight::fill4x4;
-        }
-        if (rows == 3 && columns == 3) {
-            return MultiplyRight::fill3x3;
-        }
-        if (rows == 2 && columns == 2) {
-            return MultiplyRight::fill2x2;
-        }
         if (rows == 1) {
             return MultiplyRight::fill1xN;
         }
@@ -122,6 +140,39 @@ public class MultiplyRight implements BLAS3 {
             int firstInCol = MatrixStore.firstInColumn(right, j, 0);
             int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
             product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
+        }
+    }
+
+    static void add1xN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
+            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
+        }
+    }
+
+    static void addMx1(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
+
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right.doubleValue(c), left, c * nbRows, 0, nbRows);
+        }
+    }
+
+    static void addMx1(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
+
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right.floatValue(c), left, c * nbRows, 0, nbRows);
+        }
+    }
+
+    static <N extends Scalar<N>> void addMx1(final N[] product, final N[] left, final int complexity, final Access1D<N> right) {
+
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right.get(c), left, c * nbRows, 0, nbRows);
         }
     }
 
@@ -259,6 +310,24 @@ public class MultiplyRight implements BLAS3 {
             int firstInCol = MatrixStore.firstInColumn(right, j, 0);
             int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
+        }
+    }
+
+    static void fill1xN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
+            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
+        }
+    }
+
+    static <N extends Scalar<N>> void fill1xN(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
+            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol, scalar);
         }
     }
 
@@ -676,6 +745,21 @@ public class MultiplyRight implements BLAS3 {
             product[++tmpIndex] = tmp7J;
             product[++tmpIndex] = tmp8J;
         }
+    }
+
+    static void fillMx1(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
+        Arrays.fill(product, 0D);
+        MultiplyRight.addMx1(product, left, complexity, right);
+    }
+
+    static void fillMx1(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
+        Arrays.fill(product, 0F);
+        MultiplyRight.addMx1(product, left, complexity, right);
+    }
+
+    static <N extends Scalar<N>> void fillMx1(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
+        Arrays.fill(product, scalar.zero().get());
+        MultiplyRight.addMx1(product, left, complexity, right);
     }
 
     static void fillMxN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {

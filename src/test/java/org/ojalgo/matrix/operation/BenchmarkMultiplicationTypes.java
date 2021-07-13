@@ -35,10 +35,10 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 @State(Scope.Benchmark)
-public class MultLeftRight {
+public class BenchmarkMultiplicationTypes {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(MultLeftRight.class);
+        BenchmarkUtils.run(BenchmarkMultiplicationTypes.class);
     }
 
     //@Param({ "3", "4", "9", "10" })
@@ -46,41 +46,45 @@ public class MultLeftRight {
     public int complexity;
 
     public Primitive64Store left;
-    public Primitive64Store right;
     public Primitive64Store product;
+    public Primitive64Store right;
 
-    MultiplyLeft.Primitive64 ML;
-    MultiplyRight.Primitive64 MR;
-    MultiplyNeither.Primitive64 MN;
     MultiplyBoth.Primitive MB;
+    MultiplyLeft.Primitive64 ML;
+    MultiplyNeither.Primitive64 MN;
+    MultiplyRight.Primitive64 MR;
 
     @Benchmark
-    public Primitive64Store multiplyLeftFixed() {
+    public Primitive64Store multiplyBoth() {
+        MB.invoke(product, left, complexity, right);
+        return product;
+    }
+
+    @Benchmark
+    public Primitive64Store multiplyLeft() {
         ML.invoke(product.data, left, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyLeftStandard() {
-        MultiplyLeft.addMxR(product.data, 0, complexity, left, complexity, right.data);
+    public Primitive64Store multiplyNeither() {
+        MN.invoke(product.data, left.data, complexity, right.data);
         return product;
     }
 
-    public Primitive64Store multiplyRightFixed() {
+    @Benchmark
+    public Primitive64Store multiplyRight() {
         MR.invoke(product.data, left.data, complexity, right);
-        return product;
-    }
-
-    public Primitive64Store multiplyRightStandard() {
-        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, right);
         return product;
     }
 
     @Setup
     public void setup() {
-        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
-        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
-        product = Primitive64Store.FACTORY.makeZero(complexity, complexity);
+
+        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        product = Primitive64Store.FACTORY.make(complexity, complexity);
+
         ML = MultiplyLeft.newPrimitive64(complexity, complexity);
         MR = MultiplyRight.newPrimitive64(complexity, complexity);
         MN = MultiplyNeither.newPrimitive64(complexity, complexity);

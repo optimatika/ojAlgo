@@ -21,15 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * Given Cartesian coordinates (x1, y1) of an input vector, these routines compute the components of a
  * modified Givens transformation matrix H that zeros the y-component of the resulting vector:
  *
  * @author apete
  */
-public final class ROTMG implements BLAS1 {
+public final class ROTMG implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

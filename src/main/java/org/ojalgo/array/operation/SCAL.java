@@ -21,15 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * The ?scal routines perform a vector operation defined as x = a*x where: a is a scalar, x is an n-element
  * vector.
  *
  * @author apete
  */
-public final class SCAL implements BLAS1 {
+public final class SCAL implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

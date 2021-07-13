@@ -502,7 +502,6 @@ ojalgo-49.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function.constant                       ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.function.special                        ojalgo-49.0.0-SNAPSHOT.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.matrix.operation                        ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.matrix.transformation                   ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.0.0-SNAPSHOT.jar
@@ -637,7 +636,6 @@ ojalgo-49.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.matrix.operation                        -> java.lang                                          java.base
    org.ojalgo.matrix.operation                        -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.operation                        -> java.lang.reflect                                  java.base
-   org.ojalgo.matrix.operation                        -> java.math                                          java.base
    org.ojalgo.matrix.operation                        -> java.util                                          java.base
    org.ojalgo.matrix.operation                        -> java.util.function                                 java.base
    org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT.jar

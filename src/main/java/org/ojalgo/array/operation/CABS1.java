@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * The ?cabs1 is an auxiliary routine for a few BLAS Level 1 routines. This routine performs an operation
  * defined as res=|Re(z)|+|Im(z)|, where z is a scalar, and res is a value containing the absolute value of a
@@ -30,7 +28,7 @@ import org.ojalgo.matrix.operation.BLAS1;
  *
  * @author apete
  */
-public final class CABS1 implements BLAS1 {
+public final class CABS1 implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

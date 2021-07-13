@@ -22,7 +22,6 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.BLAS1;
 
 /**
  * The ?asum routine computes the sum of the magnitudes of elements of a real vector, or the sum of magnitudes
@@ -31,7 +30,7 @@ import org.ojalgo.matrix.operation.BLAS1;
  *
  * @author apete
  */
-public final class ASUM implements BLAS1 {
+public final class ASUM implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

@@ -134,14 +134,13 @@ public class MultiplyLeftRight {
 
     static void invokeCIJ(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int c = 0; c < complexity; c++) {
             for (int i = 0; i < numbRows; i++) {
-                final double a = left[i + c * numbRows];
                 for (int j = 0; j < numbCols; j++) {
-                    product[i + j * numbRows] += a * right[c + j * complexity];
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -149,38 +148,22 @@ public class MultiplyLeftRight {
 
     static void invokeCJI(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int c = 0; c < complexity; c++) {
             for (int j = 0; j < numbCols; j++) {
-                final double a = right[c + j * complexity];
                 for (int i = 0; i < numbRows; i++) {
-                    product[i + j * numbRows] += left[i + c * numbRows] * a;
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
-            }
-        }
-    }
-
-    static void invokeCJIb(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
-
-        for (int cj = 0; cj < right.length; cj++) {
-            final int c = cj % complexity;
-            final int j = cj / complexity;
-            final double val = right[cj];
-            for (int i = 0; i < numbRows; i++) {
-                product[i + j * numbRows] += left[i + c * numbRows] * val;
             }
         }
     }
 
     static void invokeICJ(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int i = 0; i < numbRows; i++) {
             for (int c = 0; c < complexity; c++) {
@@ -193,8 +176,8 @@ public class MultiplyLeftRight {
 
     static void invokeIJC(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int i = 0; i < numbRows; i++) {
             for (int j = 0; j < numbCols; j++) {
@@ -205,30 +188,15 @@ public class MultiplyLeftRight {
         }
     }
 
-    static void invokeIJCb(final double[] product, final double[] left, final int complexity, final double[] right) {
-
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
-
-        for (int c = 0; c < complexity; c += 2) {
-            for (int i = 0; i < numbRows; i++) {
-                for (int j = 0; j < numbCols; j++) {
-                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
-                }
-            }
-        }
-    }
-
     static void invokeJCI(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int j = 0; j < numbCols; j++) {
             for (int c = 0; c < complexity; c++) {
-                final double tmpD = right[c + j * complexity];
                 for (int i = 0; i < numbRows; i++) {
-                    product[i + j * numbRows] += left[i + c * numbRows] * tmpD;
+                    product[i + j * numbRows] += left[i + c * numbRows] * right[c + j * complexity];
                 }
             }
         }
@@ -236,8 +204,8 @@ public class MultiplyLeftRight {
 
     static void invokeJIC(final double[] product, final double[] left, final int complexity, final double[] right) {
 
-        final int numbCols = right.length / complexity;
-        final int numbRows = product.length / numbCols;
+        int numbRows = left.length / complexity;
+        int numbCols = right.length / complexity;
 
         for (int j = 0; j < numbCols; j++) {
             for (int i = 0; i < numbRows; i++) {
@@ -255,52 +223,47 @@ public class MultiplyLeftRight {
     public Primitive64Store product;
     public Primitive64Store right;
 
+    @Benchmark
     public Primitive64Store invokeCIJ() {
         MultiplyLeftRight.invokeCIJ(product.data, left.data, complexity, right.data);
         return product;
     }
 
+    @Benchmark
     public Primitive64Store invokeCJI() {
         MultiplyLeftRight.invokeCJI(product.data, left.data, complexity, right.data);
         return product;
     }
 
-    public Primitive64Store invokeCJI2() {
-        MultiplyLeftRight.invokeCJIb(product.data, left.data, complexity, right.data);
-        return product;
-    }
-
+    @Benchmark
     public Primitive64Store invokeICJ() {
         MultiplyLeftRight.invokeICJ(product.data, left.data, complexity, right.data);
         return product;
     }
 
+    @Benchmark
     public Primitive64Store invokeIJC() {
         MultiplyLeftRight.invokeIJC(product.data, left.data, complexity, right.data);
         return product;
     }
 
+    @Benchmark
     public Primitive64Store invokeJCI() {
         MultiplyLeftRight.invokeJCI(product.data, left.data, complexity, right.data);
         return product;
     }
 
+    @Benchmark
     public Primitive64Store invokeJIC() {
         MultiplyLeftRight.invokeJIC(product.data, left.data, complexity, right.data);
         return product;
     }
 
-    @Benchmark
-    public Primitive64Store invokeNeitherMaybe3() {
-        MultiplyNeither.addMxR(product.data, 0, complexity, left.data, complexity, right.data);
-        return product;
-    }
-
     @Setup
     public void setup() {
-        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
-        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
-        product = Primitive64Store.FACTORY.makeZero(complexity, complexity);
+        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        product = Primitive64Store.FACTORY.make(complexity, complexity);
 
     }
 }

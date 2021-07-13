@@ -23,7 +23,6 @@ package org.ojalgo.array.operation;
 
 import java.lang.reflect.Array;
 
-import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -31,7 +30,7 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-public final class COPY implements BLAS1 {
+public final class COPY implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

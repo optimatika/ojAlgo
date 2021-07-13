@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.operation.BLAS1;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -36,17 +35,9 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class DOT implements BLAS1 {
+public final class DOT implements ArrayOperation {
 
     public static int THRESHOLD = 128;
-
-    public static double invoke(final Access1D<?> array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
-        double retVal = PrimitiveMath.ZERO;
-        for (int i = first; i < limit; i++) {
-            retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
-        }
-        return retVal;
-    }
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -54,6 +45,19 @@ public final class DOT implements BLAS1 {
             retVal += array1.doubleValue(offset1 + i) * array2[offset2 + i];
         }
         return retVal;
+    }
+
+    public static float invoke(final Access1D<?> array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
+        float retVal = 0F;
+        for (int i = first; i < limit; i++) {
+            retVal += array1.floatValue(offset1 + i) * array2[offset2 + i];
+        }
+        return retVal;
+    }
+
+    public static <N extends Scalar<N>> N invoke(final Access1D<N> array2, final int offset2, final N[] array1, final int offset1, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        return DOT.invoke(array1, offset1, array2, offset2, first, limit, factory);
     }
 
     public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
@@ -86,8 +90,25 @@ public final class DOT implements BLAS1 {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
 
+    public static float invoke(final float[] array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
+        float retVal = 0F;
+        for (int i = first; i < limit; i++) {
+            retVal += array1[offset1 + i] * array2.floatValue(offset2 + i);
+        }
+        return retVal;
+    }
+
     public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
+    }
+
+    public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        Scalar<N> retVal = factory.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2.get(offset2 + i)));
+        }
+        return retVal.get();
     }
 
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first, final int limit,
@@ -97,6 +118,23 @@ public final class DOT implements BLAS1 {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
         }
         return retVal.get();
+    }
+
+    public static <N extends Scalar<N>> N invokeG(final Access1D<N> array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> scalar) {
+        Scalar<N> retVal = scalar.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1.get(offset1 + i).multiply(array2.get(offset2 + i)));
+        }
+        return retVal.get();
+    }
+
+    public static double invokeP64(final Access1D<?> array1, final int offset1, final Access1D<?> array2, final int offset2, final int first, final int limit) {
+        double retVal = PrimitiveMath.ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal += array1.doubleValue(offset1 + i) * array2.doubleValue(offset2 + i);
+        }
+        return retVal;
     }
 
     static double plain(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {

@@ -28,39 +28,36 @@ final class UpperSymmetricStore<N extends Comparable<N>> extends ShadingStore<N>
     private final boolean myHermitian;
 
     UpperSymmetricStore(final MatrixStore<N> base, final boolean hermitian) {
-        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
+        super(base);
         myHermitian = hermitian;
     }
 
     public double doubleValue(final long row, final long col) {
         if (row > col) {
             return this.base().doubleValue(col, row);
-        } else {
-            return this.base().doubleValue(row, col);
         }
+        return this.base().doubleValue(row, col);
     }
 
     public N get(final long row, final long col) {
         if (myHermitian) {
             return this.toScalar(row, col).get();
+        }
+        if (row > col) {
+            return this.base().get(col, row);
         } else {
-            if (row > col) {
-                return this.base().get(col, row);
-            } else {
-                return this.base().get(row, col);
-            }
+            return this.base().get(row, col);
         }
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
-        if (row > col) {
-            if (myHermitian) {
-                return this.base().toScalar(col, row).conjugate();
-            } else {
-                return this.base().toScalar(col, row);
-            }
-        } else {
+        if (row <= col) {
             return this.base().toScalar(row, col);
+        }
+        if (myHermitian) {
+            return this.base().toScalar(col, row).conjugate();
+        } else {
+            return this.base().toScalar(col, row);
         }
     }
 }

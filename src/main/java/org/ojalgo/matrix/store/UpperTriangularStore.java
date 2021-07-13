@@ -30,7 +30,7 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
 
     UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
 
-        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
+        super(base);
 
         myUnitDiagonal = unitDiagonal;
     }
@@ -38,7 +38,8 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
     public double doubleValue(final long row, final long col) {
         if (row > col) {
             return PrimitiveMath.ZERO;
-        } else if (myUnitDiagonal && (row == col)) {
+        }
+        if (myUnitDiagonal && row == col) {
             return PrimitiveMath.ONE;
         } else {
             return this.base().doubleValue(row, col);
@@ -52,7 +53,8 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
     public N get(final long row, final long col) {
         if (row > col) {
             return this.zero().get();
-        } else if (myUnitDiagonal && (row == col)) {
+        }
+        if (myUnitDiagonal && row == col) {
             return this.one().get();
         } else {
             return this.base().get(row, col);
@@ -67,7 +69,8 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
             return this.zero();
-        } else if (myUnitDiagonal && (row == col)) {
+        }
+        if (myUnitDiagonal && row == col) {
             return this.one();
         } else {
             return this.base().toScalar(row, col);

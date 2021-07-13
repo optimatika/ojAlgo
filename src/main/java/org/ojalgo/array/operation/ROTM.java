@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.matrix.operation.BLAS1;
-
 /**
  * Given two vectors x and y, each vector element of these vectors is replaced as follows: for i=1 to n, where
  * H is a modified Givens transformation matrix whose values are stored in the param[1] through param[4]
@@ -30,7 +28,7 @@ import org.ojalgo.matrix.operation.BLAS1;
  *
  * @author apete
  */
-public final class ROTM implements BLAS1 {
+public final class ROTM implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
