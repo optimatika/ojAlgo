@@ -107,6 +107,30 @@ public class TestSpecificSizeImplementation {
     }
 
     @Test
+    public void testMultiplyBothShadedP64() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
+                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> l = left.logical().tridiagonal().get();
+                    MatrixStore<Double> r = right.logical().tridiagonal().get();
+
+                    MultiplyBoth.fillMxN_P64(expected, l, c, r);
+                    MultiplyBoth.newPrimitive64(m, n).invoke(actual, l, c, r);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                }
+            }
+        }
+    }
+
+    @Test
     public void testMultiplyLeftP32() {
 
         for (int m : DIMS) {
@@ -172,6 +196,29 @@ public class TestSpecificSizeImplementation {
     }
 
     @Test
+    public void testMultiplyLeftShadedP64() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
+                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> l = left.logical().tridiagonal().get();
+
+                    MultiplyLeft.fillMxN(expected.data, l, c, right.data);
+                    MultiplyLeft.newPrimitive64(m, n).invoke(actual.data, l, c, right.data);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
+                }
+            }
+        }
+    }
+
+    @Test
     public void testMultiplyNeitherP32() {
 
         for (int m : DIMS) {
@@ -190,22 +237,6 @@ public class TestSpecificSizeImplementation {
                 }
             }
         }
-    }
-
-    @Test
-    public void testMultiplyNeitherP32_1_5_2() {
-
-        int m = 1, c = 5, n = 2;
-
-        Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-        Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-        Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-        Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
-
-        MultiplyNeither.fillMxN(expected.data, left.data, c, right.data);
-        MultiplyNeither.newPrimitive32(m, n).invoke(actual.data, left.data, c, right.data);
-
-        TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P32);
     }
 
     @Test
@@ -289,6 +320,29 @@ public class TestSpecificSizeImplementation {
                     MultiplyRight.newPrimitive32(m, n).invoke(actual.data, left.data, c, r);
 
                     TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P32);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testMultiplyRightShadedP64() {
+
+        for (int m : DIMS) {
+            for (int c : DIMS) {
+                for (int n : DIMS) {
+
+                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
+                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+
+                    MatrixStore<Double> r = right.logical().tridiagonal().get();
+
+                    MultiplyRight.fillMxN(expected.data, left.data, c, r);
+                    MultiplyRight.newPrimitive64(m, n).invoke(actual.data, left.data, c, r);
+
+                    TestUtils.assertEquals(m + "-" + c + "-" + n, expected, actual, ACCURACY_P64);
                 }
             }
         }
