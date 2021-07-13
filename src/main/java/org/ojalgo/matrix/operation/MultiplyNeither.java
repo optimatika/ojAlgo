@@ -66,6 +66,12 @@ public class MultiplyNeither implements MatrixOperation {
         if (rows > THRESHOLD && columns > THRESHOLD) {
             return MultiplyNeither::fillMxN_MT;
         }
+        if (columns == 1) {
+            return MultiplyNeither::fillMx1;
+        }
+        if (rows == 1) {
+            return MultiplyNeither::fill1xN;
+        }
         return MultiplyNeither::fillMxN;
     }
 
@@ -148,6 +154,14 @@ public class MultiplyNeither implements MatrixOperation {
     }
 
     static void addMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
+
+        int nbRows = product.length;
+        for (int c = 0; c < complexity; c++) {
+            AXPY.invoke(product, 0, right[c], left, c * nbRows, 0, nbRows);
+        }
+    }
+
+    static <N extends Scalar<N>> void addMx1(final N[] product, final N[] left, final int complexity, final N[] right) {
 
         int nbRows = product.length;
         for (int c = 0; c < complexity; c++) {
@@ -284,6 +298,13 @@ public class MultiplyNeither implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity);
+        }
+    }
+
+    static <N extends Scalar<N>> void fill1xN(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+
+        for (int j = 0, nbCols = product.length; j < nbCols; j++) {
+            product[j] = DOT.invoke(left, 0, right, j * complexity, 0, complexity, scalar);
         }
     }
 
@@ -710,6 +731,11 @@ public class MultiplyNeither implements MatrixOperation {
 
     static void fillMx1(final float[] product, final float[] left, final int complexity, final float[] right) {
         Arrays.fill(product, 0F);
+        MultiplyNeither.addMx1(product, left, complexity, right);
+    }
+
+    static <N extends Scalar<N>> void fillMx1(final N[] product, final N[] left, final int complexity, final N[] right, final Factory<N> scalar) {
+        Arrays.fill(product, scalar.zero().get());
         MultiplyNeither.addMx1(product, left, complexity, right);
     }
 
