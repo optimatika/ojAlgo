@@ -28,6 +28,7 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
@@ -114,7 +115,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getInternalStore().logical().triangular(false, true).get();
+        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(false, true);
+        int nbRows = this.getRowDim();
+        if (nbRows < this.getColDim()) {
+            return logical.limits(nbRows, nbRows).get();
+        }
+        return logical.get();
     }
 
     public int[] getPivotOrder() {
@@ -143,7 +149,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getU() {
-        return this.getInternalStore().logical().triangular(true, false).get();
+        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(true, false);
+        int nbCols = this.getColDim();
+        if (this.getRowDim() > nbCols) {
+            logical.limits(nbCols, nbCols).get();
+        }
+        return logical.get();
     }
 
     @Override
@@ -157,9 +168,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isPivoted() {
@@ -194,9 +204,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
             return this.doSolve(preallocated);
 
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final double[][] data, final boolean pivoting) {
