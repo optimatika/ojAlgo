@@ -33,12 +33,12 @@ import org.ojalgo.type.context.NumberContext;
  * Verify that the various specific-size implementations produce the same results as the general
  * implementation (for various shapes).
  */
-public class TestSpecificSizeImplementation {
+public class TestSpecificSizeImplementationPrimitive {
 
     private static final NumberContext ACCURACY_P32 = NumberContext.of(6, 7);
     private static final NumberContext ACCURACY_P64 = NumberContext.of(12, 14);
 
-    static final int[] DIMS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 100, 200, 500 };
+    static final int[] DIMS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 100, 200 };
 
     @Test
     public void testMultiplyBothP32() {
