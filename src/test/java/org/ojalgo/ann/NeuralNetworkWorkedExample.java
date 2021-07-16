@@ -45,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
 public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
     private static final double _255_0 = 255.0;
-    private static final NumberContext PRECISION = new NumberContext(5, 5);
+    private static final NumberContext PRECISION = NumberContext.of(5, 5);
 
     public NeuralNetworkWorkedExample() {
         super();

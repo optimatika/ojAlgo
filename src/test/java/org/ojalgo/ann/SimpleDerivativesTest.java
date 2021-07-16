@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleDerivativesTest extends BackPropagationExample {
 
-    private static final NumberContext PRECISION = new NumberContext(6, 8);
+    private static final NumberContext PRECISION = NumberContext.of(6, 8);
 
     public SimpleDerivativesTest() {
         super();

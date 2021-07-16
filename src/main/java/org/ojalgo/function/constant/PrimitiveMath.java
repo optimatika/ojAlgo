@@ -23,7 +23,6 @@ package org.ojalgo.function.constant;
 
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 public abstract class PrimitiveMath {

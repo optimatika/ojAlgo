@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
 public class NeuralNetworksDemystified extends BackPropagationExample {
 
     private static final double LEARNING_RATE = 0.1;
-    private static final NumberContext PRECISION = new NumberContext(8, 8);
+    private static final NumberContext PRECISION = NumberContext.of(8, 8);
     private static final int TRAINING_ITERATIONS = 100;
 
     public NeuralNetworksDemystified() {

@@ -60,6 +60,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The nested interfaces `Mutate1D.ModifiableReceiver`, `Mutate2D.ModifiableReceiver` and `MutateAnyD.ModifiableReceiver` now also extend `Access*D` which makes them aligned with the requirements of the `Transformation*D` interfaces.
 
+### Fixed
+
+#### org.ojalgo.ann
+
+- Some `ArtificialNeuralNetwork` input would cause matrix calculation problems. The input is typed as `Access1D<Double>` which essentially means any ojAlgo data structure. In the case where the actual/specific type used mached the internal types, but with wrong shape (transposed), there would be matrix multiplication problems. This no longer happens. 
+
 ### Removed
 
 #### org.ojalgo.function

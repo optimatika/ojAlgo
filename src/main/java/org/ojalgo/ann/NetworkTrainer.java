@@ -24,7 +24,6 @@ package org.ojalgo.ann;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -42,36 +41,16 @@ public final class NetworkTrainer extends WrappedANN {
     private final TrainingConfiguration myConfiguration = new TrainingConfiguration();
     private final PhysicalStore<Double>[] myGradients;
 
-    @SuppressWarnings("unchecked")
     NetworkTrainer(final ArtificialNeuralNetwork network) {
 
         super(network);
 
         int depth = network.depth();
 
-        myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[1 + depth];
-        myGradients[0] = network.newStore(network.countInputNodes(0), 1);
+        myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[depth];
         for (int l = 0; l < depth; l++) {
-            myGradients[1 + l] = network.newStore(network.countOutputNodes(l), 1);
+            myGradients[l] = network.newStore(network.countOutputNodes(l), 1);
         }
-
-    }
-
-    @SuppressWarnings("unchecked")
-    NetworkTrainer(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
-
-        super(new ArtificialNeuralNetwork(factory, numberOfInputNodes, outputNodesPerCalculationLayer));
-
-        if (outputNodesPerCalculationLayer.length < 1) {
-            ProgrammingError.throwWithMessage("There must be at least 1 layer!");
-        }
-
-        myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[1 + outputNodesPerCalculationLayer.length];
-        myGradients[0] = factory.make(numberOfInputNodes, 1);
-        for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myGradients[1 + l] = factory.make(outputNodesPerCalculationLayer[l], 1);
-        }
-
     }
 
     /**
@@ -122,17 +101,11 @@ public final class NetworkTrainer extends WrappedANN {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof NetworkTrainer)) {
+        if (!super.equals(obj) || !(obj instanceof NetworkTrainer)) {
             return false;
         }
         NetworkTrainer other = (NetworkTrainer) obj;
-        if (!myConfiguration.equals(other.myConfiguration)) {
-            return false;
-        }
-        if (!Arrays.equals(myGradients, other.myGradients)) {
+        if (!myConfiguration.equals(other.myConfiguration) || !Arrays.equals(myGradients, other.myGradients)) {
             return false;
         }
         return true;
@@ -143,10 +116,8 @@ public final class NetworkTrainer extends WrappedANN {
             if (error != Error.CROSS_ENTROPY) {
                 throw new IllegalArgumentException();
             }
-        } else {
-            if (error != Error.HALF_SQUARED_DIFFERENCE) {
-                throw new IllegalArgumentException();
-            }
+        } else if (error != Error.HALF_SQUARED_DIFFERENCE) {
+            throw new IllegalArgumentException();
         }
         myConfiguration.error = error;
         return this;
@@ -156,8 +127,8 @@ public final class NetworkTrainer extends WrappedANN {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + myConfiguration.hashCode();
-        result = (prime * result) + Arrays.hashCode(myGradients);
+        result = prime * result + myConfiguration.hashCode();
+        result = prime * result + Arrays.hashCode(myGradients);
         return result;
     }
 
@@ -206,18 +177,17 @@ public final class NetworkTrainer extends WrappedANN {
 
         Access1D<Double> current = this.invoke(givenInput, myConfiguration);
 
-        myGradients[0].fillMatching(givenInput);
         myGradients[myGradients.length - 1].fillMatching(targetOutput, myConfiguration.error.getDerivative(), current);
 
-        for (int k = this.depth() - 1; k >= 0; k--) {
+        for (int l = this.depth() - 1; l >= 0; l--) {
 
-            Access1D<Double> input = k == 0 ? givenInput : this.getOutput(k - 1);
-            PhysicalStore<Double> output = this.getOutput(k);
+            PhysicalStore<Double> input = l == 0 ? this.getInput() : this.getOutput(l - 1);
+            PhysicalStore<Double> output = this.getOutput(l);
 
-            PhysicalStore<Double> upstreamGradient = myGradients[k];
-            PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
+            PhysicalStore<Double> upstreamGradient = l == 0 ? null : myGradients[l - 1];
+            PhysicalStore<Double> downstreamGradient = myGradients[l];
 
-            this.adjust(k, input, output, upstreamGradient, downstreamGradient);
+            this.adjust(l, input, output, upstreamGradient, downstreamGradient);
         }
     }
 
