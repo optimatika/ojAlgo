@@ -234,12 +234,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     static void doReLU(final PhysicalStore<Double> output) {
-
-        for (long i = 0, limit = output.count(); i < limit; i++) {
-            if (output.doubleValue(i) < ZERO) {
-                output.set(i, ZERO);
-            }
-        }
+        output.modifyAll(MAX.second(ZERO));
     }
 
     static void doSigmoid(final PhysicalStore<Double> output) {
@@ -419,9 +414,9 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+    void adjust(final int layer, final PhysicalStore<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient) {
-        myLayers[layer].adjust(input, output, layer == 0 ? null : upstreamGradient, downstreamGradient, -myConfiguration.learningRate,
+        myLayers[layer].adjust(input, output, upstreamGradient, downstreamGradient, -myConfiguration.learningRate,
                 myConfiguration.probabilityDidKeepInput(layer), myConfiguration.regularisation());
     }
 

@@ -32,16 +32,17 @@ import org.ojalgo.structure.Structure2D;
 
 abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
 
+    private final PhysicalStore<Double> myInput;
     private final ArtificialNeuralNetwork myNetwork;
     private final PhysicalStore<Double>[] myOutputs;
 
-    @SuppressWarnings("unchecked")
     WrappedANN(final ArtificialNeuralNetwork network) {
 
         super();
 
         myNetwork = network;
 
+        myInput = network.newStore(1, network.countInputNodes(0));
         myOutputs = (PhysicalStore<Double>[]) new PhysicalStore<?>[network.depth()];
         for (int l = 0; l < myOutputs.length; l++) {
             myOutputs[l] = network.newStore(1, network.countOutputNodes(l));
@@ -75,11 +76,11 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myNetwork == null) ? 0 : myNetwork.hashCode());
+        result = prime * result + (myNetwork == null ? 0 : myNetwork.hashCode());
         return result;
     }
 
-    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+    void adjust(final int layer, final PhysicalStore<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient) {
         myNetwork.adjust(layer, input, output, upstreamGradient, downstreamGradient);
     }
@@ -94,6 +95,10 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
 
     double getBias(final int layer, final int output) {
         return myNetwork.getBias(layer, output);
+    }
+
+    PhysicalStore<Double> getInput() {
+        return myInput;
     }
 
     PhysicalStore<Double> getOutput(final int layer) {
@@ -113,12 +118,13 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
     }
 
     MatrixStore<Double> invoke(final Access1D<Double> input, final TrainingConfiguration configuration) {
+
+        myInput.fillMatching(input);
         myNetwork.setConfiguration(configuration);
-        Access1D<Double> argVal = input;
-        PhysicalStore<Double> retVal = null;
+
+        PhysicalStore<Double> retVal = myInput;
         for (int l = 0, limit = this.depth(); l < limit; l++) {
-            retVal = myNetwork.invoke(l, argVal, myOutputs[l]);
-            argVal = retVal;
+            retVal = myNetwork.invoke(l, retVal, myOutputs[l]);
         }
         return retVal;
     }

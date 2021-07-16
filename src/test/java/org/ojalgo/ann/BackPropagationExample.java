@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -47,9 +49,9 @@ abstract class BackPropagationExample extends ANNTest {
             this(1.0);
         }
 
-        Data(final double rate) {
+        Data(final double learningRate) {
             super();
-            this.rate = rate;
+            rate = learningRate;
         }
 
         Data expected(final double... row) {
@@ -81,7 +83,7 @@ abstract class BackPropagationExample extends ANNTest {
         int counter = 0;
 
         for (Data triplet : this.getTestCases()) {
-            if ((triplet.input != null) && (triplet.target != null)) {
+            if (triplet.input != null && triplet.target != null) {
                 this.deriveTheHardWay(this.getInitialNetwork(Primitive64Store.FACTORY), triplet, this.precision());
                 counter++;
             }
@@ -147,7 +149,7 @@ abstract class BackPropagationExample extends ANNTest {
                     trainer.weight(layer, input, output, orgWeight);
 
                     final double derivative = (upperError - lowerError) / (delta + delta);
-                    newWeights.set(input, output, orgWeight - (triplet.rate * derivative));
+                    newWeights.set(input, output, orgWeight - triplet.rate * derivative);
                 }
 
                 double orgBias = trainer.getBias(layer, output);
@@ -159,7 +161,7 @@ abstract class BackPropagationExample extends ANNTest {
                 trainer.bias(layer, output, orgBias);
 
                 final double derivative = (upperError - lowerError) / (delta + delta);
-                newBias.set(output, orgBias - (triplet.rate * derivative));
+                newBias.set(output, orgBias - triplet.rate * derivative);
             }
 
             if (DEBUG) {
@@ -218,8 +220,46 @@ abstract class BackPropagationExample extends ANNTest {
         NetworkInvoker invoker = network.newInvoker();
 
         for (Data triplet : this.getTestCases()) {
-            if ((triplet.input != null) && (triplet.expected != null)) {
-                TestUtils.assertEquals(triplet.expected, invoker.invoke(triplet.input), this.precision());
+
+            Primitive64Store input = triplet.input;
+            Primitive64Store expected = triplet.expected;
+
+            PhysicalStore<Double> i = null;
+            PhysicalStore<Double> e = null;
+            MatrixStore<Double> a = null;
+
+            if (input != null && expected != null) {
+
+                i = Primitive64Store.FACTORY.rows(input);
+                e = Primitive64Store.FACTORY.rows(expected);
+                a = Primitive64Store.FACTORY.rows(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
+                i = Primitive32Store.FACTORY.rows(input);
+                e = Primitive32Store.FACTORY.rows(expected);
+                a = Primitive32Store.FACTORY.rows(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
+                i = RawStore.FACTORY.rows(input);
+                e = RawStore.FACTORY.rows(expected);
+                a = RawStore.FACTORY.rows(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
+                i = Primitive64Store.FACTORY.columns(input);
+                e = Primitive64Store.FACTORY.columns(expected);
+                a = Primitive64Store.FACTORY.columns(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
+                i = Primitive32Store.FACTORY.columns(input);
+                e = Primitive32Store.FACTORY.columns(expected);
+                a = Primitive32Store.FACTORY.columns(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
+                i = RawStore.FACTORY.columns(input);
+                e = RawStore.FACTORY.columns(expected);
+                a = RawStore.FACTORY.columns(invoker.invoke(i));
+                TestUtils.assertEquals(e, a, this.precision());
+
                 counter++;
             }
         }

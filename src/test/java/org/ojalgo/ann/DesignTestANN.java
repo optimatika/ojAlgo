@@ -35,7 +35,7 @@ public class DesignTestANN extends ANNTest {
     @Test
     public void testSoftmaxWikipediaCase() {
 
-        NumberContext precision = new NumberContext(7, 8);
+        NumberContext precision = NumberContext.of(7, 8);
 
         Primitive64Store arguments = Primitive64Store.FACTORY.row(1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0);
         Primitive64Store results = Primitive64Store.FACTORY.row(0.02364054, 0.06426166, 0.1746813, 0.474833, 0.02364054, 0.06426166, 0.1746813);

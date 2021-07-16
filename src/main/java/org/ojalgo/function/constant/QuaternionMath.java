@@ -76,7 +76,7 @@ public abstract class QuaternionMath {
     };
     public static final QuaternionFunction.Unary CONJUGATE = Quaternion::conjugate;
     public static final QuaternionFunction.Unary COS = arg -> QuaternionMath.COSH.invoke(arg.multiply(Quaternion.I));
-    public static final QuaternionFunction.Unary COSH = arg -> (QuaternionMath.EXP.invoke(arg).add(QuaternionMath.EXP.invoke(arg.negate())))
+    public static final QuaternionFunction.Unary COSH = arg -> QuaternionMath.EXP.invoke(arg).add(QuaternionMath.EXP.invoke(arg.negate()))
             .divide(PrimitiveMath.TWO);
     public static final QuaternionFunction.Binary DIVIDE = Quaternion::divide;
     public static final QuaternionFunction.Unary EXP = arg -> {
@@ -87,14 +87,12 @@ public abstract class QuaternionMath {
 
             return Quaternion.valueOf(tmpScalar);
 
-        } else {
-
-            final double tmpNorm = PrimitiveMath.EXP.invoke(arg.scalar());
-            final double[] tmpUnit = arg.unit();
-            final double tmpPhase = arg.getVectorLength();
-
-            return Quaternion.makePolar(tmpNorm, tmpUnit, tmpPhase);
         }
+        final double tmpNorm = PrimitiveMath.EXP.invoke(arg.scalar());
+        final double[] tmpUnit = arg.unit();
+        final double tmpPhase = arg.getVectorLength();
+
+        return Quaternion.makePolar(tmpNorm, tmpUnit, tmpPhase);
 
         // final double tmpNorm = PrimitiveFunction.EXP.invoke(arg.doubleValue());
         // final double tmpPhase = arg.i;
@@ -174,10 +172,8 @@ public abstract class QuaternionMath {
 
             return EXP.invoke(LOG.invoke(arg).divide(param));
 
-        } else {
-
-            throw new IllegalArgumentException();
         }
+        throw new IllegalArgumentException();
     };
     public static final QuaternionFunction.Parameter SCALE = (arg, param) -> {
         final double tmpScalar = PrimitiveMath.SCALE.invoke(arg.scalar(), param);
@@ -188,7 +184,7 @@ public abstract class QuaternionMath {
     };
     public static final QuaternionFunction.Unary SIGNUM = Quaternion::signum;
     public static final QuaternionFunction.Unary SIN = arg -> QuaternionMath.SINH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
-    public static final QuaternionFunction.Unary SINH = arg -> (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+    public static final QuaternionFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(PrimitiveMath.TWO);
     public static final QuaternionFunction.Unary SQRT = arg -> ROOT.invoke(arg, 2);
     public static final QuaternionFunction.Unary SQRT1PX2 = arg -> SQRT.invoke(Quaternion.ONE.add(arg.multiply(arg)));
     public static final QuaternionFunction.Binary SUBTRACT = Quaternion::subtract;

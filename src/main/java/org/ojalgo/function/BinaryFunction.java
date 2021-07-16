@@ -36,11 +36,11 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
      */
     public static final class FixedFirst<N extends Comparable<N>> implements UnaryFunction<N> {
 
+        private final double myDoubleValue;
+        private final float myFloatValue;
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
-        private final double myValue;
 
-        @SuppressWarnings("unchecked")
         FixedFirst(final double arg1, final BinaryFunction<N> function) {
 
             super();
@@ -48,7 +48,8 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = (N) Double.valueOf(arg1);
-            myValue = arg1;
+            myDoubleValue = arg1;
+            myFloatValue = (float) arg1;
         }
 
         FixedFirst(final N arg1, final BinaryFunction<N> function) {
@@ -58,15 +59,16 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = arg1;
-            myValue = NumberDefinition.doubleValue(arg1);
+            myDoubleValue = NumberDefinition.doubleValue(arg1);
+            myFloatValue = NumberDefinition.floatValue(arg1);
         }
 
         public double doubleValue() {
-            return myValue;
+            return myDoubleValue;
         }
 
         public float floatValue() {
-            return (float) myValue;
+            return myFloatValue;
         }
 
         public BinaryFunction<N> getFunction() {
@@ -78,11 +80,11 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
         }
 
         public double invoke(final double arg2) {
-            return myFunction.invoke(myValue, arg2);
+            return myFunction.invoke(myDoubleValue, arg2);
         }
 
         public float invoke(final float arg2) {
-            return myFunction.invoke((float) myValue, arg2);
+            return myFunction.invoke(myFloatValue, arg2);
         }
 
         public N invoke(final N arg2) {
@@ -98,11 +100,11 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
      */
     public static final class FixedSecond<N extends Comparable<N>> implements UnaryFunction<N> {
 
+        private final double myDoubleValue;
+        private final float myFloatValue;
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
-        private final double myValue;
 
-        @SuppressWarnings("unchecked")
         FixedSecond(final BinaryFunction<N> function, final double arg2) {
 
             super();
@@ -110,7 +112,8 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = (N) Double.valueOf(arg2);
-            myValue = arg2;
+            myDoubleValue = arg2;
+            myFloatValue = (float) arg2;
         }
 
         FixedSecond(final BinaryFunction<N> function, final N arg2) {
@@ -120,15 +123,16 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = arg2;
-            myValue = NumberDefinition.doubleValue(arg2);
+            myDoubleValue = NumberDefinition.doubleValue(arg2);
+            myFloatValue = NumberDefinition.floatValue(arg2);
         }
 
         public double doubleValue() {
-            return myValue;
+            return myDoubleValue;
         }
 
         public float floatValue() {
-            return (float) myValue;
+            return myFloatValue;
         }
 
         public BinaryFunction<N> getFunction() {
@@ -140,11 +144,11 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
         }
 
         public double invoke(final double arg1) {
-            return myFunction.invoke(arg1, myValue);
+            return myFunction.invoke(arg1, myDoubleValue);
         }
 
         public float invoke(final float arg1) {
-            return myFunction.invoke(arg1, (float) myValue);
+            return myFunction.invoke(arg1, myFloatValue);
         }
 
         public N invoke(final N arg1) {

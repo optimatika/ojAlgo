@@ -53,7 +53,7 @@ final class CalculationLayer {
         if (this == obj) {
             return true;
         }
-        if ((obj == null) || !(obj instanceof CalculationLayer)) {
+        if (obj == null || !(obj instanceof CalculationLayer)) {
             return false;
         }
         CalculationLayer other = (CalculationLayer) obj;
@@ -100,7 +100,7 @@ final class CalculationLayer {
         return tmpBuilder.toString();
     }
 
-    void adjust(final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+    void adjust(final PhysicalStore<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient, final double learningRate, final double dropoutsFactor, final DoubleUnaryOperator regularisation) {
 
         downstreamGradient.modifyMatching(MULTIPLY, output.onAll(myActivator.getDerivativeInTermsOfOutput()));
