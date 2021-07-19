@@ -134,6 +134,23 @@ public class MultiplyLeft implements MatrixOperation {
         return MultiplyLeft::fillMxN;
     }
 
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void base(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+
+        int nbRows = Math.toIntExact(left.count() / complexity);
+        int nbCols = right.length / complexity;
+
+        for (int i = 0; i < nbRows; i++) {
+            for (int c = 0; c < complexity; c++) {
+                for (int j = 0; j < nbCols; j++) {
+                    product[i + j * nbRows] += left.doubleValue(Structure2D.index(nbRows, i, c)) * right[c + j * complexity];
+                }
+            }
+        }
+    }
+
     static void add1xN(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
 
         int nbCols = right.length / complexity;

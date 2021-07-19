@@ -57,25 +57,25 @@ ThresholdMultiplyRight.tune    128    1  thrpt    3     25848,018 ±     6415,26
 ThresholdMultiplyRight.tune    128    2  thrpt    3     45033,847 ±    11734,425  ops/min
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-08 => 16
+ * MacBook Pro (16-inch, 2019): 2021-07-08 => 32
  *
  * <pre>
-Benchmark                    (dim)  (z)   Mode  Cnt         Score          Error    Units
-ThresholdMultiplyRight.tune      8    1  thrpt    3  82784837.438 ± 65640478.006  ops/min
-ThresholdMultiplyRight.tune      8    2  thrpt    3   5409713.904 ±   221597.990  ops/min
-ThresholdMultiplyRight.tune      8    4  thrpt    3   2735482.295 ±  2107889.049  ops/min
-ThresholdMultiplyRight.tune     16    1  thrpt    3  10386710.053 ±  2147856.458  ops/min
-ThresholdMultiplyRight.tune     16    2  thrpt    3   4276427.264 ±  1148125.057  ops/min
-ThresholdMultiplyRight.tune     16    4  thrpt    3   2250778.269 ±   445136.305  ops/min
-ThresholdMultiplyRight.tune     32    1  thrpt    3   1741201.140 ±  1174160.477  ops/min
-ThresholdMultiplyRight.tune     32    2  thrpt    3   1672839.257 ±   435739.598  ops/min
-ThresholdMultiplyRight.tune     32    4  thrpt    3   1542568.784 ±   131129.199  ops/min
-ThresholdMultiplyRight.tune     64    1  thrpt    3    254583.739 ±   283035.017  ops/min
-ThresholdMultiplyRight.tune     64    2  thrpt    3    388499.264 ±    52184.247  ops/min
-ThresholdMultiplyRight.tune     64    4  thrpt    3    477775.949 ±   304680.019  ops/min
-ThresholdMultiplyRight.tune    128    1  thrpt    3     35783.104 ±    26376.655  ops/min
-ThresholdMultiplyRight.tune    128    2  thrpt    3     63085.873 ±     3261.578  ops/min
-ThresholdMultiplyRight.tune    128    4  thrpt    3     93742.973 ±     2895.409  ops/min
+Benchmark                    (dim)  (z)   Mode  Cnt         Score         Error    Units
+ThresholdMultiplyRight.tune      8    1  thrpt    3  86856851.754 ± 2245608.193  ops/min
+ThresholdMultiplyRight.tune      8    2  thrpt    3   5654901.954 ±  236802.326  ops/min
+ThresholdMultiplyRight.tune      8    4  thrpt    3   2868836.300 ±  306341.286  ops/min
+ThresholdMultiplyRight.tune     16    1  thrpt    3  12397523.317 ± 2793006.627  ops/min
+ThresholdMultiplyRight.tune     16    2  thrpt    3   4597485.749 ±  101466.856  ops/min
+ThresholdMultiplyRight.tune     16    4  thrpt    3   2628861.968 ±  323306.409  ops/min
+ThresholdMultiplyRight.tune     32    1  thrpt    3   2273712.338 ±  296654.555  ops/min
+ThresholdMultiplyRight.tune     32    2  thrpt    3   2244136.445 ±  647437.349  ops/min
+ThresholdMultiplyRight.tune     32    4  thrpt    3   1626640.843 ±  514732.840  ops/min
+ThresholdMultiplyRight.tune     64    1  thrpt    3    356278.586 ±    6398.783  ops/min
+ThresholdMultiplyRight.tune     64    2  thrpt    3    552667.490 ±  101596.595  ops/min
+ThresholdMultiplyRight.tune     64    4  thrpt    3    689220.545 ±  275448.930  ops/min
+ThresholdMultiplyRight.tune    128    1  thrpt    3     50073.358 ±    7361.293  ops/min
+ThresholdMultiplyRight.tune    128    2  thrpt    3     85156.322 ±   13541.683  ops/min
+ThresholdMultiplyRight.tune    128    4  thrpt    3    136230.760 ±   42145.165  ops/min
  * </pre>
  *
  * @author apete
@@ -87,7 +87,7 @@ public class ThresholdMultiplyRight extends ThresholdTuner {
         BenchmarkUtils.run(ThresholdTuner.options(), ThresholdMultiplyRight.class);
     }
 
-    @Param({ "8", "16", "32", "64", "128" })
+    @Param({ "16", "32", "64", "128" })
     public int dim;
 
     MatrixStore<Double> left;

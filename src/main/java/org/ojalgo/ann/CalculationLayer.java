@@ -28,7 +28,6 @@ import java.util.function.DoubleUnaryOperator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer {
@@ -152,13 +151,13 @@ final class CalculationLayer {
         return myWeights.doubleValue(input, output);
     }
 
-    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final PhysicalStore<Double> input, final PhysicalStore<Double> output) {
         myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
         myActivator.activate(output);
         return output;
     }
 
-    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
+    PhysicalStore<Double> invoke(final PhysicalStore<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
         myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
         myActivator.activate(output, probabilityToKeep);
         return output;

@@ -123,13 +123,13 @@ public class MultTranspRight {
 
     @Benchmark
     public Primitive64Store multiplyRightStandardInt() {
-        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, rightD.transpose());
+        MultiplyRight.addMxC(product.data, 0, complexity, left.data, complexity, rightD.transpose());
         return product;
     }
 
     @Benchmark
     public Primitive64Store multiplyRightStandardPre() {
-        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, rightT);
+        MultiplyRight.addMxC(product.data, 0, complexity, left.data, complexity, rightT);
         return product;
     }
 

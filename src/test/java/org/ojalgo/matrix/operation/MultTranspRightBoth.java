@@ -114,7 +114,7 @@ public class MultTranspRightBoth {
 
     @Benchmark
     public Primitive64Store multiplyStatic() {
-        MultiplyRight.addMxR(product.data, 0, complexity, left.data, complexity, right.transpose());
+        MultiplyRight.addMxC(product.data, 0, complexity, left.data, complexity, right.transpose());
         return product;
     }
 
