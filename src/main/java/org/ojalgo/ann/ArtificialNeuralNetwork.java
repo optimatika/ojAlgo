@@ -440,7 +440,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final int layer, final PhysicalStore<Double> input, final PhysicalStore<Double> output) {
         if (myConfiguration != null) {
             return myLayers[layer].invoke(input, output, myConfiguration.probabilityWillKeepOutput(layer, this.depth()));
         }

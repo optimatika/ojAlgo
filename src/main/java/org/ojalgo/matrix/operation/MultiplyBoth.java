@@ -114,6 +114,24 @@ public class MultiplyBoth implements MatrixOperation {
         return MultiplyBoth::fillMxN_P64;
     }
 
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void base(final TransformableRegion<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
+
+        int nbRows = product.getRowDim();
+        int nbCols = product.getColDim();
+
+        for (int i = 0; i < nbRows; i++) {
+            for (int c = 0; c < complexity; c++) {
+                for (int j = 0; j < nbCols; j++) {
+                    product.add(Structure2D.index(nbRows, i, j),
+                            left.doubleValue(Structure2D.index(nbRows, i, c)) * right.doubleValue(Structure2D.index(complexity, c, j)));
+                }
+            }
+        }
+    }
+
     static void divide(final int first, final int limit, final Conquerer conquerer) {
         DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
     }

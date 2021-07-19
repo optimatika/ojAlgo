@@ -61,7 +61,7 @@ public class MultiplyRight implements MatrixOperation {
     }
 
     public static IntSupplier PARALLELISM = Parallelism.THREADS;
-    public static int THRESHOLD = 16;
+    public static int THRESHOLD = 32;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
 
@@ -134,6 +134,23 @@ public class MultiplyRight implements MatrixOperation {
         return MultiplyRight::fillMxN;
     }
 
+    /**
+     * Not running code. Copies used as a starting point when coding various variants
+     */
+    private static void base(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
+
+        int nbRows = left.length / complexity;
+        int nbCols = Math.toIntExact(right.count() / complexity);
+
+        for (int i = 0; i < nbRows; i++) {
+            for (int c = 0; c < complexity; c++) {
+                for (int j = 0; j < nbCols; j++) {
+                    product[i + j * nbRows] += left[i + c * nbRows] * right.doubleValue(Structure2D.index(complexity, c, j));
+                }
+            }
+        }
+    }
+
     static void add1xN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
@@ -176,69 +193,63 @@ public class MultiplyRight implements MatrixOperation {
         }
     }
 
+    static void addMxC(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity,
+            final Access1D<?> right) {
+
+        int nbRows = left.length / complexity;
+
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * nbRows, right.doubleValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+            }
+        }
+    }
+
+    static void addMxC(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final Access1D<?> right) {
+
+        int nbRows = left.length / complexity;
+
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * nbRows, right.floatValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+            }
+        }
+    }
+
+    static <N extends Scalar<N>> void addMxC(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+            final Access1D<N> right) {
+
+        int nbRows = left.length / complexity;
+
+        for (int c = 0; c < complexity; c++) {
+
+            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * nbRows, right.get(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+            }
+        }
+    }
+
     static void addMxN_MT(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxR(product, f, l, left, complexity, right));
+        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
     }
 
     static void addMxN_MT(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxR(product, f, l, left, complexity, right));
+        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
     }
 
-    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
-        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxR(product, f, l, left, complexity, right, scalar));
-    }
-
-    static void addMxR(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity,
-            final Access1D<?> right) {
-
-        int structure = left.length / complexity;
-
-        double[] leftColumn = new double[structure];
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
-            }
-        }
-    }
-
-    static void addMxR(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final Access1D<?> right) {
-
-        int structure = left.length / complexity;
-
-        float[] leftColumn = new float[structure];
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.floatValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
-            }
-        }
-    }
-
-    static <N extends Scalar<N>> void addMxR(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
-            final Access1D<N> right, final Scalar.Factory<N> scalar) {
-
-        int structure = left.length / complexity;
-
-        N[] leftColumn = scalar.newArrayInstance(structure);
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.get(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
-            }
-        }
+    static <N extends Scalar<N>> void addMxN_MT(final N[] product, final N[] left, final int complexity, final Access1D<N> right) {
+        MultiplyRight.divide(0, Math.toIntExact(right.count() / complexity), (f, l) -> MultiplyRight.addMxC(product, f, l, left, complexity, right));
     }
 
     static void divide(final int first, final int limit, final Conquerer conquerer) {
@@ -766,21 +777,21 @@ public class MultiplyRight implements MatrixOperation {
 
         Arrays.fill(product, 0D);
 
-        MultiplyRight.addMxR(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
+        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
     }
 
     static void fillMxN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
 
         Arrays.fill(product, 0F);
 
-        MultiplyRight.addMxR(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
+        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
     }
 
     static <N extends Scalar<N>> void fillMxN(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
 
         Arrays.fill(product, scalar.zero().get());
 
-        MultiplyRight.addMxR(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right, scalar);
+        MultiplyRight.addMxC(product, 0, Math.toIntExact(right.count() / complexity), left, complexity, right);
     }
 
     static void fillMxN_MT(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
@@ -801,7 +812,7 @@ public class MultiplyRight implements MatrixOperation {
 
         Arrays.fill(product, scalar.zero().get());
 
-        MultiplyRight.addMxN_MT(product, left, complexity, right, scalar);
+        MultiplyRight.addMxN_MT(product, left, complexity, right);
     }
 
 }

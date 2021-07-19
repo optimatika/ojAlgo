@@ -54,7 +54,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `ElementsSupplier` no longer extends `Supplier<MatrixStore<N>>` and no longer defines the method `PhysicalStore.Factory<N, ?> physical()`. Instead subinterfaces/implementors define corresponding functionality as needed.
 - According to the docs `ShadingStore`:s (`LogicalStore`:s that shade some elements) are not allowed to alter the size/shape of the matrix they shade, but several implementations did that anyway. This is now corrected. Some matrix decomposition implementations relied on that faulty behaviour when constructing various component matrices. That had to be changed as well.
-- Changed, re-tuned. the matrix multiplication concurrency thresholds. 
+- Changed, re-tuned, the matrix multiplication concurrency thresholds. 
 
 #### org.ojalgo.structure
 

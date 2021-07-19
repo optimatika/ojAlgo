@@ -229,6 +229,7 @@ ojalgo-49.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> java.lang                                          java.base
    org.ojalgo.matrix.operation                        -> java.util.concurrent                               java.base
    org.ojalgo.matrix.operation                        -> java.util.function                                 java.base
+   org.ojalgo.matrix.operation                        -> org.junit.jupiter.api                              not found
    org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT-tests.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.0.0-SNAPSHOT.jar
@@ -237,7 +238,9 @@ ojalgo-49.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.random                                  ojalgo-49.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.type.context                            ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.runner                             not found
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.runner.options                     not found
@@ -461,7 +464,6 @@ ojalgo-49.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.ann                                     -> java.util                                          java.base
    org.ojalgo.ann                                     -> java.util.concurrent                               java.base
    org.ojalgo.ann                                     -> java.util.function                                 java.base
-   org.ojalgo.ann                                     -> org.ojalgo                                         ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.ann                                     -> org.ojalgo.function                                ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.ann                                     -> org.ojalgo.function.aggregator                     ojalgo-49.0.0-SNAPSHOT.jar
    org.ojalgo.ann                                     -> org.ojalgo.function.constant                       ojalgo-49.0.0-SNAPSHOT.jar
