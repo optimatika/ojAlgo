@@ -882,6 +882,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.sliceRow(row, col);
     }
 
+    @Override
+    public String toString() {
+        return Access2D.toString(this);
+    }
+
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;

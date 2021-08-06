@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
@@ -74,14 +73,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
-                public boolean isMergeable() {
-                    return false;
-                }
-
-                public void merge(final BigDecimal result) {
-                    ProgrammingError.throwForIllegalInvocation();
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     myNumber = ZERO;
@@ -114,10 +105,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     }
                 }
 
-                public void merge(final BigDecimal result) {
-                    myCount += result.intValue();
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     return this;
@@ -145,10 +132,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.MAX.invoke(myNumber, BigMath.ABS.invoke(anArg));
-                }
-
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -180,10 +163,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.MAX.invoke(myNumber, anArg);
                 }
 
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_NEGATIVE;
                     return this;
@@ -204,9 +183,8 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
-                    } else {
-                        return myNumber;
                     }
+                    return myNumber;
                 }
 
                 public int intValue() {
@@ -215,10 +193,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.MIN.invoke(myNumber, anArg);
-                }
-
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -250,10 +224,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.ADD.invoke(myNumber, anArg.abs());
                 }
 
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -281,10 +251,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
-                }
-
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -316,10 +282,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.MULTIPLY.invoke(myNumber, anArg);
                 }
 
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ONE;
                     return this;
@@ -349,10 +311,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.MULTIPLY.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
-                public void merge(final BigDecimal result) {
-                    myNumber = BigMath.MULTIPLY.invoke(myNumber, result);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ONE;
                     return this;
@@ -375,9 +333,8 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
-                    } else {
-                        return myNumber;
                     }
+                    return myNumber;
                 }
 
                 public int intValue() {
@@ -388,10 +345,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     if (anArg.signum() != 0) {
                         myNumber = BigMath.MIN.invoke(myNumber, BigMath.ABS.invoke(anArg));
                     }
-                }
-
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -423,10 +376,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -454,10 +403,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
-                }
-
-                public void merge(final BigDecimal result) {
-                    myNumber = BigMath.ADD.invoke(myNumber, result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {

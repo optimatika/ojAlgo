@@ -39,13 +39,13 @@ import org.ojalgo.structure.Access2D;
  */
 public abstract class IDX {
 
-    public static ArrayAnyD<Double> parse(final String filePath) {
+    public static ArrayAnyD<Double> parse(final File filePath) {
         return IDX.parse(filePath, Primitive32Array.FACTORY);
     }
 
-    public static ArrayAnyD<Double> parse(final String filePath, final DenseArray.Factory<Double> arrayFactory) {
+    public static ArrayAnyD<Double> parse(final File filePath, final DenseArray.Factory<Double> arrayFactory) {
 
-        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePath))))) {
+        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
 
             input.read();
             input.read();
@@ -86,10 +86,17 @@ public abstract class IDX {
 
             return data;
 
-        } catch (IOException exception) {
-
-            return null;
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
         }
+    }
+
+    public static ArrayAnyD<Double> parse(final String filePath) {
+        return IDX.parse(new File(filePath));
+    }
+
+    public static ArrayAnyD<Double> parse(final String filePath, final DenseArray.Factory<Double> arrayFactory) {
+        return IDX.parse(new File(filePath), arrayFactory);
     }
 
     public static void print(final Access2D<?> image, final BasicLogger.Printer printer) {
@@ -109,7 +116,7 @@ public abstract class IDX {
     public static void print(final Access2D<?> image, final BasicLogger.Printer printer, final boolean transpose, final double maxExpectedValue) {
 
         double oneThird = maxExpectedValue / 3D;
-        double twoThirds = (2D * maxExpectedValue) / 3D;
+        double twoThirds = 2D * maxExpectedValue / 3D;
 
         long numbRows = image.countRows();
         long numbCols = image.countColumns();

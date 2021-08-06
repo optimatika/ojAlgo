@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.ojalgo.data.DataBatch;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -59,8 +60,14 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         IDENTITY(ArtificialNeuralNetwork::doIdentity, arg -> ONE, true),
         /**
          * ReLU: [0,+)
+         *
+         * @deprecated v49 Use {@link #RELU} instead
          */
         RECTIFIER(ArtificialNeuralNetwork::doReLU, arg -> arg > ZERO ? ONE : ZERO, true),
+        /**
+         * ReLU: [0,+)
+         */
+        RELU(ArtificialNeuralNetwork::doReLU, arg -> arg > ZERO ? ONE : ZERO, true),
         /**
          * [0,1]
          */
@@ -72,7 +79,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          * training.
          */
         SOFTMAX(ArtificialNeuralNetwork::doSoftMax, arg -> ONE, false),
-
         /**
          * [-1,1]
          */
@@ -243,8 +249,8 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     static void doSoftMax(final PhysicalStore<Double> output) {
         output.modifyAll(EXP);
-        double total = output.aggregateAll(Aggregator.SUM).doubleValue();
-        output.modifyAll(DIVIDE.by(total));
+        Primitive64Store totals = output.reduceRows(Aggregator.SUM).collect(Primitive64Store.FACTORY);
+        output.onRows(DIVIDE, totals).supplyTo(output);
     }
 
     static void doTanh(final PhysicalStore<Double> output) {
@@ -335,15 +341,42 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     /**
-     * If you create multiple invokers you can use them in different threads simutaneously - the invoker
-     * contains any/all invocation specific state.
+     * With batch size 1
+     *
+     * @see #newInvoker(int)
      */
     public NetworkInvoker newInvoker() {
-        return new NetworkInvoker(this);
+        return this.newInvoker(1);
     }
 
+    /**
+     * If you create multiple invokers you can use them in different threads simutaneously - the invoker
+     * contains any/all invocation specific state.
+     *
+     * @param batchSize The batch size - the number of batched invocations
+     * @return The invoker
+     */
+    public NetworkInvoker newInvoker(final int batchSize) {
+        return new NetworkInvoker(this, batchSize);
+    }
+
+    /**
+     * With batch size 1
+     *
+     * @see #newTrainer(int)
+     */
     public NetworkTrainer newTrainer() {
-        NetworkTrainer trainer = new NetworkTrainer(this);
+        return this.newTrainer(1);
+    }
+
+    /**
+     * Only 1 trainer at the time.
+     *
+     * @param batchSize The batch size - the number of batched training examples
+     * @return The trainer
+     */
+    public NetworkTrainer newTrainer(final int batchSize) {
+        NetworkTrainer trainer = new NetworkTrainer(this, batchSize);
         if (this.getOutputActivator() == Activator.SOFTMAX) {
             trainer.error(Error.CROSS_ENTROPY);
         } else {
@@ -367,7 +400,11 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
         tmpBuilder.append("ArtificialNeuralNetwork [Layers=");
-        tmpBuilder.append(Arrays.toString(myLayers));
+        for (CalculationLayer calculationLayer : myLayers) {
+            tmpBuilder.append("\n");
+            tmpBuilder.append(calculationLayer);
+        }
+        tmpBuilder.append("\n");
         tmpBuilder.append("]");
         return tmpBuilder.toString();
     }
@@ -420,8 +457,16 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
                 myConfiguration.probabilityDidKeepInput(layer), myConfiguration.regularisation());
     }
 
+    int countInputNodes() {
+        return myLayers[0].countInputNodes();
+    }
+
     int countInputNodes(final int layer) {
         return myLayers[layer].countInputNodes();
+    }
+
+    int countOutputNodes() {
+        return myLayers[myLayers.length - 1].countOutputNodes();
     }
 
     int countOutputNodes(final int layer) {
@@ -445,6 +490,10 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return myLayers[layer].invoke(input, output, myConfiguration.probabilityWillKeepOutput(layer, this.depth()));
         }
         return myLayers[layer].invoke(input, output);
+    }
+
+    DataBatch newBatch(final int rows, final int columns) {
+        return DataBatch.from(myFactory, rows, columns);
     }
 
     PhysicalStore<Double> newStore(final int rows, final int columns) {

@@ -146,7 +146,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        FillAll.fill(data, values);
+        if (values instanceof Primitive64Array) {
+            FillMatchingSingle.fill(data, ((Primitive64Array) values).data);
+        } else {
+            FillMatchingSingle.fill(data, values);
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ package org.ojalgo.array.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
@@ -86,6 +87,48 @@ public final class FillMatchingSingle implements ArrayOperation {
             for (int i = 0; i < structure; i++) {
                 data[index++] = scalar.cast(source.get(i, j));
             }
+        }
+    }
+
+    public static void fill(final double[] data, final Access1D<?> values) {
+        int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = values.doubleValue(i);
+        }
+    }
+
+    public static void fill(final double[] data, final double[] values) {
+        int limit = Math.min(data.length, values.length);
+        for (int i = 0; i < limit; i++) {
+            data[i] = values[i];
+        }
+    }
+
+    public static void fill(final float[] data, final Access1D<?> values) {
+        int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = values.floatValue(i);
+        }
+    }
+
+    public static void fill(final float[] data, final float[] values) {
+        int limit = Math.min(data.length, values.length);
+        for (int i = 0; i < limit; i++) {
+            data[i] = values[i];
+        }
+    }
+
+    public static <N extends Comparable<N>> void fill(final N[] data, final Access1D<?> values, final Scalar.Factory<N> scalar) {
+        int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = scalar.cast(values.get(i));
+        }
+    }
+
+    public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
+            final int limit) {
+        for (int i = first; i < limit; i++) {
+            destination[destinationOffset + i] = source[sourceOffset + i];
         }
     }
 

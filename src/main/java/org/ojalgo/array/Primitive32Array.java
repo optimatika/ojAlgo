@@ -142,7 +142,11 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        FillAll.fill(data, values);
+        if (values instanceof Primitive32Array) {
+            FillMatchingSingle.fill(data, ((Primitive32Array) values).data);
+        } else {
+            FillMatchingSingle.fill(data, values);
+        }
     }
 
     @Override

@@ -26,6 +26,8 @@ import java.util.Iterator;
 
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
+import org.ojalgo.data.DataBatch;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -41,15 +43,15 @@ public final class NetworkTrainer extends WrappedANN {
     private final TrainingConfiguration myConfiguration = new TrainingConfiguration();
     private final PhysicalStore<Double>[] myGradients;
 
-    NetworkTrainer(final ArtificialNeuralNetwork network) {
+    NetworkTrainer(final ArtificialNeuralNetwork network, final int batchSize) {
 
-        super(network);
+        super(network, batchSize);
 
         int depth = network.depth();
 
         myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[depth];
         for (int l = 0; l < depth; l++) {
-            myGradients[l] = network.newStore(network.countOutputNodes(l), 1);
+            myGradients[l] = network.newStore(network.countOutputNodes(l), batchSize);
         }
     }
 
@@ -141,6 +143,14 @@ public final class NetworkTrainer extends WrappedANN {
         return this;
     }
 
+    /**
+     * @see NetworkTrainer#newInputBatch()
+     */
+    @Override
+    public DataBatch newOutputBatch() {
+        return super.newOutputBatch();
+    }
+
     public NetworkTrainer rate(final double rate) {
         myConfiguration.learningRate = rate;
         return this;
@@ -173,15 +183,23 @@ public final class NetworkTrainer extends WrappedANN {
         return builder.toString();
     }
 
+    /**
+     * The arguments are typed as {@link Access1D} but it's probably best to think of (create) them as
+     * something 2D where the number of rows should match the batch size and the number of columns the number
+     * of inputs and outputs respectively. When the batch size is 1 then the arguments can actually be 1D.
+     *
+     * @param givenInput One or more input examples, depending on the batch size
+     * @param targetOutput One or more, matching, output targets
+     */
     public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
 
-        Access1D<Double> current = this.invoke(givenInput, myConfiguration);
+        MatrixStore<Double> current = this.invoke(givenInput, myConfiguration);
 
-        myGradients[myGradients.length - 1].fillMatching(targetOutput, myConfiguration.error.getDerivative(), current);
+        myGradients[myGradients.length - 1].regionByTransposing().fillMatching(targetOutput, myConfiguration.error.getDerivative(), current);
 
         for (int l = this.depth() - 1; l >= 0; l--) {
 
-            PhysicalStore<Double> input = l == 0 ? this.getInput() : this.getOutput(l - 1);
+            PhysicalStore<Double> input = this.getInput(l);
             PhysicalStore<Double> output = this.getOutput(l);
 
             PhysicalStore<Double> upstreamGradient = l == 0 ? null : myGradients[l - 1];
@@ -194,7 +212,10 @@ public final class NetworkTrainer extends WrappedANN {
     /**
      * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
      * {@link Access2D#columns()} on anything "2D".
+     *
+     * @deprecated Just use {@link #train(Access1D, Access1D)} instead
      */
+    @Deprecated
     public void train(final Iterable<? extends Access1D<Double>> givenInputs, final Iterable<? extends Access1D<Double>> targetOutputs) {
 
         Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();

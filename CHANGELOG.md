@@ -15,6 +15,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.ann
+
+- Now possible to train and invoke/evaluate neural networks in batches.
+
 #### org.ojalgo.array
 
 - `Array2D` and `ArrayAnyD` are now reshapable
@@ -23,6 +27,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Additions to `DaemonPoolExecutor`: A `ThreadFactory` factory method, as well as a set of `ExecutorService` factory methods that makes use of that.
 - New utility `ProcessingService` standardise/simplify some `ExecutorService` usage.
+
+#### org.ojalgo.data
+
+- New `DataBatch` class. It's a resuable component to help collect 1D data in a 2D structure. Can be used with neural networks (and other things) to batch data.
 
 #### org.ojalgo.matrix
 
@@ -45,6 +53,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.ann
 
 - Internal refactoring to `ArtificialNeuralNetwork` primarily to improve performance.
+- The activator RECTIFIER has been deprecated/renamed RELU which is more in line with what users expect.
 
 #### org.ojalgo.concurrent
 

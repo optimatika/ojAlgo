@@ -174,7 +174,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        COPY.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
+        FillMatchingSingle.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
