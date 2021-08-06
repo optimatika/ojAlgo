@@ -91,7 +91,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         @Deprecated
         default boolean isAllSmall(final double comparedTo) {
             boolean retVal = true;
-            for (long i = 0L, limit = this.count(); retVal && (i < limit); i++) {
+            for (long i = 0L, limit = this.count(); retVal && i < limit; i++) {
                 retVal &= this.isSmall(i, comparedTo);
             }
             return retVal;
@@ -175,7 +175,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
             if (remaining > 1L) {
 
-                final long split = myCursor + (remaining / 2L);
+                final long split = myCursor + remaining / 2L;
 
                 final ElementView<N> retVal = new ElementView<>(myValues, myCursor, split);
 
@@ -183,24 +183,14 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
                 return retVal;
 
-            } else {
-
-                return null;
             }
+            return null;
         }
 
     }
 
-    /**
-     * @deprecated v48 Will be removed
-     */
-    @Deprecated
     public interface IndexOf extends Structure1D {
 
-        /**
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
         default long indexOfLargest() {
             return this.indexOfLargestInRange(0L, this.count());
         }
@@ -266,7 +256,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
         boolean retVal = length == accessB.count();
 
-        for (int i = 0; retVal && (i < length); i++) {
+        for (int i = 0; retVal && i < length; i++) {
             retVal &= !accuracy.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
         }
 
