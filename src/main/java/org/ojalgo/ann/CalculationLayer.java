@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.function.DoubleUnaryOperator;
 
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
@@ -102,7 +103,7 @@ final class CalculationLayer {
     void adjust(final PhysicalStore<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient, final double learningRate, final double dropoutsFactor, final DoubleUnaryOperator regularisation) {
 
-        downstreamGradient.modifyMatching(MULTIPLY, output.onAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(MULTIPLY, output.onAll(myActivator.getDerivativeInTermsOfOutput()).transpose());
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -110,16 +111,22 @@ final class CalculationLayer {
             myWeights.multiply(downstreamGradient, upstreamGradient);
         }
 
-        for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
-            final double gradient = downstreamGradient.doubleValue(j);
-            double ratedGradient = learningRate * gradient;
-            for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                if (regularisation != null) {
-                    myWeights.add(i, j, learningRate * regularisation.applyAsDouble(myWeights.doubleValue(i, j)));
+        if (regularisation != null) {
+            PrimitiveFunction.Unary modifier = arg -> arg + learningRate * regularisation.applyAsDouble(arg);
+            myWeights.modifyAll(modifier);
+        }
+
+        for (long j = 0L, nbOutput = myWeights.countColumns(); j < nbOutput; j++) {
+            for (long b = 0L, batchSize = input.countRows(); b < batchSize; b++) {
+
+                double gradient = downstreamGradient.doubleValue(j, b);
+                double ratedGradient = learningRate * gradient;
+                myBias.add(j, ratedGradient);
+
+                for (long i = 0L, nbInput = myWeights.countRows(); i < nbInput; i++) {
+                    myWeights.add(i, j, ratedGradient * (input.doubleValue(b, i) / dropoutsFactor));
                 }
-                myWeights.add(i, j, ratedGradient * (input.doubleValue(i) / dropoutsFactor));
             }
-            myBias.add(j, ratedGradient);
         }
     }
 
@@ -152,13 +159,13 @@ final class CalculationLayer {
     }
 
     PhysicalStore<Double> invoke(final PhysicalStore<Double> input, final PhysicalStore<Double> output) {
-        myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
+        myWeights.premultiply(input).onColumns(ADD, myBias).supplyTo(output);
         myActivator.activate(output);
         return output;
     }
 
     PhysicalStore<Double> invoke(final PhysicalStore<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
-        myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
+        myWeights.premultiply(input).onColumns(ADD, myBias).supplyTo(output);
         myActivator.activate(output, probabilityToKeep);
         return output;
     }

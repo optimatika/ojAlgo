@@ -28,6 +28,7 @@ import java.util.Spliterators;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
@@ -87,7 +88,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        FillAll.fill(data, values, this.factory().scalar());
+        FillMatchingSingle.fill(data, values, this.factory().scalar());
     }
 
     @Override

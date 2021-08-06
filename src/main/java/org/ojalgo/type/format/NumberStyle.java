@@ -23,10 +23,72 @@ package org.ojalgo.type.format;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.function.LongFunction;
 
 public enum NumberStyle {
 
     CURRENCY, GENERAL, INTEGER, PERCENT, SCIENTIFIC;
+
+    static final class IntegerToUniformString {
+
+        private static final String PADDING = "00000000000000000000";
+
+        static int numberOfDigits(final long number) {
+
+            if (number == 0) {
+                return 1;
+            }
+
+            long nmbr = number;
+            int count = 0;
+            while (nmbr != 0) {
+                nmbr /= 10;
+                count++;
+            }
+            return count;
+        }
+
+        static String toStringWithFixedNumberOfDigits(final long value, final int numberOfDigits) {
+            String retVal = Long.toString(value);
+            retVal = PADDING + retVal;
+            return retVal.substring(retVal.length() - numberOfDigits);
+        }
+
+        private final int myMaxNumberOfDigits;
+
+        IntegerToUniformString(final long rangeSize) {
+            super();
+            myMaxNumberOfDigits = IntegerToUniformString.numberOfDigits(rangeSize - 1);
+        }
+
+        public String toString(final long value) {
+            return IntegerToUniformString.toStringWithFixedNumberOfDigits(value, myMaxNumberOfDigits);
+        }
+
+    }
+
+    /**
+     * Similar to {@link NumberStyle#toUniformString(long, long)} but return a "formatter" with the specified
+     * range size.
+     *
+     * @param rangeSize The max number of integers
+     * @return An integer-to-string function
+     */
+    public static LongFunction<String> newUniformFormatter(final long rangeSize) {
+        IntegerToUniformString formatter = new IntegerToUniformString(rangeSize);
+        return formatter::toString;
+    }
+
+    /**
+     * Creates String:s like "0067" and "0004" rather than "67" and "4" given an integer range (max number of
+     * integers).
+     */
+    public static String toUniformString(final long value, final long rangeSize) {
+
+        int maxNumberOfDigits = IntegerToUniformString.numberOfDigits(rangeSize - 1);
+
+        return IntegerToUniformString.toStringWithFixedNumberOfDigits(value, maxNumberOfDigits);
+    }
 
     public NumberFormat getFormat() {
         return this.getFormat(Locale.getDefault());

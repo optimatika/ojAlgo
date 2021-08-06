@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -63,7 +64,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Structure2D.ReducibleTo1D<ElementsSupplier<N>> {
+        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>> {
 
     public interface Factory<N extends Comparable<N>> {
 
@@ -427,11 +428,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         }
 
         public void supplyTo(final TransformableRegion<N> receiver) {
-            if (receiver.isAcceptable(this)) {
-                receiver.accept(this.get());
-            } else {
+            if (!receiver.isAcceptable(this)) {
                 throw new ProgrammingError("Not acceptable!");
             }
+            receiver.accept(this.get());
         }
 
         public LogicalBuilder<N> symmetric(final boolean upper) {
@@ -768,6 +768,34 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return this;
     }
 
+    default long indexOfLargestInColumn(final long row, final long col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, col + 1L);
+        long step = 1L;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
+    default long indexOfLargestInRange(final long first, final long limit) {
+        return AMAX.invoke(this, first, limit, 1L);
+    }
+
+    default long indexOfLargestInRow(final long row, final long col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, row, this.countColumns());
+        long step = structure;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
+    default long indexOfLargestOnDiagonal(final long start) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, start, start);
+        long limit = Structure2D.index(structure, structure, this.countColumns());
+        long step = structure + 1L;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
     default boolean isAbsolute(final long row, final long col) {
         return this.toScalar(row, col).isAbsolute();
     }
@@ -786,9 +814,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
             ComplexNumber lowerLeft;
             ComplexNumber upperRight;
 
-            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+            for (int j = 0; retVal && j < numberOfColumns; j++) {
                 retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(this.get(j, j)).i);
-                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                for (int i = j + 1; retVal && i < numberOfRows; i++) {
                     lowerLeft = ComplexNumber.valueOf(this.get(i, j)).conjugate();
                     upperRight = ComplexNumber.valueOf(this.get(j, i));
                     retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, lowerLeft.subtract(upperRight).norm());
@@ -797,8 +825,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         } else {
 
-            for (int j = 0; retVal && (j < numberOfColumns); j++) {
-                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+            for (int j = 0; retVal && j < numberOfColumns; j++) {
+                for (int i = j + 1; retVal && i < numberOfRows; i++) {
                     retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, this.doubleValue(i, j) - this.doubleValue(j, i));
                 }
             }
@@ -900,11 +928,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
         if (this.isVector()) {
             return frobeniusNorm;
-        } else {
-            // Bringing it closer to what the operator norm would be
-            // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-            return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
         }
+        // Bringing it closer to what the operator norm would be
+        // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
+        return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
     }
 
     default MatrixStore<N> onAll(final UnaryFunction<N> operator) {
@@ -936,41 +963,42 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
             return factory.builder().makeIdentity(this.countRows()).get();
 
-        } else if (power == 1) {
+        }
+        if (power == 1) {
 
             return this;
 
-        } else if (power == 2) {
+        }
+        if (power == 2) {
 
             return this.multiply(this);
 
-        } else if ((power % 2) == 0) {
+        }
+        if (power % 2 == 0) {
             // 4,6,8,10...
 
             return this.power(2).power(power / 2);
 
-        } else if (power > 8) {
+        }
+        if (power > 8) {
             // 9,11,13,15...
 
             return this.power(power - 1).multiply(this);
 
-        } else {
-            // 3,5,7
-
-            PhysicalStore<N> right = factory.make(this);
-            PhysicalStore<N> product = factory.make(this);
-            PhysicalStore<N> temp;
-
-            this.multiply(this, product);
-            for (int i = 2; i < power; i++) {
-                temp = right;
-                right = product;
-                product = temp;
-                this.multiply(right, product);
-            }
-
-            return product;
         }
+        PhysicalStore<N> right = factory.make(this);
+        PhysicalStore<N> product = factory.make(this);
+        PhysicalStore<N> temp;
+
+        this.multiply(this, product);
+        for (int i = 2; i < power; i++) {
+            temp = right;
+            right = product;
+            product = temp;
+            this.multiply(right, product);
+        }
+
+        return product;
     }
 
     /**

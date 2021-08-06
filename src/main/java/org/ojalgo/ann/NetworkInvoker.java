@@ -21,16 +21,26 @@
  */
 package org.ojalgo.ann;
 
+import org.ojalgo.data.DataBatch;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.structure.Access1D;
 
 public class NetworkInvoker extends WrappedANN implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
 
-    NetworkInvoker(final ArtificialNeuralNetwork network) {
-        super(network);
+    NetworkInvoker(final ArtificialNeuralNetwork network, final int batchSize) {
+        super(network, batchSize);
     }
 
+    /**
+     * The input argument is typed as {@link Access1D} which essentially means it can be anything. If the
+     * batch size is anything other than 1 this needs to be a 2D structure with the number of rows matching
+     * the batch size. The return type is a {@link MatrixStore} where the number of rows match the batch size
+     * and the number of columns match the number of output nodes. A {@link DataBatch} may help when creating
+     * the batches or you simply create any 2D data structure and fill the rows.
+     *
+     * @see org.ojalgo.function.BasicFunction.PlainUnary#invoke(java.lang.Object)
+     */
     @Override
     public MatrixStore<Double> invoke(final Access1D<Double> input) {
         return super.invoke(input, null);

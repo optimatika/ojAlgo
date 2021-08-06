@@ -30,8 +30,8 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
@@ -431,7 +431,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
 
-        COPY.invoke(data[last], 0, d, 0, 0, size);
+        FillMatchingSingle.invoke(data[last], 0, d, 0, 0, size);
 
         for (int m = last; m > 0; m--) { // row index of target householder point
             // col index of target householder point
