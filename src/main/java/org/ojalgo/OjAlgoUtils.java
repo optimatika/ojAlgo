@@ -23,9 +23,9 @@ package org.ojalgo;
 
 import java.time.LocalDate;
 
-import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.machine.VirtualMachine;
+import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.netio.BasicLogger;
 
 public abstract class OjAlgoUtils {
@@ -159,7 +159,7 @@ public abstract class OjAlgoUtils {
     }
 
     public static void pushUpConcurrencyThresholds(final int minValue) {
-        ArrayOperation.setThresholdsMinValue(minValue);
+        MatrixOperation.setThresholdsMinValue(minValue);
     }
 
     private OjAlgoUtils() {

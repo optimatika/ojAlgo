@@ -33,7 +33,7 @@ public final class OperationBinary implements ArrayOperation {
 
     public static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if ((left instanceof Primitive64Array) && (right instanceof Primitive64Array)) {
+        if (left instanceof Primitive64Array && right instanceof Primitive64Array) {
             OperationBinary.invoke(data, first, limit, step, ((Primitive64Array) left).data, function, ((Primitive64Array) right).data);
         } else {
             for (int i = first; i < limit; i += step) {
@@ -100,7 +100,7 @@ public final class OperationBinary implements ArrayOperation {
 
     public static void invoke(final float[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if ((left instanceof Primitive32Array) && (right instanceof Primitive32Array)) {
+        if (left instanceof Primitive32Array && right instanceof Primitive32Array) {
             OperationBinary.invoke(data, first, limit, step, ((Primitive32Array) left).data, function, ((Primitive32Array) right).data);
         } else {
             for (int i = first; i < limit; i += step) {
@@ -218,10 +218,6 @@ public final class OperationBinary implements ArrayOperation {
                 data[i] = function.invoke(left[i], right[i]);
             }
         }
-    }
-
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

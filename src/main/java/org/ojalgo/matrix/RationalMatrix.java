@@ -49,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
     public static final class DenseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.DenseReceiver {
+            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<PhysicalStore<RationalNumber>> {
 
         DenseReceiver(final Factory enclosing, final PhysicalStore<RationalNumber> delegate) {
             enclosing.super(delegate);
@@ -100,7 +100,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     public static final class SparseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.SparseReceiver {
+            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<SparseStore<RationalNumber>> {
 
         SparseReceiver(final Factory enclosing, final SparseStore<RationalNumber> delegate) {
             enclosing.super(delegate);
@@ -117,6 +117,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
         super(aStore);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public RationalMatrix.DenseReceiver copy() {
         return new RationalMatrix.DenseReceiver(FACTORY, this.getStore().copy());

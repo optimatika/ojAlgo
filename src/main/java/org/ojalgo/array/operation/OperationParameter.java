@@ -48,8 +48,4 @@ public final class OperationParameter implements ArrayOperation {
         }
     }
 
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

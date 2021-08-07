@@ -48,7 +48,7 @@ import org.ojalgo.structure.Structure2D;
 public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matrix> {
 
     public static final class DenseReceiver extends
-            MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver>.DenseReceiver {
+            MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver>.Mutator<PhysicalStore<Double>> {
 
         DenseReceiver(final Factory enclosing, final PhysicalStore<Double> delegate) {
             enclosing.super(delegate);
@@ -99,7 +99,7 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
     }
 
     public static final class SparseReceiver extends
-            MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver>.SparseReceiver {
+            MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver>.Mutator<SparseStore<Double>> {
 
         SparseReceiver(final Factory enclosing, final SparseStore<Double> delegate) {
             enclosing.super(delegate);
@@ -116,6 +116,7 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
         super(aStore);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Primitive64Matrix.DenseReceiver copy() {
         return new Primitive64Matrix.DenseReceiver(FACTORY, this.getStore().copy());

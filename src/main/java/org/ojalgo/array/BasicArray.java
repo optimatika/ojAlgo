@@ -47,8 +47,8 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Comparable<N>>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N> {
+public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
 
     public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -92,14 +92,13 @@ public abstract class BasicArray<N extends Comparable<N>>
 
                 return this.makeSegmented(structure);
 
-            } else if (strategy.isChunked(total)) {
-
-                return new SparseArray<>(total, strategy);
-
-            } else {
-
-                return strategy.make(total);
             }
+            if (strategy.isChunked(total)) {
+
+                return new SparseArray<>(strategy.limit(total));
+
+            }
+            return strategy.make(total);
         }
 
         @Override
@@ -113,10 +112,8 @@ public abstract class BasicArray<N extends Comparable<N>>
 
                 return strategy.makeSegmented(total);
 
-            } else {
-
-                return strategy.make(total);
             }
+            return strategy.make(total);
         }
 
         DenseCapacityStrategy<N> strategy() {
@@ -192,7 +189,7 @@ public abstract class BasicArray<N extends Comparable<N>>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 
@@ -220,6 +217,13 @@ public abstract class BasicArray<N extends Comparable<N>>
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         this.modify(first, limit, 1L, modifier);
+    }
+
+    public void supplyTo(final Mutate1D receiver) {
+        long limit = Math.min(this.count(), receiver.count());
+        for (long i = 0; i < limit; i++) {
+            receiver.set(i, this.get(i));
+        }
     }
 
     @Override

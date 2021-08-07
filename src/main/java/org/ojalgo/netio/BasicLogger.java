@@ -21,6 +21,8 @@
  */
 package org.ojalgo.netio;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -97,7 +99,7 @@ public abstract class BasicLogger {
         public Printer printf(final Locale locale, final String format, final Object... args) {
 
             synchronized (myAppendable) {
-                if ((myFormatter == null) || (myFormatter.locale() != locale)) {
+                if (myFormatter == null || myFormatter.locale() != locale) {
                     myFormatter = new Formatter(myAppendable, locale);
                 }
                 myFormatter.format(locale, format, args);
@@ -109,7 +111,7 @@ public abstract class BasicLogger {
         public Printer printf(final String format, final Object... args) {
 
             synchronized (myAppendable) {
-                if ((myFormatter == null) || (myFormatter.locale() != Locale.getDefault())) {
+                if (myFormatter == null || myFormatter.locale() != Locale.getDefault()) {
                     myFormatter = new Formatter(myAppendable);
                 }
                 myFormatter.format(Locale.getDefault(), format, args);
@@ -778,6 +780,14 @@ public abstract class BasicLogger {
         BasicLogger.println(DEBUG);
     }
 
+    public static void mkdirs(final File dir) {
+        if (!dir.exists()) {
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new RuntimeException(new FileNotFoundException(dir.getAbsolutePath()));
+            }
+        }
+    }
+
     public static void debug(final Object message) {
         BasicLogger.println(DEBUG, message);
     }
@@ -862,12 +872,11 @@ public abstract class BasicLogger {
             } else {
                 return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toPlainString();
             }
+        }
+        if (number instanceof Scalar<?>) {
+            return ((Scalar<?>) number).toString(context);
         } else {
-            if (number instanceof Scalar<?>) {
-                return ((Scalar<?>) number).toString(context);
-            } else {
-                return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toString();
-            }
+            return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toString();
         }
     }
 
@@ -890,8 +899,8 @@ public abstract class BasicLogger {
     }
 
     static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context) {
-        if ((appender != null) && (matrix.count() > 0L)) {
-            if ((matrix instanceof ComplexMatrix) || (matrix.get(0, 0) instanceof ComplexNumber)) {
+        if (appender != null && matrix.count() > 0L) {
+            if (matrix instanceof ComplexMatrix || matrix.get(0, 0) instanceof ComplexNumber) {
                 BasicLogger.printmtrx(appender, matrix, context, false);
             } else {
                 BasicLogger.printmtrx(appender, matrix, context, true);

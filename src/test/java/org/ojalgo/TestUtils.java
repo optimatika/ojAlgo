@@ -23,10 +23,10 @@ package org.ojalgo;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.function.IntSupplier;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -36,6 +36,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
+import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -46,10 +47,12 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.tensor.Tensor;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.NumberDefinition;
@@ -78,7 +81,7 @@ public abstract class TestUtils {
         BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
         BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
 
-        if ((tmpValue.compareTo(tmpLower) == -1) || (tmpValue.compareTo(tmpUpper) == 1)) {
+        if (tmpValue.compareTo(tmpLower) == -1 || tmpValue.compareTo(tmpUpper) == 1) {
             Assertions.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
         }
     }
@@ -140,6 +143,10 @@ public abstract class TestUtils {
 
     public static void assertEquals(final int expected, final int actual) {
         Assertions.assertEquals(expected, actual);
+    }
+
+    public static void assertEquals(final int expected, final IntSupplier actual) {
+        TestUtils.assertEquals(expected, actual.getAsInt());
     }
 
     public static void assertEquals(final int[] expected, final int[] actual) {
@@ -232,10 +239,10 @@ public abstract class TestUtils {
     public static void assertEquals(final String message, final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
 
         TestUtils.assertEquals(message + ", different count()", expected.count(), actual.count());
-        if ((expected instanceof Structure2D) && (actual instanceof Structure2D)) {
+        if (expected instanceof Structure2D && actual instanceof Structure2D) {
             TestUtils.assertEquals(message + ", different countRows()", ((Structure2D) expected).countRows(), ((Structure2D) actual).countRows());
             TestUtils.assertEquals(message + ", different countColumns()", ((Structure2D) expected).countColumns(), ((Structure2D) actual).countColumns());
-        } else if ((expected instanceof StructureAnyD) && (actual instanceof StructureAnyD)) {
+        } else if (expected instanceof StructureAnyD && actual instanceof StructureAnyD) {
             TestUtils.assertEquals(message + ", different shape()", ((StructureAnyD) expected).shape(), ((StructureAnyD) actual).shape());
         }
 
@@ -255,7 +262,7 @@ public abstract class TestUtils {
 
     public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual, final NumberContext precision) {
 
-        if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+        if (expected instanceof Quaternion || actual instanceof Quaternion) {
 
             Quaternion tmpExpected = Quaternion.valueOf(expected);
             Quaternion tmpActual = Quaternion.valueOf(actual);
@@ -277,7 +284,7 @@ public abstract class TestUtils {
                 Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
             }
 
-        } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
+        } else if (expected instanceof ComplexNumber || actual instanceof ComplexNumber) {
 
             ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
             ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
@@ -291,12 +298,9 @@ public abstract class TestUtils {
                 Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
-        } else {
-
-            if (precision.isDifferent(NumberDefinition.doubleValue(expected), NumberDefinition.doubleValue(actual))) {
-                // Assertions.fail(() -> message + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
-            }
+        } else if (precision.isDifferent(NumberDefinition.doubleValue(expected), NumberDefinition.doubleValue(actual))) {
+            // Assertions.fail(() -> message + ": " + expected + " != " + actual);
+            Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
         }
     }
 
@@ -376,7 +380,7 @@ public abstract class TestUtils {
     }
 
     public static void assertInRange(final int first, final int limit, final int actual) {
-        if ((first > actual) || (actual >= limit)) {
+        if (first > actual || actual >= limit) {
             TestUtils.fail("Not in range!");
         }
     }
@@ -478,6 +482,18 @@ public abstract class TestUtils {
         Assertions.assertTrue(actual.getState().isOptimal(), actual.toString());
     }
 
+    public static void assertTensorEquals(final Tensor<?, ?> expected, final Tensor<?, ?> actual) {
+
+        TestUtils.assertEquals(expected.rank(), actual.rank());
+        TestUtils.assertEquals(expected.dimensions(), actual.dimensions());
+
+        if (expected.rank() == 0) {
+            TestUtils.assertEquals(((Scalar<?>) expected).doubleValue(), ((Scalar<?>) actual).doubleValue(), EQUALS);
+        } else {
+            TestUtils.assertEquals((Access1D<?>) expected, (Access1D<?>) actual, EQUALS);
+        }
+    }
+
     public static void assertTrue(final boolean condition) {
         Assertions.assertTrue(condition);
     }
@@ -522,7 +538,7 @@ public abstract class TestUtils {
     }
 
     public static void minimiseAllBranchLimits() {
-        ArrayOperation.setAllOperationThresholds(2);
+        MatrixOperation.setAllOperationThresholds(2);
     }
 
     static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
@@ -538,9 +554,9 @@ public abstract class TestUtils {
 
             if (expectedState == actualState) {
 
-            } else if ((expectedState.isDistinct() && !actualState.isDistinct()) || (expectedState.isOptimal() && !actualState.isOptimal())) {
+            } else if (expectedState.isDistinct() && !actualState.isDistinct() || expectedState.isOptimal() && !actualState.isOptimal()) {
                 failed = true;
-            } else if ((expectedState.isFeasible() && !actualState.isFeasible()) || (expectedState.isApproximate() && !actualState.isApproximate())) {
+            } else if (expectedState.isFeasible() && !actualState.isFeasible() || expectedState.isApproximate() && !actualState.isApproximate()) {
                 failed = true;
             }
 

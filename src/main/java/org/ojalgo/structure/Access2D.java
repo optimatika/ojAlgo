@@ -23,6 +23,10 @@ package org.ojalgo.structure;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -69,7 +73,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends Mutate2D.Receiver<N>> extends Structure2D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate2D> extends Structure2D {
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 
@@ -123,7 +127,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         default boolean isColumnSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countRows();
-            for (long i = row; retVal && (i < tmpLimit); i++) {
+            for (long i = row; retVal && i < tmpLimit; i++) {
                 retVal &= this.isSmall(i, col, comparedTo);
             }
             return retVal;
@@ -146,7 +150,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         default boolean isRowSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countColumns();
-            for (long j = col; retVal && (j < tmpLimit); j++) {
+            for (long j = col; retVal && j < tmpLimit; j++) {
                 retVal &= this.isSmall(row, j, comparedTo);
             }
             return retVal;
@@ -243,9 +247,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
             if (delegateSpliterator != null) {
                 return new ElementView<>(delegateSpliterator, myStructure);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }
@@ -271,7 +274,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
          * @deprecated v48 Will be removed
          */
         @Deprecated
-        long indexOfLargestInColumn(final long row, final long col);
+        default long indexOfLargestInColumn(final long row, final long col) {
+            long structure = this.countRows();
+            return this.indexOfLargestInRange(Structure2D.index(structure, row, col), Structure2D.index(structure, 0, col + 1));
+        }
 
         /**
          * @deprecated v48 Will be removed
@@ -407,8 +413,59 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static boolean equals(final Access2D<?> accessA, final Access2D<?> accessB, final NumberContext accuracy) {
-        return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns())
-                && Access1D.equals(accessA, accessB, accuracy);
+        return accessA.countRows() == accessB.countRows() && accessA.countColumns() == accessB.countColumns() && Access1D.equals(accessA, accessB, accuracy);
+    }
+
+    /**
+     * @deprecated v47 Use {@link MatrixStore#isHermitian()} instead
+     */
+    @Deprecated
+    static boolean isHermitian(final Access2D<?> matrix) {
+
+        long rows = matrix.countRows();
+        long cols = matrix.countColumns();
+
+        Comparable<?> anyElement = matrix.get(0L);
+
+        boolean retVal = rows == cols;
+
+        if (anyElement instanceof ComplexNumber) {
+
+            for (int j = 0; retVal && j < cols; j++) {
+
+                double imagDiag = ComplexNumber.valueOf(matrix.get(j, j)).i;
+
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, imagDiag);
+
+                for (int i = j + 1; retVal && i < rows; i++) {
+
+                    ComplexNumber lowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
+                    ComplexNumber upperRight = ComplexNumber.valueOf(matrix.get(j, i));
+
+                    double diff = lowerLeft.subtract(upperRight).norm();
+                    double sum = lowerLeft.add(upperRight).norm();
+
+                    retVal &= PrimitiveScalar.isSmall(sum, diff);
+                }
+            }
+
+        } else {
+
+            for (int j = 0; retVal && j < cols; j++) {
+                for (int i = j + 1; retVal && i < rows; i++) {
+
+                    double lowerLeft = matrix.doubleValue(i, j);
+                    double upperRight = matrix.doubleValue(j, i);
+
+                    double diff = lowerLeft - upperRight;
+                    double sum = lowerLeft + upperRight;
+
+                    retVal &= PrimitiveScalar.isSmall(sum, diff);
+                }
+            }
+        }
+
+        return retVal;
     }
 
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
@@ -459,7 +516,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         builder.append(matrix.getClass().getName());
         builder.append(' ').append('<').append(' ').append(numbRows).append(' ').append('x').append(' ').append(numbCols).append(' ').append('>');
 
-        if ((numbRows > 0) && (numbCols > 0) && (numbRows <= 50) && (numbCols <= 50) && ((numbRows * numbCols) <= 200)) {
+        if (numbRows > 0 && numbCols > 0 && numbRows <= 50 && numbCols <= 50 && numbRows * numbCols <= 200) {
 
             // First element
             builder.append("\n{ { ").append(matrix.get(0, 0));

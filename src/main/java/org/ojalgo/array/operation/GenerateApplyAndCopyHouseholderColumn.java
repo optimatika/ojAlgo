@@ -61,10 +61,10 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
-                data[(row + tmpColBase)] = tmpNorm2 * tmpNormInf;
+                data[row + tmpColBase] = tmpNorm2 * tmpNormInf;
                 tmpScale -= tmpNorm2;
             } else {
-                data[(row + tmpColBase)] = -tmpNorm2 * tmpNormInf;
+                data[row + tmpColBase] = -tmpNorm2 * tmpNormInf;
                 tmpScale += tmpNorm2;
             }
 
@@ -111,10 +111,10 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
-                data[(row + tmpColBase)] = (float) (tmpNorm2 * tmpNormInf);
+                data[row + tmpColBase] = (float) (tmpNorm2 * tmpNormInf);
                 tmpScale -= tmpNorm2;
             } else {
-                data[(row + tmpColBase)] = (float) (-tmpNorm2 * tmpNormInf);
+                data[row + tmpColBase] = (float) (-tmpNorm2 * tmpNormInf);
                 tmpScale += tmpNorm2;
             }
 
@@ -163,7 +163,7 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
             tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2);
 
             // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
-            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
+            data[row + col * structure] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
             // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
             tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
 
@@ -177,11 +177,6 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
         }
 
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

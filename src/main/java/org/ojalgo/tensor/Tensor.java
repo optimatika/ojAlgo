@@ -22,27 +22,41 @@
 package org.ojalgo.tensor;
 
 import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.AccessAnyD;
+import org.ojalgo.array.ArrayAnyD;
 
-public interface Tensor<N extends Comparable<N>> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
+/**
+ * An n:th-rank tensor in m-dimensional space is a mathematical object that has n indices and m^n components
+ * and obeys certain transformation rules. Tensors are generalizations of scalars (that have no indices),
+ * vectors (that have exactly one index), and matrices (that have exactly two indices) to an arbitrary number
+ * of indices. If all you want is multi-dimesional arrays this interface and its implementations is NOT what
+ * you're looking for. In that case just use {@link ArrayAnyD} instead.
+ *
+ * @see https://mathworld.wolfram.com/Tensor.html
+ * @author apete
+ */
+public interface Tensor<N extends Comparable<N>, T extends Tensor<N, T>> extends NormedVectorSpace<T, N> {
 
-    static <N extends Scalar<N>> Tensor<N> make(final DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
-        return new AnyTensor<>(rank, dimensions, arrayFactory);
+    /**
+     * The total number of scalar components
+     */
+    default long components() {
+        return Math.round(Math.pow(this.dimensions(), this.rank()));
     }
 
-    static Tensor<Double> makePrimitive(final int rank, final int dimensions) {
-        return new AnyTensor<>(rank, dimensions, Primitive64Array.FACTORY);
-    }
-
-    default long count(final int dimension) {
-        return this.dimensions();
-    }
-
+    /**
+     * The range of the indices that identify the scalar components. Each index of a tensor ranges over the
+     * number of dimensions.
+     */
     int dimensions();
 
+    default boolean isSameShape(final Tensor<?, ?> other) {
+        return (this.rank() == other.rank()) && (this.dimensions() == other.dimensions());
+    }
+
+    /**
+     * The total number of indices required to uniquely identify each scalar component is called the order,
+     * degree or rank of the tensor.
+     */
     int rank();
 
 }

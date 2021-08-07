@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class HowToBuildNeuralNetwork extends BackPropagationExample {
 
-    private static final NumberContext PRECISION = new NumberContext(4, 8);
+    private static final NumberContext PRECISION = NumberContext.of(4, 8);
 
     public HowToBuildNeuralNetwork() {
         super();

@@ -146,7 +146,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        FillAll.fill(data, values);
+        if (values instanceof Primitive64Array) {
+            FillMatchingSingle.fill(data, ((Primitive64Array) values).data);
+        } else {
+            FillMatchingSingle.fill(data, values);
+        }
     }
 
     @Override
@@ -165,7 +169,7 @@ public class Primitive64Array extends PrimitiveArray {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + Arrays.hashCode(data);
+        result = prime * result + Arrays.hashCode(data);
         return result;
     }
 
@@ -192,6 +196,14 @@ public class Primitive64Array extends PrimitiveArray {
 
     public DoubleStream stream(final boolean parallel) {
         return StreamSupport.doubleStream(this.spliterator(), parallel);
+    }
+
+    @Override
+    public void supplyTo(final Mutate1D receiver) {
+        int limit = Math.min(data.length, receiver.size());
+        for (int i = 0; i < limit; i++) {
+            receiver.set(i, data[i]);
+        }
     }
 
     @Override

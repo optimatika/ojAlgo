@@ -2,6 +2,7 @@ package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.SparseFactory;
@@ -10,9 +11,8 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
 import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.Mutate1D;
 
-public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N> {
+public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N>, Supplier<PhysicalStore<N>> {
 
     static final class ItemView<N extends Comparable<N>> extends ColumnView<N> {
 
@@ -48,11 +48,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<
     }
 
     public SparseArray<N> addColumn() {
-        return this.addColumn(SparseArray.factory(myFactory.array(), myRowsCount).make());
+        return this.addColumn(SparseArray.factory(myFactory.array()).limit(myRowsCount).make());
     }
 
     public void addColumns(final int numberToAdd) {
-        SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myRowsCount);
+        SparseFactory<N> factory = SparseArray.factory(myFactory.array()).limit(myRowsCount);
         for (int j = 0; j < numberToAdd; j++) {
             myColumns.add(factory.make());
         }
@@ -74,16 +74,16 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<
         return myColumns.get((int) col).doubleValue(row);
     }
 
+    public PhysicalStore<N> get() {
+        return this.collect(myFactory);
+    }
+
     public N get(final long row, final long col) {
         return myColumns.get((int) col).get(row);
     }
 
     public SparseArray<N> getColumn(final int index) {
         return myColumns.get(index);
-    }
-
-    public Factory<N, ?> physical() {
-        return myFactory;
     }
 
     public Access1D<N> removeColumn(final int index) {
@@ -103,31 +103,7 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<
         receiver.reset();
 
         for (int j = 0, limit = myColumns.size(); j < limit; j++) {
-            long col = j;
-
-            myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
-
-                public void add(final long index, final Comparable<?> addend) {
-                    receiver.add(index, col, addend);
-                }
-
-                public void add(final long index, final double addend) {
-                    receiver.add(index, col, addend);
-                }
-
-                public long count() {
-                    return receiver.countRows();
-                }
-
-                public void set(final long index, final Comparable<?> value) {
-                    receiver.set(index, col, value);
-                }
-
-                public void set(final long index, final double value) {
-                    receiver.set(index, col, value);
-                }
-
-            });
+            myColumns.get(j).supplyNonZerosTo(receiver.regionByColumns(j));
         }
     }
 

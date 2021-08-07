@@ -29,13 +29,13 @@ import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Stream2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -97,10 +97,14 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] retVal = this.reset(matrix, true);
+        double[][] retVal = this.reset(matrix, true);
 
-        // TODO Handle case with non Stream2D
-        ((Stream2D) matrix).transpose().supplyTo(this.getInternalStore());
+        if (matrix instanceof ElementsSupplier) {
+            ((ElementsSupplier) matrix).transpose().supplyTo(this.getInternalStore());
+        } else {
+            // TODO Find a better solution
+            matrix.collect(RawStore.FACTORY).transpose().supplyTo(this.getInternalStore());
+        }
 
         return this.doDecompose(retVal);
     }

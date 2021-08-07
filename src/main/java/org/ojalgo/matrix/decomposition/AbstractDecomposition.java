@@ -63,26 +63,14 @@ abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixD
     }
 
     protected final boolean computed(final boolean computed) {
-        return (myComputed = computed);
+        return myComputed = computed;
     }
 
     protected abstract FunctionSet<N> function();
 
-    protected abstract int getColDim();
-
     protected final double getDimensionalEpsilon() {
         return this.getMaxDim() * MACHINE_EPSILON;
     }
-
-    protected int getMaxDim() {
-        return Math.max(this.getRowDim(), this.getColDim());
-    }
-
-    protected int getMinDim() {
-        return Math.min(this.getRowDim(), this.getColDim());
-    }
-
-    protected abstract int getRowDim();
 
     protected final boolean isAspectRatioNormal() {
         return this.getRowDim() >= this.getColDim();
@@ -91,14 +79,14 @@ abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixD
     protected abstract Scalar.Factory<N> scalar();
 
     boolean isSolvable() {
-        if (myComputed && (mySolvable == null)) {
+        if (myComputed && mySolvable == null) {
             if (this instanceof MatrixDecomposition.Solver) {
                 mySolvable = Boolean.valueOf(this.checkSolvability());
             } else {
                 mySolvable = Boolean.FALSE;
             }
         }
-        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
+        return myComputed && mySolvable != null && mySolvable.booleanValue();
     }
 
 }

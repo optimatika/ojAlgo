@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BackPropagationIsVerySimple extends BackPropagationExample {
 
-    private static final NumberContext PRECISION = new NumberContext(4, 4);
+    private static final NumberContext PRECISION = NumberContext.of(4, 4);
 
     public BackPropagationIsVerySimple() {
         super();

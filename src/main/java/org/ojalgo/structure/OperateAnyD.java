@@ -4,7 +4,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface OperateAnyD<N extends Comparable<N>, A extends AccessAnyD<N>, P extends OperateAnyD<N, A, P>> {
+public interface OperateAnyD<N extends Comparable<N>, P extends OperateAnyD<N, P>> {
 
     default P onAll(final BinaryFunction<N> operator, final double right) {
         return this.onAll(operator.second(right));
@@ -30,9 +30,9 @@ public interface OperateAnyD<N extends Comparable<N>, A extends AccessAnyD<N>, P
 
     P onAny(TransformationAnyD<N> operator);
 
-    P onMatching(A left, BinaryFunction<N> operator);
+    P onMatching(AccessAnyD<N> left, BinaryFunction<N> operator);
 
-    P onMatching(BinaryFunction<N> operator, A right);
+    P onMatching(BinaryFunction<N> operator, AccessAnyD<N> right);
 
     /**
      * @deprecated v49
@@ -94,7 +94,7 @@ public interface OperateAnyD<N extends Comparable<N>, A extends AccessAnyD<N>, P
      * @deprecated v49
      */
     @Deprecated
-    default P operateOnMatching(final A left, final BinaryFunction<N> operator) {
+    default P operateOnMatching(final AccessAnyD<N> left, final BinaryFunction<N> operator) {
         return this.onMatching(left, operator);
     }
 
@@ -102,7 +102,7 @@ public interface OperateAnyD<N extends Comparable<N>, A extends AccessAnyD<N>, P
      * @deprecated v49
      */
     @Deprecated
-    default P operateOnMatching(final BinaryFunction<N> operator, final A right) {
+    default P operateOnMatching(final BinaryFunction<N> operator, final AccessAnyD<N> right) {
         return this.onMatching(operator, right);
     }
 

@@ -43,17 +43,19 @@ import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.structure.TransformationAnyD;
+import org.ojalgo.tensor.TensorFactoryAnyD;
 
 /**
  * ArrayAnyD
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Comparable<N>>
-        implements AccessAnyD<N>, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>, AccessAnyD.Elements, AccessAnyD.IndexOf,
-        StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
+public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>,
+        AccessAnyD.Elements, AccessAnyD.IndexOf, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>,
+        AccessAnyD.Collectable<N, MutateAnyD>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
 
-    public static final class Factory<N extends Comparable<N>> implements FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
+    public static final class Factory<N extends Comparable<N>>
+            implements FactoryAnyD.Dense<ArrayAnyD<N>>, FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -62,10 +64,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
-        /**
-         * @deprecated v48 Use {@link ArrayAnyD#fillMatching(Access1D)}
-         */
-        @Deprecated
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
             return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
@@ -84,12 +82,13 @@ public final class ArrayAnyD<N extends Comparable<N>>
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
-        /**
-         * @deprecated v48 Use {@link ArrayAnyD#fillAll(NullaryFunction)}
-         */
-        @Deprecated
         public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
+
+            BasicArray<N> toBeFilled = myDelegate.makeToBeFilled(structure);
+
+            toBeFilled.fillAll(supplier);
+
+            return toBeFilled.wrapInArrayAnyD(structure);
         }
 
         public ArrayAnyD<N> makeSparse(final long... structure) {
@@ -99,6 +98,10 @@ public final class ArrayAnyD<N extends Comparable<N>>
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
+        }
+
+        public TensorFactoryAnyD<N, ArrayAnyD<N>> tensor() {
+            return TensorFactoryAnyD.of(this);
         }
 
     }
@@ -183,21 +186,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
         return visitor.get();
     }
 
-    /**
-     * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not
-     * copied, it is just accessed through a different adaptor.
-     *
-     * @deprecated v39 Not needed
-     */
-    @Deprecated
-    public Array1D<N> asArray1D() {
-        return myDelegate.wrapInArray1D();
-    }
-
-    public void clear() {
-        myDelegate.reset();
-    }
-
     @Override
     public long count() {
         return myDelegate.count();
@@ -238,6 +226,18 @@ public final class ArrayAnyD<N extends Comparable<N>>
             return false;
         }
         return true;
+    }
+
+    public ArrayAnyD<N> expand(final int rank) {
+
+        int r = Math.max(this.rank(), rank);
+        long[] shape = new long[r];
+
+        for (int d = 0; d < r; d++) {
+            shape[d] = this.count(d);
+        }
+
+        return this.reshape(shape);
     }
 
     @Override
@@ -305,6 +305,16 @@ public final class ArrayAnyD<N extends Comparable<N>>
         this.loop(initial, dimension, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 
+    /**
+     * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
+     *
+     * @see org.ojalgo.structure.StructureAnyD.Reshapable#flatten()
+     */
+    public Array1D<N> flatten() {
+        return myDelegate.wrapInArray1D();
+    }
+
     @Override
     public N get(final long index) {
         return myDelegate.get(index);
@@ -319,8 +329,8 @@ public final class ArrayAnyD<N extends Comparable<N>>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        result = (prime * result) + Arrays.hashCode(myStructure);
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
+        result = prime * result + Arrays.hashCode(myStructure);
         return result;
     }
 
@@ -432,7 +442,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     @Override
     public Array1D<N> reduce(final int dimension, final Aggregator aggregator) {
         final long reduceToCount = StructureAnyD.count(myStructure, dimension);
-        Array1D<N> retVal = myDelegate.factory().makeZero(reduceToCount).wrapInArray1D();
+        Array1D<N> retVal = myDelegate.factory().make(reduceToCount).wrapInArray1D();
         this.reduce(dimension, aggregator, retVal);
         return retVal;
     }
@@ -449,7 +459,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
         final boolean primitive = myDelegate.isPrimitive();
 
-        Array2D<N> retVal = myDelegate.factory().makeZero(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
+        Array2D<N> retVal = myDelegate.factory().make(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
 
         for (long j = 0L; j < numberOfColumns; j++) {
             final long colInd = j;
@@ -458,7 +468,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
                 final long rowInd = i;
 
                 visitor.reset();
-                this.loop(reference -> (reference[rowDimension] == rowInd) && (reference[columnDimension] == colInd), index -> this.visitOne(index, visitor));
+                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
                 if (primitive) {
                     retVal.set(rowInd, colInd, visitor.doubleValue());
                 } else {
@@ -468,6 +478,17 @@ public final class ArrayAnyD<N extends Comparable<N>>
         }
 
         return retVal;
+    }
+
+    public void reset() {
+        myDelegate.reset();
+    }
+
+    public ArrayAnyD<N> reshape(final long... shape) {
+        if (StructureAnyD.count(shape) != this.count()) {
+            throw new IllegalArgumentException();
+        }
+        return myDelegate.wrapInArrayAnyD(shape);
     }
 
     @Override
@@ -526,6 +547,36 @@ public final class ArrayAnyD<N extends Comparable<N>>
         return new Array1D<>(myDelegate, first.longValue(), limit.longValue(), step.longValue());
     }
 
+    public ArrayAnyD<N> squeeze() {
+
+        long[] oldShape = this.shape();
+
+        int notOne = 0;
+        for (int i = 0; i < oldShape.length; i++) {
+            if (oldShape[i] > 1) {
+                notOne++;
+            }
+        }
+
+        if (notOne == oldShape.length) {
+            return this;
+        }
+        long[] shape = new long[notOne];
+
+        for (int i = 0, d = 0; i < oldShape.length; i++) {
+            long length = oldShape[i];
+            if (length > 1) {
+                shape[d++] = length;
+            }
+        }
+
+        return this.reshape(shape);
+    }
+
+    public void supplyTo(final MutateAnyD receiver) {
+        myDelegate.supplyTo(receiver);
+    }
+
     @Override
     public String toString() {
 
@@ -540,7 +591,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
         retVal.append('>');
 
         final int tmpLength = (int) this.count();
-        if ((tmpLength >= 1) && (tmpLength <= 100)) {
+        if (tmpLength >= 1 && tmpLength <= 100) {
             retVal.append(' ');
             retVal.append(myDelegate.toString());
         }
@@ -581,5 +632,4 @@ public final class ArrayAnyD<N extends Comparable<N>>
     BasicArray<N> getDelegate() {
         return myDelegate;
     }
-
 }

@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -35,6 +36,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -204,36 +206,44 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     }
 
-    public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
+    public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuildingFactory<N, SparseArray<N>, SparseFactory<N>>
+            implements Factory1D<SparseArray<N>> {
 
         SparseFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);
         }
 
-        SparseFactory(final DenseArray.Factory<N> denseFactory, final long count) {
-            super(denseFactory);
-            this.getStrategy().limit(count);
+        public FunctionSet<N> function() {
+            return this.getStrategy().function();
         }
 
         @Override
         public SparseArray<N> make() {
-            return new SparseArray<>(this.getStrategy().limit(), this.getStrategy());
+            return new SparseArray<>(this.getStrategy());
         }
 
         public SparseArray<N> make(final long count) {
-            return new SparseArray<>(count, this.getStrategy().limit(count));
+            return this.limit(count).make();
+        }
+
+        public Scalar.Factory<N> scalar() {
+            return this.getStrategy().scalar();
         }
 
     }
 
-    private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+    private static final NumberContext MATH_CONTEXT = NumberContext.ofMath(MathContext.DECIMAL64);
 
     public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new SparseFactory<>(denseFactory);
     }
 
+    /**
+     * @deprecated v49 Use {@link #factory(org.ojalgo.array.DenseArray.Factory)} instead
+     */
+    @Deprecated
     public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
-        return new SparseFactory<>(denseFactory, count);
+        return SparseArray.factory(denseFactory).limit(count);
     }
 
     /**
@@ -248,11 +258,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseCapacityStrategy<N> strategy) {
+    SparseArray(final DenseCapacityStrategy<N> strategy) {
 
         super(strategy.getDenseFactory());
 
-        myCount = count;
+        myCount = strategy.limit();
 
         myStrategy = strategy;
 

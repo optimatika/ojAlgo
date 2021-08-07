@@ -23,10 +23,9 @@ package org.ojalgo.array.operation;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Given a vector x, the i?amax functions return the position of the vector element x[i] that has the largest
@@ -36,20 +35,20 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class AMAX implements BLAS1 {
+public final class AMAX implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
-    public static <N extends Comparable<N>> long invoke(final BasicArray<N> data, final long first, final long limit, final long step) {
+    public static long invoke(final Access1D<?> data, final long first, final long limit, final long step) {
 
         long retVal = first;
-        double tmpLargest = 0D;
-        double tmpValue;
+        double largest = 0D;
+        double candidate;
 
         for (long i = first; i < limit; i += step) {
-            tmpValue = PrimitiveMath.ABS.invoke(data.doubleValue(i));
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
+            candidate = Math.abs(data.doubleValue(i));
+            if (candidate > largest) {
+                largest = candidate;
                 retVal = i;
             }
         }
@@ -59,13 +58,13 @@ public final class AMAX implements BLAS1 {
     public static int invoke(final BigDecimal[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
-        BigDecimal tmpLargest = BigMath.ZERO;
-        BigDecimal tmpValue;
+        BigDecimal largest = BigMath.ZERO;
+        BigDecimal candidate;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = BigMath.ABS.invoke(data[i]);
-            if (tmpValue.compareTo(tmpLargest) > 0) {
-                tmpLargest = tmpValue;
+            candidate = data[i].abs();
+            if (candidate.compareTo(largest) > 0) {
+                largest = candidate;
                 retVal = i;
             }
         }
@@ -79,7 +78,7 @@ public final class AMAX implements BLAS1 {
         double candidate;
 
         for (int i = first; i < limit; i += step) {
-            candidate = PrimitiveMath.ABS.invoke(data[i]);
+            candidate = Math.abs(data[i]);
             if (candidate > largest) {
                 largest = candidate;
                 retVal = i;
@@ -91,13 +90,13 @@ public final class AMAX implements BLAS1 {
     public static int invoke(final float[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
-        float tmpLargest = 0F;
-        float tmpValue;
+        float largest = 0F;
+        float candidate;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = Math.abs(data[i]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
+            candidate = Math.abs(data[i]);
+            if (candidate > largest) {
+                largest = candidate;
                 retVal = i;
             }
         }
@@ -107,22 +106,17 @@ public final class AMAX implements BLAS1 {
     public static <N extends Scalar<N>> int invoke(final N[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
-        double tmpLargest = 0D;
-        double tmpValue;
+        double largest = 0D;
+        double candidate;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = data[i].norm();
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
+            candidate = data[i].norm();
+            if (candidate > largest) {
+                largest = candidate;
                 retVal = i;
             }
         }
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

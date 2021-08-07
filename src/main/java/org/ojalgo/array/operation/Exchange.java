@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-public final class Exchange implements BLAS1 {
+public final class Exchange implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
@@ -77,10 +77,6 @@ public final class Exchange implements BLAS1 {
             indexA += step;
             indexB += step;
         }
-    }
-
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

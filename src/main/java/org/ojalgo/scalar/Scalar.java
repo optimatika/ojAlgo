@@ -25,9 +25,9 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 
 import org.ojalgo.algebra.Field;
-import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.structure.AccessScalar;
+import org.ojalgo.tensor.Tensor;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -49,8 +49,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<Scalar<N>>, NormedVectorSpace<Scalar<N>, N>,
-        ScalarOperation.Addition<Scalar<N>, N>, ScalarOperation.Division<Scalar<N>, N>, ScalarOperation.Subtraction<Scalar<N>, N>, Comparable<N> {
+public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<Scalar<N>>, ScalarOperation.Addition<Scalar<N>, N>,
+        ScalarOperation.Division<Scalar<N>, N>, ScalarOperation.Subtraction<Scalar<N>, N>, Comparable<N>, Tensor<N, Scalar<N>> {
 
     public interface Factory<N extends Comparable<N>> {
 
@@ -140,6 +140,10 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
         return this.add(addend.get());
     }
 
+    default int dimensions() {
+        return 1;
+    }
+
     @Override
     default Scalar<N> divide(final Scalar<N> divisor) {
         return this.divide(divisor.get());
@@ -155,6 +159,10 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
     @Override
     default Scalar<N> multiply(final Scalar<N> multiplicand) {
         return this.multiply(multiplicand.get());
+    }
+
+    default int rank() {
+        return 0;
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
@@ -99,8 +99,8 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
 
         final long totalCount = StructureAnyD.count(structure);
 
-        final int max = PrimitiveMath.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
-        final int min = PrimitiveMath.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
+        final int max = PowerOf2.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
+        final int min = PowerOf2.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
 
         if (min > max) {
             throw new IllegalArgumentException();

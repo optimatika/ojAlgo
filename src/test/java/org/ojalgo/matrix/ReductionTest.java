@@ -19,7 +19,7 @@ public class ReductionTest {
     @Test
     public void testReduction() {
 
-        BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> builder = Primitive64Matrix.FACTORY.makeDense(2, 3);
+        Primitive64Matrix.DenseReceiver builder = Primitive64Matrix.FACTORY.makeDense(2, 3);
         builder.set(0, 0, 1.0);
         builder.set(0, 1, 2.0);
         builder.set(0, 2, 3.0);

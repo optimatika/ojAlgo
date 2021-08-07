@@ -31,7 +31,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  *
  * @author apete
  */
-public final class AMIN implements BLAS1 {
+public final class AMIN implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -49,11 +49,6 @@ public final class AMIN implements BLAS1 {
             }
         }
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

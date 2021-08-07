@@ -21,7 +21,6 @@
  */
 package org.ojalgo.function.aggregator;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -50,11 +49,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
     }
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -77,14 +72,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.add(anArg);
                 }
 
-                public boolean isMergeable() {
-                    return false;
-                }
-
-                public void merge(final RationalNumber result) {
-                    ProgrammingError.throwForIllegalInvocation();
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myCount = 0;
                     myNumber = RationalNumber.ZERO;
@@ -95,11 +82,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -121,10 +104,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     }
                 }
 
-                public void merge(final RationalNumber result) {
-                    myCount += result.intValue();
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myCount = 0;
                     return this;
@@ -134,11 +113,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> LARGEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> LARGEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -158,10 +133,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = RationalMath.MAX.invoke(myNumber, RationalMath.ABS.invoke(anArg));
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -171,11 +142,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MAX = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> MAX = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -195,10 +162,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = RationalMath.MAX.invoke(myNumber, anArg);
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.NEGATIVE_INFINITY;
                     return this;
@@ -208,11 +171,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -223,9 +182,8 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 public RationalNumber get() {
                     if (RationalNumber.isInfinite(myNumber)) {
                         return RationalNumber.ZERO;
-                    } else {
-                        return myNumber;
                     }
+                    return myNumber;
                 }
 
                 public int intValue() {
@@ -234,10 +192,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void invoke(final RationalNumber anArg) {
                     myNumber = RationalMath.MIN.invoke(myNumber, anArg);
-                }
-
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
@@ -249,11 +203,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM1 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM1 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -273,10 +223,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.add(PrimitiveMath.ABS.invoke(anArg.doubleValue()));
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -286,11 +232,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -311,10 +253,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.add(tmpMod * tmpMod);
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -324,11 +262,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -348,10 +282,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.multiply(anArg);
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ONE;
                     return this;
@@ -361,11 +291,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -385,10 +311,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.multiply(anArg.multiply(anArg));
                 }
 
-                public void merge(final RationalNumber result) {
-                    myNumber = myNumber.multiply(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ONE;
                     return this;
@@ -398,11 +320,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final RationalAggregator SET = new RationalAggregator();
+
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -413,9 +333,8 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 public RationalNumber get() {
                     if (RationalNumber.isInfinite(myNumber)) {
                         return RationalNumber.ZERO;
-                    } else {
-                        return myNumber;
                     }
+                    return myNumber;
                 }
 
                 public int intValue() {
@@ -428,10 +347,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     }
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.POSITIVE_INFINITY;
                     return this;
@@ -441,11 +356,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -465,10 +376,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.add(anArg);
                 }
 
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -478,11 +385,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         }
     };
 
-    /**
-     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
-     */
-    @Deprecated
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+    private static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM2 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
@@ -502,10 +405,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myNumber = myNumber.add(anArg.multiply(anArg));
                 }
 
-                public void merge(final RationalNumber result) {
-                    myNumber = myNumber.add(result);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -514,8 +413,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             };
         }
     };
-
-    private static final RationalAggregator SET = new RationalAggregator();
 
     public static RationalAggregator getSet() {
         return SET;

@@ -68,9 +68,9 @@ public final class HouseholderHermitian implements ArrayOperation {
         for (int c = tmpFirst; c < tmpLength; c++) {
             tmpVal += tmpVector[c] * worker[c];
         }
-        tmpVal *= (tmpBeta / PrimitiveMath.TWO);
+        tmpVal *= tmpBeta / PrimitiveMath.TWO;
         for (int c = tmpFirst; c < tmpLength; c++) {
-            worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
+            worker[c] = tmpBeta * (worker[c] - tmpVal * tmpVector[c]);
         }
 
         if (tmpCount > HermitianRank2Update.THRESHOLD) {
@@ -174,7 +174,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        COPY.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
+        FillMatchingSingle.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
@@ -192,9 +192,9 @@ public final class HouseholderHermitian implements ArrayOperation {
                 // Skip generation, already zero
                 e[i] = d[l];
                 for (int j = 0; j < i; j++) {
-                    d[j] = data[l + (tmpRowDim * j)];
-                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO; // Are both needed?
-                    data[j + (tmpRowDim * i)] = PrimitiveMath.ZERO; // Could cause cache-misses
+                    d[j] = data[l + tmpRowDim * j];
+                    data[i + tmpRowDim * j] = PrimitiveMath.ZERO; // Are both needed?
+                    data[j + tmpRowDim * i] = PrimitiveMath.ZERO; // Could cause cache-misses
                 }
 
             } else {
@@ -218,10 +218,10 @@ public final class HouseholderHermitian implements ArrayOperation {
                 // Remaing refers to all columns "before" the target col
                 for (int j = 0; j < i; j++) {
                     f = d[j];
-                    data[j + (tmpRowDim * i)] = f;
-                    g = e[j] + (data[j + (tmpRowDim * j)] * f);
+                    data[j + tmpRowDim * i] = f;
+                    g = e[j] + data[j + tmpRowDim * j] * f;
                     for (int k = j + 1; k <= l; k++) {
-                        tmpVal = data[k + (tmpRowDim * j)];
+                        tmpVal = data[k + tmpRowDim * j];
                         g += tmpVal * d[k]; // access the same element in z twice
                         e[k] += tmpVal * f;
                     }
@@ -238,10 +238,10 @@ public final class HouseholderHermitian implements ArrayOperation {
                     f = d[j];
                     g = e[j];
                     for (int k = j; k <= l; k++) {
-                        data[k + (tmpRowDim * j)] -= ((f * e[k]) + (g * d[k]));
+                        data[k + tmpRowDim * j] -= f * e[k] + g * d[k];
                     }
-                    d[j] = data[l + (tmpRowDim * j)];
-                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+                    d[j] = data[l + tmpRowDim * j];
+                    data[i + tmpRowDim * j] = PrimitiveMath.ZERO;
                 }
             }
             d[i] = h;
@@ -254,32 +254,32 @@ public final class HouseholderHermitian implements ArrayOperation {
 
                 final int l = i + 1;
 
-                data[tmpLast + (tmpRowDim * i)] = data[i + (tmpRowDim * i)];
-                data[i + (tmpRowDim * i)] = PrimitiveMath.ONE;
+                data[tmpLast + tmpRowDim * i] = data[i + tmpRowDim * i];
+                data[i + tmpRowDim * i] = PrimitiveMath.ONE;
                 h = d[l];
                 if (h != PrimitiveMath.ZERO) {
                     for (int k = 0; k <= i; k++) {
-                        d[k] = data[k + (tmpRowDim * l)] / h;
+                        d[k] = data[k + tmpRowDim * l] / h;
                     }
                     for (int j = 0; j <= i; j++) {
                         g = PrimitiveMath.ZERO;
                         for (int k = 0; k <= i; k++) {
-                            g += data[k + (tmpRowDim * l)] * data[k + (tmpRowDim * j)];
+                            g += data[k + tmpRowDim * l] * data[k + tmpRowDim * j];
                         }
                         for (int k = 0; k <= i; k++) {
-                            data[k + (tmpRowDim * j)] -= g * d[k];
+                            data[k + tmpRowDim * j] -= g * d[k];
                         }
                     }
                 }
                 for (int k = 0; k <= i; k++) {
-                    data[k + (tmpRowDim * l)] = PrimitiveMath.ZERO;
+                    data[k + tmpRowDim * l] = PrimitiveMath.ZERO;
                 }
             }
             for (int j = 0; j < n; j++) {
-                d[j] = data[tmpLast + (tmpRowDim * j)];
-                data[tmpLast + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+                d[j] = data[tmpLast + tmpRowDim * j];
+                data[tmpLast + tmpRowDim * j] = PrimitiveMath.ZERO;
             }
-            data[tmpLast + (tmpRowDim * tmpLast)] = PrimitiveMath.ONE;
+            data[tmpLast + tmpRowDim * tmpLast] = PrimitiveMath.ONE;
 
             e[0] = PrimitiveMath.ZERO;
         }
@@ -315,48 +315,48 @@ public final class HouseholderHermitian implements ArrayOperation {
             if (l > 0) {
 
                 for (int k = 0; k < i; k++) {
-                    scale += PrimitiveMath.ABS.invoke(data[i + (k * tmpRowDim)]);
+                    scale += PrimitiveMath.ABS.invoke(data[i + k * tmpRowDim]);
                 }
 
                 // if (scale == PrimitiveMath.ZERO) {
                 if (NumberContext.compare(scale, PrimitiveMath.ZERO) == 0) {
-                    e[i] = data[i + (l * tmpRowDim)];
+                    e[i] = data[i + l * tmpRowDim];
                 } else {
                     for (int k = 0; k < i; k++) {
-                        data[i + (k * tmpRowDim)] /= scale;
-                        h += data[i + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                        data[i + k * tmpRowDim] /= scale;
+                        h += data[i + k * tmpRowDim] * data[i + k * tmpRowDim];
                     }
-                    f = data[i + (l * tmpRowDim)];
-                    g = (f >= PrimitiveMath.ZERO) ? -PrimitiveMath.SQRT.invoke(h) : PrimitiveMath.SQRT.invoke(h);
+                    f = data[i + l * tmpRowDim];
+                    g = f >= PrimitiveMath.ZERO ? -PrimitiveMath.SQRT.invoke(h) : PrimitiveMath.SQRT.invoke(h);
                     e[i] = scale * g;
                     h -= f * g;
-                    data[i + (l * tmpRowDim)] = f - g;
+                    data[i + l * tmpRowDim] = f - g;
                     f = PrimitiveMath.ZERO;
                     for (int j = 0; j < i; j++) {
                         if (yesvecs) {
-                            data[j + (i * tmpRowDim)] = data[i + (j * tmpRowDim)] / h;
+                            data[j + i * tmpRowDim] = data[i + j * tmpRowDim] / h;
                         }
                         g = PrimitiveMath.ZERO;
-                        for (int k = 0; k < (j + 1); k++) {
-                            g += data[j + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                        for (int k = 0; k < j + 1; k++) {
+                            g += data[j + k * tmpRowDim] * data[i + k * tmpRowDim];
                         }
                         for (int k = j + 1; k < i; k++) {
-                            g += data[k + (j * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                            g += data[k + j * tmpRowDim] * data[i + k * tmpRowDim];
                         }
                         e[j] = g / h;
-                        f += e[j] * data[i + (j * tmpRowDim)];
+                        f += e[j] * data[i + j * tmpRowDim];
                     }
                     hh = f / (h + h);
                     for (int j = 0; j < i; j++) {
-                        f = data[i + (j * tmpRowDim)];
-                        e[j] = g = e[j] - (hh * f);
-                        for (int k = 0; k < (j + 1); k++) {
-                            data[j + (k * tmpRowDim)] -= ((f * e[k]) + (g * data[i + (k * tmpRowDim)]));
+                        f = data[i + j * tmpRowDim];
+                        e[j] = g = e[j] - hh * f;
+                        for (int k = 0; k < j + 1; k++) {
+                            data[j + k * tmpRowDim] -= f * e[k] + g * data[i + k * tmpRowDim];
                         }
                     }
                 }
             } else {
-                e[i] = data[i + (l * tmpRowDim)];
+                e[i] = data[i + l * tmpRowDim];
             }
             d[i] = h;
         }
@@ -370,28 +370,23 @@ public final class HouseholderHermitian implements ArrayOperation {
                     for (int j = 0; j < i; j++) {
                         g = PrimitiveMath.ZERO;
                         for (int k = 0; k < i; k++) {
-                            g += data[i + (k * tmpRowDim)] * data[k + (j * tmpRowDim)];
+                            g += data[i + k * tmpRowDim] * data[k + j * tmpRowDim];
                         }
                         for (int k = 0; k < i; k++) {
-                            data[k + (j * tmpRowDim)] -= g * data[k + (i * tmpRowDim)];
+                            data[k + j * tmpRowDim] -= g * data[k + i * tmpRowDim];
                         }
                     }
                 }
-                d[i] = data[i + (i * tmpRowDim)];
-                data[i + (i * tmpRowDim)] = PrimitiveMath.ONE;
+                d[i] = data[i + i * tmpRowDim];
+                data[i + i * tmpRowDim] = PrimitiveMath.ONE;
                 for (int j = 0; j < i; j++) {
-                    data[i + (j * tmpRowDim)] = PrimitiveMath.ZERO;
-                    data[j + (i * tmpRowDim)] = PrimitiveMath.ZERO;
+                    data[i + j * tmpRowDim] = PrimitiveMath.ZERO;
+                    data[j + i * tmpRowDim] = PrimitiveMath.ZERO;
                 }
             } else {
-                d[i] = data[i + (i * tmpRowDim)];
+                d[i] = data[i + i * tmpRowDim];
             }
         }
-    }
-
-    @Override
-    public int threshold() {
-        return Math.min(MultiplyHermitianAndVector.THRESHOLD, HermitianRank2Update.THRESHOLD);
     }
 
 }

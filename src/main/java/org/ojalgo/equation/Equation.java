@@ -53,11 +53,11 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     }
 
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
-        return new Equation(pivot, SparseArray.factory(factory, cols).make(), ZERO);
+        return new Equation(pivot, SparseArray.factory(factory).limit(cols).make(), ZERO);
     }
 
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory, final int numberOfNonzeros) {
-        return new Equation(pivot, SparseArray.factory(factory, cols).initial(numberOfNonzeros).make(), ZERO);
+        return new Equation(pivot, SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), ZERO);
     }
 
     public static List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
@@ -65,7 +65,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(i, SparseArray.factory(factory, cols).make(), ZERO));
+            system.add(new Equation(i, SparseArray.factory(factory).limit(cols).make(), ZERO));
         }
 
         return system;
@@ -76,7 +76,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(i, SparseArray.factory(factory, cols).initial(numberOfNonzeros).make(), ZERO));
+            system.add(new Equation(i, SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), ZERO));
         }
 
         return system;
@@ -98,7 +98,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     @Deprecated
     public Equation(final int row, final long numberOfColumns, final double rhs) {
-        this(row, SparseArray.factory(Primitive64Array.FACTORY, numberOfColumns).make(), rhs);
+        this(row, SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).make(), rhs);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     @Deprecated
     public Equation(final int row, final long numberOfColumns, final double rhs, final int numberOfNonzeros) {
-        this(row, SparseArray.factory(Primitive64Array.FACTORY, numberOfColumns).initial(numberOfNonzeros).make(), rhs);
+        this(row, SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).initial(numberOfNonzeros).make(), rhs);
     }
 
     Equation(final int pivot, final BasicArray<Double> elements, final double rhs) {
@@ -163,10 +163,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Equation)) {
+        if (obj == null || !(obj instanceof Equation)) {
             return false;
         }
         final Equation other = (Equation) obj;
@@ -198,7 +195,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + index;
+        result = prime * result + index;
         return result;
     }
 

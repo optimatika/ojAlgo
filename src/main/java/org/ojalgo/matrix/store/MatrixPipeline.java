@@ -24,18 +24,18 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Transformation2D;
 
 abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSupplier<N> {
 
     static final class BinaryOperatorLeft<N extends Comparable<N>> extends MatrixPipeline<N> {
 
-        private final MatrixStore<N> myLeft;
+        private final Access2D<N> myLeft;
         private final BinaryFunction<N> myOperator;
 
-        BinaryOperatorLeft(final MatrixStore<N> left, final BinaryFunction<N> operator, final ElementsSupplier<N> right) {
+        BinaryOperatorLeft(final Access2D<N> left, final BinaryFunction<N> operator, final ElementsSupplier<N> right) {
             super(right);
             myLeft = left;
             myOperator = operator;
@@ -51,9 +51,9 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
     static final class BinaryOperatorRight<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myOperator;
-        private final MatrixStore<N> myRight;
+        private final Access2D<N> myRight;
 
-        BinaryOperatorRight(final ElementsSupplier<N> left, final BinaryFunction<N> operator, final MatrixStore<N> right) {
+        BinaryOperatorRight(final ElementsSupplier<N> left, final BinaryFunction<N> operator, final Access2D<N> right) {
             super(left);
             myRight = right;
             myOperator = operator;
@@ -100,14 +100,9 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         private final MatrixStore<N> myBase;
 
         ColumnsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
-            super(base);
+            super(base, 1L, base.countColumns());
             myBase = base;
             myAggregator = aggregator;
-        }
-
-        @Override
-        public long countRows() {
-            return 1L;
         }
 
         @Override
@@ -124,20 +119,10 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
         Multiplication(final Access1D<N> left, final MatrixStore<N> right) {
 
-            super(right);
+            super(right, left.count() / right.countRows(), right.countColumns());
 
             myLeft = left;
             myRight = right;
-        }
-
-        @Override
-        public long countColumns() {
-            return myRight.countColumns();
-        }
-
-        @Override
-        public long countRows() {
-            return myLeft.count() / myRight.countRows();
         }
 
         @Override
@@ -181,14 +166,9 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         private final MatrixStore<N> myBase;
 
         RowsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
-            super(base);
+            super(base, base.countRows(), 1L);
             myBase = base;
             myAggregator = aggregator;
-        }
-
-        @Override
-        public long countColumns() {
-            return 1L;
         }
 
         @Override
@@ -217,26 +197,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
     static final class Transpose<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         Transpose(final ElementsSupplier<N> context) {
-            super(context);
-        }
-
-        @Override
-        public long countColumns() {
-            return this.getContext().countRows();
-        }
-
-        @Override
-        public long countRows() {
-            return this.getContext().countColumns();
-        }
-
-        public MatrixStore<N> get() {
-
-            final PhysicalStore<N> retVal = this.physical().makeZero(this.getContext().countRows(), this.getContext().countColumns());
-
-            this.supplyTo(retVal);
-
-            return retVal;
+            super(context, context.countColumns(), context.countRows());
         }
 
         public ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
@@ -277,31 +238,35 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         }
     }
 
+    private final long myColumnsCount;
     private final ElementsSupplier<N> myContext;
+    private final long myRowsCount;
 
-    protected MatrixPipeline(final ElementsSupplier<N> context) {
+    MatrixPipeline(final ElementsSupplier<N> context) {
+        this(context, context.countRows(), context.countColumns());
+    }
+
+    MatrixPipeline(final ElementsSupplier<N> context, final long rowsCount, final long columnsCount) {
         super();
         myContext = context;
+        myRowsCount = rowsCount;
+        myColumnsCount = columnsCount;
     }
 
-    public long countColumns() {
-        return myContext.countColumns();
+    public final long countColumns() {
+        return myColumnsCount;
     }
 
-    public long countRows() {
-        return myContext.countRows();
-    }
-
-    public final Factory<N, ?> physical() {
-        return myContext.physical();
+    public final long countRows() {
+        return myRowsCount;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return myContext.toString();
     }
 
-    ElementsSupplier<N> getContext() {
+    final ElementsSupplier<N> getContext() {
         return myContext;
     }
 

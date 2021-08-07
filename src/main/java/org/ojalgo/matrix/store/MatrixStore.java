@@ -22,13 +22,13 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.Matrix2D;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -63,9 +63,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Comparable<N>>
-        extends ElementsSupplier<N>, Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
-        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
+        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>> {
 
     public interface Factory<N extends Comparable<N>> {
 
@@ -209,17 +208,6 @@ public interface MatrixStore<N extends Comparable<N>>
             return this.above((MatrixStore<N>[]) new MatrixStore<?>[] { above1, above2 });
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> above(final N... elements) {
-            MatrixStore<N> above = LogicalBuilder.buildRow(myStore.physical(), myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(above, myStore);
-            return this;
-        }
-
         public LogicalBuilder<N> below(final long numberOfRows) {
             ZeroStore<N> below = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(myStore, below);
@@ -244,42 +232,11 @@ public interface MatrixStore<N extends Comparable<N>>
             return this.below((MatrixStore<N>[]) new MatrixStore<?>[] { below1, below2 });
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> below(final N... elements) {
-            MatrixStore<N> below = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
-            myStore = new AboveBelowStore<>(myStore, below);
-            return this;
-        }
-
         public LogicalBuilder<N> bidiagonal(final boolean upper) {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = null;
-            Access1D<N> subdiagonal = null;
             if (upper) {
-                superdiagonal = myStore.sliceDiagonal(0, 1);
+                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
             } else {
-                subdiagonal = myStore.sliceDiagonal(1, 0);
-            }
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
-            return this;
-        }
-
-        /**
-         * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
-         */
-        @Deprecated
-        public LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
-            if (upper) {
-                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
-            } else {
-                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), assumeOne);
+                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
             }
             return this;
         }
@@ -294,10 +251,6 @@ public interface MatrixStore<N extends Comparable<N>>
             return this;
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#conjugate()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
@@ -305,14 +258,6 @@ public interface MatrixStore<N extends Comparable<N>>
                 myStore = new ConjugatedStore<>(myStore);
             }
             return this;
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public PhysicalStore<N> copy() {
-            return myStore.copy();
         }
 
         public long count() {
@@ -328,11 +273,7 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         public LogicalBuilder<N> diagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, null, null);
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
             return this;
         }
 
@@ -368,15 +309,11 @@ public interface MatrixStore<N extends Comparable<N>>
             return myStore;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<>(myStore);
+                myStore = new UpperSymmetricStore<>(myStore, true);
             } else {
-                myStore = new LowerHermitianStore<>(myStore);
+                myStore = new LowerSymmetricStore<>(myStore, true);
             }
             return this;
         }
@@ -415,17 +352,6 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> left(final N... elements) {
-            MatrixStore<N> left = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(left, myStore);
-            return this;
-        }
-
-        /**
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
@@ -440,8 +366,8 @@ public interface MatrixStore<N extends Comparable<N>>
             return this;
         }
 
-        public PhysicalStore.Factory<N, ?> physical() {
-            return myStore.physical();
+        public ElementsSupplier<N> operate() {
+            return this;
         }
 
         public LogicalBuilder<N> repeat(final int rowsRepetitions, final int columnsRepetitions) {
@@ -482,17 +408,6 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public LogicalBuilder<N> right(final N... elements) {
-            MatrixStore<N> right = LogicalBuilder.buildColumn(myStore.physical(), myStore.countRows(), elements);
-            myStore = new LeftRightStore<>(myStore, right);
-            return this;
-        }
-
-        /**
          * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
          * and any negative row reference/index will translate to a row of zeros. The number of rows in the
          * resulting matrix is the same as the number of elements in the rows index array.
@@ -502,39 +417,30 @@ public interface MatrixStore<N extends Comparable<N>>
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
+        public LogicalBuilder<N> superimpose(final long row, final long col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        public LogicalBuilder<N> superimpose(final int row, final int col, final N matrix) {
-            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
-            return this;
-        }
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
         public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
         }
 
         public void supplyTo(final TransformableRegion<N> receiver) {
-            if (receiver.isAcceptable(this)) {
-                receiver.accept(this.get());
-            } else {
+            if (!receiver.isAcceptable(this)) {
                 throw new ProgrammingError("Not acceptable!");
             }
+            receiver.accept(this.get());
+        }
+
+        public LogicalBuilder<N> symmetric(final boolean upper) {
+            if (upper) {
+                myStore = new UpperSymmetricStore<>(myStore, false);
+            } else {
+                myStore = new LowerSymmetricStore<>(myStore, false);
+            }
+            return this;
         }
 
         @Override
@@ -542,10 +448,6 @@ public interface MatrixStore<N extends Comparable<N>>
             return myStore.toString();
         }
 
-        /**
-         * @deprecated v48 Use {@link MatrixStore#transpose()} instead
-         */
-        @Deprecated
         public LogicalBuilder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();
@@ -565,13 +467,7 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         public LogicalBuilder<N> tridiagonal() {
-            PhysicalStore.Factory<N, ?> factory = myStore.physical();
-            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
-            Access1D<N> superdiagonal = myStore.sliceDiagonal(0, 1);
-            Access1D<N> subdiagonal = myStore.sliceDiagonal(1, 0);
-            long numbRows = myStore.countRows();
-            long numbCols = myStore.countColumns();
-            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
+            myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
             return this;
         }
 
@@ -749,8 +645,16 @@ public interface MatrixStore<N extends Comparable<N>>
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
+    default MatrixStore<N> add(final double scalarAddend) {
+        return this.add(this.physical().scalar().cast(scalarAddend));
+    }
+
     default MatrixStore<N> add(final MatrixStore<N> addend) {
-        return this.onMatching(this.physical().function().add(), addend).get();
+        return this.onMatching(this.physical().function().add(), addend).collect(this.physical());
+    }
+
+    default MatrixStore<N> add(final N scalarAddend) {
+        return this.onAll(this.physical().function().add().second(scalarAddend)).get();
     }
 
     default N aggregateAll(final Aggregator aggregator) {
@@ -823,6 +727,14 @@ public interface MatrixStore<N extends Comparable<N>>
         return retVal;
     }
 
+    default MatrixStore<N> divide(final double scalarDivisor) {
+        return this.divide(this.physical().scalar().cast(scalarDivisor));
+    }
+
+    default MatrixStore<N> divide(final N scalarDivisor) {
+        return this.onAll(this.physical().function().divide().second(scalarDivisor)).get();
+    }
+
     default double doubleValue(final long row, final long col) {
         return NumberDefinition.doubleValue(this.get(row, col));
     }
@@ -856,6 +768,34 @@ public interface MatrixStore<N extends Comparable<N>>
         return this;
     }
 
+    default long indexOfLargestInColumn(final long row, final long col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, col + 1L);
+        long step = 1L;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
+    default long indexOfLargestInRange(final long first, final long limit) {
+        return AMAX.invoke(this, first, limit, 1L);
+    }
+
+    default long indexOfLargestInRow(final long row, final long col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, row, this.countColumns());
+        long step = structure;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
+    default long indexOfLargestOnDiagonal(final long start) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, start, start);
+        long limit = Structure2D.index(structure, structure, this.countColumns());
+        long step = structure + 1L;
+        return AMAX.invoke(this, first, limit, step);
+    }
+
     default boolean isAbsolute(final long row, final long col) {
         return this.toScalar(row, col).isAbsolute();
     }
@@ -874,9 +814,9 @@ public interface MatrixStore<N extends Comparable<N>>
             ComplexNumber lowerLeft;
             ComplexNumber upperRight;
 
-            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+            for (int j = 0; retVal && j < numberOfColumns; j++) {
                 retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(this.get(j, j)).i);
-                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                for (int i = j + 1; retVal && i < numberOfRows; i++) {
                     lowerLeft = ComplexNumber.valueOf(this.get(i, j)).conjugate();
                     upperRight = ComplexNumber.valueOf(this.get(j, i));
                     retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, lowerLeft.subtract(upperRight).norm());
@@ -885,8 +825,8 @@ public interface MatrixStore<N extends Comparable<N>>
 
         } else {
 
-            for (int j = 0; retVal && (j < numberOfColumns); j++) {
-                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+            for (int j = 0; retVal && j < numberOfColumns; j++) {
+                for (int i = j + 1; retVal && i < numberOfRows; i++) {
                     retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, this.doubleValue(i, j) - this.doubleValue(j, i));
                 }
             }
@@ -938,8 +878,8 @@ public interface MatrixStore<N extends Comparable<N>>
         target.fillByMultiplying(this, right);
     }
 
-    default MatrixStore<N> multiply(final double scalar) {
-        return this.multiply(this.physical().scalar().cast(scalar));
+    default MatrixStore<N> multiply(final double scalarMultiplicand) {
+        return this.multiply(this.physical().scalar().cast(scalarMultiplicand));
     }
 
     default MatrixStore<N> multiply(final MatrixStore<N> right) {
@@ -954,8 +894,8 @@ public interface MatrixStore<N extends Comparable<N>>
         return retVal;
     }
 
-    default MatrixStore<N> multiply(final N scalar) {
-        return this.onAll(this.physical().function().multiply().second(scalar)).get();
+    default MatrixStore<N> multiply(final N scalarMultiplicand) {
+        return this.onAll(this.physical().function().multiply().second(scalarMultiplicand)).get();
     }
 
     /**
@@ -988,16 +928,21 @@ public interface MatrixStore<N extends Comparable<N>>
 
         if (this.isVector()) {
             return frobeniusNorm;
-        } else {
-            // Bringing it closer to what the operator norm would be
-            // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-            return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
         }
+        // Bringing it closer to what the operator norm would be
+        // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
+        return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
     }
 
     default MatrixStore<N> onAll(final UnaryFunction<N> operator) {
         return new UnaryOperatoStore<>(this, operator);
     }
+
+    default ElementsSupplier<N> operate() {
+        return this;
+    }
+
+    PhysicalStore.Factory<N, ?> physical();
 
     /**
      * Multiply this matrix by itself {@code power} times.
@@ -1018,41 +963,42 @@ public interface MatrixStore<N extends Comparable<N>>
 
             return factory.builder().makeIdentity(this.countRows()).get();
 
-        } else if (power == 1) {
+        }
+        if (power == 1) {
 
             return this;
 
-        } else if (power == 2) {
+        }
+        if (power == 2) {
 
             return this.multiply(this);
 
-        } else if ((power % 2) == 0) {
+        }
+        if (power % 2 == 0) {
             // 4,6,8,10...
 
             return this.power(2).power(power / 2);
 
-        } else if (power > 8) {
+        }
+        if (power > 8) {
             // 9,11,13,15...
 
             return this.power(power - 1).multiply(this);
 
-        } else {
-            // 3,5,7
-
-            PhysicalStore<N> right = factory.make(this);
-            PhysicalStore<N> product = factory.make(this);
-            PhysicalStore<N> temp;
-
-            this.multiply(this, product);
-            for (int i = 2; i < power; i++) {
-                temp = right;
-                right = product;
-                product = temp;
-                this.multiply(right, product);
-            }
-
-            return product;
         }
+        PhysicalStore<N> right = factory.make(this);
+        PhysicalStore<N> product = factory.make(this);
+        PhysicalStore<N> temp;
+
+        this.multiply(this, product);
+        for (int i = 2; i < power; i++) {
+            temp = right;
+            right = product;
+            product = temp;
+            this.multiply(right, product);
+        }
+
+        return product;
     }
 
     /**
@@ -1174,8 +1120,16 @@ public interface MatrixStore<N extends Comparable<N>>
         };
     }
 
+    default MatrixStore<N> subtract(final double scalarSubtrahend) {
+        return this.subtract(this.physical().scalar().cast(scalarSubtrahend));
+    }
+
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.onMatching(this.physical().function().subtract(), subtrahend).get();
+        return this.onMatching(this.physical().function().subtract(), subtrahend).collect(this.physical());
+    }
+
+    default MatrixStore<N> subtract(final N scalarSubtrahend) {
+        return this.onAll(this.physical().function().subtract().second(scalarSubtrahend)).get();
     }
 
     default void supplyTo(final TransformableRegion<N> receiver) {

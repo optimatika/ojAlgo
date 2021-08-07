@@ -111,9 +111,8 @@ public abstract class RationalMath {
     public static final RationalFunction.Unary ABS = arg -> {
         if (arg.compareTo(RationalNumber.ZERO) == -1) {
             return arg.negate();
-        } else {
-            return arg;
         }
+        return arg;
     };
     public static final RationalFunction.Unary ACOS = arg -> {
 
@@ -193,8 +192,7 @@ public abstract class RationalMath {
 
         return RationalNumber.valueOf(tmpRet);
     };
-    public static final RationalFunction.Unary COSH = arg -> (RationalMath.EXP.invoke(arg).add(RationalMath.EXP.invoke(arg.negate())))
-            .divide(RationalNumber.TWO);
+    public static final RationalFunction.Unary COSH = arg -> RationalMath.EXP.invoke(arg).add(RationalMath.EXP.invoke(arg.negate())).divide(RationalNumber.TWO);
     public static final RationalFunction.Binary DIVIDE = (arg1, arg2) -> arg1.divide(arg2);
     public static final RationalFunction.Unary EXP = arg -> {
 
@@ -324,7 +322,7 @@ public abstract class RationalMath {
 
         return RationalNumber.valueOf(tmpRet);
     };
-    public static final RationalFunction.Unary SINH = arg -> (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(RationalNumber.TWO);
+    public static final RationalFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(RationalNumber.TWO);
     public static final RationalFunction.Unary SQRT = arg -> {
 
         final BigDecimal tmpArg = arg.toBigDecimal();

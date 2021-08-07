@@ -4,7 +4,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface Operate2D<N extends Comparable<N>, A extends Access2D<N>, P extends Operate2D<N, A, P>> {
+public interface Operate2D<N extends Comparable<N>, P extends Operate2D<N, P>> {
 
     default P onAll(final BinaryFunction<N> operator, final double right) {
         return this.onAll(operator.second(right));
@@ -32,9 +32,9 @@ public interface Operate2D<N extends Comparable<N>, A extends Access2D<N>, P ext
 
     P onColumns(BinaryFunction<N> operator, Access1D<N> right);
 
-    P onMatching(A left, BinaryFunction<N> operator);
+    P onMatching(Access2D<N> left, BinaryFunction<N> operator);
 
-    P onMatching(BinaryFunction<N> operator, A right);
+    P onMatching(BinaryFunction<N> operator, Access2D<N> right);
 
     P onRows(BinaryFunction<N> operator, Access1D<N> right);
 
@@ -106,7 +106,7 @@ public interface Operate2D<N extends Comparable<N>, A extends Access2D<N>, P ext
      * @deprecated v49
      */
     @Deprecated
-    default P operateOnMatching(final A left, final BinaryFunction<N> operator) {
+    default P operateOnMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
         return this.onMatching(left, operator);
     }
 
@@ -114,7 +114,7 @@ public interface Operate2D<N extends Comparable<N>, A extends Access2D<N>, P ext
      * @deprecated v49
      */
     @Deprecated
-    default P operateOnMatching(final BinaryFunction<N> operator, final A right) {
+    default P operateOnMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
         return this.onMatching(operator, right);
     }
 

@@ -11,6 +11,90 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.0.0] – 2021-08-??
+
+- Many things that have been deprecated for a while are now actually removed. Not all are mentioned specifically below.
+
+### Added
+
+#### org.ojalgo.ann
+
+- Now possible to train and invoke/evaluate neural networks in batches.
+
+#### org.ojalgo.array
+
+- `Array2D` and `ArrayAnyD` are now reshapable
+
+#### org.ojalgo.concurrent
+
+- Additions to `DaemonPoolExecutor`: A `ThreadFactory` factory method, as well as a set of `ExecutorService` factory methods that makes use of that.
+- New utility `ProcessingService` standardise/simplify some `ExecutorService` usage.
+
+#### org.ojalgo.data
+
+- New `DataBatch` class. It's a resuable component to help collect 1D data in a 2D structure. Can be used with neural networks (and other things) to batch data.
+
+#### org.ojalgo.matrix
+
+- New interface `Matrix2D` common to both `BasicMatrix` (implements it) and `MatrixStore` (extends it).
+- Additional matrix multiplication variants implemented.
+
+#### org.ojalgo.structure
+
+- A few additions to `Structure2D.Logical` like `symmetric(...)` and `superimpose(...)`
+- New interface `Structure2D.Reshapable` and `StructureAnyD.Reshapable`
+- `AccessAnyD` is now vector-terable in the same way it was already matrix-iterable – it now has a method `vectors()` and there is a new utility class `VectorView`.
+- `Structure2D` now directlty define the `int` valued `getRowDim()`, `getColDim()`, `getMinDim()` and `getMaxDim()` methods.
+
+#### org.ojalgo.tensor
+
+- This package existed before but didn't really contain anything functional/useful – now it does. Now it contains 1D, 2D, and AnyD tensor implementations. These are not just (multi dimensional) arrays, but mathematical tensors as used by physicists and engineers. They are instatiated via special factories that implement various tensor products and direct sums. Further these factories are implemented as wrappers of (they delegate to) other 1D, 2D or AnyD factories. This means that just about any other data structure in ojAlgo can be created using the tensor product or direct sum implemenatations of these factories.
+
+### Changed
+
+#### org.ojalgo.ann
+
+- Internal refactoring to `ArtificialNeuralNetwork` primarily to improve performance.
+- The activator RECTIFIER has been deprecated/renamed RELU which is more in line with what users expect.
+
+#### org.ojalgo.concurrent
+
+- Changed the `Parallelism` enum. Changed which instances are available but increased flexibility by implemention the new `ParallelismSupplier` interface. 
+
+#### org.ojalgo.matrix
+
+- `ElementsSupplier` no longer extends `Supplier<MatrixStore<N>>` and no longer defines the method `PhysicalStore.Factory<N, ?> physical()`. Instead subinterfaces/implementors define corresponding functionality as needed.
+- According to the docs `ShadingStore`:s (`LogicalStore`:s that shade some elements) are not allowed to alter the size/shape of the matrix they shade, but several implementations did that anyway. This is now corrected. Some matrix decomposition implementations relied on that faulty behaviour when constructing various component matrices. That had to be changed as well.
+- Changed, re-tuned, the matrix multiplication concurrency thresholds. 
+
+#### org.ojalgo.structure
+
+- The nested interfaces `Mutate1D.ModifiableReceiver`, `Mutate2D.ModifiableReceiver` and `MutateAnyD.ModifiableReceiver` now also extend `Access*D` which makes them aligned with the requirements of the `Transformation*D` interfaces.
+
+### Fixed
+
+#### org.ojalgo.ann
+
+- Some `ArtificialNeuralNetwork` input would cause matrix calculation problems. The input is typed as `Access1D<Double>` which essentially means any ojAlgo data structure. In the case where the actual/specific type used mached the internal types, but with wrong shape (transposed), there would be matrix multiplication problems. This no longer happens. 
+
+### Removed
+
+#### org.ojalgo.function
+
+- `FunctionUtils`, that only contained deprecated (moved) utility functions, has been deleted.
+
+#### org.ojalgo.matrix
+
+- The entire package `org.ojalgo.matrix.geometry` has been removed. Not deprecated, removed directly. It was never finished, not tested, and now it was in the way of refactoring other matrix stuff. Anything it did can just as well be done with the normal matrix classes.
+- `MatrixUtils`, that only contained deprecated (moved) utility functions, has been deleted.
+
+#### org.ojalgo.random
+
+- `RandomUtils`, that only contained deprecated (moved) utility functions, has been deleted.
+
+#### org.ojalgo.structure
+
+- The interfaces `Stream*D` have been removed – they were redundant. The `Operate*D` interfaces replace them.
 
 ## [48.4.2] – 2021-04-22
 
@@ -1175,7 +1259,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 The first version to require Java 8!
 
 
-## [37.0.0] / [37.1.0]
+## [37.0.0] / [37.1.0] / [37.1.1]
 
 ### Changed
 

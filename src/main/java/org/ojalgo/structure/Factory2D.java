@@ -23,12 +23,14 @@ package org.ojalgo.structure;
 
 import java.util.List;
 
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.scalar.Scalar.Factory;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */
@@ -75,7 +77,7 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
      *
      * @author apete
      */
-    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.ModifiableReceiver<?>> extends Factory2D<I> {
+    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.Receiver<?>> extends Factory2D<I> {
 
         DR makeDense(long rows, long columns);
 
@@ -89,6 +91,24 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return this.makeSparse(shape.countRows(), shape.countColumns());
         }
 
+    }
+
+    default Factory1D<I> asFactory1D() {
+        return new Factory1D<I>() {
+
+            public FunctionSet<?> function() {
+                return Factory2D.this.function();
+            }
+
+            public I make(final long count) {
+                return Factory2D.this.make(count, 1L);
+            }
+
+            public Factory<?> scalar() {
+                return Factory2D.this.scalar();
+            }
+
+        };
     }
 
     I make(long rows, long columns);

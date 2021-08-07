@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -43,10 +43,10 @@ public class LongToNumberMapTest {
 
     @Test
     public void testAlignCapacity() {
-        TestUtils.assertEquals(1, 1L << PrimitiveMath.powerOf2Larger(-1L));
-        TestUtils.assertEquals(16, 1L << PrimitiveMath.powerOf2Larger(16L));
-        TestUtils.assertEquals(512, 1L << PrimitiveMath.powerOf2Larger(365L));
-        TestUtils.assertEquals(16_384, 1L << PrimitiveMath.powerOf2Larger(16_384L));
+        TestUtils.assertEquals(1, 1L << PowerOf2.powerOf2Larger(-1L));
+        TestUtils.assertEquals(16, 1L << PowerOf2.powerOf2Larger(16L));
+        TestUtils.assertEquals(512, 1L << PowerOf2.powerOf2Larger(365L));
+        TestUtils.assertEquals(16_384, 1L << PowerOf2.powerOf2Larger(16_384L));
     }
 
     @Test

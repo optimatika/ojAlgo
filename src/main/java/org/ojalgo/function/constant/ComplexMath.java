@@ -90,7 +90,7 @@ public abstract class ComplexMath {
     };
     public static final ComplexFunction.Unary CONJUGATE = ComplexNumber::conjugate;
     public static final ComplexFunction.Unary COS = arg -> ComplexMath.COSH.invoke(arg.multiply(ComplexNumber.I));
-    public static final ComplexFunction.Unary COSH = arg -> (ComplexMath.EXP.invoke(arg).add(ComplexMath.EXP.invoke(arg.negate()))).divide(TWO);
+    public static final ComplexFunction.Unary COSH = arg -> ComplexMath.EXP.invoke(arg).add(ComplexMath.EXP.invoke(arg.negate())).divide(TWO);
     public static final ComplexFunction.Binary DIVIDE = ComplexNumber::divide;
     public static final ComplexFunction.Unary EXP = arg -> {
 
@@ -186,10 +186,8 @@ public abstract class ComplexMath {
 
             return ComplexNumber.makePolar(retMod, retArg);
 
-        } else {
-
-            throw new IllegalArgumentException();
         }
+        throw new IllegalArgumentException();
     };
     public static final ComplexFunction.Parameter SCALE = (arg, param) -> {
         final double tmpRe = PrimitiveMath.SCALE.invoke(arg.doubleValue(), param);
@@ -198,7 +196,7 @@ public abstract class ComplexMath {
     };
     public static final ComplexFunction.Unary SIGNUM = ComplexNumber::signum;
     public static final ComplexFunction.Unary SIN = arg -> ComplexMath.SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
-    public static final ComplexFunction.Unary SINH = arg -> (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(TWO);
+    public static final ComplexFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(TWO);
     public static final ComplexFunction.Unary SQRT = arg -> {
 
         final double retMod = PrimitiveMath.SQRT.invoke(arg.norm());

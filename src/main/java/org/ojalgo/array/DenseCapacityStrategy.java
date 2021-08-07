@@ -4,6 +4,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.scalar.Scalar.Factory;
 
@@ -73,7 +74,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
     }
 
     DenseCapacityStrategy<N> chunk(final long chunk) {
-        final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
+        final int power = PowerOf2.powerOf2Smaller(Math.min(chunk, mySegment));
         myChunk = 1L << power;
         return this;
     }
@@ -172,7 +173,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
     }
 
     DenseCapacityStrategy<N> segment(final long segment) {
-        final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
+        final int power = PowerOf2.powerOf2Smaller(Math.max(myChunk, segment));
         mySegment = 1L << power;
         return this;
     }

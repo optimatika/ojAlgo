@@ -30,7 +30,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  *
  * @author apete
  */
-public final class ASUM implements BLAS1 {
+public final class ASUM implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -40,11 +40,6 @@ public final class ASUM implements BLAS1 {
             retVal += PrimitiveMath.ABS.invoke(data[i]);
         }
         return retVal;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

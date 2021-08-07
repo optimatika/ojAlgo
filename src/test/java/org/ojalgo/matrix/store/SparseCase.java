@@ -67,8 +67,8 @@ public class SparseCase extends NonPhysicalTest {
         TestUtils.assertEquals(denseA.multiply(denseB), sparseA.multiply(sparseB));
         TestUtils.assertEquals(denseA.multiply(sparseB), sparseA.multiply(denseB));
 
-        TestUtils.assertEquals(denseB.premultiply(denseA).get(), sparseB.premultiply(sparseA).get());
-        TestUtils.assertEquals(denseB.premultiply(sparseA).get(), sparseB.premultiply(denseA).get());
+        TestUtils.assertEquals(denseB.premultiply(denseA).collect(Primitive64Store.FACTORY), sparseB.premultiply(sparseA).collect(Primitive64Store.FACTORY));
+        TestUtils.assertEquals(denseB.premultiply(sparseA).collect(Primitive64Store.FACTORY), sparseB.premultiply(denseA).collect(Primitive64Store.FACTORY));
 
         denseA.multiply(denseB, denseC);
         sparseA.multiply(sparseB, sparseC);

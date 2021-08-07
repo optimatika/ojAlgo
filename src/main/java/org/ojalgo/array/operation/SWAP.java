@@ -26,7 +26,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class SWAP implements BLAS1 {
+public final class SWAP implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -44,11 +44,6 @@ public final class SWAP implements BLAS1 {
         double[] tmpRow = target[rowA];
         target[rowA] = target[rowB];
         target[rowB] = tmpRow;
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

@@ -27,6 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -38,6 +39,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class DegenerateLUCase extends MatrixDecompositionTests {
 
+    private static final NumberContext ACCURACY = NumberContext.of(7, 4);
+
     @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
@@ -45,59 +48,63 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     }
 
     @Test
-    public void testBig() {
-
-        final NumberContext evaluation = new NumberContext(7, 4);
-
-        RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
-
-        final LU<RationalNumber> decomp = LU.RATIONAL.make();
-        decomp.decompose(degenerate);
-
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(degenerate), decomp, evaluation);
-    }
-
-    @Test
     public void testComplex() {
 
-        final NumberContext evaluation = new NumberContext(7, 4);
-
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
+        GenericStore<ComplexNumber> degenerate = GenericStore.COMPLEX.copy(RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get());
 
-        final LU<ComplexNumber> decomp = LU.COMPLEX.make();
-        decomp.decompose(GenericStore.COMPLEX.copy(degenerate));
+        LU<ComplexNumber> decomp = LU.COMPLEX.make();
+        decomp.decompose(degenerate);
 
-        TestUtils.assertEquals(GenericStore.COMPLEX.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(degenerate, decomp, ACCURACY);
     }
 
     @Test
-    public void testDensePrimitive() {
-
-        final NumberContext evaluation = new NumberContext(7, 4);
+    public void testDensePrimitive32() {
 
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
+        Primitive32Store degenerate = Primitive32Store.FACTORY.copy(RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get());
 
-        final LU<Double> decomp = LU.PRIMITIVE.make();
-        decomp.decompose(Primitive64Store.FACTORY.copy(degenerate));
+        LU<Double> decomp = LU.PRIMITIVE.make();
+        decomp.decompose(degenerate);
 
-        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(degenerate, decomp, ACCURACY);
+    }
+
+    @Test
+    public void testDensePrimitive64() {
+
+        RationalMatrix square = SimpleEquationCase.getBody();
+        Primitive64Store degenerate = Primitive64Store.FACTORY.copy(RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get());
+
+        LU<Double> decomp = LU.PRIMITIVE.make();
+        decomp.decompose(degenerate);
+
+        TestUtils.assertEquals(degenerate, decomp, ACCURACY);
+    }
+
+    @Test
+    public void testRational() {
+
+        RationalMatrix square = SimpleEquationCase.getBody();
+        RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
+
+        LU<RationalNumber> decomp = LU.RATIONAL.make();
+        decomp.decompose(degenerate);
+
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(degenerate), decomp, ACCURACY);
     }
 
     @Test
     public void testRawPrimitive() {
 
-        final NumberContext evaluation = new NumberContext(7, 4);
-
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
+        RawStore degenerate = RawStore.FACTORY.copy(RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get());
 
-        final LU<Double> decomp = new RawLU();
-        decomp.decompose(RawStore.FACTORY.copy(degenerate));
+        LU<Double> decomp = new RawLU();
+        decomp.decompose(degenerate);
 
-        TestUtils.assertEquals(RawStore.FACTORY.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(degenerate, decomp, ACCURACY);
     }
 
 }

@@ -75,7 +75,8 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     public final double doubleValue(final long index) {
-        return this.doubleValue(Math.toIntExact(index));
+        // No Math.toIntExact() here, be as direct as possible
+        return this.doubleValue((int) index);
     }
 
     @Override
@@ -115,12 +116,14 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     public final float floatValue(final long index) {
-        return this.floatValue(Math.toIntExact(index));
+        // No Math.toIntExact() here, be as direct as possible
+        return this.floatValue((int) index);
     }
 
     @Override
     public final N get(final long index) {
-        return this.get(Math.toIntExact(index));
+        // No Math.toIntExact() here, be as direct as possible
+        return this.get((int) index);
     }
 
     /**
@@ -146,17 +149,20 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     public final void set(final long index, final Comparable<?> number) {
-        this.set(Math.toIntExact(index), number);
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, number);
     }
 
     @Override
     public final void set(final long index, final double value) {
-        this.set(Math.toIntExact(index), value);
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
     }
 
     @Override
     public final void set(final long index, final float value) {
-        this.set(Math.toIntExact(index), value);
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
     }
 
     @Override
@@ -168,7 +174,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
         boolean retVal = true;
 
-        for (int i = first; retVal && (i < limit); i += step) {
+        for (int i = first; retVal && i < limit; i += step) {
             retVal &= this.isSmall(i, comparedTo);
         }
 
@@ -181,7 +187,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     protected abstract void add(int index, float addend);
 
-    protected abstract double doubleValue(final int index);
+    protected abstract double doubleValue(int index);
 
     protected abstract void exchange(int firstA, int firstB, int step, int count);
 

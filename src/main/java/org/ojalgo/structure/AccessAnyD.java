@@ -21,6 +21,8 @@
  */
 package org.ojalgo.structure;
 
+import java.util.Arrays;
+
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
@@ -50,7 +52,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD.Receiver<N>> extends StructureAnyD {
+    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD> extends StructureAnyD {
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 
@@ -160,6 +162,10 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return retVal && Access1D.equals(accessA, accessB, accuracy);
     }
 
+    static String toString(final AccessAnyD<?> array) {
+        return Arrays.toString(array.shape()) + " " + Access1D.toString(array);
+    }
+
     default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
         return new Collectable<NN, R>() {
 
@@ -228,6 +234,10 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     default Iterable<MatrixView<N>> matrices() {
         return new MatrixView<>(this);
+    }
+
+    default Iterable<VectorView<N>> vectors() {
+        return new VectorView<>(this);
     }
 
     default short shortValue(final long index) {

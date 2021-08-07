@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.FillMatchingDual;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -96,8 +96,8 @@ public class ThresholdFillMatchingDual extends AbstractThresholdTuner {
     @Override
     @Benchmark
     public Object tune() {
-        target.fillMatching(left, PrimitiveFunction.MULTIPLY, right);
+        target.fillMatching(left, PrimitiveMath.MULTIPLY, right);
         return target;
-    };
+    }
 
 }

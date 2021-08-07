@@ -190,9 +190,4 @@ public final class SubstituteForwards implements ArrayOperation {
         }
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

@@ -36,8 +36,7 @@ import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-public final class Quaternion
-        implements SelfDeclaringScalar<Quaternion>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D> {
 
     public enum RotationAxis {
 
@@ -46,7 +45,7 @@ public final class Quaternion
         private final int myIndex;
         private final double[] myVector;
 
-        private RotationAxis(final int index, final double[] axis) {
+        RotationAxis(final int index, final double[] axis) {
             myIndex = index;
             myVector = axis;
         }
@@ -763,7 +762,7 @@ public final class Quaternion
     }
 
     @Override
-    public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
+    public void supplyTo(final Mutate2D receiver) {
         receiver.set(0L, myScalar);
         receiver.set(1L, i);
         receiver.set(2L, j);
@@ -942,7 +941,7 @@ public final class Quaternion
     }
 
     @Override
-    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
+    public <T extends ModifiableReceiver<Double>> void transform(final T transformable) {
 
         final double s = myScalar;
 
@@ -1104,7 +1103,7 @@ public final class Quaternion
         return retVal;
     }
 
-    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformVersor(final T transformable) {
+    <T extends ModifiableReceiver<Double>> void transformVersor(final T transformable) {
 
         final double s = this.doubleValue();
 

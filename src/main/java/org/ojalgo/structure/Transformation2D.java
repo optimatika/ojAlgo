@@ -29,6 +29,6 @@ package org.ojalgo.structure;
 @FunctionalInterface
 public interface Transformation2D<N extends Comparable<N>> {
 
-    <T extends Mutate2D.ModifiableReceiver<N> & Access2D<N>> void transform(T transformable);
+    <T extends Mutate2D.ModifiableReceiver<N>> void transform(T transformable);
 
 }

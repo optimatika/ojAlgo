@@ -69,9 +69,4 @@ public final class SortAll implements ArrayOperation {
         } while (tmpSwapped);
     }
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
 }

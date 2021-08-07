@@ -42,16 +42,19 @@ import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.tensor.TensorFactory2D;
 
 /**
  * Array2D
  *
  * @author apete
  */
-public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
+public final class Array2D<N extends Comparable<N>>
+        implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
+        Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
-    public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>>
+            implements Factory2D.Dense<Array2D<N>>, Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -162,7 +165,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
 
             long tmpIndex = 0L;
             for (long j = 0L; j < columns; j++) {
@@ -238,7 +241,6 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        @SuppressWarnings("unchecked")
         public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRows = source.length;
@@ -259,6 +261,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
+        }
+
+        public TensorFactory2D<N, Array2D<N>> tensor() {
+            return TensorFactory2D.of(this);
         }
 
     }
@@ -348,21 +354,6 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         return visitor.get();
     }
 
-    /**
-     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
-     * copied, it is just accessed through a different adaptor.
-     *
-     * @deprecated v39 Not needed
-     */
-    @Deprecated
-    public Array1D<N> asArray1D() {
-        return myDelegate.wrapInArray1D();
-    }
-
-    public void clear() {
-        myDelegate.reset();
-    }
-
     @Override
     public long count() {
         return myDelegate.count();
@@ -397,10 +388,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
             return false;
         }
         Array2D<?> other = (Array2D<?>) obj;
-        if (myRowsCount != other.myRowsCount) {
-            return false;
-        }
-        if (myColumnsCount != other.myColumnsCount) {
+        if (myRowsCount != other.myRowsCount || myColumnsCount != other.myColumnsCount) {
             return false;
         }
         if (myDelegate == null) {
@@ -520,11 +508,11 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
         if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < limit; i++) {
-                this.set(offset + (i * myRowsCount), values.doubleValue(i));
+                this.set(offset + i * myRowsCount, values.doubleValue(i));
             }
         } else {
             for (long i = 0L; i < limit; i++) {
-                this.fillOne(offset + (i * myRowsCount), values.get(i));
+                this.fillOne(offset + i * myRowsCount, values.get(i));
             }
         }
     }
@@ -537,6 +525,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     @Override
     public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
+    }
+
+    /**
+     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
+     *
+     * @see org.ojalgo.structure.Structure2D.Reshapable#flatten()
+     */
+    public Array1D<N> flatten() {
+        return myDelegate.wrapInArray1D();
     }
 
     @Override
@@ -553,9 +551,9 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (myColumnsCount ^ (myColumnsCount >>> 32));
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        result = (prime * result) + (int) (myRowsCount ^ (myRowsCount >>> 32));
+        result = prime * result + (int) (myColumnsCount ^ myColumnsCount >>> 32);
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
+        result = prime * result + (int) (myRowsCount ^ myRowsCount >>> 32);
         return result;
     }
 
@@ -711,16 +709,27 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
     @Override
     public Array1D<N> reduceColumns(final Aggregator aggregator) {
-        Array1D<N> retVal = myDelegate.factory().makeZero(myColumnsCount).wrapInArray1D();
+        Array1D<N> retVal = myDelegate.factory().make(myColumnsCount).wrapInArray1D();
         this.reduceColumns(aggregator, retVal);
         return retVal;
     }
 
     @Override
     public Array1D<N> reduceRows(final Aggregator aggregator) {
-        Array1D<N> retVal = myDelegate.factory().makeZero(myRowsCount).wrapInArray1D();
+        Array1D<N> retVal = myDelegate.factory().make(myRowsCount).wrapInArray1D();
         this.reduceRows(aggregator, retVal);
         return retVal;
+    }
+
+    public void reset() {
+        myDelegate.reset();
+    }
+
+    public Array2D<N> reshape(final long rows, final long columns) {
+        if (Structure2D.count(rows, columns) != this.count()) {
+            throw new IllegalArgumentException();
+        }
+        return myDelegate.wrapInArray2D(rows);
     }
 
     @Override
@@ -783,6 +792,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     @Override
     public Array1D<N> sliceRow(final long row, final long col) {
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount);
+    }
+
+    public void supplyTo(final Mutate2D receiver) {
+        myDelegate.supplyTo(receiver);
     }
 
     @Override

@@ -51,6 +51,7 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
 
@@ -73,6 +74,14 @@ public abstract class BufferArray extends PlainArray<Double> {
             super(DIRECT64, buffer, file);
 
             myDoubleBuffer = buffer;
+        }
+
+        @Override
+        public void supplyTo(final Mutate1D receiver) {
+            int limit = Math.min(this.size(), receiver.size());
+            for (int i = 0; i < limit; i++) {
+                receiver.set(i, this.doubleValue(i));
+            }
         }
 
         @Override
@@ -99,7 +108,6 @@ public abstract class BufferArray extends PlainArray<Double> {
         protected void set(final int index, final float value) {
             myDoubleBuffer.put(index, value);
         }
-
     }
 
     static final class FloatBufferArray extends BufferArray {
@@ -111,6 +119,14 @@ public abstract class BufferArray extends PlainArray<Double> {
             super(DIRECT32, buffer, file);
 
             myFloatBuffer = buffer;
+        }
+
+        @Override
+        public void supplyTo(final Mutate1D receiver) {
+            int limit = Math.min(this.size(), receiver.size());
+            for (int i = 0; i < limit; i++) {
+                receiver.set(i, this.doubleValue(i));
+            }
         }
 
         @Override
@@ -137,7 +153,6 @@ public abstract class BufferArray extends PlainArray<Double> {
         protected void set(final int index, final float value) {
             myFloatBuffer.put(index, value);
         }
-
     }
 
     public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<Double>() {

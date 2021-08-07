@@ -460,15 +460,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     /**
-     * @deprecated v48 Use either {@link #addPreferredSolver(Integration)} or
-     *             {@link #addFallbackSolver(Integration)} instead
-     */
-    @Deprecated
-    public static boolean addIntegration(final Integration<?> integration) {
-        return ExpressionsBasedModel.addPreferredSolver(integration);
-    }
-
-    /**
      * Add a solver that will be used rather than the built-in solvers
      */
     public static boolean addPreferredSolver(final Integration<?> integration) {

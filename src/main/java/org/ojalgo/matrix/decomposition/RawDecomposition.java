@@ -54,6 +54,16 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     @Override
+    public int getColDim() {
+        return myColDim;
+    }
+
+    @Override
+    public int getRowDim() {
+        return myRowDim;
+    }
+
+    @Override
     protected Primitive64Store allocate(final long numberOfRows, final long numberOfColumns) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
         return Primitive64Store.FACTORY.makeZero(numberOfRows, numberOfColumns);
@@ -61,9 +71,9 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     protected boolean checkSymmetry() {
         boolean retVal = myRowDim == myColDim;
-        for (int i = 0; retVal && (i < myRowDim); i++) {
-            for (int j = 0; retVal && (j < i); j++) {
-                retVal &= (NumberContext.compare(myInternalData[i][j], myInternalData[j][i]) == 0);
+        for (int i = 0; retVal && i < myRowDim; i++) {
+            for (int j = 0; retVal && j < i; j++) {
+                retVal &= NumberContext.compare(myInternalData[i][j], myInternalData[j][i]) == 0;
             }
         }
         return retVal;
@@ -74,21 +84,16 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
         if (source instanceof MatrixStore) {
             return (MatrixStore<Double>) source;
-        } else if (source instanceof Access2D) {
-            return Primitive64Store.FACTORY.builder().makeWrapper((Access2D<?>) source).get();
-        } else {
-            return source.collect(Primitive64Store.FACTORY);
         }
+        if (source instanceof Access2D) {
+            return Primitive64Store.FACTORY.builder().makeWrapper((Access2D<?>) source).get();
+        }
+        return source.collect(Primitive64Store.FACTORY);
     }
 
     @Override
     protected final FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
-    }
-
-    @Override
-    protected int getColDim() {
-        return myColDim;
     }
 
     protected double[][] getInternalData() {
@@ -97,11 +102,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     protected RawStore getInternalStore() {
         return myInternalStore;
-    }
-
-    @Override
-    protected int getRowDim() {
-        return myRowDim;
     }
 
     protected final <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
@@ -127,7 +127,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         final int internalRows = transpose ? templateCols : templateRows;
         final int internalCols = transpose ? templateRows : templateCols;
 
-        if ((myInternalData == null) || (myRowDim != templateRows) || (myColDim != templateCols)) {
+        if (myInternalData == null || myRowDim != templateRows || myColDim != templateCols) {
 
             myInternalStore = RawStore.FACTORY.makeZero(internalRows, internalCols);
             myInternalData = myInternalStore.data;

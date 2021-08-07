@@ -52,7 +52,7 @@ abstract class LogicalStore<N extends Comparable<N>> extends AbstractStore<N> {
         this(base, Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
     }
 
-    public final PhysicalStore.Factory<N, ?> physical() {
+    public PhysicalStore.Factory<N, ?> physical() {
         return myBase.physical();
     }
 

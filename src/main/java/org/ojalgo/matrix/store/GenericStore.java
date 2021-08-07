@@ -43,6 +43,12 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyLeft;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -119,7 +125,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
                 }
             }
 
@@ -137,7 +143,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
                 }
             }
 
@@ -155,7 +161,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
                 }
             }
 
@@ -173,7 +179,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
                 }
             }
 
@@ -292,7 +298,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
                 }
             }
 
@@ -310,7 +316,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
                 }
             }
 
@@ -328,7 +334,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
                 }
             }
 
@@ -346,7 +352,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
+                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
                 }
             }
 
@@ -474,7 +480,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final N[] tmpData = data;
         final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyCholesky.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -497,7 +503,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final N[] tmpData = data;
         final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -520,7 +526,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final N[] tmpData = data;
         final N[] tmpColumn = ((ScalarArray<N>) multipliers).data;
 
-        if ((myColDim - iterationPoint - 1) > ApplyLU.THRESHOLD) {
+        if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -539,7 +545,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public Array1D<N> asList() {
-        return myUtility.asArray1D();
+        return myUtility.flatten();
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<N> transformationCollector, final boolean eigenvalue) {
@@ -570,7 +576,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
         final N[] tmpDestination = ((ScalarArray<N>) destination).data;
 
-        int tmpIndex = row + (column * tmpRowDim);
+        int tmpIndex = row + column * tmpRowDim;
         final N tmpDenominator = tmpData[tmpIndex];
 
         for (int i = row + 1; i < tmpRowDim; i++) {
@@ -580,7 +586,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public double doubleValue(final long row, final long col) {
-        return this.doubleValue(row + (col * myRowDim));
+        return this.doubleValue(row + col * myRowDim);
     }
 
     @Override
@@ -588,10 +594,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof GenericStore)) {
+        if (!super.equals(obj) || !(obj instanceof GenericStore)) {
             return false;
         }
         GenericStore other = (GenericStore) obj;
@@ -661,12 +664,10 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             } else {
                 multiplyRight.invoke(data, this.cast(left).data, complexity, right, myFactory.scalar());
             }
+        } else if (right instanceof GenericStore) {
+            multiplyLeft.invoke(data, left, complexity, this.cast(right).data, myFactory.scalar());
         } else {
-            if (right instanceof GenericStore) {
-                multiplyLeft.invoke(data, left, complexity, this.cast(right).data, myFactory.scalar());
-            } else {
-                multiplyBoth.invoke(this, left, complexity, right);
-            }
+            multiplyBoth.invoke(this, left, complexity, right);
         }
     }
 
@@ -829,13 +830,29 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         return myUtility.get(row, col);
     }
 
+    public int getColDim() {
+        return myColDim;
+    }
+
+    public int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    public int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    public int getRowDim() {
+        return myRowDim;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + myColDim;
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
-        result = (prime * result) + myRowDim;
+        result = prime * result + myColDim;
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
+        result = prime * result + myRowDim;
         return result;
     }
 
@@ -949,23 +966,23 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public TransformableRegion<N> regionByColumns(final int... columns) {
-        return new TransformableRegion.ColumnsRegion<>(this, multiplyBoth, columns);
+        return new Subregion2D.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new TransformableRegion.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new TransformableRegion.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public TransformableRegion<N> regionByRows(final int... rows) {
-        return new TransformableRegion.RowsRegion<>(this, multiplyBoth, rows);
+        return new Subregion2D.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public TransformableRegion<N> regionByTransposing() {
-        return new TransformableRegion.TransposedRegion<>(this, multiplyBoth);
+        return new Subregion2D.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {
@@ -1060,31 +1077,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public void transformLeft(final Householder<N> transformation, final int firstColumn) {
-
-        final Householder.Generic<N> tmpTransf = this.cast(transformation);
-
-        final N[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    HouseholderLeft.invoke(tmpData, tmpRowDim, aFirst, aLimit, tmpTransf, myFactory.scalar());
-                }
-
-            };
-
-            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
-
-        } else {
-
-            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf, myFactory.scalar());
-        }
+        HouseholderLeft.call(data, myRowDim, firstColumn, myColDim, this.cast(transformation), myFactory.scalar());
     }
 
     public void transformLeft(final Rotation<N> transformation) {
@@ -1095,48 +1088,22 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final int tmpHigh = tmpTransf.high;
 
         if (tmpLow != tmpHigh) {
-            if ((tmpTransf.cos != null) && (tmpTransf.sin != null)) {
+            if (tmpTransf.cos != null && tmpTransf.sin != null) {
                 RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }
+        } else if (tmpTransf.cos != null) {
+            myUtility.modifyRow(tmpLow, 0, myFactory.function().multiply().second(tmpTransf.cos));
+        } else if (tmpTransf.sin != null) {
+            myUtility.modifyRow(tmpLow, 0, myFactory.function().divide().second(tmpTransf.sin));
         } else {
-            if (tmpTransf.cos != null) {
-                myUtility.modifyRow(tmpLow, 0, myFactory.function().multiply().second(tmpTransf.cos));
-            } else if (tmpTransf.sin != null) {
-                myUtility.modifyRow(tmpLow, 0, myFactory.function().divide().second(tmpTransf.sin));
-            } else {
-                myUtility.modifyRow(tmpLow, 0, myFactory.function().negate());
-            }
+            myUtility.modifyRow(tmpLow, 0, myFactory.function().negate());
         }
     }
 
     public void transformRight(final Householder<N> transformation, final int firstRow) {
-
-        final Householder.Generic<N> tmpTransf = this.cast(transformation);
-
-        final N[] tmpData = data;
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    HouseholderRight.invoke(tmpData, aFirst, aLimit, tmpColDim, tmpTransf, myFactory.scalar());
-                }
-
-            };
-
-            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
-
-        } else {
-
-            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf, myFactory.scalar());
-        }
+        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, this.cast(transformation), myFactory.scalar());
     }
 
     public void transformRight(final Rotation<N> transformation) {
@@ -1147,19 +1114,17 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final int tmpHigh = tmpTransf.high;
 
         if (tmpLow != tmpHigh) {
-            if ((tmpTransf.cos != null) && (tmpTransf.sin != null)) {
+            if (tmpTransf.cos != null && tmpTransf.sin != null) {
                 RotateRight.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeColumns(tmpLow, tmpHigh);
             }
+        } else if (tmpTransf.cos != null) {
+            myUtility.modifyColumn(0, tmpHigh, myFactory.function().multiply().second(tmpTransf.cos));
+        } else if (tmpTransf.sin != null) {
+            myUtility.modifyColumn(0, tmpHigh, myFactory.function().divide().second(tmpTransf.sin));
         } else {
-            if (tmpTransf.cos != null) {
-                myUtility.modifyColumn(0, tmpHigh, myFactory.function().multiply().second(tmpTransf.cos));
-            } else if (tmpTransf.sin != null) {
-                myUtility.modifyColumn(0, tmpHigh, myFactory.function().divide().second(tmpTransf.sin));
-            } else {
-                myUtility.modifyColumn(0, tmpHigh, myFactory.function().negate());
-            }
+            myUtility.modifyColumn(0, tmpHigh, myFactory.function().negate());
         }
     }
 
@@ -1190,29 +1155,28 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     private GenericStore<N> cast(final Access1D<N> matrix) {
         if (matrix instanceof GenericStore) {
             return (GenericStore<N>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return myFactory.copy((Access2D<?>) matrix);
-        } else {
-            return myFactory.columns(matrix);
         }
+        if (matrix instanceof Access2D<?>) {
+            return myFactory.copy((Access2D<?>) matrix);
+        }
+        return myFactory.columns(matrix);
     }
 
     private Householder.Generic<N> cast(final Householder<N> transformation) {
         if (transformation instanceof Householder.Generic) {
             return (Householder.Generic<N>) transformation;
-        } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
-        } else {
-            return new Householder.Generic<>(myFactory.scalar(), transformation);
         }
+        if (transformation instanceof HouseholderReference<?>) {
+            return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
+        }
+        return new Householder.Generic<>(myFactory.scalar(), transformation);
     }
 
     private Rotation.Generic<N> cast(final Rotation<N> transformation) {
         if (transformation instanceof Rotation.Generic) {
             return (Rotation.Generic<N>) transformation;
-        } else {
-            return new Rotation.Generic<>(transformation);
         }
+        return new Rotation.Generic<>(transformation);
     }
 
     private N[] getWorkerColumn() {
@@ -1224,22 +1188,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         Arrays.fill(myWorkerColumn, myFactory.scalar().zero().get());
 
         return myWorkerColumn;
-    }
-
-    int getColDim() {
-        return myColDim;
-    }
-
-    int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    int getRowDim() {
-        return myRowDim;
     }
 
 }

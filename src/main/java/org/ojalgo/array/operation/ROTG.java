@@ -29,13 +29,8 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class ROTG implements BLAS1 {
+public final class ROTG implements ArrayOperation {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
 }

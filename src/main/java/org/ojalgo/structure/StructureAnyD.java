@@ -102,6 +102,8 @@ public interface StructureAnyD extends Structure1D {
 
     interface Logical<S extends StructureAnyD, B extends Logical<S, B>> extends StructureAnyD {
 
+        S get();
+
     }
 
     public final class LongReference implements Comparable<LongReference> {
@@ -254,6 +256,33 @@ public interface StructureAnyD extends Structure1D {
             final long[] ref = StructureAnyD.reference(index, myStructure);
             return (T) myMappers[dim].toKey(ref[dim]);
         }
+
+    }
+
+    public interface Reshapable extends StructureAnyD {
+
+        /**
+         * If necessary increase the rank to the specified number (without changing the total number of
+         * components)
+         */
+        StructureAnyD expand(int rank);
+
+        /**
+         * Flattens this to a 1D structure. This operation is largely redundant in ojAlgo as anything AnyD is
+         * also/simultaneously 1D.
+         */
+        Structure1D flatten();
+
+        /**
+         * The same array viewed/accessed with a different shape
+         */
+        StructureAnyD reshape(long... shape);
+
+        /**
+         * Squeezing removes the dimensions or axes that have a length of one. (This does not change the total
+         * number of components.)
+         */
+        StructureAnyD squeeze();
 
     }
 

@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
@@ -68,7 +67,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
         public SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
-            return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody), false);
+            return this.make(templateBody, templateRHS, Access2D.isHermitian(templateBody), false);
         }
 
         public abstract SolverTask<N> make(Structure2D templateBody, Structure2D templateRHS, boolean symmetric, boolean positiveDefinite);

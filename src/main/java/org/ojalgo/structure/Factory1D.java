@@ -28,7 +28,7 @@ import org.ojalgo.function.NullaryFunction;
 public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */
@@ -55,18 +55,18 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
      *
      * @author apete
      */
-    interface MayBeSparse<I extends Structure1D, DR extends Mutate1D.ModifiableReceiver<?>, SR extends Mutate1D.ModifiableReceiver<?>> extends Factory1D<I> {
+    interface MayBeSparse<I extends Structure1D, DR extends Mutate1D.ModifiableReceiver<?>, SR extends Mutate1D.Receiver<?>> extends Factory1D<I> {
 
-        I makeDense(long count);
+        DR makeDense(long count);
 
-        default I makeDense(final Structure1D shape) {
-            return this.make(shape.count());
+        default DR makeDense(final Structure1D shape) {
+            return this.makeDense(shape.count());
         }
 
-        I makeSparse(long count);
+        SR makeSparse(long count);
 
-        default I makeSparse(final Structure1D shape) {
-            return this.make(shape.count());
+        default SR makeSparse(final Structure1D shape) {
+            return this.makeSparse(shape.count());
         }
 
     }

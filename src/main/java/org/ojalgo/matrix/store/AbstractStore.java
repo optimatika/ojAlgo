@@ -88,13 +88,29 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return this;
     }
 
+    public final int getColDim() {
+        return myColDim;
+    }
+
+    public final int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    public final int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    public final int getRowDim() {
+        return myRowDim;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + myColDim;
-        result = (prime * result) + ((myComponentType == null) ? 0 : myComponentType.hashCode());
-        result = (prime * result) + myRowDim;
+        result = prime * result + myColDim;
+        result = prime * result + (myComponentType == null ? 0 : myComponentType.hashCode());
+        result = prime * result + myRowDim;
         return result;
     }
 
@@ -118,31 +134,13 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
             return tmpStep2.get(0L);
 
-        } else {
-
-            return MatrixStore.super.multiplyBoth(leftAndRight);
         }
+        return MatrixStore.super.multiplyBoth(leftAndRight);
     }
 
     @Override
     public final String toString() {
         return Access2D.toString(this);
-    }
-
-    protected final int getColDim() {
-        return myColDim;
-    }
-
-    protected final int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    protected final int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    protected final int getRowDim() {
-        return myRowDim;
     }
 
     protected final boolean isPrimitive() {

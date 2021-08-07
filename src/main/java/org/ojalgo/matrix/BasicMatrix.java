@@ -29,8 +29,6 @@ import java.util.function.Supplier;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
-import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -66,12 +64,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
-        Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
-        Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
+        implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
+            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>>, Supplier<M> {
 
         default M build() {
             return this.get();
@@ -79,16 +76,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     }
 
-    public interface PhysicalReceiver<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-            extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
-
-        default M build() {
-            return this.get();
-        }
-
-    }
-
-    private static final NumberContext EQUALS = NumberContext.getGeneral(8, 12);
+    private static final NumberContext EQUALS = NumberContext.of(8, 12);
 
     /**
      * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
@@ -135,21 +123,15 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
     private final MatrixStore<N> myStore;
+    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient Boolean mySymmetric = null;
-
-    @SuppressWarnings("unused")
-    private BasicMatrix() {
-
-        this(null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     BasicMatrix(final MatrixStore<N> store) {
 
         super();
 
         myStore = store;
+        myFactory = store.physical();
     }
 
     public M add(final double scalarAddend) {
@@ -210,7 +192,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    public abstract BasicMatrix.PhysicalReceiver<N, M> copy();
+    public abstract <R extends Mutate2D.ModifiableReceiver<N> & Supplier<M>> R copy();
 
     public long count() {
         return myStore.count();
@@ -390,7 +372,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = MatrixUtils.hashCode(myStore);
+            myHashCode = Access1D.hashCode(myStore);
         }
         return myHashCode;
     }
@@ -478,7 +460,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isHermitian() {
         if (myHermitian == null) {
-            myHermitian = this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS);
+            myHermitian = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS));
         }
         return myHermitian.booleanValue();
     }
@@ -493,7 +475,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isSymmetric() {
         if (mySymmetric == null) {
-            mySymmetric = this.isSquare() && myStore.equals(myStore.transpose(), EQUALS);
+            mySymmetric = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.transpose(), EQUALS));
         }
         return mySymmetric.booleanValue();
     }
@@ -517,7 +499,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
-        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
+        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).collect(myFactory)));
     }
 
     public M multiply(final N scalarMultiplicand) {
@@ -556,11 +538,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M reduceColumns(final Aggregator aggregator) {
-        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
+        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).collect(myFactory));
     }
 
     public M reduceRows(final Aggregator aggregator) {
-        return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
+        return this.getFactory().instantiate(myStore.reduceRows(aggregator).collect(myFactory));
     }
 
     public M signum() {
@@ -766,7 +748,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ? extends PhysicalReceiver<N, M>, ? extends PhysicalReceiver<N, M>> getFactory();
+    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ?, ?> getFactory();
 
     final MatrixStore<N> getStore() {
         return myStore;

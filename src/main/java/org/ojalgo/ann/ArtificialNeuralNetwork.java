@@ -30,8 +30,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
+import org.ojalgo.data.DataBatch;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -56,58 +57,59 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         /**
          * (-,+)
          */
-        IDENTITY(args -> (arg -> arg), arg -> ONE, true),
+        IDENTITY(ArtificialNeuralNetwork::doIdentity, arg -> ONE, true),
+        /**
+         * ReLU: [0,+)
+         *
+         * @deprecated v49 Use {@link #RELU} instead
+         */
+        RECTIFIER(ArtificialNeuralNetwork::doReLU, arg -> arg > ZERO ? ONE : ZERO, true),
         /**
          * ReLU: [0,+)
          */
-        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
+        RELU(ArtificialNeuralNetwork::doReLU, arg -> arg > ZERO ? ONE : ZERO, true),
         /**
          * [0,1]
          */
-        SIGMOID(args -> (LOGISTIC), arg -> arg * (ONE - arg), true),
+        SIGMOID(ArtificialNeuralNetwork::doSigmoid, arg -> arg * (ONE - arg), true),
         /**
          * [0,1] <br>
          * Currently this can only be used in the final layer in combination with
          * {@link ArtificialNeuralNetwork.Error#CROSS_ENTROPY}. All other usage will give incorrect network
          * training.
          */
-        SOFTMAX(args -> {
-            PhysicalStore<Double> parts = args.copy();
-            parts.modifyAll(EXP);
-            double total = parts.aggregateAll(Aggregator.SUM).doubleValue();
-            return arg -> EXP.invoke(arg) / total;
-        }, arg -> ONE, false),
-
+        SOFTMAX(ArtificialNeuralNetwork::doSoftMax, arg -> ONE, false),
         /**
          * [-1,1]
          */
-        TANH(args -> PrimitiveMath.TANH, arg -> ONE - (arg * arg), true);
+        TANH(ArtificialNeuralNetwork::doTanh, arg -> ONE - arg * arg, true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
-        private final Function<PhysicalStore<Double>, PrimitiveFunction.Unary> myFunction;
+        private final Consumer<PhysicalStore<Double>> myFunction;
         private final boolean mySingleFolded;
 
-        Activator(final Function<PhysicalStore<Double>, PrimitiveFunction.Unary> function, final PrimitiveFunction.Unary derivativeInTermsOfOutput,
-                final boolean singleFolded) {
+        Activator(final Consumer<PhysicalStore<Double>> function, final PrimitiveFunction.Unary derivativeInTermsOfOutput, final boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
             mySingleFolded = singleFolded;
         }
 
-        PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
-            return myDerivativeInTermsOfOutput;
+        void activate(final PhysicalStore<Double> output) {
+            myFunction.accept(output);
         }
 
-        PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments) {
-            return myFunction.apply(arguments);
-        }
+        void activate(final PhysicalStore<Double> output, final double probabilityToKeep) {
 
-        PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments, final double probabilityToKeep) {
-            if ((ZERO < probabilityToKeep) && (probabilityToKeep <= ONE)) {
-                return new NodeDroppingActivatorFunction(probabilityToKeep, this.getFunction(arguments));
-            } else {
+            if (ZERO >= probabilityToKeep || probabilityToKeep > ONE) {
                 throw new IllegalArgumentException();
             }
+
+            myFunction.accept(output);
+            output.modifyAll(NodeDropper.of(probabilityToKeep));
+        }
+
+        PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
+            return myDerivativeInTermsOfOutput;
         }
 
         boolean isSingleFolded() {
@@ -233,6 +235,28 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
+    static void doIdentity(final PhysicalStore<Double> output) {
+        // no-op activator
+    }
+
+    static void doReLU(final PhysicalStore<Double> output) {
+        output.modifyAll(MAX.second(ZERO));
+    }
+
+    static void doSigmoid(final PhysicalStore<Double> output) {
+        output.modifyAll(LOGISTIC);
+    }
+
+    static void doSoftMax(final PhysicalStore<Double> output) {
+        output.modifyAll(EXP);
+        Primitive64Store totals = output.reduceRows(Aggregator.SUM).collect(Primitive64Store.FACTORY);
+        output.onRows(DIVIDE, totals).supplyTo(output);
+    }
+
+    static void doTanh(final PhysicalStore<Double> output) {
+        output.modifyAll(PrimitiveMath.TANH);
+    }
+
     private transient TrainingConfiguration myConfiguration = null;
     private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
@@ -278,10 +302,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ArtificialNeuralNetwork)) {
+        if (obj == null || !(obj instanceof ArtificialNeuralNetwork)) {
             return false;
         }
         ArtificialNeuralNetwork other = (ArtificialNeuralNetwork) obj;
@@ -307,7 +328,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + Arrays.hashCode(myLayers);
+        result = prime * result + Arrays.hashCode(myLayers);
         return result;
     }
 
@@ -320,15 +341,42 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     /**
-     * If you create multiple invokers you can use them in different threads simutaneously - the invoker
-     * contains any/all invocation specific state.
+     * With batch size 1
+     *
+     * @see #newInvoker(int)
      */
     public NetworkInvoker newInvoker() {
-        return new NetworkInvoker(this);
+        return this.newInvoker(1);
     }
 
+    /**
+     * If you create multiple invokers you can use them in different threads simutaneously - the invoker
+     * contains any/all invocation specific state.
+     *
+     * @param batchSize The batch size - the number of batched invocations
+     * @return The invoker
+     */
+    public NetworkInvoker newInvoker(final int batchSize) {
+        return new NetworkInvoker(this, batchSize);
+    }
+
+    /**
+     * With batch size 1
+     *
+     * @see #newTrainer(int)
+     */
     public NetworkTrainer newTrainer() {
-        NetworkTrainer trainer = new NetworkTrainer(this);
+        return this.newTrainer(1);
+    }
+
+    /**
+     * Only 1 trainer at the time.
+     *
+     * @param batchSize The batch size - the number of batched training examples
+     * @return The trainer
+     */
+    public NetworkTrainer newTrainer(final int batchSize) {
+        NetworkTrainer trainer = new NetworkTrainer(this, batchSize);
         if (this.getOutputActivator() == Activator.SOFTMAX) {
             trainer.error(Error.CROSS_ENTROPY);
         } else {
@@ -337,11 +385,26 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return trainer;
     }
 
+    public Structure2D[] structure() {
+
+        Structure2D[] retVal = new Structure2D[myLayers.length];
+
+        for (int l = 0; l < retVal.length; l++) {
+            retVal[l] = myLayers[l].getStructure();
+        }
+
+        return retVal;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
         tmpBuilder.append("ArtificialNeuralNetwork [Layers=");
-        tmpBuilder.append(Arrays.toString(myLayers));
+        for (CalculationLayer calculationLayer : myLayers) {
+            tmpBuilder.append("\n");
+            tmpBuilder.append(calculationLayer);
+        }
+        tmpBuilder.append("\n");
         tmpBuilder.append("]");
         return tmpBuilder.toString();
     }
@@ -362,7 +425,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * {@link #from(DataInput)}.
      */
     public void writeTo(final DataOutput output) throws IOException {
-        int version = (myFactory == Primitive32Store.FACTORY) ? 2 : 1;
+        int version = myFactory == Primitive32Store.FACTORY ? 2 : 1;
         FileFormat.write(this, version, output);
     }
 
@@ -388,14 +451,22 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+    void adjust(final int layer, final PhysicalStore<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient) {
-        myLayers[layer].adjust(input, output, layer == 0 ? null : upstreamGradient, downstreamGradient, -myConfiguration.learningRate,
+        myLayers[layer].adjust(input, output, upstreamGradient, downstreamGradient, -myConfiguration.learningRate,
                 myConfiguration.probabilityDidKeepInput(layer), myConfiguration.regularisation());
+    }
+
+    int countInputNodes() {
+        return myLayers[0].countInputNodes();
     }
 
     int countInputNodes(final int layer) {
         return myLayers[layer].countInputNodes();
+    }
+
+    int countOutputNodes() {
+        return myLayers[myLayers.length - 1].countOutputNodes();
     }
 
     int countOutputNodes(final int layer) {
@@ -414,12 +485,15 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final int layer, final PhysicalStore<Double> input, final PhysicalStore<Double> output) {
         if (myConfiguration != null) {
             return myLayers[layer].invoke(input, output, myConfiguration.probabilityWillKeepOutput(layer, this.depth()));
-        } else {
-            return myLayers[layer].invoke(input, output);
         }
+        return myLayers[layer].invoke(input, output);
+    }
+
+    DataBatch newBatch(final int rows, final int columns) {
+        return DataBatch.from(myFactory, rows, columns);
     }
 
     PhysicalStore<Double> newStore(final int rows, final int columns) {
@@ -445,7 +519,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     void setConfiguration(final TrainingConfiguration configuration) {
-        if ((myConfiguration != null) && (configuration == null)) {
+        if (myConfiguration != null && configuration == null) {
             for (int l = 1, limit = this.depth(); l < limit; l++) {
                 this.scale(l, myConfiguration.probabilityDidKeepInput(l));
             }
@@ -455,17 +529,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     void setWeight(final int layer, final int input, final int output, final double weight) {
         myLayers[layer].setWeight(input, output, weight);
-    }
-
-    Structure2D[] structure() {
-
-        Structure2D[] retVal = new Structure2D[myLayers.length];
-
-        for (int l = 0; l < retVal.length; l++) {
-            retVal[l] = myLayers[l].getStructure();
-        }
-
-        return retVal;
     }
 
 }

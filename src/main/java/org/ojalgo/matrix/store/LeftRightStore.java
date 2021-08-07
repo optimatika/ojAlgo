@@ -41,10 +41,10 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
 
     LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
-        super(base, (int) base.countRows(), (int) (base.countColumns() + right.countColumns()));
+        super(base, base.countRows(), base.countColumns() + right.countColumns());
 
         myRight = right;
-        mySplit = (int) base.countColumns();
+        mySplit = Math.toIntExact(base.countColumns());
 
         if (base.countRows() != right.countRows()) {
             throw new IllegalArgumentException();
@@ -130,10 +130,10 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
 
         final Future<ElementsSupplier<N>> futureLeft = this.executePremultiply(left);
 
-        final MatrixStore<N> right = myRight.premultiply(left).get();
+        final MatrixStore<N> right = myRight.premultiply(left).collect(this.physical());
 
         try {
-            return new LeftRightStore<>(futureLeft.get().get(), right);
+            return new LeftRightStore<>(futureLeft.get().collect(this.physical()), right);
         } catch (final InterruptedException | ExecutionException ex) {
             ex.printStackTrace(System.err);
             return null;

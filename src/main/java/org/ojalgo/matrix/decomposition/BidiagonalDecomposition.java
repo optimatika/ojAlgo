@@ -208,11 +208,11 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (((ij + 1) < tmpRowDim) && storage.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
+                if (ij + 1 < tmpRowDim && storage.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
 
-                if (((ij + 2) < tmpColDim) && storage.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
+                if (ij + 2 < tmpColDim && storage.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
             }
@@ -227,11 +227,11 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (((ij + 1) < tmpColDim) && storage.generateApplyAndCopyHouseholderRow(ij, ij, tmpHouseholderRow)) {
+                if (ij + 1 < tmpColDim && storage.generateApplyAndCopyHouseholderRow(ij, ij, tmpHouseholderRow)) {
                     storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
 
-                if (((ij + 2) < tmpRowDim) && storage.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
+                if (ij + 2 < tmpRowDim && storage.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
                     storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
             }
@@ -248,12 +248,12 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
     }
 
     public MatrixStore<N> getD() {
-        MatrixStore<N> retVal = this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
+        MatrixStore<N> retVal = this.doGetDiagonal();
         if (myFullSize) {
-            if (this.getRowDim() > retVal.countRows()) {
-                retVal = retVal.logical().below((int) (this.getRowDim() - retVal.countRows())).get();
-            } else if (this.getColDim() > retVal.countColumns()) {
-                retVal = retVal.logical().right((int) (this.getColDim() - retVal.countColumns())).get();
+            if (this.getRowDim() > retVal.getRowDim()) {
+                retVal = retVal.logical().below(this.getRowDim() - retVal.countRows()).get();
+            } else if (this.getColDim() > retVal.getColDim()) {
+                retVal = retVal.logical().right(this.getColDim() - retVal.countColumns()).get();
             }
         }
         return retVal;
@@ -325,7 +325,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         final boolean tmpUpper = this.isUpper();
-        for (int ij = (tmpUpper && (tmpRowDim != tmpMinDim)) ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
+        for (int ij = tmpUpper && tmpRowDim != tmpMinDim ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
 
             tmpReference.point(tmpUpper ? ij : ij + 1, ij);
 
@@ -387,10 +387,10 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
             } else {
                 for (int i = 0; i < tmpLim; i++) {
                     aMtrxV.set(i, j,
-                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
+                            (aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j) + aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j))
                                     / tmpSingular);
                 }
-                aMtrxV.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
+                aMtrxV.set(tmpLim, j, aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j) / tmpSingular);
             }
         }
     }
@@ -413,10 +413,10 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
             } else {
                 for (int i = 0; i < tmpLim; i++) {
                     retVal.set(i, j,
-                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
+                            (aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j) + aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j))
                                     / tmpSingular);
                 }
-                retVal.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
+                retVal.set(tmpLim, j, aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j) / tmpSingular);
             }
         }
 

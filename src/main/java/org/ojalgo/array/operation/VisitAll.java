@@ -57,7 +57,7 @@ public final class VisitAll implements ArrayOperation {
 
     public static void visitDiagonal(final double[][] target, final int row, final int col, final DoubleConsumer visitor) {
         int limit = target.length;
-        for (int ij = 0; ((row + ij) < limit) && ((col + ij) < target[row + ij].length); ij++) {
+        for (int ij = 0; row + ij < limit && col + ij < target[row + ij].length; ij++) {
             visitor.accept(target[row + ij][col + ij]);
         }
     }
@@ -74,11 +74,6 @@ public final class VisitAll implements ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             visitor.accept(targetRow[j]);
         }
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

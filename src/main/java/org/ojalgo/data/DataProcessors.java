@@ -29,7 +29,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -38,7 +37,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
 
 /**
@@ -153,14 +151,14 @@ public class DataProcessors {
         if (limit > 0) {
 
             Array1D<Double> values = svd.getSingularValues();
-            ElementsSupplier<Double> vectors = svd.getV();
+            MatrixStore<Double> vectors = svd.getV();
 
             if (limit < numberOfVariables) {
                 values = values.sliceRange(0L, limit);
-                vectors = vectors.get().logical().limits(-1, limit);
+                vectors = vectors.logical().limits(-1, limit).get();
             }
 
-            MatrixStore<Double> scaledV = vectors.onColumns(MULTIPLY, values).get();
+            MatrixStore<Double> scaledV = vectors.onColumns(MULTIPLY, values).collect(factory);
 
             retVal.fillByMultiplying(scaledV, scaledV.transpose());
 
@@ -173,7 +171,7 @@ public class DataProcessors {
     public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
         return new Transformation2D<Double>() {
 
-            public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
+            public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {
                 SampleSet sampleSet = SampleSet.make();
                 for (ColumnView<Double> view : transformable.columns()) {
                     sampleSet.swap(view);

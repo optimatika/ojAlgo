@@ -2,16 +2,16 @@ package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.RowView;
 
-public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N> {
+public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N>, Supplier<PhysicalStore<N>> {
 
     static final class ItemView<N extends Comparable<N>> extends RowView<N> {
 
@@ -47,11 +47,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>,
     }
 
     public SparseArray<N> addRow() {
-        return this.addRow(SparseArray.factory(myFactory.array(), myColumnsCount).make());
+        return this.addRow(SparseArray.factory(myFactory.array()).limit(myColumnsCount).make());
     }
 
     public void addRows(final int numberToAdd) {
-        SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myColumnsCount);
+        SparseFactory<N> factory = SparseArray.factory(myFactory.array()).limit(myColumnsCount);
         for (int i = 0; i < numberToAdd; i++) {
             myRows.add(factory.make());
         }
@@ -67,6 +67,10 @@ public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>,
 
     public double doubleValue(final long row, final long col) {
         return myRows.get((int) row).doubleValue(col);
+    }
+
+    public PhysicalStore<N> get() {
+        return this.collect(myFactory);
     }
 
     public N get(final long row, final long col) {
@@ -102,31 +106,7 @@ public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>,
         receiver.reset();
 
         for (int i = 0, limit = myRows.size(); i < limit; i++) {
-            long row = i;
-
-            myRows.get(i).supplyNonZerosTo(new Mutate1D() {
-
-                public void add(final long index, final Comparable<?> addend) {
-                    receiver.add(row, index, addend);
-                }
-
-                public void add(final long index, final double addend) {
-                    receiver.add(row, index, addend);
-                }
-
-                public long count() {
-                    return receiver.countColumns();
-                }
-
-                public void set(final long index, final Comparable<?> value) {
-                    receiver.set(row, index, value);
-                }
-
-                public void set(final long index, final double value) {
-                    receiver.set(row, index, value);
-                }
-
-            });
+            myRows.get(i).supplyNonZerosTo(receiver.regionByRows(i));
         }
     }
 

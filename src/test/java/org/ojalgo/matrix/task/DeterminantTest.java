@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
@@ -108,7 +107,7 @@ public final class DeterminantTest extends MatrixTaskTests {
     }
 
     MatrixStore<Double> makeSymmetric(final int dim) {
-        return MatrixUtils.makeSPD(dim);
+        return Primitive64Store.FACTORY.makeSPD(dim);
     }
 
 }

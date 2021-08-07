@@ -81,9 +81,14 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return this.decompose(matrix, false);
     }
 
+    @Override
+    public int getColDim() {
+        return mySquareDim;
+    }
+
     public final MatrixStore<N> getD() {
 
-        if ((myD == null) && this.isComputed()) {
+        if (myD == null && this.isComputed()) {
             myD = this.makeD();
         }
 
@@ -92,16 +97,31 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
 
     public final Array1D<ComplexNumber> getEigenvalues() {
 
-        if ((myEigenvalues == null) && this.isComputed()) {
+        if (myEigenvalues == null && this.isComputed()) {
             myEigenvalues = this.makeEigenvalues();
         }
 
         return myEigenvalues;
     }
 
+    @Override
+    public int getMaxDim() {
+        return mySquareDim;
+    }
+
+    @Override
+    public int getMinDim() {
+        return mySquareDim;
+    }
+
+    @Override
+    public int getRowDim() {
+        return mySquareDim;
+    }
+
     public final MatrixStore<N> getV() {
 
-        if ((myV == null) && !myValuesOnly && this.isComputed()) {
+        if (myV == null && !myValuesOnly && this.isComputed()) {
             myV = this.makeV();
         }
 
@@ -142,26 +162,6 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
     }
 
     protected abstract boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly);
-
-    @Override
-    protected int getColDim() {
-        return mySquareDim;
-    }
-
-    @Override
-    protected int getMaxDim() {
-        return mySquareDim;
-    }
-
-    @Override
-    protected int getMinDim() {
-        return mySquareDim;
-    }
-
-    @Override
-    protected int getRowDim() {
-        return mySquareDim;
-    }
 
     protected abstract MatrixStore<N> makeD();
 

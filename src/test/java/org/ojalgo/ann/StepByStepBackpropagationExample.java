@@ -43,7 +43,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class StepByStepBackpropagationExample extends BackPropagationExample {
 
-    private static final NumberContext PRECISION = new NumberContext(8, 8);
+    private static final NumberContext PRECISION = NumberContext.of(8, 8);
 
     public StepByStepBackpropagationExample() {
         super();

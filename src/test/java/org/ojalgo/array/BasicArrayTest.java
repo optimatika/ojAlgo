@@ -51,7 +51,7 @@ public abstract class BasicArrayTest {
 
     @Test
     public void testHugeSparse() {
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY, Long.MAX_VALUE).initial(COUNT).make());
+        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
     }
 
     @Test
@@ -79,7 +79,7 @@ public abstract class BasicArrayTest {
     @Test
     public void testSparse() {
         final long count = COUNT;
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseCapacityStrategy.capacity(count)).make());
+        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(count).initial(DenseCapacityStrategy.capacity(count)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);

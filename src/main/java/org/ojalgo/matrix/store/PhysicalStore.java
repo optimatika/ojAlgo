@@ -30,13 +30,14 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.tensor.TensorFactory1D;
+import org.ojalgo.tensor.TensorFactory2D;
 
 /**
  * <p>
@@ -49,9 +50,17 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
+
+        default TensorFactory2D<N, I> tensor2D() {
+            return TensorFactory2D.of(this);
+        }
+
+        default TensorFactory1D<N, I> tensor1D() {
+            return TensorFactory1D.of(this.asFactory1D());
+        }
 
         AggregatorSet<N> aggregator();
 
@@ -146,8 +155,6 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
     default void supplyTo(final TransformableRegion<N> receiver) {
         if (this != receiver) {
             receiver.fillMatching(this);
-        } else {
-            BasicLogger.error("Why do you this!");
         }
     }
 

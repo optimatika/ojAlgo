@@ -36,24 +36,6 @@ import org.ojalgo.type.context.NumberContext;
 
 public abstract class Presolvers {
 
-    /**
-     * If an expression contains at least 1 binary variable and all non-fixed variable weights are of the same
-     * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
-     * variables. (Doesn't seem to work and/or is not effective.)
-     *
-     * @deprecated v48 Has been replaced by
-     *             {@link #doCaseN(Expression, Set, BigDecimal, BigDecimal, NumberContext)}
-     */
-    @Deprecated
-    public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
-            return Presolvers.doCaseN(expression, remaining, lower, upper, precision, relaxed);
-        }
-
-    };
     public static final ExpressionsBasedModel.Presolver INTEGER_EXPRESSION_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
@@ -115,24 +97,6 @@ public abstract class Presolvers {
             }
 
             return false;
-        }
-
-    };
-
-    /**
-     * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
-     * fact can only be zero.
-     *
-     * @deprecated v48 Has been replaced by
-     *             {@link #doCaseN(Expression, Set, BigDecimal, BigDecimal, NumberContext)}
-     */
-    @Deprecated
-    public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
-            return Presolvers.doCaseN(expression, remaining, lower, upper, precision, relaxed);
         }
 
     };

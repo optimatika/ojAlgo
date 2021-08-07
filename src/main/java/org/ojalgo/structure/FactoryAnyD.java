@@ -21,12 +21,14 @@
  */
 package org.ojalgo.structure;
 
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.scalar.Scalar.Factory;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
     /**
-     * Should only be implemented by factories that always produce dense structures.
+     * Should only be implemented by factories that always (or primarily) produce dense structures.
      *
      * @author apete
      */
@@ -47,21 +49,38 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
      *
      * @author apete
      */
-    interface MayBeSparse<I extends StructureAnyD, DR extends MutateAnyD.ModifiableReceiver<?>, SR extends MutateAnyD.ModifiableReceiver<?>>
-            extends FactoryAnyD<I> {
+    interface MayBeSparse<I extends StructureAnyD, DR extends MutateAnyD.ModifiableReceiver<?>, SR extends MutateAnyD.Receiver<?>> extends FactoryAnyD<I> {
 
-        I makeDense(long... structure);
+        DR makeDense(long... structure);
 
-        default I makeDense(final StructureAnyD shape) {
-            return this.make(shape.shape());
+        default DR makeDense(final StructureAnyD shape) {
+            return this.makeDense(shape.shape());
         }
 
-        I makeSparse(long... structure);
+        SR makeSparse(long... structure);
 
-        default I makeSparse(final StructureAnyD shape) {
-            return this.make(shape.shape());
+        default SR makeSparse(final StructureAnyD shape) {
+            return this.makeSparse(shape.shape());
         }
 
+    }
+
+    default Factory1D<I> asFactory1D() {
+        return new Factory1D<I>() {
+
+            public FunctionSet<?> function() {
+                return FactoryAnyD.this.function();
+            }
+
+            public I make(final long count) {
+                return FactoryAnyD.this.make(count);
+            }
+
+            public Factory<?> scalar() {
+                return FactoryAnyD.this.scalar();
+            }
+
+        };
     }
 
     I make(long... structure);

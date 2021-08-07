@@ -130,10 +130,7 @@ public class Primitive32Array extends PrimitiveArray {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof Primitive32Array)) {
+        if (!super.equals(obj) || !(obj instanceof Primitive32Array)) {
             return false;
         }
         Primitive32Array other = (Primitive32Array) obj;
@@ -145,7 +142,11 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        FillAll.fill(data, values);
+        if (values instanceof Primitive32Array) {
+            FillMatchingSingle.fill(data, ((Primitive32Array) values).data);
+        } else {
+            FillMatchingSingle.fill(data, values);
+        }
     }
 
     @Override
@@ -164,7 +165,7 @@ public class Primitive32Array extends PrimitiveArray {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + Arrays.hashCode(data);
+        result = prime * result + Arrays.hashCode(data);
         return result;
     }
 
@@ -183,6 +184,14 @@ public class Primitive32Array extends PrimitiveArray {
         CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
         Arrays.parallelSort(data);
         CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
+    }
+
+    @Override
+    public void supplyTo(final Mutate1D receiver) {
+        int limit = Math.min(data.length, receiver.size());
+        for (int i = 0; i < limit; i++) {
+            receiver.set(i, data[i]);
+        }
     }
 
     @Override
