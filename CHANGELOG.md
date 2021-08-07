@@ -11,7 +11,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-## [49.0.0] – 2021-08-??
+## [49.0.0] – 2021-08-07
 
 - Many things that have been deprecated for a while are now actually removed. Not all are mentioned specifically below.
 
