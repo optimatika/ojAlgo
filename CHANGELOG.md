@@ -11,6 +11,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.0.1] – 2021-08-11
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Sparse-sparse matrix multiplication didn't work for non-primitive matrixes: https://github.com/optimatika/ojAlgo/issues/360
+
 ## [49.0.0] – 2021-08-07
 
 - Many things that have been deprecated for a while are now actually removed. Not all are mentioned specifically below.
