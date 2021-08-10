@@ -58,36 +58,52 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     }
 
-    public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
+    public static final SparseStore.Factory<ComplexNumber> COMPLEX = SparseStore::makeComplex;
+    public static final SparseStore.Factory<Double> PRIMITIVE32 = SparseStore::makePrimitive32;
+    public static final SparseStore.Factory<Double> PRIMITIVE64 = SparseStore::makePrimitive;
+    public static final SparseStore.Factory<Quaternion> QUATERNION = SparseStore::makeQuaternion;
+    public static final SparseStore.Factory<RationalNumber> RATIONAL = SparseStore::makeRational;
 
-    public static final SparseStore.Factory<Double> PRIMITIVE32 = (rowsCount, columnsCount) -> SparseStore.makePrimitive32((int) rowsCount, (int) columnsCount);
-
-    public static final SparseStore.Factory<Double> PRIMITIVE64 = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
-
-    public static final SparseStore.Factory<Quaternion> QUATERNION = (rowsCount, columnsCount) -> SparseStore.makeQuaternion((int) rowsCount,
-            (int) columnsCount);
-
-    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
-            (int) columnsCount);
-
-    public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
+    public static SparseStore<ComplexNumber> makeComplex(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.COMPLEX, rowsCount, columnsCount);
     }
 
-    public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
+    public static SparseStore<Double> makePrimitive(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(Primitive64Store.FACTORY, rowsCount, columnsCount);
     }
 
-    public static SparseStore<Double> makePrimitive32(final int rowsCount, final int columnsCount) {
+    public static SparseStore<Double> makePrimitive32(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(Primitive32Store.FACTORY, rowsCount, columnsCount);
     }
 
-    public static SparseStore<Quaternion> makeQuaternion(final int rowsCount, final int columnsCount) {
+    public static SparseStore<Quaternion> makeQuaternion(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.QUATERNION, rowsCount, columnsCount);
     }
 
-    public static SparseStore<RationalNumber> makeRational(final int rowsCount, final int columnsCount) {
+    public static SparseStore<RationalNumber> makeRational(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.RATIONAL, rowsCount, columnsCount);
+    }
+
+    private static <N extends Scalar<N>> void doGenericColumnAXPY(final SparseArray<N> elements, final long colX, final long colY, final N a,
+            final TransformableRegion<N> y) {
+
+        long structure = y.countRows();
+
+        long first = structure * colX;
+        long limit = first + structure;
+
+        elements.visitReferenceTypeNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, value.multiply(a)));
+    }
+
+    private static void doPrimitiveColumnAXPY(final SparseArray<Double> elements, final long colX, final long colY, final double a,
+            final TransformableRegion<Double> y) {
+
+        long structure = y.countRows();
+
+        long first = structure * colX;
+        long limit = first + structure;
+
+        elements.visitPrimitiveNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, a * value));
     }
 
     static <N extends Comparable<N>> SparseStore<N> makeSparse(final PhysicalStore.Factory<N, ?> physical, final long numberOfRows,
@@ -101,24 +117,57 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     static <N extends Comparable<N>> void multiply(final SparseStore<N> left, final SparseStore<N> right, final TransformableRegion<N> target) {
 
+        target.reset();
+
         if (left.isPrimitive()) {
 
-            target.reset();
+            SparseArray<Double> tmpLeft = (SparseArray<Double>) left.getElements();
+            TransformableRegion<Double> tmpTarget = (TransformableRegion<Double>) target;
 
             right.nonzeros().stream().forEach(element -> {
-                left.doColumnAXPY(element.row(), element.column(), element.doubleValue(), target);
+                SparseStore.doPrimitiveColumnAXPY(tmpLeft, element.row(), element.column(), element.doubleValue(), tmpTarget);
+            });
+
+        } else if (left.getComponentType().isAssignableFrom(ComplexNumber.class)) {
+
+            SparseArray<ComplexNumber> tmpLeft = (SparseArray<ComplexNumber>) left.getElements();
+            SparseStore<ComplexNumber> tmpRight = (SparseStore<ComplexNumber>) right;
+            TransformableRegion<ComplexNumber> tmpTarget = (TransformableRegion<ComplexNumber>) target;
+
+            tmpRight.nonzeros().stream().forEach(element -> {
+                SparseStore.doGenericColumnAXPY(tmpLeft, element.row(), element.column(), element.get(), tmpTarget);
+            });
+
+        } else if (left.getComponentType().isAssignableFrom(RationalNumber.class)) {
+
+            SparseArray<RationalNumber> tmpLeft = (SparseArray<RationalNumber>) left.getElements();
+            SparseStore<RationalNumber> tmpRight = (SparseStore<RationalNumber>) right;
+            TransformableRegion<RationalNumber> tmpTarget = (TransformableRegion<RationalNumber>) target;
+
+            tmpRight.nonzeros().stream().forEach(element -> {
+                SparseStore.doGenericColumnAXPY(tmpLeft, element.row(), element.column(), element.get(), tmpTarget);
+            });
+
+        } else if (left.getComponentType().isAssignableFrom(Quaternion.class)) {
+
+            SparseArray<Quaternion> tmpLeft = (SparseArray<Quaternion>) left.getElements();
+            SparseStore<Quaternion> tmpRight = (SparseStore<Quaternion>) right;
+            TransformableRegion<Quaternion> tmpTarget = (TransformableRegion<Quaternion>) target;
+
+            tmpRight.nonzeros().stream().forEach(element -> {
+                SparseStore.doGenericColumnAXPY(tmpLeft, element.row(), element.column(), element.get(), tmpTarget);
             });
 
         } else {
 
-            left.multiply(right, target);
+            throw new IllegalStateException("Unsupported element type!");
         }
     }
 
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
-    private final TransformableRegion.FillByMultiplying<N> myMultiplyer;
+    private TransformableRegion.FillByMultiplying<N> myMultiplyer;
 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
@@ -130,13 +179,11 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         Arrays.fill(myFirsts, columnsCount);
         // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
 
-        final Class<? extends Comparable> tmpType = factory.scalar().zero().get().getClass();
+        Class<? extends Comparable> tmpType = factory.scalar().zero().get().getClass();
         if (tmpType.equals(Double.class)) {
             myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rowsCount, columnsCount);
-        } else if (tmpType.equals(ComplexNumber.class)) {
-            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rowsCount, columnsCount);
         } else {
-            myMultiplyer = null;
+            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rowsCount, columnsCount);
         }
     }
 
@@ -182,7 +229,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
-        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        int complexity = Math.toIntExact(left.count() / this.countRows());
         if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
             ProgrammingError.throwForMultiplicationNotPossible();
         }
@@ -210,12 +257,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public int firstInColumn(final int col) {
 
-        final long structure = myFirsts.length;
+        long structure = myFirsts.length;
 
-        final long rangeFirst = structure * col;
-        final long rangeLimit = structure * (col + 1);
+        long rangeFirst = structure * col;
+        long rangeLimit = structure * (col + 1);
 
-        final long firstInRange = myElements.firstInRange(rangeFirst, rangeLimit);
+        long firstInRange = myElements.firstInRange(rangeFirst, rangeLimit);
 
         if (rangeFirst == firstInRange) {
             return 0;
@@ -233,7 +280,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myElements == null ? 0 : myElements.hashCode());
         result = prime * result + Arrays.hashCode(myFirsts);
@@ -244,12 +291,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     @Override
     public int limitOfColumn(final int col) {
 
-        final long structure = myFirsts.length;
+        long structure = myFirsts.length;
 
-        final long rangeFirst = structure * col;
-        final long rangeLimit = rangeFirst + structure;
+        long rangeFirst = structure * col;
+        long rangeLimit = rangeFirst + structure;
 
-        final long limitOfRange = myElements.limitOfRange(rangeFirst, rangeLimit);
+        long limitOfRange = myElements.limitOfRange(rangeFirst, rangeLimit);
 
         if (rangeLimit == limitOfRange) {
             return (int) structure;
@@ -263,7 +310,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
-        final long tmpLimit = this.count();
+        long tmpLimit = this.count();
         if (this.isPrimitive()) {
             for (long i = 0L; i < tmpLimit; i++) {
                 this.set(i, modifier.invoke(this.doubleValue(i)));
@@ -277,7 +324,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
 
-        final long limit = Math.min(left.count(), this.count());
+        long limit = Math.min(left.count(), this.count());
         boolean notModifiesZero = function.invoke(E, ZERO) == ZERO;
 
         if (this.isPrimitive()) {
@@ -303,7 +350,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
 
-        final long limit = Math.min(this.count(), right.count());
+        long limit = Math.min(this.count(), right.count());
         boolean notModifiesZero = function.invoke(ZERO, E) == ZERO;
 
         if (this.isPrimitive()) {
@@ -343,22 +390,22 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         } else if (this.isPrimitive()) {
 
-            final long complexity = this.countColumns();
-            final long numberOfColumns = target.countColumns();
+            long complexity = this.countColumns();
+            long numberOfColumns = target.countColumns();
 
             target.reset();
 
             this.nonzeros().stream().forEach(element -> {
 
-                final long row = element.row();
-                final long col = element.column();
-                final double value = element.doubleValue();
+                long row = element.row();
+                long col = element.column();
+                double value = element.doubleValue();
 
-                final long first = MatrixStore.firstInRow(right, col, 0L);
-                final long limit = MatrixStore.limitOfRow(right, col, numberOfColumns);
+                long first = MatrixStore.firstInRow(right, col, 0L);
+                long limit = MatrixStore.limitOfRow(right, col, numberOfColumns);
                 for (long j = first; j < limit; j++) {
-                    final long index = Structure2D.index(complexity, col, j);
-                    final double addition = value * right.doubleValue(index);
+                    long index = Structure2D.index(complexity, col, j);
+                    double addition = value * right.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
                         target.add(row, j, addition);
                     }
@@ -373,19 +420,19 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public MatrixStore<N> multiply(final double scalar) {
 
-        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
+        SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
         if (this.isPrimitive()) {
 
-            for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
+            for (ElementView2D<N, ?> nonzero : this.nonzeros()) {
                 retVal.set(nonzero.index(), nonzero.doubleValue() * scalar);
             }
 
         } else {
 
-            final Scalar<N> sclr = this.physical().scalar().convert(scalar);
+            Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
-            for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
+            for (ElementView2D<N, ?> nonzero : this.nonzeros()) {
                 retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
@@ -400,14 +447,14 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         if (right instanceof SparseStore) {
 
-            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+            SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
             SparseStore.multiply(this, (SparseStore<N>) right, retVal);
 
             return retVal;
 
         }
-        final PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
+        PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
 
         this.multiply(right, retVal);
 
@@ -416,21 +463,21 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public MatrixStore<N> multiply(final N scalar) {
 
-        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
+        SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
         if (this.isPrimitive()) {
 
-            final double sclr = NumberDefinition.doubleValue(scalar);
+            double sclr = NumberDefinition.doubleValue(scalar);
 
-            for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
+            for (ElementView2D<N, ?> nonzero : this.nonzeros()) {
                 retVal.set(nonzero.index(), nonzero.doubleValue() * sclr);
             }
 
         } else {
 
-            final Scalar<N> sclr = this.physical().scalar().convert(scalar);
+            Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
-            for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
+            for (ElementView2D<N, ?> nonzero : this.nonzeros()) {
                 retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
@@ -456,7 +503,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         if (left instanceof SparseStore<?>) {
 
-            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+            SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
             SparseStore.multiply((SparseStore<N>) left, this, retVal);
 
@@ -467,19 +514,19 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
             return super.premultiply(left);
         }
-        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+        SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
         this.nonzeros().stream().forEach(element -> {
 
-            final long row = element.row();
-            final long col = element.column();
-            final double value = element.doubleValue();
+            long row = element.row();
+            long col = element.column();
+            double value = element.doubleValue();
 
-            final long first = MatrixStore.firstInColumn(left, row, 0L);
-            final long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
+            long first = MatrixStore.firstInColumn(left, row, 0L);
+            long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
             for (long i = first; i < limit; i++) {
-                final long index = Structure2D.index(numberOfRows, i, row);
-                final double addition = value * left.doubleValue(index);
+                long index = Structure2D.index(numberOfRows, i, row);
+                double addition = value * left.doubleValue(index);
                 if (NumberContext.compare(addition, ZERO) != 0) {
                     retVal.add(i, col, addition);
                 }
@@ -597,14 +644,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros((int) row, (int) col);
     }
 
-    void doColumnAXPY(final long colX, final long colY, final double a, final TransformableRegion<N> y) {
-
-        long structure = y.countRows();
-
-        final long first = structure * colX;
-        final long limit = first + structure;
-
-        myElements.visitPrimitiveNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, a * value));
+    SparseArray<N> getElements() {
+        return myElements;
     }
 
     void updateNonZeros(final int row, final int col) {

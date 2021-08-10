@@ -26,8 +26,37 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 public class SparseCase extends NonPhysicalTest {
+
+    static <N extends Comparable<N>> void doTestMultiplication(final SparseStore<N> sparseA, final SparseStore<N> sparseB, final SparseStore<N> sparseC,
+            final PhysicalStore.Factory<N, ?> fctory) {
+
+        SparsePerformance.fill(sparseA);
+        SparsePerformance.fill(sparseB);
+        SparsePerformance.fill(sparseC);
+
+        PhysicalStore<N> denseA = sparseA.copy();
+        PhysicalStore<N> denseB = sparseB.copy();
+        PhysicalStore<N> denseC = sparseC.copy();
+
+        TestUtils.assertEquals(denseA.multiply(denseB), sparseA.multiply(sparseB));
+        TestUtils.assertEquals(denseA.multiply(sparseB), sparseA.multiply(denseB));
+
+        TestUtils.assertEquals(denseB.premultiply(denseA).collect(fctory), sparseB.premultiply(sparseA).collect(fctory));
+        TestUtils.assertEquals(denseB.premultiply(sparseA).collect(fctory), sparseB.premultiply(denseA).collect(fctory));
+
+        denseA.multiply(denseB, denseC);
+        sparseA.multiply(sparseB, sparseC);
+        TestUtils.assertEquals(denseC, sparseC);
+
+        denseA.multiply(sparseB, denseC);
+        sparseA.multiply(denseB, sparseC);
+        TestUtils.assertEquals(denseC, sparseC);
+    }
 
     @Override
     @BeforeEach
@@ -50,33 +79,43 @@ public class SparseCase extends NonPhysicalTest {
     }
 
     @Test
-    public void testMultiplySparseDense() {
+    public void testMultiplySparseDenseComplex() {
+
+        SparseStore<ComplexNumber> sparseA = SparseStore.makeComplex(7, 8);
+        SparseStore<ComplexNumber> sparseB = SparseStore.makeComplex(8, 9);
+        SparseStore<ComplexNumber> sparseC = SparseStore.makeComplex(7, 9);
+
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.COMPLEX);
+    }
+
+    @Test
+    public void testMultiplySparseDensePrimitive() {
 
         SparseStore<Double> sparseA = SparseStore.makePrimitive(7, 8);
         SparseStore<Double> sparseB = SparseStore.makePrimitive(8, 9);
         SparseStore<Double> sparseC = SparseStore.makePrimitive(7, 9);
 
-        SparsePerformance.fill(sparseA);
-        SparsePerformance.fill(sparseB);
-        SparsePerformance.fill(sparseC);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, Primitive64Store.FACTORY);
+    }
 
-        PhysicalStore<Double> denseA = sparseA.copy();
-        PhysicalStore<Double> denseB = sparseB.copy();
-        PhysicalStore<Double> denseC = sparseC.copy();
+    @Test
+    public void testMultiplySparseDenseQuaternion() {
 
-        TestUtils.assertEquals(denseA.multiply(denseB), sparseA.multiply(sparseB));
-        TestUtils.assertEquals(denseA.multiply(sparseB), sparseA.multiply(denseB));
+        SparseStore<Quaternion> sparseA = SparseStore.makeQuaternion(7, 8);
+        SparseStore<Quaternion> sparseB = SparseStore.makeQuaternion(8, 9);
+        SparseStore<Quaternion> sparseC = SparseStore.makeQuaternion(7, 9);
 
-        TestUtils.assertEquals(denseB.premultiply(denseA).collect(Primitive64Store.FACTORY), sparseB.premultiply(sparseA).collect(Primitive64Store.FACTORY));
-        TestUtils.assertEquals(denseB.premultiply(sparseA).collect(Primitive64Store.FACTORY), sparseB.premultiply(denseA).collect(Primitive64Store.FACTORY));
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.QUATERNION);
+    }
 
-        denseA.multiply(denseB, denseC);
-        sparseA.multiply(sparseB, sparseC);
-        TestUtils.assertEquals(denseC, sparseC);
+    @Test
+    public void testMultiplySparseDenseRational() {
 
-        denseA.multiply(sparseB, denseC);
-        sparseA.multiply(denseB, sparseC);
-        TestUtils.assertEquals(denseC, sparseC);
+        SparseStore<RationalNumber> sparseA = SparseStore.makeRational(7, 8);
+        SparseStore<RationalNumber> sparseB = SparseStore.makeRational(8, 9);
+        SparseStore<RationalNumber> sparseC = SparseStore.makeRational(7, 9);
+
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.RATIONAL);
     }
 
     @Test
