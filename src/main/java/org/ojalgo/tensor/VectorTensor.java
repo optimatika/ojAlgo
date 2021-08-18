@@ -46,10 +46,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
             if (this == obj) {
                 return true;
             }
-            if (!super.equals(obj)) {
-                return false;
-            }
-            if (!(obj instanceof Factory)) {
+            if (!super.equals(obj) || !(obj instanceof Factory)) {
                 return false;
             }
             Factory other = (Factory) obj;
@@ -67,7 +64,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         public int hashCode() {
             final int prime = 31;
             int result = super.hashCode();
-            result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+            result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
             return result;
         }
 
@@ -118,10 +115,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof VectorTensor)) {
+        if (!super.equals(obj) || !(obj instanceof VectorTensor)) {
             return false;
         }
         VectorTensor other = (VectorTensor) obj;
@@ -162,8 +156,8 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myArray == null) ? 0 : myArray.hashCode());
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myArray == null ? 0 : myArray.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 
