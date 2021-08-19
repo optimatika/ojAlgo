@@ -38,52 +38,48 @@ public class TensorTest {
     private static final Primitive64Matrix ELEMENTS_C = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
     private static final Primitive64Matrix ELEMENTS_D = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
 
+    private static final Primitive64Matrix.Factory FACTORY__M = Primitive64Matrix.FACTORY;
     private static final TensorFactory1D<Double, VectorTensor<Double>> FACTORY_1 = VectorTensor.factory(Primitive64Array.FACTORY);
     private static final TensorFactory2D<Double, MatrixTensor<Double>> FACTORY_2 = MatrixTensor.factory(Primitive64Array.FACTORY);
     private static final TensorFactoryAnyD<Double, AnyTensor<Double>> FACTORY_N = AnyTensor.factory(Primitive64Array.FACTORY);
 
-    private static final Primitive64Matrix.Factory FACTORY_M = Primitive64Matrix.FACTORY;
-
     static final boolean DEBUG = false;
 
     @Test
-    public void testCompareConjugateProducts() {
+    public void testCompareProductBetweenFactories() {
 
         VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
         VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
-        VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
 
-        VectorTensor<Double> vecProd21 = FACTORY_1.product(vectorA, vectorB);
-        MatrixTensor<Double> vecProd22 = FACTORY_2.product(vectorA, vectorB).conjugate();
-        AnyTensor<Double> vecProd2N = FACTORY_N.product(vectorA, vectorB).conjugate();
+        MatrixTensor<Double> prod2 = FACTORY_2.product(vectorA, vectorB);
+        AnyTensor<Double> prodN = FACTORY_N.product(vectorA, vectorB);
 
-        TestUtils.assertEquals(vecProd21, vecProd22);
-        TestUtils.assertEquals(vecProd21, vecProd2N);
+        if (DEBUG) {
+            BasicLogger.debug("prod2: {}", prod2.toRawCopy1D());
+            BasicLogger.debug("prodN: {}", prodN.toRawCopy1D());
+        }
 
-        VectorTensor<Double> vecProd31 = FACTORY_1.product(vectorA, vectorB, vectorC);
-        AnyTensor<Double> vecProd3N = FACTORY_N.product(vectorA, vectorB, vectorC).conjugate();
-
-        TestUtils.assertEquals(vecProd31, vecProd3N);
+        TestUtils.assertEquals(prod2, prodN);
     }
 
     @Test
-    public void testCompareTensorProductOf2Vectors() {
+    public void testCompareSumBetweenFactories() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        MatrixTensor<Double> matrixA = FACTORY_2.copy(ELEMENTS_A);
+        MatrixTensor<Double> matrixB = FACTORY_2.copy(ELEMENTS_B);
 
-        MatrixTensor<Double> matrix = FACTORY_2.product(vectorA, vectorB);
-        AnyTensor<Double> any = FACTORY_N.product(vectorA, vectorB);
+        AnyTensor<Double> anyA = FACTORY_N.copy(ELEMENTS_A);
+        AnyTensor<Double> anyB = FACTORY_N.copy(ELEMENTS_B);
+
+        MatrixTensor<Double> sum2 = FACTORY_2.blocks(matrixA, matrixB);
+        AnyTensor<Double> sumN = FACTORY_N.blocks(anyA, anyB);
 
         if (DEBUG) {
-            BasicLogger.debug("matrix", matrix);
-            BasicLogger.debug("any: {}", any);
+            BasicLogger.debug("vecProd22: {}", sum2.toRawCopy1D());
+            BasicLogger.debug("vecProd2N: {}", sumN.toRawCopy1D());
         }
 
-        TestUtils.assertEquals(matrix.rank(), any.rank());
-        TestUtils.assertEquals(matrix.dimensions(), any.dimensions());
-
-        TestUtils.assertTensorEquals(matrix, any);
+        TestUtils.assertEquals(sum2, sumN);
     }
 
     @Test
@@ -154,16 +150,16 @@ public class TensorTest {
         MatrixTensor<Double> tensorC = FACTORY_2.copy(ELEMENTS_C);
         MatrixTensor<Double> tensorD = FACTORY_2.copy(ELEMENTS_D);
 
-        MatrixTensor<Double> sum1 = FACTORY_2.sum(tensorA, tensorB);
-        MatrixTensor<Double> sum2 = FACTORY_2.sum(tensorC, tensorD);
+        MatrixTensor<Double> sum1 = FACTORY_2.blocks(tensorA, tensorB);
+        MatrixTensor<Double> sum2 = FACTORY_2.blocks(tensorC, tensorD);
 
-        MatrixTensor<Double> product1 = FACTORY_2.product(tensorA, tensorB);
-        MatrixTensor<Double> product2 = FACTORY_2.product(tensorC, tensorD);
+        MatrixTensor<Double> product1 = FACTORY_2.kronecker(tensorA, tensorB);
+        MatrixTensor<Double> product2 = FACTORY_2.kronecker(tensorC, tensorD);
 
-        Primitive64Matrix matrixS1 = FACTORY_M.copy(sum1);
-        Primitive64Matrix matrixS2 = FACTORY_M.copy(sum2);
-        Primitive64Matrix matrixP1 = FACTORY_M.copy(product1);
-        Primitive64Matrix matrixP2 = FACTORY_M.copy(product2);
+        Primitive64Matrix matrixS1 = FACTORY__M.copy(sum1);
+        Primitive64Matrix matrixS2 = FACTORY__M.copy(sum2);
+        Primitive64Matrix matrixP1 = FACTORY__M.copy(product1);
+        Primitive64Matrix matrixP2 = FACTORY__M.copy(product2);
 
         TestUtils.assertEquals(ELEMENTS_A.getDeterminant().multiply(ELEMENTS_B.getDeterminant()), matrixS1.getDeterminant());
         TestUtils.assertEquals(ELEMENTS_C.getDeterminant().multiply(ELEMENTS_D.getDeterminant()), matrixS2.getDeterminant());
@@ -179,30 +175,45 @@ public class TensorTest {
     }
 
     @Test
-    public void testMatrixProduct() {
+    public void testKroneckerProduct() {
 
         MatrixTensor<Double> matrixA = FACTORY_2.copy(ELEMENTS_A);
+        MatrixTensor<Double> matrixB = FACTORY_2.copy(ELEMENTS_B);
 
         MatrixTensor<Double> identity = FACTORY_2.identity(3);
 
-        MatrixTensor<Double> right = FACTORY_2.product(identity, matrixA);
-        MatrixTensor<Double> left = FACTORY_2.product(matrixA, identity);
-        MatrixTensor<Double> both = FACTORY_2.product(matrixA, matrixA);
+        MatrixTensor<Double> left = FACTORY_2.kronecker(matrixA, identity);
+        MatrixTensor<Double> right = FACTORY_2.kronecker(identity, matrixB);
+        MatrixTensor<Double> both = FACTORY_2.kronecker(matrixA, matrixB);
 
-        MatrixTensor<Double> sum = FACTORY_2.sum(matrixA, matrixA, matrixA);
+        MatrixTensor<Double> blocks = FACTORY_2.blocks(matrixB, matrixB, matrixB);
 
         if (DEBUG) {
-            BasicLogger.debug("right", right);
             BasicLogger.debug("left", left);
+            BasicLogger.debug("right", right);
             BasicLogger.debug("both", both);
-            BasicLogger.debug("sum", sum);
+            BasicLogger.debug("blocks", blocks);
         }
 
         TestUtils.assertEquals(3 * DIM, right.dimensions());
         TestUtils.assertEquals(DIM * 3, left.dimensions());
         TestUtils.assertEquals(DIM * DIM, both.dimensions());
 
-        TestUtils.assertEquals(sum, right);
+        TestUtils.assertEquals(blocks, right);
+
+        MatrixTensor<Double> matrixC = FACTORY_2.copy(ELEMENTS_C);
+        MatrixTensor<Double> matrixD = FACTORY_2.copy(ELEMENTS_D);
+
+        Primitive64Matrix matrixAkB = FACTORY__M.copy(FACTORY_2.kronecker(matrixA, matrixB));
+        Primitive64Matrix matrixCkD = FACTORY__M.copy(FACTORY_2.kronecker(matrixC, matrixD));
+        Primitive64Matrix matrixAkBmCkD = matrixAkB.multiply(matrixCkD);
+
+        MatrixTensor<Double> matrixAmC = FACTORY_2.copy(ELEMENTS_A.multiply(ELEMENTS_C));
+        MatrixTensor<Double> matrixBmD = FACTORY_2.copy(ELEMENTS_B.multiply(ELEMENTS_D));
+
+        MatrixTensor<Double> matrixACkBD = FACTORY_2.kronecker(matrixAmC, matrixBmD);
+
+        TestUtils.assertEquals(matrixAkBmCkD, matrixACkBD);
     }
 
     @Test
@@ -213,8 +224,9 @@ public class TensorTest {
         VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
 
         int length = DIM * DIM;
+        int count = length * length * length;
 
-        VectorTensor<Double> vectorProduct = FACTORY_1.product(vectorA, vectorB, vectorC);
+        AnyTensor<Double> vectorProduct = FACTORY_N.product(vectorA, vectorB, vectorC);
 
         if (DEBUG) {
             BasicLogger.debug("vectorA: {}", vectorA);
@@ -223,18 +235,18 @@ public class TensorTest {
             BasicLogger.debug("product: {}", vectorProduct);
         }
 
-        TestUtils.assertEquals(1, vectorProduct.rank());
-        TestUtils.assertEquals(length * length * length, vectorProduct.dimensions());
+        TestUtils.assertEquals(3, vectorProduct.rank());
+        TestUtils.assertEquals(length, vectorProduct.dimensions());
+        TestUtils.assertEquals(count, vectorProduct.count());
 
         // Check first element
         TestUtils.assertEquals(vectorA.doubleValue(0) * vectorB.doubleValue(0) * vectorC.doubleValue(0), vectorProduct.doubleValue(0));
 
-        int lastABC = length - 1;
-        int lastProduct = vectorProduct.dimensions() - 1;
+        int lastIndex = length - 1;
 
         // Check last element
-        TestUtils.assertEquals(vectorA.doubleValue(lastABC) * vectorB.doubleValue(lastABC) * vectorC.doubleValue(lastABC),
-                vectorProduct.doubleValue(lastProduct));
+        double expectedLast = vectorA.doubleValue(lastIndex) * vectorB.doubleValue(lastIndex) * vectorC.doubleValue(lastIndex);
+        TestUtils.assertEquals(expectedLast, vectorProduct.doubleValue(new long[] { lastIndex, lastIndex, lastIndex }));
     }
 
     @Test
@@ -246,27 +258,31 @@ public class TensorTest {
 
         int length = DIM * DIM;
 
-        VectorTensor<Double> vectorSum = FACTORY_1.sum(vectorA, vectorB, vectorC);
+        VectorTensor<Double> sum1 = FACTORY_1.sum(vectorA, vectorB, vectorC);
 
         if (DEBUG) {
             BasicLogger.debug("vectorA: {}", vectorA);
             BasicLogger.debug("vectorB: {}", vectorB);
             BasicLogger.debug("vectorC: {}", vectorC);
-            BasicLogger.debug("sum: {}", vectorSum);
+            BasicLogger.debug("sum: {}", sum1);
         }
 
-        TestUtils.assertEquals(1, vectorSum.rank());
-        TestUtils.assertEquals(3 * length, vectorSum.dimensions());
+        TestUtils.assertEquals(1, sum1.rank());
+        TestUtils.assertEquals(3 * length, sum1.dimensions());
 
         for (int i = 0; i < vectorA.dimensions(); i++) {
-            TestUtils.assertEquals(vectorA.doubleValue(i), vectorSum.doubleValue(i));
+            TestUtils.assertEquals(vectorA.doubleValue(i), sum1.doubleValue(i));
         }
         for (int i = 0; i < vectorB.dimensions(); i++) {
-            TestUtils.assertEquals(vectorB.doubleValue(i), vectorSum.doubleValue(length + i));
+            TestUtils.assertEquals(vectorB.doubleValue(i), sum1.doubleValue(length + i));
         }
         for (int i = 0; i < vectorC.dimensions(); i++) {
-            TestUtils.assertEquals(vectorC.doubleValue(i), vectorSum.doubleValue(length + length + i));
+            TestUtils.assertEquals(vectorC.doubleValue(i), sum1.doubleValue(length + length + i));
         }
+
+        AnyTensor<Double> sumN = FACTORY_N.sum(vectorA, vectorB, vectorC);
+
+        TestUtils.assertEquals(sum1, sumN);
     }
 
     /**

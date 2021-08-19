@@ -61,10 +61,7 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof TensorFactory1D)) {
+        if (!super.equals(obj) || !(obj instanceof TensorFactory1D)) {
             return false;
         }
         TensorFactory1D other = (TensorFactory1D) obj;
@@ -86,7 +83,7 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 
@@ -94,31 +91,15 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         return myFactory.make(count);
     }
 
-    public T power(final Access1D<N> vector, final int exponent) {
-        Access1D<N>[] vectors = (Access1D<N>[]) new Access1D<?>[exponent];
-        Arrays.fill(vectors, vector);
-        return this.product(vectors);
-    }
-
-    public T product(final Access1D<N>... vectors) {
-
-        long[] dims = new long[vectors.length];
-        long dimensions = 1;
-        for (int i = 0; i < vectors.length; i++) {
-            dimensions *= (dims[i] = vectors[i].count());
-        }
-
-        T retVal = myFactory.make(dimensions);
-
-        this.prod(retVal, 1.0, vectors, 0, 0);
-
-        return retVal;
-    }
-
     public Scalar.Factory<N> scalar() {
         return (Factory<N>) myFactory.scalar();
     }
 
+    /**
+     * Direct sum of vectors.
+     *
+     * @see TensorFactoryAnyD#sum(Access1D...)
+     */
     public T sum(final Access1D<N>... vectors) {
 
         long dimensions = 0;
@@ -160,25 +141,6 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         }
 
         return retVal;
-    }
-
-    private int prod(final T array, final double soFar, final Access1D<N>[] vectors, final int d, final int index) {
-
-        Access1D<N> vector = vectors[d];
-        int next = d + 1;
-
-        if (next < vectors.length) {
-            int ii = index;
-            for (int i = 0; i < vector.count(); i++) {
-                ii = this.prod(array, soFar * vector.doubleValue(i), vectors, next, ii);
-            }
-            return ii;
-        } else {
-            for (int i = 0; i < vector.count(); i++) {
-                array.set(index + i, soFar * vector.doubleValue(i));
-            }
-            return index + vector.size();
-        }
     }
 
 }
