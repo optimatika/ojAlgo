@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.0.2] – 2021-08-24
+
 ### Changed
 
 #### org.ojalgo.tensor
