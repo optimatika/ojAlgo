@@ -17,6 +17,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Changed the TensorFactory API a bit. (This package contains new functionality that may see more changes before the API stabilizes.)
 
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Continued operations on a transposed `ElementsSupplier` in some cases reversed the transposition.
+
 #### 
 
 ## [49.0.1] – 2021-08-11

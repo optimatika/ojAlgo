@@ -200,18 +200,6 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
             super(context, context.countColumns(), context.countRows());
         }
 
-        public ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
-            return this.getContext().onAll(operator);
-        }
-
-        public ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-            return this.getContext().onMatching(operator, right.transpose());
-        }
-
-        public ElementsSupplier<N> onMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-            return this.getContext().onMatching(left.transpose(), operator);
-        }
-
         @Override
         public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver.regionByTransposing());
@@ -263,7 +251,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
     @Override
     public final String toString() {
-        return myContext.toString();
+        return myRowsCount + "x" + myColumnsCount + " " + this.getClass();
     }
 
     final ElementsSupplier<N> getContext() {
