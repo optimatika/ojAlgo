@@ -67,20 +67,25 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+            result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
             return result;
         }
 
         public AnyTensor<N> make(final long... structure) {
-            if (structure.length <= 0) {
+
+            int rank = structure.length;
+            long dimensions = structure[0];
+
+            if (rank <= 0 || dimensions <= 0L) {
                 throw new IllegalArgumentException();
             }
-            for (int i = 1; i < structure.length; i++) {
-                if (structure[i] != structure[0]) {
+            for (int i = 1; i < rank; i++) {
+                if (structure[i] != dimensions) {
                     throw new IllegalArgumentException();
                 }
             }
-            return new AnyTensor<>(myFactory, structure.length, Math.toIntExact(structure[0]));
+
+            return new AnyTensor<>(myFactory, rank, Math.toIntExact(dimensions));
         }
 
     }
@@ -143,10 +148,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof AnyTensor)) {
+        if (!super.equals(obj) || !(obj instanceof AnyTensor)) {
             return false;
         }
         AnyTensor other = (AnyTensor) obj;
@@ -211,8 +213,8 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myArray == null) ? 0 : myArray.hashCode());
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myArray == null ? 0 : myArray.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 

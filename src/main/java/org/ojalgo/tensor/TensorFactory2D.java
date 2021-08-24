@@ -60,10 +60,7 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof TensorFactory2D)) {
+        if (!super.equals(obj) || !(obj instanceof TensorFactory2D)) {
             return false;
         }
         TensorFactory2D other = (TensorFactory2D) obj;
@@ -85,7 +82,7 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         return result;
     }
 
@@ -106,6 +103,9 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         return myFactory.make(rows, columns);
     }
 
+    /**
+     * Same as {@link TensorFactoryAnyD#product(Access1D...)} but explicitly for rank 2.
+     */
     public T product(final Access1D<N> vector1, final Access1D<N> vector2) {
 
         long rows = vector1.count();
@@ -122,7 +122,14 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         return retVal;
     }
 
-    public T product(final Access2D<N> matrix1, final Access2D<N> matrix2) {
+    public T power2(final Access1D<N> vector) {
+        return this.product(vector, vector);
+    }
+
+    /**
+     * The Kronecker matrix product / matrix tensor product
+     */
+    public T kronecker(final Access2D<N> matrix1, final Access2D<N> matrix2) {
 
         long rows1 = matrix1.countRows();
         long cols1 = matrix1.countColumns();
@@ -137,14 +144,14 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
 
         for (long j1 = 0; j1 < cols1; j1++) {
             for (long j2 = 0; j2 < cols2; j2++) {
-                j = (j1 * cols2) + j2;
+                j = j1 * cols2 + j2;
 
                 for (long i1 = 0; i1 < rows1; i1++) {
 
                     double val1 = matrix1.doubleValue(i1, j1);
 
                     for (long i2 = 0; i2 < rows2; i2++) {
-                        i = (i1 * rows2) + i2;
+                        i = i1 * rows2 + i2;
 
                         double val2 = matrix2.doubleValue(i2, j2);
 
@@ -161,7 +168,10 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         return (Factory<N>) myFactory.scalar();
     }
 
-    public T sum(final Access2D<N>... matrices) {
+    /**
+     * Will create a block diagonal tensor using the input matrices as blocks in the supplied order.
+     */
+    public T blocks(final Access2D<N>... matrices) {
 
         long rows = 0;
         long cols = 0;

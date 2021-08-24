@@ -68,12 +68,16 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myArrayFactory == null) ? 0 : myArrayFactory.hashCode());
+            result = prime * result + (myArrayFactory == null ? 0 : myArrayFactory.hashCode());
             return result;
         }
 
         public Scalar.Factory<N> scalar() {
             return myArrayFactory.scalar();
+        }
+
+        DenseArray.Factory<N> getArrayFactory() {
+            return myArrayFactory;
         }
 
     }
@@ -131,10 +135,10 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + myDimensions;
-        result = (prime * result) + ((myFunctionSet == null) ? 0 : myFunctionSet.hashCode());
-        result = (prime * result) + myRank;
-        result = (prime * result) + ((myScalarFactory == null) ? 0 : myScalarFactory.hashCode());
+        result = prime * result + myDimensions;
+        result = prime * result + (myFunctionSet == null ? 0 : myFunctionSet.hashCode());
+        result = prime * result + myRank;
+        result = prime * result + (myScalarFactory == null ? 0 : myScalarFactory.hashCode());
         return result;
     }
 

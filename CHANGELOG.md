@@ -11,6 +11,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.0.2] – 2021-08-24
+
+### Changed
+
+#### org.ojalgo.tensor
+
+- Changed the TensorFactory API a bit. (This package contains new functionality that may see more changes before the API stabilizes.)
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Continued operations on a transposed `ElementsSupplier` in some cases reversed the transposition.
+
+#### 
+
 ## [49.0.1] – 2021-08-11
 
 ### Fixed

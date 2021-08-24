@@ -59,7 +59,7 @@ public interface StructureAnyD extends Structure1D {
             int retVal = reference.length - ref.reference.length;
 
             int i = reference.length - 1;
-            while ((retVal == 0) && (i >= 0)) {
+            while (retVal == 0 && i >= 0) {
                 retVal = reference[i] - ref.reference[i];
                 i--;
             }
@@ -72,10 +72,7 @@ public interface StructureAnyD extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof IntReference)) {
+            if ((obj == null) || !(obj instanceof IntReference)) {
                 return false;
             }
             final IntReference other = (IntReference) obj;
@@ -89,7 +86,7 @@ public interface StructureAnyD extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + Arrays.hashCode(reference);
+            result = prime * result + Arrays.hashCode(reference);
             return result;
         }
 
@@ -131,7 +128,7 @@ public interface StructureAnyD extends Structure1D {
             int retVal = Integer.compare(reference.length, ref.reference.length);
 
             int i = reference.length - 1;
-            while ((retVal == 0) && (i >= 0)) {
+            while (retVal == 0 && i >= 0) {
                 retVal = Long.compare(reference[i], ref.reference[i]);
                 i--;
             }
@@ -144,10 +141,7 @@ public interface StructureAnyD extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof LongReference)) {
+            if ((obj == null) || !(obj instanceof LongReference)) {
                 return false;
             }
             final LongReference other = (LongReference) obj;
@@ -161,7 +155,7 @@ public interface StructureAnyD extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + Arrays.hashCode(reference);
+            result = prime * result + Arrays.hashCode(reference);
             return result;
         }
 
@@ -382,7 +376,7 @@ public interface StructureAnyD extends Structure1D {
 
         for (int s = 0; s < structure.length; s++) {
             tmpNext *= structure[s];
-            retVal[s] = (index % tmpNext) / tmpPrev;
+            retVal[s] = index % tmpNext / tmpPrev;
             tmpPrev = tmpNext;
         }
 
@@ -531,7 +525,7 @@ public interface StructureAnyD extends Structure1D {
 
         final long first = StructureAnyD.index(structure, initial);
         final long step = StructureAnyD.step(structure, dimension);
-        final long limit = first + (step * remaining);
+        final long limit = first + step * remaining;
 
         callback.call(first, limit, step);
     }
@@ -547,9 +541,9 @@ public interface StructureAnyD extends Structure1D {
     }
 
     default void loopAll(final ReferenceCallback callback) {
-        final long[] tmpShape = this.shape();
+        long[] shape = this.shape();
         for (long i = 0L; i < this.count(); i++) {
-            callback.call(StructureAnyD.reference(i, tmpShape));
+            callback.call(StructureAnyD.reference(i, shape));
         }
     }
 
