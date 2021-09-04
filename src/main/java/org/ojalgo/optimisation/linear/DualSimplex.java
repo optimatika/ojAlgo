@@ -36,20 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 
 final class DualSimplex extends SimplexSolver {
 
-    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
-
-        SimplexTableau tableau = DualSimplex.build(convex, options);
-
-        DualSimplex solver = new DualSimplex(tableau, options);
-
-        Result result = solver.solve();
-
-        Optimisation.Result retVal = DualSimplex.toConvexState(result, convex);
-
-        return retVal;
-    }
-
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options) {
+    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
 
         int numbVars = convex.countVariables();
         int numbEqus = convex.countEqualityConstraints();
@@ -61,7 +48,7 @@ final class DualSimplex extends SimplexSolver {
         Mutate2D constrBody = retVal.constraintsBody();
         Mutate1D constrRHS = retVal.constraintsRHS();
 
-        MatrixStore<Double> convexC = convex.getC();
+        MatrixStore<Double> convexC = convex.getC(zeroC);
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
         RowsSupplier<Double> convexAI = convex.getAI();
@@ -103,6 +90,28 @@ final class DualSimplex extends SimplexSolver {
         return retVal;
     }
 
+    static Optimisation.Result doSolve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+
+        SimplexTableau tableau = DualSimplex.build(convex, options, zeroC);
+
+        DualSimplex solver = new DualSimplex(tableau, options);
+
+        Result result = solver.solve();
+
+        Optimisation.Result retVal = DualSimplex.toConvexState(result, convex);
+
+        return retVal;
+    }
+
+    static int size(final ConvexSolver.Builder convex) {
+
+        int numbVars = convex.countVariables();
+        int numbEqus = convex.countEqualityConstraints();
+        int numbInes = convex.countInequalityConstraints();
+
+        return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0);
+    }
+
     static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
 
         int numbEqus = convex.countEqualityConstraints();
@@ -121,9 +130,8 @@ final class DualSimplex extends SimplexSolver {
             public double doubleValue(final long index) {
                 if (index < numbEqus) {
                     return -(multipliers.doubleValue(index) - multipliers.doubleValue(numbEqus + index));
-                } else {
-                    return -multipliers.doubleValue(numbEqus + index);
                 }
+                return -multipliers.doubleValue(numbEqus + index);
             }
 
             public Double get(final long index) {
@@ -161,11 +169,11 @@ final class DualSimplex extends SimplexSolver {
 
         if (state == State.UNBOUNDED) {
             return State.INFEASIBLE;
-        } else if (!state.isFeasible()) {
-            return State.UNBOUNDED;
-        } else {
-            return state;
         }
+        if (!state.isFeasible()) {
+            return State.UNBOUNDED;
+        }
+        return state;
     }
 
 }

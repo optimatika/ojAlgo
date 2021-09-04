@@ -71,14 +71,14 @@ public class PrimalDualTest extends OptimisationLinearTests {
         ConvexSolver.Builder primConvex = ConvexSolver.getBuilder();
         ConvexSolver.copy(primModel, primConvex);
 
-        Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
-        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
+        Result primModelPrimSolver = PrimalSimplex.doSolve(primConvex, primModel.options, false);
+        Result primModelDualSolver = DualSimplex.doSolve(primConvex, dualModel.options, false);
 
         ConvexSolver.Builder dualConvex = ConvexSolver.getBuilder();
         ConvexSolver.copy(dualModel, dualConvex);
 
-        Result dualModelPrimSolver = PrimalSimplex.solve(dualConvex, dualModel.options);
-        Result dualModelDualSolver = DualSimplex.solve(dualConvex, primModel.options);
+        Result dualModelPrimSolver = PrimalSimplex.doSolve(dualConvex, dualModel.options, false);
+        Result dualModelDualSolver = DualSimplex.doSolve(dualConvex, primModel.options, false);
 
         if (DEBUG) {
 
@@ -127,8 +127,8 @@ public class PrimalDualTest extends OptimisationLinearTests {
         ConvexSolver.Builder convex = ConvexSolver.getBuilder();
         ConvexSolver.copy(model, convex);
 
-        Result primResult = PrimalSimplex.solve(convex, model.options);
-        Result dualResult = DualSimplex.solve(convex, model.options);
+        Result primResult = PrimalSimplex.doSolve(convex, model.options, false);
+        Result dualResult = DualSimplex.doSolve(convex, model.options, false);
 
         if (DEBUG) {
 
@@ -269,12 +269,12 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(1, primConvex.countEqualityConstraints());
         TestUtils.assertEquals(2, primConvex.countInequalityConstraints());
 
-        Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
+        Result primModelPrimSolver = PrimalSimplex.doSolve(primConvex, primModel.options, false);
 
         TestUtils.assertEquals(2, primModelPrimSolver.size());
         TestUtils.assertEquals(3, primModelPrimSolver.getMultipliers().get().size());
 
-        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
+        Result primModelDualSolver = DualSimplex.doSolve(primConvex, dualModel.options, false);
 
         TestUtils.assertEquals(2, primModelDualSolver.size());
         TestUtils.assertEquals(3, primModelDualSolver.getMultipliers().get().size());
@@ -287,12 +287,12 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(0, dualConvex.countEqualityConstraints());
         TestUtils.assertEquals(2, dualConvex.countInequalityConstraints());
 
-        Result dualModelPrimSolver = PrimalSimplex.solve(dualConvex, dualModel.options);
+        Result dualModelPrimSolver = PrimalSimplex.doSolve(dualConvex, dualModel.options, false);
 
         TestUtils.assertEquals(1, dualModelPrimSolver.size());
         TestUtils.assertEquals(2, dualModelPrimSolver.getMultipliers().get().size());
 
-        Result dualModelDualSolver = DualSimplex.solve(dualConvex, primModel.options);
+        Result dualModelDualSolver = DualSimplex.doSolve(dualConvex, primModel.options, false);
 
         TestUtils.assertEquals(1, dualModelDualSolver.size());
         TestUtils.assertEquals(2, dualModelDualSolver.getMultipliers().get().size());
