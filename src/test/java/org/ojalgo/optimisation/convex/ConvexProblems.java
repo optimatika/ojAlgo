@@ -36,7 +36,6 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -52,6 +51,7 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -187,20 +187,22 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * Build model, and initialise variable values to the expected solution
+     * Build model, and initialise variable values to the expected solution (if not null)
      */
-    static ExpressionsBasedModel buildModel(final Primitive64Store[] matrices, final Primitive64Store expectedSolution) {
+    static ExpressionsBasedModel buildModel(final Access2D<?>[] matrices, final Access2D<?> expectedSolution) {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        int tmpNumberOfVariables = (int) matrices[3].count();
+        int tmpNumberOfVariables = (int) matrices[3].count(); // c
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             Variable tmpVariable = Variable.make("X" + v);
-            tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
+            if (expectedSolution != null) {
+                tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
+            }
             retVal.addVariable(tmpVariable);
         }
-        if ((matrices[0] != null) && (matrices[1] != null)) {
+        if (matrices[0] != null && matrices[1] != null) {
             for (int e = 0; e < matrices[0].countRows(); e++) {
                 Expression tmpExpression = retVal.addExpression("E" + e);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
@@ -209,7 +211,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 tmpExpression.level(matrices[1].doubleValue(e));
             }
         }
-        if ((matrices[4] != null) && (matrices[5] != null)) {
+        if (matrices[4] != null && matrices[5] != null) {
             for (int i = 0; i < matrices[4].countRows(); i++) {
                 Expression tmpExpression = retVal.addExpression("I" + i);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
@@ -1050,7 +1052,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         Array1D<BigDecimal> tmpSolution = Array1D.BIG.copy(tmpResult);
         tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
         for (BigDecimal tmpBigDecimal : tmpSolution) {
-            if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
+            if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }
         }
@@ -1354,62 +1356,57 @@ public class ConvexProblems extends OptimisationConvexTests {
      * passes(!). I’ve been running this test (alone) in TestNG. I’m using Ojalgo v35 and Java 1.7.55. The Q
      * matrix is positive definite.
      *
-     * @see "http://bugzilla.optimatika.se/show_bug.cgi?id=210"
+     * @see http://bugzilla.optimatika.se/show_bug.cgi?id=210
+     * @see https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/?viewmonth=201405
      */
     @Test
     public void testP20140522() {
 
+        ConvexSolver.Builder builder = ConvexProblems.getDataP20140522();
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null, null);
+
+        // Solution obtained by CPLEX (via ojAlgo) 2021-09-04
+        // OPTIMAL 61.51948373172937 @ { -0.40000000035828, 0.12000000009385, -0.01960000190641, -2.45784999791179 }
+
+        // Solution given in the original bug report
+        Optimisation.Result expectedResult = Optimisation.Result.of(61.519484, State.OPTIMAL, -0.4, 0.12, -0.0196, -2.45785);
+
+        Access2D<?>[] matrices = new Access2D<?>[] { null, null, builder.getQ(), builder.getC(), builder.getAI(), builder.getBI() };
+        ExpressionsBasedModel model = ConvexProblems.buildModel(matrices, null);
+        Optimisation.Result modelResult = model.minimise();
+
+        TestUtils.assertStateAndSolution(expectedResult, modelResult);
+
+        ConvexSolver solver = builder.build();
+
+        if (DEBUG) {
+            solver.options.validate = true;
+            solver.options.debug(ConvexSolver.class);
+        }
+
+        Optimisation.Result solverResult = solver.solve();
+
+        TestUtils.assertStateAndSolution(expectedResult, solverResult);
+    }
+
+    public static ConvexSolver.Builder getDataP20140522() {
+
         double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
-        RawStore JamaQ = RawStore.FACTORY.rows(q);
+        RawStore mtrxQ = RawStore.FACTORY.rows(q);
 
         double[] c = new double[] { 195.0, 59.0, -1.8, -11.7 };
-        RawStore JamaC = RawStore.FACTORY.columns(c);
+        RawStore mtrxC = RawStore.FACTORY.columns(c);
 
         double[][] ai = new double[][] { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 },
                 { 1.0, 1.0, 1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 },
                 { -0.01, 0.0, 0.0, 0.0 }, { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
-        RawStore JamaAI = RawStore.FACTORY.rows(ai);
+        RawStore mtrxAI = RawStore.FACTORY.rows(ai);
 
         double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
-        RawStore JamaBI = RawStore.FACTORY.columns(bi);
+        RawStore mtrxBI = RawStore.FACTORY.columns(bi);
 
-        Optimisation.Result result = null;
-
-        try {
-
-            ConvexSolver.Builder qsBuilder = new ConvexSolver.Builder(JamaQ, JamaC);
-            qsBuilder.inequalities(JamaAI, JamaBI);
-
-            ConvexSolver qSolver = qsBuilder.build();
-
-            // qSolver.options.debug(ConvexSolver.class);
-
-            result = qSolver.solve();
-
-            OptimisationConvexTests.assertDirectAndIterativeEquals(qsBuilder, null, null);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
-        }
-
-        QuadraticFunction<Double> tmpObj = QuadraticFunction.makePrimitive(JamaQ.multiply(0.5), JamaC.multiply(-1.0));
-
-        TestUtils.assertEquals(State.OPTIMAL, result.getState());
-
-        int numElm = (int) result.count();
-
-        double[] expectedSolution = new double[] { -0.4, 0.12, -0.0196, -2.45785 };
-        tmpObj.invoke(Access1D.wrap(expectedSolution));
-        tmpObj.invoke(Access1D.asPrimitive1D(result));
-
-        JamaBI.subtract(JamaAI.multiply(Primitive64Store.FACTORY.columns(expectedSolution)));
-        JamaBI.subtract(JamaAI.multiply(Primitive64Store.FACTORY.columns(result)));
-
-        for (int i = 0; i < numElm; i++) {
-            TestUtils.assertEquals(expectedSolution[i], result.doubleValue(i), 1e-4);
-        }
-
+        return new ConvexSolver.Builder(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI);
     }
 
     /**

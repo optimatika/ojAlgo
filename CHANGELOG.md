@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Changed how the ConvexSolver (with inequality constraints) finds a first feasible solution. It should be both faster and more resilient now.
+
 ## [49.0.2] – 2021-08-24
 
 ### Changed

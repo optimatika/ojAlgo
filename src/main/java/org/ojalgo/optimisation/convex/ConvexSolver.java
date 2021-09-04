@@ -135,7 +135,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             super();
 
-            if ((matrices.length >= 2) && (matrices[0] != null) && (matrices[1] != null)) {
+            if (matrices.length >= 2 && matrices[0] != null && matrices[1] != null) {
                 this.equalities(matrices[0], matrices[1]);
             }
 
@@ -147,7 +147,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 }
             }
 
-            if ((matrices.length >= 6) && (matrices[4] != null) && (matrices[5] != null)) {
+            if (matrices.length >= 6 && matrices[4] != null && matrices[5] != null) {
                 this.inequalities(matrices[4], matrices[5]);
             }
         }
@@ -157,6 +157,10 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          */
         public MatrixStore<Double> getC() {
             return myObjective.linear();
+        }
+
+        public MatrixStore<Double> getC(final boolean zeroC) {
+            return zeroC ? MatrixStore.PRIMITIVE64.makeZero(this.countVariables(), 1).get() : this.getC();
         }
 
         /**
@@ -206,7 +210,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         private Builder setObjective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
 
-            if ((mtrxQ == null) && (mtrxC == null)) {
+            if (mtrxQ == null && mtrxC == null) {
                 ProgrammingError.throwWithMessage("Both parameters can't be null!");
             }
 
@@ -241,16 +245,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             this.validate();
 
             if (this.hasInequalityConstraints()) {
-                if ((options.sparse == null) || options.sparse) {
+                if (options.sparse == null || options.sparse) {
                     return new IterativeASS(this, options);
-                } else {
-                    return new DirectASS(this, options);
                 }
-            } else if (this.hasEqualityConstraints()) {
-                return new QPESolver(this, options);
-            } else {
-                return new UnconstrainedSolver(this, options);
+                return new DirectASS(this, options);
             }
+            if (this.hasEqualityConstraints()) {
+                return new QPESolver(this, options);
+            }
+            return new UnconstrainedSolver(this, options);
         }
 
     }
@@ -330,7 +333,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             for (final IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
                 final int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
                 final int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
-                if ((tmpRow >= 0) && (tmpColumn >= 0)) {
+                if (tmpRow >= 0 && tmpColumn >= 0) {
                     tmpModifier = tmpBaseFunc.second(tmpObjExpr.getAdjustedQuadraticFactor(tmpKey));
                     mtrxQ.modifyOne(tmpRow, tmpColumn, tmpModifier);
                     mtrxQ.modifyOne(tmpColumn, tmpRow, tmpModifier);
@@ -358,7 +361,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             }
         }
 
-        if ((mtrxQ == null) && (mtrxC == null)) {
+        if (mtrxQ == null && mtrxC == null) {
             // In some very rare case the model was verified to be a quadratic
             // problem, but then the presolver eliminated/fixed all variables
             // part of the objective function - then we would end up here.
@@ -385,7 +388,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         final List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
         final int numbLoVar = tmpLoVar.size();
 
-        if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
+        if (numbUpExpr + numbUpVar + numbLoExpr + numbLoVar > 0) {
 
             final RowsSupplier<Double> mtrxAI = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
             final PhysicalStore<Double> mtrxBI = Primitive64Store.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
@@ -452,6 +455,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     private final Primitive64Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final Cholesky<Double> mySolverQ;
+    private boolean myPatchedQ = false;
+    private boolean myZeroQ = false;
 
     @SuppressWarnings("unused")
     private ConvexSolver(final Options solverOptions) {
@@ -576,11 +581,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     protected int getRankGeneral() {
         if (mySolverGeneral instanceof MatrixDecomposition.RankRevealing) {
             return ((MatrixDecomposition.RankRevealing) mySolverGeneral).getRank();
-        } else if (mySolverGeneral.isSolvable()) {
-            return (int) mySolverGeneral.reconstruct().countColumns();
-        } else {
-            return 0;
         }
+        if (mySolverGeneral.isSolvable()) {
+            return (int) mySolverGeneral.reconstruct().countColumns();
+        }
+        return 0;
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -634,17 +639,24 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 symmetric = false;
                 this.setState(State.INVALID);
 
-                if (this.isLogDebug()) {
-                    this.log(Q_NOT_SYMMETRIC, matrixQ);
-                } else {
+                if (!this.isLogDebug()) {
                     throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
                 }
+                this.log(Q_NOT_SYMMETRIC, matrixQ);
             }
         }
 
+        myPatchedQ = false;
+        myZeroQ = false;
         if (!mySolverQ.compute(matrixQ)) {
-            matrixQ.modifyDiagonal(ADD.by(SMALL_DIAGONAL_FACTOR * matrixQ.aggregateAll(Aggregator.LARGEST)));
-            mySolverQ.compute(matrixQ);
+            double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
+            if (largest > SMALL_DIAGONAL_FACTOR) {
+                matrixQ.modifyDiagonal(ADD.by(SMALL_DIAGONAL_FACTOR * largest));
+                mySolverQ.compute(matrixQ);
+                myPatchedQ = true;
+            } else {
+                myZeroQ = true;
+            }
         }
 
         boolean semidefinite = true;
@@ -657,17 +669,16 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             decompEvD.reset();
 
             for (final ComplexNumber eigval : eigenvalues) {
-                if (((eigval.doubleValue() < ZERO) && !eigval.isSmall(TEN)) || !eigval.isReal()) {
+                if (eigval.doubleValue() < ZERO && !eigval.isSmall(TEN) || !eigval.isReal()) {
 
                     semidefinite = false;
                     this.setState(State.INVALID);
 
-                    if (this.isLogDebug()) {
-                        this.log(Q_NOT_POSITIVE_SEMIDEFINITE);
-                        this.log("The eigenvalues are: {}", eigenvalues);
-                    } else {
+                    if (!this.isLogDebug()) {
                         throw new IllegalArgumentException(Q_NOT_POSITIVE_SEMIDEFINITE);
                     }
+                    this.log(Q_NOT_POSITIVE_SEMIDEFINITE);
+                    this.log("The eigenvalues are: {}", eigenvalues);
                 }
             }
         }
@@ -695,18 +706,17 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (this.computeGeneral(this.getIterationKKT())) {
             this.getSolutionGeneral(this.getIterationRHS(), preallocated);
             return true;
-        } else {
-            if (this.isLogDebug()) {
-                options.logger_appender.println("KKT system unsolvable!");
-                //                options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
-                //                options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
-            }
-            return false;
         }
+        if (this.isLogDebug()) {
+            options.logger_appender.println("KKT system unsolvable!");
+            //                options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
+            //                options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
+        }
+        return false;
     }
 
     protected Optimisation.Result solveLP() {
-        return LinearSolver.solve(myMatrices, options);
+        return LinearSolver.solve(myMatrices, options, !myZeroQ);
     }
 
 }

@@ -31,6 +31,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.structure.Access1D;
@@ -45,7 +46,7 @@ public class LagrangeTest extends OptimisationConvexTests {
     @Test
     public void testGavinAndScruggsExample() {
 
-        NumberContext accuracy = NumberContext.getMath(2); // Example solutions are very much rounded
+        NumberContext accuracy = NumberContext.of(2); // Example solutions are very much rounded
 
         Primitive64Store mtrxQ = FACTORY.rows(new double[][] { { 2, 3 }, { 3, 10 } });
         Primitive64Store mtrxC = FACTORY.column(-0.5, 0); // Defined negated the ojAlgo way
@@ -74,6 +75,11 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         Primitive64Store inequalityX = FACTORY.column(-0.81, 0.21);
         Primitive64Store inequalityL = FACTORY.column(0.16, 0);
+
+        if (DEBUG) {
+            inequalityConstrainedSolver.options.debug(Optimisation.Solver.class);
+            inequalityConstrainedSolver.options.validate = true;
+        }
 
         Result inequalitySolution = inequalityConstrainedSolver.solve();
         Access1D<?> inequalityMultipliers = inequalitySolution.getMultipliers().get();

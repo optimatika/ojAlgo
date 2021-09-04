@@ -155,7 +155,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options);
+            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
 
             return new PrimalSimplex(tableau, options);
         }
@@ -170,7 +170,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return (!model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic());
+            return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
         }
 
         @Override
@@ -232,9 +232,10 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             BigDecimal value = variable.getValue();
 
-            if ((value.signum() >= 0) && ((retVal = model.indexOfPositiveVariable(variable)) >= 0)) {
+            if (value.signum() >= 0 && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
                 return retVal;
-            } else if ((value.signum() <= 0) && ((retVal = model.indexOfNegativeVariable(variable)) >= 0)) {
+            }
+            if (value.signum() <= 0 && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
                 retVal += model.getPositiveVariables().size();
                 return retVal;
             }
@@ -257,16 +258,23 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearSolver.getBuilder().objective(C);
     }
 
-    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
+    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
 
-        Optimisation.Result primRes = PrimalSimplex.solve(convex, options);
+        int dualSize = DualSimplex.size(convex);
+        int primSize = PrimalSimplex.size(convex);
+        boolean dual = dualSize <= primSize;
+
+        Optimisation.Result result = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
 
         if (options.validate) {
 
-            Optimisation.Result dualRes = DualSimplex.solve(convex, options);
+            Optimisation.Result altResult = dual ? PrimalSimplex.doSolve(convex, options, zeroC) : DualSimplex.doSolve(convex, options, zeroC);
 
-            if (primRes.getMultipliers().isPresent()
-                    && !Access1D.equals(primRes.getMultipliers().get(), dualRes.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+            if (result.getMultipliers().isPresent()
+                    && !Access1D.equals(result.getMultipliers().get(), altResult.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+
+                Optimisation.Result primRes = dual ? altResult : result;
+                Optimisation.Result dualRes = dual ? result : altResult;
 
                 BasicLogger.error();
                 BasicLogger.error("Prim sol: {}", primRes);
@@ -278,7 +286,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }
         }
 
-        return primRes;
+        return result;
     }
 
     protected LinearSolver(final Options solverOptions) {
