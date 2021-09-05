@@ -45,20 +45,7 @@ import org.ojalgo.type.context.NumberContext;
 
 final class PrimalSimplex extends SimplexSolver {
 
-    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
-
-        SimplexTableau tableau = PrimalSimplex.build(convex, options);
-
-        LinearSolver solver = new PrimalSimplex(tableau, options);
-
-        Result result = solver.solve();
-
-        Optimisation.Result retVal = PrimalSimplex.toConvexState(result, convex);
-
-        return retVal;
-    }
-
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options) {
+    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
 
         int numbVars = convex.countVariables();
         int numbEqus = convex.countEqualityConstraints();
@@ -68,7 +55,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Mutate1D obj = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC();
+        MatrixStore<Double> convexC = convex.getC(zeroC);
 
         for (int v = 0; v < numbVars; v++) {
             double valC = convexC.doubleValue(v);
@@ -130,14 +117,14 @@ final class PrimalSimplex extends SimplexSolver {
         List<Expression> tmpExprsLo = model.constraints().filter(c -> c.isLowerConstraint() && !c.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         List<Expression> tmpExprsUp = model.constraints().filter(c -> c.isUpperConstraint() && !c.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
 
-        List<Variable> tmpVarsPosLo = model.bounds().filter(v -> v.isPositive() && v.isLowerConstraint() && (v.getLowerLimit().signum() > 0))
+        List<Variable> tmpVarsPosLo = model.bounds().filter(v -> v.isPositive() && v.isLowerConstraint() && v.getLowerLimit().signum() > 0)
                 .collect(Collectors.toList());
-        List<Variable> tmpVarsPosUp = model.bounds().filter(v -> v.isPositive() && v.isUpperConstraint() && (v.getUpperLimit().signum() > 0))
+        List<Variable> tmpVarsPosUp = model.bounds().filter(v -> v.isPositive() && v.isUpperConstraint() && v.getUpperLimit().signum() > 0)
                 .collect(Collectors.toList());
 
-        List<Variable> tmpVarsNegLo = model.bounds().filter(v -> v.isNegative() && v.isLowerConstraint() && (v.getLowerLimit().signum() < 0))
+        List<Variable> tmpVarsNegLo = model.bounds().filter(v -> v.isNegative() && v.isLowerConstraint() && v.getLowerLimit().signum() < 0)
                 .collect(Collectors.toList());
-        List<Variable> tmpVarsNegUp = model.bounds().filter(v -> v.isNegative() && v.isUpperConstraint() && (v.getUpperLimit().signum() < 0))
+        List<Variable> tmpVarsNegUp = model.bounds().filter(v -> v.isNegative() && v.isUpperConstraint() && v.getUpperLimit().signum() < 0)
                 .collect(Collectors.toList());
 
         int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
@@ -416,11 +403,32 @@ final class PrimalSimplex extends SimplexSolver {
         //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
         //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
 
-        if ((model.options.sparse == null) && (retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory()))) {
+        if (model.options.sparse == null && retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory())) {
             return retVal.toDense();
-        } else {
-            return retVal;
         }
+        return retVal;
+    }
+
+    static Optimisation.Result doSolve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+
+        SimplexTableau tableau = PrimalSimplex.build(convex, options, zeroC);
+
+        LinearSolver solver = new PrimalSimplex(tableau, options);
+
+        Result result = solver.solve();
+
+        Optimisation.Result retVal = PrimalSimplex.toConvexState(result, convex);
+
+        return retVal;
+    }
+
+    static int size(final ConvexSolver.Builder convex) {
+
+        int numbVars = convex.countVariables();
+        int numbEqus = convex.countEqualityConstraints();
+        int numbInes = convex.countInequalityConstraints();
+
+        return SimplexTableau.size(numbEqus + numbInes, numbVars + numbVars, numbInes);
     }
 
     static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {

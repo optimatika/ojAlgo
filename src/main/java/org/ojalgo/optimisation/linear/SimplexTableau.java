@@ -855,6 +855,14 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
     }
 
+    static int size(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+
+        int numbRows = numberOfConstraints + 2;
+        int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
+
+        return numbRows * numbCols; //  Total number of elements in a dense tableau
+    }
+
     private final int[] myBasis;
     private transient Mutate2D myConstraintsBody = null;
     private transient Mutate1D myConstraintsRHS = null;
