@@ -72,9 +72,9 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
 
     @Override
     public Double invoke(final Access1D<Double> arg) {
-        double quadratic = myPureQuadratic.invoke(arg);
-        double linear = myLinear.invoke(arg);
-        return quadratic - linear;
+        double quadratic = myPureQuadratic.invoke(arg).doubleValue();
+        double linear = myLinear.invoke(arg).doubleValue();
+        return Double.valueOf(quadratic - linear);
     }
 
     public PhysicalStore<Double> linear() {

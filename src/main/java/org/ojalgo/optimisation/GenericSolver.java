@@ -67,11 +67,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         public int countEqualityConstraints() {
-            return (int) ((this.getAE() != null) ? this.getAE().countRows() : 0);
+            return Math.toIntExact(this.getAE() != null ? this.getAE().countRows() : 0);
         }
 
         public int countInequalityConstraints() {
-            return (int) ((this.getAI() != null) ? this.getAI().countRows() : 0);
+            return Math.toIntExact(this.getAI() != null ? this.getAI().countRows() : 0);
         }
 
         public int countVariables() {
@@ -91,7 +91,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return retVal;
         }
 
-        @SuppressWarnings("unchecked")
         public B equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
 
             ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
@@ -132,18 +131,17 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         public boolean hasEqualityConstraints() {
-            return (myAE != null) && (myAE.countRows() > 0);
+            return myAE != null && myAE.countRows() > 0;
         }
 
         public boolean hasInequalityConstraints() {
-            return (myAI != null) && (myAI.countRows() > 0);
+            return myAI != null && myAI.countRows() > 0;
         }
 
         public boolean hasObjective() {
             return myObjective != null;
         }
 
-        @SuppressWarnings("unchecked")
         public B inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
 
             ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
@@ -196,11 +194,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
                 if (this.getAE() == null) {
                     throw new ProgrammingError("AE cannot be null!");
-                } else if (this.getAE().countColumns() != this.countVariables()) {
+                }
+                if (this.getAE().countColumns() != this.countVariables()) {
                     throw new ProgrammingError("AE has the wrong number of columns!");
-                } else if (this.getAE().countRows() != this.getBE().countRows()) {
+                }
+                if (this.getAE().countRows() != this.getBE().countRows()) {
                     throw new ProgrammingError("AE and BE do not have the same number of rows!");
-                } else if (this.getBE().countColumns() != 1) {
+                }
+                if (this.getBE().countColumns() != 1) {
                     throw new ProgrammingError("BE must have precisely one column!");
                 }
 
@@ -225,11 +226,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
                 if (this.getAI() == null) {
                     throw new ProgrammingError("AI cannot be null!");
-                } else if (this.getAI().countColumns() != this.countVariables()) {
+                }
+                if (this.getAI().countColumns() != this.countVariables()) {
                     throw new ProgrammingError("AI has the wrong number of columns!");
-                } else if (this.getAI().countRows() != this.getBI().countRows()) {
+                }
+                if (this.getAI().countRows() != this.getBI().countRows()) {
                     throw new ProgrammingError("AI and BI do not have the same number of rows!");
-                } else if (this.getBI().countColumns() != 1) {
+                }
+                if (this.getBI().countColumns() != 1) {
                     throw new ProgrammingError("BI must have precisely one column!");
                 }
 
@@ -243,7 +247,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
         protected abstract S doBuild(Optimisation.Options options);
 
         protected double evaluate(final Access1D<Double> arg) {
-            return myObjective.invoke(arg);
+            return myObjective.invoke(arg).doubleValue();
         }
 
         protected SparseArray<Double> getAI(final int row) {
@@ -256,7 +260,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     }
 
-    protected static final NumberContext ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+    protected static final NumberContext ACCURACY = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
 
     public final Optimisation.Options options;
 
@@ -318,7 +322,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected final int incrementIterationsCount() {
         int iterationsDone = myIterationsCount.incrementAndGet();
-        if (this.isLogProgress() && ((iterationsDone % 100_000) == 0)) {
+        if (this.isLogProgress() && iterationsDone % 100_000 == 0) {
             this.log("Done {} {} iterations after {}.", iterationsDone, this.getClass().getSimpleName(), myStopwatch.stop(CalendarDateUnit.SECOND));
         }
         return iterationsDone;
@@ -331,19 +335,15 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected final boolean isIterationAllowed() {
 
-        if (myState.isFailure()) {
-            return false;
-        }
-
-        if (Thread.currentThread().isInterrupted()) {
+        if (myState.isFailure() || Thread.currentThread().isInterrupted()) {
             return false;
         }
 
         if (myState.isFeasible()) {
-            return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
+            return this.countTime() < options.time_suffice && this.countIterations() < options.iterations_suffice;
         }
 
-        return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
+        return this.countTime() < options.time_abort && this.countIterations() < options.iterations_abort;
     }
 
     /**
@@ -357,14 +357,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * No logging
      */
     protected final boolean isLogOff() {
-        return (options.logger_appender == null) || (!options.logger_solver.isAssignableFrom(this.getClass()));
+        return options.logger_appender == null || !options.logger_solver.isAssignableFrom(this.getClass());
     }
 
     /**
      * Cursory progress logging (at least)
      */
     protected final boolean isLogProgress() {
-        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
+        return options.logger_appender != null && options.logger_solver.isAssignableFrom(this.getClass());
     }
 
     protected final void log() {

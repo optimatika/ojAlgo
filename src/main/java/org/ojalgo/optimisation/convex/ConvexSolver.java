@@ -245,7 +245,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             this.validate();
 
             if (this.hasInequalityConstraints()) {
-                if (options.sparse == null || options.sparse) {
+                if (options.sparse == null || options.sparse.booleanValue()) {
                     return new IterativeASS(this, options);
                 }
                 return new DirectASS(this, options);
