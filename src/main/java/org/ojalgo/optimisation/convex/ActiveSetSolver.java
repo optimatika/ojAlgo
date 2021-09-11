@@ -23,8 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.Optional;
-
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -33,7 +31,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.GenericSolver;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
@@ -303,26 +300,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        boolean didInitWithLP = false;
-
         if (!feasible) {
 
-            final Result resultLP = this.solveLP();
+            Result resultLP = this.solveLP();
 
             if (feasible = resultLP.getState().isFeasible()) {
-
                 this.getSolutionX().fillMatching(resultLP);
-
-                final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
-                if (tmpMultipliers.isPresent()) {
-                    this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    // Somewhat confused about what sign the Lagrange multipliers should have here
-                    // It works best to always initiate the solver with mon-negative values
-                    this.getSolutionL().modifyAll(ABS);
-                    didInitWithLP = true;
-                } else {
-                    this.getSolutionL().fillAll(ZERO);
-                }
+                this.getSolutionL().fillAll(ZERO);
             }
         }
 
@@ -330,7 +314,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator(didInitWithLP);
+            this.resetActivator();
 
         } else {
 
@@ -623,7 +607,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     }
 
-    void resetActivator(final boolean useLagrange) {
+    void resetActivator() {
 
         myActivator.excludeAll();
 
@@ -643,13 +627,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
                 if (ACCURACY.isZero(slack) && this.countIncluded() < maxToInclude) {
-                    double lagr = lagrange.doubleValue(numbEqus + excl[i]);
-                    if (!useLagrange || lagr > 1E-4) {
-                        if (this.isLogDebug()) {
-                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagr);
-                        }
-                        this.include(excl[i]);
+                    if (this.isLogDebug()) {
+                        this.log("Will inlcude ineq {} with slack={}", i, slack);
                     }
+                    this.include(excl[i]);
                 }
             }
         }
