@@ -329,7 +329,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Primitive64Store expDualSol = factory.rows(new double[] { 11.0, 0.5 });
         final double expOptVal = 294.0;
 
-        final LinearSolver.Builder primal = LinearSolver.getBuilder();
+        final LinearSolver.Builder primal = LinearSolver.newStandardBuilder();
 
         // Negated since actual problem is max and algorithm expects min
         final Primitive64Store pC = factory.makeZero(5, 1);
@@ -375,7 +375,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
             TestUtils.assertEquals(expDualSol.doubleValue(i), -pMultipliers.doubleValue(i));
         }
 
-        final LinearSolver.Builder dual = LinearSolver.getBuilder();
+        final LinearSolver.Builder dual = LinearSolver.newStandardBuilder();
 
         final Primitive64Store dC = factory.makeZero(5, 1);
         dC.set(0, 24.0);

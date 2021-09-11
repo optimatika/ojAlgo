@@ -33,7 +33,6 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
@@ -52,6 +51,7 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
@@ -92,10 +92,18 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         private ConvexObjectiveFunction myObjective = null;
 
+        /**
+         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
+         */
+        @Deprecated
         public Builder() {
             super();
         }
 
+        /**
+         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
+         */
+        @Deprecated
         public Builder(final MatrixStore<Double> C) {
 
             super();
@@ -103,32 +111,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             this.objective(C);
         }
 
+        /**
+         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
+         */
+        @Deprecated
         public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
 
             super();
 
             this.objective(Q, C);
-        }
-
-        protected Builder(final ConvexSolver.Builder matrices) {
-
-            super();
-
-            if (matrices.hasEqualityConstraints()) {
-                this.equalities(matrices.getAE(), matrices.getBE());
-            }
-
-            if (matrices.hasObjective()) {
-                if (matrices.getQ() != null) {
-                    this.objective(matrices.getQ(), matrices.getC());
-                } else {
-                    this.objective(matrices.getC());
-                }
-            }
-
-            if (matrices.hasInequalityConstraints()) {
-                this.inequalities(matrices.getAI().get(), matrices.getBI());
-            }
         }
 
         Builder(final MatrixStore<Double>[] matrices) {
@@ -152,15 +143,32 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             }
         }
 
+        @Override
+        public MatrixStore<Double> getAI() {
+            return super.getAI();
+        }
+
+        @Override
+        public SparseArray<Double> getAI(final int row) {
+            return super.getAI(row);
+        }
+
+        @Override
+        public MatrixStore<Double> getAI(final int... rows) {
+            return super.getAI(rows);
+        }
+
+        @Override
+        public MatrixStore<Double> getBI() {
+            return super.getBI();
+        }
+
         /**
          * Linear objective: [C]
          */
-        public MatrixStore<Double> getC() {
+        @Override
+        public PhysicalStore<Double> getC() {
             return myObjective.linear();
-        }
-
-        public MatrixStore<Double> getC(final boolean zeroC) {
-            return zeroC ? MatrixStore.PRIMITIVE64.makeZero(this.countVariables(), 1).get() : this.getC();
         }
 
         /**
@@ -170,12 +178,26 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return myObjective.quadratic();
         }
 
+        @Override
+        public Builder inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+            return super.inequalities(mtrxAI, mtrxBI);
+        }
+
+        /**
+         * @deprecated v50 Use {@link #objective(MatrixStore, MatrixStore)} instead, or build a
+         *             {@link LinearSolver}.
+         */
+        @Deprecated
         public Builder objective(final MatrixStore<Double> mtrxC) {
-            return this.setObjective(null, mtrxC);
+            myObjective = ConvexSolver.toObjectiveFunction(null, mtrxC);
+            this.setObjective(myObjective);
+            return this;
         }
 
         public Builder objective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
-            return this.setObjective(mtrxQ, mtrxC);
+            myObjective = ConvexSolver.toObjectiveFunction(mtrxQ, mtrxC);
+            this.setObjective(myObjective);
+            return this;
         }
 
         @Override
@@ -184,65 +206,95 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             myObjective = null;
         }
 
-        @Override
-        public String toString() {
+        /**
+         * Disregard the objective function (set it to zero) and form the dual LP.
+         */
+        public LinearSolver.GeneralBuilder toFeasibilityChecker() {
 
-            final String simpleName = this.getClass().getSimpleName();
+            MatrixStore<Double> mtrxAE = this.getAE();
+            MatrixStore<Double> mtrxBE = this.getBE();
 
-            final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
+            MatrixStore<Double> mtrxAI = this.getAI();
+            MatrixStore<Double> mtrxBI = this.getBI();
 
-            retVal.append("\n[AE] = " + (this.getAE() != null ? Primitive64Matrix.FACTORY.copy(this.getAE()) : "?"));
+            LinearSolver.GeneralBuilder retVal = LinearSolver.newGeneralBuilder();
 
-            retVal.append("\n[BE] = " + (this.getBE() != null ? Primitive64Matrix.FACTORY.copy(this.getBE()) : "?"));
+            int nbEqus = this.countEqualityConstraints();
+            int nbIneq = this.countInequalityConstraints();
+            int nbVars = this.countVariables();
 
-            retVal.append("\n[Q] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getQ()) : "?"));
+            MatrixStore<Double> rhs = MatrixStore.PRIMITIVE64.makeZero(nbVars, 1).get();
 
-            retVal.append("\n[C] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getC()) : "?"));
+            if (nbEqus > 0) {
 
-            retVal.append("\n[AI] = " + (this.getAI() != null ? Primitive64Matrix.FACTORY.copy(this.getAI()) : "?"));
+                MatrixStore<Double> transpAE = mtrxAE.transpose();
 
-            retVal.append("\n[BI] = " + (this.getBI() != null ? Primitive64Matrix.FACTORY.copy(this.getBI()) : "?"));
+                if (nbIneq > 0) {
 
-            retVal.append("\n</" + simpleName + ">");
+                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate(), mtrxBI).get());
 
-            return retVal.toString();
+                    retVal.equalities(transpAE.logical().right(transpAE.negate(), mtrxAI.transpose()).get(), rhs);
+
+                } else {
+
+                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate()).get());
+
+                    retVal.equalities(transpAE.logical().right(transpAE.negate()).get(), rhs);
+                }
+
+            } else if (nbIneq > 0) {
+
+                retVal.objective(mtrxBI);
+
+                retVal.equalities(mtrxAI.transpose(), rhs);
+
+            } else {
+
+                throw new IllegalStateException("The problem is unconstrained!");
+            }
+
+            return retVal;
         }
 
-        private Builder setObjective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
+        /**
+         * Linearise the objective function (at the specified point) and duplicate all variables to handle the
+         * (potential) positive and negative parts separately.
+         */
+        public LinearSolver.GeneralBuilder toLinearApproximation(final Access1D<Double> point) {
 
-            if (mtrxQ == null && mtrxC == null) {
-                ProgrammingError.throwWithMessage("Both parameters can't be null!");
+            MatrixStore<Double> mtrxC = this.getObjective().toFirstOrderApproximation(point).getLinearFactors();
+
+            MatrixStore<Double> mtrxAE = this.getAE();
+            MatrixStore<Double> mtrxBE = this.getBE();
+
+            MatrixStore<Double> mtrxAI = this.getAI();
+            MatrixStore<Double> mtrxBI = this.getBI();
+
+            LinearSolver.GeneralBuilder retVal = LinearSolver.newGeneralBuilder();
+
+            retVal.objective(mtrxC.logical().below(mtrxC.negate()).get());
+
+            if (mtrxAE != null && mtrxBE != null) {
+                retVal.equalities(mtrxAE.logical().right(mtrxAE.negate()).get(), mtrxBE);
             }
 
-            PhysicalStore<Double> tmpQ = null;
-            PhysicalStore<Double> tmpC = null;
-
-            if (mtrxQ == null) {
-                tmpQ = Primitive64Store.FACTORY.make(mtrxC.count(), mtrxC.count());
-            } else if (mtrxQ instanceof PhysicalStore) {
-                tmpQ = (PhysicalStore<Double>) mtrxQ;
-            } else {
-                tmpQ = mtrxQ.copy();
+            if (mtrxAI != null && mtrxBI != null) {
+                retVal.inequalities(mtrxAI.logical().right(mtrxAI.negate()).get(), mtrxBI);
             }
 
-            if (mtrxC == null) {
-                tmpC = Primitive64Store.FACTORY.make(mtrxQ.countRows(), 1L);
-            } else if (mtrxC instanceof PhysicalStore) {
-                tmpC = (PhysicalStore<Double>) mtrxC;
-            } else {
-                tmpC = mtrxC.copy();
-            }
+            return retVal;
+        }
 
-            myObjective = new ConvexObjectiveFunction(tmpQ, tmpC);
-            super.setObjective(myObjective);
+        @Override
+        protected void append(final StringBuilder builder) {
 
-            return this;
+            super.append(builder);
+
+            GenericSolver.Builder.append(builder, "Q", this.getQ());
         }
 
         @Override
         protected ConvexSolver doBuild(final Optimisation.Options options) {
-
-            this.validate();
 
             if (this.hasInequalityConstraints()) {
                 if (options.sparse == null || options.sparse.booleanValue()) {
@@ -262,7 +314,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            final ConvexSolver.Builder tmpBuilder = ConvexSolver.getBuilder();
+            final ConvexSolver.Builder tmpBuilder = ConvexSolver.newBuilder();
 
             ConvexSolver.copy(model, tmpBuilder);
 
@@ -443,19 +495,59 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
     }
 
+    /**
+     * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
+     */
+    @Deprecated
     public static Builder getBuilder() {
+        return ConvexSolver.newBuilder();
+    }
+
+    /**
+     * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
+     */
+    @Deprecated
+    public static Builder getBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+        return ConvexSolver.newBuilder().objective(Q, C);
+    }
+
+    public static Builder newBuilder() {
         return new Builder();
     }
 
-    public static Builder getBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-        return ConvexSolver.getBuilder().objective(Q, C);
+    static ConvexObjectiveFunction toObjectiveFunction(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
+
+        if (mtrxQ == null && mtrxC == null) {
+            ProgrammingError.throwWithMessage("Both parameters can't be null!");
+        }
+
+        PhysicalStore<Double> tmpQ = null;
+        PhysicalStore<Double> tmpC = null;
+
+        if (mtrxQ == null) {
+            tmpQ = Primitive64Store.FACTORY.make(mtrxC.count(), mtrxC.count());
+        } else if (mtrxQ instanceof PhysicalStore) {
+            tmpQ = (PhysicalStore<Double>) mtrxQ;
+        } else {
+            tmpQ = mtrxQ.copy();
+        }
+
+        if (mtrxC == null) {
+            tmpC = Primitive64Store.FACTORY.make(tmpQ.countRows(), 1L);
+        } else if (mtrxC instanceof PhysicalStore) {
+            tmpC = (PhysicalStore<Double>) mtrxC;
+        } else {
+            tmpC = mtrxC.copy();
+        }
+
+        return new ConvexObjectiveFunction(tmpQ, tmpC);
     }
 
     private final ConvexSolver.Builder myMatrices;
+    private boolean myPatchedQ = false;
     private final Primitive64Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final Cholesky<Double> mySolverQ;
-    private boolean myPatchedQ = false;
     private boolean myZeroQ = false;
 
     @SuppressWarnings("unused")
@@ -542,16 +634,16 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return myMatrices.getAE();
     }
 
-    protected RowsSupplier<Double> getMatrixAI() {
+    protected MatrixStore<Double> getMatrixAI() {
         return myMatrices.getAI();
     }
 
     protected SparseArray<Double> getMatrixAI(final int row) {
-        return myMatrices.getAI().getRow(row);
+        return myMatrices.getAI(row);
     }
 
-    protected RowsSupplier<Double> getMatrixAI(final int[] rows) {
-        return myMatrices.getAI().selectRows(rows);
+    protected MatrixStore<Double> getMatrixAI(final int[] rows) {
+        return myMatrices.getAI(rows);
     }
 
     protected MatrixStore<Double> getMatrixBE() {

@@ -106,11 +106,11 @@ public interface MultiaryFunction<N extends Comparable<N>> extends BasicFunction
          */
         MatrixStore<N> getLinearFactors();
 
-        default MultiaryFunction<N> toFirstOrderApproximation(final Access1D<N> arg) {
+        default MultiaryFunction.TwiceDifferentiable<N> toFirstOrderApproximation(final Access1D<N> arg) {
             return new FirstOrderApproximation<>(this, arg);
         }
 
-        default MultiaryFunction<N> toSecondOrderApproximation(final Access1D<N> arg) {
+        default MultiaryFunction.TwiceDifferentiable<N> toSecondOrderApproximation(final Access1D<N> arg) {
             return new SecondOrderApproximation<>(this, arg);
         }
 

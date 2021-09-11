@@ -32,6 +32,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexProblems;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 
 public class PrimalDualTest extends OptimisationLinearTests {
 
@@ -68,13 +69,13 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(optimalY, dualResult);
         TestUtils.assertEquals(primResult.getState().isOptimal(), dualResult.getState().isOptimal());
 
-        ConvexSolver.Builder primConvex = ConvexSolver.getBuilder();
+        ConvexSolver.Builder primConvex = ConvexSolver.newBuilder();
         ConvexSolver.copy(primModel, primConvex);
 
         Result primModelPrimSolver = PrimalSimplex.doSolve(primConvex, primModel.options, false);
         Result primModelDualSolver = DualSimplex.doSolve(primConvex, dualModel.options, false);
 
-        ConvexSolver.Builder dualConvex = ConvexSolver.getBuilder();
+        ConvexSolver.Builder dualConvex = ConvexSolver.newBuilder();
         ConvexSolver.copy(dualModel, dualConvex);
 
         Result dualModelPrimSolver = PrimalSimplex.doSolve(dualConvex, dualModel.options, false);
@@ -116,6 +117,8 @@ public class PrimalDualTest extends OptimisationLinearTests {
             // Sometimes the presolver finds additional lower/upper constraints on the variables
             // In those cases these tests may fail.
             TestUtils.assertEquals(primModelPrimSolver.getMultipliers().get(), primModelDualSolver.getMultipliers().get());
+            PrimalDualTest.doEvaluate(primModel, false);
+            PrimalDualTest.doEvaluate(dualModel, true);
         }
         TestUtils.assertEquals(dualModelPrimSolver.getMultipliers().get(), dualModelDualSolver.getMultipliers().get());
     }
@@ -124,24 +127,35 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         Result modResult = minimise ? model.minimise() : model.maximise();
 
-        ConvexSolver.Builder convex = ConvexSolver.getBuilder();
+        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
         ConvexSolver.copy(model, convex);
 
         Result primResult = PrimalSimplex.doSolve(convex, model.options, false);
         Result dualResult = DualSimplex.doSolve(convex, model.options, false);
 
+        GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
+        Result lineResult = linear.build(model.options).solve();
+
         if (DEBUG) {
+
+            BasicLogger.debug(model);
 
             BasicLogger.debug(modResult);
             BasicLogger.debug(primResult);
             BasicLogger.debug(dualResult);
+            BasicLogger.debug(lineResult);
 
             BasicLogger.debug(primResult.getMultipliers().get());
             BasicLogger.debug(dualResult.getMultipliers().get());
+            BasicLogger.debug(lineResult.getMultipliers().get());
         }
 
         TestUtils.assertStateAndSolution(modResult, primResult);
         TestUtils.assertStateAndSolution(modResult, dualResult);
+
+        for (int i = 0; i < modResult.size(); i++) {
+            TestUtils.assertEquals(modResult.doubleValue(i), lineResult.doubleValue(i) - lineResult.doubleValue(modResult.size() + i));
+        }
 
         TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
@@ -247,21 +261,16 @@ public class PrimalDualTest extends OptimisationLinearTests {
     @Test
     public void testWikipediaExample() {
 
+        double optimalValue = 14.0 / 3.0;
+        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.0, 7.0 / 6.0 });
+        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 4.0 / 6.0 });
+
         ExpressionsBasedModel primModel = new ExpressionsBasedModel();
         Variable x1 = primModel.addVariable("X1").lower(0).weight(3);
         Variable x2 = primModel.addVariable("X2").lower(0).weight(4);
         primModel.addExpression().set(x1, 5).set(x2, 6).level(7);
 
-        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
-        Variable y1 = dualModel.addVariable("Y1").weight(7);
-        dualModel.addExpression().set(y1, 5).lower(3);
-        dualModel.addExpression().set(y1, 6).lower(4);
-
-        double optimalValue = 14.0 / 3.0;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.0, 7.0 / 6.0 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 4.0 / 6.0 });
-
-        ConvexSolver.Builder primConvex = ConvexSolver.getBuilder();
+        ConvexSolver.Builder primConvex = ConvexSolver.newBuilder();
         ConvexSolver.copy(primModel, primConvex);
 
         TestUtils.assertEquals(2, primConvex.countVariables());
@@ -274,12 +283,17 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(2, primModelPrimSolver.size());
         TestUtils.assertEquals(3, primModelPrimSolver.getMultipliers().get().size());
 
-        Result primModelDualSolver = DualSimplex.doSolve(primConvex, dualModel.options, false);
+        Result primModelDualSolver = DualSimplex.doSolve(primConvex, primModel.options, false);
 
         TestUtils.assertEquals(2, primModelDualSolver.size());
         TestUtils.assertEquals(3, primModelDualSolver.getMultipliers().get().size());
 
-        ConvexSolver.Builder dualConvex = ConvexSolver.getBuilder();
+        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
+        Variable y1 = dualModel.addVariable("Y1").weight(7);
+        dualModel.addExpression().set(y1, 5).lower(3);
+        dualModel.addExpression().set(y1, 6).lower(4);
+
+        ConvexSolver.Builder dualConvex = ConvexSolver.newBuilder();
         ConvexSolver.copy(dualModel, dualConvex);
 
         TestUtils.assertEquals(1, dualConvex.countVariables());

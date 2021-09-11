@@ -28,10 +28,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -40,6 +38,7 @@ import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -55,7 +54,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Mutate1D obj = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC(zeroC);
+        MatrixStore<Double> convexC = zeroC ? MatrixStore.PRIMITIVE64.makeZero(convex.countVariables(), 1).get() : convex.getC();
 
         for (int v = 0; v < numbVars; v++) {
             double valC = convexC.doubleValue(v);
@@ -82,12 +81,13 @@ final class PrimalSimplex extends SimplexSolver {
             constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        RowsSupplier<Double> convexAI = convex.getAI();
+        MatrixStore<Double> convexAI = convex.getAI();
         MatrixStore<Double> convexBI = convex.getBI();
 
-        for (int i = 0; i < numbInes; i++) {
-            int r = i;
-            SparseArray<Double> row = convexAI.getRow(r);
+        for (RowView<Double> row : convexAI.rows()) {
+
+            int r = Math.toIntExact(row.row());
+
             double rhs = convexBI.doubleValue(r);
 
             boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
@@ -95,8 +95,22 @@ final class PrimalSimplex extends SimplexSolver {
             row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
             row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
             constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
+            constrRHS.set(numbEqus + r, neg ? -rhs : rhs);
+
         }
+
+        //        for (int i = 0; i < numbInes; i++) {
+        //            int r = i;
+        //            SparseArray<Double> row = convexAI.getRow(r);
+        //            double rhs = convexBI.doubleValue(r);
+        //
+        //            boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+        //
+        //            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+        //            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+        //            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
+        //            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
+        //        }
 
         // BasicLogger.debug("Primal", retVal);
         // BasicLogger.debug("Negs (primal): {}", negs);

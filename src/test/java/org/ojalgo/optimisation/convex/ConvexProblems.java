@@ -1626,7 +1626,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         Primitive64Store AE = Primitive64Store.FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
         Primitive64Store BE = Primitive64Store.FACTORY.rows(new double[][] { { 3 }, { 0 } });
 
-        Builder builder = ConvexSolver.getBuilder();
+        Builder builder = ConvexSolver.newBuilder();
         builder.objective(Q, C.negate());
         builder.equalities(AE, BE);
         ConvexSolver solver = builder.build();

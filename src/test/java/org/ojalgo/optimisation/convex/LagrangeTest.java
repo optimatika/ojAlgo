@@ -137,7 +137,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         TestUtils.assertEquals(solutionKKT, combinedSolution, accuracy);
 
-        Builder builder = ConvexSolver.getBuilder();
+        Builder builder = ConvexSolver.newBuilder();
         builder.objective(Q, C.negate());
         builder.equalities(AE, BE);
         ConvexSolver solver = builder.build();
@@ -160,7 +160,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         //  Test similar system where each equality constraint are converted into two inequality constraints.
         //  The result should be the same.
-        Builder ieBuilder = ConvexSolver.getBuilder();
+        Builder ieBuilder = ConvexSolver.newBuilder();
         ieBuilder.objective(Q, C.negate());
         MatrixStore<Double> AI = AE.logical().below(AE.negate()).get();
         MatrixStore<Double> BI = BE.logical().below(BE.negate()).get();
