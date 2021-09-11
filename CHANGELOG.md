@@ -11,6 +11,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The hierarchy of solver builders have been refactored. The most important change is that there are now 2 different `LinearSolver` builders – `StandardBuilder` and `GeneralBuilder`.
+- Some very very small inequality parameters used to be removed (rounded to 0.0) when instantiating `ConvexSolver`. This is now longer done.
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- The solver builders have been refactored. All previous public constructors and factory methods are now deprecated. What you should do now is call `ConvexSolver.newBuilder`, `LinearSolver.newStandardBuilder` or `LinearSolver.newGeneralBuilder`. The only thing you absolutely have to change now is if you explicitly/directly called the `LinearSolver.Builder` constructor. That needs to be replaced by `LinearSolver.StandardBuilder`. Don't forget! The recommendation is to use `ExpressionsBasedModel` and let it instantiate the solvers for you. In that case you do not need to worry about any of these changes.
+
 ## [49.0.3] – 2021-09-05
 
 ### Changed

@@ -46,6 +46,9 @@ public final class OptimisationData {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
+    /**
+     * Assumed constrained to be <= 0.0
+     */
     private Map<String, MultiaryFunction.TwiceDifferentiable<Double>> myAdditionalConstraints;
     private MatrixStore<Double> myAE = null;
     private RowsSupplier<Double> myAI = null;

@@ -64,7 +64,7 @@ public abstract class OptimisationConvexTests {
 
     protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model, final NumberContext accuracy) {
 
-        ConvexSolver.Builder builder = new ConvexSolver.Builder();
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder();
 
         ConvexSolver.copy(model, builder);
 

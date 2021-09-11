@@ -445,7 +445,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
         }
 
-        SparseTableau(final LinearSolver.Builder matrices) {
+        SparseTableau(final LinearSolver.StandardBuilder matrices) {
 
             this(matrices.countConstraints(), matrices.countVariables(), 0);
 

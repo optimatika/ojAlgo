@@ -101,7 +101,7 @@ public class GitHubIssue300 extends OptimisationConvexTests {
     @Test
     public void resultShouldHonorInequalities() {
 
-        ConvexSolver solve = ConvexSolver.getBuilder(q, c).inequalities(ai, bi).build();
+        ConvexSolver solve = ConvexSolver.newBuilder().objective(q, c).inequalities(ai, bi).build();
 
         // solve.options.debug(ConvexSolver.class);
 
@@ -149,7 +149,7 @@ public class GitHubIssue300 extends OptimisationConvexTests {
             objectiveOfSomeProfile = model.objective().evaluate(someProfile).doubleValue();
         }
 
-        double relativeError = Math.abs(1 - (objectiveOfMinimum / objectiveOfSomeProfile));
+        double relativeError = Math.abs(1 - objectiveOfMinimum / objectiveOfSomeProfile);
 
         TestUtils.assertEquals(Optimisation.State.OPTIMAL, state);
         TestUtils.assertTrue("relative error " + relativeError + "<= 1", relativeError <= 1);

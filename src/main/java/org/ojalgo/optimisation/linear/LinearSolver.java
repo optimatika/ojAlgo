@@ -46,28 +46,6 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     /**
-     * Defines optimisation problems on the (LP standard) form:
-     * <p>
-     * min [C]<sup>T</sup>[X]<br>
-     * when [AE][X] == [BE]<br>
-     * and 0 &lt;= [X]<br>
-     * and 0 &lt;= [BE]
-     * </p>
-     * A Linear Program is in Standard Form if:
-     * <ul>
-     * <li>All constraints are equality constraints.</li>
-     * <li>All variables have a nonnegativity sign restriction.</li>
-     * </ul>
-     * <p>
-     * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements
-     * in [BE]). Don't think that's an LP standard form requirement, but it is required here.
-     * </p>
-     * <p>
-     * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
-     * be a minimisation.
-     * </p>
-     *
-     * @author apete
      * @deprecated v50 Use {@link StandardBuilder} instead
      */
     @Deprecated
@@ -128,7 +106,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbEqualites = this.countEqualityConstraints();
             int nbVariables = this.countVariables();
 
-            StandardBuilder retVal = new StandardBuilder();
+            StandardBuilder retVal = LinearSolver.newStandardBuilder();
 
             PhysicalStore<Double> mtrxC = null;
 
@@ -289,6 +267,30 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    /**
+     * Defines optimisation problems on the (LP standard) form:
+     * <p>
+     * min [C]<sup>T</sup>[X]<br>
+     * when [AE][X] == [BE]<br>
+     * and 0 &lt;= [X]<br>
+     * and 0 &lt;= [BE]
+     * </p>
+     * A Linear Program is in Standard Form if:
+     * <ul>
+     * <li>All constraints are equality constraints.</li>
+     * <li>All variables have a nonnegativity sign restriction.</li>
+     * </ul>
+     * <p>
+     * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements
+     * in [BE]). Don't think that's an LP standard form requirement, but it is required here.
+     * </p>
+     * <p>
+     * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
+     * be a minimisation.
+     * </p>
+     *
+     * @author apete
+     */
     public static final class StandardBuilder extends LinearSolver.Builder {
 
         /**
