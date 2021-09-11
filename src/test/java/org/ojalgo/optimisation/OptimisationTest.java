@@ -21,12 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-/**
- * OptimisationQuadraticPackageTests
- *
- * @author apete
- */
-public abstract class OptimisationTests {
+public abstract class OptimisationTest {
 
     static final boolean DEBUG = false;
 }

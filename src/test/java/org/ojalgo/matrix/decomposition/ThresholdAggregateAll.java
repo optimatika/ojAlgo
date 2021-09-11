@@ -91,6 +91,6 @@ public class ThresholdAggregateAll extends AbstractThresholdTuner {
             target.aggregateAll(tmpAggregator);
         }
         return target;
-    };
+    }
 
 }

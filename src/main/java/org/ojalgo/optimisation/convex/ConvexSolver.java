@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -257,6 +258,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         /**
+         * Approximate at origin (0.0 vector)
+         *
+         * @see #toLinearApproximation(Access1D)
+         */
+        public LinearSolver.GeneralBuilder toLinearApproximation() {
+            return this.toLinearApproximation(Primitive64Array.make(this.countVariables()));
+        }
+
+        /**
          * Linearise the objective function (at the specified point) and duplicate all variables to handle the
          * (potential) positive and negative parts separately.
          */
@@ -302,9 +312,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 }
                 return new DirectASS(this, options);
             }
+
             if (this.hasEqualityConstraints()) {
                 return new QPESolver(this, options);
             }
+
             return new UnconstrainedSolver(this, options);
         }
 
