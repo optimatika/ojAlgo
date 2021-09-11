@@ -24,6 +24,7 @@ package org.ojalgo;
 import java.util.Objects;
 
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.TypeUtils;
 
@@ -73,8 +74,12 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
         ProgrammingError.throwIfNotEqualColumnDimensions(mtrx1, mtrx2);
     }
 
-    public static void throwIfNotEqualRowDimensions(final Structure2D mtrx1, final Structure2D mtrx2) {
-        if (mtrx1.countRows() != mtrx2.countRows()) {
+    public static void throwIfNotEqualRowDimensions(final Structure2D mtrx1, final Structure1D mtrx2) {
+        if (mtrx2 instanceof Structure2D) {
+            if (mtrx1.countRows() != ((Structure2D) mtrx2).countRows()) {
+                throw new ProgrammingError("Row dimensions are not equal!");
+            }
+        } else if (mtrx1.countRows() != mtrx2.count()) {
             throw new ProgrammingError("Row dimensions are not equal!");
         }
     }
@@ -134,7 +139,7 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
     public String toString() {
         final String retVal = this.getClass().getSimpleName();
         final String tmpMessage = this.getLocalizedMessage();
-        return (tmpMessage != null) ? (retVal + ": " + tmpMessage) : retVal;
+        return tmpMessage != null ? retVal + ": " + tmpMessage : retVal;
     }
 
 }

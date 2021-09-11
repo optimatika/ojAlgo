@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.structure.Access1D;
@@ -48,10 +47,10 @@ final class DualSimplex extends SimplexSolver {
         Mutate2D constrBody = retVal.constraintsBody();
         Mutate1D constrRHS = retVal.constraintsRHS();
 
-        MatrixStore<Double> convexC = convex.getC(zeroC);
+        MatrixStore<Double> convexC = zeroC ? MatrixStore.PRIMITIVE64.makeZero(convex.countVariables(), 1).get() : convex.getC();
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
-        RowsSupplier<Double> convexAI = convex.getAI();
+        MatrixStore<Double> convexAI = convex.getAI();
         MatrixStore<Double> convexBI = convex.getBI();
 
         for (int i = 0; i < numbVars; i++) {

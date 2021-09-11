@@ -29,10 +29,8 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.multiary.LinearFunction;
-import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -47,98 +45,19 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
-    public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
+    /**
+     * @deprecated v50 Use {@link StandardBuilder} instead
+     */
+    @Deprecated
+    public static abstract class Builder extends GenericSolver.Builder<LinearSolver.StandardBuilder, LinearSolver> {
 
-        private LinearFunction<Double> myObjective = null;
-
-        public Builder() {
+        Builder() {
             super();
         }
 
-        public Builder(final MatrixStore<Double> C) {
-
-            super();
-
-            this.objective(C);
-        }
-
-        /**
-         * Currently/still the RHS elements need to non-negative. (You have to convert the LP to standard
-         * form.)
-         *
-         * @see org.ojalgo.optimisation.GenericSolver.Builder#equalities(org.ojalgo.matrix.store.MatrixStore,
-         *      org.ojalgo.matrix.store.MatrixStore)
-         */
-        @Override
-        public Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
-            return super.equalities(mtrxAE, mtrxBE);
-        }
-
-        public MatrixStore<Double> getC() {
-            return myObjective.linear();
-        }
-
-        /**
-         * Setting inequalities here is not yet supported. (You have to convert the LP to standard form.)
-         *
-         * @see org.ojalgo.optimisation.GenericSolver.Builder#inequalities(org.ojalgo.structure.Access2D,
-         *      org.ojalgo.matrix.store.MatrixStore)
-         */
-        @Override
-        public Builder inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
-            ProgrammingError.throwForIllegalInvocation();
-            return super.inequalities(mtrxAI, mtrxBI);
-        }
-
-        public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
-            this.setObjective(mtrxC);
-            return this;
-        }
-
-        @Override
-        public void reset() {
-            super.reset();
-            myObjective = null;
-        }
-
-        @Override
-        public String toString() {
-
-            final String simpleName = this.getClass().getSimpleName();
-
-            final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
-
-            retVal.append("\n[AE] = " + (this.getAE() != null ? Primitive64Matrix.FACTORY.copy(this.getAE()) : "?"));
-
-            retVal.append("\n[BE] = " + (this.getBE() != null ? Primitive64Matrix.FACTORY.copy(this.getBE()) : "?"));
-
-            retVal.append("\n[C] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getC()) : "?"));
-
-            retVal.append("\n[AI] = " + (this.getAI() != null ? Primitive64Matrix.FACTORY.copy(this.getAI()) : "?"));
-
-            retVal.append("\n[BI] = " + (this.getBI() != null ? Primitive64Matrix.FACTORY.copy(this.getBI()) : "?"));
-
-            retVal.append("\n</" + simpleName + ">");
-
-            return retVal.toString();
-        }
-
-        private Builder setObjective(final MatrixStore<Double> mtrxC) {
-
-            PhysicalStore<Double> tmpC = null;
-
-            if (mtrxC == null) {
-                tmpC = Primitive64Store.FACTORY.make(this.countVariables(), 1);
-            } else if (mtrxC instanceof PhysicalStore) {
-                tmpC = (PhysicalStore<Double>) mtrxC;
-            } else {
-                tmpC = mtrxC.copy();
-            }
-
-            myObjective = LinearFunction.wrap(tmpC);
-            super.setObjective(myObjective);
-
-            return this;
+        public StandardBuilder objective(final MatrixStore<Double> mtrxC) {
+            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
+            return (StandardBuilder) this;
         }
 
         @Override
@@ -147,6 +66,106 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             final SimplexTableau tableau = new DenseTableau(this);
 
             return new PrimalSimplex(tableau, options);
+        }
+    }
+
+    /**
+     * Compared to {@link LinearSolver.StandardBuilder} this builder: <br>
+     * 1) Accepts inequality constraints <br>
+     * 2) Has relaxed the requiremnt on the RHS to be non-negative (both equalities and inequalities) <br>
+     * <br>
+     * Compared to {@link ConvexSolver.Builder} this builder: <br>
+     * 1) Requires the objective function to be linear (or only the linear factors will be concidered) <br>
+     * 2) Assumes (requires) variables to be non-negative <br>
+     * <br>
+     *
+     * @author apete
+     */
+    public static final class GeneralBuilder extends GenericSolver.Builder<LinearSolver.GeneralBuilder, LinearSolver> {
+
+        GeneralBuilder() {
+            super();
+        }
+
+        @Override
+        public LinearSolver.GeneralBuilder inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+            return super.inequalities(mtrxAI, mtrxBI);
+        }
+
+        public GeneralBuilder objective(final MatrixStore<Double> mtrxC) {
+            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
+            return this;
+        }
+
+        /**
+         * Convert inequalities to equalities (adding slack variables) and make sure all RHS are non-negative.
+         */
+        public StandardBuilder toStandardForm() {
+
+            int nbInequalites = this.countInequalityConstraints();
+            int nbEqualites = this.countEqualityConstraints();
+            int nbVariables = this.countVariables();
+
+            StandardBuilder retVal = LinearSolver.newStandardBuilder();
+
+            PhysicalStore<Double> mtrxC = null;
+
+            PhysicalStore<Double> mtrxAE = null;
+            PhysicalStore<Double> mtrxBE = null;
+
+            if (nbEqualites > 0) {
+
+                if (nbInequalites > 0) {
+
+                    mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+
+                    mtrxAE = this.getAE().logical().below(this.getAI()).right(nbInequalites).collect(FACTORY);
+                    mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
+
+                    mtrxBE = this.getBE().logical().below(this.getBI()).collect(FACTORY);
+
+                } else {
+
+                    mtrxC = this.getC().collect(FACTORY);
+
+                    mtrxAE = this.getAE().collect(FACTORY);
+
+                    mtrxBE = this.getBE().collect(FACTORY);
+
+                }
+
+            } else if (nbInequalites > 0) {
+
+                mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+
+                mtrxAE = this.getAI().logical().right(nbInequalites).collect(FACTORY);
+                mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
+
+                mtrxBE = this.getBI().collect(FACTORY);
+
+            } else {
+
+                throw new IllegalStateException("The problem is unconstrained!");
+            }
+
+            for (int i = 0; i < mtrxBE.getRowDim(); i++) {
+                double rhs = mtrxBE.doubleValue(i, 0);
+                if (rhs < ZERO) {
+                    mtrxAE.modifyRow(i, NEGATE);
+                    mtrxBE.set(i, 0, -rhs);
+                }
+            }
+
+            retVal.objective(mtrxC);
+            retVal.equalities(mtrxAE, mtrxBE);
+
+            return retVal;
+        }
+
+        @Override
+        protected LinearSolver doBuild(final Options options) {
+            // TODO Do it better
+            return this.toStandardForm().build(options);
         }
 
     }
@@ -162,9 +181,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            final SimplexTableau tableau = PrimalSimplex.build(model);
-
-            // BasicLogger.debug("EBM tabeau", tableau);
+            SimplexTableau tableau = PrimalSimplex.build(model);
 
             return new PrimalSimplex(tableau, model.options);
         }
@@ -250,12 +267,82 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    public static LinearSolver.Builder getBuilder() {
-        return new LinearSolver.Builder();
+    /**
+     * Defines optimisation problems on the (LP standard) form:
+     * <p>
+     * min [C]<sup>T</sup>[X]<br>
+     * when [AE][X] == [BE]<br>
+     * and 0 &lt;= [X]<br>
+     * and 0 &lt;= [BE]
+     * </p>
+     * A Linear Program is in Standard Form if:
+     * <ul>
+     * <li>All constraints are equality constraints.</li>
+     * <li>All variables have a nonnegativity sign restriction.</li>
+     * </ul>
+     * <p>
+     * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements
+     * in [BE]). Don't think that's an LP standard form requirement, but it is required here.
+     * </p>
+     * <p>
+     * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
+     * be a minimisation.
+     * </p>
+     *
+     * @author apete
+     */
+    public static final class StandardBuilder extends LinearSolver.Builder {
+
+        /**
+         * @deprecated v50 Use {@link LinearSolver#newBuilder()} instead.
+         */
+        @Deprecated
+        public StandardBuilder() {
+            super();
+        }
+
+        /**
+         * @deprecated v50 Use {@link LinearSolver#newBuilder()} instead.
+         */
+        @Deprecated
+        public StandardBuilder(final MatrixStore<Double> mtrxC) {
+
+            super();
+
+            this.objective(mtrxC);
+        }
+
+        @Override
+        public StandardBuilder objective(final MatrixStore<Double> mtrxC) {
+            return super.objective(mtrxC);
+        }
+
     }
 
-    public static LinearSolver.Builder getBuilder(final MatrixStore<Double> C) {
-        return LinearSolver.getBuilder().objective(C);
+    /**
+     * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
+     *             {@link LinearSolver#newGeneralBuilder()} instead.
+     */
+    @Deprecated
+    public static LinearSolver.StandardBuilder getBuilder() {
+        return LinearSolver.newStandardBuilder();
+    }
+
+    /**
+     * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
+     *             {@link LinearSolver#newGeneralBuilder()} instead.
+     */
+    @Deprecated
+    public static LinearSolver.StandardBuilder getBuilder(final MatrixStore<Double> C) {
+        return LinearSolver.newStandardBuilder().objective(C);
+    }
+
+    public static LinearSolver.GeneralBuilder newGeneralBuilder() {
+        return new LinearSolver.GeneralBuilder();
+    }
+
+    public static LinearSolver.StandardBuilder newStandardBuilder() {
+        return new LinearSolver.StandardBuilder();
     }
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
@@ -287,6 +374,21 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         return result;
+    }
+
+    static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {
+
+        ProgrammingError.throwIfNull(mtrxC);
+
+        PhysicalStore<Double> tmpC = null;
+
+        if (mtrxC instanceof PhysicalStore) {
+            tmpC = (PhysicalStore<Double>) mtrxC;
+        } else {
+            tmpC = mtrxC.copy();
+        }
+
+        return LinearFunction.wrap(tmpC);
     }
 
     protected LinearSolver(final Options solverOptions) {

@@ -323,7 +323,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(tmpC);
+        final LinearSolver.Builder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
         final Optimisation.Options tmpOptions = new Optimisation.Options();
@@ -366,7 +366,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         final Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(tmpC);
+        final LinearSolver.Builder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
         final Optimisation.Options tmpOptions = new Optimisation.Options();
