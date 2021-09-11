@@ -372,13 +372,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
             this.exclude(toExclude);
             return true;
-        } else {
-            if (this.isLogDebug()) {
-                this.log("Stop!");
-            }
-            this.setState(State.OPTIMAL);
-            return false;
         }
+        if (this.isLogDebug()) {
+            this.log("Stop!");
+        }
+        this.setState(State.OPTIMAL);
+        return false;
     }
 
     /**

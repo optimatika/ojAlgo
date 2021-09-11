@@ -133,6 +133,11 @@ public class PrimalDualTest extends OptimisationLinearTests {
         Result primResult = PrimalSimplex.doSolve(convex, model.options, false);
         Result dualResult = DualSimplex.doSolve(convex, model.options, false);
 
+        GeneralBuilder feasibility = convex.toFeasibilityChecker();
+        Result feasResult = feasibility.build(model.options).solve();
+
+        TestUtils.assertStateNotLessThanOptimal(feasResult);
+
         GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
         Result lineResult = linear.build(model.options).solve();
 

@@ -231,9 +231,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
                 if (nbIneq > 0) {
 
-                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate(), mtrxBI).get());
+                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate()).below(mtrxBI).get());
 
-                    retVal.equalities(transpAE.logical().right(transpAE.negate(), mtrxAI.transpose()).get(), rhs);
+                    retVal.equalities(transpAE.logical().right(transpAE.negate()).right(mtrxAI.transpose()).get(), rhs);
 
                 } else {
 
