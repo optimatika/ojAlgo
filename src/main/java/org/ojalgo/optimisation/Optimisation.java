@@ -243,6 +243,8 @@ public interface Optimisation {
          * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
          * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default.</li>
          * </ol>
+         * Currently (2021-09-12) if you don't set this the dense LinearSolver and the sparse ConvexSolver
+         * will be used.
          */
         public Boolean sparse = null;
 
@@ -285,18 +287,17 @@ public interface Optimisation {
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
-            logger_detailed = solver != null ? true : false;
-            validate = solver != null ? true : false;
+            logger_detailed = solver != null == true;
+            validate = solver != null == true;
         }
 
         @SuppressWarnings("unchecked")
         public <T> Optional<T> getConfigurator(final Class<T> type) {
             ProgrammingError.throwIfNull(type);
-            if ((myConfigurator != null) && type.isInstance(myConfigurator)) {
+            if (myConfigurator != null && type.isInstance(myConfigurator)) {
                 return Optional.of((T) myConfigurator);
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         /**
@@ -369,10 +370,7 @@ public interface Optimisation {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (this.getClass() != obj.getClass()) {
+            if ((obj == null) || (this.getClass() != obj.getClass())) {
                 return false;
             }
             final Result other = (Result) obj;
@@ -424,10 +422,10 @@ public interface Optimisation {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myState == null) ? 0 : myState.hashCode());
+            result = prime * result + (myState == null ? 0 : myState.hashCode());
             long temp;
             temp = Double.doubleToLongBits(myValue);
-            result = (prime * result) + (int) (temp ^ (temp >>> 32));
+            result = prime * result + (int) (temp ^ temp >>> 32);
             return result;
         }
 
@@ -537,7 +535,7 @@ public interface Optimisation {
         }
 
         public boolean isApproximate() {
-            return (this == APPROXIMATE) || this.isFeasible();
+            return this == APPROXIMATE || this.isFeasible();
         }
 
         public boolean isDistinct() {

@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -145,6 +143,7 @@ final class PrimalSimplex extends SimplexSolver {
                 + tmpVarsNegUp.size();
         int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
         int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size() + tmpVarsNegUp.size();
+
         SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount, model.options);
 
         int tmpPosVarsBaseIndex = 0;
@@ -417,9 +416,6 @@ final class PrimalSimplex extends SimplexSolver {
         //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
         //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
 
-        if (model.options.sparse == null && retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory())) {
-            return retVal.toDense();
-        }
         return retVal;
     }
 

@@ -38,12 +38,18 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
+
+    public static LinearSolver newSolver(final ExpressionsBasedModel model) {
+
+        SimplexTableau tableau = PrimalSimplex.build(model);
+
+        return new PrimalSimplex(tableau, model.options);
+    }
 
     /**
      * @deprecated v50 Use {@link StandardBuilder} instead
@@ -63,7 +69,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
-            final SimplexTableau tableau = new DenseTableau(this);
+            final SimplexTableau tableau = SimplexTableau.make(this, options);
 
             return new PrimalSimplex(tableau, options);
         }

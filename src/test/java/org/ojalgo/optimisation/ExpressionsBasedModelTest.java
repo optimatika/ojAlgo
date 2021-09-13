@@ -26,14 +26,101 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.context.NumberContext;
 
-public class ExpressionsBasedModelTest {
+public class ExpressionsBasedModelTest extends OptimisationTest {
+
+    /**
+     * https://github.com/optimatika/ojAlgo-extensions/issues/3 <br>
+     * "compensating" didn't work because of an incorrectly used stream - did peek(...) instead of map(...).
+     */
+    @Test
+    public void testCompensate() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(Variable.make("X1").lower(0).upper(5).weight(1));
+        model.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
+        model.addVariable(Variable.make("X3").level(4).weight(1));
+
+        Expression expression = model.addExpression("MAX5").upper(5);
+        expression.set(0, 1).set(1, 1).set(2, 1);
+
+        Optimisation.Result result = model.maximise();
+
+        TestUtils.assertTrue(model.validate(result));
+
+        TestUtils.assertTrue(result.getState().isOptimal());
+
+        TestUtils.assertEquals(5.0, result.getValue(), PrimitiveMath.MACHINE_EPSILON);
+
+        TestUtils.assertEquals(1.0, result.doubleValue(0) + result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(4.0, result.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo-extensions/issues/1 Reported as a problem with the CPLEX
+     * integration
+     */
+    @Test
+    public void testFixedVariables() {
+
+        ExpressionsBasedModel test = new ExpressionsBasedModel();
+        test.addVariable(Variable.make("V1").level(0.5));
+        test.addVariable(Variable.make("V2").lower(0).upper(5).weight(2));
+        test.addVariable(Variable.make("V3").lower(0).upper(1).weight(1));
+        Expression expressions = test.addExpression("E1").lower(0).upper(2);
+        expressions.set(1, 1).set(2, 1);
+
+        Optimisation.Result minResult = test.minimise();
+        TestUtils.assertTrue(test.validate(minResult));
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, minResult.getState());
+        TestUtils.assertEquals(0.0, minResult.getValue(), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(0.5, minResult.doubleValue(0), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(0.0, minResult.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(0.0, minResult.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+
+        Optimisation.Result maxResult = test.maximise();
+        TestUtils.assertTrue(test.validate(maxResult));
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, maxResult.getState());
+        TestUtils.assertEquals(4.0, maxResult.getValue(), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(0.5, maxResult.doubleValue(0), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(2.0, maxResult.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(0.0, maxResult.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo-extensions/issues/2 <br>
+     * Reported as a problem with the Gurobi integration. The problem is unbounded. Many solvers do not return
+     * a feasible solution in such case - even if they could.
+     */
+    @Test
+    @Tag("unstable")
+    public void testGitHubIssue2() {
+
+        Variable[] objective = new Variable[] { new Variable("X1").weight(0.8), new Variable("X2").weight(0.2), new Variable("X3").weight(0.7),
+                new Variable("X4").weight(0.3), new Variable("X5").weight(0.6), new Variable("X6").weight(0.4) };
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
+
+        model.addExpression("C1").set(0, 1).set(2, 1).set(4, 1).level(23);
+        model.addExpression("C2").set(1, 1).set(3, 1).set(5, 1).level(23);
+        model.addExpression("C3").set(0, 1).lower(10);
+        model.addExpression("C4").set(2, 1).lower(8);
+        model.addExpression("C5").set(4, 1).lower(5);
+
+        Optimisation.Result result = model.maximise();
+
+        // A valid solution of 25.8 can be produced with:
+        //     X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
+        TestUtils.assertEquals(25.8, result.getValue(), 0.001);
+    }
 
     @Test
     public void testIntegerRounding() {
@@ -76,30 +163,30 @@ public class ExpressionsBasedModelTest {
     @Test
     public void testMPStestprob() {
 
-        final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
-        final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
-        final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
+        Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
+        Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
+        Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        final BigDecimal[] tmpFactorsLIM1 = new BigDecimal[] { ONE, ONE, ZERO };
-        final Expression tmpLIM1 = tmpModel.addExpression("LIM1");
+        BigDecimal[] tmpFactorsLIM1 = new BigDecimal[] { ONE, ONE, ZERO };
+        Expression tmpLIM1 = tmpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, tmpFactorsLIM1[v]);
         }
         tmpLIM1.upper(FIVE.add(TENTH));
 
-        final BigDecimal[] tmpFactorsLIM2 = new BigDecimal[] { ONE, ZERO, ONE };
-        final Expression tmpLIM2 = tmpModel.addExpression("LIM2");
+        BigDecimal[] tmpFactorsLIM2 = new BigDecimal[] { ONE, ZERO, ONE };
+        Expression tmpLIM2 = tmpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, tmpFactorsLIM2[v]);
         }
         tmpLIM2.lower(TEN.add(TENTH));
 
-        final BigDecimal[] tmpFactorsMYEQN = new BigDecimal[] { ZERO, ONE.negate(), ONE };
-        final Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
+        BigDecimal[] tmpFactorsMYEQN = new BigDecimal[] { ZERO, ONE.negate(), ONE };
+        Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, tmpFactorsMYEQN[v]);
         }
@@ -107,10 +194,10 @@ public class ExpressionsBasedModelTest {
 
         TestUtils.assertTrue(tmpModel.validate());
 
-        final Result tmpMinRes = tmpModel.minimise();
-        final Result tmpMaxRes = tmpModel.maximise();
+        Result tmpMinRes = tmpModel.minimise();
+        Result tmpMaxRes = tmpModel.maximise();
 
-        if (OptimisationTests.DEBUG) {
+        if (OptimisationTest.DEBUG) {
             BasicLogger.debug(tmpMinRes);
             BasicLogger.debug(tmpMaxRes);
         }
@@ -128,7 +215,6 @@ public class ExpressionsBasedModelTest {
         tmpYTWO.lower(ONE).upper(NEG);
 
         TestUtils.assertFalse(tmpModel.validate());
-
     }
 
     @Test
@@ -170,6 +256,35 @@ public class ExpressionsBasedModelTest {
 
         TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 
+    }
+
+    @Test
+    public void testSimplyLowerAndUpperBounds() {
+
+        double precision = 0.00001;
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(Variable.make("A").level(2).weight(3));
+        model.addVariable(Variable.make("B").lower(1).upper(3).weight(2));
+        model.addVariable(Variable.make("C").lower(0).upper(4).weight(1));
+        model.addExpression("SUM").set(0, 1).set(1, 1).set(2, 1).level(6);
+
+        Optimisation.Result minResult = model.minimise();
+        TestUtils.assertTrue(model.validate(minResult));
+        TestUtils.assertTrue(minResult.getState().isOptimal());
+
+        TestUtils.assertEquals(11, minResult.getValue(), precision);
+        TestUtils.assertEquals(2, minResult.doubleValue(0), precision);
+        TestUtils.assertEquals(1, minResult.doubleValue(1), precision);
+        TestUtils.assertEquals(3, minResult.doubleValue(2), precision);
+
+        Optimisation.Result maxResult = model.maximise();
+        TestUtils.assertTrue(model.validate(maxResult));
+        TestUtils.assertTrue(maxResult.getState().isOptimal());
+        TestUtils.assertEquals(13, maxResult.getValue(), precision);
+        TestUtils.assertEquals(2, maxResult.doubleValue(0), precision);
+        TestUtils.assertEquals(3, maxResult.doubleValue(1), precision);
+        TestUtils.assertEquals(1, maxResult.doubleValue(2), precision);
     }
 
 }

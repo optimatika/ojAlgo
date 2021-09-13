@@ -38,6 +38,6 @@ public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
         extends Access2D<N>, Access2D.Aggregatable<N>, NormedVectorSpace<M, N>, Operation.Subtraction<M>, Operation.Multiplication<M>,
         ScalarOperation.Addition<M, N>, ScalarOperation.Subtraction<M, N>, ScalarOperation.Division<M, N> {
 
-    Matrix2D<N, M> transpose();
+    M transpose();
 
 }
