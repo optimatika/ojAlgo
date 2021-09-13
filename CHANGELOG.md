@@ -18,6 +18,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The hierarchy of solver builders have been refactored. The most important change is that there are now 2 different `LinearSolver` builders – `StandardBuilder` and `GeneralBuilder`.
 - Some very very small inequality parameters used to be removed (rounded to 0.0) when instantiating `ConvexSolver`. This is no longer done.
 - The `ActiveSetSolver` (`ConvexSolver`) no longer makes use of Lagrange multipliers obtained when finding an initial feasible solution (they're mostly 0.0 anyway).
+- Changed the default behaviour when `Optimisation.Options.sparse` is not set. If you don't set this the dense LinearSolver and the iterative ConvexSolver will be used.
 
 ### Deprecated
 

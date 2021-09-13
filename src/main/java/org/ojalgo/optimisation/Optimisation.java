@@ -167,7 +167,7 @@ public interface Optimisation {
          * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
          * values integer or not?
          */
-        public NumberContext feasibility = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+        public NumberContext feasibility = NumberContext.of(12, 8);
 
         /**
          * The maximmum number of iterations allowed for the solve() command.
@@ -223,7 +223,7 @@ public interface Optimisation {
         /**
          * For display only!
          */
-        public NumberContext print = NumberContext.getGeneral(8, 10);
+        public NumberContext print = NumberContext.of(8, 10);
 
         /**
          * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
@@ -231,7 +231,7 @@ public interface Optimisation {
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
          * corresponding to full double precision.
          */
-        public NumberContext solution = new NumberContext(0, 14, RoundingMode.HALF_DOWN);
+        public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 
         /**
          * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.
@@ -241,10 +241,12 @@ public interface Optimisation {
          * <ol>
          * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
          * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
-         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default.</li>
+         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default. Currently, the
+         * dense LinearSolver and the iterative ConvexSolver will be used. In the vast majority of cases these
+         * are the best alternatives.</li>
          * </ol>
-         * Currently (2021-09-12) if you don't set this the dense LinearSolver and the sparse ConvexSolver
-         * will be used.
+         * In most cases you do not need to worry about this configuration option - leave this choice to
+         * ojAlgo.
          */
         public Boolean sparse = null;
 
@@ -370,14 +372,11 @@ public interface Optimisation {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || (this.getClass() != obj.getClass())) {
+            if (obj == null || this.getClass() != obj.getClass()) {
                 return false;
             }
             final Result other = (Result) obj;
-            if (myState != other.myState) {
-                return false;
-            }
-            if (Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other.myValue)) {
+            if (myState != other.myState || Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other.myValue)) {
                 return false;
             }
             return true;
