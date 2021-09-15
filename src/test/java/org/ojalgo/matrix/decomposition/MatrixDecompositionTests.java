@@ -195,7 +195,7 @@ public abstract class MatrixDecompositionTests {
 
     @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getPrimitiveEigenvalueGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Dynamic(), new GeneralEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.General() };
     }
 
     @SuppressWarnings("unchecked")
