@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.RowView;
 
 /**
  * Should be able hold data for any problem solvable by ojAlgo's built-in solvers.
@@ -263,8 +264,16 @@ public final class OptimisationData {
         return myAI.getRow(row);
     }
 
-    MatrixStore<Double> getAI(final int... rows) {
-        return myAI.selectRows(rows).get();
+    RowsSupplier<Double> getAI(final int... rows) {
+        return myAI.selectRows(rows);
+    }
+
+    double getBI(final int row) {
+        return myBI.doubleValue(row);
+    }
+
+    RowView<Double> getRowsAI() {
+        return myAI.rows();
     }
 
     void newEqualities(final int nbEqualities, final int nbVariables) {
