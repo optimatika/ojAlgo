@@ -50,8 +50,6 @@ final class DualSimplex extends SimplexSolver {
         MatrixStore<Double> convexC = zeroC ? MatrixStore.PRIMITIVE64.makeZero(convex.countVariables(), 1).get() : convex.getC();
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
-        MatrixStore<Double> convexAI = convex.getAI();
-        MatrixStore<Double> convexBI = convex.getBI();
 
         for (int i = 0; i < numbVars; i++) {
             double rhs = convexC.doubleValue(i);
@@ -64,10 +62,11 @@ final class DualSimplex extends SimplexSolver {
             constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        for (RowView<Double> rowV : convexAI.rows()) {
-            long tabJ = rowV.row();
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
 
-            for (ElementView1D<Double, ?> elemV : rowV.nonzeros()) {
+            long tabJ = rowAI.row();
+
+            for (ElementView1D<Double, ?> elemV : rowAI.nonzeros()) {
                 int tabI = Math.toIntExact(elemV.index());
 
                 double tabVal = elemV.doubleValue();
@@ -80,11 +79,8 @@ final class DualSimplex extends SimplexSolver {
             obj.set(numbEqus + j, -convexBE.doubleValue(j));
         }
         for (int j = 0; j < numbInes; j++) {
-            obj.set(numbEqus + numbEqus + j, convexBI.doubleValue(j));
+            obj.set(numbEqus + numbEqus + j, convex.getBI(j));
         }
-
-        //        BasicLogger.debug("Dual", retVal);
-        //        BasicLogger.debug("Negs (dual): {}", Arrays.toString(retVal.negative));
 
         return retVal;
     }

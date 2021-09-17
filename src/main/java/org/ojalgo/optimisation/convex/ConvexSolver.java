@@ -54,6 +54,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 
@@ -155,13 +156,18 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        public MatrixStore<Double> getAI(final int... rows) {
+        public RowsSupplier<Double> getAI(final int... rows) {
             return super.getAI(rows);
         }
 
         @Override
         public MatrixStore<Double> getBI() {
             return super.getBI();
+        }
+
+        @Override
+        public double getBI(final int row) {
+            return super.getBI(row);
         }
 
         /**
@@ -177,6 +183,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          */
         public PhysicalStore<Double> getQ() {
             return myObjective.quadratic();
+        }
+
+        @Override
+        public RowView<Double> getRowsAI() {
+            return super.getRowsAI();
         }
 
         @Override
@@ -654,7 +665,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return myMatrices.getAI(row);
     }
 
-    protected MatrixStore<Double> getMatrixAI(final int[] rows) {
+    protected RowsSupplier<Double> getMatrixAI(final int[] rows) {
         return myMatrices.getAI(rows);
     }
 

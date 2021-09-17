@@ -79,39 +79,19 @@ final class PrimalSimplex extends SimplexSolver {
             constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        MatrixStore<Double> convexAI = convex.getAI();
-        MatrixStore<Double> convexBI = convex.getBI();
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
 
-        for (RowView<Double> row : convexAI.rows()) {
+            int r = Math.toIntExact(rowAI.row());
 
-            int r = Math.toIntExact(row.row());
-
-            double rhs = convexBI.doubleValue(r);
+            double rhs = convex.getBI(r);
 
             boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
 
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
             constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
             constrRHS.set(numbEqus + r, neg ? -rhs : rhs);
-
         }
-
-        //        for (int i = 0; i < numbInes; i++) {
-        //            int r = i;
-        //            SparseArray<Double> row = convexAI.getRow(r);
-        //            double rhs = convexBI.doubleValue(r);
-        //
-        //            boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
-        //
-        //            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-        //            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
-        //            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-        //            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
-        //        }
-
-        // BasicLogger.debug("Primal", retVal);
-        // BasicLogger.debug("Negs (primal): {}", negs);
 
         return retVal;
     }

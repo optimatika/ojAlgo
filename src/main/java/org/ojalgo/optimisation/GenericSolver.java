@@ -32,9 +32,11 @@ import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.context.NumberContext;
@@ -183,7 +185,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getAI(row);
         }
 
-        protected MatrixStore<Double> getAI(final int... rows) {
+        protected RowsSupplier<Double> getAI(final int... rows) {
             return myData.getAI(rows);
         }
 
@@ -194,8 +196,16 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getBI();
         }
 
+        protected double getBI(final int row) {
+            return myData.getBI(row);
+        }
+
         protected <T extends TwiceDifferentiable<Double>> T getObjective() {
             return myData.getObjective();
+        }
+
+        protected RowView<Double> getRowsAI() {
+            return myData.getRowsAI();
         }
 
         protected B inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
