@@ -13,6 +13,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.matrix
+
+- Slight change in how shifting is done when calculating the EvD for non-symmetric. Not strictly a bug fix but this solved GitHub issue 366 (there is a chance this may introduce problems for other cases).
+
 #### org.ojalgo.optimisation
 
 - The hierarchy of solver builders have been refactored. The most important change is that there are now 2 different `LinearSolver` builders – `StandardBuilder` and `GeneralBuilder`.

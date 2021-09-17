@@ -23,8 +23,13 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.io.IOException;
 import java.math.MathContext;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,10 +66,61 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
     }
 
+    private static void doVerifyGeneral(final Primitive64Store matrix) {
+
+        for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
+
+            tmpEigenvalue.decompose(matrix);
+
+            TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL32));
+
+            Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
+
+            tmpEigenvalue.computeValuesOnly(matrix);
+            Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
+            TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
+        }
+    }
+
     @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
+    }
+
+    /**
+     * org.ojalgo.matrix.decomposition.EvD2D.hqr2 not converging #366. Following the debugger, it is the
+     * method hqr2 that get stuck in a loop
+     */
+    @Test
+    public void testGitHUbIssue366() throws IOException {
+
+        String path = "src/test/resources/org/ojalgo/matrix/decomposition/GitHubIssue366_Mat.txt";
+        List<String> lines = Files.lines(Paths.get(path)).collect(Collectors.toList());
+
+        Primitive64Store problematic = Primitive64Store.FACTORY.make(lines.size(), lines.size());
+
+        for (int r = 0; r < lines.size(); r++) {
+            String[] line_vec = lines.get(r).split(" ");
+            for (int c = 0; c < line_vec.length; c++) {
+                double v = Double.parseDouble(line_vec[c]);
+                problematic.set(r, c, v);
+            }
+        }
+
+        CaseEigenvalue.doVerifyGeneral(problematic);
+    }
+
+    /**
+     * A matrix that was once reported problematic with JAMA (JAMA v1.0.3 contained a fix)
+     */
+    @Test
+    public void testJamaProblem() throws IOException {
+
+        Primitive64Store problematic = Primitive64Store.FACTORY
+                .rows(new double[][] { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 1 }, { 0, 0, 0, 1, 0 }, { 1, 1, 0, 0, 1 }, { 1, 0, 1, 0, 1 } });
+
+        CaseEigenvalue.doVerifyGeneral(problematic);
     }
 
     @Test
@@ -256,19 +312,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         Primitive64Store matrix = Primitive64Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
-        for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
-
-            tmpEigenvalue.decompose(matrix);
-
-            TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL64));
-
-            Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
-
-            tmpEigenvalue.computeValuesOnly(matrix);
-            Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
-            TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
-
-        }
+        CaseEigenvalue.doVerifyGeneral(matrix);
     }
 
     @Test

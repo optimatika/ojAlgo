@@ -51,7 +51,7 @@ public abstract class EvD2D {
                 if (NumberContext.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (ABS.invoke(mtrxH[l][l - 1]) < (MACHINE_EPSILON * s)) {
+                if (ABS.invoke(mtrxH[l][l - 1]) < MACHINE_EPSILON * s) {
                     break;
                 }
                 l--;
@@ -69,10 +69,10 @@ public abstract class EvD2D {
 
                 // Two roots found
 
-            } else if (l == (n - 1)) {
+            } else if (l == n - 1) {
                 w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
                 p = (mtrxH[n - 1][n - 1] - mtrxH[n][n]) / TWO;
-                q = (p * p) + w;
+                q = p * p + w;
                 z = SQRT.invoke(ABS.invoke(q));
                 mtrxH[n][n] = mtrxH[n][n] + exshift;
                 mtrxH[n - 1][n - 1] = mtrxH[n - 1][n - 1] + exshift;
@@ -90,7 +90,7 @@ public abstract class EvD2D {
                     d[n] = d[n - 1];
                     // if (z != ZERO) {
                     if (NumberContext.compare(z, ZERO) != 0) {
-                        d[n] = x - (w / z);
+                        d[n] = x - w / z;
                     }
                     e[n - 1] = ZERO;
                     e[n] = ZERO;
@@ -98,7 +98,7 @@ public abstract class EvD2D {
                     s = ABS.invoke(x) + ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = SQRT.invoke((p * p) + (q * q));
+                    r = SQRT.invoke(p * p + q * q);
                     p = p / r;
                     q = q / r;
 
@@ -106,27 +106,27 @@ public abstract class EvD2D {
 
                     for (int j = n - 1; j < size; j++) {
                         z = mtrxH[n - 1][j];
-                        mtrxH[n - 1][j] = (q * z) + (p * mtrxH[n][j]);
-                        mtrxH[n][j] = (q * mtrxH[n][j]) - (p * z);
+                        mtrxH[n - 1][j] = q * z + p * mtrxH[n][j];
+                        mtrxH[n][j] = q * mtrxH[n][j] - p * z;
                     }
 
                     // Column modification
 
                     for (int i = 0; i <= n; i++) {
                         z = mtrxH[i][n - 1];
-                        mtrxH[i][n - 1] = (q * z) + (p * mtrxH[i][n]);
-                        mtrxH[i][n] = (q * mtrxH[i][n]) - (p * z);
+                        mtrxH[i][n - 1] = q * z + p * mtrxH[i][n];
+                        mtrxH[i][n] = q * mtrxH[i][n] - p * z;
                     }
 
                     // Accumulate transformations
                     if (trnspV != null) {
-                        for (int i = 0; i <= (size - 1); i++) {
+                        for (int i = 0; i <= size - 1; i++) {
                             //z = V[i][n - 1];
                             z = trnspV[n - 1][i];
                             //V[i][n - 1] = (q * z) + (p * V[i][n]);
-                            trnspV[n - 1][i] = (q * z) + (p * trnspV[n][i]);
+                            trnspV[n - 1][i] = q * z + p * trnspV[n][i];
                             //V[i][n] = (q * V[i][n]) - (p * z);
-                            trnspV[n][i] = (q * trnspV[n][i]) - (p * z);
+                            trnspV[n][i] = q * trnspV[n][i] - p * z;
                         }
                     }
 
@@ -153,7 +153,7 @@ public abstract class EvD2D {
 
                 // Wilkinson's original ad hoc shift
 
-                if (iter == 10) {
+                if (iter > 0 && iter % 11 == 0) {
                     exshift += x;
                     for (int i = 0; i <= n; i++) {
                         mtrxH[i][i] -= x;
@@ -165,15 +165,15 @@ public abstract class EvD2D {
 
                 // MATLAB's new ad hoc shift
 
-                if (iter == 30) {
+                if (iter > 0 && iter % 31 == 0) {
                     s = (y - x) / TWO;
-                    s = (s * s) + w;
+                    s = s * s + w;
                     if (s > 0) {
                         s = SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
-                        s = x - (w / (((y - x) / TWO) + s));
+                        s = x - w / ((y - x) / TWO + s);
                         for (int i = 0; i <= n; i++) {
                             mtrxH[i][i] -= s;
                         }
@@ -191,18 +191,15 @@ public abstract class EvD2D {
                     z = mtrxH[m][m];
                     r = x - z;
                     s = y - z;
-                    p = (((r * s) - w) / mtrxH[m + 1][m]) + mtrxH[m][m + 1];
+                    p = (r * s - w) / mtrxH[m + 1][m] + mtrxH[m][m + 1];
                     q = mtrxH[m + 1][m + 1] - z - r - s;
                     r = mtrxH[m + 2][m + 1];
                     s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
-                    if (m == l) {
-                        break;
-                    }
-                    if ((ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (MACHINE_EPSILON
-                            * (ABS.invoke(p) * (ABS.invoke(mtrxH[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(mtrxH[m + 1][m + 1]))))) {
+                    if (m == l || ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r)) < MACHINE_EPSILON
+                            * (ABS.invoke(p) * (ABS.invoke(mtrxH[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(mtrxH[m + 1][m + 1])))) {
                         break;
                     }
                     m--;
@@ -210,19 +207,19 @@ public abstract class EvD2D {
 
                 for (int i = m + 2; i <= n; i++) {
                     mtrxH[i][i - 2] = ZERO;
-                    if (i > (m + 2)) {
+                    if (i > m + 2) {
                         mtrxH[i][i - 3] = ZERO;
                     }
                 }
 
                 // Double QR step involving rows l:n and columns m:n
 
-                for (int k = m; k <= (n - 1); k++) {
-                    final boolean notlast = (k != (n - 1));
+                for (int k = m; k <= n - 1; k++) {
+                    final boolean notlast = k != n - 1;
                     if (k != m) {
                         p = mtrxH[k][k - 1];
                         q = mtrxH[k + 1][k - 1];
-                        r = (notlast ? mtrxH[k + 2][k - 1] : ZERO);
+                        r = notlast ? mtrxH[k + 2][k - 1] : ZERO;
                         x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                         // if (x == ZERO) {
                         if (NumberContext.compare(x, ZERO) == 0) {
@@ -233,7 +230,7 @@ public abstract class EvD2D {
                         r = r / x;
                     }
 
-                    s = SQRT.invoke((p * p) + (q * q) + (r * r));
+                    s = SQRT.invoke(p * p + q * q + r * r);
                     if (p < 0) {
                         s = -s;
                     }
@@ -252,41 +249,41 @@ public abstract class EvD2D {
 
                         // Row modification
                         for (int j = k; j < size; j++) {
-                            p = mtrxH[k][j] + (q * mtrxH[k + 1][j]);
+                            p = mtrxH[k][j] + q * mtrxH[k + 1][j];
                             if (notlast) {
-                                p = p + (r * mtrxH[k + 2][j]);
-                                mtrxH[k + 2][j] = mtrxH[k + 2][j] - (p * z);
+                                p = p + r * mtrxH[k + 2][j];
+                                mtrxH[k + 2][j] = mtrxH[k + 2][j] - p * z;
                             }
-                            mtrxH[k][j] = mtrxH[k][j] - (p * x);
-                            mtrxH[k + 1][j] = mtrxH[k + 1][j] - (p * y);
+                            mtrxH[k][j] = mtrxH[k][j] - p * x;
+                            mtrxH[k + 1][j] = mtrxH[k + 1][j] - p * y;
                         }
 
                         // Column modification
                         for (int i = 0; i <= Math.min(n, k + 3); i++) {
-                            p = (x * mtrxH[i][k]) + (y * mtrxH[i][k + 1]);
+                            p = x * mtrxH[i][k] + y * mtrxH[i][k + 1];
                             if (notlast) {
-                                p = p + (z * mtrxH[i][k + 2]);
-                                mtrxH[i][k + 2] = mtrxH[i][k + 2] - (p * r);
+                                p = p + z * mtrxH[i][k + 2];
+                                mtrxH[i][k + 2] = mtrxH[i][k + 2] - p * r;
                             }
                             mtrxH[i][k] = mtrxH[i][k] - p;
-                            mtrxH[i][k + 1] = mtrxH[i][k + 1] - (p * q);
+                            mtrxH[i][k + 1] = mtrxH[i][k + 1] - p * q;
                         }
 
                         // Accumulate transformations
                         if (trnspV != null) {
-                            for (int i = 0; i <= (size - 1); i++) {
+                            for (int i = 0; i <= size - 1; i++) {
                                 //p = (x * V[i][k]) + (y * V[i][k + 1]);
-                                p = (x * trnspV[k][i]) + (y * trnspV[k + 1][i]);
+                                p = x * trnspV[k][i] + y * trnspV[k + 1][i];
                                 if (notlast) {
                                     //p = p + (z * V[i][k + 2]);
-                                    p = p + (z * trnspV[k + 2][i]);
+                                    p = p + z * trnspV[k + 2][i];
                                     //V[i][k + 2] = V[i][k + 2] - (p * r);
-                                    trnspV[k + 2][i] = trnspV[k + 2][i] - (p * r);
+                                    trnspV[k + 2][i] = trnspV[k + 2][i] - p * r;
                                 }
                                 //V[i][k] = V[i][k] - p;
                                 trnspV[k][i] = trnspV[k][i] - p;
                                 //V[i][k + 1] = V[i][k + 1] - (p * q);
-                                trnspV[k + 1][i] = trnspV[k + 1][i] - (p * q);
+                                trnspV[k + 1][i] = trnspV[k + 1][i] - p * q;
                             }
                         }
 
@@ -315,7 +312,7 @@ public abstract class EvD2D {
                     w = mtrxH[i][i] - p;
                     r = ZERO;
                     for (int j = l; j <= n; j++) {
-                        r = r + (mtrxH[i][j] * mtrxH[j][n]);
+                        r = r + mtrxH[i][j] * mtrxH[j][n];
                     }
                     if (e[i] < ZERO) {
                         z = w;
@@ -335,20 +332,20 @@ public abstract class EvD2D {
                         } else {
                             x = mtrxH[i][i + 1];
                             y = mtrxH[i + 1][i];
-                            q = ((d[i] - p) * (d[i] - p)) + (e[i] * e[i]);
-                            t = ((x * s) - (z * r)) / q;
+                            q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
+                            t = (x * s - z * r) / q;
                             mtrxH[i][n] = t;
                             if (ABS.invoke(x) > ABS.invoke(z)) {
-                                mtrxH[i + 1][n] = (-r - (w * t)) / x;
+                                mtrxH[i + 1][n] = (-r - w * t) / x;
                             } else {
-                                mtrxH[i + 1][n] = (-s - (y * t)) / z;
+                                mtrxH[i + 1][n] = (-s - y * t) / z;
                             }
                         }
 
                         // Overflow control
 
                         t = ABS.invoke(mtrxH[i][n]);
-                        if (((MACHINE_EPSILON * t) * t) > 1) {
+                        if (MACHINE_EPSILON * t * t > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n] = mtrxH[j][n] / t;
                             }
@@ -380,8 +377,8 @@ public abstract class EvD2D {
                     ra = ZERO;
                     sa = ZERO;
                     for (int j = l; j <= n; j++) {
-                        ra = ra + (mtrxH[i][j] * mtrxH[j][n - 1]);
-                        sa = sa + (mtrxH[i][j] * mtrxH[j][n]);
+                        ra = ra + mtrxH[i][j] * mtrxH[j][n - 1];
+                        sa = sa + mtrxH[i][j] * mtrxH[j][n];
                     }
                     w = mtrxH[i][i] - p;
 
@@ -401,20 +398,20 @@ public abstract class EvD2D {
 
                             x = mtrxH[i][i + 1];
                             y = mtrxH[i + 1][i];
-                            vr = (((d[i] - p) * (d[i] - p)) + (e[i] * e[i])) - (q * q);
+                            vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
                             vi = (d[i] - p) * TWO * q;
                             // if ((vr == ZERO) & (vi == ZERO)) {
-                            if ((NumberContext.compare(vr, ZERO) == 0) && (NumberContext.compare(vi, ZERO) == 0)) {
+                            if (NumberContext.compare(vr, ZERO) == 0 && NumberContext.compare(vi, ZERO) == 0) {
                                 vr = MACHINE_EPSILON * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
-                            EvD2D.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi, cdiv);
+                            EvD2D.cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi, cdiv);
                             mtrxH[i][n - 1] = cdiv[0];
                             mtrxH[i][n] = cdiv[1];
-                            if (ABS.invoke(x) > (ABS.invoke(z) + ABS.invoke(q))) {
-                                mtrxH[i + 1][n - 1] = ((-ra - (w * mtrxH[i][n - 1])) + (q * mtrxH[i][n])) / x;
-                                mtrxH[i + 1][n] = (-sa - (w * mtrxH[i][n]) - (q * mtrxH[i][n - 1])) / x;
+                            if (ABS.invoke(x) > ABS.invoke(z) + ABS.invoke(q)) {
+                                mtrxH[i + 1][n - 1] = (-ra - w * mtrxH[i][n - 1] + q * mtrxH[i][n]) / x;
+                                mtrxH[i + 1][n] = (-sa - w * mtrxH[i][n] - q * mtrxH[i][n - 1]) / x;
                             } else {
-                                EvD2D.cdiv(-r - (y * mtrxH[i][n - 1]), -s - (y * mtrxH[i][n]), z, q, cdiv);
+                                EvD2D.cdiv(-r - y * mtrxH[i][n - 1], -s - y * mtrxH[i][n], z, q, cdiv);
                                 mtrxH[i + 1][n - 1] = cdiv[0];
                                 mtrxH[i + 1][n] = cdiv[1];
                             }
@@ -422,7 +419,7 @@ public abstract class EvD2D {
 
                         // Overflow control
                         t = MAX.invoke(ABS.invoke(mtrxH[i][n - 1]), ABS.invoke(mtrxH[i][n]));
-                        if (((MACHINE_EPSILON * t) * t) > 1) {
+                        if (MACHINE_EPSILON * t * t > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n - 1] = mtrxH[j][n - 1] / t;
                                 mtrxH[j][n] = mtrxH[j][n] / t;
@@ -437,11 +434,11 @@ public abstract class EvD2D {
 
             // Back transformation to get eigenvectors of original matrix
             for (int j = size - 1; j >= 0; j--) {
-                for (int i = 0; i <= (size - 1); i++) {
+                for (int i = 0; i <= size - 1; i++) {
                     z = ZERO;
                     for (int k = 0; k <= Math.min(j, size - 1); k++) {
                         //z = z + (V[i][k] * H[k][j]);
-                        z = z + (trnspV[k][i] * mtrxH[k][j]);
+                        z = z + trnspV[k][i] * mtrxH[k][j];
                     }
                     //V[i][j] = z;
                     trnspV[j][i] = z;
@@ -484,7 +481,7 @@ public abstract class EvD2D {
                 if (vctrWork[m] > 0) {
                     g = -g;
                 }
-                h = h - (vctrWork[m] * g);
+                h = h - vctrWork[m] * g;
                 vctrWork[m] = vctrWork[m] - g;
 
                 // Apply Householder similarity transformation
@@ -522,11 +519,11 @@ public abstract class EvD2D {
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
                     //V[i][j] = (i == j ? ONE : ZERO);
-                    trnspV[j][i] = (i == j ? ONE : ZERO);
+                    trnspV[j][i] = i == j ? ONE : ZERO;
                 }
             }
 
-            for (int m = sizeM2; m >= (0 + 1); m--) {
+            for (int m = sizeM2; m >= 0 + 1; m--) {
                 if (mtrxH[m][m - 1] != ZERO) {
                     for (int i = m + 1; i <= sizeM1; i++) {
                         vctrWork[i] = mtrxH[i][m - 1];
@@ -538,7 +535,7 @@ public abstract class EvD2D {
                             g += vctrWork[i] * trnspV[j][i];
                         }
                         // Double division avoids possible underflow
-                        g = (g / vctrWork[m]) / mtrxH[m][m - 1];
+                        g = g / vctrWork[m] / mtrxH[m][m - 1];
                         for (int i = m; i <= sizeM1; i++) {
                             //V[i][j] += g * ort[i];
                             trnspV[j][i] += g * vctrWork[i];
@@ -556,14 +553,14 @@ public abstract class EvD2D {
         double r, d;
         if (ABS.invoke(yr) > ABS.invoke(yi)) {
             r = yi / yr;
-            d = yr + (r * yi);
-            cdiv[0] = (xr + (r * xi)) / d;
-            cdiv[1] = (xi - (r * xr)) / d;
+            d = yr + r * yi;
+            cdiv[0] = (xr + r * xi) / d;
+            cdiv[1] = (xi - r * xr) / d;
         } else {
             r = yr / yi;
-            d = yi + (r * yr);
-            cdiv[0] = ((r * xr) + xi) / d;
-            cdiv[1] = ((r * xi) - xr) / d;
+            d = yi + r * yr;
+            cdiv[0] = (r * xr + xi) / d;
+            cdiv[1] = (r * xi - xr) / d;
         }
     }
 
