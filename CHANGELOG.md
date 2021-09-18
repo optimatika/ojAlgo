@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.1.0] – 2021-09-19
+
 ### Changed
 
 #### org.ojalgo.matrix

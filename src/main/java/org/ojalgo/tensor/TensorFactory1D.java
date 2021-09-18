@@ -21,8 +21,6 @@
  */
 package org.ojalgo.tensor;
 
-import java.util.Arrays;
-
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
