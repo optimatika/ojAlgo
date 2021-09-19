@@ -38,28 +38,8 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * LinearSolver solves optimisation problems of the (LP standard) form:
- * <p>
- * min [C]<sup>T</sup>[X]<br>
- * when [AE][X] == [BE]<br>
- * and 0 &lt;= [X]<br>
- * and 0 &lt;= [BE]
- * </p>
- * A Linear Program is in Standard Form if:
- * <ul>
- * <li>All constraints are equality constraints.</li>
- * <li>All variables have a nonnegativity sign restriction.</li>
- * </ul>
- * <p>
- * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements in
- * [BE]).
- * </p>
- * <p>
  * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
- * and not worry about solver details. If you do want to instantiate a linear solver directly use the
- * {@linkplain org.ojalgo.optimisation.linear.LinearSolver.Builder} class. It will return an appropriate
- * subclass for you.
- * </p>
+ * and not worry about solver details.
  *
  * @author apete
  */
@@ -280,27 +260,24 @@ public abstract class SimplexSolver extends LinearSolver {
                 if (myPoint.isPhase2()) {
 
                     this.setState(State.UNBOUNDED);
-                    retVal = false;
 
                 } else {
 
                     this.setState(State.INFEASIBLE);
-                    retVal = false;
                 }
+                retVal = false;
             }
 
         } else {
-
             if (myPoint.isPhase1()) {
 
                 this.setState(State.INFEASIBLE);
-                retVal = false;
 
             } else {
 
                 this.setState(State.OPTIMAL);
-                retVal = false;
             }
+            retVal = false;
         }
 
         if (this.isLogDebug()) {
@@ -391,7 +368,7 @@ public abstract class SimplexSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
 
             // Phase 2 with artificials still in the basis
-            boolean specialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
+            boolean specialCase = tmpPhase2 && myTableau.getBasisColumnIndex(i) < 0;
 
             denom = myTableau.doubleValue(i, tmpDenomCol);
 
@@ -402,20 +379,17 @@ public abstract class SimplexSolver extends LinearSolver {
 
                 ratio = MACHINE_LARGEST;
 
-            } else {
-
-                if (specialCase) {
-                    if (RATIO.isSmall(denom, numer)) {
-                        ratio = MACHINE_EPSILON;
-                    } else {
-                        ratio = MACHINE_LARGEST;
-                    }
+            } else if (specialCase) {
+                if (RATIO.isSmall(denom, numer)) {
+                    ratio = MACHINE_EPSILON;
                 } else {
-                    ratio = numer / denom;
+                    ratio = MACHINE_LARGEST;
                 }
+            } else {
+                ratio = numer / denom;
             }
 
-            if ((specialCase || (denom > ZERO)) && (ratio >= ZERO) && (ratio < minRatio)) {
+            if ((specialCase || denom > ZERO) && ratio >= ZERO && ratio < minRatio) {
 
                 retVal = i;
                 minRatio = ratio;
@@ -459,7 +433,7 @@ public abstract class SimplexSolver extends LinearSolver {
                 }
             }
 
-            if ((minRHS < ZERO) && !GenericSolver.ACCURACY.isZero(minRHS)) {
+            if (minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) {
                 if (this.isLogDebug()) {
                     this.log("Entire RHS columns: {}", colRHS);
                     this.log();

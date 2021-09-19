@@ -27,14 +27,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.context.NumberContext;
@@ -43,62 +45,56 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
 
-        private MatrixStore<Double> myAE = null;
-        private RowsSupplier<Double> myAI = null;
-        private MatrixStore<Double> myBE = null;
-        private MatrixStore<Double> myBI = null;
-        private MultiaryFunction.TwiceDifferentiable<Double> myObjective;
+        protected static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
+
+        protected static final void append(final StringBuilder builder, final String label, final MatrixStore<Double> matrix) {
+            if (builder != null && label != null && matrix != null) {
+                builder.append("\n[");
+                builder.append(label);
+                builder.append("] = ");
+                builder.append(Primitive64Matrix.FACTORY.copy(matrix));
+            }
+        }
+
+        private final OptimisationData myData = new OptimisationData();
 
         protected Builder() {
             super();
         }
 
         public final S build() {
+            myData.validate();
             return this.doBuild(new Optimisation.Options());
         }
 
         public final S build(final Optimisation.Options options) {
             ProgrammingError.throwIfNull(options);
+            myData.validate();
             return this.doBuild(options);
         }
 
+        public int countAdditionalConstraints() {
+            return myData.countAdditionalConstraints();
+        }
+
         public int countConstraints() {
-            return this.countEqualityConstraints() + this.countInequalityConstraints();
+            return this.countEqualityConstraints() + this.countInequalityConstraints() + this.countAdditionalConstraints();
         }
 
         public int countEqualityConstraints() {
-            return Math.toIntExact(this.getAE() != null ? this.getAE().countRows() : 0);
+            return myData.countEqualityConstraints();
         }
 
         public int countInequalityConstraints() {
-            return Math.toIntExact(this.getAI() != null ? this.getAI().countRows() : 0);
+            return myData.countInequalityConstraints();
         }
 
         public int countVariables() {
-
-            int retVal = -1;
-
-            if (this.getAE() != null) {
-                retVal = (int) this.getAE().countColumns();
-            } else if (this.getAI() != null) {
-                retVal = (int) this.getAI().countColumns();
-            } else if (myObjective != null) {
-                retVal = myObjective.arity();
-            } else {
-                throw new ProgrammingError("Cannot deduce the number of variables!");
-            }
-
-            return retVal;
+            return myData.countVariables();
         }
 
-        public B equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
-
-            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
-
-            myAE = mtrxAE;
-            myBE = mtrxBE;
-
+        public B equalities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
+            myData.setEqualities(mtrxAE, mtrxBE);
             return (B) this;
         }
 
@@ -106,156 +102,119 @@ public abstract class GenericSolver implements Optimisation.Solver {
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getAE() {
-            return myAE;
-        }
-
-        /**
-         * [AI][X] &lt;= [BI]
-         */
-        public RowsSupplier<Double> getAI() {
-            return myAI;
+            return myData.getAE();
         }
 
         /**
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getBE() {
-            return myBE;
+            return myData.getBE();
+        }
+
+        public MatrixStore<Double> getC() {
+            return myData.getObjective().getLinearFactors();
+        }
+
+        public boolean hasEqualityConstraints() {
+            return myData.countEqualityConstraints() > 0;
+        }
+
+        public boolean hasInequalityConstraints() {
+            return myData.countInequalityConstraints() > 0;
+        }
+
+        /**
+         * @deprecated v50 You have to have an objective function.
+         */
+        @Deprecated
+        public boolean hasObjective() {
+            return myData.getObjective() != null;
+        }
+
+        public void reset() {
+            myData.reset();
+        }
+
+        @Override
+        public final String toString() {
+
+            String simpleName = this.getClass().getSimpleName();
+
+            StringBuilder retVal = new StringBuilder();
+
+            retVal.append("<");
+            retVal.append(simpleName);
+            retVal.append(">");
+
+            this.append(retVal);
+
+            retVal.append("\n</");
+            retVal.append(simpleName);
+            retVal.append(">");
+
+            return retVal.toString();
+        }
+
+        /**
+         * @deprecated v50 No need for you to call this explicitly. Validation is done for you.
+         */
+        @Deprecated
+        public final void validate() {
+            myData.validate();
+        }
+
+        protected void append(final StringBuilder builder) {
+            Builder.append(builder, "AE", this.getAE());
+            Builder.append(builder, "BE", this.getBE());
+            Builder.append(builder, "AI", this.getAI());
+            Builder.append(builder, "BI", this.getBI());
+            Builder.append(builder, "C", this.getC());
+        }
+
+        protected abstract S doBuild(Optimisation.Options options);
+
+        /**
+         * [AI][X] &lt;= [BI]
+         */
+        protected MatrixStore<Double> getAI() {
+            return myData.getAI();
+        }
+
+        protected SparseArray<Double> getAI(final int row) {
+            return myData.getAI(row);
+        }
+
+        protected RowsSupplier<Double> getAI(final int... rows) {
+            return myData.getAI(rows);
         }
 
         /**
          * [AI][X] &lt;= [BI]
          */
-        public MatrixStore<Double> getBI() {
-            return myBI;
+        protected MatrixStore<Double> getBI() {
+            return myData.getBI();
         }
 
-        public boolean hasEqualityConstraints() {
-            return myAE != null && myAE.countRows() > 0;
+        protected double getBI(final int row) {
+            return myData.getBI(row);
         }
 
-        public boolean hasInequalityConstraints() {
-            return myAI != null && myAI.countRows() > 0;
+        protected <T extends TwiceDifferentiable<Double>> T getObjective() {
+            return myData.getObjective();
         }
 
-        public boolean hasObjective() {
-            return myObjective != null;
+        protected RowView<Double> getRowsAI() {
+            return myData.getRowsAI();
         }
 
-        public B inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
-
-            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
-            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
-
-            if (mtrxAI instanceof RowsSupplier) {
-
-                myAI = (RowsSupplier<Double>) mtrxAI;
-
-            } else {
-
-                myAI = Primitive64Store.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
-                myAI.addRows((int) mtrxAI.countRows());
-
-                if (mtrxAI instanceof SparseStore) {
-
-                    ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow((int) nz.row()).set((int) nz.column(), nz.doubleValue()));
-
-                } else {
-
-                    double value;
-                    for (int i = 0; i < mtrxAI.countRows(); i++) {
-                        final SparseArray<Double> tmpRow = myAI.getRow(i);
-                        for (int j = 0; j < mtrxAI.countColumns(); j++) {
-                            value = mtrxAI.doubleValue(i, j);
-                            if (!GenericSolver.ACCURACY.isZero(value)) {
-                                tmpRow.set(j, value);
-                            }
-                        }
-                    }
-                }
-            }
-
-            myBI = mtrxBI;
-
+        protected B inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+            myData.setInequalities(mtrxAI, mtrxBI);
             return (B) this;
         }
 
-        public void reset() {
-            myAE = null;
-            myAI = null;
-            myBE = null;
-            myBI = null;
-            myObjective = null;
-        }
-
-        public void validate() {
-
-            if (this.hasEqualityConstraints()) {
-
-                if (this.getAE() == null) {
-                    throw new ProgrammingError("AE cannot be null!");
-                }
-                if (this.getAE().countColumns() != this.countVariables()) {
-                    throw new ProgrammingError("AE has the wrong number of columns!");
-                }
-                if (this.getAE().countRows() != this.getBE().countRows()) {
-                    throw new ProgrammingError("AE and BE do not have the same number of rows!");
-                }
-                if (this.getBE().countColumns() != 1) {
-                    throw new ProgrammingError("BE must have precisely one column!");
-                }
-
-            } else {
-
-                myAE = null;
-                myBE = null;
-            }
-
-            if (this.hasObjective()) {
-
-                if (myObjective.arity() != this.countVariables()) {
-                    throw new ProgrammingError("The objective function has the wrong arity!");
-                }
-
-            } else {
-
-                myObjective = null;
-            }
-
-            if (this.hasInequalityConstraints()) {
-
-                if (this.getAI() == null) {
-                    throw new ProgrammingError("AI cannot be null!");
-                }
-                if (this.getAI().countColumns() != this.countVariables()) {
-                    throw new ProgrammingError("AI has the wrong number of columns!");
-                }
-                if (this.getAI().countRows() != this.getBI().countRows()) {
-                    throw new ProgrammingError("AI and BI do not have the same number of rows!");
-                }
-                if (this.getBI().countColumns() != 1) {
-                    throw new ProgrammingError("BI must have precisely one column!");
-                }
-
-            } else {
-
-                myAI = null;
-                myBI = null;
-            }
-        }
-
-        protected abstract S doBuild(Optimisation.Options options);
-
-        protected double evaluate(final Access1D<Double> arg) {
-            return myObjective.invoke(arg).doubleValue();
-        }
-
-        protected SparseArray<Double> getAI(final int row) {
-            return myAI.getRow(row);
-        }
-
-        protected void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
-            myObjective = objective;
+        protected void setObjective(final TwiceDifferentiable<Double> objective) {
+            myData.setObjective(objective);
         }
 
     }

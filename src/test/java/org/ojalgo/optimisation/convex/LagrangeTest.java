@@ -51,7 +51,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         Primitive64Store mtrxQ = FACTORY.rows(new double[][] { { 2, 3 }, { 3, 10 } });
         Primitive64Store mtrxC = FACTORY.column(-0.5, 0); // Defined negated the ojAlgo way
 
-        ConvexSolver unconstrainedSolver = ConvexSolver.getBuilder(mtrxQ, mtrxC).build();
+        ConvexSolver unconstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).build();
 
         Primitive64Store unconstrainedX = FACTORY.column(-0.45, 0.14);
 
@@ -60,7 +60,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         Primitive64Store mtrxAI = FACTORY.rows(new double[][] { { 3, 2 }, { 15, -3 } });
         Primitive64Store mtrxBI = FACTORY.column(-2, 1);
 
-        ConvexSolver equalityConstrainedSolver = ConvexSolver.getBuilder(mtrxQ, mtrxC).equalities(mtrxAI, mtrxBI).build();
+        ConvexSolver equalityConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).equalities(mtrxAI, mtrxBI).build();
 
         Primitive64Store equalityX = FACTORY.column(-0.10, -0.85);
         Primitive64Store equalityL = FACTORY.column(3.55, -0.56);
@@ -71,7 +71,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         TestUtils.assertEquals(equalityX, equalitySolution, accuracy);
         TestUtils.assertEquals(equalityL, equalityMultipliers, accuracy);
 
-        ConvexSolver inequalityConstrainedSolver = ConvexSolver.getBuilder(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI).build();
+        ConvexSolver inequalityConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI).build();
 
         Primitive64Store inequalityX = FACTORY.column(-0.81, 0.21);
         Primitive64Store inequalityL = FACTORY.column(0.16, 0);
@@ -91,7 +91,8 @@ public class LagrangeTest extends OptimisationConvexTests {
         // Setting the first as an equality constraint, and only the other as an
         // inequality should give the same result.
 
-        ConvexSolver mixConstrainedSolver = ConvexSolver.getBuilder(mtrxQ, mtrxC).equalities(mtrxAI.logical().row(0).get(), mtrxBI.logical().row(0).get())
+        ConvexSolver mixConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC)
+                .equalities(mtrxAI.logical().row(0).get(), mtrxBI.logical().row(0).get())
                 .inequalities(mtrxAI.logical().row(1).get(), mtrxBI.logical().row(1).get()).build();
 
         Result mixSolution = mixConstrainedSolver.solve();
@@ -137,7 +138,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         TestUtils.assertEquals(solutionKKT, combinedSolution, accuracy);
 
-        Builder builder = ConvexSolver.getBuilder();
+        Builder builder = ConvexSolver.newBuilder();
         builder.objective(Q, C.negate());
         builder.equalities(AE, BE);
         ConvexSolver solver = builder.build();
@@ -160,7 +161,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         //  Test similar system where each equality constraint are converted into two inequality constraints.
         //  The result should be the same.
-        Builder ieBuilder = ConvexSolver.getBuilder();
+        Builder ieBuilder = ConvexSolver.newBuilder();
         ieBuilder.objective(Q, C.negate());
         MatrixStore<Double> AI = AE.logical().below(AE.negate()).get();
         MatrixStore<Double> BI = BE.logical().below(BE.negate()).get();

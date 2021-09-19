@@ -1,7 +1,7 @@
-ojalgo-49.0.2-tests.jar -> java.base
-ojalgo-49.0.2-tests.jar -> java.logging
-ojalgo-49.0.2-tests.jar -> not found
-ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
+ojalgo-49.1.0-tests.jar -> java.base
+ojalgo-49.1.0-tests.jar -> java.logging
+ojalgo-49.1.0-tests.jar -> not found
+ojalgo-49.1.0-tests.jar -> ./target/ojalgo-49.1.0.jar
    org.ojalgo                                         -> java.lang                                          java.base
    org.ojalgo                                         -> java.lang.invoke                                   java.base
    org.ojalgo                                         -> java.math                                          java.base
@@ -9,20 +9,20 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo                                         -> java.util.concurrent                               java.base
    org.ojalgo                                         -> java.util.function                                 java.base
    org.ojalgo                                         -> org.junit.jupiter.api                              not found
-   org.ojalgo                                         -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.matrix.operation                        ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.tensor                                  ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo                                         -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.matrix.operation                        ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.tensor                                  ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo                                         -> org.openjdk.jmh.annotations                        not found
    org.ojalgo                                         -> org.openjdk.jmh.runner                             not found
    org.ojalgo                                         -> org.openjdk.jmh.runner.options                     not found
@@ -34,16 +34,16 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.ann                                     -> java.util.function                                 java.base
    org.ojalgo.ann                                     -> org.junit.jupiter.api                              not found
    org.ojalgo.ann                                     -> org.junit.jupiter.api.io                           not found
-   org.ojalgo.ann                                     -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.ann                                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.data                                    ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.ann                                     -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.ann                                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.data                                    ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.array                                   -> java.lang                                          java.base
    org.ojalgo.array                                   -> java.lang.invoke                                   java.base
    org.ojalgo.array                                   -> java.util                                          java.base
@@ -52,21 +52,21 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.array                                   -> java.util.function                                 java.base
    org.ojalgo.array                                   -> java.util.stream                                   java.base
    org.ojalgo.array                                   -> org.junit.jupiter.api                              not found
-   org.ojalgo.array                                   -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.array                                   -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.array                                   -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.array                                   -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.array                                   -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.array                                   -> org.openjdk.jmh.runner                             not found
    org.ojalgo.array.jmh_generated                     -> java.lang                                          java.base
    org.ojalgo.array.jmh_generated                     -> java.util.concurrent                               java.base
    org.ojalgo.array.jmh_generated                     -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.array.jmh_generated                     -> org.ojalgo.array                                   ojalgo-49.0.2-tests.jar
+   org.ojalgo.array.jmh_generated                     -> org.ojalgo.array                                   ojalgo-49.1.0-tests.jar
    org.ojalgo.array.jmh_generated                     -> org.openjdk.jmh.infra                              not found
    org.ojalgo.array.jmh_generated                     -> org.openjdk.jmh.results                            not found
    org.ojalgo.array.jmh_generated                     -> org.openjdk.jmh.runner                             not found
@@ -74,21 +74,21 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.array.operation                         -> java.lang                                          java.base
    org.ojalgo.array.operation                         -> java.util                                          java.base
    org.ojalgo.array.operation                         -> org.junit.jupiter.api                              not found
-   org.ojalgo.array.operation                         -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.array.operation                         -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.array.operation                         -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.array.operation                         -> org.openjdk.jmh.runner                             not found
    org.ojalgo.array.operation.jmh_generated           -> java.lang                                          java.base
    org.ojalgo.array.operation.jmh_generated           -> java.lang.reflect                                  java.base
    org.ojalgo.array.operation.jmh_generated           -> java.util.concurrent                               java.base
    org.ojalgo.array.operation.jmh_generated           -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.array.operation.jmh_generated           -> org.ojalgo.array.operation                         ojalgo-49.0.2-tests.jar
+   org.ojalgo.array.operation.jmh_generated           -> org.ojalgo.array.operation                         ojalgo-49.1.0-tests.jar
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.infra                              not found
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.results                            not found
    org.ojalgo.array.operation.jmh_generated           -> org.openjdk.jmh.runner                             not found
@@ -101,49 +101,49 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.concurrent                              -> java.util.concurrent.atomic                        java.base
    org.ojalgo.concurrent                              -> java.util.function                                 java.base
    org.ojalgo.concurrent                              -> org.junit.jupiter.api                              not found
-   org.ojalgo.concurrent                              -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
+   org.ojalgo.concurrent                              -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
    org.ojalgo.function.aggregator                     -> java.lang                                          java.base
    org.ojalgo.function.aggregator                     -> java.math                                          java.base
    org.ojalgo.function.aggregator                     -> org.junit.jupiter.api                              not found
-   org.ojalgo.function.aggregator                     -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.function.constant                       -> java.lang                                          java.base
    org.ojalgo.function.constant                       -> java.math                                          java.base
    org.ojalgo.function.constant                       -> org.junit.jupiter.api                              not found
-   org.ojalgo.function.constant                       -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function.constant                       -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.multiary                       -> java.lang                                          java.base
    org.ojalgo.function.multiary                       -> org.junit.jupiter.api                              not found
-   org.ojalgo.function.multiary                       -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.polynomial                     -> java.lang                                          java.base
    org.ojalgo.function.polynomial                     -> org.junit.jupiter.api                              not found
-   org.ojalgo.function.polynomial                     -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.special                        -> java.lang                                          java.base
    org.ojalgo.function.special                        -> java.lang.invoke                                   java.base
    org.ojalgo.function.special                        -> java.util                                          java.base
    org.ojalgo.function.special                        -> java.util.function                                 java.base
    org.ojalgo.function.special                        -> java.util.stream                                   java.base
    org.ojalgo.function.special                        -> org.junit.jupiter.api                              not found
-   org.ojalgo.function.special                        -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.function.special                        -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function.special                        -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.function.special                        -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.special                        -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.function.special                        -> org.openjdk.jmh.runner                             not found
    org.ojalgo.function.special                        -> org.openjdk.jmh.runner.options                     not found
@@ -151,69 +151,71 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.function.special.jmh_generated          -> java.lang.reflect                                  java.base
    org.ojalgo.function.special.jmh_generated          -> java.util.concurrent                               java.base
    org.ojalgo.function.special.jmh_generated          -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.function.special.jmh_generated          -> org.ojalgo.function.special                        ojalgo-49.0.2-tests.jar
+   org.ojalgo.function.special.jmh_generated          -> org.ojalgo.function.special                        ojalgo-49.1.0-tests.jar
    org.ojalgo.function.special.jmh_generated          -> org.openjdk.jmh.infra                              not found
    org.ojalgo.function.special.jmh_generated          -> org.openjdk.jmh.results                            not found
    org.ojalgo.function.special.jmh_generated          -> org.openjdk.jmh.runner                             not found
    org.ojalgo.function.special.jmh_generated          -> org.openjdk.jmh.util                               not found
    org.ojalgo.machine                                 -> java.lang                                          java.base
    org.ojalgo.machine                                 -> org.junit.jupiter.api                              not found
-   org.ojalgo.machine                                 -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.machine                                 -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
+   org.ojalgo.machine                                 -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.machine                                 -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
    org.ojalgo.matrix                                  -> java.lang                                          java.base
    org.ojalgo.matrix                                  -> java.math                                          java.base
    org.ojalgo.matrix                                  -> java.util                                          java.base
    org.ojalgo.matrix                                  -> org.junit.jupiter.api                              not found
-   org.ojalgo.matrix                                  -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix                                  -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix                                  -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.matrix                                  -> org.openjdk.jmh.runner                             not found
    org.ojalgo.matrix                                  -> org.openjdk.jmh.runner.options                     not found
    org.ojalgo.matrix.decomposition                    -> java.io                                            java.base
    org.ojalgo.matrix.decomposition                    -> java.lang                                          java.base
    org.ojalgo.matrix.decomposition                    -> java.math                                          java.base
+   org.ojalgo.matrix.decomposition                    -> java.nio.file                                      java.base
    org.ojalgo.matrix.decomposition                    -> java.util                                          java.base
+   org.ojalgo.matrix.decomposition                    -> java.util.stream                                   java.base
    org.ojalgo.matrix.decomposition                    -> org.junit.jupiter.api                              not found
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix                                  ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.operation                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.task                             ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.transformation                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix                                  ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.operation                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.task                             ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.transformation                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.decomposition                    -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.matrix.decomposition                    -> org.openjdk.jmh.runner                             not found
    org.ojalgo.matrix.decomposition.jmh_generated      -> java.lang                                          java.base
    org.ojalgo.matrix.decomposition.jmh_generated      -> java.lang.reflect                                  java.base
    org.ojalgo.matrix.decomposition.jmh_generated      -> java.util.concurrent                               java.base
    org.ojalgo.matrix.decomposition.jmh_generated      -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.matrix.decomposition.jmh_generated      -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.decomposition.jmh_generated      -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.decomposition.jmh_generated      -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.decomposition.jmh_generated      -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.decomposition.jmh_generated      -> org.openjdk.jmh.infra                              not found
    org.ojalgo.matrix.decomposition.jmh_generated      -> org.openjdk.jmh.results                            not found
    org.ojalgo.matrix.decomposition.jmh_generated      -> org.openjdk.jmh.runner                             not found
@@ -222,9 +224,9 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.matrix.jmh_generated                    -> java.lang.reflect                                  java.base
    org.ojalgo.matrix.jmh_generated                    -> java.util.concurrent                               java.base
    org.ojalgo.matrix.jmh_generated                    -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix                                  ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix                                  ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.jmh_generated                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.jmh_generated                    -> org.openjdk.jmh.infra                              not found
    org.ojalgo.matrix.jmh_generated                    -> org.openjdk.jmh.results                            not found
    org.ojalgo.matrix.jmh_generated                    -> org.openjdk.jmh.runner                             not found
@@ -233,17 +235,17 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.matrix.operation                        -> java.util.concurrent                               java.base
    org.ojalgo.matrix.operation                        -> java.util.function                                 java.base
    org.ojalgo.matrix.operation                        -> org.junit.jupiter.api                              not found
-   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.runner                             not found
    org.ojalgo.matrix.operation                        -> org.openjdk.jmh.runner.options                     not found
@@ -251,9 +253,9 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.matrix.operation.jmh_generated          -> java.lang.reflect                                  java.base
    org.ojalgo.matrix.operation.jmh_generated          -> java.util.concurrent                               java.base
    org.ojalgo.matrix.operation.jmh_generated          -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.concurrent                              ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.operation                        ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.concurrent                              ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.operation                        ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.operation.jmh_generated          -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.infra                              not found
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.results                            not found
    org.ojalgo.matrix.operation.jmh_generated          -> org.openjdk.jmh.runner                             not found
@@ -261,33 +263,33 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.matrix.store                            -> java.lang                                          java.base
    org.ojalgo.matrix.store                            -> java.math                                          java.base
    org.ojalgo.matrix.store                            -> org.junit.jupiter.api                              not found
-   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.data                                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.data                                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.task                             -> java.lang                                          java.base
    org.ojalgo.matrix.task                             -> java.util                                          java.base
    org.ojalgo.matrix.task                             -> org.junit.jupiter.api                              not found
-   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2-tests.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.task.iterative                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0-tests.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.task.iterative                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.netio                                   -> java.io                                            java.base
    org.ojalgo.netio                                   -> java.lang                                          java.base
    org.ojalgo.netio                                   -> java.lang.invoke                                   java.base
@@ -298,18 +300,23 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.netio                                   -> java.util.function                                 java.base
    org.ojalgo.netio                                   -> java.util.logging                                  java.logging
    org.ojalgo.netio                                   -> org.junit.jupiter.api                              not found
-   org.ojalgo.netio                                   -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
+   org.ojalgo.netio                                   -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
    org.ojalgo.optimisation                            -> java.io                                            java.base
    org.ojalgo.optimisation                            -> java.lang                                          java.base
    org.ojalgo.optimisation                            -> java.math                                          java.base
    org.ojalgo.optimisation                            -> java.util                                          java.base
    org.ojalgo.optimisation                            -> org.junit.jupiter.api                              not found
-   org.ojalgo.optimisation                            -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation                            -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.linear                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.openjdk.jmh.annotations                        not found
+   org.ojalgo.optimisation                            -> org.openjdk.jmh.runner                             not found
    org.ojalgo.optimisation.convex                     -> java.io                                            java.base
    org.ojalgo.optimisation.convex                     -> java.lang                                          java.base
    org.ojalgo.optimisation.convex                     -> java.lang.invoke                                   java.base
@@ -320,147 +327,159 @@ ojalgo-49.0.2-tests.jar -> ./target/ojalgo-49.0.2.jar
    org.ojalgo.optimisation.convex                     -> org.junit.jupiter.api                              not found
    org.ojalgo.optimisation.convex                     -> org.junit.jupiter.params                           not found
    org.ojalgo.optimisation.convex                     -> org.junit.jupiter.params.provider                  not found
-   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task                             ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task                             ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.optimisation.integer                    -> java.io                                            java.base
    org.ojalgo.optimisation.integer                    -> java.lang                                          java.base
    org.ojalgo.optimisation.integer                    -> java.math                                          java.base
    org.ojalgo.optimisation.integer                    -> java.util                                          java.base
    org.ojalgo.optimisation.integer                    -> org.junit.jupiter.api                              not found
-   org.ojalgo.optimisation.integer                    -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation.linear                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation.linear                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.jmh_generated              -> java.lang                                          java.base
+   org.ojalgo.optimisation.jmh_generated              -> java.lang.reflect                                  java.base
+   org.ojalgo.optimisation.jmh_generated              -> java.util.concurrent                               java.base
+   org.ojalgo.optimisation.jmh_generated              -> java.util.concurrent.atomic                        java.base
+   org.ojalgo.optimisation.jmh_generated              -> org.ojalgo.optimisation                            ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.jmh_generated              -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.jmh_generated              -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.jmh_generated              -> org.ojalgo.optimisation.linear                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.jmh_generated              -> org.openjdk.jmh.infra                              not found
+   org.ojalgo.optimisation.jmh_generated              -> org.openjdk.jmh.results                            not found
+   org.ojalgo.optimisation.jmh_generated              -> org.openjdk.jmh.runner                             not found
+   org.ojalgo.optimisation.jmh_generated              -> org.openjdk.jmh.util                               not found
    org.ojalgo.optimisation.linear                     -> java.lang                                          java.base
    org.ojalgo.optimisation.linear                     -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.linear                     -> java.math                                          java.base
    org.ojalgo.optimisation.linear                     -> java.util                                          java.base
    org.ojalgo.optimisation.linear                     -> org.junit.jupiter.api                              not found
-   org.ojalgo.optimisation.linear                     -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.integer                    ojalgo-49.0.2-tests.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.integer                    ojalgo-49.1.0-tests.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.random                                  -> java.lang                                          java.base
    org.ojalgo.random                                  -> org.junit.jupiter.api                              not found
-   org.ojalgo.random                                  -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.random                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.series                                  ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.series.primitive                        ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.random                                  -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.random                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.series                                  ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.series.primitive                        ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.random.process                          -> java.lang                                          java.base
    org.ojalgo.random.process                          -> java.util                                          java.base
    org.ojalgo.random.process                          -> org.junit.jupiter.api                              not found
-   org.ojalgo.random.process                          -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.random.process                          -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.type.keyvalue                           ojalgo-49.0.2.jar
+   org.ojalgo.random.process                          -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.random.process                          -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.type.keyvalue                           ojalgo-49.1.0.jar
    org.ojalgo.scalar                                  -> java.lang                                          java.base
    org.ojalgo.scalar                                  -> java.math                                          java.base
    org.ojalgo.scalar                                  -> java.util                                          java.base
    org.ojalgo.scalar                                  -> org.junit.jupiter.api                              not found
    org.ojalgo.scalar                                  -> org.junit.jupiter.params                           not found
    org.ojalgo.scalar                                  -> org.junit.jupiter.params.provider                  not found
-   org.ojalgo.scalar                                  -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.scalar                                  -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.scalar                                  -> org.openjdk.jmh.annotations                        not found
    org.ojalgo.scalar                                  -> org.openjdk.jmh.runner                             not found
    org.ojalgo.scalar                                  -> org.openjdk.jmh.runner.options                     not found
    org.ojalgo.scalar.jmh_generated                    -> java.lang                                          java.base
    org.ojalgo.scalar.jmh_generated                    -> java.util.concurrent                               java.base
    org.ojalgo.scalar.jmh_generated                    -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.scalar.jmh_generated                    -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.scalar.jmh_generated                    -> org.ojalgo.scalar                                  ojalgo-49.0.2-tests.jar
+   org.ojalgo.scalar.jmh_generated                    -> org.ojalgo.scalar                                  ojalgo-49.1.0-tests.jar
+   org.ojalgo.scalar.jmh_generated                    -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
    org.ojalgo.scalar.jmh_generated                    -> org.openjdk.jmh.infra                              not found
    org.ojalgo.scalar.jmh_generated                    -> org.openjdk.jmh.results                            not found
    org.ojalgo.scalar.jmh_generated                    -> org.openjdk.jmh.runner                             not found
    org.ojalgo.scalar.jmh_generated                    -> org.openjdk.jmh.util                               not found
    org.ojalgo.structure                               -> java.lang                                          java.base
    org.ojalgo.structure                               -> org.junit.jupiter.api                              not found
-   org.ojalgo.structure                               -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.structure                               -> org.ojalgo.random                                  ojalgo-49.0.2.jar
+   org.ojalgo.structure                               -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.structure                               -> org.ojalgo.random                                  ojalgo-49.1.0.jar
    org.ojalgo.tensor                                  -> java.lang                                          java.base
    org.ojalgo.tensor                                  -> org.junit.jupiter.api                              not found
-   org.ojalgo.tensor                                  -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.tensor                                  -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.type                                    -> java.lang                                          java.base
    org.ojalgo.type                                    -> java.time                                          java.base
    org.ojalgo.type                                    -> java.util                                          java.base
    org.ojalgo.type                                    -> org.junit.jupiter.api                              not found
-   org.ojalgo.type                                    -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-   org.ojalgo.type                                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.type                                    -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+   org.ojalgo.type                                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.type.context                            -> java.lang                                          java.base
    org.ojalgo.type.context                            -> java.math                                          java.base
    org.ojalgo.type.context                            -> java.util                                          java.base
    org.ojalgo.type.context                            -> org.junit.jupiter.api                              not found
-   org.ojalgo.type.context                            -> org.ojalgo                                         ojalgo-49.0.2-tests.jar
-ojalgo-49.0.2.jar -> java.base
+   org.ojalgo.type.context                            -> org.ojalgo                                         ojalgo-49.1.0-tests.jar
+ojalgo-49.1.0.jar -> java.base
    org.ojalgo                                         -> java.lang                                          java.base
    org.ojalgo                                         -> java.time                                          java.base
    org.ojalgo                                         -> java.util                                          java.base
-   org.ojalgo                                         -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.matrix.operation                        ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo                                         -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo                                         -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.matrix.operation                        ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo                                         -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.algebra                                 -> java.lang                                          java.base
-   org.ojalgo.algebra                                 -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
+   org.ojalgo.algebra                                 -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
    org.ojalgo.ann                                     -> java.io                                            java.base
    org.ojalgo.ann                                     -> java.lang                                          java.base
    org.ojalgo.ann                                     -> java.lang.invoke                                   java.base
@@ -468,14 +487,14 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.ann                                     -> java.util                                          java.base
    org.ojalgo.ann                                     -> java.util.concurrent                               java.base
    org.ojalgo.ann                                     -> java.util.function                                 java.base
-   org.ojalgo.ann                                     -> org.ojalgo.data                                    ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.ann                                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.ann                                     -> org.ojalgo.data                                    ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.ann                                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.array                                   -> java.io                                            java.base
    org.ojalgo.array                                   -> java.lang                                          java.base
    org.ojalgo.array                                   -> java.lang.invoke                                   java.base
@@ -487,156 +506,156 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.array                                   -> java.util.concurrent.atomic                        java.base
    org.ojalgo.array                                   -> java.util.function                                 java.base
    org.ojalgo.array                                   -> java.util.stream                                   java.base
-   org.ojalgo.array                                   -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.tensor                                  ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.array                                   -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.array                                   -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.tensor                                  ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.array                                   -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.array.operation                         -> java.lang                                          java.base
    org.ojalgo.array.operation                         -> java.lang.reflect                                  java.base
    org.ojalgo.array.operation                         -> java.math                                          java.base
    org.ojalgo.array.operation                         -> java.util                                          java.base
    org.ojalgo.array.operation                         -> java.util.function                                 java.base
-   org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.concurrent                              ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.matrix.transformation                   ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.array.operation                         -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.concurrent                              ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.matrix.transformation                   ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.array.operation                         -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.concurrent                              -> java.lang                                          java.base
    org.ojalgo.concurrent                              -> java.lang.invoke                                   java.base
    org.ojalgo.concurrent                              -> java.util                                          java.base
    org.ojalgo.concurrent                              -> java.util.concurrent                               java.base
    org.ojalgo.concurrent                              -> java.util.concurrent.atomic                        java.base
    org.ojalgo.concurrent                              -> java.util.function                                 java.base
-   org.ojalgo.concurrent                              -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.concurrent                              -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.concurrent                              -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
+   org.ojalgo.concurrent                              -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.concurrent                              -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.concurrent                              -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
    org.ojalgo.data                                    -> java.lang                                          java.base
    org.ojalgo.data                                    -> java.lang.invoke                                   java.base
    org.ojalgo.data                                    -> java.util                                          java.base
    org.ojalgo.data                                    -> java.util.function                                 java.base
-   org.ojalgo.data                                    -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.data                                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.data                                    -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.data                                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.equation                                -> java.lang                                          java.base
    org.ojalgo.equation                                -> java.util                                          java.base
-   org.ojalgo.equation                                -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.equation                                -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.equation                                -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.equation                                -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.equation                                -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.equation                                -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.equation                                -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.equation                                -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.equation                                -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.equation                                -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.function                                -> java.lang                                          java.base
    org.ojalgo.function                                -> java.lang.invoke                                   java.base
    org.ojalgo.function                                -> java.math                                          java.base
    org.ojalgo.function                                -> java.util.function                                 java.base
-   org.ojalgo.function                                -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.function                                -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function                                -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.function                                -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.aggregator                     -> java.lang                                          java.base
    org.ojalgo.function.aggregator                     -> java.math                                          java.base
-   org.ojalgo.function.aggregator                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.function.aggregator                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.function.constant                       -> java.lang                                          java.base
    org.ojalgo.function.constant                       -> java.lang.invoke                                   java.base
    org.ojalgo.function.constant                       -> java.math                                          java.base
-   org.ojalgo.function.constant                       -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.function.constant                       -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.function.constant                       -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
    org.ojalgo.function.multiary                       -> java.lang                                          java.base
-   org.ojalgo.function.multiary                       -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.multiary                       -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.multiary                       -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.function.polynomial                     -> java.lang                                          java.base
    org.ojalgo.function.polynomial                     -> java.math                                          java.base
    org.ojalgo.function.polynomial                     -> java.util                                          java.base
-   org.ojalgo.function.polynomial                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.series                                  ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.function.polynomial                     -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.series                                  ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.function.polynomial                     -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.function.special                        -> java.lang                                          java.base
    org.ojalgo.function.special                        -> java.math                                          java.base
    org.ojalgo.function.special                        -> java.util                                          java.base
-   org.ojalgo.function.special                        -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.function.special                        -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
+   org.ojalgo.function.special                        -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.function.special                        -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
    org.ojalgo.machine                                 -> java.lang                                          java.base
    org.ojalgo.machine                                 -> java.lang.reflect                                  java.base
    org.ojalgo.machine                                 -> java.util                                          java.base
-   org.ojalgo.machine                                 -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.machine                                 -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.machine                                 -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.machine                                 -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.matrix                                  -> java.lang                                          java.base
    org.ojalgo.matrix                                  -> java.lang.reflect                                  java.base
    org.ojalgo.matrix                                  -> java.util                                          java.base
    org.ojalgo.matrix                                  -> java.util.function                                 java.base
-   org.ojalgo.matrix                                  -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.algebra                                 ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.matrix.task                             ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.tensor                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix                                  -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.algebra                                 ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.matrix.task                             ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.tensor                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.decomposition                    -> java.lang                                          java.base
    org.ojalgo.matrix.decomposition                    -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.decomposition                    -> java.util                                          java.base
    org.ojalgo.matrix.decomposition                    -> java.util.function                                 java.base
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.decomposition.function           ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.task                             ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.transformation                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.decomposition.function           ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.task                             ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.matrix.transformation                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.decomposition                    -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.decomposition.function           -> java.lang                                          java.base
    org.ojalgo.matrix.decomposition.function           -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.operation                        -> java.lang                                          java.base
@@ -644,14 +663,14 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.matrix.operation                        -> java.lang.reflect                                  java.base
    org.ojalgo.matrix.operation                        -> java.util                                          java.base
    org.ojalgo.matrix.operation                        -> java.util.function                                 java.base
-   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.transformation                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.concurrent                              ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.matrix.transformation                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.operation                        -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.matrix.store                            -> java.io                                            java.base
    org.ojalgo.matrix.store                            -> java.lang                                          java.base
    org.ojalgo.matrix.store                            -> java.lang.invoke                                   java.base
@@ -659,57 +678,57 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.matrix.store                            -> java.util.concurrent                               java.base
    org.ojalgo.matrix.store                            -> java.util.function                                 java.base
    org.ojalgo.matrix.store                            -> java.util.stream                                   java.base
-   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.concurrent                              ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.operation                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.transformation                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.tensor                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.store                            -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.concurrent                              ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.operation                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.matrix.transformation                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.tensor                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.task                             -> java.lang                                          java.base
-   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task                             -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task                             -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.matrix.task.iterative                   -> java.lang                                          java.base
    org.ojalgo.matrix.task.iterative                   -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.task.iterative                   -> java.math                                          java.base
    org.ojalgo.matrix.task.iterative                   -> java.util                                          java.base
    org.ojalgo.matrix.task.iterative                   -> java.util.function                                 java.base
    org.ojalgo.matrix.task.iterative                   -> java.util.stream                                   java.base
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.equation                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.matrix.task                             ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.equation                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.matrix.task                             ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.matrix.task.iterative                   -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.matrix.transformation                   -> java.lang                                          java.base
-   org.ojalgo.matrix.transformation                   -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.matrix.transformation                   -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.matrix.transformation                   -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.matrix.transformation                   -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.matrix.transformation                   -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.matrix.transformation                   -> org.ojalgo.structure                               ojalgo-49.0.2.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.matrix.transformation                   -> org.ojalgo.structure                               ojalgo-49.1.0.jar
    org.ojalgo.netio                                   -> java.io                                            java.base
    org.ojalgo.netio                                   -> java.lang                                          java.base
    org.ojalgo.netio                                   -> java.lang.invoke                                   java.base
@@ -723,15 +742,15 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.netio                                   -> java.util.function                                 java.base
    org.ojalgo.netio                                   -> java.util.stream                                   java.base
    org.ojalgo.netio                                   -> java.util.zip                                      java.base
-   org.ojalgo.netio                                   -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.netio                                   -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.netio                                   -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.netio                                   -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.optimisation                            -> java.io                                            java.base
    org.ojalgo.optimisation                            -> java.lang                                          java.base
    org.ojalgo.optimisation                            -> java.lang.invoke                                   java.base
@@ -740,44 +759,44 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.optimisation                            -> java.util.concurrent.atomic                        java.base
    org.ojalgo.optimisation                            -> java.util.function                                 java.base
    org.ojalgo.optimisation                            -> java.util.stream                                   java.base
-   org.ojalgo.optimisation                            -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.convex                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.integer                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.linear                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation                            -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation                            -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.matrix                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.integer                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.optimisation.linear                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation                            -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.optimisation.convex                     -> java.lang                                          java.base
    org.ojalgo.optimisation.convex                     -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.convex                     -> java.util                                          java.base
    org.ojalgo.optimisation.convex                     -> java.util.function                                 java.base
    org.ojalgo.optimisation.convex                     -> java.util.stream                                   java.base
-   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.equation                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task.iterative                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation.linear                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.equation                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task.iterative                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation.linear                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.optimisation.integer                    -> java.lang                                          java.base
    org.ojalgo.optimisation.integer                    -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.integer                    -> java.lang.reflect                                  java.base
@@ -786,173 +805,171 @@ ojalgo-49.0.2.jar -> java.base
    org.ojalgo.optimisation.integer                    -> java.util.concurrent                               java.base
    org.ojalgo.optimisation.integer                    -> java.util.concurrent.atomic                        java.base
    org.ojalgo.optimisation.integer                    -> java.util.function                                 java.base
-   org.ojalgo.optimisation.integer                    -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.integer                    -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.machine                                 ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.integer                    -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.optimisation.linear                     -> java.lang                                          java.base
    org.ojalgo.optimisation.linear                     -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.linear                     -> java.math                                          java.base
    org.ojalgo.optimisation.linear                     -> java.util                                          java.base
    org.ojalgo.optimisation.linear                     -> java.util.function                                 java.base
    org.ojalgo.optimisation.linear                     -> java.util.stream                                   java.base
-   org.ojalgo.optimisation.linear                     -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.array.operation                         ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.machine                                 ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix                                  ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.array.operation                         ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.random                                  -> java.lang                                          java.base
    org.ojalgo.random                                  -> java.util                                          java.base
-   org.ojalgo.random                                  -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.random                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.random                                  -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.random                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.random.process                          -> java.lang                                          java.base
    org.ojalgo.random.process                          -> java.util                                          java.base
-   org.ojalgo.random.process                          -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.matrix.decomposition                    ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.series.primitive                        ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.random.process                          -> org.ojalgo.type.keyvalue                           ojalgo-49.0.2.jar
+   org.ojalgo.random.process                          -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.matrix.decomposition                    ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.series.primitive                        ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.random.process                          -> org.ojalgo.type.keyvalue                           ojalgo-49.1.0.jar
    org.ojalgo.scalar                                  -> java.lang                                          java.base
    org.ojalgo.scalar                                  -> java.lang.reflect                                  java.base
    org.ojalgo.scalar                                  -> java.math                                          java.base
-   org.ojalgo.scalar                                  -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.algebra                                 ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.tensor                                  ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.scalar                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.scalar                                  -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.algebra                                 ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.tensor                                  ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.scalar                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.series                                  -> java.lang                                          java.base
    org.ojalgo.series                                  -> java.math                                          java.base
    org.ojalgo.series                                  -> java.time                                          java.base
    org.ojalgo.series                                  -> java.util                                          java.base
-   org.ojalgo.series                                  -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.series.primitive                        ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
-   org.ojalgo.series                                  -> org.ojalgo.type.keyvalue                           ojalgo-49.0.2.jar
+   org.ojalgo.series                                  -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.series.primitive                        ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
+   org.ojalgo.series                                  -> org.ojalgo.type.keyvalue                           ojalgo-49.1.0.jar
    org.ojalgo.series.function                         -> java.lang                                          java.base
    org.ojalgo.series.function                         -> java.util                                          java.base
-   org.ojalgo.series.function                         -> org.ojalgo.series                                  ojalgo-49.0.2.jar
-   org.ojalgo.series.function                         -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.series.function                         -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.series.function                         -> org.ojalgo.series                                  ojalgo-49.1.0.jar
+   org.ojalgo.series.function                         -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.series.function                         -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.series.primitive                        -> java.lang                                          java.base
    org.ojalgo.series.primitive                        -> java.util                                          java.base
    org.ojalgo.series.primitive                        -> java.util.function                                 java.base
-   org.ojalgo.series.primitive                        -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.matrix.store                            ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.series                                  ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.series.primitive                        -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.matrix.store                            ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.series                                  ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.series.primitive                        -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.structure                               -> java.lang                                          java.base
    org.ojalgo.structure                               -> java.lang.invoke                                   java.base
    org.ojalgo.structure                               -> java.util                                          java.base
    org.ojalgo.structure                               -> java.util.concurrent.atomic                        java.base
    org.ojalgo.structure                               -> java.util.function                                 java.base
    org.ojalgo.structure                               -> java.util.stream                                   java.base
-   org.ojalgo.structure                               -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.function.special                        ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.structure                               -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.structure                               -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.function.special                        ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.structure                               -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
    org.ojalgo.tensor                                  -> java.lang                                          java.base
    org.ojalgo.tensor                                  -> java.lang.invoke                                   java.base
    org.ojalgo.tensor                                  -> java.util                                          java.base
-   org.ojalgo.tensor                                  -> org.ojalgo.algebra                                 ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.array                                   ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.function.aggregator                     ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.tensor                                  -> org.ojalgo.type                                    ojalgo-49.0.2.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.algebra                                 ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.array                                   ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.function.aggregator                     ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.type                                    ojalgo-49.1.0.jar
    org.ojalgo.type                                    -> java.lang                                          java.base
    org.ojalgo.type                                    -> java.math                                          java.base
    org.ojalgo.type                                    -> java.time                                          java.base
    org.ojalgo.type                                    -> java.time.temporal                                 java.base
    org.ojalgo.type                                    -> java.util                                          java.base
    org.ojalgo.type                                    -> java.util.concurrent                               java.base
-   org.ojalgo.type                                    -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.random                                  ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.scalar                                  ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
-   org.ojalgo.type                                    -> org.ojalgo.type.format                             ojalgo-49.0.2.jar
+   org.ojalgo.type                                    -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.random                                  ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.scalar                                  ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.type.context                            ojalgo-49.1.0.jar
+   org.ojalgo.type                                    -> org.ojalgo.type.format                             ojalgo-49.1.0.jar
    org.ojalgo.type.context                            -> java.lang                                          java.base
    org.ojalgo.type.context                            -> java.math                                          java.base
    org.ojalgo.type.context                            -> java.text                                          java.base
    org.ojalgo.type.context                            -> java.time.format                                   java.base
    org.ojalgo.type.context                            -> java.time.temporal                                 java.base
    org.ojalgo.type.context                            -> java.util                                          java.base
-   org.ojalgo.type.context                            -> org.ojalgo                                         ojalgo-49.0.2.jar
-   org.ojalgo.type.context                            -> org.ojalgo.function                                ojalgo-49.0.2.jar
-   org.ojalgo.type.context                            -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.type.context                            -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.type.context                            -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.type.context                            -> org.ojalgo.type.format                             ojalgo-49.0.2.jar
+   org.ojalgo.type.context                            -> org.ojalgo                                         ojalgo-49.1.0.jar
+   org.ojalgo.type.context                            -> org.ojalgo.function                                ojalgo-49.1.0.jar
+   org.ojalgo.type.context                            -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.type.context                            -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.type.context                            -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.type.context                            -> org.ojalgo.type.format                             ojalgo-49.1.0.jar
    org.ojalgo.type.format                             -> java.lang                                          java.base
    org.ojalgo.type.format                             -> java.lang.invoke                                   java.base
    org.ojalgo.type.format                             -> java.text                                          java.base
    org.ojalgo.type.format                             -> java.util                                          java.base
    org.ojalgo.type.format                             -> java.util.function                                 java.base
-   org.ojalgo.type.format                             -> org.ojalgo.function                                ojalgo-49.0.2.jar
+   org.ojalgo.type.format                             -> org.ojalgo.function                                ojalgo-49.1.0.jar
    org.ojalgo.type.keyvalue                           -> java.lang                                          java.base
    org.ojalgo.type.keyvalue                           -> java.lang.reflect                                  java.base
    org.ojalgo.type.keyvalue                           -> java.util                                          java.base
    org.ojalgo.type.keyvalue                           -> java.util.concurrent.atomic                        java.base
-   org.ojalgo.type.keyvalue                           -> org.ojalgo.function.constant                       ojalgo-49.0.2.jar
-   org.ojalgo.type.keyvalue                           -> org.ojalgo.netio                                   ojalgo-49.0.2.jar
-   org.ojalgo.type.keyvalue                           -> org.ojalgo.structure                               ojalgo-49.0.2.jar
-   org.ojalgo.type.keyvalue                           -> org.ojalgo.type                                    ojalgo-49.0.2.jar
-   org.ojalgo.type.keyvalue                           -> org.ojalgo.type.context                            ojalgo-49.0.2.jar
+   org.ojalgo.type.keyvalue                           -> org.ojalgo.function.constant                       ojalgo-49.1.0.jar
+   org.ojalgo.type.keyvalue                           -> org.ojalgo.netio                                   ojalgo-49.1.0.jar
+   org.ojalgo.type.keyvalue                           -> org.ojalgo.structure                               ojalgo-49.1.0.jar
+   org.ojalgo.type.keyvalue                           -> org.ojalgo.type                                    ojalgo-49.1.0.jar
+   org.ojalgo.type.keyvalue                           -> org.ojalgo.type.context                            ojalgo-49.1.0.jar

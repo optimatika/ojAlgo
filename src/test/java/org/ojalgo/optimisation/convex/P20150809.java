@@ -43,8 +43,8 @@ class P20150809 {
 
         try {
             final Optimisation.Result solution = cs.solve();
-            if ((solution.getState() == Optimisation.State.DISTINCT) || (solution.getState() == Optimisation.State.APPROXIMATE)
-                    || (solution.getState() == Optimisation.State.OPTIMAL)) {
+            if (solution.getState() == Optimisation.State.DISTINCT || solution.getState() == Optimisation.State.APPROXIMATE
+                    || solution.getState() == Optimisation.State.OPTIMAL) {
                 final double[] pt = new double[4];
                 for (int i = 0; i < pt.length; i++) {
                     pt[i] = solution.doubleValue(i);
@@ -86,7 +86,7 @@ class P20150809 {
             }
         }
         final RawStore linPart = new RawStore(C, 4);
-        ConvexSolver.Builder builder = ConvexSolver.getBuilder(cov, linPart);
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder().objective(cov, linPart);
 
         if (addDummyConstraints) {
             final RawStore ineq = RawStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0 },

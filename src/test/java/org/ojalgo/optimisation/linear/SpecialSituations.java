@@ -26,7 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.optimisation.linear.LinearSolver.Builder;
+import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
@@ -50,7 +50,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 2, 0, 4, 0, 0 });
 
-        final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
+        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.OPTIMAL, x);
@@ -59,8 +59,8 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = new SimplexTableau.DenseTableau(builder);
-        SparseTableau sparse = new SimplexTableau.SparseTableau(builder);
+        DenseTableau dense = SimplexTableau.newDense(builder);
+        SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
@@ -118,7 +118,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 7.0 / 3.0, 7.0 / 3.0, 0, 0 });
 
-        final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
+        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.OPTIMAL, x);
@@ -126,8 +126,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = new SimplexTableau.DenseTableau(builder);
-        SparseTableau sparse = new SimplexTableau.SparseTableau(builder);
+        DenseTableau dense = SimplexTableau.newDense(builder);
+        SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 
@@ -158,7 +158,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 30, 20, 0, 0 });
 
-        final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
+        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.UNBOUNDED, x);
@@ -166,8 +166,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = new SimplexTableau.DenseTableau(builder);
-        SparseTableau sparse = new SimplexTableau.SparseTableau(builder);
+        DenseTableau dense = SimplexTableau.newDense(builder);
+        SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 

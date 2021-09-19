@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
@@ -33,7 +32,6 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
@@ -60,47 +58,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int numbRows = numberOfConstraints + 2;
             final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
 
-            myTransposed = Primitive64Store.FACTORY.makeZero(numbCols, numbRows);
-            myStructure = (int) myTransposed.countRows();
-        }
-
-        DenseTableau(final LinearSolver.Builder matrices) {
-
-            super(matrices.countConstraints(), matrices.countVariables(), 0);
-
-            int constraintsCount = this.countConstraints();
-            int variablesCount = this.countVariables();
-
-            MatrixStore.LogicalBuilder<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
-            tableauBuilder = tableauBuilder
-                    .left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, constraintsCount).get()).get());
-
-            if (constraintsCount >= 1) {
-                tableauBuilder = tableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(constraintsCount).get(), matrices.getBE());
-            }
-            tableauBuilder = tableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, variablesCount).get(),
-                    Primitive64Store.FACTORY.makeFilled(1, constraintsCount, new NullaryFunction<Double>() {
-
-                        public double doubleValue() {
-                            return ONE;
-                        }
-
-                        public Double invoke() {
-                            return ONE;
-                        }
-
-                    }));
-            //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
-            myTransposed = tableauBuilder.transpose().collect(Primitive64Store.FACTORY);
-            myStructure = (int) myTransposed.countRows();
-            // myTableau = LinearSolver.make(myTransposedTableau);
-
-            for (int i = 0; i < constraintsCount; i++) {
-
-                myTransposed.caxpy(NEG, i, constraintsCount + 1, 0);
-
-            }
-
+            myTransposed = Primitive64Store.FACTORY.make(numbCols, numbRows);
+            myStructure = myTransposed.getRowDim();
         }
 
         DenseTableau(final SparseTableau sparse) {
@@ -108,7 +67,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             super(sparse.countConstraints(), sparse.countProblemVariables(), sparse.countSlackVariables());
 
             myTransposed = sparse.transpose();
-            myStructure = (int) myTransposed.countRows();
+            myStructure = myTransposed.getRowDim();
         }
 
         public long countColumns() {
@@ -443,40 +402,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             myObjectiveWeights = ARRAY1D_FACTORY.makeZero(totNumbVars);
             myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
-        }
-
-        SparseTableau(final LinearSolver.Builder matrices) {
-
-            this(matrices.countConstraints(), matrices.countVariables(), 0);
-
-            MatrixStore<Double> A = matrices.getAE();
-            Mutate2D body = this.newConstraintsBody();
-            for (int i = 0; i < A.countRows(); i++) {
-                for (int j = 0; j < A.countColumns(); j++) {
-                    final double value = A.doubleValue(i, j);
-                    if (Math.abs(value) > MACHINE_EPSILON) {
-                        body.set(i, j, value);
-                    }
-                }
-            }
-
-            MatrixStore<Double> b = matrices.getBE();
-            Mutate1D rhs = this.newConstraintsRHS();
-            for (int i = 0; i < b.count(); i++) {
-                final double value = b.doubleValue(i);
-                if (Math.abs(value) > MACHINE_EPSILON) {
-                    rhs.set(i, value);
-                }
-            }
-
-            MatrixStore<Double> c = matrices.getC();
-            Mutate1D obj = this.newObjective();
-            for (int i = 0; i < c.count(); i++) {
-                final double value = c.doubleValue(i);
-                if (Math.abs(value) > MACHINE_EPSILON) {
-                    obj.set(i, value);
-                }
-            }
         }
 
         public long countColumns() {
@@ -827,32 +752,124 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     }
 
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(Primitive64Array.FACTORY);
+
     static final DenseArray.Factory<Double> DENSE_FACTORY = Primitive64Array.FACTORY;
 
     protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables,
             final Optimisation.Options options) {
 
-        final int numbRows = numberOfConstraints + 2;
-        final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
-        final int totCount = numbRows * numbCols; //  Total number of elements in a dense tableau
-
-        if (options.sparse == null) {
-
-            // Max number of elements in CPU cache
-            long maxCount = OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory());
-
-            if (totCount <= maxCount || numberOfProblemVariables <= numberOfConstraints && totCount <= 2L * maxCount) {
-                return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-            }
+        if (SimplexTableau.isSparse(numberOfConstraints, numberOfProblemVariables + numberOfSlackVariables, options)) {
             return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-
-        }
-        if (options.sparse) {
-
-            return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-
         }
         return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+    }
+
+    protected static SimplexTableau make(final LinearSolver.Builder builder, final Optimisation.Options options) {
+
+        int numberOfConstraints = builder.countConstraints();
+        int numberOfProblemVariables = builder.countVariables();
+        int numberOfSlackVariables = 0;
+
+        if (SimplexTableau.isSparse(numberOfConstraints, numberOfProblemVariables, options)) {
+            SparseTableau sparseTableau = new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+            SimplexTableau.copy(builder, sparseTableau);
+            return sparseTableau;
+        }
+
+        DenseTableau denseTableau = new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+        SimplexTableau.copy(builder, denseTableau);
+        return denseTableau;
+    }
+
+    static void copy(final LinearSolver.Builder builder, final DenseTableau tableau) {
+
+        int constraintsCount = tableau.countConstraints();
+        int variablesCount = tableau.countVariables();
+
+        MatrixStore.LogicalBuilder<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
+        tableauBuilder = tableauBuilder.left(builder.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, constraintsCount).get()).get());
+
+        if (constraintsCount >= 1) {
+            tableauBuilder = tableauBuilder.above(builder.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(constraintsCount).get(), builder.getBE());
+        }
+        tableauBuilder = tableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, variablesCount).get(),
+                Primitive64Store.FACTORY.makeFilled(1, constraintsCount, new NullaryFunction<Double>() {
+
+                    public double doubleValue() {
+                        return ONE;
+                    }
+
+                    public Double invoke() {
+                        return ONE;
+                    }
+
+                }));
+        //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
+        tableauBuilder.transpose().supplyTo(tableau.myTransposed);
+        // myStructure = (int) myTransposed.countRows();
+        // myTableau = LinearSolver.make(myTransposedTableau);
+
+        for (int i = 0; i < constraintsCount; i++) {
+
+            tableau.myTransposed.caxpy(NEG, i, constraintsCount + 1, 0);
+
+        }
+
+    }
+
+    static void copy(final LinearSolver.Builder builder, final SparseTableau tableau) {
+
+        MatrixStore<Double> mtrxAE = builder.getAE();
+        Mutate2D body = tableau.newConstraintsBody();
+        for (int i = 0; i < mtrxAE.countRows(); i++) {
+            for (int j = 0; j < mtrxAE.countColumns(); j++) {
+                double value = mtrxAE.doubleValue(i, j);
+                if (Math.abs(value) > MACHINE_EPSILON) {
+                    body.set(i, j, value);
+                }
+            }
+        }
+
+        MatrixStore<Double> mtrxBE = builder.getBE();
+        Mutate1D rhs = tableau.newConstraintsRHS();
+        for (int i = 0; i < mtrxBE.count(); i++) {
+            double value = mtrxBE.doubleValue(i);
+            if (Math.abs(value) > MACHINE_EPSILON) {
+                rhs.set(i, value);
+            }
+        }
+
+        MatrixStore<Double> mtrxC = builder.getC();
+        Mutate1D obj = tableau.newObjective();
+        for (int i = 0; i < mtrxC.count(); i++) {
+            double value = mtrxC.doubleValue(i);
+            if (Math.abs(value) > MACHINE_EPSILON) {
+                obj.set(i, value);
+            }
+        }
+
+    }
+
+    static boolean isSparse(final int nbConstraints, final int nbVariables, final Optimisation.Options options) {
+        return options.sparse != null && options.sparse.booleanValue();
+    }
+
+    static DenseTableau newDense(final LinearSolver.Builder matrices) {
+
+        DenseTableau tableau = new DenseTableau(matrices.countConstraints(), matrices.countVariables(), 0);
+
+        SimplexTableau.copy(matrices, tableau);
+
+        return tableau;
+    }
+
+    static SparseTableau newSparse(final LinearSolver.Builder matrices) {
+
+        SparseTableau tableau = new SparseTableau(matrices.countConstraints(), matrices.countVariables(), 0);
+
+        SimplexTableau.copy(matrices, tableau);
+
+        return tableau;
     }
 
     static int size(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {

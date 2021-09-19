@@ -27,11 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -40,6 +36,7 @@ import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -55,7 +52,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Mutate1D obj = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC(zeroC);
+        MatrixStore<Double> convexC = zeroC ? MatrixStore.PRIMITIVE64.makeZero(convex.countVariables(), 1).get() : convex.getC();
 
         for (int v = 0; v < numbVars; v++) {
             double valC = convexC.doubleValue(v);
@@ -82,24 +79,19 @@ final class PrimalSimplex extends SimplexSolver {
             constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        RowsSupplier<Double> convexAI = convex.getAI();
-        MatrixStore<Double> convexBI = convex.getBI();
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
 
-        for (int i = 0; i < numbInes; i++) {
-            int r = i;
-            SparseArray<Double> row = convexAI.getRow(r);
-            double rhs = convexBI.doubleValue(r);
+            int r = Math.toIntExact(rowAI.row());
+
+            double rhs = convex.getBI(r);
 
             boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
 
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
             constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
+            constrRHS.set(numbEqus + r, neg ? -rhs : rhs);
         }
-
-        // BasicLogger.debug("Primal", retVal);
-        // BasicLogger.debug("Negs (primal): {}", negs);
 
         return retVal;
     }
@@ -131,6 +123,7 @@ final class PrimalSimplex extends SimplexSolver {
                 + tmpVarsNegUp.size();
         int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
         int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size() + tmpVarsNegUp.size();
+
         SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount, model.options);
 
         int tmpPosVarsBaseIndex = 0;
@@ -403,9 +396,6 @@ final class PrimalSimplex extends SimplexSolver {
         //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
         //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
 
-        if (model.options.sparse == null && retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory())) {
-            return retVal.toDense();
-        }
         return retVal;
     }
 

@@ -167,7 +167,7 @@ public interface Optimisation {
          * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
          * values integer or not?
          */
-        public NumberContext feasibility = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+        public NumberContext feasibility = NumberContext.of(12, 8);
 
         /**
          * The maximmum number of iterations allowed for the solve() command.
@@ -223,7 +223,7 @@ public interface Optimisation {
         /**
          * For display only!
          */
-        public NumberContext print = NumberContext.getGeneral(8, 10);
+        public NumberContext print = NumberContext.of(8, 10);
 
         /**
          * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
@@ -231,7 +231,7 @@ public interface Optimisation {
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
          * corresponding to full double precision.
          */
-        public NumberContext solution = new NumberContext(0, 14, RoundingMode.HALF_DOWN);
+        public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 
         /**
          * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.
@@ -241,8 +241,12 @@ public interface Optimisation {
          * <ol>
          * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
          * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
-         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default.</li>
+         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default. Currently, the
+         * dense LinearSolver and the iterative ConvexSolver will be used. In the vast majority of cases these
+         * are the best alternatives.</li>
          * </ol>
+         * In most cases you do not need to worry about this configuration option - leave this choice to
+         * ojAlgo.
          */
         public Boolean sparse = null;
 
@@ -285,18 +289,17 @@ public interface Optimisation {
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
-            logger_detailed = solver != null ? true : false;
-            validate = solver != null ? true : false;
+            logger_detailed = solver != null == true;
+            validate = solver != null == true;
         }
 
         @SuppressWarnings("unchecked")
         public <T> Optional<T> getConfigurator(final Class<T> type) {
             ProgrammingError.throwIfNull(type);
-            if ((myConfigurator != null) && type.isInstance(myConfigurator)) {
+            if (myConfigurator != null && type.isInstance(myConfigurator)) {
                 return Optional.of((T) myConfigurator);
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         /**
@@ -369,17 +372,11 @@ public interface Optimisation {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (this.getClass() != obj.getClass()) {
+            if (obj == null || this.getClass() != obj.getClass()) {
                 return false;
             }
             final Result other = (Result) obj;
-            if (myState != other.myState) {
-                return false;
-            }
-            if (Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other.myValue)) {
+            if (myState != other.myState || Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other.myValue)) {
                 return false;
             }
             return true;
@@ -424,10 +421,10 @@ public interface Optimisation {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myState == null) ? 0 : myState.hashCode());
+            result = prime * result + (myState == null ? 0 : myState.hashCode());
             long temp;
             temp = Double.doubleToLongBits(myValue);
-            result = (prime * result) + (int) (temp ^ (temp >>> 32));
+            result = prime * result + (int) (temp ^ temp >>> 32);
             return result;
         }
 
@@ -537,7 +534,7 @@ public interface Optimisation {
         }
 
         public boolean isApproximate() {
-            return (this == APPROXIMATE) || this.isFeasible();
+            return this == APPROXIMATE || this.isFeasible();
         }
 
         public boolean isDistinct() {

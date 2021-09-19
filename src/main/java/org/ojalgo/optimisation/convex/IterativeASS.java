@@ -217,7 +217,7 @@ final class IterativeASS extends ActiveSetSolver {
 
         final Primitive64Store iterX = this.getIterationX();
 
-        if ((this.countIterationConstraints() <= this.countVariables()) && (solved = this.isSolvableQ())) {
+        if (this.countIterationConstraints() <= this.countVariables() && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
@@ -269,9 +269,9 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator(final boolean useLagrange) {
+    void resetActivator() {
 
-        super.resetActivator(useLagrange);
+        super.resetActivator();
 
         final int numbEqus = this.countEqualityConstraints();
         final int numbVars = this.countVariables();
@@ -279,7 +279,7 @@ final class IterativeASS extends ActiveSetSolver {
         myS.clear();
         final int[] incl = this.getIncluded();
 
-        if ((numbEqus + incl.length) > 0) {
+        if (numbEqus + incl.length > 0) {
 
             final MatrixStore<Double> iterA = this.getIterationA();
             final MatrixStore<Double> iterB = this.getIterationB();
