@@ -147,37 +147,32 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
                 return new Result(solverState.getState(), modelSolution);
 
-            } else {
-
-                if (solverState.count() != numbVariables) {
-                    throw new IllegalStateException();
-                }
-
-                return solverState;
             }
+            if (solverState.count() != numbVariables) {
+                throw new IllegalStateException();
+            }
+
+            return solverState;
         }
 
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-            if (this.isSolutionMapped()) {
-
-                final List<Variable> tmpFreeVariables = model.getFreeVariables();
-                final int numbFreeVars = tmpFreeVariables.size();
-
-                final Primitive64Array solverSolution = Primitive64Array.make(numbFreeVars);
-
-                for (int i = 0; i < numbFreeVars; i++) {
-                    final Variable variable = tmpFreeVariables.get(i);
-                    final int modelIndex = model.indexOf(variable);
-                    solverSolution.set(i, modelState.doubleValue(modelIndex));
-                }
-
-                return new Result(modelState.getState(), solverSolution);
-
-            } else {
+            if (!this.isSolutionMapped()) {
 
                 return modelState;
             }
+            final List<Variable> tmpFreeVariables = model.getFreeVariables();
+            final int numbFreeVars = tmpFreeVariables.size();
+
+            final Primitive64Array solverSolution = Primitive64Array.make(numbFreeVars);
+
+            for (int i = 0; i < numbFreeVars; i++) {
+                final Variable variable = tmpFreeVariables.get(i);
+                final int modelIndex = model.indexOf(variable);
+                solverSolution.set(i, modelState.doubleValue(modelIndex));
+            }
+
+            return new Result(modelState.getState(), solverSolution);
         }
 
         /**
@@ -244,7 +239,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-            if ((mySolver == null) && (PRESOLVERS.size() > 0)) {
+            if (mySolver == null && PRESOLVERS.size() > 0) {
                 myModel.presolve();
             }
 
@@ -254,9 +249,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
                 return new Optimisation.Result(State.INFEASIBLE, solution);
 
-            } else if (myModel.isUnbounded()) {
+            }
+            if (myModel.isUnbounded()) {
 
-                if ((candidate != null) && myModel.validate(candidate)) {
+                if (candidate != null && myModel.validate(candidate)) {
                     return new Optimisation.Result(State.UNBOUNDED, candidate);
                 }
 
@@ -271,9 +267,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
                 if (derivedSolution.getState().isFeasible()) {
                     return new Optimisation.Result(State.DISTINCT, derivedSolution);
-                } else {
-                    return new Optimisation.Result(State.INVALID, derivedSolution);
                 }
+                return new Optimisation.Result(State.INVALID, derivedSolution);
             }
 
             final ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
@@ -302,7 +297,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         public void update(final Variable variable) {
 
-            if (myInPlaceUpdatesOK && (mySolver != null) && (mySolver instanceof UpdatableSolver) && variable.isFixed()) {
+            if (myInPlaceUpdatesOK && mySolver != null && mySolver instanceof UpdatableSolver && variable.isFixed()) {
                 UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
                 int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
@@ -311,9 +306,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
                     // Solver updated in-place
                     return;
-                } else {
-                    myInPlaceUpdatesOK = false;
                 }
+                myInPlaceUpdatesOK = false;
             }
 
             // Solver will be re-generated
@@ -363,7 +357,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         @Override
         boolean isApplicable(final Expression target) {
-            return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && (target.countQuadraticFactors() == 0);
+            return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && target.countQuadraticFactors() == 0;
         }
 
     }
@@ -387,10 +381,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof Simplifier)) {
+            if (obj == null || !(obj instanceof Simplifier)) {
                 return false;
             }
             final Simplifier<?, ?> other = (Simplifier<?, ?>) obj;
@@ -408,7 +399,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         public final int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((myUUID == null) ? 0 : myUUID.hashCode());
+            result = prime * result + (myUUID == null ? 0 : myUUID.hashCode());
             return result;
         }
 
@@ -483,14 +474,13 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         String lowerCasePath = file.getPath().toLowerCase();
 
-        if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
-            try (FileInputStream input = new FileInputStream(file)) {
-                return ExpressionsBasedModel.parse(input, FileFormat.MPS);
-            } catch (IOException cause) {
-                throw new RuntimeException(cause);
-            }
-        } else {
+        if (!lowerCasePath.endsWith("mps") && !lowerCasePath.endsWith("sif")) {
             throw new IllegalArgumentException();
+        }
+        try (FileInputStream input = new FileInputStream(file)) {
+            return ExpressionsBasedModel.parse(input, FileFormat.MPS);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
         }
     }
 
@@ -575,14 +565,14 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         super(modelToCopy.options);
 
-        this.setMinimisation(modelToCopy.isMinimisation());
+        this.setOptimisationSense(modelToCopy.getOptimisationSense());
 
         for (final Variable tmpVariable : modelToCopy.getVariables()) {
             this.addVariable(tmpVariable.copy());
         }
 
         for (final Expression tmpExpression : modelToCopy.getExpressions()) {
-            if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
+            if (allEntities || tmpExpression.isObjective() || tmpExpression.isConstraint() && !tmpExpression.isRedundant()) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
                 // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
@@ -624,11 +614,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         final IntIndex[] sequence = new IntIndex[orderedSet.size()];
         int index = 0;
         for (final Variable variable : orderedSet) {
-            if ((variable == null) || (variable.getIndex() == null)) {
+            if (variable == null || variable.getIndex() == null) {
                 throw new ProgrammingError("Variables must be already inserted in the model!");
-            } else {
-                sequence[index++] = variable.getIndex();
             }
+            sequence[index++] = variable.getIndex();
         }
 
         ExpressionsBasedModel.addPresolver(new SpecialOrderedSet(sequence, type, linkedTo));
@@ -652,7 +641,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int min, final int max) {
 
-        if ((max <= 0) || (min > max)) {
+        if (max <= 0 || min > max) {
             throw new ProgrammingError("Invalid min/max number of ON variables!");
         }
 
@@ -661,11 +650,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         final Expression expression = this.addExpression(name);
 
         for (final Variable variable : orderedSet) {
-            if ((variable == null) || (variable.getIndex() == null) || !variable.isBinary()) {
+            if (variable == null || variable.getIndex() == null || !variable.isBinary()) {
                 throw new ProgrammingError("Variables must be binary and already inserted in the model!");
-            } else {
-                expression.set(variable.getIndex(), ONE);
             }
+            expression.set(variable.getIndex(), ONE);
         }
 
         expression.upper(BigDecimal.valueOf(max));
@@ -689,10 +677,9 @@ public final class ExpressionsBasedModel extends AbstractModel {
     public void addVariable(final Variable variable) {
         if (myWorkCopy) {
             throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
-        } else {
-            myVariables.add(variable);
-            variable.setIndex(new IntIndex(myVariables.size() - 1));
         }
+        myVariables.add(variable);
+        variable.setIndex(new IntIndex(myVariables.size() - 1));
     }
 
     public void addVariables(final Collection<? extends Variable> variables) {
@@ -874,21 +861,18 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
                 retSolution.set(i, tmpVariable.getValue());
 
+            } else if (tmpVariable.isEqualityConstraint()) {
+                retSolution.set(i, tmpVariable.getLowerLimit());
+            } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
+                retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
+                shouldCheckGradient = true;
+            } else if (tmpVariable.isLowerLimitSet()) {
+                retSolution.set(i, tmpVariable.getLowerLimit());
+            } else if (tmpVariable.isUpperLimitSet()) {
+                retSolution.set(i, tmpVariable.getUpperLimit());
             } else {
-
-                if (tmpVariable.isEqualityConstraint()) {
-                    retSolution.set(i, tmpVariable.getLowerLimit());
-                } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
-                    shouldCheckGradient = true;
-                } else if (tmpVariable.isLowerLimitSet()) {
-                    retSolution.set(i, tmpVariable.getLowerLimit());
-                } else if (tmpVariable.isUpperLimitSet()) {
-                    retSolution.set(i, tmpVariable.getUpperLimit());
-                } else {
-                    retSolution.set(i, ZERO);
-                    allVarsSomeInfo = false; // This var no info
-                }
+                retSolution.set(i, ZERO);
+                allVarsSomeInfo = false; // This var no info
             }
         }
 
@@ -1002,7 +986,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (expr.isConstraint() && !expr.isRedundant() && expr.isAnyQuadraticFactorNonZero());
+            retVal |= expr.isConstraint() && !expr.isRedundant() && expr.isAnyQuadraticFactorNonZero();
         }
 
         return retVal;
@@ -1020,7 +1004,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (expr.isAnyQuadraticFactorNonZero() && (expr.isObjective() || (expr.isConstraint() && !expr.isRedundant())));
+            retVal |= expr.isAnyQuadraticFactorNonZero() && (expr.isObjective() || expr.isConstraint() && !expr.isRedundant());
         }
 
         return retVal;
@@ -1031,7 +1015,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (expr.isObjective() && expr.isAnyQuadraticFactorNonZero());
+            retVal |= expr.isObjective() && expr.isAnyQuadraticFactorNonZero();
         }
 
         return retVal;
@@ -1049,9 +1033,9 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean retVal = false;
 
-        for (int i = 0, limit = myVariables.size(); !retVal && (i < limit); i++) {
+        for (int i = 0, limit = myVariables.size(); !retVal && i < limit; i++) {
             Variable variable = myVariables.get(i);
-            retVal |= (variable.isInteger() && !variable.isFixed());
+            retVal |= variable.isInteger() && !variable.isFixed();
         }
 
         return retVal;
@@ -1245,12 +1229,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public boolean validate(final Access1D<BigDecimal> solution) {
         final NumberContext context = options.feasibility;
-        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        final Printer appender = options.logger_detailed && options.logger_appender != null ? options.logger_appender : BasicLogger.NULL;
         return this.validate(solution, context, appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        final Printer appender = options.logger_detailed && options.logger_appender != null ? options.logger_appender : BasicLogger.NULL;
         return this.validate(solution, context, appender);
     }
 
@@ -1262,7 +1246,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean retVal = size == solution.count();
 
-        for (int i = 0; retVal && (i < size); i++) {
+        for (int i = 0; retVal && i < size; i++) {
             final Variable tmpVariable = myVariables.get(i);
             final BigDecimal value = solution.get(i);
             retVal &= tmpVariable.validate(value, context, appender, myRelaxed);
@@ -1285,7 +1269,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public boolean validate(final NumberContext context) {
         final Result solution = this.getVariableValues(context);
-        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        final Printer appender = options.logger_detailed && options.logger_appender != null ? options.logger_appender : BasicLogger.NULL;
         return this.validate(solution, context, appender);
     }
 
@@ -1304,7 +1288,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return A stream of variables that are not fixed
      */
     public Stream<Variable> variables() {
-        return myVariables.stream().filter((final Variable v) -> (!v.isEqualityConstraint()));
+        return myVariables.stream().filter((final Variable v) -> !v.isEqualityConstraint());
     }
 
     private void categoriseVariables() {
@@ -1336,12 +1320,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 myFreeVariables.add(tmpVariable);
                 myFreeIndices[i] = myFreeVariables.size() - 1;
 
-                if (!tmpVariable.isUpperLimitSet() || (tmpVariable.getUpperLimit().signum() == 1)) {
+                if (!tmpVariable.isUpperLimitSet() || tmpVariable.getUpperLimit().signum() == 1) {
                     myPositiveVariables.add(tmpVariable);
                     myPositiveIndices[i] = myPositiveVariables.size() - 1;
                 }
 
-                if (!tmpVariable.isLowerLimitSet() || (tmpVariable.getLowerLimit().signum() == -1)) {
+                if (!tmpVariable.isLowerLimitSet() || tmpVariable.getLowerLimit().signum() == -1) {
                     myNegativeVariables.add(tmpVariable);
                     myNegativeIndices[i] = myNegativeVariables.size() - 1;
                 }
@@ -1423,12 +1407,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 if (INTEGER_INTEGRATION.isCapable(this)) {
                     retVal = INTEGER_INTEGRATION;
                 }
-            } else {
-                if (CONVEX_INTEGRATION.isCapable(this)) {
-                    retVal = CONVEX_INTEGRATION;
-                } else if (LINEAR_INTEGRATION.isCapable(this)) {
-                    retVal = LINEAR_INTEGRATION;
-                }
+            } else if (CONVEX_INTEGRATION.isCapable(this)) {
+                retVal = CONVEX_INTEGRATION;
+            } else if (LINEAR_INTEGRATION.isCapable(this)) {
+                retVal = LINEAR_INTEGRATION;
             }
         }
 
@@ -1479,7 +1461,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     Optimisation.Result optimise() {
 
-        if (!myWorkCopy && (PRESOLVERS.size() > 0)) {
+        if (!myWorkCopy && PRESOLVERS.size() > 0) {
             this.scanEntities();
         }
 
@@ -1518,7 +1500,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             needToRepeat = false;
 
             for (Expression expr : this.getExpressions()) {
-                if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && expr.countQuadraticFactors() == 0) {
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
 
@@ -1543,7 +1525,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         if (!this.isInfeasible()) {
             Set<IntIndex> fixedVariables = this.getFixedVariables();
             for (Expression expr : this.getExpressions()) {
-                if (expr.isConstraint() && expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                if (expr.isConstraint() && expr.isRedundant() && expr.countQuadraticFactors() == 0) {
                     // Specifically need to check if constraints that have been determined redundant
                     // are not infeasible
 
