@@ -426,6 +426,144 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     }
 
+    static final class VariablesCategorisation {
+
+        private transient int[] myFreeIndices = null;
+        private final List<Variable> myFreeVariables = new ArrayList<>();
+        private transient int[] myIntegerIndices = null;
+        private final List<Variable> myIntegerVariables = new ArrayList<>();
+        private transient int[] myNegativeIndices = null;
+        private final List<Variable> myNegativeVariables = new ArrayList<>();
+        private transient int[] myPositiveIndices = null;
+        private final List<Variable> myPositiveVariables = new ArrayList<>();
+
+        private void free(final ArrayList<Variable> variables) {
+            if (myFreeIndices == null || myFreeIndices.length != variables.size()) {
+                this.update(variables);
+            }
+        }
+
+        private void integer(final ArrayList<Variable> variables) {
+            if (myIntegerIndices == null || myIntegerIndices.length != variables.size()) {
+                this.update(variables);
+            }
+        }
+
+        private void negative(final ArrayList<Variable> variables) {
+            if (myNegativeIndices == null || myNegativeIndices.length != variables.size()) {
+                this.update(variables);
+            }
+        }
+
+        private void positive(final ArrayList<Variable> variables) {
+            if (myPositiveIndices == null || myPositiveIndices.length != variables.size()) {
+                this.update(variables);
+            }
+        }
+
+        List<Variable> getFreeVariables(final ArrayList<Variable> variables) {
+            this.free(variables);
+            return myFreeVariables;
+        }
+
+        List<Variable> getIntegerVariables(final ArrayList<Variable> variables) {
+            this.integer(variables);
+            return myIntegerVariables;
+        }
+
+        List<Variable> getNegativeVariables(final ArrayList<Variable> variables) {
+            this.negative(variables);
+            return myNegativeVariables;
+        }
+
+        List<Variable> getPositiveVariables(final ArrayList<Variable> variables) {
+            this.positive(variables);
+            return myPositiveVariables;
+        }
+
+        int indexOfFreeVariable(final int globalIndex, final ArrayList<Variable> variables) {
+            this.free(variables);
+            return myFreeIndices[globalIndex];
+        }
+
+        int indexOfIntegerVariable(final int globalIndex, final ArrayList<Variable> variables) {
+            this.integer(variables);
+            return myIntegerIndices[globalIndex];
+        }
+
+        int indexOfNegativeVariable(final int globalIndex, final ArrayList<Variable> variables) {
+            this.negative(variables);
+            return myNegativeIndices[globalIndex];
+        }
+
+        int indexOfPositiveVariable(final int globalIndex, final ArrayList<Variable> variables) {
+            this.positive(variables);
+            return myPositiveIndices[globalIndex];
+        }
+
+        void reset() {
+
+            myFreeVariables.clear();
+            myFreeIndices = null;
+
+            myPositiveVariables.clear();
+            myPositiveIndices = null;
+
+            myNegativeVariables.clear();
+            myNegativeIndices = null;
+
+            myIntegerVariables.clear();
+            myIntegerIndices = null;
+        }
+
+        void update(final ArrayList<Variable> variables) {
+
+            int nbVariables = variables.size();
+
+            myFreeVariables.clear();
+            myFreeIndices = new int[nbVariables];
+            Arrays.fill(myFreeIndices, -1);
+
+            myPositiveVariables.clear();
+            myPositiveIndices = new int[nbVariables];
+            Arrays.fill(myPositiveIndices, -1);
+
+            myNegativeVariables.clear();
+            myNegativeIndices = new int[nbVariables];
+            Arrays.fill(myNegativeIndices, -1);
+
+            myIntegerVariables.clear();
+            myIntegerIndices = new int[nbVariables];
+            Arrays.fill(myIntegerIndices, -1);
+
+            for (int i = 0; i < nbVariables; i++) {
+
+                Variable tmpVariable = variables.get(i);
+
+                if (!tmpVariable.isFixed()) {
+
+                    myFreeVariables.add(tmpVariable);
+                    myFreeIndices[i] = myFreeVariables.size() - 1;
+
+                    if (!tmpVariable.isUpperLimitSet() || tmpVariable.getUpperLimit().signum() == 1) {
+                        myPositiveVariables.add(tmpVariable);
+                        myPositiveIndices[i] = myPositiveVariables.size() - 1;
+                    }
+
+                    if (!tmpVariable.isLowerLimitSet() || tmpVariable.getLowerLimit().signum() == -1) {
+                        myNegativeVariables.add(tmpVariable);
+                        myNegativeIndices[i] = myNegativeVariables.size() - 1;
+                    }
+
+                    if (tmpVariable.isInteger()) {
+                        myIntegerVariables.add(tmpVariable);
+                        myIntegerIndices[i] = myIntegerVariables.size() - 1;
+                    }
+                }
+            }
+        }
+    }
+
     private static final ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
     private static final List<ExpressionsBasedModel.Integration<?>> FALLBACK_INTEGRATIONS = new ArrayList<>();
     private static final IntegerSolver.ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
@@ -503,15 +641,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
-    private transient int[] myFreeIndices = null;
-    private final List<Variable> myFreeVariables = new ArrayList<>();
     private transient boolean myInfeasible = false;
-    private transient int[] myIntegerIndices = null;
-    private final List<Variable> myIntegerVariables = new ArrayList<>();
-    private transient int[] myNegativeIndices = null;
-    private final List<Variable> myNegativeVariables = new ArrayList<>();
-    private transient int[] myPositiveIndices = null;
-    private final List<Variable> myPositiveVariables = new ArrayList<>();
     private final Set<IntIndex> myReferences = new HashSet<>();
     private boolean myRelaxed;
     /**
@@ -519,11 +649,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     private final Set<IntIndex> myTemporary = new HashSet<>();
     private final ArrayList<Variable> myVariables = new ArrayList<>();
+    private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
     private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
 
-        super();
+        super(new Optimisation.Options());
 
         myWorkCopy = false;
         myRelaxed = false;
@@ -531,7 +662,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
 
-        super();
+        super(new Optimisation.Options());
 
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
@@ -551,7 +682,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public ExpressionsBasedModel(final Variable... variables) {
 
-        super();
+        super(new Optimisation.Options());
 
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
@@ -561,7 +692,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         myRelaxed = false;
     }
 
-    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean allEntities) {
+    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean relaxed, final boolean allEntities) {
 
         super(modelToCopy.options);
 
@@ -580,7 +711,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
 
         myWorkCopy = workCopy;
-        myRelaxed = workCopy;
+        myRelaxed = relaxed;
     }
 
     public Expression addExpression() {
@@ -709,7 +840,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     public ExpressionsBasedModel copy() {
-        return new ExpressionsBasedModel(this, false, true);
+        return new ExpressionsBasedModel(this, false, false, true);
     }
 
     public int countExpressions() {
@@ -735,17 +866,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         myFixedVariables.clear();
 
-        myFreeVariables.clear();
-        myFreeIndices = null;
-
-        myPositiveVariables.clear();
-        myPositiveIndices = null;
-
-        myNegativeVariables.clear();
-        myNegativeIndices = null;
-
-        myIntegerVariables.clear();
-        myIntegerIndices = null;
+        myVariablesCategorisation.reset();
     }
 
     public Expression generateCut(final Expression constraint, final Optimisation.Result solution) {
@@ -775,12 +896,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return A list of the variables that are not fixed at a specific value
      */
     public List<Variable> getFreeVariables() {
-
-        if (myFreeIndices == null) {
-            this.categoriseVariables();
-        }
-
-        return Collections.unmodifiableList(myFreeVariables);
+        return Collections.unmodifiableList(myVariablesCategorisation.getFreeVariables(myVariables));
     }
 
     /**
@@ -788,12 +904,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      *         variables
      */
     public List<Variable> getIntegerVariables() {
-
-        if (myIntegerIndices == null) {
-            this.categoriseVariables();
-        }
-
-        return Collections.unmodifiableList(myIntegerVariables);
+        return Collections.unmodifiableList(myVariablesCategorisation.getIntegerVariables(myVariables));
     }
 
     /**
@@ -801,12 +912,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      *         values
      */
     public List<Variable> getNegativeVariables() {
-
-        if (myNegativeIndices == null) {
-            this.categoriseVariables();
-        }
-
-        return Collections.unmodifiableList(myNegativeVariables);
+        return Collections.unmodifiableList(myVariablesCategorisation.getNegativeVariables(myVariables));
     }
 
     /**
@@ -814,12 +920,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      *         values and/or zero
      */
     public List<Variable> getPositiveVariables() {
-
-        if (myPositiveIndices == null) {
-            this.categoriseVariables();
-        }
-
-        return Collections.unmodifiableList(myPositiveVariables);
+        return Collections.unmodifiableList(myVariablesCategorisation.getPositiveVariables(myVariables));
     }
 
     public Variable getVariable(final int index) {
@@ -919,10 +1020,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     /**
      * @param globalIndex General, global, variable index
-     * @return Local index among the free variables. -1 indicates the variable is not a positive variable.
+     * @return Local index among the free variables. -1 indicates the variable is not a free variable.
      */
     public int indexOfFreeVariable(final int globalIndex) {
-        return myFreeIndices[globalIndex];
+        return myVariablesCategorisation.indexOfFreeVariable(globalIndex, myVariables);
     }
 
     public int indexOfFreeVariable(final IntIndex variableIndex) {
@@ -938,7 +1039,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return Local index among the integer variables. -1 indicates the variable is not an integer variable.
      */
     public int indexOfIntegerVariable(final int globalIndex) {
-        return myIntegerIndices[globalIndex];
+        return myVariablesCategorisation.indexOfIntegerVariable(globalIndex, myVariables);
     }
 
     public int indexOfIntegerVariable(final IntIndex variableIndex) {
@@ -954,7 +1055,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return Local index among the negative variables. -1 indicates the variable is not a negative variable.
      */
     public int indexOfNegativeVariable(final int globalIndex) {
-        return myNegativeIndices[globalIndex];
+        return myVariablesCategorisation.indexOfNegativeVariable(globalIndex, myVariables);
     }
 
     public int indexOfNegativeVariable(final IntIndex variableIndex) {
@@ -970,7 +1071,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return Local index among the positive variables. -1 indicates the variable is not a positive variable.
      */
     public int indexOfPositiveVariable(final int globalIndex) {
-        return myPositiveIndices[globalIndex];
+        return myVariablesCategorisation.indexOfPositiveVariable(globalIndex, myVariables);
     }
 
     public int indexOfPositiveVariable(final IntIndex variableIndex) {
@@ -1160,7 +1261,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
-        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, false);
+        ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true, false);
 
         if (inPlace) {
             myRelaxed = true;
@@ -1175,30 +1276,28 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         this.presolve();
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, false);
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, true, false);
 
         return retVal;
     }
 
     public ExpressionsBasedModel snapshot() {
-        return new ExpressionsBasedModel(this, true, false);
+        return new ExpressionsBasedModel(this, true, true, false);
     }
 
     @Override
     public String toString() {
 
-        final StringBuilder retVal = new StringBuilder(START_END);
+        StringBuilder retVal = new StringBuilder(START_END);
 
-        for (final Variable tmpVariable : myVariables) {
+        for (Variable tmpVariable : myVariables) {
             tmpVariable.appendToString(retVal);
             retVal.append(NEW_LINE);
         }
 
-        for (final Expression tmpExpression : myExpressions.values()) {
-            // if ((tmpExpression.isConstraint() && !tmpExpression.isRedundant()) || tmpExpression.isObjective()) {
+        for (Expression tmpExpression : myExpressions.values()) {
             tmpExpression.appendToString(retVal, this.getVariableValues());
             retVal.append(NEW_LINE);
-            // }
         }
 
         return retVal.append(START_END).toString();
@@ -1291,53 +1390,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return myVariables.stream().filter((final Variable v) -> !v.isEqualityConstraint());
     }
 
-    private void categoriseVariables() {
-
-        final int tmpLength = myVariables.size();
-
-        myFreeVariables.clear();
-        myFreeIndices = new int[tmpLength];
-        Arrays.fill(myFreeIndices, -1);
-
-        myPositiveVariables.clear();
-        myPositiveIndices = new int[tmpLength];
-        Arrays.fill(myPositiveIndices, -1);
-
-        myNegativeVariables.clear();
-        myNegativeIndices = new int[tmpLength];
-        Arrays.fill(myNegativeIndices, -1);
-
-        myIntegerVariables.clear();
-        myIntegerIndices = new int[tmpLength];
-        Arrays.fill(myIntegerIndices, -1);
-
-        for (int i = 0; i < tmpLength; i++) {
-
-            final Variable tmpVariable = myVariables.get(i);
-
-            if (!tmpVariable.isFixed()) {
-
-                myFreeVariables.add(tmpVariable);
-                myFreeIndices[i] = myFreeVariables.size() - 1;
-
-                if (!tmpVariable.isUpperLimitSet() || tmpVariable.getUpperLimit().signum() == 1) {
-                    myPositiveVariables.add(tmpVariable);
-                    myPositiveIndices[i] = myPositiveVariables.size() - 1;
-                }
-
-                if (!tmpVariable.isLowerLimitSet() || tmpVariable.getLowerLimit().signum() == -1) {
-                    myNegativeVariables.add(tmpVariable);
-                    myNegativeIndices[i] = myNegativeVariables.size() - 1;
-                }
-
-                if (tmpVariable.isInteger()) {
-                    myIntegerVariables.add(tmpVariable);
-                    myIntegerIndices[i] = myIntegerVariables.size() - 1;
-                }
-            }
-        }
-    }
-
     private void scanEntities() {
 
         boolean anyVarInt = this.isAnyVariableInteger();
@@ -1359,7 +1411,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             }
         }
 
-        for (final Variable tmpVar : myVariables) {
+        for (Variable tmpVar : myVariables) {
             Presolvers.UNREFERENCED.simplify(tmpVar, this);
             if (anyVarInt && tmpVar.isConstraint()) {
                 Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
@@ -1543,7 +1595,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             }
         }
 
-        this.categoriseVariables();
+        myVariablesCategorisation.update(myVariables);
     }
 
     void setInfeasible() {

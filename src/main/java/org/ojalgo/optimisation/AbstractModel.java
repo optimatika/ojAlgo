@@ -27,13 +27,6 @@ abstract class AbstractModel implements Optimisation.Model {
 
     private Optimisation.Sense myOptimisationSense = Optimisation.Sense.MIN;
 
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
-    }
-
     protected AbstractModel(final Optimisation.Options someOptions) {
 
         super();
