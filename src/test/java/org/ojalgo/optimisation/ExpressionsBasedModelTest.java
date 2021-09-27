@@ -35,7 +35,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.context.NumberContext;
 
-public class ExpressionsBasedModelTest extends OptimisationTest {
+public class ExpressionsBasedModelTest extends OptimisationTests {
 
     /**
      * https://github.com/optimatika/ojAlgo-extensions/issues/3 <br>
@@ -197,7 +197,7 @@ public class ExpressionsBasedModelTest extends OptimisationTest {
         Result tmpMinRes = tmpModel.minimise();
         Result tmpMaxRes = tmpModel.maximise();
 
-        if (OptimisationTest.DEBUG) {
+        if (OptimisationTests.DEBUG) {
             BasicLogger.debug(tmpMinRes);
             BasicLogger.debug(tmpMaxRes);
         }
