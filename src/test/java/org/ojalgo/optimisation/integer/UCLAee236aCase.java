@@ -82,6 +82,10 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
 
+        if (DEBUG) {
+            model.options.debug(IntegerSolver.class);
+        }
+
         Optimisation.Result result = model.minimise();
 
         TestUtils.assertStateAndSolution(expected, result, PRECISION);
