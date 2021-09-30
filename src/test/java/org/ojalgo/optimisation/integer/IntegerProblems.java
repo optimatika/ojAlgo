@@ -270,7 +270,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         // Verify solution
         for (final int[] tmpCoeff : P20150127a.getCoefficients()) {
-            final int tmpValue = (tmpCoeff[0] * tmpIntX) + (tmpCoeff[1] * tmpIntY);
+            final int tmpValue = tmpCoeff[0] * tmpIntX + tmpCoeff[1] * tmpIntY;
             final BigDecimal tmpExact = tmpSolX.multiply(BigDecimal.valueOf(tmpCoeff[0])).add(tmpSolY.multiply(BigDecimal.valueOf(tmpCoeff[1])));
             if (tmpValue >= 0) {
                 TestUtils.fail(tmpCoeff[0] + "*x + " + tmpCoeff[1] + "*y = " + tmpValue + " must be negative (exact: " + tmpExact + ")");
@@ -363,6 +363,10 @@ public class IntegerProblems extends OptimisationIntegerTests {
         Expression objectiveFunction = model.addExpression("X").weight(ONE).set(varX, ONE);
 
         Result result = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
 
         TestUtils.assertNotEquals(result.getState(), Optimisation.State.INFEASIBLE);
     }
