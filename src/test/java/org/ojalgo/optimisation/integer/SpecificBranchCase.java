@@ -70,7 +70,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 }
             }
 
-            ExpressionsBasedModel relaxedModel = modelMIP.copy().relax(false);
+            ExpressionsBasedModel relaxedModel = modelMIP.copy(true);
 
             for (int i = 0; i < index.length; i++) { // Set up the node
                 relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
@@ -182,8 +182,8 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
 
             TestUtils.assertTrue(tmpModel.validate());
 
-            ExpressionsBasedModel tmpLowerBranchModel = tmpModel.relax(false);
-            ExpressionsBasedModel tmpUpperBranchModel = tmpModel.relax(false);
+            ExpressionsBasedModel tmpLowerBranchModel = tmpModel.copy(true);
+            ExpressionsBasedModel tmpUpperBranchModel = tmpModel.copy(true);
 
             tmpLowerBranchModel.getVariable(106).upper(BigMath.ZERO);
             tmpUpperBranchModel.getVariable(106).lower(BigMath.ONE);

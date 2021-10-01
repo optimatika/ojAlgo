@@ -112,14 +112,14 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Tag("slow")
     public void testP20130225() {
 
-        final ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
-        final ExpressionsBasedModel tmpRelaxedModel = tmpIntegerModel.relax(false);
+        ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
+        ExpressionsBasedModel tmpRelaxedModel = tmpIntegerModel.copy(true);
 
-        final Optimisation.Result tmpRelaxedResult = tmpRelaxedModel.minimise();
+        Optimisation.Result tmpRelaxedResult = tmpRelaxedModel.minimise();
         TestUtils.assertEquals("Solution To Relaxed Problem Not Optimal!", Optimisation.State.OPTIMAL, tmpRelaxedResult.getState());
         TestUtils.assertTrue("Solution To Relaxed Problem Not Valid!", tmpRelaxedModel.validate(tmpRelaxedResult));
 
-        final Optimisation.Result tmpIntegerResult = tmpIntegerModel.minimise();
+        Optimisation.Result tmpIntegerResult = tmpIntegerModel.minimise();
         TestUtils.assertEquals("Integer Solution Not Optimal!", Optimisation.State.OPTIMAL, tmpIntegerResult.getState());
         TestUtils.assertTrue("Integer Solution Not Valid!", tmpIntegerModel.validate(tmpIntegerResult));
     }

@@ -63,8 +63,6 @@ public class P20140819 extends OptimisationIntegerTests {
 
     private static void doTestRelaxedAtSpecificNode(final ExpressionsBasedModel model, final int[] lower, final int[] upper) {
 
-        model.relax(true);
-
         for (int v = 0; v < upper.length; v++) {
             model.getVariable(v).integer(false).lower(lower[v]).upper(upper[v]);
         }
@@ -153,20 +151,17 @@ public class P20140819 extends OptimisationIntegerTests {
         int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
         int[] upper = new int[] { 414, 414, 414, 414, 414, 414, 414, 414, 414, 5, 0, 0, 414, 414, 414, 414 };
 
-        ExpressionsBasedModel parentModel = integerModel.relax(false);
-        ExpressionsBasedModel lowerModel = integerModel.relax(false);
-
+        ExpressionsBasedModel parentModel = integerModel.copy(true);
         P20140819.doTestRelaxedAtSpecificNode(parentModel, lower, upper);
 
+        ExpressionsBasedModel lowerModel = integerModel.copy(true);
         lower[2] = 0;
         upper[2] = 0;
-
         P20140819.doTestRelaxedAtSpecificNode(lowerModel, lower, upper);
 
+        ExpressionsBasedModel upperModel = integerModel.copy(true);
         lower[2] = 1;
         upper[2] = 414;
-
-        ExpressionsBasedModel upperModel = integerModel.relax(false);
         P20140819.doTestRelaxedAtSpecificNode(upperModel, lower, upper);
     }
 
@@ -500,7 +495,7 @@ public class P20140819 extends OptimisationIntegerTests {
     @Test
     public void testRelaxedButConstrainedToOptimal() {
 
-        ExpressionsBasedModel model = P20140819.makeModel().relax(true);
+        ExpressionsBasedModel model = P20140819.makeModel().copy(true);
 
         for (int v = 0; v < CPLEX_RESULTS.size(); v++) {
             model.getVariable(v).level(CPLEX_RESULTS.longValue(v));
