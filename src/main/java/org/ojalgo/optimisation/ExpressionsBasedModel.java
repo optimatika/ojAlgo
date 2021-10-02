@@ -642,7 +642,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient boolean myInfeasible = false;
-    private final Set<IntIndex> myReferences = new HashSet<>();
+    private final Set<IntIndex> myReferences;
     private boolean myRelaxed;
     /**
      * Temporary storage for some expresssion specific subset of variables
@@ -653,28 +653,23 @@ public final class ExpressionsBasedModel extends AbstractModel {
     private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
-
-        super(new Optimisation.Options());
-
-        myWorkCopy = false;
-        myRelaxed = false;
+        this(new Optimisation.Options());
     }
 
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
 
-        super(new Optimisation.Options());
+        this();
 
-        for (final Variable tmpVariable : variables) {
+        for (Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
-
-        myWorkCopy = false;
-        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Optimisation.Options someOptions) {
 
         super(someOptions);
+
+        myReferences = new HashSet<>();
 
         myWorkCopy = false;
         myRelaxed = false;
@@ -682,14 +677,11 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public ExpressionsBasedModel(final Variable... variables) {
 
-        super(new Optimisation.Options());
+        this();
 
-        for (final Variable tmpVariable : variables) {
+        for (Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
-
-        myWorkCopy = false;
-        myRelaxed = false;
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean relaxed, final boolean allEntities) {
@@ -698,17 +690,19 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         this.setOptimisationSense(modelToCopy.getOptimisationSense());
 
-        for (final Variable tmpVariable : modelToCopy.getVariables()) {
+        for (Variable tmpVariable : modelToCopy.getVariables()) {
             this.addVariable(tmpVariable.copy());
         }
 
-        for (final Expression tmpExpression : modelToCopy.getExpressions()) {
+        for (Expression tmpExpression : modelToCopy.getExpressions()) {
             if (allEntities || tmpExpression.isObjective() || tmpExpression.isConstraint() && !tmpExpression.isRedundant()) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
                 // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
+
+        myReferences = modelToCopy.getReferences();
 
         myWorkCopy = workCopy;
         myRelaxed = relaxed;
@@ -840,7 +834,15 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     public ExpressionsBasedModel copy() {
-        return new ExpressionsBasedModel(this, false, false, true);
+        return this.copy(false);
+    }
+
+    public ExpressionsBasedModel copy(final boolean relax) {
+        ExpressionsBasedModel copy = new ExpressionsBasedModel(this, false, false, true);
+        if (relax) {
+            copy.relax(false);
+        }
+        return copy;
     }
 
     public int countExpressions() {
@@ -1259,15 +1261,24 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return new ExpressionsBasedModel.Intermediate(this);
     }
 
-    public ExpressionsBasedModel relax(final boolean inPlace) {
+    public void relax() {
+        this.relax(false);
+    }
 
-        ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true, false);
-
-        if (inPlace) {
+    /**
+     * @param soft If true the integer variables are still identified as such, but the model is flagged as
+     *        non-integer (will not use the {@link IntegerSolver}, but presolve and validation may still
+     *        recognise the variables' integer property). If false the integer property of any/all variables
+     *        are removed.
+     */
+    public void relax(final boolean soft) {
+        if (soft) {
             myRelaxed = true;
+        } else {
+            for (Variable variable : myVariables) {
+                variable.relax();
+            }
         }
-
-        return retVal;
     }
 
     public ExpressionsBasedModel simplify() {
@@ -1480,6 +1491,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
 
         return retVal;
+    }
+
+    Set<IntIndex> getReferences() {
+        return myReferences;
     }
 
     boolean isFixed() {

@@ -412,15 +412,13 @@ public final class IntegerSolver extends GenericSolver {
         if (bestSolutionFound.getState().isFeasible()) {
             if (normalExit) {
                 return new Optimisation.Result(State.OPTIMAL, bestSolutionFound);
-            } else {
-                return new Optimisation.Result(State.FEASIBLE, bestSolutionFound);
             }
+            return new Optimisation.Result(State.FEASIBLE, bestSolutionFound);
         }
         if (normalExit) {
             return new Optimisation.Result(State.INFEASIBLE, bestSolutionFound);
-        } else {
-            return new Optimisation.Result(State.FAILED, bestSolutionFound);
         }
+        return new Optimisation.Result(State.FAILED, bestSolutionFound);
     }
 
     @Override
@@ -468,9 +466,8 @@ public final class IntegerSolver extends GenericSolver {
             nodeModel.dispose();
             if (nodeKey.sequence == 0 && (nodeResult.getState().isUnexplored() || !nodeResult.getState().isValid())) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
         }
         if (this.isLogDebug()) {
             nodePrinter.println("Node solved to optimality!");
@@ -511,68 +508,62 @@ public final class IntegerSolver extends GenericSolver {
             nodeModel.dispose();
             return true;
 
-        } else {
+        }
+        if (this.isLogDebug()) {
+            nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
+        }
+
+        final double variableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
+
+        if (!this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
             if (this.isLogDebug()) {
-                nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
+                nodePrinter.println("Can't find better integer solutions - stop this branch!");
+                IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
 
-            final double variableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
+            nodeModel.dispose();
+            return true;
+        }
+        if (this.isLogDebug()) {
+            nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
+                    nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
+            IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
+        }
 
-            if (this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
+        // this.generateCuts(nodeModel);
 
-                if (this.isLogDebug()) {
-                    nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
-                            nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
-                    IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
-                }
+        final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
+        final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
 
-                // this.generateCuts(nodeModel);
+        final NodeKey nextTask;
+        final BranchAndBoundNodeTask forkedTask;
 
-                final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
-                final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
-
-                final NodeKey nextTask;
-                final BranchAndBoundNodeTask forkedTask;
-
-                if (upperBranch.displacement <= HALF) {
-                    nextTask = upperBranch;
-                    if (lowerBranch.displacement < options.mip_defer) {
-                        forkedTask = new BranchAndBoundNodeTask(lowerBranch);
-                    } else {
-                        forkedTask = null;
-                        myDeferredNodes.offer(lowerBranch);
-                    }
-                } else {
-                    nextTask = lowerBranch;
-                    if (upperBranch.displacement < options.mip_defer) {
-                        forkedTask = new BranchAndBoundNodeTask(upperBranch);
-                    } else {
-                        forkedTask = null;
-                        myDeferredNodes.offer(upperBranch);
-                    }
-                }
-
-                if (forkedTask != null) {
-
-                    forkedTask.fork();
-
-                    return this.compute(nextTask, nodeModel, nodePrinter) && forkedTask.join();
-
-                } else {
-
-                    return this.compute(nextTask, nodeModel, nodePrinter);
-                }
-
+        if (upperBranch.displacement <= HALF) {
+            nextTask = upperBranch;
+            if (lowerBranch.displacement < options.mip_defer) {
+                forkedTask = new BranchAndBoundNodeTask(lowerBranch);
             } else {
-                if (this.isLogDebug()) {
-                    nodePrinter.println("Can't find better integer solutions - stop this branch!");
-                    IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
-                }
-
-                nodeModel.dispose();
-                return true;
+                forkedTask = null;
+                myDeferredNodes.offer(lowerBranch);
+            }
+        } else {
+            nextTask = lowerBranch;
+            if (upperBranch.displacement < options.mip_defer) {
+                forkedTask = new BranchAndBoundNodeTask(upperBranch);
+            } else {
+                forkedTask = null;
+                myDeferredNodes.offer(upperBranch);
             }
         }
+
+        if (forkedTask != null) {
+
+            forkedTask.fork();
+
+            return this.compute(nextTask, nodeModel, nodePrinter) && forkedTask.join();
+
+        }
+        return this.compute(nextTask, nodeModel, nodePrinter);
 
     }
 
@@ -622,7 +613,9 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected ExpressionsBasedModel getNodeModel() {
-        return myIntegerModel.relax(false);
+        ExpressionsBasedModel shallowCopy = myIntegerModel.snapshot();
+        shallowCopy.relax(true);
+        return shallowCopy;
     }
 
     protected boolean initialise(final Result kickStarter) {
@@ -645,9 +638,8 @@ public final class IntegerSolver extends GenericSolver {
 
         if (myMinimisation) {
             return relaxedNodeValue < bestIntegerValue && relativeGap > options.mip_gap && absoluteGap > options.mip_gap;
-        } else {
-            return relaxedNodeValue > bestIntegerValue && relativeGap > options.mip_gap && absoluteGap > options.mip_gap;
         }
+        return relaxedNodeValue > bestIntegerValue && relativeGap > options.mip_gap && absoluteGap > options.mip_gap;
     }
 
     protected boolean isIntegerSolutionFound() {

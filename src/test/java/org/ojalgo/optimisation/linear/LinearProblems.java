@@ -191,8 +191,8 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20100412() {
 
-        ExpressionsBasedModel tmpModel = OptimisationIntegerData.buildModelForP20100412().relax(true);
-        //tmpModel.relax(); // Relax the integer constraints
+        ExpressionsBasedModel tmpModel = OptimisationIntegerData.buildModelForP20100412();
+        tmpModel.relax(false); // Relax the integer constraints
         tmpModel.getVariable(1).lower(ONE); // Set branch state
 
         State tmpResultState = tmpModel.maximise().getState();
