@@ -308,7 +308,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
     double getFraction(final int index, final double value) {
 
-        final double feasibleValue = this.feasible(index, value, true);
+        double feasibleValue = this.feasible(index, value, true);
 
         return PrimitiveMath.ABS.invoke(feasibleValue - PrimitiveMath.RINT.invoke(feasibleValue));
     }

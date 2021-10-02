@@ -245,25 +245,25 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
             if (myModel.isInfeasible()) {
 
-                final Optimisation.Result solution = candidate != null ? candidate : myModel.getVariableValues();
+                Optimisation.Result solution = candidate != null ? candidate : myModel.getVariableValues();
 
                 return new Optimisation.Result(State.INFEASIBLE, solution);
-
             }
+
             if (myModel.isUnbounded()) {
 
                 if (candidate != null && myModel.validate(candidate)) {
                     return new Optimisation.Result(State.UNBOUNDED, candidate);
                 }
 
-                final Optimisation.Result derivedSolution = myModel.getVariableValues();
+                Optimisation.Result derivedSolution = myModel.getVariableValues();
                 if (derivedSolution.getState().isFeasible()) {
                     return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
                 }
 
             } else if (myModel.isFixed()) {
 
-                final Optimisation.Result derivedSolution = myModel.getVariableValues();
+                Optimisation.Result derivedSolution = myModel.getVariableValues();
 
                 if (derivedSolution.getState().isFeasible()) {
                     return new Optimisation.Result(State.DISTINCT, derivedSolution);
@@ -271,8 +271,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 return new Optimisation.Result(State.INVALID, derivedSolution);
             }
 
-            final ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
-            final Optimisation.Solver solver = this.getSolver();
+            ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
+            Optimisation.Solver solver = this.getSolver();
 
             Optimisation.Result retVal = candidate != null ? candidate : myModel.getVariableValues();
             retVal = integration.toSolverState(retVal, myModel);
@@ -697,8 +697,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         for (Expression tmpExpression : modelToCopy.getExpressions()) {
             if (allEntities || tmpExpression.isObjective() || tmpExpression.isConstraint() && !tmpExpression.isRedundant()) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
-            } else {
-                // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
 
@@ -886,7 +884,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public Set<IntIndex> getFixedVariables() {
         myFixedVariables.clear();
-        for (final Variable tmpVar : myVariables) {
+        for (Variable tmpVar : myVariables) {
             if (tmpVar.isFixed()) {
                 myFixedVariables.add(tmpVar.getIndex());
             }
@@ -1405,7 +1403,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean anyVarInt = this.isAnyVariableInteger();
 
-        for (final Expression tmpExpr : myExpressions.values()) {
+        for (Expression tmpExpr : myExpressions.values()) {
 
             Set<IntIndex> allVars = tmpExpr.getLinearKeySet();
             BigDecimal lower = tmpExpr.getLowerLimit();
@@ -1537,7 +1535,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         Optimisation.Result result = prepared.solve(null);
 
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
-            final Variable tmpVariable = myVariables.get(i);
+            Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
                 tmpVariable.setValue(options.solution.toBigDecimal(result.doubleValue(i)));
             }

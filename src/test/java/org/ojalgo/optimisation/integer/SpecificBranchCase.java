@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 public class SpecificBranchCase extends OptimisationIntegerTests implements ModelFileMPS {
@@ -74,6 +75,10 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
 
             for (int i = 0; i < index.length; i++) { // Set up the node
                 relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
+            }
+
+            if (DEBUG) {
+                relaxedModel.options.debug(LinearSolver.class);
             }
 
             Optimisation.Result result = relaxedModel.minimise();

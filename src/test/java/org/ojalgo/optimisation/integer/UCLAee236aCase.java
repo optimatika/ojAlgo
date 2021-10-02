@@ -47,7 +47,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     /**
      * Solutions in the pdf are given with 2 decimals (3 digits).
      */
-    private static final NumberContext PRECISION = NumberContext.of(2);
+    private static final NumberContext PRECISION = NumberContext.of(3, 2);
 
     private static ExpressionsBasedModel makeOriginalRootModel() {
 

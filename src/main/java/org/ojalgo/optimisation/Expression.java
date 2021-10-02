@@ -80,6 +80,11 @@ public final class Expression extends ModelEntity<Expression> {
     private final ExpressionsBasedModel myModel;
     private final HashMap<IntRowColumn, BigDecimal> myQuadratic;
     private transient boolean myRedundant = false;
+    /**
+     * A shallow copy (typically created by presolver or integer solver) shares the Map:s holding the
+     * paramaters with other Expressions. They will only differ on the lower/upper limits and on meta data
+     * like flags indicating redundancy or infeasibility.
+     */
     private final boolean myShallowCopy;
 
     @SuppressWarnings("unused")
@@ -119,14 +124,14 @@ public final class Expression extends ModelEntity<Expression> {
 
         super(name);
 
+        ProgrammingError.throwIfNull(name, model);
+
         myModel = model;
 
         myShallowCopy = false;
 
         myLinear = new HashMap<>();
         myQuadratic = new HashMap<>();
-
-        ProgrammingError.throwIfNull(myModel, myLinear, myQuadratic);
     }
 
     public Expression add(final IntIndex key, final Comparable<?> value) {
@@ -169,92 +174,88 @@ public final class Expression extends ModelEntity<Expression> {
      */
     public Expression compensate(final Set<IntIndex> fixedVariables) {
 
-        if ((fixedVariables.size() == 0) || (!this.isAnyQuadraticFactorNonZero() && Collections.disjoint(fixedVariables, this.getLinearKeySet()))) {
+        if (fixedVariables.size() == 0 || !this.isAnyQuadraticFactorNonZero() && Collections.disjoint(fixedVariables, this.getLinearKeySet())) {
 
             return this; // No need to copy/compensate anything
 
-        } else {
-
-            final ExpressionsBasedModel tmpModel = this.getModel();
-
-            final Expression retVal = new Expression(this.getName(), tmpModel);
-
-            BigDecimal tmpFixedValue = BigMath.ZERO;
-
-            for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
-
-                final IntIndex tmpKey = tmpEntry.getKey();
-                final BigDecimal tmpFactor = tmpEntry.getValue();
-
-                if (fixedVariables.contains(tmpKey)) {
-                    // Fixed
-
-                    final BigDecimal tmpValue = tmpModel.getVariable(tmpKey.index).getValue();
-
-                    tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpValue));
-
-                } else {
-                    // Not fixed
-
-                    retVal.set(tmpKey, tmpFactor);
-                }
-            }
-
-            for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
-
-                final IntRowColumn tmpKey = tmpEntry.getKey();
-                final BigDecimal tmpFactor = tmpEntry.getValue();
-
-                final Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
-                final Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
-
-                final IntIndex tmpRowKey = tmpRowVariable.getIndex();
-                final IntIndex tmpColKey = tmpColVariable.getIndex();
-
-                if (fixedVariables.contains(tmpRowKey)) {
-
-                    final BigDecimal tmpRowValue = tmpRowVariable.getValue();
-
-                    if (fixedVariables.contains(tmpColKey)) {
-                        // Both fixed
-
-                        final BigDecimal tmpColValue = tmpColVariable.getValue();
-
-                        tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
-
-                    } else {
-                        // Row fixed
-
-                        retVal.add(tmpColKey, tmpFactor.multiply(tmpRowValue));
-                    }
-
-                } else {
-
-                    if (fixedVariables.contains(tmpColKey)) {
-                        // Column fixed
-
-                        final BigDecimal tmpColValue = tmpColVariable.getValue();
-
-                        retVal.add(tmpRowKey, tmpFactor.multiply(tmpColValue));
-
-                    } else {
-                        // Neither fixed
-
-                        retVal.set(tmpKey, tmpFactor);
-                    }
-                }
-            }
-
-            if (this.isLowerLimitSet()) {
-                retVal.lower(this.getLowerLimit().subtract(tmpFixedValue));
-            }
-
-            if (this.isUpperLimitSet()) {
-                retVal.upper(this.getUpperLimit().subtract(tmpFixedValue));
-            }
-
-            return retVal;
         }
+        final ExpressionsBasedModel tmpModel = this.getModel();
+
+        final Expression retVal = new Expression(this.getName(), tmpModel);
+
+        BigDecimal tmpFixedValue = BigMath.ZERO;
+
+        for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
+
+            final IntIndex tmpKey = tmpEntry.getKey();
+            final BigDecimal tmpFactor = tmpEntry.getValue();
+
+            if (fixedVariables.contains(tmpKey)) {
+                // Fixed
+
+                Variable variable = tmpModel.getVariable(tmpKey.index);
+                BigDecimal tmpValue = variable.getValue();
+
+                tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpValue));
+
+            } else {
+                // Not fixed
+
+                retVal.set(tmpKey, tmpFactor);
+            }
+        }
+
+        for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
+
+            final IntRowColumn tmpKey = tmpEntry.getKey();
+            final BigDecimal tmpFactor = tmpEntry.getValue();
+
+            final Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
+            final Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
+
+            final IntIndex tmpRowKey = tmpRowVariable.getIndex();
+            final IntIndex tmpColKey = tmpColVariable.getIndex();
+
+            if (fixedVariables.contains(tmpRowKey)) {
+
+                final BigDecimal tmpRowValue = tmpRowVariable.getValue();
+
+                if (fixedVariables.contains(tmpColKey)) {
+                    // Both fixed
+
+                    final BigDecimal tmpColValue = tmpColVariable.getValue();
+
+                    tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
+
+                } else {
+                    // Row fixed
+
+                    retVal.add(tmpColKey, tmpFactor.multiply(tmpRowValue));
+                }
+
+            } else if (fixedVariables.contains(tmpColKey)) {
+                // Column fixed
+
+                final BigDecimal tmpColValue = tmpColVariable.getValue();
+
+                retVal.add(tmpRowKey, tmpFactor.multiply(tmpColValue));
+
+            } else {
+                // Neither fixed
+
+                retVal.set(tmpKey, tmpFactor);
+            }
+        }
+
+        if (this.isLowerLimitSet()) {
+            retVal.lower(this.getLowerLimit().subtract(tmpFixedValue));
+        }
+
+        if (this.isUpperLimitSet()) {
+            retVal.upper(this.getUpperLimit().subtract(tmpFixedValue));
+        }
+
+        return retVal;
 
     }
 
@@ -289,9 +290,8 @@ public final class Expression extends ModelEntity<Expression> {
         final IntIndex tmpIndex = variable.getIndex();
         if (tmpIndex != null) {
             return this.get(tmpIndex);
-        } else {
-            throw new IllegalStateException("Variable not part of (this) model!");
         }
+        throw new IllegalStateException("Variable not part of (this) model!");
     }
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
@@ -402,28 +402,28 @@ public final class Expression extends ModelEntity<Expression> {
      * @return Are all the (linear) variables binary
      */
     public boolean isLinearAndAllBinary() {
-        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isBinary());
+        return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isBinary());
     }
 
     /**
      * @return Are all the (linear) variables integer
      */
     public boolean isLinearAndAllInteger() {
-        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isInteger());
+        return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isInteger());
     }
 
     /**
      * @return Are any of the (linear) variables binary
      */
     public boolean isLinearAndAnyBinary() {
-        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isBinary());
+        return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isBinary());
     }
 
     /**
      * @return Are any of the (linear) variables integer
      */
     public boolean isLinearAndAnyInteger() {
-        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
+        return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
     public Expression set(final int index, final Comparable<?> value) {
@@ -452,20 +452,17 @@ public final class Expression extends ModelEntity<Expression> {
 
     public Expression set(final IntIndex key, final Comparable<?> value) {
 
-        if (key != null) {
-
-            final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
-
-            if (tmpValue.signum() != 0) {
-                myLinear.put(key, tmpValue);
-                myModel.addReference(key);
-            } else {
-                myLinear.remove(key);
-            }
-
-        } else {
+        if (key == null) {
 
             throw new IllegalArgumentException();
+        }
+        final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
+
+        if (tmpValue.signum() != 0) {
+            myLinear.put(key, tmpValue);
+            myModel.addReference(key);
+        } else {
+            myLinear.remove(key);
         }
 
         return this;
@@ -493,21 +490,18 @@ public final class Expression extends ModelEntity<Expression> {
 
     public Expression set(final IntRowColumn key, final Comparable<?> value) {
 
-        if (key != null) {
-
-            final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
-
-            if (tmpValue.signum() != 0) {
-                myQuadratic.put(key, tmpValue);
-                myModel.addReference(key.row());
-                myModel.addReference(key.column());
-            } else {
-                myQuadratic.remove(key);
-            }
-
-        } else {
+        if (key == null) {
 
             throw new IllegalArgumentException();
+        }
+        final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
+
+        if (tmpValue.signum() != 0) {
+            myQuadratic.put(key, tmpValue);
+            myModel.addReference(key.row());
+            myModel.addReference(key.column());
+        } else {
+            myQuadratic.remove(key);
         }
 
         return this;
@@ -603,7 +597,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         final int tmpLimit = variables.size();
 
-        if ((factors.countRows() != tmpLimit) || (factors.countColumns() != tmpLimit)) {
+        if (factors.countRows() != tmpLimit || factors.countColumns() != tmpLimit) {
             throw new IllegalArgumentException();
         }
 
@@ -619,41 +613,34 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (this.isFunctionQuadratic()) {
             return this.makeQuadraticFunction();
-        } else if (this.isFunctionPureQuadratic()) {
-            return this.makePureQuadraticFunction();
-        } else if (this.isFunctionLinear()) {
-            return this.makeLinearFunction();
-        } else {
-            return this.makeConstantFunction();
         }
+        if (this.isFunctionPureQuadratic()) {
+            return this.makePureQuadraticFunction();
+        }
+        if (this.isFunctionLinear()) {
+            return this.makeLinearFunction();
+        }
+        return this.makeConstantFunction();
     }
 
     private BigDecimal convert(final BigDecimal value, final boolean adjusted) {
 
-        if (value != null) {
-
-            if (adjusted) {
-
-                final int tmpAdjExp = this.getAdjustmentExponent();
-
-                if (tmpAdjExp != 0) {
-
-                    return value.movePointRight(tmpAdjExp);
-
-                } else {
-
-                    return value;
-                }
-
-            } else {
-
-                return value;
-            }
-
-        } else {
+        if (value == null) {
 
             return BigMath.ZERO;
         }
+        if (!adjusted) {
+
+            return value;
+        }
+        final int tmpAdjExp = this.getAdjustmentExponent();
+
+        if (tmpAdjExp != 0) {
+
+            return value.movePointRight(tmpAdjExp);
+
+        }
+        return value;
     }
 
     private ConstantFunction<Double> makeConstantFunction() {
@@ -847,19 +834,17 @@ public final class Expression extends ModelEntity<Expression> {
 
             return ModelEntity.deriveAdjustmentExponent(largest, smallest, 6);
 
-        } else if (this.isAnyLinearFactorNonZero()) {
-
-            for (BigDecimal linearFactor : myLinear.values()) {
-                largest.invoke(linearFactor);
-                smallest.invoke(linearFactor);
-            }
-
-            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
-
-        } else {
+        }
+        if (!this.isAnyLinearFactorNonZero()) {
 
             return 0;
         }
+        for (BigDecimal linearFactor : myLinear.values()) {
+            largest.invoke(linearFactor);
+            smallest.invoke(linearFactor);
+        }
+
+        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
     }
 
     Expression doMixedIntegerRounding() {
@@ -879,7 +864,7 @@ public final class Expression extends ModelEntity<Expression> {
         for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
             Variable variable = this.resolve(entry.getKey());
 
-            if (!variable.isLowerLimitSet() || (variable.getLowerLimit().compareTo(BigMath.ZERO) < 0)) {
+            if (!variable.isLowerLimitSet() || variable.getLowerLimit().compareTo(BigMath.ZERO) < 0) {
                 return null;
             }
 
@@ -896,14 +881,11 @@ public final class Expression extends ModelEntity<Expression> {
                     retVal.set(variable, BigMath.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
                 }
 
-            } else {
-
-                if (coeff.signum() == 1) {
-                    retVal.set(variable, BigMath.DIVIDE.invoke(coeff, posFracLevel));
-                } else if (coeff.signum() == -1) {
-                    BigDecimal negCoeff = coeff.negate();
-                    retVal.set(variable, BigMath.DIVIDE.invoke(negCoeff, cmpFracLevel));
-                }
+            } else if (coeff.signum() == 1) {
+                retVal.set(variable, BigMath.DIVIDE.invoke(coeff, posFracLevel));
+            } else if (coeff.signum() == -1) {
+                BigDecimal negCoeff = coeff.negate();
+                retVal.set(variable, BigMath.DIVIDE.invoke(negCoeff, cmpFracLevel));
             }
         }
 
@@ -949,7 +931,7 @@ public final class Expression extends ModelEntity<Expression> {
     boolean includes(final Variable variable) {
         final IntIndex tmpVarInd = variable.getIndex();
         return myLinear.containsKey(tmpVarInd)
-                || ((myQuadratic.size() > 0) && myQuadratic.keySet().stream().anyMatch(k -> ((k.row == tmpVarInd.index) || (k.column == tmpVarInd.index))));
+                || myQuadratic.size() > 0 && myQuadratic.keySet().stream().anyMatch(k -> (k.row == tmpVarInd.index || k.column == tmpVarInd.index));
     }
 
     @Override
@@ -966,11 +948,11 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (!this.isAnyQuadraticFactorNonZero()) {
             for (IntIndex index : subset) {
-                final Variable setVar = myModel.getVariable(index);
+                Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
-                if ((signum < 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                if (signum < 0 && setVar.isLowerLimitSet() && setVar.getLowerLimit().signum() >= 0) {
 
-                } else if ((signum > 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                } else if (signum > 0 && setVar.isUpperLimitSet() && setVar.getUpperLimit().signum() <= 0) {
 
                 } else {
                     return false;
@@ -990,11 +972,11 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (!this.isAnyQuadraticFactorNonZero()) {
             for (IntIndex index : subset) {
-                final Variable setVar = myModel.getVariable(index);
+                Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
-                if ((signum > 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                if (signum > 0 && setVar.isLowerLimitSet() && setVar.getLowerLimit().signum() >= 0) {
 
-                } else if ((signum < 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                } else if (signum < 0 && setVar.isUpperLimitSet() && setVar.getUpperLimit().signum() <= 0) {
 
                 } else {
                     return false;
