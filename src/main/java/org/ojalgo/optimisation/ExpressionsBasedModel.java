@@ -645,12 +645,16 @@ public final class ExpressionsBasedModel extends AbstractModel {
     private final Set<IntIndex> myReferences;
     private boolean myRelaxed;
     /**
+     * A shallow copy may share complex/large data structures with other models - typically the Map:s holding
+     * Expression parameters.
+     */
+    private final boolean myShallowCopy;
+    /**
      * Temporary storage for some expresssion specific subset of variables
      */
     private final Set<IntIndex> myTemporary = new HashSet<>();
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
-    private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
         this(new Optimisation.Options());
@@ -671,7 +675,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         myReferences = new HashSet<>();
 
-        myWorkCopy = false;
+        myShallowCopy = false;
         myRelaxed = false;
     }
 
@@ -684,26 +688,40 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
-    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean relaxed, final boolean allEntities) {
+    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean shallow, final boolean prune) {
 
         super(modelToCopy.options);
 
         this.setOptimisationSense(modelToCopy.getOptimisationSense());
 
-        for (Variable tmpVariable : modelToCopy.getVariables()) {
-            this.addVariable(tmpVariable.copy());
+        for (Variable tmpVar : modelToCopy.getVariables()) {
+            myVariables.add(tmpVar.clone());
         }
 
-        for (Expression tmpExpression : modelToCopy.getExpressions()) {
-            if (allEntities || tmpExpression.isObjective() || tmpExpression.isConstraint() && !tmpExpression.isRedundant()) {
-                myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
+        Set<IntIndex> fixedVariables = modelToCopy.getFixedVariables();
+
+        for (Expression tmpExpr : modelToCopy.getExpressions()) {
+            if (shallow) {
+                if (prune) {
+                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                        myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
+                    }
+                } else {
+                    myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
+                }
+            } else if (prune) {
+                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                    myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true).compensate(fixedVariables));
+                }
+            } else {
+                myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true));
             }
         }
 
         myReferences = modelToCopy.getReferences();
 
-        myWorkCopy = workCopy;
-        myRelaxed = relaxed;
+        myShallowCopy = shallow || modelToCopy.isShallowCopy();
+        myRelaxed = modelToCopy.isRelaxed();
     }
 
     public Expression addExpression() {
@@ -798,7 +816,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     public void addVariable(final Variable variable) {
-        if (myWorkCopy) {
+        if (myShallowCopy) {
             throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
         }
         myVariables.add(variable);
@@ -832,15 +850,19 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     public ExpressionsBasedModel copy() {
-        return this.copy(false);
+        return new ExpressionsBasedModel(this, false, false);
     }
 
     public ExpressionsBasedModel copy(final boolean relax) {
-        ExpressionsBasedModel copy = new ExpressionsBasedModel(this, false, false, true);
+        ExpressionsBasedModel copy = new ExpressionsBasedModel(this, false, false);
         if (relax) {
             copy.relax(false);
         }
         return copy;
+    }
+
+    public ExpressionsBasedModel copy(final boolean shallow, final boolean prune) {
+        return new ExpressionsBasedModel(this, shallow, prune);
     }
 
     public int countExpressions() {
@@ -1142,10 +1164,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return retVal;
     }
 
-    public boolean isWorkCopy() {
-        return myWorkCopy;
-    }
-
     public void limitObjective(final BigDecimal lower, final BigDecimal upper) {
 
         Expression constrExpr = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
@@ -1279,19 +1297,26 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
+    /**
+     * Will perform presolve and then create a copy removing redundant constraint expressions, and pruning the
+     * remaining ones to no longer include fixed variables.
+     */
     public ExpressionsBasedModel simplify() {
 
         this.scanEntities();
 
         this.presolve();
 
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, true, false);
-
-        return retVal;
+        return new ExpressionsBasedModel(this, true, true);
     }
 
+    /**
+     * Will create a shallow copy flagged as relaxed.
+     */
     public ExpressionsBasedModel snapshot() {
-        return new ExpressionsBasedModel(this, true, true, false);
+        ExpressionsBasedModel shallowCopy = this.copy(true, false);
+        shallowCopy.relax(true);
+        return shallowCopy;
     }
 
     @Override
@@ -1520,13 +1545,21 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return myReferences.contains(variable.getIndex());
     }
 
+    boolean isRelaxed() {
+        return myRelaxed;
+    }
+
+    boolean isShallowCopy() {
+        return myShallowCopy;
+    }
+
     boolean isUnbounded() {
         return myVariables.stream().anyMatch(Variable::isUnbounded);
     }
 
     Optimisation.Result optimise() {
 
-        if (!myWorkCopy && PRESOLVERS.size() > 0) {
+        if (!myShallowCopy && PRESOLVERS.size() > 0) {
             this.scanEntities();
         }
 
