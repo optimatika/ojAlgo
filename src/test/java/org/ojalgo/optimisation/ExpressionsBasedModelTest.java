@@ -234,7 +234,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         expr3.set(varX, TWO.negate());
         expr3.set(varA, NEG);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr3, expr3.getLinearKeySet(), expr3.getLowerLimit(), expr3.getUpperLimit(), precision, false);
+        Presolvers.ZERO_ONE_TWO.simplify(expr3, expr3.getLinearKeySet(), expr3.getLowerLimit(), expr3.getUpperLimit(), precision);
 
         TestUtils.assertEquals(TWO.negate(), varA.getUpperLimit(), precision);
 
@@ -243,7 +243,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         expr2.set(varX, TWO.negate());
         expr2.set(varY, NEG);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr2, expr2.getLinearKeySet(), expr2.getLowerLimit(), expr2.getUpperLimit(), precision, false);
+        Presolvers.ZERO_ONE_TWO.simplify(expr2, expr2.getLinearKeySet(), expr2.getLowerLimit(), expr2.getUpperLimit(), precision);
 
         TestUtils.assertEquals(TWO.negate(), varY.getUpperLimit(), precision);
 
@@ -252,7 +252,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         expr1.set(varX, TWO.negate());
         expr1.set(varZ, ONE);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr1, expr1.getLinearKeySet(), expr1.getLowerLimit(), expr1.getUpperLimit(), precision, false);
+        Presolvers.ZERO_ONE_TWO.simplify(expr1, expr1.getLinearKeySet(), expr1.getLowerLimit(), expr1.getUpperLimit(), precision);
 
         TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 
