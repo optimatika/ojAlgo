@@ -363,7 +363,7 @@ public final class IntegerSolver extends GenericSolver {
 
         super(solverOptions);
 
-        myIntegerModel = model.snapshot();
+        myIntegerModel = model.simplify();
         myFunction = myIntegerModel.objective().toFunction();
 
         myMinimisation = myIntegerModel.isMinimisation();
