@@ -71,7 +71,8 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 }
             }
 
-            ExpressionsBasedModel relaxedModel = modelMIP.copy(true);
+            ExpressionsBasedModel relaxedModel = modelMIP;
+            relaxedModel.relax(true);
 
             for (int i = 0; i < index.length; i++) { // Set up the node
                 relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);

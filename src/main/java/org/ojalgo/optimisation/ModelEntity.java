@@ -107,7 +107,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         myLowerLimit = entityToCopy.getLowerLimit();
         myUpperLimit = entityToCopy.getUpperLimit();
 
-        myAdjustmentExponent = entityToCopy.getAdjustmentExponent();
+        myAdjustmentExponent = entityToCopy.getAdjustmentExponentValue();
     }
 
     protected ModelEntity(final String name) {
@@ -493,6 +493,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     abstract int deriveAdjustmentExponent();
+
+    final int getAdjustmentExponentValue() {
+        return myAdjustmentExponent;
+    }
 
     final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;

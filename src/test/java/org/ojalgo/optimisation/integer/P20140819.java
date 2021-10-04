@@ -48,7 +48,7 @@ public class P20140819 extends OptimisationIntegerTests {
         model.relax(true);
 
         for (int v = 0; v < upper.length; v++) {
-            model.getVariable(v).integer(false).lower(lower[v]).upper(upper[v]);
+            model.getVariable(v).lower(lower[v]).upper(upper[v]);
         }
 
         Result result = model.minimise();
@@ -63,8 +63,10 @@ public class P20140819 extends OptimisationIntegerTests {
 
     private static void doTestRelaxedAtSpecificNode(final ExpressionsBasedModel model, final int[] lower, final int[] upper) {
 
+        model.relax(true);
+
         for (int v = 0; v < upper.length; v++) {
-            model.getVariable(v).integer(false).lower(lower[v]).upper(upper[v]);
+            model.getVariable(v).lower(lower[v]).upper(upper[v]);
         }
 
         if (DEBUG) {
@@ -326,6 +328,7 @@ public class P20140819 extends OptimisationIntegerTests {
         ExpressionsBasedModel model = P20140819.makeModel();
 
         // model.options.mip_defer = 0.0;
+        // model.options.debug(LinearSolver.class);
 
         P20140819.doTestToMatchExpected(model);
     }
