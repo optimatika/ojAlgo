@@ -114,27 +114,12 @@ public final class IntegerSolver extends GenericSolver {
         @Override
         protected Boolean compute() {
 
-            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getNodeModel();
-            myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
+            ExpressionsBasedModel nodeModel = IntegerSolver.this.getNodeModel();
+            int[] integerIndices = IntegerSolver.this.getIntegerIndices();
 
-            if (IntegerSolver.this.isIntegerSolutionFound()) {
+            myKey.setNodeState(nodeModel, integerIndices);
 
-                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-
-                double nudge = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
-
-                if (nodeModel.isMinimisation()) {
-                    final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
-                    nodeModel.limitObjective(null, upper);
-                } else {
-                    final BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
-                    nodeModel.limitObjective(lower, null);
-                }
-            }
-
-            final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
-
-            return retVal;
+            return IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
         }
 
         NodeKey getKey() {
@@ -663,7 +648,7 @@ public final class IntegerSolver extends GenericSolver {
             this.log("\t@ node {}", key);
         }
 
-        final Optimisation.Result currentlyTheBest = myBestResultSoFar;
+        Optimisation.Result currentlyTheBest = myBestResultSoFar;
 
         if (currentlyTheBest == null) {
 
@@ -686,6 +671,18 @@ public final class IntegerSolver extends GenericSolver {
                     this.addIntegerSignificance(i, ONE / varDiff);
                 }
             }
+        }
+
+        double bestIntegerSolutionValue = myBestResultSoFar.getValue();
+
+        double nudge = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
+
+        if (myIntegerModel.isMinimisation()) {
+            BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
+            myIntegerModel.limitObjective(null, upper);
+        } else {
+            BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
+            myIntegerModel.limitObjective(lower, null);
         }
 
         myIntegerSolutionsCount.incrementAndGet();
