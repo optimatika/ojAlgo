@@ -11,6 +11,21 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.2.0] – 2021-10-05
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Changed what alternatives (method signatures) are available to copy and/or relax optimisation models. These are API (behaviour) breaking changes, but of features primarily used within ojAlgo (when writing test cases and such). If you've used methods named `copy`, `relax`, `snapshot` or `simplify` in `ExpressionsBasedModel` then be aware. Even if your code still compiles it may not do exactly what it did before.
+- Refactoring of `ExpressionsBasedModel` primarily affecting how presolving deals with integer variables - increased the number of cases when integer rounding will actually occur.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed problem with progress/debug logging of `IntegerSolver`. The node id and count were not correct. (Only an issue with log output.)
+
 ## [49.1.0] – 2021-09-19
 
 ### Changed

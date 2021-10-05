@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-public abstract class OptimisationTest {
+public abstract class OptimisationTests {
 
     static final boolean DEBUG = false;
 }

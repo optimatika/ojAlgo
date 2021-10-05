@@ -47,7 +47,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     /**
      * Solutions in the pdf are given with 2 decimals (3 digits).
      */
-    private static final NumberContext PRECISION = NumberContext.of(2);
+    private static final NumberContext PRECISION = NumberContext.of(3, 2);
 
     private static ExpressionsBasedModel makeOriginalRootModel() {
 
@@ -82,6 +82,10 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
 
+        if (DEBUG) {
+            model.options.debug(IntegerSolver.class);
+        }
+
         Optimisation.Result result = model.minimise();
 
         TestUtils.assertStateAndSolution(expected, result, PRECISION);
@@ -93,7 +97,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = EXPECTED_MIP;
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(TWO);
         model.getVariable(0).upper(TWO);
         model.getVariable(1).lower(TWO);
@@ -113,7 +118,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-10.56, Optimisation.State.OPTIMAL, 2.17, 2.07);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
 
         Optimisation.Result result = model.minimise();
 
@@ -129,7 +135,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-10.43, Optimisation.State.OPTIMAL, 2.00, 2.14);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).upper(TWO);
 
         Optimisation.Result result = model.minimise();
@@ -146,7 +153,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Optimisation.Result expected = Result.of(-10.0, State.OPTIMAL, 3.00, 1.33);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
 
         Optimisation.Result result = model.minimise();
@@ -163,7 +171,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-10.00, Optimisation.State.OPTIMAL, 2.00, 2.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).upper(TWO);
         model.getVariable(1).upper(TWO);
 
@@ -181,7 +190,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 0.00, 3.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).upper(TWO);
         model.getVariable(1).lower(THREE);
 
@@ -199,7 +209,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-9.75, Optimisation.State.OPTIMAL, 3.38, 1.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
 
@@ -217,7 +228,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).lower(TWO);
 
@@ -234,7 +246,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 3.00, 1.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).upper(THREE);
@@ -253,7 +266,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-9.33, Optimisation.State.OPTIMAL, 4.00, 0.44);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).lower(FOUR);
@@ -272,7 +286,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 4.50, 0.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(false);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).lower(FOUR);
@@ -292,7 +307,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).lower(FOUR);
@@ -311,7 +327,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(-8.00, State.OPTIMAL, 4.00, 0.00);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).lower(FOUR);
@@ -332,7 +349,8 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
+        model.relax(false);
         model.getVariable(0).lower(THREE);
         model.getVariable(1).upper(ONE);
         model.getVariable(0).lower(FOUR);

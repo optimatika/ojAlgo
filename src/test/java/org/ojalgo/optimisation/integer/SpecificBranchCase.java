@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 public class SpecificBranchCase extends OptimisationIntegerTests implements ModelFileMPS {
@@ -70,10 +71,15 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 }
             }
 
-            ExpressionsBasedModel relaxedModel = modelMIP.copy().relax(false);
+            ExpressionsBasedModel relaxedModel = modelMIP;
+            relaxedModel.relax(true);
 
             for (int i = 0; i < index.length; i++) { // Set up the node
                 relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
+            }
+
+            if (DEBUG) {
+                relaxedModel.options.debug(LinearSolver.class);
             }
 
             Optimisation.Result result = relaxedModel.minimise();
@@ -182,8 +188,8 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
 
             TestUtils.assertTrue(tmpModel.validate());
 
-            ExpressionsBasedModel tmpLowerBranchModel = tmpModel.relax(false);
-            ExpressionsBasedModel tmpUpperBranchModel = tmpModel.relax(false);
+            ExpressionsBasedModel tmpLowerBranchModel = tmpModel.copy(true);
+            ExpressionsBasedModel tmpUpperBranchModel = tmpModel.copy(true);
 
             tmpLowerBranchModel.getVariable(106).upper(BigMath.ZERO);
             tmpUpperBranchModel.getVariable(106).lower(BigMath.ONE);

@@ -82,6 +82,9 @@ public final class Variable extends ModelEntity<Variable> {
         return this.getIndex().compareTo(obj.getIndex());
     }
 
+    /**
+     * @return A copy that can be used with other models
+     */
     public Variable copy() {
         return new Variable(this);
     }
@@ -102,7 +105,7 @@ public final class Variable extends ModelEntity<Variable> {
             }
         }
 
-        if ((retVal != null) && this.isInteger()) {
+        if (retVal != null && this.isInteger()) {
             retVal = retVal.setScale(0, BigDecimal.ROUND_CEILING);
         }
 
@@ -125,7 +128,7 @@ public final class Variable extends ModelEntity<Variable> {
             }
         }
 
-        if ((retVal != null) && this.isInteger()) {
+        if (retVal != null && this.isInteger()) {
             retVal = retVal.setScale(0, BigDecimal.ROUND_FLOOR);
         }
 
@@ -133,7 +136,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public BigDecimal getValue() {
-        if ((myValue == null) && this.isEqualityConstraint()) {
+        if (myValue == null && this.isEqualityConstraint()) {
             myValue = this.getLowerLimit();
         }
         return myValue;
@@ -162,11 +165,11 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public boolean isNegative() {
-        return !this.isLowerLimitSet() || (this.getLowerLimit().signum() < 0);
+        return !this.isLowerLimitSet() || this.getLowerLimit().signum() < 0;
     }
 
     public boolean isPositive() {
-        return !this.isUpperLimitSet() || (this.getUpperLimit().signum() > 0);
+        return !this.isUpperLimitSet() || this.getUpperLimit().signum() > 0;
     }
 
     public boolean isValueSet() {
@@ -185,7 +188,7 @@ public final class Variable extends ModelEntity<Variable> {
         BigDecimal retVal = ZERO;
 
         BigDecimal contributionWeight = this.getContributionWeight();
-        if ((contributionWeight != null) && (myValue != null)) {
+        if (contributionWeight != null && myValue != null) {
             retVal = contributionWeight.multiply(myValue);
         }
 
@@ -222,7 +225,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     private void assertFixedValue() {
-        if (this.isLowerLimitSet() && this.isUpperLimitSet() && (this.getLowerLimit().compareTo(this.getUpperLimit()) == 0)) {
+        if (this.isLowerLimitSet() && this.isUpperLimitSet() && this.getLowerLimit().compareTo(this.getUpperLimit()) == 0) {
             myValue = this.getLowerLimit();
         }
     }
@@ -244,6 +247,19 @@ public final class Variable extends ModelEntity<Variable> {
         }
     }
 
+    /**
+     * Internal copy that includes the index
+     */
+    @Override
+    protected Variable clone() {
+
+        Variable retVal = this.copy();
+
+        retVal.setIndex(myIndex);
+
+        return retVal;
+    }
+
     @Override
     protected void destroy() {
 
@@ -256,10 +272,10 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     protected void doIntegerRounding() {
         BigDecimal limit;
-        if (((limit = this.getUpperLimit()) != null) && (limit.scale() > 0)) {
+        if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
             this.upper(limit.setScale(0, RoundingMode.FLOOR));
         }
-        if (((limit = this.getLowerLimit()) != null) && (limit.scale() > 0)) {
+        if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
             this.lower(limit.setScale(0, RoundingMode.CEILING));
         }
     }
@@ -324,7 +340,7 @@ public final class Variable extends ModelEntity<Variable> {
 
     void setIndex(final IntIndex index) {
         Objects.requireNonNull(index, "The index cannot be null!");
-        if ((myIndex != null) && (myIndex.index != index.index)) {
+        if (myIndex != null && myIndex.index != index.index) {
             throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
         myIndex = index;

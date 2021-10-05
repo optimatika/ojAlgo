@@ -968,7 +968,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         Primitive64Store tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, 0.01750000000000, -0.01750000000000, 1.46389524463679,
                 5.00000000000000, 4.87681260745493, 4.45803387299108, -6.77235264210831, 0.22574508859158 });
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(2, 14), false);
+        NumberContext accuracy = NumberContext.of(2, 14);
+
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, false);
     }
 
     /**

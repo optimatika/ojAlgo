@@ -40,7 +40,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
+                final NumberContext precision) {
             if (expression.isLinearAndAllInteger()) {
                 expression.doIntegerRounding();
             }
@@ -72,7 +72,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
+                final NumberContext precision) {
 
             if (expression.isFunctionLinear()) {
 
@@ -109,7 +109,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
+                final NumberContext precision) {
 
             if (remaining.isEmpty()) {
                 expression.setRedundant();
@@ -161,9 +161,9 @@ public abstract class Presolvers {
 
                 boolean upperRedundant = false;
                 if (upper != null) {
-                    if ((min != null) && (min.compareTo(upper) > 0) && (Presolvers.findCommonLevel(upper, min) == null)) {
+                    if (min != null && min.compareTo(upper) > 0 && Presolvers.findCommonLevel(upper, min) == null) {
                         expression.setInfeasible();
-                    } else if ((max != null) && (max.compareTo(upper) <= 0)) {
+                    } else if (max != null && max.compareTo(upper) <= 0) {
                         upperRedundant = true;
                     }
                 } else {
@@ -172,9 +172,9 @@ public abstract class Presolvers {
 
                 boolean lowerRedundant = false;
                 if (lower != null) {
-                    if ((max != null) && (max.compareTo(lower) < 0) && (Presolvers.findCommonLevel(lower, max) == null)) {
+                    if (max != null && max.compareTo(lower) < 0 && Presolvers.findCommonLevel(lower, max) == null) {
                         expression.setInfeasible();
-                    } else if ((min != null) && (min.compareTo(lower) >= 0)) {
+                    } else if (min != null && min.compareTo(lower) >= 0) {
                         lowerRedundant = true;
                     }
                 } else {
@@ -210,13 +210,13 @@ public abstract class Presolvers {
                 if (variable.isObjective()) {
                     int weightSignum = variable.getContributionWeight().signum();
 
-                    if ((model.isMaximisation() && (weightSignum == -1)) || (model.isMinimisation() && (weightSignum == 1))) {
+                    if (model.isMaximisation() && weightSignum == -1 || model.isMinimisation() && weightSignum == 1) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
                         } else {
                             variable.setUnbounded(true);
                         }
-                    } else if ((model.isMaximisation() && (weightSignum == 1)) || (model.isMinimisation() && (weightSignum == -1))) {
+                    } else if (model.isMaximisation() && weightSignum == 1 || model.isMinimisation() && weightSignum == -1) {
                         if (variable.isUpperLimitSet()) {
                             variable.setFixed(variable.getUpperLimit());
                         } else {
@@ -243,17 +243,17 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision, final boolean relaxed) {
+                final NumberContext precision) {
 
             switch (remaining.size()) {
             case 0:
-                return Presolvers.doCase0(expression, remaining, lower, upper, precision, relaxed);
+                return Presolvers.doCase0(expression, remaining, lower, upper, precision);
             case 1:
-                return Presolvers.doCase1(expression, remaining, lower, upper, precision, relaxed);
+                return Presolvers.doCase1(expression, remaining, lower, upper, precision);
             case 2:
-                return Presolvers.doCase2(expression, remaining, lower, upper, precision, relaxed);
+                return Presolvers.doCase2(expression, remaining, lower, upper, precision);
             default: // 3 or more
-                return Presolvers.doCaseN(expression, remaining, lower, upper, precision, relaxed);
+                return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
         }
     };
@@ -265,21 +265,21 @@ public abstract class Presolvers {
 
     public static void checkFeasibility(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
             final NumberContext precision, final boolean relaxed) {
-        ZERO_ONE_TWO.simplify(expression, remaining, lower, upper, precision, relaxed);
+        ZERO_ONE_TWO.simplify(expression, remaining, lower, upper, precision);
     }
 
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
     static boolean doCase0(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-            final NumberContext precision, final boolean relaxed) {
+            final NumberContext precision) {
 
         expression.setRedundant();
 
-        if ((lower != null) && precision.isMoreThan(ZERO, lower)) {
+        if (lower != null && precision.isMoreThan(ZERO, lower)) {
             expression.setInfeasible();
         }
-        if ((upper != null) && precision.isLessThan(ZERO, upper)) {
+        if (upper != null && precision.isLessThan(ZERO, upper)) {
             expression.setInfeasible();
         }
 
@@ -291,7 +291,7 @@ public abstract class Presolvers {
      * that variable, and the expression marked as redundant.
      */
     static boolean doCase1(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-            final NumberContext precision, final boolean relaxed) {
+            final NumberContext precision) {
 
         expression.setRedundant();
 
@@ -307,110 +307,94 @@ public abstract class Presolvers {
 
             BigDecimal solution = BigMath.DIVIDE.invoke(upper, factor);
 
-            if (variable.validate(solution, precision, null)) {
-
-                if (variable.isFixed()) {
-
-                    if (Presolvers.findCommonLevel(solution, variable.getValue()) == null) {
-                        expression.setInfeasible();
-                    }
-
-                    return false;
-
-                } else {
-
-                    variable.setFixed(solution);
-                    return true;
-                }
-
-            } else {
+            if (!variable.validate(solution, precision, null)) {
                 expression.setInfeasible();
                 return false;
             }
+            if (!variable.isFixed()) {
 
-        } else {
-            // More general case
-
-            BigDecimal lowerCand;
-            BigDecimal upperCand;
-            if (neg) {
-                lowerCand = upper != null ? upper.divide(factor, LOWER) : null;
-                upperCand = lower != null ? lower.divide(factor, UPPER) : null;
-            } else {
-                lowerCand = lower != null ? lower.divide(factor, LOWER) : null;
-                upperCand = upper != null ? upper.divide(factor, UPPER) : null;
+                variable.setFixed(solution);
+                return true;
+            }
+            if (Presolvers.findCommonLevel(solution, variable.getValue()) == null) {
+                expression.setInfeasible();
             }
 
-            BigDecimal lowerNew;
-            if (lowerOld != null) {
-                if (lowerCand != null) {
-                    lowerNew = lowerOld.max(lowerCand);
-                } else {
-                    lowerNew = lowerOld;
-                }
-            } else {
-                if (lowerCand != null) {
-                    lowerNew = lowerCand;
-                } else {
-                    lowerNew = null;
-                }
-            }
-
-            BigDecimal upperNew;
-            if (upperOld != null) {
-                if (upperCand != null) {
-                    upperNew = upperOld.min(upperCand);
-                } else {
-                    upperNew = upperOld;
-                }
-            } else {
-                if (upperCand != null) {
-                    upperNew = upperCand;
-                } else {
-                    upperNew = null;
-                }
-            }
-
-            if ((lowerNew != null) && (upperNew != null)) {
-                BigDecimal level = Presolvers.findCommonLevel(lowerNew, upperNew);
-                if (level != null) {
-                    lowerNew = level;
-                    upperNew = level;
-                    variable.setFixed(level);
-                }
-            }
-
-            if ((lowerNew != null) && !relaxed && variable.isInteger()) {
-                lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
-            }
-            if ((upperNew != null) && !relaxed && variable.isInteger()) {
-                upperNew = upperNew.setScale(0, RoundingMode.FLOOR);
-            }
-
-            if ((lowerNew != null) && (upperNew != null)) {
-
-                if (lowerNew.compareTo(upperNew) > 0) {
-
-                    expression.setInfeasible();
-                    return false;
-
-                } else {
-
-                    BigDecimal level = Presolvers.findCommonLevel(lowerNew, upperNew);
-
-                    if (level != null) {
-
-                        variable.setFixed(level);
-                        return true;
-
-                    }
-                }
-            }
-
-            variable.lower(lowerNew).upper(upperNew);
             return false;
 
         }
+        BigDecimal lowerCand;
+        BigDecimal upperCand;
+        if (neg) {
+            lowerCand = upper != null ? upper.divide(factor, LOWER) : null;
+            upperCand = lower != null ? lower.divide(factor, UPPER) : null;
+        } else {
+            lowerCand = lower != null ? lower.divide(factor, LOWER) : null;
+            upperCand = upper != null ? upper.divide(factor, UPPER) : null;
+        }
+
+        BigDecimal lowerNew;
+        if (lowerOld != null) {
+            if (lowerCand != null) {
+                lowerNew = lowerOld.max(lowerCand);
+            } else {
+                lowerNew = lowerOld;
+            }
+        } else if (lowerCand != null) {
+            lowerNew = lowerCand;
+        } else {
+            lowerNew = null;
+        }
+
+        BigDecimal upperNew;
+        if (upperOld != null) {
+            if (upperCand != null) {
+                upperNew = upperOld.min(upperCand);
+            } else {
+                upperNew = upperOld;
+            }
+        } else if (upperCand != null) {
+            upperNew = upperCand;
+        } else {
+            upperNew = null;
+        }
+
+        if (lowerNew != null && upperNew != null) {
+            BigDecimal level = Presolvers.findCommonLevel(lowerNew, upperNew);
+            if (level != null) {
+                lowerNew = level;
+                upperNew = level;
+                variable.setFixed(level);
+            }
+        }
+
+        if (lowerNew != null && variable.isInteger()) {
+            lowerNew = lowerNew.setScale(0, RoundingMode.CEILING);
+        }
+        if (upperNew != null && variable.isInteger()) {
+            upperNew = upperNew.setScale(0, RoundingMode.FLOOR);
+        }
+
+        if (lowerNew != null && upperNew != null) {
+
+            if (lowerNew.compareTo(upperNew) > 0) {
+
+                expression.setInfeasible();
+                return false;
+
+            }
+            BigDecimal level = Presolvers.findCommonLevel(lowerNew, upperNew);
+
+            if (level != null) {
+
+                variable.setFixed(level);
+                return true;
+
+            }
+        }
+
+        variable.lower(lowerNew).upper(upperNew);
+        return false;
     }
 
     /**
@@ -418,7 +402,7 @@ public abstract class Presolvers {
      * bounds on the other variable.
      */
     static boolean doCase2(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-            final NumberContext precision, final boolean relaxed) {
+            final NumberContext precision) {
 
         Iterator<IntIndex> iterator = remaining.iterator();
 
@@ -452,12 +436,12 @@ public abstract class Presolvers {
             contrMaxB = upperOldB != null ? factorB.multiply(upperOldB) : null;
         }
 
-        if ((lower != null) && (contrMaxA != null) && (contrMaxB != null) && precision.isLessThan(lower, contrMaxA.add(contrMaxB))) {
+        if (lower != null && contrMaxA != null && contrMaxB != null && precision.isLessThan(lower, contrMaxA.add(contrMaxB))) {
             expression.setInfeasible();
             return false;
         }
 
-        if ((upper != null) && (contrMinA != null) && (contrMinB != null) && precision.isMoreThan(upper, contrMinA.add(contrMinB))) {
+        if (upper != null && contrMinA != null && contrMinB != null && precision.isMoreThan(upper, contrMinA.add(contrMinB))) {
             expression.setInfeasible();
             return false;
         }
@@ -546,7 +530,7 @@ public abstract class Presolvers {
             }
         }
 
-        if ((lowerNewA != null) && (upperNewA != null)) {
+        if (lowerNewA != null && upperNewA != null) {
             BigDecimal level = Presolvers.findCommonLevel(lowerNewA, upperNewA);
             if (level != null) {
                 lowerNewA = level;
@@ -555,7 +539,7 @@ public abstract class Presolvers {
             }
         }
 
-        if ((lowerNewB != null) && (upperNewB != null)) {
+        if (lowerNewB != null && upperNewB != null) {
             BigDecimal level = Presolvers.findCommonLevel(lowerNewB, upperNewB);
             if (level != null) {
                 lowerNewB = level;
@@ -564,7 +548,7 @@ public abstract class Presolvers {
             }
         }
 
-        if (!relaxed && variableA.isInteger()) {
+        if (variableA.isInteger()) {
             if (lowerNewA != null) {
                 lowerNewA = lowerNewA.setScale(0, RoundingMode.CEILING);
             }
@@ -573,7 +557,7 @@ public abstract class Presolvers {
             }
         }
 
-        if (!relaxed && variableB.isInteger()) {
+        if (variableB.isInteger()) {
             if (lowerNewB != null) {
                 lowerNewB = lowerNewB.setScale(0, RoundingMode.CEILING);
             }
@@ -593,11 +577,11 @@ public abstract class Presolvers {
      * fact can only be zero.
      */
     static boolean doCaseN(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-            final NumberContext precision, final boolean relaxed) {
+            final NumberContext precision) {
 
         boolean didFixVariable = false;
 
-        if ((lower != null) && expression.isNegativeOn(remaining)) {
+        if (lower != null && expression.isNegativeOn(remaining)) {
 
             int signum = lower.signum();
 
@@ -606,28 +590,25 @@ public abstract class Presolvers {
                 expression.setInfeasible();
                 return false;
 
-            } else {
+            }
+            for (IntIndex indexOfFree : remaining) {
+                Variable freeVariable = expression.resolve(indexOfFree);
 
-                for (IntIndex indexOfFree : remaining) {
-                    Variable freeVariable = expression.resolve(indexOfFree);
-
-                    if (signum == 0) {
-                        if (freeVariable.validate(ZERO, precision, null)) {
-                            freeVariable.setFixed(ZERO);
-                            didFixVariable = true;
-                        } else {
-                            expression.setInfeasible();
-                            return false;
-                        }
-                    } else if (!relaxed && freeVariable.isBinary() && (expression.get(freeVariable).compareTo(lower) < 0)) {
-                        freeVariable.setFixed(ZERO);
-                        didFixVariable = true;
+                if (signum == 0) {
+                    if (!freeVariable.validate(ZERO, precision, null)) {
+                        expression.setInfeasible();
+                        return false;
                     }
+                    freeVariable.setFixed(ZERO);
+                    didFixVariable = true;
+                } else if (freeVariable.isBinary() && expression.get(freeVariable).compareTo(lower) < 0) {
+                    freeVariable.setFixed(ZERO);
+                    didFixVariable = true;
                 }
             }
         }
 
-        if ((upper != null) && expression.isPositiveOn(remaining)) {
+        if (upper != null && expression.isPositiveOn(remaining)) {
 
             int signum = upper.signum();
 
@@ -636,23 +617,20 @@ public abstract class Presolvers {
                 expression.setInfeasible();
                 return false;
 
-            } else {
+            }
+            for (IntIndex indexOfFree : remaining) {
+                Variable freeVariable = expression.resolve(indexOfFree);
 
-                for (IntIndex indexOfFree : remaining) {
-                    Variable freeVariable = expression.resolve(indexOfFree);
-
-                    if (signum == 0) {
-                        if (freeVariable.validate(ZERO, precision, null)) {
-                            freeVariable.setFixed(ZERO);
-                            didFixVariable = true;
-                        } else {
-                            expression.setInfeasible();
-                            return false;
-                        }
-                    } else if (!relaxed && freeVariable.isBinary() && (expression.get(freeVariable).compareTo(upper) > 0)) {
-                        freeVariable.setFixed(ZERO);
-                        didFixVariable = true;
+                if (signum == 0) {
+                    if (!freeVariable.validate(ZERO, precision, null)) {
+                        expression.setInfeasible();
+                        return false;
                     }
+                    freeVariable.setFixed(ZERO);
+                    didFixVariable = true;
+                } else if (freeVariable.isBinary() && expression.get(freeVariable).compareTo(upper) > 0) {
+                    freeVariable.setFixed(ZERO);
+                    didFixVariable = true;
                 }
             }
         }
@@ -663,15 +641,13 @@ public abstract class Presolvers {
     static BigDecimal findCommonLevel(final BigDecimal a, final BigDecimal b) {
         if (a.compareTo(b) == 0) {
             return a;
-        } else {
-            BigDecimal levelledA = LEVEL.enforce(a);
-            BigDecimal levelledB = LEVEL.enforce(b);
-            if (levelledA.compareTo(levelledB) == 0) {
-                return DIVIDE.invoke(a.add(a), TWO);
-            } else {
-                return null;
-            }
         }
+        BigDecimal levelledA = LEVEL.enforce(a);
+        BigDecimal levelledB = LEVEL.enforce(b);
+        if (levelledA.compareTo(levelledB) == 0) {
+            return DIVIDE.invoke(a.add(a), TWO);
+        }
+        return null;
     }
 
 }

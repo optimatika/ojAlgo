@@ -193,7 +193,7 @@ TuneSparseOrDenseSolver.solveLinear   1000     false  thrpt    3   24587042.198 
  * @author apete
  */
 @org.openjdk.jmh.annotations.State(Scope.Benchmark)
-public class TuneSparseOrDenseSolver extends OptimisationTest {
+public class TuneSparseOrDenseSolver extends OptimisationTests {
 
     /**
      * Random number [0.0%,20.0%)

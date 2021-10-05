@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -36,10 +37,11 @@ import org.ojalgo.type.context.NumberContext;
 final class NodeKey implements Comparable<NodeKey> {
 
     /**
-     * Same scale as the default {@linkplain org.ojalgo.optimisation.Optimisation.Options#feasibility} and
-     * half its precision.
+     * Used for one thing only - to validate (log problems with) node solver results. Does not effect the
+     * algorithm.
      */
-    private static final NumberContext FEASIBILITY = new NumberContext(7, 6);
+    private static final NumberContext FEASIBILITY = NumberContext.of(8, 6);
+    private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
     private final boolean mySignChanged;
@@ -67,12 +69,12 @@ final class NodeKey implements Comparable<NodeKey> {
      */
     final long sequence;
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final long sequenceIncr,
-            final int integerIndexBranchedOn, final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged) {
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged) {
 
         super();
 
-        sequence = parentSequenceNumber + sequenceIncr;
+        sequence = SEQUENCE_GENERATOR.incrementAndGet();
 
         myLowerBounds = lowerBounds;
         myUpperBounds = upperBounds;
@@ -89,7 +91,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         super();
 
-        sequence = 0;
+        sequence = 0L;
 
         final List<Variable> integerVariables = integerModel.getIntegerVariables();
         final int numberOfIntegerVariables = integerVariables.size();
@@ -150,10 +152,7 @@ final class NodeKey implements Comparable<NodeKey> {
     }
 
     public boolean equals(final int[] lowerBounds, final int[] upperBounds) {
-        if (!Arrays.equals(myLowerBounds, lowerBounds)) {
-            return false;
-        }
-        if (!Arrays.equals(myUpperBounds, upperBounds)) {
+        if (!Arrays.equals(myLowerBounds, lowerBounds) || !Arrays.equals(myUpperBounds, upperBounds)) {
             return false;
         }
         return true;
@@ -164,10 +163,7 @@ final class NodeKey implements Comparable<NodeKey> {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof NodeKey)) {
+        if (obj == null || !(obj instanceof NodeKey)) {
             return false;
         }
         final NodeKey other = (NodeKey) obj;
@@ -178,8 +174,8 @@ final class NodeKey implements Comparable<NodeKey> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + Arrays.hashCode(myLowerBounds);
-        result = (prime * result) + Arrays.hashCode(myUpperBounds);
+        result = prime * result + Arrays.hashCode(myLowerBounds);
+        result = prime * result + Arrays.hashCode(myUpperBounds);
         return result;
     }
 
@@ -240,7 +236,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final int tmpLength = myLowerBounds.length;
         for (int i = 0; i < tmpLength; i++) {
-            retVal *= (1L + (myUpperBounds[i] - myLowerBounds[i]));
+            retVal *= 1L + (myUpperBounds[i] - myLowerBounds[i]);
         }
 
         return retVal;
@@ -257,7 +253,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         int oldVal = tmpUBs[branchIntegerIndex];
 
-        if ((tmpFloor >= tmpUBs[branchIntegerIndex]) && (tmpFloor > tmpLBs[branchIntegerIndex])) {
+        if (tmpFloor >= tmpUBs[branchIntegerIndex] && tmpFloor > tmpLBs[branchIntegerIndex]) {
             tmpUBs[branchIntegerIndex] = tmpFloor - 1;
         } else {
             tmpUBs[branchIntegerIndex] = tmpFloor;
@@ -265,9 +261,9 @@ final class NodeKey implements Comparable<NodeKey> {
 
         int newVal = tmpUBs[branchIntegerIndex];
 
-        final boolean changed = (oldVal > 0) && (newVal <= 0);
+        final boolean changed = oldVal > 0 && newVal <= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, 1L, branchIntegerIndex, value - tmpFloor, objective, changed);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective, changed);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objective) {
@@ -281,7 +277,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         int oldVal = tmpLBs[branchIntegerIndex];
 
-        if ((tmpCeil <= tmpLBs[branchIntegerIndex]) && (tmpCeil < tmpUBs[branchIntegerIndex])) {
+        if (tmpCeil <= tmpLBs[branchIntegerIndex] && tmpCeil < tmpUBs[branchIntegerIndex]) {
             tmpLBs[branchIntegerIndex] = tmpCeil + 1;
         } else {
             tmpLBs[branchIntegerIndex] = tmpCeil;
@@ -289,9 +285,9 @@ final class NodeKey implements Comparable<NodeKey> {
 
         int newVal = tmpLBs[branchIntegerIndex];
 
-        final boolean changed = (oldVal < 0) && (newVal >= 0);
+        final boolean changed = oldVal < 0 && newVal >= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, 2L, branchIntegerIndex, tmpCeil - value, objective, changed);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective, changed);
     }
 
     void enforceBounds(final ExpressionsBasedModel model, final int integerIndex, final int[] integerToGlobalTranslator) {
@@ -312,7 +308,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
     double getFraction(final int index, final double value) {
 
-        final double feasibleValue = this.feasible(index, value, true);
+        double feasibleValue = this.feasible(index, value, true);
 
         return PrimitiveMath.ABS.invoke(feasibleValue - PrimitiveMath.RINT.invoke(feasibleValue));
     }
@@ -321,9 +317,8 @@ final class NodeKey implements Comparable<NodeKey> {
         final int tmpLower = myLowerBounds[index];
         if (tmpLower != Integer.MIN_VALUE) {
             return new BigDecimal(tmpLower);
-        } else {
-            return null;
         }
+        return null;
     }
 
     int[] getLowerBounds() {
@@ -334,9 +329,8 @@ final class NodeKey implements Comparable<NodeKey> {
         final int tmpUpper = myUpperBounds[index];
         if (tmpUpper != Integer.MAX_VALUE) {
             return new BigDecimal(tmpUpper);
-        } else {
-            return null;
         }
+        return null;
     }
 
     int[] getUpperBounds() {

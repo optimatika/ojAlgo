@@ -444,6 +444,10 @@ public interface Optimisation {
 
     }
 
+    public enum Sense implements Optimisation {
+        MAX, MIN;
+    }
+
     /**
      * <p>
      * An {@linkplain Optimisation.Solver} instance implements a specific optimisation algorithm. Typically

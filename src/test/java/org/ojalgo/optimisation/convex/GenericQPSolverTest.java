@@ -116,7 +116,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         tmpActual = myAE.multiply(myXI);
         TestUtils.assertEquals(tmpExpected, tmpActual, myEvaluationContext);
 
-        if ((myAI != null) && (myBI != null)) {
+        if (myAI != null && myBI != null) {
 
             final PhysicalStore<Double> tmpSlack = myBI.copy();
             tmpSlack.modifyMatching(PrimitiveMath.SUBTRACT, myAI.multiply(myXI));
@@ -130,11 +130,11 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     @Test
     public void testSolverResults() {
 
-        final Primitive64Store[] tmpMatricesI = new Primitive64Store[] { myAE, myBE, myQ, myC, myAI, myBI };
+        Primitive64Store[] tmpMatricesI = new Primitive64Store[] { myAE, myBE, myQ, myC, myAI, myBI };
 
         ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, false);
 
-        final Primitive64Store[] tmpMatricesE = new Primitive64Store[] { myAE, myBE, myQ, myC, null, null };
+        Primitive64Store[] tmpMatricesE = new Primitive64Store[] { myAE, myBE, myQ, myC, null, null };
 
         ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, false);
     }

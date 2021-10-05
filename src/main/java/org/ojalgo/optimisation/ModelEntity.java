@@ -45,7 +45,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
-    static final NumberContext DISPLAY = NumberContext.getGeneral(6);
+    static final NumberContext DISPLAY = NumberContext.ofScale(6);
 
     static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, final int range) {
 
@@ -57,14 +57,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
             return 0;
 
-        } else {
-
-            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
-
-            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
-
-            return MissingMath.roundToInt(negatedAverage);
         }
+        double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
+
+        double negatedAverage = (expL + expS) / -PrimitiveMath.TWO;
+
+        return MissingMath.roundToInt(negatedAverage);
     }
 
     static BigDecimal toBigDecimal(final Comparable<?> number) {
@@ -109,7 +107,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         myLowerLimit = entityToCopy.getLowerLimit();
         myUpperLimit = entityToCopy.getUpperLimit();
 
-        myAdjustmentExponent = entityToCopy.getAdjustmentExponent();
+        myAdjustmentExponent = entityToCopy.getAdjustmentExponentValue();
     }
 
     protected ModelEntity(final String name) {
@@ -183,7 +181,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final boolean isConstraint() {
-        return (myLowerLimit != null) || (myUpperLimit != null);
+        return myLowerLimit != null || myUpperLimit != null;
     }
 
     public final boolean isContributionWeightSet() {
@@ -191,11 +189,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final boolean isEqualityConstraint() {
-        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) == 0);
+        return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) == 0;
     }
 
     public final boolean isLowerConstraint() {
-        return (myLowerLimit != null) && !this.isEqualityConstraint();
+        return myLowerLimit != null && !this.isEqualityConstraint();
     }
 
     public final boolean isLowerLimitSet() {
@@ -203,11 +201,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     public final boolean isObjective() {
-        return (myContributionWeight != null) && (myContributionWeight.signum() != 0);
+        return myContributionWeight != null && myContributionWeight.signum() != 0;
     }
 
     public final boolean isUpperConstraint() {
-        return (myUpperLimit != null) && !this.isEqualityConstraint();
+        return myUpperLimit != null && !this.isEqualityConstraint();
     }
 
     public final boolean isUpperLimitSet() {
@@ -343,7 +341,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     @SuppressWarnings("unchecked")
     public final ME weight(final Comparable<?> weight) {
         myContributionWeight = ModelEntity.toBigDecimal(weight);
-        if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
+        if (myContributionWeight != null && myContributionWeight.signum() == 0) {
             myContributionWeight = null;
         }
         return (ME) this;
@@ -360,7 +358,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private double toLowerValue(final boolean adjusted) {
 
         final BigDecimal limit;
-        if (adjusted && (myLowerLimit != null)) {
+        if (adjusted && myLowerLimit != null) {
             final int adjustmentExponent = this.getAdjustmentExponent();
             if (adjustmentExponent != 0) {
                 limit = myLowerLimit.movePointRight(adjustmentExponent);
@@ -373,15 +371,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         if (limit != null) {
             return limit.doubleValue();
-        } else {
-            return Double.NEGATIVE_INFINITY;
         }
+        return Double.NEGATIVE_INFINITY;
     }
 
     private double toUpperValue(final boolean adjusted) {
 
         final BigDecimal limit;
-        if (adjusted && (myUpperLimit != null)) {
+        if (adjusted && myUpperLimit != null) {
             final int adjustmentExponent = this.getAdjustmentExponent();
             if (adjustmentExponent != 0) {
                 limit = myUpperLimit.movePointRight(adjustmentExponent);
@@ -394,9 +391,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         if (limit != null) {
             return limit.doubleValue();
-        } else {
-            return Double.POSITIVE_INFINITY;
         }
+        return Double.POSITIVE_INFINITY;
     }
 
     protected void appendLeftPart(final StringBuilder builder) {
@@ -446,8 +442,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         boolean retVal = true;
 
-        if ((myLowerLimit != null) && (myUpperLimit != null)) {
-            if ((myLowerLimit.compareTo(myUpperLimit) == 1) || (myUpperLimit.compareTo(myLowerLimit) == -1)) {
+        if (myLowerLimit != null && myUpperLimit != null) {
+            if (myLowerLimit.compareTo(myUpperLimit) == 1 || myUpperLimit.compareTo(myLowerLimit) == -1) {
                 if (appender != null) {
                     appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
                 }
@@ -455,7 +451,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
             }
         }
 
-        if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
+        if (myContributionWeight != null && myContributionWeight.signum() == 0) {
             if (appender != null) {
                 appender.println(this.toString() + " The contribution weight (if it exists) should not be zero!");
             }
@@ -471,7 +467,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         BigDecimal tmpLimit = null;
 
-        if (((tmpLimit = this.getLowerLimit()) != null) && (value.subtract(tmpLimit).signum() == -1)
+        if ((tmpLimit = this.getLowerLimit()) != null && value.subtract(tmpLimit).signum() == -1
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
             if (appender != null) {
                 appender.println(value + " ! " + this.toString());
@@ -479,7 +475,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
             retVal = false;
         }
 
-        if (((tmpLimit = this.getUpperLimit()) != null) && (value.subtract(tmpLimit).signum() == 1)
+        if ((tmpLimit = this.getUpperLimit()) != null && value.subtract(tmpLimit).signum() == 1
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
             if (appender != null) {
                 appender.println(value + " ! " + this.toString());
@@ -497,6 +493,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     abstract int deriveAdjustmentExponent();
+
+    final int getAdjustmentExponentValue() {
+        return myAdjustmentExponent;
+    }
 
     final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
@@ -519,11 +519,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      *         upper.
      */
     boolean isClosedRange(final BigDecimal lower, final BigDecimal upper) {
-        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
+        return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(lower) == 0 && myUpperLimit.compareTo(upper) == 0;
     }
 
     boolean isInfeasible() {
-        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
+        return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) > 0;
     }
 
 }

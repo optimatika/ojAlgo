@@ -25,14 +25,7 @@ abstract class AbstractModel implements Optimisation.Model {
 
     public final Optimisation.Options options;
 
-    private boolean myMinimisation = true;
-
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
-    }
+    private Optimisation.Sense myOptimisationSense = Optimisation.Sense.MIN;
 
     protected AbstractModel(final Optimisation.Options someOptions) {
 
@@ -45,36 +38,42 @@ abstract class AbstractModel implements Optimisation.Model {
      * @deprected v49 Will be removed or at least made private
      */
     public final boolean isMaximisation() {
-        return !this.isMinimisation();
+        return this.getOptimisationSense() == Optimisation.Sense.MAX;
     }
 
     /**
      * @deprected v49 Will be removed or at least made private
      */
     public final boolean isMinimisation() {
-        return myMinimisation;
+        return this.getOptimisationSense() == Optimisation.Sense.MIN;
     }
 
     /**
      * @deprected v49 Will be removed or at least made private
      */
     public final void setMaximisation() {
-        this.setMaximisation(true);
+        this.setOptimisationSense(Optimisation.Sense.MAX);
     }
 
     /**
      * @deprected v49 Will be removed or at least made private
      */
     public final void setMinimisation() {
-        this.setMinimisation(true);
+        this.setOptimisationSense(Optimisation.Sense.MIN);
     }
 
-    protected final void setMaximisation(final boolean maximisation) {
-        this.setMinimisation(!maximisation);
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
+    protected final Optimisation.Sense getOptimisationSense() {
+        return myOptimisationSense;
     }
 
-    protected final void setMinimisation(final boolean minimisation) {
-        myMinimisation = minimisation;
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
+    protected final void setOptimisationSense(final Optimisation.Sense optimisationSense) {
+        myOptimisationSense = optimisationSense;
     }
 
 }

@@ -112,14 +112,14 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Tag("slow")
     public void testP20130225() {
 
-        final ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
-        final ExpressionsBasedModel tmpRelaxedModel = tmpIntegerModel.relax(false);
+        ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
+        ExpressionsBasedModel tmpRelaxedModel = tmpIntegerModel.copy(true);
 
-        final Optimisation.Result tmpRelaxedResult = tmpRelaxedModel.minimise();
+        Optimisation.Result tmpRelaxedResult = tmpRelaxedModel.minimise();
         TestUtils.assertEquals("Solution To Relaxed Problem Not Optimal!", Optimisation.State.OPTIMAL, tmpRelaxedResult.getState());
         TestUtils.assertTrue("Solution To Relaxed Problem Not Valid!", tmpRelaxedModel.validate(tmpRelaxedResult));
 
-        final Optimisation.Result tmpIntegerResult = tmpIntegerModel.minimise();
+        Optimisation.Result tmpIntegerResult = tmpIntegerModel.minimise();
         TestUtils.assertEquals("Integer Solution Not Optimal!", Optimisation.State.OPTIMAL, tmpIntegerResult.getState());
         TestUtils.assertTrue("Integer Solution Not Valid!", tmpIntegerModel.validate(tmpIntegerResult));
     }
@@ -270,7 +270,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         // Verify solution
         for (final int[] tmpCoeff : P20150127a.getCoefficients()) {
-            final int tmpValue = (tmpCoeff[0] * tmpIntX) + (tmpCoeff[1] * tmpIntY);
+            final int tmpValue = tmpCoeff[0] * tmpIntX + tmpCoeff[1] * tmpIntY;
             final BigDecimal tmpExact = tmpSolX.multiply(BigDecimal.valueOf(tmpCoeff[0])).add(tmpSolY.multiply(BigDecimal.valueOf(tmpCoeff[1])));
             if (tmpValue >= 0) {
                 TestUtils.fail(tmpCoeff[0] + "*x + " + tmpCoeff[1] + "*y = " + tmpValue + " must be negative (exact: " + tmpExact + ")");
@@ -363,6 +363,10 @@ public class IntegerProblems extends OptimisationIntegerTests {
         Expression objectiveFunction = model.addExpression("X").weight(ONE).set(varX, ONE);
 
         Result result = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
 
         TestUtils.assertNotEquals(result.getState(), Optimisation.State.INFEASIBLE);
     }
