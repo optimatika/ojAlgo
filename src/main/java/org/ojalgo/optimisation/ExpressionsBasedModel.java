@@ -1115,11 +1115,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     /**
      * Objective or any constraint has quadratic part.
-     *
-     * @deprecated v45 Use {@link #isAnyConstraintQuadratic()} and/or {@link #isAnyObjectiveQuadratic()}
-     *             instead
      */
-    @Deprecated
     public boolean isAnyExpressionQuadratic() {
 
         boolean retVal = false;

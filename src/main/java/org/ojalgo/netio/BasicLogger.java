@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.scalar.ComplexNumber;
@@ -68,6 +70,10 @@ public abstract class BasicLogger {
         public AppendablePrinter(final Appendable appendable) {
             super();
             myAppendable = appendable;
+        }
+
+        public Optional<Appendable> getAppendable() {
+            return Optional.of(myAppendable);
         }
 
         public void print(final char c) {
@@ -128,13 +134,6 @@ public abstract class BasicLogger {
             }
         }
 
-        /**
-         * @return the appendable
-         */
-        Appendable getAppendable() {
-            return myAppendable;
-        }
-
     }
 
     /**
@@ -181,6 +180,68 @@ public abstract class BasicLogger {
     }
 
     public interface Printer {
+
+        /**
+         * Will print 1 line/row with the objects in fixed width columns
+         *
+         * @param width The exact witdth of each column
+         * @param objects The column objects, {@link #toString()} and then fix the length/width
+         */
+        default void columns(final int width, final Object... objects) {
+
+            char[] chars = new char[width];
+            Arrays.fill(chars, ASCII.SP);
+            String padder = new String(chars);
+
+            String[] strings = new String[objects.length];
+
+            for (int i = 0; i < strings.length; i++) {
+                strings[i] = String.valueOf(objects[i]);
+            }
+            for (int i = 0; i < strings.length; i++) {
+                strings[i] = strings[i] + padder;
+            }
+            for (int i = 0; i < strings.length; i++) {
+                strings[i] = strings[i].substring(0, width);
+            }
+            for (int i = 0; i < strings.length; i++) {
+                this.print(strings[i]);
+            }
+            this.println();
+        }
+
+        /**
+         * Typically only 1 of these 3 will exist.
+         *
+         * @see #getAppendable()
+         * @see #getPrintStream()
+         * @see #getPrintWriter()
+         */
+        default Optional<Appendable> getAppendable() {
+            return Optional.empty();
+        }
+
+        /**
+         * Typically only 1 of these 3 will exist.
+         *
+         * @see #getAppendable()
+         * @see #getPrintStream()
+         * @see #getPrintWriter()
+         */
+        default Optional<PrintStream> getPrintStream() {
+            return Optional.empty();
+        }
+
+        /**
+         * Typically only 1 of these 3 will exist.
+         *
+         * @see #getAppendable()
+         * @see #getPrintStream()
+         * @see #getPrintWriter()
+         */
+        default Optional<PrintWriter> getPrintWriter() {
+            return Optional.empty();
+        }
 
         /**
          * @see java.io.PrintWriter#print(boolean)
@@ -379,6 +440,10 @@ public abstract class BasicLogger {
             myStream = stream;
         }
 
+        public Optional<PrintStream> getPrintStream() {
+            return Optional.of(myStream);
+        }
+
         /**
          * @see java.io.PrintStream#print(boolean)
          */
@@ -567,6 +632,10 @@ public abstract class BasicLogger {
             myWriter = writer;
         }
 
+        public Optional<PrintWriter> getPrintWriter() {
+            return Optional.of(myWriter);
+        }
+
         /**
          * @see java.io.PrintWriter#print(boolean)
          */
@@ -753,12 +822,15 @@ public abstract class BasicLogger {
     public static final BasicLogger.Printer NULL = new BasicLogger.Printer() {
 
         public void print(final char c) {
+            // no-op printer
         }
 
         public void print(final char[] ca) {
+            // no-op printer
         }
 
         public void print(final String str) {
+            // no-op printer
         }
 
         public Printer printf(final Locale locale, final String format, final Object... args) {
@@ -770,22 +842,19 @@ public abstract class BasicLogger {
         }
 
         public void println() {
+            // no-op printer
         }
 
     };
 
-    static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.getGeneral(6);
+    static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.ofScale(6);
 
     public static void debug() {
         BasicLogger.println(DEBUG);
     }
 
-    public static void mkdirs(final File dir) {
-        if (!dir.exists()) {
-            if (!dir.mkdirs() && !dir.exists()) {
-                throw new RuntimeException(new FileNotFoundException(dir.getAbsolutePath()));
-            }
-        }
+    public static void debug(final int width, final Object... arguments) {
+        BasicLogger.columns(DEBUG, width, arguments);
     }
 
     public static void debug(final Object message) {
@@ -811,6 +880,10 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR);
     }
 
+    public static void error(final int width, final Object... arguments) {
+        BasicLogger.columns(ERROR, width, arguments);
+    }
+
     public static void error(final Object message) {
         BasicLogger.println(ERROR, message);
     }
@@ -828,6 +901,14 @@ public abstract class BasicLogger {
 
     public static void error(final String message, final Object... arguments) {
         BasicLogger.println(ERROR, message, arguments);
+    }
+
+    public static void mkdirs(final File dir) {
+        if (!dir.exists()) {
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new RuntimeException(new FileNotFoundException(dir.getAbsolutePath()));
+            }
+        }
     }
 
     private static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context, final boolean plain) {
@@ -869,14 +950,18 @@ public abstract class BasicLogger {
         if (plain) {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toPlainString(context);
-            } else {
-                return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toPlainString();
             }
+            return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toPlainString();
         }
         if (number instanceof Scalar<?>) {
             return ((Scalar<?>) number).toString(context);
-        } else {
-            return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toString();
+        }
+        return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toString();
+    }
+
+    static void columns(final Printer appender, final int width, final Object... arguments) {
+        if (appender != null) {
+            appender.columns(width, arguments);
         }
     }
 

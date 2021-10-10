@@ -35,7 +35,7 @@ public class Stopwatch {
         public final CalendarDateDuration duration;
         public final T result;
 
-        TimedResult(final T result, final CalendarDateDuration duration) {
+        public TimedResult(final T result, final CalendarDateDuration duration) {
             super();
             this.result = result;
             this.duration = duration;
