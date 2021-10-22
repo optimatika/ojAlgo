@@ -50,4 +50,43 @@ public class NumberContextTest {
 
         TestUtils.assertEquals("12,345.67%", tmpNC.format(tmpBD));
     }
+
+    @Test
+    public void testPrecisionAndScaleMutations() {
+
+        NumberContext nc = NumberContext.of(12, 14);
+
+        NumberContext incrementedPrecision = nc.withIncrementedPrecision();
+        TestUtils.assertEquals(13, incrementedPrecision.getPrecision());
+        TestUtils.assertEquals(14, incrementedPrecision.getScale());
+
+        NumberContext incrementedScale = nc.withIncrementedScale();
+        TestUtils.assertEquals(12, incrementedScale.getPrecision());
+        TestUtils.assertEquals(15, incrementedScale.getScale());
+
+        NumberContext decrementedPrecision = nc.withDecrementedPrecision();
+        TestUtils.assertEquals(11, decrementedPrecision.getPrecision());
+        TestUtils.assertEquals(14, decrementedPrecision.getScale());
+
+        NumberContext decrementedScale = nc.withDecrementedScale();
+        TestUtils.assertEquals(12, decrementedScale.getPrecision());
+        TestUtils.assertEquals(13, decrementedScale.getScale());
+
+        NumberContext doubledPrecision = nc.withDoubledPrecision();
+        TestUtils.assertEquals(24, doubledPrecision.getPrecision());
+        TestUtils.assertEquals(14, doubledPrecision.getScale());
+
+        NumberContext doubledScale = nc.withDoubledScale();
+        TestUtils.assertEquals(12, doubledScale.getPrecision());
+        TestUtils.assertEquals(28, doubledScale.getScale());
+
+        NumberContext halvedPrecision = nc.withHalvedPrecision();
+        TestUtils.assertEquals(6, halvedPrecision.getPrecision());
+        TestUtils.assertEquals(14, halvedPrecision.getScale());
+
+        NumberContext halvedScale = nc.withHalvedScale();
+        TestUtils.assertEquals(12, halvedScale.getPrecision());
+        TestUtils.assertEquals(7, halvedScale.getScale());
+    }
+
 }

@@ -452,8 +452,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             SparseStore.multiply(this, (SparseStore<N>) right, retVal);
 
             return retVal;
-
         }
+
         PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
 
         this.multiply(right, retVal);
