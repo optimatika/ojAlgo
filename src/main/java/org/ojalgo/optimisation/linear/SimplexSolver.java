@@ -53,6 +53,7 @@ public abstract class SimplexSolver extends LinearSolver {
     private static final NumberContext PHASE1 = ACCURACY.withScale(7);
     private static final NumberContext PIVOT = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
+    private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
 
     private LongToNumberMap<Double> myFixedVariables = null;
     private final IterationPoint myPoint;
@@ -300,14 +301,18 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotCol() {
 
-        int[] tmpExcluded = myTableau.getExcluded();
+        int rowObjective = this.getRowObjective();
+        int[] excluded = myTableau.getExcluded();
+
+        boolean phase1 = myPoint.isPhase1();
+        boolean phase2 = myPoint.isPhase2();
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(this.getRowObjective());
-                double[] exclVals = new double[tmpExcluded.length];
+                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(rowObjective);
+                double[] exclVals = new double[excluded.length];
                 for (int i = 0; i < exclVals.length; i++) {
-                    exclVals[i] = sliceTableauRow.doubleValue(tmpExcluded[i]);
+                    exclVals[i] = sliceTableauRow.doubleValue(excluded[i]);
                 }
                 this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}", Arrays.toString(exclVals));
             } else {
@@ -317,17 +322,16 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int retVal = -1;
 
-        double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -GenericSolver.ACCURACY.epsilon() : ZERO;
-
         int tmpCol;
+        double tmpVal;
+        double minVal = phase2 ? -GenericSolver.ACCURACY.epsilon() : ZERO;
 
-        for (int e = 0; e < tmpExcluded.length; e++) {
-            tmpCol = tmpExcluded[e];
-            tmpVal = myTableau.doubleValue(this.getRowObjective(), tmpCol);
-            if (tmpVal < tmpMinVal) {
+        for (int e = 0; e < excluded.length; e++) {
+            tmpCol = excluded[e];
+            tmpVal = myTableau.doubleValue(rowObjective, tmpCol);
+            if (tmpVal < minVal && (retVal < 0 || WEIGHT.isDifferent(minVal, tmpVal))) {
                 retVal = tmpCol;
-                tmpMinVal = tmpVal;
+                minVal = tmpVal;
                 if (this.isLogDebug()) {
                     this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
                 }
@@ -389,9 +393,10 @@ public abstract class SimplexSolver extends LinearSolver {
                     retVal = i;
                     minRatio = ratio;
                     curDenom = denom;
+                    // curDenom = degenerate ? MACHINE_LARGEST : denom;
 
                     if (this.isLogDebug()) {
-                        this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, ratio, numer, denom);
+                        this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {},\tArtificial: {}.", i, ratio, numer, denom, artificial);
                     }
                 }
             }
