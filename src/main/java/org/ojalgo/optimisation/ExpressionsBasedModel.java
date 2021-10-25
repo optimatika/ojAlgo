@@ -1158,12 +1158,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return retVal;
     }
 
-    public void limitObjective(final BigDecimal lower, final BigDecimal upper) {
+    public Expression limitObjective(final BigDecimal lower, final BigDecimal upper) {
 
         Expression constrExpr = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
 
         if (constrExpr == null) {
-            final Expression objExpr = this.objective();
+            Expression objExpr = this.objective();
             if (!objExpr.isAnyQuadraticFactorNonZero()) {
                 constrExpr = objExpr.copy(this, false);
                 myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, constrExpr);
@@ -1178,6 +1178,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 constrExpr.doIntegerRounding();
             }
         }
+
+        return constrExpr != null ? constrExpr : this.objective();
     }
 
     public Optimisation.Result maximise() {
