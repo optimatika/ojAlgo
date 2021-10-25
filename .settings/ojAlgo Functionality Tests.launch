@@ -11,6 +11,9 @@
         <listEntry value="org.eclipse.eclemma.ui.launchGroup.coverage"/>
         <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
     </listAttribute>
+    <listAttribute key="org.eclipse.eclemma.core.SCOPE_IDS">
+        <listEntry value="=ojAlgo/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/"/>
+    </listAttribute>
     <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=ojAlgo"/>
     <stringAttribute key="org.eclipse.jdt.junit.EXCLUDE_TAGS" value="slow,unstable"/>
     <booleanAttribute key="org.eclipse.jdt.junit.HAS_EXCLUDE_TAGS" value="true"/>
