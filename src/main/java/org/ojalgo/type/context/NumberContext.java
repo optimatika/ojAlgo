@@ -79,9 +79,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public static int compare(final double arg1, final double arg2) {
         if (arg1 == arg2) {
             return 0;
-        } else {
-            return Double.compare(arg1, arg2);
         }
+        return Double.compare(arg1, arg2);
     }
 
     /**
@@ -90,9 +89,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public static int compare(final float arg1, final float arg2) {
         if (arg1 == arg2) {
             return 0;
-        } else {
-            return Float.compare(arg1, arg2);
         }
+        return Float.compare(arg1, arg2);
     }
 
     public static NumberContext getCurrency(final Locale locale) {
@@ -234,7 +232,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return (PrimitiveMath.ABS.invoke(value) <= tolerance);
+        return PrimitiveMath.ABS.invoke(value) <= tolerance;
     }
 
     private final double myEpsilon;
@@ -342,11 +340,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public Comparable<?> enforce(final Comparable<?> object) {
         if (object instanceof BigDecimal) {
             return this.enforce((BigDecimal) object);
-        } else if (object instanceof Enforceable<?>) {
-            return (Comparable<?>) ((Enforceable<?>) object).enforce(this);
-        } else {
-            return this.enforce(NumberDefinition.doubleValue(object));
         }
+        if (object instanceof Enforceable<?>) {
+            return (Comparable<?>) ((Enforceable<?>) object).enforce(this);
+        }
+        return this.enforce(NumberDefinition.doubleValue(object));
     }
 
     /**
@@ -373,10 +371,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof NumberContext)) {
+        if (!super.equals(obj) || !(obj instanceof NumberContext)) {
             return false;
         }
         final NumberContext other = (NumberContext) obj;
@@ -399,9 +394,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         }
         if (this.isConfigured()) {
             return this.format().format(number);
-        } else {
-            return this.format(Double.valueOf(number));
         }
+        return this.format(Double.valueOf(number));
     }
 
     public String format(final long number) {
@@ -440,34 +434,32 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myMathContext == null) ? 0 : myMathContext.hashCode());
-        result = (prime * result) + myScale;
+        result = prime * result + (myMathContext == null ? 0 : myMathContext.hashCode());
+        result = prime * result + myScale;
         return result;
     }
 
     public boolean isDifferent(final double expected, final double actual) {
         if (expected == actual) {
             return false;
-        } else {
-            return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
         }
+        return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
     }
 
     public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {
-        return (value.compareTo(reference) == -1) && this.isDifferent(reference.doubleValue(), value.doubleValue());
+        return value.compareTo(reference) < 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
     }
 
     public boolean isMoreThan(final BigDecimal reference, final BigDecimal value) {
-        return (value.compareTo(reference) == 1) && this.isDifferent(reference.doubleValue(), value.doubleValue());
+        return value.compareTo(reference) > 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
         double norm = PrimitiveMath.ABS.invoke(comparedTo);
         if (NumberContext.isZero(norm, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
-        } else {
-            return NumberContext.isZero(value / norm, myEpsilon);
         }
+        return NumberContext.isZero(value / norm, myEpsilon);
     }
 
     public boolean isZero(final double value) {
@@ -523,9 +515,57 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return this.getClass().getSimpleName() + " " + myMathContext.getPrecision() + ":" + myScale + " " + myMathContext.getRoundingMode().toString();
     }
 
+    public NumberContext withDecrementedPrecision() {
+        return this.withDecrementedPrecision(1);
+    }
+
+    public NumberContext withDecrementedPrecision(final int subtrahend) {
+        return this.withPrecision(myMathContext.getPrecision() - subtrahend);
+    }
+
+    public NumberContext withDecrementedScale() {
+        return this.withDecrementedScale(1);
+    }
+
+    public NumberContext withDecrementedScale(final int subtrahend) {
+        return this.withScale(myScale - subtrahend);
+    }
+
+    public NumberContext withDoubledPrecision() {
+        return this.withPrecision(myMathContext.getPrecision() * 2);
+    }
+
+    public NumberContext withDoubledScale() {
+        return this.withScale(myScale * 2);
+    }
+
     public NumberContext withFormat(final NumberStyle style, final Locale locale) {
         NumberFormat format = style.getFormat(locale);
         return new NumberContext(format, myMathContext, myScale);
+    }
+
+    public NumberContext withHalvedPrecision() {
+        return this.withPrecision(myMathContext.getPrecision() / 2);
+    }
+
+    public NumberContext withHalvedScale() {
+        return this.withScale(myScale / 2);
+    }
+
+    public NumberContext withIncrementedPrecision() {
+        return this.withIncrementedPrecision(1);
+    }
+
+    public NumberContext withIncrementedPrecision(final int addend) {
+        return this.withPrecision(myMathContext.getPrecision() + addend);
+    }
+
+    public NumberContext withIncrementedScale() {
+        return this.withIncrementedScale(1);
+    }
+
+    public NumberContext withIncrementedScale(final int addend) {
+        return this.withScale(myScale + addend);
     }
 
     public NumberContext withMath(final MathContext math) {

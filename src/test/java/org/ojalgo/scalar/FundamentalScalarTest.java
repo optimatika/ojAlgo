@@ -36,7 +36,7 @@ public class FundamentalScalarTest extends ScalarTests {
 
     private static final Uniform UNIFORM = new Uniform(0, 4);
 
-    static NumberContext CONTEXT = NumberContext.getMath(16);
+    static NumberContext CONTEXT = NumberContext.of(12, 14);
 
     BigScalar big1;
     BigScalar big2;
@@ -219,9 +219,8 @@ public class FundamentalScalarTest extends ScalarTests {
 
         if (tmpbase > tmpExp) {
             return PrimitiveMath.POW.invoke(tmpbase, tmpExp);
-        } else {
-            return -PrimitiveMath.POW.invoke(tmpbase, tmpExp);
         }
+        return -PrimitiveMath.POW.invoke(tmpbase, tmpExp);
     }
 
 }

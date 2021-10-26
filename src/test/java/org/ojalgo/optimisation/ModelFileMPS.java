@@ -47,7 +47,7 @@ public interface ModelFileMPS {
     static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
             final NumberContext precision) {
 
-        //        model.options.debug(Optimisation.Solver.class);
+        //        model.options.debug(LinearSolver.class);
         //        model.options.mip_defer = 0.0;
 
         TestUtils.assertTrue(model.validate());
@@ -56,7 +56,7 @@ public interface ModelFileMPS {
 
             Result result = model.minimise();
 
-            TestUtils.assertStateNotLessThanFeasible(result);
+            TestUtils.assertStateNotLessThanOptimal(result);
 
             TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision, BasicLogger.DEBUG));
 
@@ -67,9 +67,9 @@ public interface ModelFileMPS {
 
             Result result = model.maximise();
 
-            TestUtils.assertStateNotLessThanFeasible(result);
+            TestUtils.assertStateNotLessThanOptimal(result);
 
-            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMaxVal, result.getValue(), precision);
         }
@@ -124,7 +124,7 @@ public interface ModelFileMPS {
 
             // model.options.debug(IntegerSolver.class);
             // model.options.progress(IntegerSolver.class);
-            // model.options.progress(LinearSolver.class);
+            // model.options.debug(LinearSolver.class);
             // model.options.validate = false;
 
             TestUtils.assertTrue(model.validate());

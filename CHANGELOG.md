@@ -11,6 +11,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [49.2.1] – 2021-10-26
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The LinearSolver (simplex) pivot selection cade has been refined.
+
 ## [49.2.0] – 2021-10-05
 
 ### Changed

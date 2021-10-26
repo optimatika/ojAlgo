@@ -442,6 +442,10 @@ public interface Optimisation {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
+        public Result withState(final State state) {
+            return new Result(state, myValue, mySolution);
+        }
+
     }
 
     public enum Sense implements Optimisation {

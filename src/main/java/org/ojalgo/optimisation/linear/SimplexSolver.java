@@ -49,11 +49,11 @@ public abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    /**
-     * 2020-09-26: Changed from 8 to 7
-     */
+    private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
     private static final NumberContext PHASE1 = ACCURACY.withScale(7);
+    private static final NumberContext PIVOT = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
+    private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
 
     private LongToNumberMap<Double> myFixedVariables = null;
     private final IterationPoint myPoint;
@@ -301,14 +301,18 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotCol() {
 
-        int[] tmpExcluded = myTableau.getExcluded();
+        int rowObjective = this.getRowObjective();
+        int[] excluded = myTableau.getExcluded();
+
+        boolean phase1 = myPoint.isPhase1();
+        boolean phase2 = myPoint.isPhase2();
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(this.getRowObjective());
-                double[] exclVals = new double[tmpExcluded.length];
+                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(rowObjective);
+                double[] exclVals = new double[excluded.length];
                 for (int i = 0; i < exclVals.length; i++) {
-                    exclVals[i] = sliceTableauRow.doubleValue(tmpExcluded[i]);
+                    exclVals[i] = sliceTableauRow.doubleValue(excluded[i]);
                 }
                 this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}", Arrays.toString(exclVals));
             } else {
@@ -318,19 +322,16 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int retVal = -1;
 
-        double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -GenericSolver.ACCURACY.epsilon() : ZERO;
-        //double tmpMinVal = ZERO;
-
         int tmpCol;
+        double tmpVal;
+        double minVal = phase2 ? -GenericSolver.ACCURACY.epsilon() : ZERO;
 
-        for (int e = 0; e < tmpExcluded.length; e++) {
-            tmpCol = tmpExcluded[e];
-            // tmpVal = myTransposedTableau.doubleValue(tmpCol, myPoint.getRowObjective());
-            tmpVal = myTableau.doubleValue(this.getRowObjective(), tmpCol);
-            if (tmpVal < tmpMinVal) {
+        for (int e = 0; e < excluded.length; e++) {
+            tmpCol = excluded[e];
+            tmpVal = myTableau.doubleValue(rowObjective, tmpCol);
+            if (tmpVal < minVal && (retVal < 0 || WEIGHT.isDifferent(minVal, tmpVal))) {
                 retVal = tmpCol;
-                tmpMinVal = tmpVal;
+                minVal = tmpVal;
                 if (this.isLogDebug()) {
                     this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
                 }
@@ -342,60 +343,61 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        int tmpNumerCol = myTableau.countConstraints() + myTableau.countVariables();
-        int tmpDenomCol = myPoint.col;
+        int numerCol = myTableau.countConstraints() + myTableau.countVariables();
+        int denomCol = myPoint.col;
+
+        boolean phase1 = myPoint.isPhase1();
+        boolean phase2 = myPoint.isPhase2();
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                Access1D<Double> tmpNumerators = myTableau.sliceTableauColumn(tmpNumerCol);
-                Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
-                Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
-                tmpRatios.modifyMatching(DIVIDE, tmpDenominators);
-                this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators, tmpDenominators,
-                        tmpRatios);
+                Access1D<Double> numerators = myTableau.sliceTableauColumn(numerCol);
+                Access1D<Double> denominators = myTableau.sliceTableauColumn(denomCol);
+                Array1D<Double> ratios = Array1D.PRIMITIVE64.copy(numerators);
+                ratios.modifyMatching(DIVIDE, denominators);
+                this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", numerators, denominators,
+                        ratios);
             } else {
                 this.log("\nfindNextPivotRow");
             }
         }
 
         int retVal = -1;
-        double numer = NaN, denom = NaN, ratio = NaN, minRatio = MACHINE_LARGEST;
+        double numer = NaN, denom = NaN, ratio = NaN, minRatio = MACHINE_LARGEST, curDenom = MACHINE_SMALLEST;
 
-        int tmpConstraintsCount = myTableau.countConstraints();
+        int constraintsCount = myTableau.countConstraints();
+        for (int i = 0; i < constraintsCount; i++) {
 
-        boolean tmpPhase2 = myPoint.isPhase2();
+            // Numerator/RHS: Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
+            numer = ABS.invoke(myTableau.doubleValue(i, numerCol));
 
-        for (int i = 0; i < tmpConstraintsCount; i++) {
+            // Denominator/Pivot
+            denom = myTableau.doubleValue(i, denomCol);
 
-            // Phase 2 with artificials still in the basis
-            boolean specialCase = tmpPhase2 && myTableau.getBasisColumnIndex(i) < 0;
+            // Phase 2, artificial variable still in basis & RHS ≈ 0.0
+            int basisColumnIndex = myTableau.getBasisColumnIndex(i);
+            boolean artificial = basisColumnIndex < 0;
+            boolean degenerate = artificial && DEGENERATE.isZero(numer);
+            boolean specialCase = phase2 && degenerate;
 
-            denom = myTableau.doubleValue(i, tmpDenomCol);
-
-            // Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
-            numer = ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
-
-            if (RATIO.isSmall(numer, denom)) {
-
-                ratio = MACHINE_LARGEST;
-
-            } else if (specialCase) {
-                if (RATIO.isSmall(denom, numer)) {
-                    ratio = MACHINE_EPSILON;
-                } else {
-                    ratio = MACHINE_LARGEST;
-                }
+            if (specialCase) {
+                ratio = ZERO;
             } else {
                 ratio = numer / denom;
             }
 
-            if ((specialCase || denom > ZERO) && ratio >= ZERO && ratio < minRatio) {
+            if ((denom > ZERO || specialCase) && !PIVOT.isZero(denom)) {
 
-                retVal = i;
-                minRatio = ratio;
+                if (ratio >= ZERO && ratio < minRatio || !RATIO.isDifferent(minRatio, ratio) && denom > curDenom) {
 
-                if (this.isLogDebug()) {
-                    this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, ratio, numer, denom);
+                    retVal = i;
+                    minRatio = ratio;
+                    curDenom = denom;
+                    // curDenom = degenerate ? MACHINE_LARGEST : denom;
+
+                    if (this.isLogDebug()) {
+                        this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {},\tArtificial: {}.", i, ratio, numer, denom, artificial);
+                    }
                 }
             }
         }

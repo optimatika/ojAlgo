@@ -85,13 +85,50 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
     }
 
     /**
-     * An example taken from Maros, which defines a problem of 3 rows and 4 columns. There's also a model
-     * named maros at netlib, but that's a different much larger model. ERROR: Något tar lång tid, och sedan
-     * blir det ArithmaticError. 2010-04-19 lp_solve => 128.33333333
+     * An example taken from Istvan Maros, Computational Techniques of the Simplex Method, Kluwer, 2003, page
+     * 93. It defines a problem of 3 rows and 4 columns. There's also a model named maros at netlib, but
+     * that's a different much larger model.
+     *
+     * @see #testMPSmarosCorrected()
      */
     @Test
     public void testMPSmaros() {
         BurkardtDatasetsMps.doTest("maros.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
+    }
+
+    /**
+     * Discovered that the problem described in the comment (inside the MPS file) does not match the MPS
+     * declaration, and the comment version makes more sense than the declaration. (The book has the same
+     * mistake.)
+     *
+     * <pre>
+     * RANGES
+     *     RANGE1    BALANCE           10.0
+     * </pre>
+     *
+     * should instead be
+     *
+     * <pre>
+     * RANGES
+     *     RANGE1    RES2              10.0
+     * </pre>
+     *
+     * Further the MPS file does not contain an OBJSENSE section, but the comment/description states that it's
+     * a maximisation problem. Funny thing is that when minimising the correct and incorrect models give the
+     * same solution, but when maximising they differ, and the minimisation solution is much more "even"
+     * (numbers better suited for a calculation example).
+     * <p>
+     * Results using CPLEX:
+     * <p>
+     * MIN: OPTIMAL 128.33333333333331 @ { 3.33333333333333, 13.33333333333333, 2E+1, 0 }
+     * <p>
+     * MAX: OPTIMAL 177.24137931034483 @ { 29.31034482758621, 12.06896551724138, -1E+1, 13.79310344827586 }
+     *
+     * @see #testMPSmaros()
+     */
+    @Test
+    public void testMPSmarosCorrected() {
+        BurkardtDatasetsMps.doTest("maros_corrected.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "177.24137931034483");
     }
 
     /**
