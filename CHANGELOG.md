@@ -78,8 +78,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Continued operations on a transposed `ElementsSupplier` in some cases reversed the transposition.
 
-#### 
-
 ## [49.0.1] – 2021-08-11
 
 ### Fixed
