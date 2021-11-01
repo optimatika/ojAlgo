@@ -640,6 +640,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient boolean myInfeasible = false;
+    private BigDecimal myObjectiveConstant = BigMath.ZERO;
     private final Set<IntIndex> myReferences;
     private boolean myRelaxed;
     /**
@@ -691,6 +692,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         super(modelToCopy.options);
 
         this.setOptimisationSense(modelToCopy.getOptimisationSense());
+        this.addObjectiveConstant(modelToCopy.getObjectiveConstant());
 
         for (Variable tmpVar : modelToCopy.getVariables()) {
             myVariables.add(tmpVar.clone());
@@ -1206,7 +1208,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     public Expression objective() {
 
-        final Expression retVal = new Expression(OBJECTIVE, this);
+        Expression retVal = new Expression(OBJECTIVE, this);
 
         Variable tmpVariable;
         for (int i = 0; i < myVariables.size(); i++) {
@@ -1221,15 +1223,17 @@ public final class ExpressionsBasedModel extends AbstractModel {
         BigDecimal tmpDiff = null;
         BigDecimal tmpNewVal = null;
 
-        for (final Expression tmpExpression : myExpressions.values()) {
+        retVal.setConstant(this.getObjectiveConstant());
+
+        for (Expression tmpExpression : myExpressions.values()) {
 
             if (tmpExpression.isObjective()) {
 
-                final BigDecimal tmpContributionWeight = tmpExpression.getContributionWeight();
-                final boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by 1.0
+                BigDecimal tmpContributionWeight = tmpExpression.getContributionWeight();
+                boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by 1.0
 
                 if (tmpExpression.isAnyLinearFactorNonZero()) {
-                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
+                    for (IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
@@ -1238,7 +1242,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 }
 
                 if (tmpExpression.isAnyQuadraticFactorNonZero()) {
-                    for (final IntRowColumn tmpKey : tmpExpression.getQuadraticKeySet()) {
+                    for (IntRowColumn tmpKey : tmpExpression.getQuadraticKeySet()) {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
@@ -1371,19 +1375,19 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         ProgrammingError.throwIfNull(solution, context, appender);
 
-        final int size = myVariables.size();
+        int size = myVariables.size();
 
         boolean retVal = size == solution.count();
 
         for (int i = 0; retVal && i < size; i++) {
-            final Variable tmpVariable = myVariables.get(i);
-            final BigDecimal value = solution.get(i);
+            Variable tmpVariable = myVariables.get(i);
+            BigDecimal value = solution.get(i);
             retVal &= tmpVariable.validate(value, context, appender, myRelaxed);
         }
 
         if (retVal) {
-            for (final Expression tmpExpression : myExpressions.values()) {
-                final BigDecimal value = tmpExpression.evaluate(solution);
+            for (Expression tmpExpression : myExpressions.values()) {
+                BigDecimal value = tmpExpression.evaluate(solution);
                 retVal &= tmpExpression.validate(value, context, appender);
             }
         }
@@ -1433,6 +1437,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             if (tmpExpr.isObjective()) {
                 Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
             }
+
             if (tmpExpr.isConstraint()) {
                 Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
                 if (anyVarInt) {
@@ -1446,6 +1451,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
             if (anyVarInt && tmpVar.isConstraint()) {
                 Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
             }
+        }
+    }
+
+    void addObjectiveConstant(final BigDecimal addition) {
+        if (addition != null && addition.signum() != 0) {
+            myObjectiveConstant = myObjectiveConstant.add(addition);
         }
     }
 
@@ -1510,6 +1521,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
 
         return retVal;
+    }
+
+    BigDecimal getObjectiveConstant() {
+        return myObjectiveConstant;
     }
 
     Set<IntIndex> getReferences() {

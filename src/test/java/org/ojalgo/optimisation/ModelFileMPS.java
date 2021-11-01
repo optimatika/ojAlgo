@@ -31,6 +31,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -124,7 +125,7 @@ public interface ModelFileMPS {
 
             // model.options.debug(IntegerSolver.class);
             // model.options.progress(IntegerSolver.class);
-            // model.options.debug(LinearSolver.class);
+            model.options.debug(ConvexSolver.class);
             // model.options.validate = false;
 
             TestUtils.assertTrue(model.validate());

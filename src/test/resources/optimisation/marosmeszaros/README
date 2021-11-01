@@ -1,0 +1,56 @@
+This directory contains the Maros and Meszaros (http://www.doc.ic.ac.uk/~im/)
+set of convex quadratic programming test problems.
+
+The problems are all in QPS format, which is itself a subset of SIF.
+The problems have been classified according to the CUTE classification
+system (see, Bongartz, Conn, Gould and Toint, ACM Transactions on
+Mathematical Software 21, 1995, pp.  123-160), and have been slightly
+reformatted for consistency.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-= Extracts from the original readme from http://www.doc.ic.ac.uk/~im/ =-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The QP problems are assumed to be in the following form:
+
+min f(x) = c_0 + c^T x + 1/2 x^T Q x,  Q symmetric and positive
+                                       semidefinite
+subject to      A x = b,
+                l <= x <= u.
+
+For further details see I. Maros, Cs. Meszaros: A Repository of Convex
+Quadratic Programming Problems, Optimization Methods and Software, 1999.
+
+The set of convex quadratic problems can also be found in the following
+three compressed (zipped) files: QPDATA1, QPDATA2 and QPDATA3 in the
+"Selection of Data files" section of http://www.doc.ic.ac.uk/~im/ .
+They were originally organized in the following way.  QPDATA1 contains
+76 problems from the CUTE library. 46 problems provided by the Brunel
+optimization group are in QPDATA2, while the other 16 problems from
+miscellaneous sources are located in QPDATA3.  Data in some problem
+files contain exponents.  The exponent indicator is always `e'.  All the
+files had the .qps extension.
+
+There is another web site holding the same set of problems in a slightly
+different structure:  ftp://ftp.sztaki.hu/pub/oplab/QPDATA is an
+anonymous ftp site with three subdirectories corresponding to the above
+three zip files.  Here, the subdirectories contain individual zip files
+of the problems.
+
+The zipped files can be unzipped by using either "pkunzip", or the
+freely available "unzip" program.  The latter can be downloaded from
+Info-ZIP: http://www.cdrom.com/pub/infozip/UnZp.html.
+
+Important note:  The .qps files are DOS type text files.  Therefore,
+under UNIX it is advisable to use "unzip -aa ..." command to get the
+correct UNIX text format of end-of-line.
+
+Both web sites of QPDATA problems are maintained and new problem
+instances may be added.  We keep the library open to further
+contributions.  Anybody with such an intent should contact
+one of the following people by Email:
+
+Istvan Maros:  i.maros@ic.ac.uk
+
+Csaba Meszaros: meszaros@sztaki.hu
+
