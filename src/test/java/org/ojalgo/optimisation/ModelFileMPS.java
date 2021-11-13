@@ -31,7 +31,6 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -47,9 +46,6 @@ public interface ModelFileMPS {
 
     static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
             final NumberContext precision) {
-
-        //        model.options.debug(LinearSolver.class);
-        //        model.options.mip_defer = 0.0;
 
         TestUtils.assertTrue(model.validate());
 
@@ -95,6 +91,13 @@ public interface ModelFileMPS {
 
         ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
 
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.mip_defer = 0.0;
+
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
@@ -122,11 +125,6 @@ public interface ModelFileMPS {
 
             model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
             model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
-
-            // model.options.debug(IntegerSolver.class);
-            // model.options.progress(IntegerSolver.class);
-            model.options.debug(ConvexSolver.class);
-            // model.options.validate = false;
 
             TestUtils.assertTrue(model.validate());
 

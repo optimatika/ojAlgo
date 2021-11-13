@@ -21,22 +21,27 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.junit.jupiter.api.Disabled;
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
+import org.ojalgo.array.BigArray;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.optimisation.Expression;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * A collection of datasets found here: ftp://ftp.numerical.rl.ac.uk/pub/cutest//marosmeszaros/marmes.html
  * <p>
- * When specifying min/max null means unbounded in that direction and "1234567890" represents an unknown or
- * unverified value. And if the min and max values are set to the same value then one of them (max) is not
- * verified.
- *
- * <pre>
- * 2021-11-??: qwerty
- * </pre>
+ * Tests with more than 1000 variables and/or constraints are tagged "slow" (can't be solved with community
+ * version of CPLEX)
+ * <p>
+ * Tests that are otherwise difficult for ojAlgo are tagged "unstable"
  *
  * @author apete
  */
@@ -63,9 +68,48 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      */
     @Test
     @Tag("slow")
-    @Disabled
-    public void testAUG2D() {
+    void testAUG2D() {
         CuteMarosMeszarosCase.doTest("AUG2D.SIF", "1.6874118e+06");
+    }
+
+    @Test
+    @Tag("slow")
+    public void testAUG2DC() {
+        CuteMarosMeszarosCase.doTest("AUG2DC.SIF", "1.8183681e+06");
+    }
+
+    @Test
+    @Tag("slow")
+    public void testAUG2DCQP() {
+        CuteMarosMeszarosCase.doTest("AUG2DCQP.SIF", "6.4981348e+06");
+    }
+
+    @Test
+    @Tag("slow")
+    public void testAUG2DQP() {
+        CuteMarosMeszarosCase.doTest("AUG2DQP.SIF", "6.2370121e+06");
+    }
+
+    @Test
+    void testAUG3D() {
+        CuteMarosMeszarosCase.doTest("AUG3D.SIF", "5.5406773e+02");
+    }
+
+    @Test
+    public void testAUG3DC() {
+        CuteMarosMeszarosCase.doTest("AUG3DC.SIF", "7.7126244e+02");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testAUG3DCQP() {
+        CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF", "9.9336215e+02");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testAUG3DQP() {
+        CuteMarosMeszarosCase.doTest("AUG3DQP.SIF", "6.7523767e+02");
     }
 
     @Test
@@ -74,9 +118,8 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * <ul>
-     * <li>CPLEX Barrier - Optimal: Objective = 1.1702830307e-05
-     * </ul>
+     * The given objective function value is 5.7310705e-07 but CPLEX gets 1.1702830307e-05 (and ojAlgo
+     * 1.9521E-23). The CPLEX solution is:
      *
      * <pre>
     C------1                      0.995735
@@ -85,15 +128,50 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     C------4                      2.989736
     C------5                     -3.982628
      * </pre>
+     *
+     * Guessing that { 1.0, 2.0, -1.0, 3.0, -4.0 } is the exact optimal solution. That gives the objective
+     * value 0.0.
      */
     @Test
     public void testHS268() {
-        CuteMarosMeszarosCase.doTest("HS268.SIF", "5.7310705e-07");
+
+        CuteMarosMeszarosCase.doTest("HS268.SIF", "5.7310705e-07", ACCURACY.withScale(5));
+
+        ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
+
+        Result proposed = new Result(Optimisation.State.OPTIMAL, BigArray.wrap(BigMath.ONE, BigMath.TWO, BigMath.NEG, BigMath.THREE, BigMath.FOUR.negate()));
+        Result cplex = Result.of(Double.NaN, Optimisation.State.OPTIMAL, 0.995735, 1.995283, -0.999028, 2.989736, -3.982628);
+
+        Expression obj = model.objective();
+
+        // Assert that the proposed solution results in a better objective function value.
+        BigDecimal propVal = obj.evaluate(proposed);
+        BigDecimal cplexVal = obj.evaluate(cplex);
+
+        TestUtils.assertLessThan(5.7310705e-07, propVal.doubleValue()); // Given
+        TestUtils.assertLessThan(1.1702830307e-05, propVal.doubleValue()); // CPLEX
+        TestUtils.assertTrue(propVal.compareTo(cplexVal) < 0); // From CPLEX solution
+
+        TestUtils.assertEquals(1.1702830307e-05, cplexVal.doubleValue(), ACCURACY.withPrecision(4));
+
+        // Assert proposed solution valid with very high precision, and that it gives objective function value 0.0
+        NumberContext VERY_HIGH_PRECISION = NumberContext.of(24);
+        TestUtils.assertTrue(model.validate(cplex, VERY_HIGH_PRECISION));
+        TestUtils.assertEquals(BigMath.ZERO, propVal, VERY_HIGH_PRECISION);
+    }
+
+    static ExpressionsBasedModel makeModel(final String name) {
+        return ModelFileMPS.makeModel("marosmeszaros", name, false);
     }
 
     @Test
-    public void testS268() {
-        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07");
+    public void testHS35() {
+        CuteMarosMeszarosCase.doTest("HS35.SIF", "1.1111111e-01");
+    }
+
+    @Test
+    public void testHS35MOD() {
+        CuteMarosMeszarosCase.doTest("HS35MOD.SIF", "2.5000000e-01");
     }
 
     @Test
@@ -112,23 +190,18 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
-    public void testHS35() {
-        CuteMarosMeszarosCase.doTest("HS35.SIF", "1.1111111e-01");
-    }
-
-    @Test
     public void testHS76() {
         CuteMarosMeszarosCase.doTest("HS76.SIF", "-4.6818182e+00");
     }
 
     @Test
-    public void testHS35MOD() {
-        CuteMarosMeszarosCase.doTest("HS35MOD.SIF", "2.5000000e-01");
+    public void testQPTEST() {
+        CuteMarosMeszarosCase.doTest("QPTEST.SIF", "4.3718750e+00");
     }
 
     @Test
-    public void testQPTEST() {
-        CuteMarosMeszarosCase.doTest("QPTEST.SIF", "4.3718750e+00");
+    public void testS268() {
+        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07");
     }
 
     @Test
