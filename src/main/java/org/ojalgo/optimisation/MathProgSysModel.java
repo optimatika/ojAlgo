@@ -370,7 +370,6 @@ public final class MathProgSysModel {
     private static final String SPACE = " ";
 
     /**
-     * @param file
      * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
      */
     @Deprecated
@@ -383,7 +382,6 @@ public final class MathProgSysModel {
     }
 
     /**
-     * @param file
      * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
      */
     @Deprecated

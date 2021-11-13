@@ -131,6 +131,12 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      *
      * Guessing that { 1.0, 2.0, -1.0, 3.0, -4.0 } is the exact optimal solution. That gives the objective
      * value 0.0.
+     * <p>
+     * Find it somewhat surprising that:
+     * <ol>
+     * <li>The given value is so inexact. It's a small model. You can validate it with pen and paper.
+     * <li>CPLEX returns a very inexact solution resulting in a value worse than the given.
+     * </ol>
      */
     @Test
     public void testHS268() {
