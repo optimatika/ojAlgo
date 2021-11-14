@@ -207,7 +207,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     @Test
     public void testS268() {
-        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07");
+        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07", ACCURACY.withScale(5));
     }
 
     @Test
