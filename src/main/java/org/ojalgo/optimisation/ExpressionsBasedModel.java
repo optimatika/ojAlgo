@@ -606,6 +606,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         PRESOLVERS.clear();
     }
 
+    /**
+     * Currently only supports the MPS file format, but with some of the various extensions. In particular it
+     * is possible to parse QP models using QUADOBJ or QMATRIX file sections.
+     */
     public static ExpressionsBasedModel parse(final File file) {
 
         String lowerCasePath = file.getPath().toLowerCase();
