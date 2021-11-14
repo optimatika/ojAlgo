@@ -60,6 +60,10 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         ModelFileMPS.makeAndAssert("marosmeszaros", name, expMinValString, null, false, accuracy != null ? accuracy : ACCURACY, null);
     }
 
+    static ExpressionsBasedModel makeModel(final String name) {
+        return ModelFileMPS.makeModel("marosmeszaros", name, false);
+    }
+
     /**
      * <ul>
      * <li>2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
@@ -68,7 +72,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      */
     @Test
     @Tag("slow")
-    void testAUG2D() {
+    public void testAUG2D() {
         CuteMarosMeszarosCase.doTest("AUG2D.SIF", "1.6874118e+06");
     }
 
@@ -91,7 +95,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
-    void testAUG3D() {
+    public void testAUG3D() {
         CuteMarosMeszarosCase.doTest("AUG3D.SIF", "5.5406773e+02");
     }
 
@@ -113,6 +117,31 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
+    public void testDUALC1() {
+        CuteMarosMeszarosCase.doTest("DUALC1.SIF", "6.1552508e+03");
+    }
+
+    @Test
+    public void testDUALC2() {
+        CuteMarosMeszarosCase.doTest("DUALC2.SIF", "3.5513077e+03");
+    }
+
+    @Test
+    public void testDUALC5() {
+        CuteMarosMeszarosCase.doTest("DUALC5.SIF", "4.2723233e+02");
+    }
+
+    @Test
+    public void testDUALC8() {
+        CuteMarosMeszarosCase.doTest("DUALC8.SIF", "1.8309359e+04");
+    }
+
+    @Test
+    public void testGENHS28() {
+        CuteMarosMeszarosCase.doTest("GENHS28", "9.2717369e-01");
+    }
+
+    @Test
     public void testHS21() {
         CuteMarosMeszarosCase.doTest("HS21.SIF", "-9.9960000e+01");
     }
@@ -129,8 +158,8 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     C------5                     -3.982628
      * </pre>
      *
-     * Guessing that { 1.0, 2.0, -1.0, 3.0, -4.0 } is the exact optimal solution. That gives the objective
-     * value 0.0.
+     * Guessing that { 1.0, 2.0, -1.0, 3.0, -4.0 } is the exact/actual optimal solution. That gives the
+     * objective value 0.0 (exactly).
      * <p>
      * Find it somewhat surprising that:
      * <ol>
@@ -164,10 +193,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         NumberContext VERY_HIGH_PRECISION = NumberContext.of(24);
         TestUtils.assertTrue(model.validate(cplex, VERY_HIGH_PRECISION));
         TestUtils.assertEquals(BigMath.ZERO, propVal, VERY_HIGH_PRECISION);
-    }
-
-    static ExpressionsBasedModel makeModel(final String name) {
-        return ModelFileMPS.makeModel("marosmeszaros", name, false);
     }
 
     @Test
