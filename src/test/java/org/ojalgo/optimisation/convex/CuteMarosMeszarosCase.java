@@ -138,7 +138,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     @Test
     public void testGENHS28() {
-        CuteMarosMeszarosCase.doTest("GENHS28", "9.2717369e-01");
+        CuteMarosMeszarosCase.doTest("GENHS28.SIF", "9.2717369e-01");
     }
 
     @Test
