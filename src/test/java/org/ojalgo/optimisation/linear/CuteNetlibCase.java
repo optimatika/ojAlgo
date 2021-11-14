@@ -371,13 +371,20 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     }
 
     /**
+     * Optimal value is stated to be -1.8751929066E+01 but there is a "RHS" of -7.113 given for the objective
+     * row which should shift the solution by that amount to instead be -1.1638929066e+01. Using CPLEX to
+     * parse the MPS file and then solve the problem confirms this.
+     *
      * <pre>
-     * 2019-02-13: Objective obtained/verified by CPLEX
+     * 2021-10-01:
+     * Dual simplex - Optimal:  Objective = -1.1638929066e+01
+     * Solution time =    0.01 sec.  Iterations = 256 (58)
+     * Deterministic time = 4.70 ticks  (710.92 ticks/sec)
      * </pre>
      */
     @Test
     public void testE226() {
-        CuteNetlibCase.doTest("E226.SIF", "-18.751929066370547", "104.53796068931459", NumberContext.of(7, 4));
+        CuteNetlibCase.doTest("E226.SIF", "-11.638929066370546", "111.65096068931459", NumberContext.of(7, 4));
     }
 
     /**

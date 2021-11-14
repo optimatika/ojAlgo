@@ -70,10 +70,9 @@ public final class MathProgSysModel {
      * @author apete
      */
     enum BoundType {
-
-        BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
-
+        BV, FR, FX, LI, LO, MI, PL, SC, UI, UP;
     }
+
     final class Column {
 
         private boolean mySemicontinuous = false;
@@ -210,21 +209,16 @@ public final class MathProgSysModel {
      * @author apete
      */
     enum ColumnMarker {
-
-        INTEND(), INTORG();
-
+        INTEND, INTORG;
     }
 
     enum FileSection {
-
-        BOUNDS(), COLUMNS(), ENDATA(), NAME(), OBJNAME(), OBJSENSE(), RANGES(), RHS(), ROWS(), SOS();
-
+        BOUNDS, COLUMNS, ENDATA, NAME, OBJNAME, OBJSENSE, QMATRIX, QUADOBJ, RANGES, RHS, ROWS, SOS;
     }
 
     final class Row {
 
         private final Expression myExpression;
-
         private final RowType myType;
 
         Row(final String name, final RowType rowType) {
@@ -239,10 +233,9 @@ public final class MathProgSysModel {
                 myExpression.weight(ONE);
             } else {
                 myExpression.weight(null);
+                // 0.0 is the default RHS value
+                this.rhs(ZERO);
             }
-
-            // 0.0 is the default RHS value
-            this.rhs(ZERO);
         }
 
         public Row range(final BigDecimal value) {
@@ -251,7 +244,7 @@ public final class MathProgSysModel {
 
             case E:
 
-                final int tmpSignum = value.signum();
+                int tmpSignum = value.signum();
                 if (tmpSignum == 1) {
                     myExpression.upper(myExpression.getLowerLimit().add(value));
                 } else if (tmpSignum == -1) {
@@ -269,13 +262,6 @@ public final class MathProgSysModel {
             case G:
 
                 myExpression.upper(myExpression.getLowerLimit().add(value.abs()));
-
-                break;
-
-            case N:
-
-                myExpression.level(null);
-                myExpression.weight(ONE);
 
                 break;
 
@@ -311,8 +297,7 @@ public final class MathProgSysModel {
 
             case N:
 
-                myExpression.level(null);
-                myExpression.weight(ONE);
+                myExpression.addObjectiveConstant(value.negate());
 
                 break;
 
@@ -367,9 +352,7 @@ public final class MathProgSysModel {
      * @author apete
      */
     enum RowType {
-
-        E(), G(), L(), N();
-
+        E, G, L, N;
     }
 
     private static final String COMMENT = "*";
@@ -387,7 +370,6 @@ public final class MathProgSysModel {
     private static final String SPACE = " ";
 
     /**
-     * @param file
      * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
      */
     @Deprecated
@@ -399,9 +381,13 @@ public final class MathProgSysModel {
         }
     }
 
+    /**
+     * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
+     */
+    @Deprecated
     public static MathProgSysModel parse(final InputStream input) {
 
-        final MathProgSysModel retVal = new MathProgSysModel();
+        MathProgSysModel retVal = new MathProgSysModel();
 
         String line;
         FileSection section = null;
@@ -415,7 +401,7 @@ public final class MathProgSysModel {
 
                 // BasicLogger.debug("Line: {}", line);
 
-                if ((line.length() == 0) || line.startsWith(COMMENT) || line.startsWith(COMMENT_REF)) {
+                if (line.length() == 0 || line.startsWith(COMMENT) || line.startsWith(COMMENT_REF)) {
                     // Skip this line
                 } else if (line.startsWith(SPACE)) {
                     retVal.parseSectionLine(section, line);
@@ -439,7 +425,7 @@ public final class MathProgSysModel {
     private String myIdRHS = null;
     private boolean myIntegerMarker = false;
     private String myName;
-
+    private Expression myQuadObjExpr = null;
     private final Map<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
@@ -460,13 +446,10 @@ public final class MathProgSysModel {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (obj == null || !(obj instanceof MathProgSysModel)) {
             return false;
         }
-        if (!(obj instanceof MathProgSysModel)) {
-            return false;
-        }
-        final MathProgSysModel other = (MathProgSysModel) obj;
+        MathProgSysModel other = (MathProgSysModel) obj;
         if (myDelegate == null) {
             if (other.myDelegate != null) {
                 return false;
@@ -490,9 +473,9 @@ public final class MathProgSysModel {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
+        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
         return result;
     }
 
@@ -525,9 +508,8 @@ public final class MathProgSysModel {
     public Optimisation.Result solve() {
         if (myDelegate.isMinimisation()) {
             return myDelegate.minimise();
-        } else {
-            return myDelegate.maximise();
         }
+        return myDelegate.maximise();
     }
 
     @Override
@@ -570,13 +552,13 @@ public final class MathProgSysModel {
                 word = false;
                 limit = i;
             }
-            if (word && ((i + 1) == line.length())) {
+            if (word && i + 1 == line.length()) {
                 word = false;
                 limit = i + 1;
             }
             if (limit > first) {
                 String key = line.substring(first, limit);
-                if (((field % 2) == 0) && !verifier.containsKey(key)) {
+                if (field % 2 == 0 && !verifier.containsKey(key)) {
                     word = true;
                 } else {
                     myFields[field++] = key;
@@ -591,7 +573,7 @@ public final class MathProgSysModel {
 
     FileSection identifySection(final String line) {
 
-        final int tmpSplit = line.indexOf(SPACE);
+        int tmpSplit = line.indexOf(SPACE);
         String tmpSection;
         String tmpArgument;
         if (tmpSplit != -1) {
@@ -604,7 +586,7 @@ public final class MathProgSysModel {
 
         // BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
 
-        final FileSection retVal = FileSection.valueOf(tmpSection);
+        FileSection retVal = FileSection.valueOf(tmpSection);
 
         switch (retVal) {
 
@@ -651,7 +633,7 @@ public final class MathProgSysModel {
             myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
             myFields[1] = line.substring(FIELD_FIRSTS[1]).trim();
 
-            final Row newRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
+            Row newRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
             myRows.put(myFields[1], newRow);
 
             break;
@@ -670,7 +652,7 @@ public final class MathProgSysModel {
 
                 this.extractFields(line, myRows);
 
-                final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], Column::new);
+                Column tmpColumn = myColumns.computeIfAbsent(myFields[1], Column::new);
 
                 tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
                 if (myFields[4] != null) {
@@ -731,6 +713,37 @@ public final class MathProgSysModel {
             }
 
             myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
+
+            break;
+
+        case QUADOBJ:
+
+            this.extractFields(line, myColumns);
+
+            if (myQuadObjExpr == null) {
+                myQuadObjExpr = myDelegate.addExpression(section.name()).weight(HALF);
+            }
+
+            Variable var1 = myColumns.get(myFields[1]).getVariable();
+            Variable var2 = myColumns.get(myFields[2]).getVariable();
+            BigDecimal param = new BigDecimal(myFields[3]);
+
+            myQuadObjExpr.set(var1, var2, param);
+            if (!var1.equals(var2)) {
+                myQuadObjExpr.set(var2, var1, param);
+            }
+
+            break;
+
+        case QMATRIX:
+
+            this.extractFields(line, myColumns);
+
+            if (myQuadObjExpr == null) {
+                myQuadObjExpr = myDelegate.addExpression(section.name()).weight(HALF);
+            }
+
+            myQuadObjExpr.set(myColumns.get(myFields[1]).getVariable(), myColumns.get(myFields[2]).getVariable(), new BigDecimal(myFields[3]));
 
             break;
 

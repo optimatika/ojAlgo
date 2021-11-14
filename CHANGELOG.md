@@ -11,13 +11,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- Possibility to read the QPS file format (QP related extensions to the MPS file format). More precisely added the ability to parse QUADOBJ and QMATRIX sections in "MPS" files.
+- A bunch of convex test cases from https://www.cuter.rl.ac.uk/Problems/marmes.shtml
+
 ## [49.2.1] – 2021-10-26
 
 ### Changed
 
 #### org.ojalgo.optimisation
 
-- The LinearSolver (simplex) pivot selection cade has been refined.
+- The LinearSolver (simplex) pivot selection code has been refined.
 
 ## [49.2.0] – 2021-10-05
 

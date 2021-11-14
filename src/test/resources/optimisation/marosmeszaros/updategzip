@@ -1,0 +1,4 @@
+echo "adding $1.SIF to compressed mastsif"
+
+cp $1.SIF ../compressed_marosmeszaros/
+gzip -f -9 ../compressed_marosmeszaros/$1.SIF
