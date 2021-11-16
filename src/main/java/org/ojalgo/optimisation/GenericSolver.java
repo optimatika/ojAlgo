@@ -112,6 +112,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getBE();
         }
 
+        /**
+         * Will replace each equality constraint with two inequality constraints
+         */
+        public void splitEqualities() {
+
+            if (this.hasEqualityConstraints()) {
+
+                myData.addInequalities(myData.getAE(), myData.getBE());
+                myData.addInequalities(myData.getAE().negate(), myData.getBE().negate());
+
+                myData.clearEqualities();
+            }
+        }
+
         public MatrixStore<Double> getC() {
             return myData.getObjective().getLinearFactors();
         }

@@ -66,8 +66,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     /**
      * <ul>
-     * <li>2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
-     * <li>2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * <li>
      * </ul>
      */
     @Test
@@ -226,8 +225,84 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
+    public void testKSIP() {
+        CuteMarosMeszarosCase.doTest("KSIP.SIF", "5.7579794e-01");
+    }
+
+    /**
+     * <p>
+     * There are redundant constraints
+     * <p>
+     * The fixed variables (from presolve) completely zeros the Q-matrix – no longer suitable for ConvexSolver
+     */
+    @Test
+    @Tag("unstable")
+    public void testQBORE3D() {
+        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", "3.1002008e+03");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQFORPLAN() {
+        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", "7.4566315e+09");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQGROW22() {
+        CuteMarosMeszarosCase.doTest("QGROW22.SIF", "-1.4962895e+08");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQPCBOEI1() {
+        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", "1.1503914e+07", ACCURACY.withScale(10));
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQPCSTAIR() {
+        CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF", "6.2043875e+06");
+    }
+
+    @Test
     public void testQPTEST() {
         CuteMarosMeszarosCase.doTest("QPTEST.SIF", "4.3718750e+00");
+    }
+
+    /**
+     * <p>
+     * Too many constraints are initially activated, making the KKT system unsolvable, and somehow cutting off
+     * the optimal value
+     * <p>
+     * Several iterations with very small step lengths
+     */
+    @Test
+    @Tag("unstable")
+    public void testQRECIPE() {
+        CuteMarosMeszarosCase.doTest("QRECIPE.SIF", "-2.6661600e+02", ACCURACY.withScale(7));
+    }
+
+    /**
+     * <p>
+     * There are redundant constraints
+     */
+    @Test
+    @Tag("unstable")
+    public void testQSCORPIO() {
+        CuteMarosMeszarosCase.doTest("QSCORPIO.SIF", "1.8805096e+03");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQSHARE1B() {
+        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", "7.2007832e+05");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQSTAIR() {
+        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", "7.9854528e+06");
     }
 
     @Test

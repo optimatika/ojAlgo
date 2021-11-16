@@ -61,6 +61,14 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         DenseArray.Factory<N> array();
 
+        /**
+         * @deprecated v50 No need to call this.
+         */
+        @Deprecated
+        default PhysicalStore.Factory<N, I> builder() {
+            return this;
+        }
+
         I conjugate(Access2D<?> source);
 
         FunctionSet<N> function();
@@ -147,12 +155,12 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new WrapperStore<>(this, access);
         }
 
-        default MatrixStore<N> makeZero(final Structure2D shape) {
-            return this.makeZero(shape.countRows(), shape.countColumns());
-        }
-
         default MatrixStore<N> makeZero(final long rowsCount, final long columnsCount) {
             return new ZeroStore<>(this, rowsCount, columnsCount);
+        }
+
+        default MatrixStore<N> makeZero(final Structure2D shape) {
+            return this.makeZero(shape.countRows(), shape.countColumns());
         }
 
         Scalar.Factory<N> scalar();
