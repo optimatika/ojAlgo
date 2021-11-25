@@ -72,7 +72,7 @@ public interface StructureAnyD extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof IntReference)) {
+            if (obj == null || !(obj instanceof IntReference)) {
                 return false;
             }
             final IntReference other = (IntReference) obj;
@@ -98,8 +98,6 @@ public interface StructureAnyD extends Structure1D {
     }
 
     interface Logical<S extends StructureAnyD, B extends Logical<S, B>> extends StructureAnyD {
-
-        S get();
 
     }
 
@@ -141,7 +139,7 @@ public interface StructureAnyD extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof LongReference)) {
+            if (obj == null || !(obj instanceof LongReference)) {
                 return false;
             }
             final LongReference other = (LongReference) obj;

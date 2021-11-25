@@ -83,14 +83,11 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || (this.getClass() != obj.getClass())) {
+            if (obj == null || this.getClass() != obj.getClass()) {
                 return false;
             }
             final IntRowColumn other = (IntRowColumn) obj;
-            if (column != other.column) {
-                return false;
-            }
-            if (row != other.row) {
+            if (column != other.column || row != other.row) {
                 return false;
             }
             return true;
@@ -135,7 +132,6 @@ public interface Structure2D extends Structure1D {
 
     }
 
-    @SuppressWarnings("unchecked")
     interface Logical<S extends Structure2D, B extends Logical<S, B>> extends Structure2D {
 
         B above(long numberOfRows);
@@ -144,15 +140,11 @@ public interface Structure2D extends Structure1D {
 
         B above(S above);
 
-        B above(S above1, S above2);
-
         B below(long numberOfRows);
 
         B below(S... below);
 
         B below(S below);
-
-        B below(S below1, S below2);
 
         B bidiagonal(boolean upper);
 
@@ -196,8 +188,6 @@ public interface Structure2D extends Structure1D {
 
         B diagonally(S... diagonally);
 
-        S get();
-
         /**
          * Similar to {@link #symmetric(boolean)} but in addition the mirrored elements are conjugated.
          */
@@ -210,8 +200,6 @@ public interface Structure2D extends Structure1D {
         B left(S... left);
 
         B left(S left);
-
-        B left(S left1, S left2);
 
         /**
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
@@ -235,8 +223,6 @@ public interface Structure2D extends Structure1D {
         B right(S... right);
 
         B right(S right);
-
-        B right(S right1, S right2);
 
         /**
          * @see #rows(int[])
@@ -340,14 +326,11 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof LongRowColumn)) {
+            if (obj == null || !(obj instanceof LongRowColumn)) {
                 return false;
             }
             final LongRowColumn other = (LongRowColumn) obj;
-            if (column != other.column) {
-                return false;
-            }
-            if (row != other.row) {
+            if (column != other.column || row != other.row) {
                 return false;
             }
             return true;
@@ -447,7 +430,7 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof RowColumnKey)) {
+            if (obj == null || !(obj instanceof RowColumnKey)) {
                 return false;
             }
             final RowColumnKey other = (RowColumnKey) obj;

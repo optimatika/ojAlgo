@@ -13,10 +13,37 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.matrix
+
+- New class `Pipeline2D` to replace `BasicMatrix.LogicalBuilder` / `MatrixFactory.Logical`
+
 #### org.ojalgo.optimisation
 
 - Possibility to read the QPS file format (QP related extensions to the MPS file format). More precisely added the ability to parse QUADOBJ and QMATRIX sections in "MPS" files.
 - A bunch of convex test cases from https://www.cuter.rl.ac.uk/Problems/marmes.shtml
+
+#### org.ojalgo.structure
+
+- Added a `nonzeros()` method to `Access2D` that returns a `ElementView2D<N, ?>`.
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
+
+### Deprecated
+
+#### org.ojalgo.matrix
+
+- The `LogicalBuilder` class as well as the `logical()` method in `MatrixStore` are deprecated.
+- `BasicMatrix.LogicalBuilder` / `MatrixFactory.Logical` are deprecated.
+
+### Removed
+
+#### org.ojalgo.structure
+
+- The `Structure*D.Logical` interfaces had their `get` methods removed. Most implementors still have a `get` method. This is just to make it more flexible regarding what type is returned.
 
 ## [49.2.1] – 2021-10-26
 

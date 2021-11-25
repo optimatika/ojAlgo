@@ -67,6 +67,13 @@ import org.ojalgo.type.context.NumberContext;
 public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
+    /**
+     * LogicalBuilder
+     *
+     * @author apete
+     * @deprecated v50 Use {@link Pipeline2D} instead
+     */
+    @Deprecated
     public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>>, Supplier<M> {
 
@@ -119,11 +126,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private transient MatrixDecomposition<N> myDecomposition = null;
+    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient int myHashCode = 0;
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
     private final MatrixStore<N> myStore;
-    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient Boolean mySymmetric = null;
 
     BasicMatrix(final MatrixStore<N> store) {
@@ -259,9 +266,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     public boolean equals(final Object other) {
         if (other instanceof Access2D<?>) {
             return Access2D.equals(myStore, (Access2D<?>) other, EQUALS);
-        } else {
-            return super.equals(other);
         }
+        return super.equals(other);
     }
 
     /**
@@ -306,7 +312,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         N tmpDeterminant = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Determinant)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Determinant
                 && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
 
             tmpDeterminant = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
@@ -406,7 +412,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         MatrixStore<N> tmpInverse = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Solver
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
             tmpInverse = ((MatrixDecomposition.Solver<N>) myDecomposition).getInverse();
@@ -480,6 +486,10 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return mySymmetric.booleanValue();
     }
 
+    /**
+     * @deprecated v50 Use {@link #pipeline()} instead
+     */
+    @Deprecated
     public abstract BasicMatrix.LogicalBuilder<N, M> logical();
 
     public M multiply(final double scalarMultiplicand) {
@@ -533,6 +543,10 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return myStore.norm();
     }
 
+    public final Pipeline2D<N, M> pipeline() {
+        return new Pipeline2D<>(this.getFactory(), myStore);
+    }
+
     public M power(final int power) {
         return this.getFactory().instantiate(myStore.power(power));
     }
@@ -569,7 +583,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         MatrixStore<N> tmpSolution = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Solver
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
             tmpSolution = ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(this.cast(rhs));
@@ -690,7 +704,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     private MatrixDecomposition.RankRevealing<N> getRankRevealing(final MatrixStore<N> store) {
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.RankRevealing)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.RankRevealing
                 && ((MatrixDecomposition.RankRevealing<?>) myDecomposition).isComputed()) {
 
         } else {
@@ -710,11 +724,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private boolean isComputedEigenvalue() {
-        return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
+        return myDecomposition != null && myDecomposition instanceof Eigenvalue && myDecomposition.isComputed();
     }
 
     private boolean isComputedSingularValue() {
-        return (myDecomposition != null) && (myDecomposition instanceof SingularValue) && myDecomposition.isComputed();
+        return myDecomposition != null && myDecomposition instanceof SingularValue && myDecomposition.isComputed();
     }
 
     abstract ElementsSupplier<N> cast(Access1D<?> matrix);
@@ -727,19 +741,17 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     LDU<N> getDecompositionLDU(final Structure2D typical) {
 
-        if ((myDecomposition != null) && (myDecomposition instanceof LDU)) {
+        if (myDecomposition != null && myDecomposition instanceof LDU) {
             return (LDU<N>) myDecomposition;
         }
 
-        if ((myHermitian != null) && myHermitian.booleanValue()) {
-            if ((mySPD != null) && mySPD.booleanValue()) {
-                return (LDU<N>) (myDecomposition = this.getDecompositionCholesky(typical));
-            } else {
-                return (LDU<N>) (myDecomposition = this.getDecompositionLDL(typical));
-            }
-        } else {
+        if (myHermitian == null || !myHermitian.booleanValue()) {
             return (LDU<N>) (myDecomposition = this.getDecompositionLDU(typical));
         }
+        if (mySPD != null && mySPD.booleanValue()) {
+            return (LDU<N>) (myDecomposition = this.getDecompositionCholesky(typical));
+        }
+        return (LDU<N>) (myDecomposition = this.getDecompositionLDL(typical));
     }
 
     abstract LU<N> getDecompositionLU(Structure2D typical);

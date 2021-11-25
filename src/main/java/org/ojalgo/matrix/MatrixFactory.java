@@ -55,6 +55,13 @@ import org.ojalgo.tensor.TensorFactory2D;
 public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, LB extends BasicMatrix.LogicalBuilder<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>, SR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>>
         implements Factory2D.Dense<M>, Factory2D.MayBeSparse<M, DR, SR> {
 
+    /**
+     * Logical
+     *
+     * @author apete
+     * @deprecated v50 Use {@link Pipeline2D} instead
+     */
+    @Deprecated
     abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
         private MatrixStore.LogicalBuilder<N> myDelegate;
@@ -83,11 +90,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return this.self();
         }
 
-        public LB above(final M above1, final M above2) {
-            myDelegate = myDelegate.above(this.cast(above1, above2));
-            return this.self();
-        }
-
         public LB below(final long numberOfRows) {
             myDelegate = myDelegate.below(numberOfRows);
             return this.self();
@@ -100,11 +102,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         public LB below(final M matrix) {
             myDelegate = myDelegate.below(this.cast(matrix));
-            return this.self();
-        }
-
-        public LB below(final M below1, final M below2) {
-            myDelegate = myDelegate.below(this.cast(below1, below2));
             return this.self();
         }
 
@@ -170,11 +167,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             return this.self();
         }
 
-        public LB left(final M left1, final M left2) {
-            myDelegate = myDelegate.left(this.cast(left1, left2));
-            return this.self();
-        }
-
         public LB limits(final long rowLimit, final long columnLimit) {
             myDelegate = myDelegate.limits(rowLimit, columnLimit);
             return this.self();
@@ -202,11 +194,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         public LB right(final M matrix) {
             myDelegate = myDelegate.right(this.cast(matrix));
-            return this.self();
-        }
-
-        public LB right(final M right1, final M right2) {
-            myDelegate = myDelegate.right(this.cast(right1, right2));
             return this.self();
         }
 
@@ -915,5 +902,9 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     abstract DR physical(final PhysicalStore<N> delegate);
 
     abstract SR physical(final SparseStore<N> delegate);
+
+    final PhysicalStore.Factory<N, ?> getPhysicalFactory() {
+        return myPhysicalFactory;
+    }
 
 }

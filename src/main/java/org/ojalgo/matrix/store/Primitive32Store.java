@@ -806,10 +806,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return tmpStep2.get(0L);
     }
 
-    public ElementView1D<Double, ?> nonzeros() {
-        return myUtility.nonzeros();
-    }
-
     public PhysicalStore.Factory<Double, ?> physical() {
         return FACTORY;
     }
