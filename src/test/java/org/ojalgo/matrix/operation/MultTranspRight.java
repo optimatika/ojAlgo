@@ -139,7 +139,7 @@ public class MultTranspRight {
         left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
         rightD = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
         rightT = rightD.transpose();
-        product = Primitive64Store.FACTORY.makeZero(complexity, complexity);
+        product = Primitive64Store.FACTORY.make(complexity, complexity);
 
         MR = MultiplyRight.newPrimitive64(complexity, complexity);
     }

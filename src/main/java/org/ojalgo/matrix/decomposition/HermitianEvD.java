@@ -118,7 +118,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
             epsilon = MACHINE_EPSILON * magnitude;
 
             m = l;
-            while ((m < limit) && (PrimitiveMath.ABS.invoke(e[m]) > epsilon)) {
+            while (m < limit && PrimitiveMath.ABS.invoke(e[m]) > epsilon) {
                 m++;
             }
 
@@ -160,9 +160,9 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
                         cos1 = p / r;
                         sin1 = e_i / r;
 
-                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * e_i) + (sin1 * d_i)));
+                        d[i + 1] = cos2 * p + sin1 * (cos1 * cos2 * e_i + sin1 * d_i);
 
-                        p = (cos1 * d_i) - (sin1 * cos2 * e_i);
+                        p = cos1 * d_i - sin1 * cos2 * e_i;
 
                         // Accumulate transformation - rotate the eigenvector matrix
                         mtrxV.rotateRight(i, i + 1, cos1, sin1);
@@ -200,10 +200,9 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         if (matrix.isHermitian()) {
             return this.decompose(matrix);
-        } else {
-            ProgrammingError.throwForUnsupportedOptionalOperation();
-            return false;
         }
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     public final N getDeterminant() {
@@ -306,18 +305,16 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
         this.decompose(this.wrap(original));
         if (this.isSolvable()) {
             return this.getInverse();
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
         this.decompose(this.wrap(original));
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public final boolean isHermitian() {
@@ -358,9 +355,8 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -369,9 +365,8 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     @Override
@@ -386,7 +381,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         myTridiagonal.decompose(matrix);
 
-        if ((d == null) || (d.length != size)) {
+        if (d == null || d.length != size) {
             d = new double[size];
             e = new double[size];
         }
@@ -418,7 +413,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         final int length = d.length;
 
-        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(length);
+        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(length);
 
         for (int ij = 0; ij < length; ij++) {
             retVal.set(ij, ComplexNumber.valueOf(d[ij]));

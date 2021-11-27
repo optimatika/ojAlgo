@@ -32,10 +32,10 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.TypeUtils;
 
-public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
+public final class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
 
     public RationalPolynomial(final int degree) {
-        super(Array1D.RATIONAL.makeZero(degree + 1));
+        super(Array1D.RATIONAL.make(degree + 1));
     }
 
     RationalPolynomial(final Array1D<RationalNumber> coefficients) {
@@ -44,17 +44,17 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
 
-        final int tmpRowDim = (int) Math.min(x.count(), y.count());
-        final int tmpColDim = this.size();
+        int tmpRowDim = (int) Math.min(x.count(), y.count());
+        int tmpColDim = this.size();
 
-        final PhysicalStore<RationalNumber> tmpBody = GenericStore.RATIONAL.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<RationalNumber> tmpRHS = GenericStore.RATIONAL.makeZero(tmpRowDim, 1);
+        PhysicalStore<RationalNumber> tmpBody = GenericStore.RATIONAL.make(tmpRowDim, tmpColDim);
+        PhysicalStore<RationalNumber> tmpRHS = GenericStore.RATIONAL.make(tmpRowDim, 1);
 
         for (int i = 0; i < tmpRowDim; i++) {
 
             BigDecimal tmpX = BigMath.ONE;
-            final BigDecimal tmpXfactor = TypeUtils.toBigDecimal(x.get(i));
-            final BigDecimal tmpY = TypeUtils.toBigDecimal(y.get(i));
+            BigDecimal tmpXfactor = TypeUtils.toBigDecimal(x.get(i));
+            BigDecimal tmpY = TypeUtils.toBigDecimal(y.get(i));
 
             for (int j = 0; j < tmpColDim; j++) {
                 tmpBody.set(i, j, tmpX);
@@ -63,17 +63,17 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<RationalNumber> tmpQR = QR.RATIONAL.make();
+        QR<RationalNumber> tmpQR = QR.RATIONAL.make();
         tmpQR.decompose(tmpBody);
         this.set(tmpQR.getSolution(tmpRHS));
     }
 
     public RationalNumber integrate(final RationalNumber fromPoint, final RationalNumber toPoint) {
 
-        final PolynomialFunction<RationalNumber> tmpPrim = this.buildPrimitive();
+        PolynomialFunction<RationalNumber> tmpPrim = this.buildPrimitive();
 
-        final RationalNumber tmpFromVal = tmpPrim.invoke(fromPoint);
-        final RationalNumber tmpToVal = tmpPrim.invoke(toPoint);
+        RationalNumber tmpFromVal = tmpPrim.invoke(fromPoint);
+        RationalNumber tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }
@@ -92,7 +92,7 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
     }
 
     public void set(final Access1D<?> coefficients) {
-        final int tmpLimit = (int) Math.min(this.count(), coefficients.count());
+        int tmpLimit = (int) Math.min(this.count(), coefficients.count());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, RationalNumber.valueOf(coefficients.get(p)));
         }
@@ -100,7 +100,7 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
 
     @Override
     protected RationalNumber getDerivativeFactor(final int power) {
-        final int tmpNextIndex = power + 1;
+        int tmpNextIndex = power + 1;
         return this.get(tmpNextIndex).multiply(tmpNextIndex);
     }
 
@@ -108,14 +108,13 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
     protected RationalNumber getPrimitiveFactor(final int power) {
         if (power <= 0) {
             return RationalNumber.ZERO;
-        } else {
-            return this.get(power - 1).divide(power);
         }
+        return this.get(power - 1).divide(power);
     }
 
     @Override
     protected AbstractPolynomial<RationalNumber> makeInstance(final int size) {
-        return new RationalPolynomial(Array1D.RATIONAL.makeZero(size));
+        return new RationalPolynomial(Array1D.RATIONAL.make(size));
     }
 
 }

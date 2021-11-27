@@ -83,10 +83,6 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     public static final class LogicalBuilder extends
             MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
-            enclosing.super(delegate);
-        }
-
         LogicalBuilder(final Factory enclosing, final MatrixStore<Double> store) {
             enclosing.super(store);
         }
@@ -135,11 +131,12 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
 
             return ((Primitive32Matrix) matrix).getStore();
 
-        } else if (matrix instanceof Primitive32Store) {
+        }
+        if (matrix instanceof Primitive32Store) {
 
             return (Primitive32Store) matrix;
 
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
+        } else if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Double) {
 
             return (ElementsSupplier<Double>) matrix;
 

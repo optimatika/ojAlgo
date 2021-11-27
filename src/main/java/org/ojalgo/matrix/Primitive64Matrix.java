@@ -83,10 +83,6 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
     public static final class LogicalBuilder extends
             MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
-            enclosing.super(delegate);
-        }
-
         LogicalBuilder(final Factory enclosing, final MatrixStore<Double> store) {
             enclosing.super(store);
         }
@@ -135,11 +131,12 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
 
             return ((Primitive64Matrix) matrix).getStore();
 
-        } else if (matrix instanceof Primitive64Store) {
+        }
+        if (matrix instanceof Primitive64Store) {
 
             return (Primitive64Store) matrix;
 
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
+        } else if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Double) {
 
             return (ElementsSupplier<Double>) matrix;
 

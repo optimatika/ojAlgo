@@ -64,15 +64,11 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     @Deprecated
     abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
-        private MatrixStore.LogicalBuilder<N> myDelegate;
+        private MatrixStore<N> myDelegate;
 
-        Logical(final MatrixStore.LogicalBuilder<N> delegate) {
+        Logical(final MatrixStore<N> delegate) {
             super();
             myDelegate = delegate;
-        }
-
-        Logical(final MatrixStore<N> store) {
-            this(store.logical());
         }
 
         public LB above(final long numberOfRows) {
@@ -790,7 +786,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         final int square = Math.min(rows, columns);
 
-        MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(square);
+        MatrixStore<N> retVal = myPhysicalFactory.builder().makeIdentity(square);
 
         if (rows > square) {
             retVal = retVal.below(rows - square);

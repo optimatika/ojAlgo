@@ -202,11 +202,11 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp01, tmp21);
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
-        final double tmpDet = ((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
 
-        solution.set(0L, (((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) / tmpDet);
-        solution.set(1L, -(((tmp0 * tmpMin01) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) / tmpDet);
-        solution.set(2L, (((tmp0 * tmpMin02) - (tmp1 * tmpMin12)) + (tmp2 * tmpMin22)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin02 - tmp1 * tmpMin12 + tmp2 * tmpMin22) / tmpDet);
     }
 
     static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
@@ -283,12 +283,12 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp02, tmp12, tmp32);
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp02, tmp12, tmp22);
 
-        final double tmpDet = (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
 
-        solution.set(0L, ((((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) - (tmp3 * tmpMin30)) / tmpDet);
-        solution.set(1L, -((((tmp0 * tmpMin01) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) - (tmp3 * tmpMin31)) / tmpDet);
-        solution.set(2L, ((((tmp0 * tmpMin02) - (tmp1 * tmpMin12)) + (tmp2 * tmpMin22)) - (tmp3 * tmpMin32)) / tmpDet);
-        solution.set(3L, -((((tmp0 * tmpMin03) - (tmp1 * tmpMin13)) + (tmp2 * tmpMin23)) - (tmp3 * tmpMin33)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin02 - tmp1 * tmpMin12 + tmp2 * tmpMin22 - tmp3 * tmpMin32) / tmpDet);
+        solution.set(3L, -(tmp0 * tmpMin03 - tmp1 * tmpMin13 + tmp2 * tmpMin23 - tmp3 * tmpMin33) / tmpDet);
     }
 
     static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
@@ -422,13 +422,13 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
                 tmp23, tmp33);
 
-        final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
 
-        solution.set(0L, (((((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) - (tmp3 * tmpMin30)) + (tmp4 * tmpMin40)) / tmpDet);
-        solution.set(1L, -(((((tmp0 * tmpMin01) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) - (tmp3 * tmpMin31)) + (tmp4 * tmpMin41)) / tmpDet);
-        solution.set(2L, (((((tmp0 * tmpMin02) - (tmp1 * tmpMin12)) + (tmp2 * tmpMin22)) - (tmp3 * tmpMin32)) + (tmp4 * tmpMin42)) / tmpDet);
-        solution.set(3L, -(((((tmp0 * tmpMin03) - (tmp1 * tmpMin13)) + (tmp2 * tmpMin23)) - (tmp3 * tmpMin33)) + (tmp4 * tmpMin43)) / tmpDet);
-        solution.set(4L, (((((tmp0 * tmpMin04) - (tmp1 * tmpMin14)) + (tmp2 * tmpMin24)) - (tmp3 * tmpMin34)) + (tmp4 * tmpMin44)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30 + tmp4 * tmpMin40) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin01 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31 + tmp4 * tmpMin41) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin02 - tmp1 * tmpMin12 + tmp2 * tmpMin22 - tmp3 * tmpMin32 + tmp4 * tmpMin42) / tmpDet);
+        solution.set(3L, -(tmp0 * tmpMin03 - tmp1 * tmpMin13 + tmp2 * tmpMin23 - tmp3 * tmpMin33 + tmp4 * tmpMin43) / tmpDet);
+        solution.set(4L, (tmp0 * tmpMin04 - tmp1 * tmpMin14 + tmp2 * tmpMin24 - tmp3 * tmpMin34 + tmp4 * tmpMin44) / tmpDet);
     }
 
     static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
@@ -437,10 +437,10 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
         final int tmpCountRows = (int) tmpTranspBody.countRows();
 
-        final Primitive64Store tmpBody = Primitive64Store.FACTORY.makeZero(tmpCountRows, tmpCountRows);
+        final Primitive64Store tmpBody = Primitive64Store.FACTORY.make(tmpCountRows, tmpCountRows);
         tmpTranspBody.multiply(tmpTranspBody.transpose(), tmpBody);
 
-        final Primitive64Store tmpRHS = Primitive64Store.FACTORY.makeZero(tmpCountRows, solution.countColumns());
+        final Primitive64Store tmpRHS = Primitive64Store.FACTORY.make(tmpCountRows, solution.countColumns());
         tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
@@ -530,11 +530,11 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
-        final double tmpDet = ((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20;
 
-        solution.set(0L, (((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) / tmpDet);
-        solution.set(1L, -(((tmp0 * tmpMin10) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) / tmpDet);
-        solution.set(2L, (((tmp0 * tmpMin20) - (tmp1 * tmpMin21)) + (tmp2 * tmpMin22)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin20 - tmp1 * tmpMin21 + tmp2 * tmpMin22) / tmpDet);
     }
 
     static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
@@ -593,12 +593,12 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp20, tmp21, tmp22);
 
-        final double tmpDet = (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30;
 
-        solution.set(0L, ((((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) - (tmp3 * tmpMin30)) / tmpDet);
-        solution.set(1L, -((((tmp0 * tmpMin10) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) - (tmp3 * tmpMin31)) / tmpDet);
-        solution.set(2L, ((((tmp0 * tmpMin20) - (tmp1 * tmpMin21)) + (tmp2 * tmpMin22)) - (tmp3 * tmpMin32)) / tmpDet);
-        solution.set(3L, -((((tmp0 * tmpMin30) - (tmp1 * tmpMin31)) + (tmp2 * tmpMin32)) - (tmp3 * tmpMin33)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin20 - tmp1 * tmpMin21 + tmp2 * tmpMin22 - tmp3 * tmpMin32) / tmpDet);
+        solution.set(3L, -(tmp0 * tmpMin30 - tmp1 * tmpMin31 + tmp2 * tmpMin32 - tmp3 * tmpMin33) / tmpDet);
     }
 
     static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
@@ -692,13 +692,13 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
                 tmp32, tmp33);
 
-        final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
+        final double tmpDet = tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40;
 
-        solution.set(0L, (((((tmp0 * tmpMin00) - (tmp1 * tmpMin10)) + (tmp2 * tmpMin20)) - (tmp3 * tmpMin30)) + (tmp4 * tmpMin40)) / tmpDet);
-        solution.set(1L, -(((((tmp0 * tmpMin10) - (tmp1 * tmpMin11)) + (tmp2 * tmpMin21)) - (tmp3 * tmpMin31)) + (tmp4 * tmpMin41)) / tmpDet);
-        solution.set(2L, (((((tmp0 * tmpMin20) - (tmp1 * tmpMin21)) + (tmp2 * tmpMin22)) - (tmp3 * tmpMin32)) + (tmp4 * tmpMin42)) / tmpDet);
-        solution.set(3L, -(((((tmp0 * tmpMin30) - (tmp1 * tmpMin31)) + (tmp2 * tmpMin32)) - (tmp3 * tmpMin33)) + (tmp4 * tmpMin43)) / tmpDet);
-        solution.set(4L, (((((tmp0 * tmpMin40) - (tmp1 * tmpMin41)) + (tmp2 * tmpMin42)) - (tmp3 * tmpMin43)) + (tmp4 * tmpMin44)) / tmpDet);
+        solution.set(0L, (tmp0 * tmpMin00 - tmp1 * tmpMin10 + tmp2 * tmpMin20 - tmp3 * tmpMin30 + tmp4 * tmpMin40) / tmpDet);
+        solution.set(1L, -(tmp0 * tmpMin10 - tmp1 * tmpMin11 + tmp2 * tmpMin21 - tmp3 * tmpMin31 + tmp4 * tmpMin41) / tmpDet);
+        solution.set(2L, (tmp0 * tmpMin20 - tmp1 * tmpMin21 + tmp2 * tmpMin22 - tmp3 * tmpMin32 + tmp4 * tmpMin42) / tmpDet);
+        solution.set(3L, -(tmp0 * tmpMin30 - tmp1 * tmpMin31 + tmp2 * tmpMin32 - tmp3 * tmpMin33 + tmp4 * tmpMin43) / tmpDet);
+        solution.set(4L, (tmp0 * tmpMin40 - tmp1 * tmpMin41 + tmp2 * tmpMin42 - tmp3 * tmpMin43 + tmp4 * tmpMin44) / tmpDet);
     }
 
     AbstractSolver() {
@@ -706,7 +706,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
     }
 
     public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return Primitive64Store.FACTORY.makeZero(templateBody.countColumns(), 1L);
+        return Primitive64Store.FACTORY.make(templateBody.countColumns(), 1L);
     }
 
 }

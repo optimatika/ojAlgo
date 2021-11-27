@@ -50,6 +50,7 @@ import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.matrix.operation.MultiplyLeft;
 import org.ojalgo.matrix.operation.MultiplyNeither;
 import org.ojalgo.matrix.operation.MultiplyRight;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -282,6 +283,30 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             return retVal;
         }
 
+        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(Primitive64Store.FACTORY, mainDiagonal);
+        }
+
+        public MatrixStore<Double> makeIdentity(final int dimension) {
+            return new IdentityStore<>(Primitive64Store.FACTORY, dimension);
+        }
+
+        public MatrixStore<Double> makeSingle(final Double element) {
+            return new SingleStore<>(Primitive64Store.FACTORY, element);
+        }
+
+        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
+            return SparseStore.PRIMITIVE64.make(rowsCount, columnsCount);
+        }
+
+        public MatrixStore<Double> makeWrapper(final Access2D<?> access) {
+            return new WrapperStore<>(Primitive64Store.FACTORY, access);
+        }
+
+        public MatrixStore<Double> makeZero(final int rowsCount, final int columnsCount) {
+            return new ZeroStore<>(Primitive64Store.FACTORY, rowsCount, columnsCount);
+        }
+
     };
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
@@ -296,7 +321,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexArgument(arg, retVal);
 
@@ -311,7 +336,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexImaginary(arg, retVal);
 
@@ -326,7 +351,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexModulus(arg, retVal);
 
@@ -341,7 +366,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexReal(arg, retVal);
 

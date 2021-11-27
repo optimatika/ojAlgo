@@ -66,7 +66,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     @Override
     protected Primitive64Store allocate(final long numberOfRows, final long numberOfColumns) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
-        return Primitive64Store.FACTORY.makeZero(numberOfRows, numberOfColumns);
+        return Primitive64Store.FACTORY.make(numberOfRows, numberOfColumns);
     }
 
     protected boolean checkSymmetry() {
@@ -129,7 +129,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
         if (myInternalData == null || myRowDim != templateRows || myColDim != templateCols) {
 
-            myInternalStore = RawStore.FACTORY.makeZero(internalRows, internalCols);
+            myInternalStore = RawStore.FACTORY.make(internalRows, internalCols);
             myInternalData = myInternalStore.data;
 
             myRowDim = templateRows;

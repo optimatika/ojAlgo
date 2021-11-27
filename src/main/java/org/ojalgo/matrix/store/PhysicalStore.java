@@ -52,7 +52,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  */
 public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
-    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
+    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I>, MatrixStore.Factory<N> {
 
         default TensorFactory2D<N, I> tensor2D() {
             return TensorFactory2D.of(this);

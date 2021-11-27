@@ -26,7 +26,6 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
@@ -51,7 +50,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         @Override
         Array1D<ComplexNumber> makeReal(final BasicArray<ComplexNumber> offDiagonal) {
 
-            final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(offDiagonal.count());
+            final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(offDiagonal.count());
             retVal.fillAll(ComplexNumber.ONE);
 
             final BasicArray<ComplexNumber> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
@@ -65,7 +64,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
                     tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpVal));
 
-                    if ((i + 1) < tmpSubdiagonal.count()) {
+                    if (i + 1 < tmpSubdiagonal.count()) {
                         tmpSubdiagonal.set(i + 1, tmpSubdiagonal.get(i + 1).multiply(tmpVal));
                     }
 
@@ -100,7 +99,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         @Override
         Array1D<Quaternion> makeReal(final BasicArray<Quaternion> offDiagonal) {
 
-            final Array1D<Quaternion> retVal = Array1D.QUATERNION.makeZero(offDiagonal.count());
+            final Array1D<Quaternion> retVal = Array1D.QUATERNION.make(offDiagonal.count());
             retVal.fillAll(Quaternion.ONE);
 
             final BasicArray<Quaternion> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
@@ -114,7 +113,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
                     tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpVal));
 
-                    if ((i + 1) < tmpSubdiagonal.count()) {
+                    if (i + 1 < tmpSubdiagonal.count()) {
                         tmpSubdiagonal.set(i + 1, tmpSubdiagonal.get(i + 1).multiply(tmpVal));
                     }
 
@@ -156,13 +155,13 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
         try {
 
-            final LogicalBuilder<N> logicallyTriangularMatrix = this.collect(matrix).logical().triangular(false, false);
+            final MatrixStore<N> logicallyTriangularMatrix = this.collect(matrix).logical().triangular(false, false);
             //TODO Not optimal code here!
             final DecompositionStore<N> inPlace = this.setInPlace(logicallyTriangularMatrix);
 
             final int size = this.getMinDim();
 
-            if ((myDiagD == null) || (myDiagD.count() != size)) {
+            if (myDiagD == null || myDiagD.count() != size) {
                 myDiagD = this.makeArray(size);
                 myDiagE = this.makeArray(size);
             }

@@ -30,7 +30,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
@@ -143,7 +142,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public MatrixStore<N> getL() {
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(false, true);
+        MatrixStore<N> logical = this.getInPlace().logical().triangular(false, true);
         int nbRows = this.getRowDim();
         if (nbRows < this.getColDim()) {
             return logical.limits(nbRows, nbRows).get();
@@ -199,12 +198,12 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public MatrixStore<N> getU() {
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(true, false);
+        MatrixStore<N> retVal = this.getInPlace().triangular(true, false);
         int nbCols = this.getColDim();
         if (this.getRowDim() > nbCols) {
-            logical.limits(nbCols, nbCols).get();
+            retVal = retVal.limits(nbCols, nbCols);
         }
-        return logical.get();
+        return retVal;
     }
 
     public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

@@ -210,11 +210,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
-        Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.makeZero(2);
+        Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.make(2);
         tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 
-        Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.makeZero(2, 2);
+        Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.make(2, 2);
         tmpExpVecs.set(0, 0, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));
@@ -247,7 +247,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericStore<ComplexNumber> tmpComplexD = GenericStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpComplexD = GenericStore.COMPLEX.make(tmpLength, tmpLength);
         for (int j = 0; j < tmpLength; j++) {
             tmpComplexD.set(j, j, tmpValues.get(j));
         }
@@ -288,7 +288,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericStore<ComplexNumber> tmpAltD = GenericStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpAltD = GenericStore.COMPLEX.make(tmpLength, tmpLength);
         MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
 
         for (int j = 0; j < tmpLength; j++) {

@@ -976,7 +976,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         State retState = State.UNEXPLORED;
         double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.BIG.makeZero(numberOfVariables);
+        final Array1D<BigDecimal> retSolution = Array1D.BIG.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
         boolean shouldCheckGradient = false;

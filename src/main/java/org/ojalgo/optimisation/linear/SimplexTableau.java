@@ -398,9 +398,9 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 myRows[r] = mySparseFactory.limit(totNumbVars).make();
             }
 
-            myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
+            myRHS = ARRAY1D_FACTORY.make(numberOfConstraints);
 
-            myObjectiveWeights = ARRAY1D_FACTORY.makeZero(totNumbVars);
+            myObjectiveWeights = ARRAY1D_FACTORY.make(totNumbVars);
             myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
         }
 
@@ -732,7 +732,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         Primitive64Store transpose() {
 
-            final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(this.countColumns(), this.countRows());
+            final Primitive64Store retVal = Primitive64Store.FACTORY.make(this.countColumns(), this.countRows());
 
             for (int i = 0; i < myRows.length; i++) {
                 for (final NonzeroView<Double> nz : myRows[i].nonzeros()) {
@@ -786,7 +786,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         int constraintsCount = tableau.countConstraints();
         int variablesCount = tableau.countVariables();
 
-        MatrixStore.LogicalBuilder<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
+        MatrixStore<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
         tableauBuilder = tableauBuilder.left(builder.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, constraintsCount).get()).get());
 
         if (constraintsCount >= 1) {

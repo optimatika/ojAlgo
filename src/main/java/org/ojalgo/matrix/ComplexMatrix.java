@@ -85,10 +85,6 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class LogicalBuilder extends
             MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<ComplexNumber> delegate) {
-            enclosing.super(delegate);
-        }
-
         LogicalBuilder(final Factory enclosing, final MatrixStore<ComplexNumber> store) {
             enclosing.super(store);
         }
@@ -165,7 +161,8 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
 
             return ((ComplexMatrix) matrix).getStore();
 
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof ComplexNumber)) {
+        }
+        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof ComplexNumber) {
 
             return (ElementsSupplier<ComplexNumber>) matrix;
 

@@ -31,7 +31,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
@@ -122,9 +121,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (myPivot.signum() == -1) {
             return aggregator.toScalar().negate().get();
-        } else {
-            return aggregator.get();
         }
+        return aggregator.get();
     }
 
     @Override
@@ -156,8 +154,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
     public MatrixStore<N> getL() {
         DecompositionStore<N> tmpInPlace = this.getInPlace();
-        LogicalBuilder<N> tmpBuilder = tmpInPlace.logical();
-        LogicalBuilder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        MatrixStore<N> tmpBuilder = tmpInPlace.logical();
+        MatrixStore<N> tmpTriangular = tmpBuilder.triangular(false, true);
         return tmpTriangular.get();
     }
 
@@ -204,9 +202,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getInverse();
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -215,9 +212,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isPivoted() {
@@ -244,9 +240,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -255,9 +250,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {

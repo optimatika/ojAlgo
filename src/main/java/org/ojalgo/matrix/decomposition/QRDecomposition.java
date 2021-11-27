@@ -28,7 +28,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
@@ -178,7 +177,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public MatrixStore<N> getR() {
 
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(true, false);
+        MatrixStore<N> logical = this.getInPlace().logical().triangular(true, false);
 
         int nbRows = this.getRowDim();
         int nbCols = this.getColDim();

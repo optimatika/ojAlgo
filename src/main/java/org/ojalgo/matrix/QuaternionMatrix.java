@@ -84,10 +84,6 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class LogicalBuilder extends
             MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Quaternion> delegate) {
-            enclosing.super(delegate);
-        }
-
         LogicalBuilder(final Factory enclosing, final MatrixStore<Quaternion> store) {
             enclosing.super(store);
         }
@@ -136,7 +132,8 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
 
             return ((QuaternionMatrix) matrix).getStore();
 
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Quaternion)) {
+        }
+        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Quaternion) {
 
             return (ElementsSupplier<Quaternion>) matrix;
 

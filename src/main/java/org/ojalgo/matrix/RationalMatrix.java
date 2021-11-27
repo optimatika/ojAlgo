@@ -84,10 +84,6 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class LogicalBuilder extends
             MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<RationalNumber> delegate) {
-            enclosing.super(delegate);
-        }
-
         LogicalBuilder(final Factory enclosing, final MatrixStore<RationalNumber> store) {
             enclosing.super(store);
         }
@@ -136,7 +132,8 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
 
             return ((RationalMatrix) matrix).getStore();
 
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof RationalNumber)) {
+        }
+        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof RationalNumber) {
 
             return (ElementsSupplier<RationalNumber>) matrix;
 

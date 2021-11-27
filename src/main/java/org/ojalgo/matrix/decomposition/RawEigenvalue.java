@@ -238,7 +238,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         final double[] tmpRe = this.getRealParts();
         final double[] tmpIm = this.getImaginaryParts();
 
-        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(tmpRe.length);
+        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(tmpRe.length);
 
         for (int i = 0; i < retVal.size(); i++) {
             retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));
@@ -330,9 +330,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     @Override
@@ -354,9 +353,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             return this.getInverse().multiply(preallocated);
 
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
@@ -389,7 +387,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final int n = data.length;
 
-        if ((d == null) || (n != d.length)) {
+        if (d == null || n != d.length) {
             if (valuesOnly) {
                 myTransposedV = null;
             } else {
@@ -412,7 +410,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         final int size = data.length;
         final int last = size - 1;
 
-        if ((d == null) || (size != d.length)) {
+        if (d == null || size != d.length) {
             d = new double[size]; // householder > main diagonal
             e = new double[size]; // work > off diagonal
         }
@@ -467,7 +465,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     g = -g;
                 }
                 e[m] = scale * g;
-                h = h - (f * g);
+                h = h - f * g;
                 d[m - 1] = f - g;
 
                 Arrays.fill(e, 0, m, ZERO);
@@ -478,7 +476,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     row = data[i];
                     f = d[i];
                     data[m][i] = f;
-                    g = e[i] + (row[i] * f);
+                    g = e[i] + row[i] * f;
                     for (int j = i + 1; j < m; j++) {
                         val = row[j];
                         g += val * d[j];
@@ -498,7 +496,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     f = d[i];
                     g = e[i];
                     for (int j = i; j < m; j++) { // rank-2 update
-                        row[j] -= ((f * e[j]) + (g * d[j]));
+                        row[j] -= f * e[j] + g * d[j];
                     }
                     d[i] = row[m - 1]; // Copy "next" row/column to work on
                     row[m] = ZERO;
@@ -555,8 +553,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 tmpVi0k = tmpVi0[k];
                 tmpVi1k = tmpVi1[k];
 
-                tmpVi0[k] = (cos * tmpVi0k) - (sin * tmpVi1k);
-                tmpVi1[k] = (sin * tmpVi0k) + (cos * tmpVi1k);
+                tmpVi0[k] = cos * tmpVi0k - sin * tmpVi1k;
+                tmpVi1[k] = sin * tmpVi0k + cos * tmpVi1k;
             }
 
         };

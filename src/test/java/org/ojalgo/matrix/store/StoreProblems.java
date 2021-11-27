@@ -150,11 +150,11 @@ public class StoreProblems extends MatrixStoreTests {
         sx = sx.logical().below(tmp).get();
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
-        for (int i = 0; i < (hp - 2); i++) {
+        for (int i = 0; i < hp - 2; i++) {
             sx = sx.logical().below(tmp.multiply(Apow)).get();
             Apow = Apow.multiply(Apow);
         }
-        currentState = Primitive64Matrix.FACTORY.makeZero(A.countRows(), 1);
+        currentState = Primitive64Matrix.FACTORY.make(A.countRows(), 1);
         currentState = currentState.add(1.0);
         sx.multiply(currentState);
     }
@@ -170,7 +170,7 @@ public class StoreProblems extends MatrixStoreTests {
 
         final PhysicalStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpMtrxB = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxC = Primitive64Store.FACTORY.makeZero(tmpDim, tmpDim);
+        final PhysicalStore<Double> tmpMtrxC = Primitive64Store.FACTORY.make(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;
         PhysicalStore<Double> tmpActual;

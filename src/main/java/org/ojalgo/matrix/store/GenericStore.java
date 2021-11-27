@@ -91,24 +91,24 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
                     return DiagonalStore.builder(GenericStore.Factory.this, mainDiagonal);
                 }
 
-                public LogicalBuilder<N> makeIdentity(final int dimension) {
-                    return new LogicalBuilder<>(new IdentityStore<>(GenericStore.Factory.this, dimension));
+                public MatrixStore<N> makeIdentity(final int dimension) {
+                    return new IdentityStore<>(GenericStore.Factory.this, dimension);
                 }
 
-                public LogicalBuilder<N> makeSingle(final N element) {
-                    return new LogicalBuilder<>(new SingleStore<>(GenericStore.Factory.this, element));
+                public MatrixStore<N> makeSingle(final N element) {
+                    return new SingleStore<>(GenericStore.Factory.this, element);
                 }
 
                 public SparseStore<N> makeSparse(final int rowsCount, final int columnsCount) {
                     return new SparseStore<>(GenericStore.Factory.this, rowsCount, columnsCount);
                 }
 
-                public LogicalBuilder<N> makeWrapper(final Access2D<?> access) {
-                    return new LogicalBuilder<>(new WrapperStore<>(GenericStore.Factory.this, access));
+                public MatrixStore<N> makeWrapper(final Access2D<?> access) {
+                    return new WrapperStore<>(GenericStore.Factory.this, access);
                 }
 
-                public LogicalBuilder<N> makeZero(final int rowsCount, final int columnsCount) {
-                    return new LogicalBuilder<>(new ZeroStore<>(GenericStore.Factory.this, rowsCount, columnsCount));
+                public MatrixStore<N> makeZero(final int rowsCount, final int columnsCount) {
+                    return new ZeroStore<>(GenericStore.Factory.this, rowsCount, columnsCount);
                 }
 
             };
@@ -252,7 +252,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
         public GenericStore<N> makeEye(final long rows, final long columns) {
 
-            final GenericStore<N> retVal = this.makeZero(rows, columns);
+            final GenericStore<N> retVal = this.make(rows, columns);
 
             retVal.myUtility.fillDiagonal(0, 0, myDenseArrayFactory.scalar().one().get());
 
@@ -389,6 +389,30 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             }
 
             return retVal;
+        }
+
+        public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(this, mainDiagonal);
+        }
+
+        public MatrixStore<N> makeIdentity(final int dimension) {
+            return new IdentityStore<>(this, dimension);
+        }
+
+        public MatrixStore<N> makeSingle(final N element) {
+            return new SingleStore<>(this, element);
+        }
+
+        public SparseStore<N> makeSparse(final int rowsCount, final int columnsCount) {
+            return SparseStore.makeSparse(this, rowsCount, columnsCount);
+        }
+
+        public MatrixStore<N> makeWrapper(final Access2D<?> access) {
+            return new WrapperStore<>(this, access);
+        }
+
+        public MatrixStore<N> makeZero(final int rowsCount, final int columnsCount) {
+            return new ZeroStore<>(this, rowsCount, columnsCount);
         }
 
     }
@@ -932,7 +956,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final GenericStore<N> retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
+        final GenericStore<N> retVal = this.physical().make(myRowDim, right.count() / myColDim);
 
         if (right instanceof GenericStore) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());
@@ -945,8 +969,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     public N multiplyBoth(final Access1D<N> leftAndRight) {
 
-        final PhysicalStore<N> tmpStep1 = myFactory.makeZero(1L, leftAndRight.count());
-        final PhysicalStore<N> tmpStep2 = myFactory.makeZero(1L, 1L);
+        final PhysicalStore<N> tmpStep1 = myFactory.make(1L, leftAndRight.count());
+        final PhysicalStore<N> tmpStep2 = myFactory.make(1L, 1L);
 
         final PhysicalStore<N> tmpLeft = myFactory.rows(leftAndRight);
         tmpLeft.modifyAll(myFactory.function().conjugate());

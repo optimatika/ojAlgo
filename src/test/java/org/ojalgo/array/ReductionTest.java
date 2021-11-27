@@ -38,7 +38,7 @@ public class ReductionTest {
     @Test
     public void test2To1D() {
 
-        final Array2D<Double> array = Array2D.PRIMITIVE64.makeZero(5, 3);
+        final Array2D<Double> array = Array2D.PRIMITIVE64.make(5, 3);
         array.fillAll(1.0);
 
         final Array1D<Double> reducedRows = array.reduceRows(Aggregator.SUM);

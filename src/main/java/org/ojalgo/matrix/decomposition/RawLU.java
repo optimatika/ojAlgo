@@ -28,7 +28,6 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
@@ -115,7 +114,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(false, true);
+        MatrixStore<Double> logical = this.getInternalStore().logical().triangular(false, true);
         int nbRows = this.getRowDim();
         if (nbRows < this.getColDim()) {
             return logical.limits(nbRows, nbRows).get();
@@ -149,12 +148,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getU() {
-        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(true, false);
+        MatrixStore<Double> retVal = this.getInternalStore().triangular(true, false);
         int nbCols = this.getColDim();
         if (this.getRowDim() > nbCols) {
-            logical.limits(nbCols, nbCols).get();
+            retVal = retVal.limits(nbCols, nbCols);
         }
-        return logical.get();
+        return retVal;
     }
 
     @Override

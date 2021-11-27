@@ -65,11 +65,11 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
     protected final MatrixStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
         if (source instanceof MatrixStore) {
             return (MatrixStore<N>) source;
-        } else if (source instanceof Access2D) {
-            return myBuilder.makeWrapper((Access2D<?>) source).get();
-        } else {
-            return source.collect(myFactory);
         }
+        if (source instanceof Access2D) {
+            return myBuilder.makeWrapper((Access2D<?>) source).get();
+        }
+        return source.collect(myFactory);
     }
 
     protected final DecompositionStore<N> copy(final Access2D<?> source) {
@@ -97,7 +97,7 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
         return myFactory.makeHouseholder(dimension);
     }
 
-    protected final MatrixStore.LogicalBuilder<N> makeIdentity(final int dimension) {
+    protected final MatrixStore<N> makeIdentity(final int dimension) {
         return myBuilder.makeIdentity(dimension);
     }
 
@@ -122,7 +122,7 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
         return myFactory.scalar();
     }
 
-    protected final MatrixStore.LogicalBuilder<N> wrap(final Access2D<?> source) {
+    protected final MatrixStore<N> wrap(final Access2D<?> source) {
         return myBuilder.makeWrapper(source);
     }
 

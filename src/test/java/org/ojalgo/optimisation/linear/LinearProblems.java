@@ -225,7 +225,7 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
 
-        Primitive64Matrix tmpExpectedSolution = Primitive64Matrix.FACTORY.makeZero(3, 1);
+        Primitive64Matrix tmpExpectedSolution = Primitive64Matrix.FACTORY.make(3, 1);
 
         Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());

@@ -199,10 +199,10 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
         if (this.isPrimitive()) {
 
-            final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
+            final PhysicalStore<N> tmpStep1 = this.physical().make(1L, leftAndRight.count());
             tmpStep1.fillByMultiplying(leftAndRight, this);
 
-            final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
+            final PhysicalStore<N> tmpStep2 = this.physical().make(1L, 1L);
             tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
 
             return tmpStep2.get(0L);

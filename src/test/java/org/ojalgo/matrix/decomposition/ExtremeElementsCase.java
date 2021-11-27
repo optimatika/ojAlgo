@@ -204,7 +204,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         long tmpDim = 5L;
 
-        Primitive64Store tmpRndm = Primitive64Store.FACTORY.makeZero(tmpDim, tmpDim);
+        Primitive64Store tmpRndm = Primitive64Store.FACTORY.make(tmpDim, tmpDim);
 
         for (long j = 0L; j < tmpDim; j++) {
             for (long i = 0L; i < tmpDim; i++) {

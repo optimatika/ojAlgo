@@ -192,7 +192,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int colRHS = myTableau.countConstraints() + myTableau.countVariables();
 
-        Primitive64Store solution = Primitive64Store.FACTORY.makeZero(myTableau.countVariables(), 1);
+        Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.countVariables(), 1);
 
         int numberOfConstraints = myTableau.countConstraints();
         for (int row = 0; row < numberOfConstraints; row++) {

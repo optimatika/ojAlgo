@@ -49,6 +49,7 @@ import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.matrix.operation.MultiplyLeft;
 import org.ojalgo.matrix.operation.MultiplyNeither;
 import org.ojalgo.matrix.operation.MultiplyRight;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -290,6 +291,30 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             }
 
             return retVal;
+        }
+
+        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(Primitive32Store.FACTORY, mainDiagonal);
+        }
+
+        public MatrixStore<Double> makeIdentity(final int dimension) {
+            return new IdentityStore<>(Primitive32Store.FACTORY, dimension);
+        }
+
+        public MatrixStore<Double> makeSingle(final Double element) {
+            return new SingleStore<>(Primitive32Store.FACTORY, element);
+        }
+
+        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
+            return SparseStore.PRIMITIVE32.make(rowsCount, columnsCount);
+        }
+
+        public MatrixStore<Double> makeWrapper(final Access2D<?> access) {
+            return new WrapperStore<>(Primitive32Store.FACTORY, access);
+        }
+
+        public MatrixStore<Double> makeZero(final int rowsCount, final int columnsCount) {
+            return new ZeroStore<>(Primitive32Store.FACTORY, rowsCount, columnsCount);
         }
 
     };

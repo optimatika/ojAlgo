@@ -89,20 +89,4 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
         return this.make(shape.shape());
     }
 
-    /**
-     * @deprecated v48 Use {@link #make(long...)} instead
-     */
-    @Deprecated
-    default I makeZero(final long... structure) {
-        return this.make(structure);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #make(StructureAnyD)} instead
-     */
-    @Deprecated
-    default I makeZero(final StructureAnyD shape) {
-        return this.make(shape);
-    }
-
 }

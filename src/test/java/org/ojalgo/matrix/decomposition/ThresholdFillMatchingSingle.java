@@ -124,7 +124,7 @@ public class ThresholdFillMatchingSingle extends AbstractThresholdTuner {
         scalar = tmpSupplier.doubleValue();
 
         original = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.makeZero(dim, dim);
+        target = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Benchmark

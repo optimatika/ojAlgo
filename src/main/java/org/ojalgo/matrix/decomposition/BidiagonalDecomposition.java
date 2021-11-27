@@ -51,33 +51,33 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         @Override
         Array1D<ComplexNumber>[] makeReal() {
 
-            final DiagonalStore<ComplexNumber, Array1D<ComplexNumber>> tmpDiagonalAccessD = this.doGetDiagonal();
+            DiagonalStore<ComplexNumber, Array1D<ComplexNumber>> tmpDiagonalAccessD = this.doGetDiagonal();
 
-            final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
+            Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.make(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
 
-            final Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
+            Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.COMPLEX.make(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ2.fillAll(ComplexNumber.ONE);
 
-            final boolean tmpUpper = this.isUpper();
+            boolean tmpUpper = this.isUpper();
 
             if (tmpUpper) {
 
-                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
-                final Array1D<ComplexNumber> tmpSuperdiagonal = tmpDiagonalAccessD.getSuperdiagonal().get();
+                Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
+                Array1D<ComplexNumber> tmpSuperdiagonal = tmpDiagonalAccessD.getSuperdiagonal().get();
 
-                final int tmpLimit = (int) tmpSuperdiagonal.count();
+                int tmpLimit = (int) tmpSuperdiagonal.count();
                 for (int i = 0; i < tmpLimit; i++) {
 
                     if (!tmpMainDiagonal.get(i).isReal()) {
-                        final ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ1.set(i, tmpSignum);
                     }
 
                     if (!tmpSuperdiagonal.get(i).isReal()) {
-                        final ComplexNumber tmpSignum = tmpSuperdiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpSuperdiagonal.get(i).signum();
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
                         tmpInitDiagQ2.set(i + 1, tmpSignum.conjugate());
@@ -85,28 +85,28 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
                 }
 
                 if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
-                    final ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
+                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ1.set(tmpLimit, tmpSignum);
                 }
 
             } else {
 
-                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
-                final Array1D<ComplexNumber> tmpSubdiagonal = tmpDiagonalAccessD.getSubdiagonal().get();
+                Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
+                Array1D<ComplexNumber> tmpSubdiagonal = tmpDiagonalAccessD.getSubdiagonal().get();
 
-                final int tmpLimit = (int) tmpSubdiagonal.count();
+                int tmpLimit = (int) tmpSubdiagonal.count();
                 for (int i = 0; i < tmpLimit; i++) {
 
                     if (!tmpMainDiagonal.get(i).isReal()) {
-                        final ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ2.set(i, tmpSignum.conjugate());
                     }
 
                     if (!tmpSubdiagonal.get(i).isReal()) {
-                        final ComplexNumber tmpSignum = tmpSubdiagonal.get(i).signum();
+                        ComplexNumber tmpSignum = tmpSubdiagonal.get(i).signum();
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
                         tmpInitDiagQ1.set(i + 1, tmpSignum);
@@ -114,7 +114,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
                 }
 
                 if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
-                    final ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
+                    ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ2.set(tmpLimit, tmpSignum.conjugate());
                 }
@@ -194,15 +194,15 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
         this.reset();
 
-        final DecompositionStore<N> storage = this.setInPlace(matrix);
+        DecompositionStore<N> storage = this.setInPlace(matrix);
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        int tmpRowDim = this.getRowDim();
+        int tmpColDim = this.getColDim();
 
-        final int tmpLimit = Math.min(tmpRowDim, tmpColDim);
+        int tmpLimit = Math.min(tmpRowDim, tmpColDim);
 
-        final Householder<N> tmpHouseholderRow = this.makeHouseholder(tmpColDim);
-        final Householder<N> tmpHouseholderCol = this.makeHouseholder(tmpRowDim);
+        Householder<N> tmpHouseholderRow = this.makeHouseholder(tmpColDim);
+        Householder<N> tmpHouseholderCol = this.makeHouseholder(tmpRowDim);
 
         if (this.isAspectRatioNormal()) {
 
@@ -217,7 +217,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
                 }
             }
 
-            final Array1D<N>[] tmpInitDiags = this.makeReal();
+            Array1D<N>[] tmpInitDiags = this.makeReal();
             if (tmpInitDiags != null) {
                 myInitDiagLQ = tmpInitDiags[0];
                 myInitDiagRQ = tmpInitDiags[1];
@@ -236,7 +236,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
                 }
             }
 
-            final Array1D<N>[] tmpInitDiags = this.makeReal();
+            Array1D<N>[] tmpInitDiags = this.makeReal();
             if (tmpInitDiags != null) {
                 myInitDiagLQ = tmpInitDiags[0];
                 myInitDiagRQ = tmpInitDiags[1];
@@ -290,9 +290,9 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     private DiagonalStore<N, Array1D<N>> makeDiagonal() {
 
-        final DecompositionStore<N> storage = this.getInPlace();
+        DecompositionStore<N> storage = this.getInPlace();
 
-        final Array1D<N> diagMain = storage.sliceDiagonal(0, 0);
+        Array1D<N> diagMain = storage.sliceDiagonal(0, 0);
         Array1D<N> diagSuper;
         Array1D<N> diagSub;
 
@@ -309,10 +309,10 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     private DecompositionStore<N> makeLQ() {
 
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
+        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpMinDim = this.getMinDim();
+        int tmpRowDim = this.getRowDim();
+        int tmpMinDim = this.getMinDim();
 
         DecompositionStore<N> retVal = null;
         if (myInitDiagLQ != null) {
@@ -324,7 +324,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
             retVal = this.makeEye(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
         }
 
-        final boolean tmpUpper = this.isUpper();
+        boolean tmpUpper = this.isUpper();
         for (int ij = tmpUpper && tmpRowDim != tmpMinDim ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
 
             tmpReference.point(tmpUpper ? ij : ij + 1, ij);
@@ -339,10 +339,10 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     private DecompositionStore<N> makeRQ() {
 
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
+        HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
 
-        final int tmpColDim = this.getColDim();
-        final int tmpMinDim = this.getMinDim();
+        int tmpColDim = this.getColDim();
+        int tmpMinDim = this.getMinDim();
 
         DecompositionStore<N> retVal = null;
         if (myInitDiagRQ != null) {
@@ -354,7 +354,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
             retVal = this.makeEye(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
         }
 
-        final boolean tmpUpper = this.isUpper();
+        boolean tmpUpper = this.isUpper();
         for (int ij = tmpUpper ? tmpMinDim - 2 : tmpMinDim - 1; ij >= 0; ij--) {
 
             tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
@@ -373,13 +373,13 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
      */
     private void solve(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
 
-        final int tmpDim = (int) aMtrxV.countRows();
-        final int tmpLim = tmpDim - 1;
+        int tmpDim = (int) aMtrxV.countRows();
+        int tmpLim = tmpDim - 1;
 
         double tmpSingular;
         for (int j = 0; j < tmpDim; j++) {
             tmpSingular = aMtrxD.doubleValue(j, j);
-            final double value = tmpSingular;
+            double value = tmpSingular;
             if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value)) {
                 for (int i = 0; i < tmpDim; i++) {
                     aMtrxV.set(i, j, PrimitiveMath.ZERO);
@@ -397,15 +397,15 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
 
-        final int tmpDim = (int) aMtrxV.countRows();
-        final int tmpLim = tmpDim - 1;
+        int tmpDim = (int) aMtrxV.countRows();
+        int tmpLim = tmpDim - 1;
 
-        final DecompositionStore<N> retVal = this.makeZero(tmpDim, tmpDim);
+        DecompositionStore<N> retVal = this.makeZero(tmpDim, tmpDim);
 
         double tmpSingular;
         for (int j = 0; j < tmpDim; j++) {
             tmpSingular = aMtrxD.doubleValue(j, j);
-            final double value = tmpSingular;
+            double value = tmpSingular;
             if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value)) {
                 for (int i = 0; i < tmpDim; i++) {
                     retVal.set(i, j, aMtrxV.doubleValue(i, j));
