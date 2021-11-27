@@ -67,22 +67,6 @@ import org.ojalgo.type.context.NumberContext;
 public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    /**
-     * LogicalBuilder
-     *
-     * @author apete
-     * @deprecated v50 Use {@link Pipeline2D} instead
-     */
-    @Deprecated
-    public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>>, Supplier<M> {
-
-        default M build() {
-            return this.get();
-        }
-
-    }
-
     private static final NumberContext EQUALS = NumberContext.of(8, 12);
 
     /**
@@ -486,11 +470,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return mySymmetric.booleanValue();
     }
 
-    /**
-     * @deprecated v50 Use {@link #pipeline()} instead
-     */
-    @Deprecated
-    public abstract BasicMatrix.LogicalBuilder<N, M> logical();
+    public abstract Pipeline2D<N, M, ?> logical();
 
     public M multiply(final double scalarMultiplicand) {
 
@@ -541,10 +521,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     public double norm() {
         return myStore.norm();
-    }
-
-    public final Pipeline2D<N, M> pipeline() {
-        return new Pipeline2D<>(this.getFactory(), myStore);
     }
 
     public M power(final int power) {
@@ -760,7 +736,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ?, ?> getFactory();
+    abstract MatrixFactory<N, M, ?, ?> getFactory();
 
     final MatrixStore<N> getStore() {
         return myStore;

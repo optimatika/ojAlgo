@@ -48,58 +48,59 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
-    public static final class DenseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<PhysicalStore<RationalNumber>> {
+    public static final class DenseReceiver extends Mutator2D<RationalNumber, RationalMatrix, PhysicalStore<RationalNumber>> {
 
-        DenseReceiver(final Factory enclosing, final PhysicalStore<RationalNumber> delegate) {
-            enclosing.super(delegate);
+        DenseReceiver(final PhysicalStore<RationalNumber> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory
-            extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
 
         Factory() {
             super(RationalMatrix.class, GenericStore.RATIONAL);
         }
 
         @Override
-        RationalMatrix.LogicalBuilder logical(final MatrixStore<RationalNumber> delegate) {
-            return new RationalMatrix.LogicalBuilder(this, delegate);
+        RationalMatrix.DenseReceiver dense(final PhysicalStore<RationalNumber> store) {
+            return new RationalMatrix.DenseReceiver(store);
         }
 
         @Override
-        RationalMatrix.DenseReceiver physical(final PhysicalStore<RationalNumber> delegate) {
-            return new RationalMatrix.DenseReceiver(this, delegate);
-        }
-
-        @Override
-        RationalMatrix.SparseReceiver physical(final SparseStore<RationalNumber> delegate) {
-            return new RationalMatrix.SparseReceiver(this, delegate);
+        RationalMatrix.SparseReceiver sparse(final SparseStore<RationalNumber> store) {
+            return new RationalMatrix.SparseReceiver(store);
         }
 
     }
 
-    public static final class LogicalBuilder extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Logical {
+    public static final class LogicalBuilder extends Pipeline2D<RationalNumber, RationalMatrix, LogicalBuilder> {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore<RationalNumber> store) {
-            enclosing.super(store);
+        LogicalBuilder(final MatrixFactory<RationalNumber, RationalMatrix, ?, ?> factory, final ElementsSupplier<RationalNumber> supplier) {
+            super(factory, supplier);
         }
 
         @Override
-        LogicalBuilder self() {
-            return this;
+        LogicalBuilder wrap(final ElementsSupplier<RationalNumber> supplier) {
+            return new LogicalBuilder(FACTORY, supplier);
         }
 
     }
 
-    public static final class SparseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<SparseStore<RationalNumber>> {
+    public static final class SparseReceiver extends Mutator2D<RationalNumber, RationalMatrix, SparseStore<RationalNumber>> {
 
-        SparseReceiver(final Factory enclosing, final SparseStore<RationalNumber> delegate) {
-            enclosing.super(delegate);
+        SparseReceiver(final SparseStore<RationalNumber> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
@@ -113,10 +114,9 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
         super(aStore);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RationalMatrix.DenseReceiver copy() {
-        return new RationalMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+        return new RationalMatrix.DenseReceiver(this.getStore().copy());
     }
 
     @Override
@@ -124,28 +124,22 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
         return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     ElementsSupplier<RationalNumber> cast(final Access1D<?> matrix) {
 
         if (matrix instanceof RationalMatrix) {
-
             return ((RationalMatrix) matrix).getStore();
-
         }
+
         if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof RationalNumber) {
-
             return (ElementsSupplier<RationalNumber>) matrix;
-
-        } else if (matrix instanceof Access2D) {
-
-            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
-
-        } else {
-
-            return this.getStore().physical().columns(matrix);
         }
+
+        if (matrix instanceof Access2D) {
+            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
+        }
+
+        return this.getStore().physical().columns(matrix);
     }
 
     @Override

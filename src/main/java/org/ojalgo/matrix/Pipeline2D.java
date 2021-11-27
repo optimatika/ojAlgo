@@ -27,20 +27,21 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Operate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 
-public class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-        implements Structure2D.Logical<Access2D<N>, Pipeline2D<N, M>>, Operate2D<N, Pipeline2D<N, M>>, Supplier<M> {
+abstract class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, P extends Pipeline2D<N, M, P>>
+        implements Structure2D.Logical<Access2D<N>, P>, Operate2D<N, P>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    private final MatrixFactory<N, M, ?, ?, ?> myFactory;
+    private final MatrixFactory<N, M, ?, ?> myFactory;
     private final MatrixStore<N> myStore;
     private final ElementsSupplier<N> mySupplier;
 
-    Pipeline2D(final MatrixFactory<N, M, ?, ?, ?> factory, final ElementsSupplier<N> supplier) {
+    Pipeline2D(final MatrixFactory<N, M, ?, ?> factory, final ElementsSupplier<N> supplier) {
 
         super();
 
@@ -55,40 +56,40 @@ public class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         }
     }
 
-    public Pipeline2D<N, M> above(final Access2D<N>... above) {
-        return new Pipeline2D<>(myFactory, this.store().above(above));
+    public P above(final Access2D<N>... above) {
+        return this.wrap(this.store().above(above));
     }
 
-    public Pipeline2D<N, M> above(final Access2D<N> above) {
-        return new Pipeline2D<>(myFactory, this.store().above(above));
+    public P above(final Access2D<N> above) {
+        return this.wrap(this.store().above(above));
     }
 
-    public Pipeline2D<N, M> above(final long numberOfRows) {
-        return new Pipeline2D<>(myFactory, this.store().above(numberOfRows));
+    public P above(final long numberOfRows) {
+        return this.wrap(this.store().above(numberOfRows));
     }
 
-    public Pipeline2D<N, M> below(final Access2D<N>... below) {
-        return new Pipeline2D<>(myFactory, this.store().below(below));
+    public P below(final Access2D<N>... below) {
+        return this.wrap(this.store().below(below));
     }
 
-    public Pipeline2D<N, M> below(final Access2D<N> below) {
-        return new Pipeline2D<>(myFactory, this.store().below(below));
+    public P below(final Access2D<N> below) {
+        return this.wrap(this.store().below(below));
     }
 
-    public Pipeline2D<N, M> below(final long numberOfRows) {
-        return new Pipeline2D<>(myFactory, this.store().below(numberOfRows));
+    public P below(final long numberOfRows) {
+        return this.wrap(this.store().below(numberOfRows));
     }
 
-    public Pipeline2D<N, M> bidiagonal(final boolean upper) {
-        return new Pipeline2D<>(myFactory, this.store().bidiagonal(upper));
+    public P bidiagonal(final boolean upper) {
+        return this.wrap(this.store().bidiagonal(upper));
     }
 
-    public Pipeline2D<N, M> columns(final int[] columns) {
-        return new Pipeline2D<>(myFactory, this.store().columns(columns));
+    public P columns(final int[] columns) {
+        return this.wrap(this.store().columns(columns));
     }
 
-    public Pipeline2D<N, M> conjugate() {
-        return new Pipeline2D<>(myFactory, this.store().conjugate());
+    public P conjugate() {
+        return this.wrap(this.store().conjugate());
     }
 
     public long countColumns() {
@@ -99,111 +100,115 @@ public class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         return mySupplier.countRows();
     }
 
-    public Pipeline2D<N, M> diagonal() {
-        return new Pipeline2D<>(myFactory, this.store().diagonal());
+    public P diagonal() {
+        return this.wrap(this.store().diagonal());
     }
 
-    public Pipeline2D<N, M> diagonally(final Access2D<N>... diagonally) {
-        return new Pipeline2D<>(myFactory, this.store().diagonally(diagonally));
+    public P diagonally(final Access2D<N>... diagonally) {
+        return this.wrap(this.store().diagonally(diagonally));
     }
 
     public M get() {
         return myFactory.instantiate(this.store());
     }
 
-    public Pipeline2D<N, M> hermitian(final boolean upper) {
-        return new Pipeline2D<>(myFactory, this.store().hermitian(upper));
+    public P hermitian(final boolean upper) {
+        return this.wrap(this.store().hermitian(upper));
     }
 
-    public Pipeline2D<N, M> hessenberg(final boolean upper) {
-        return new Pipeline2D<>(myFactory, this.store().hessenberg(upper));
+    public P hessenberg(final boolean upper) {
+        return this.wrap(this.store().hessenberg(upper));
     }
 
-    public Pipeline2D<N, M> left(final Access2D<N>... left) {
-        return new Pipeline2D<>(myFactory, this.store().left(left));
+    public P left(final Access2D<N>... left) {
+        return this.wrap(this.store().left(left));
     }
 
-    public Pipeline2D<N, M> left(final Access2D<N> left) {
-        return new Pipeline2D<>(myFactory, this.store().left(left));
+    public P left(final Access2D<N> left) {
+        return this.wrap(this.store().left(left));
     }
 
-    public Pipeline2D<N, M> left(final long numberOfColumns) {
-        return new Pipeline2D<>(myFactory, this.store().left(numberOfColumns));
+    public P left(final long numberOfColumns) {
+        return this.wrap(this.store().left(numberOfColumns));
     }
 
-    public Pipeline2D<N, M> limits(final long rowLimit, final long columnLimit) {
-        return new Pipeline2D<>(myFactory, this.store().limits(rowLimit, columnLimit));
+    public P limits(final long rowLimit, final long columnLimit) {
+        return this.wrap(this.store().limits(rowLimit, columnLimit));
     }
 
-    public Pipeline2D<N, M> offsets(final long rowOffset, final long columnOffset) {
-        return new Pipeline2D<>(myFactory, this.store().offsets(rowOffset, columnOffset));
+    public P offsets(final long rowOffset, final long columnOffset) {
+        return this.wrap(this.store().offsets(rowOffset, columnOffset));
     }
 
-    public Pipeline2D<N, M> onAll(final UnaryFunction<N> operator) {
-        return new Pipeline2D<>(myFactory, mySupplier.onAll(operator));
+    public P onAll(final UnaryFunction<N> operator) {
+        return this.wrap(mySupplier.onAll(operator));
     }
 
-    public Pipeline2D<N, M> onAny(final Transformation2D<N> operator) {
-        return new Pipeline2D<>(myFactory, mySupplier.onAny(operator));
+    public P onAny(final Transformation2D<N> operator) {
+        return this.wrap(mySupplier.onAny(operator));
     }
 
-    public Pipeline2D<N, M> onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
-        return new Pipeline2D<>(myFactory, mySupplier.onColumns(operator, right));
+    public P onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return this.wrap(mySupplier.onColumns(operator, right));
     }
 
-    public Pipeline2D<N, M> onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
-        return new Pipeline2D<>(myFactory, mySupplier.onMatching(left, operator));
+    public P onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
+        return this.wrap(mySupplier.onMatching(left, operator));
     }
 
-    public Pipeline2D<N, M> onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
-        return new Pipeline2D<>(myFactory, mySupplier.onMatching(operator, right));
+    public P onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
+        return this.wrap(mySupplier.onMatching(operator, right));
     }
 
-    public Pipeline2D<N, M> onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
-        return new Pipeline2D<>(myFactory, mySupplier.onRows(operator, right));
+    public P onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return this.wrap(mySupplier.onRows(operator, right));
     }
 
-    public Pipeline2D<N, M> repeat(final int rowsRepetitions, final int columnsRepetitions) {
-        return new Pipeline2D<>(myFactory, this.store().repeat(rowsRepetitions, columnsRepetitions));
+    public P repeat(final int rowsRepetitions, final int columnsRepetitions) {
+        return this.wrap(this.store().repeat(rowsRepetitions, columnsRepetitions));
     }
 
-    public Pipeline2D<N, M> right(final Access2D<N>... right) {
-        return new Pipeline2D<>(myFactory, this.store().right(right));
+    public P right(final Access2D<N>... right) {
+        return this.wrap(this.store().right(right));
     }
 
-    public Pipeline2D<N, M> right(final Access2D<N> right) {
-        return new Pipeline2D<>(myFactory, this.store().right(right));
+    public P right(final Access2D<N> right) {
+        return this.wrap(this.store().right(right));
     }
 
-    public Pipeline2D<N, M> right(final long numberOfColumns) {
-        return new Pipeline2D<>(myFactory, this.store().right(numberOfColumns));
+    public P right(final long numberOfColumns) {
+        return this.wrap(this.store().right(numberOfColumns));
     }
 
-    public Pipeline2D<N, M> rows(final int[] rows) {
-        return new Pipeline2D<>(myFactory, this.store().rows(rows));
+    public P rows(final int[] rows) {
+        return this.wrap(this.store().rows(rows));
     }
 
-    public Pipeline2D<N, M> superimpose(final long row, final long col, final Access2D<N> matrix) {
-        return new Pipeline2D<>(myFactory, this.store().superimpose(row, col, matrix));
+    public P superimpose(final long row, final long col, final Access2D<N> matrix) {
+        return this.wrap(this.store().superimpose(row, col, matrix));
     }
 
-    public Pipeline2D<N, M> symmetric(final boolean upper) {
-        return new Pipeline2D<>(myFactory, this.store().symmetric(upper));
+    public void supplyTo(final PhysicalStore<N> receiver) {
+        mySupplier.supplyTo(receiver);
     }
 
-    public Pipeline2D<N, M> transpose() {
-        return new Pipeline2D<>(myFactory, this.store().transpose());
+    public P symmetric(final boolean upper) {
+        return this.wrap(this.store().symmetric(upper));
     }
 
-    public Pipeline2D<N, M> triangular(final boolean upper, final boolean assumeOne) {
-        return new Pipeline2D<>(myFactory, this.store().triangular(upper, assumeOne));
+    public P transpose() {
+        return this.wrap(this.store().transpose());
     }
 
-    public Pipeline2D<N, M> tridiagonal() {
-        return new Pipeline2D<>(myFactory, this.store().tridiagonal());
+    public P triangular(final boolean upper, final boolean assumeOne) {
+        return this.wrap(this.store().triangular(upper, assumeOne));
     }
 
-    MatrixStore<N> store() {
+    public P tridiagonal() {
+        return this.wrap(this.store().tridiagonal());
+    }
+
+    private MatrixStore<N> store() {
 
         if (myStore != null) {
             return myStore;
@@ -211,5 +216,7 @@ public class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>>
 
         return mySupplier.collect(myFactory.getPhysicalFactory());
     }
+
+    abstract P wrap(ElementsSupplier<N> supplier);
 
 }
