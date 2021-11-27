@@ -302,6 +302,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return 0;
     }
 
+    /**
+     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Logical} and this method simply
+     *             return "this".
+     */
+    @Deprecated
     default MatrixStore<N> get() {
         return this;
     }
@@ -446,8 +451,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * @deprecated v50 No need for {@link LogicalBuilder} as {@link MatrixStore} now implements
-     *             {@link Logical}.
+     * @deprecated v50 No need as {@link MatrixStore} now implements {@link Logical}.
      */
     @Deprecated
     default MatrixStore<N> logical() {
