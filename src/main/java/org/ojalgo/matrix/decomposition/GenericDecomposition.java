@@ -41,7 +41,6 @@ import org.ojalgo.structure.Structure2D;
  */
 abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDecomposition<N> {
 
-    private final MatrixStore.Factory<N> myBuilder;
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
 
     protected GenericDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
@@ -49,7 +48,6 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
         super();
 
         myFactory = factory;
-        myBuilder = myFactory.builder();
     }
 
     protected final AggregatorSet<N> aggregator() {
@@ -61,13 +59,12 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
         return myFactory.make(numberOfRows, numberOfColumns);
     }
 
-    @SuppressWarnings("unchecked")
     protected final MatrixStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
         if (source instanceof MatrixStore) {
             return (MatrixStore<N>) source;
         }
         if (source instanceof Access2D) {
-            return myBuilder.makeWrapper((Access2D<?>) source).get();
+            return myFactory.makeWrapper((Access2D<?>) source).get();
         }
         return source.collect(myFactory);
     }
@@ -98,7 +95,7 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
     }
 
     protected final MatrixStore<N> makeIdentity(final int dimension) {
-        return myBuilder.makeIdentity(dimension);
+        return myFactory.makeIdentity(dimension);
     }
 
     protected final Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
@@ -123,7 +120,7 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
     }
 
     protected final MatrixStore<N> wrap(final Access2D<?> source) {
-        return myBuilder.makeWrapper(source);
+        return myFactory.makeWrapper(source);
     }
 
 }

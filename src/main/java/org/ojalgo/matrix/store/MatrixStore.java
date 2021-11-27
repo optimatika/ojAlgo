@@ -29,7 +29,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.Matrix2D;
-import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
@@ -66,173 +65,12 @@ import org.ojalgo.type.context.NumberContext;
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
         Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
 
-    public interface Factory<N extends Comparable<N>> {
-
-        <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(D mainDiagonal);
-
-        MatrixStore<N> makeIdentity(int dimension);
-
-        default MatrixStore<N> makeIdentity(final long dimension) {
-            return this.makeIdentity(Math.toIntExact(dimension));
-        }
-
-        MatrixStore<N> makeSingle(N element);
-
-        SparseStore<N> makeSparse(int rowsCount, int columnsCount);
-
-        default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
-            return this.makeSparse(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
-        }
-
-        MatrixStore<N> makeWrapper(Access2D<?> access);
-
-        MatrixStore<N> makeZero(int rowsCount, int columnsCount);
-
-        default MatrixStore<N> makeZero(final long rowsCount, final long columnsCount) {
-            return this.makeZero(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
-        }
-
-    }
-
-    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public <D extends Access1D<?>> DiagonalStore.Builder<ComplexNumber, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericStore.COMPLEX, mainDiagonal);
-        }
-
-        public MatrixStore<ComplexNumber> makeIdentity(final int dimension) {
-            return new IdentityStore<>(GenericStore.COMPLEX, dimension);
-        }
-
-        public MatrixStore<ComplexNumber> makeSingle(final ComplexNumber element) {
-            return new SingleStore<>(GenericStore.COMPLEX, element);
-        }
-
-        public SparseStore<ComplexNumber> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.COMPLEX.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<ComplexNumber> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(GenericStore.COMPLEX, access);
-        }
-
-        public MatrixStore<ComplexNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(GenericStore.COMPLEX, rowsCount, columnsCount);
-        }
-
-    };
-
-    Factory<Double> PRIMITIVE32 = new Factory<Double>() {
-
-        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(Primitive32Store.FACTORY, mainDiagonal);
-        }
-
-        public MatrixStore<Double> makeIdentity(final int dimension) {
-            return new IdentityStore<>(Primitive32Store.FACTORY, dimension);
-        }
-
-        public MatrixStore<Double> makeSingle(final Double element) {
-            return new SingleStore<>(Primitive32Store.FACTORY, element);
-        }
-
-        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.PRIMITIVE32.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<Double> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(Primitive32Store.FACTORY, access);
-        }
-
-        public MatrixStore<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(Primitive32Store.FACTORY, rowsCount, columnsCount);
-        }
-
-    };
-
-    Factory<Double> PRIMITIVE64 = new Factory<Double>() {
-
-        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(Primitive64Store.FACTORY, mainDiagonal);
-        }
-
-        public MatrixStore<Double> makeIdentity(final int dimension) {
-            return new IdentityStore<>(Primitive64Store.FACTORY, dimension);
-        }
-
-        public MatrixStore<Double> makeSingle(final Double element) {
-            return new SingleStore<>(Primitive64Store.FACTORY, element);
-        }
-
-        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.PRIMITIVE64.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<Double> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(Primitive64Store.FACTORY, access);
-        }
-
-        public MatrixStore<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(Primitive64Store.FACTORY, rowsCount, columnsCount);
-        }
-
-    };
-
-    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
-
-        public <D extends Access1D<?>> Builder<Quaternion, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericStore.QUATERNION, mainDiagonal);
-        }
-
-        public MatrixStore<Quaternion> makeIdentity(final int dimension) {
-            return new IdentityStore<>(GenericStore.QUATERNION, dimension);
-        }
-
-        public MatrixStore<Quaternion> makeSingle(final Quaternion element) {
-            return new SingleStore<>(GenericStore.QUATERNION, element);
-        }
-
-        public SparseStore<Quaternion> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.QUATERNION.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<Quaternion> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(GenericStore.QUATERNION, access);
-        }
-
-        public MatrixStore<Quaternion> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(GenericStore.QUATERNION, rowsCount, columnsCount);
-        }
-
-    };
-
-    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
-
-        public <D extends Access1D<?>> Builder<RationalNumber, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericStore.RATIONAL, mainDiagonal);
-        }
-
-        public MatrixStore<RationalNumber> makeIdentity(final int dimension) {
-            return new IdentityStore<>(GenericStore.RATIONAL, dimension);
-        }
-
-        public MatrixStore<RationalNumber> makeSingle(final RationalNumber element) {
-            return new SingleStore<>(GenericStore.RATIONAL, element);
-        }
-
-        public SparseStore<RationalNumber> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.RATIONAL.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<RationalNumber> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(GenericStore.RATIONAL, access);
-        }
-
-        public MatrixStore<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(GenericStore.RATIONAL, rowsCount, columnsCount);
-        }
-
-    };
+    PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = GenericStore.COMPLEX;
+    PhysicalStore.Factory<Double, Primitive32Store> PRIMITIVE32 = Primitive32Store.FACTORY;
+    PhysicalStore.Factory<Double, Primitive64Store> PRIMITIVE64 = Primitive64Store.FACTORY;
+    PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = GenericStore.QUATERNION;
+    PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = GenericStore.RATIONAL;
+    PhysicalStore.Factory<Double, RawStore> RAW = RawStore.FACTORY;
 
     static int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
@@ -775,11 +613,11 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         MatrixStore<N> retVal = this;
 
         if (rowsRepetitions > 1) {
-            retVal = new RepeatedRowsStore<>(this, rowsRepetitions);
+            retVal = new RepeatedRowsStore<>(retVal, rowsRepetitions);
         }
 
         if (columnsRepetitions > 1) {
-            retVal = new RepeatedColumnsStore<>(this, columnsRepetitions);
+            retVal = new RepeatedColumnsStore<>(retVal, columnsRepetitions);
         }
 
         return retVal;

@@ -52,7 +52,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  */
 public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
-    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I>, MatrixStore.Factory<N> {
+    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
 
         default TensorFactory2D<N, I> tensor2D() {
             return TensorFactory2D.of(this);
@@ -66,7 +66,13 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         DenseArray.Factory<N> array();
 
-        MatrixStore.Factory<N> builder();
+        /**
+         * @deprecated v50 No need to call this.
+         */
+        @Deprecated
+        default PhysicalStore.Factory<N, I> builder() {
+            return this;
+        }
 
         I conjugate(Access2D<?> source);
 
@@ -115,6 +121,30 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
         Scalar.Factory<N> scalar();
 
         I transpose(Access2D<?> source);
+
+        <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(D mainDiagonal);
+
+        MatrixStore<N> makeIdentity(int dimension);
+
+        default MatrixStore<N> makeIdentity(final long dimension) {
+            return this.makeIdentity(Math.toIntExact(dimension));
+        }
+
+        MatrixStore<N> makeSingle(N element);
+
+        SparseStore<N> makeSparse(int rowsCount, int columnsCount);
+
+        default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
+            return this.makeSparse(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+        }
+
+        MatrixStore<N> makeWrapper(Access2D<?> access);
+
+        MatrixStore<N> makeZero(int rowsCount, int columnsCount);
+
+        default MatrixStore<N> makeZero(final long rowsCount, final long columnsCount) {
+            return this.makeZero(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+        }
 
     }
 

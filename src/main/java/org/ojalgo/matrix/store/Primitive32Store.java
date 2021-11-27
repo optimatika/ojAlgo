@@ -70,11 +70,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             return Primitive32Array.FACTORY;
         }
 
-        @Override
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE32;
-        }
-
         public Primitive32Store columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();

@@ -44,10 +44,6 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
         return Primitive64Array.FACTORY;
     }
 
-    public MatrixStore.Factory<Double> builder() {
-        return MatrixStore.PRIMITIVE64;
-    }
-
     public final I conjugate(final Access2D<?> source) {
         return this.transpose(source);
     }

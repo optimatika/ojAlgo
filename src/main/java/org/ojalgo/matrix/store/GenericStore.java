@@ -84,36 +84,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return myDenseArrayFactory;
         }
 
-        public MatrixStore.Factory<N> builder() {
-            return new MatrixStore.Factory<N>() {
-
-                public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
-                    return DiagonalStore.builder(GenericStore.Factory.this, mainDiagonal);
-                }
-
-                public MatrixStore<N> makeIdentity(final int dimension) {
-                    return new IdentityStore<>(GenericStore.Factory.this, dimension);
-                }
-
-                public MatrixStore<N> makeSingle(final N element) {
-                    return new SingleStore<>(GenericStore.Factory.this, element);
-                }
-
-                public SparseStore<N> makeSparse(final int rowsCount, final int columnsCount) {
-                    return new SparseStore<>(GenericStore.Factory.this, rowsCount, columnsCount);
-                }
-
-                public MatrixStore<N> makeWrapper(final Access2D<?> access) {
-                    return new WrapperStore<>(GenericStore.Factory.this, access);
-                }
-
-                public MatrixStore<N> makeZero(final int rowsCount, final int columnsCount) {
-                    return new ZeroStore<>(GenericStore.Factory.this, rowsCount, columnsCount);
-                }
-
-            };
-        }
-
         public GenericStore<N> columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
