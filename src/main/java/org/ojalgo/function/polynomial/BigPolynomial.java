@@ -25,10 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.TypeUtils;
 
@@ -49,28 +45,11 @@ public final class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
 
-        int tmpRowDim = (int) Math.min(x.count(), y.count());
-        int tmpColDim = this.size();
+        RationalPolynomial delegate = new RationalPolynomial(this.degree());
 
-        PhysicalStore<RationalNumber> tmpBody = GenericStore.RATIONAL.make(tmpRowDim, tmpColDim);
-        PhysicalStore<RationalNumber> tmpRHS = GenericStore.RATIONAL.make(tmpRowDim, 1);
+        delegate.estimate(x, y);
 
-        for (int i = 0; i < tmpRowDim; i++) {
-
-            BigDecimal tmpX = BigMath.ONE;
-            BigDecimal tmpXfactor = TypeUtils.toBigDecimal(x.get(i));
-            BigDecimal tmpY = TypeUtils.toBigDecimal(y.get(i));
-
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpBody.set(i, j, tmpX);
-                tmpX = tmpX.multiply(tmpXfactor);
-            }
-            tmpRHS.set(i, 0, tmpY);
-        }
-
-        QR<RationalNumber> tmpQR = QR.RATIONAL.make();
-        tmpQR.decompose(tmpBody);
-        this.set(tmpQR.getSolution(tmpRHS));
+        this.set(delegate);
     }
 
     public BigDecimal integrate(final BigDecimal fromPoint, final BigDecimal toPoint) {
@@ -97,7 +76,7 @@ public final class BigPolynomial extends AbstractPolynomial<BigDecimal> {
     }
 
     public void set(final Access1D<?> coefficients) {
-        int tmpLimit = (int) Math.min(this.count(), coefficients.count());
+        int tmpLimit = Math.min(this.size(), coefficients.size());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, TypeUtils.toBigDecimal(coefficients.get(p)));
         }

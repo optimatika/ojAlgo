@@ -24,7 +24,6 @@ package org.ojalgo.function.polynomial;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 
@@ -39,29 +38,7 @@ public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-
-        int tmpRowDim = (int) Math.min(x.count(), y.count());
-        int tmpColDim = this.size();
-
-        PhysicalStore<Double> tmpBody = Primitive64Store.FACTORY.make(tmpRowDim, tmpColDim);
-        PhysicalStore<Double> tmpRHS = Primitive64Store.FACTORY.make(tmpRowDim, 1);
-
-        for (int i = 0; i < tmpRowDim; i++) {
-
-            double tmpX = PrimitiveMath.ONE;
-            double tmpXfactor = x.doubleValue(i);
-            double tmpY = y.doubleValue(i);
-
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpBody.set(i, j, tmpX);
-                tmpX *= tmpXfactor;
-            }
-            tmpRHS.set(i, 0, tmpY);
-        }
-
-        QR<Double> tmpQR = QR.PRIMITIVE.make();
-        tmpQR.decompose(tmpBody);
-        this.set(tmpQR.getSolution(tmpRHS));
+        this.estimate(x, y, Primitive64Store.FACTORY, QR.PRIMITIVE);
     }
 
     public Double integrate(final Double fromPoint, final Double toPoint) {
@@ -71,15 +48,15 @@ public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
         double tmpFromVal = tmpPrim.invoke(fromPoint.doubleValue());
         double tmpToVal = tmpPrim.invoke(toPoint.doubleValue());
 
-        return tmpToVal - tmpFromVal;
+        return Double.valueOf(tmpToVal - tmpFromVal);
     }
 
     public Double invoke(final Double arg) {
-        return this.invoke(arg.doubleValue());
+        return Double.valueOf(this.invoke(arg.doubleValue()));
     }
 
     public void set(final Access1D<?> coefficients) {
-        int tmpLimit = (int) Math.min(this.count(), coefficients.count());
+        int tmpLimit = Math.min(this.size(), coefficients.size());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, coefficients.doubleValue(p));
         }
@@ -88,15 +65,15 @@ public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
     @Override
     protected Double getDerivativeFactor(final int power) {
         int tmpNextIndex = power + 1;
-        return tmpNextIndex * this.doubleValue(tmpNextIndex);
+        return Double.valueOf(tmpNextIndex * this.doubleValue(tmpNextIndex));
     }
 
     @Override
     protected Double getPrimitiveFactor(final int power) {
         if (power <= 0) {
-            return PrimitiveMath.ZERO;
+            return Double.valueOf(PrimitiveMath.ZERO);
         }
-        return this.doubleValue(power - 1) / power;
+        return Double.valueOf(this.doubleValue(power - 1) / power);
     }
 
     @Override

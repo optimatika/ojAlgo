@@ -24,7 +24,6 @@ package org.ojalgo.function.polynomial;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 
@@ -39,29 +38,7 @@ public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-
-        int tmpRowDim = (int) Math.min(x.count(), y.count());
-        int tmpColDim = this.size();
-
-        PhysicalStore<ComplexNumber> tmpBody = GenericStore.COMPLEX.make(tmpRowDim, tmpColDim);
-        PhysicalStore<ComplexNumber> tmpRHS = GenericStore.COMPLEX.make(tmpRowDim, 1);
-
-        for (int i = 0; i < tmpRowDim; i++) {
-
-            ComplexNumber tmpX = ComplexNumber.ONE;
-            ComplexNumber tmpXfactor = ComplexNumber.valueOf(x.get(i));
-            ComplexNumber tmpY = ComplexNumber.valueOf(y.get(i));
-
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpBody.set(i, j, tmpX);
-                tmpX = tmpX.multiply(tmpXfactor);
-            }
-            tmpRHS.set(i, 0, tmpY);
-        }
-
-        QR<ComplexNumber> tmpQR = QR.COMPLEX.make();
-        tmpQR.decompose(tmpBody);
-        this.set(tmpQR.getSolution(tmpRHS));
+        this.estimate(x, y, GenericStore.COMPLEX, QR.COMPLEX);
     }
 
     public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
@@ -88,7 +65,7 @@ public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     }
 
     public void set(final Access1D<?> coefficients) {
-        int tmpLimit = (int) Math.min(this.size(), coefficients.count());
+        int tmpLimit = Math.min(this.size(), coefficients.size());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, ComplexNumber.valueOf(coefficients.get(p)));
         }
