@@ -42,30 +42,30 @@ public final class JacobiSolver extends StationaryIterativeSolver {
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
 
         MatrixStore<Double> tmpBody = null;
-        if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {
+        if (body instanceof MatrixStore<?> && body.get(0L) instanceof Double) {
             tmpBody = (MatrixStore<Double>) body;
         } else {
-            tmpBody = MatrixStore.PRIMITIVE64.makeWrapper(body).get();
+            tmpBody = Primitive64Store.FACTORY.makeWrapper(body);
         }
-        final MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.columns(tmpBody.sliceDiagonal());
+        MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.columns(tmpBody.sliceDiagonal());
 
         MatrixStore<Double> tmpRHS = null;
-        if ((rhs instanceof MatrixStore<?>) && (rhs.get(0L) instanceof Double)) {
+        if (rhs instanceof MatrixStore<?> && rhs.get(0L) instanceof Double) {
             tmpRHS = (MatrixStore<Double>) rhs;
         } else {
-            tmpRHS = MatrixStore.PRIMITIVE64.makeWrapper(rhs).get();
+            tmpRHS = Primitive64Store.FACTORY.makeWrapper(rhs);
         }
 
-        final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
+        PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
         TransformableRegion<Double> incremetReceiver = body.isFat() ? tmpIncrement.regionByLimits((int) body.countRows(), 1) : tmpIncrement;
 
         double tmpNormErr = POSITIVE_INFINITY;
-        final double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);
+        double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);
 
         int tmpIterations = 0;
-        final int tmpLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getAccuracyContext();
-        final double tmpRelaxation = this.getRelaxationFactor();
+        int tmpLimit = this.getIterationsLimit();
+        NumberContext tmpCntxt = this.getAccuracyContext();
+        double tmpRelaxation = this.getRelaxationFactor();
         do {
 
             current.premultiply(tmpBody).onMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
@@ -84,7 +84,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
                 this.debug(tmpIterations, tmpNormErr / tmpNormRHS, current);
             }
 
-        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+        } while (tmpIterations < tmpLimit && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
 
         return current;
     }

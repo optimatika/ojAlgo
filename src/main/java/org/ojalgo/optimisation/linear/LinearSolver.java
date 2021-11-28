@@ -123,12 +123,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
                 if (nbInequalites > 0) {
 
-                    mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+                    mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
 
-                    mtrxAE = this.getAE().logical().below(this.getAI()).right(nbInequalites).collect(FACTORY);
+                    mtrxAE = this.getAE().below(this.getAI()).right(nbInequalites).collect(FACTORY);
                     mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
-                    mtrxBE = this.getBE().logical().below(this.getBI()).collect(FACTORY);
+                    mtrxBE = this.getBE().below(this.getBI()).collect(FACTORY);
 
                 } else {
 
@@ -142,9 +142,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             } else if (nbInequalites > 0) {
 
-                mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+                mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
 
-                mtrxAE = this.getAI().logical().right(nbInequalites).collect(FACTORY);
+                mtrxAE = this.getAI().right(nbInequalites).collect(FACTORY);
                 mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
                 mtrxBE = this.getBI().collect(FACTORY);

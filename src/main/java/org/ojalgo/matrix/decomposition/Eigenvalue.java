@@ -83,10 +83,7 @@ public interface Eigenvalue<N extends Comparable<N>>
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof Eigenpair)) {
+            if (obj == null || !(obj instanceof Eigenpair)) {
                 return false;
             }
             final Eigenpair other = (Eigenpair) obj;
@@ -111,8 +108,8 @@ public interface Eigenvalue<N extends Comparable<N>>
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) + ((value == null) ? 0 : value.hashCode());
-            result = (prime * result) + ((vector == null) ? 0 : vector.hashCode());
+            result = prime * result + (value == null ? 0 : value.hashCode());
+            result = prime * result + (vector == null ? 0 : vector.hashCode());
             return result;
         }
 
@@ -141,9 +138,8 @@ public interface Eigenvalue<N extends Comparable<N>>
         default Eigenvalue<N> make(final Structure2D typical) {
             if (typical instanceof MatrixStore) {
                 return this.make(typical, ((MatrixStore<?>) typical).isHermitian());
-            } else {
-                return this.make(typical, false);
             }
+            return this.make(typical, false);
         }
 
         Eigenvalue<N> make(Structure2D typical, boolean hermitian);
@@ -241,28 +237,24 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
-            if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+            if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
                 return new DynamicEvD.Primitive();
-            } else {
-                return new RawEigenvalue.Dynamic();
             }
+            return new RawEigenvalue.Dynamic();
         }
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
-                if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+                if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
                     return new HermitianEvD.Primitive();
-                } else {
-                    return new RawEigenvalue.Symmetric();
                 }
-            } else {
-                if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                    return new GeneralEvD.Primitive();
-                } else {
-                    return new RawEigenvalue.General();
-                }
+                return new RawEigenvalue.Symmetric();
             }
+            if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+                return new GeneralEvD.Primitive();
+            }
+            return new RawEigenvalue.General();
         }
 
         @Override
@@ -349,9 +341,11 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         if (tmpNumber instanceof ComplexNumber) {
             return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
-        } else if (tmpNumber instanceof Double) {
+        }
+        if (tmpNumber instanceof Double) {
             return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
-        } else if (tmpNumber instanceof Quaternion) {
+        }
+        if (tmpNumber instanceof Quaternion) {
             return (Eigenvalue<N>) QUATERNION.make(typical, hermitian);
         } else if (tmpNumber instanceof RationalNumber) {
             return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
@@ -382,11 +376,11 @@ public interface Eigenvalue<N extends Comparable<N>>
         final int prevCol = index - 1;
         final int nextCol = index + 1;
 
-        if ((index < (tmpDimension - 1L)) && (tmpD.doubleValue(nextCol, index) != 0.0)) {
+        if (index < tmpDimension - 1L && tmpD.doubleValue(nextCol, index) != 0.0) {
             for (int i = 0; i < tmpDimension; i++) {
                 destination.set(i, ComplexNumber.of(tmpV.doubleValue(i, index), tmpV.doubleValue(i, nextCol)));
             }
-        } else if ((index > 0) && (tmpD.doubleValue(prevCol, index) != 0.0)) {
+        } else if (index > 0 && tmpD.doubleValue(prevCol, index) != 0.0) {
             for (int i = 0; i < tmpDimension; i++) {
                 destination.set(i, ComplexNumber.of(tmpV.doubleValue(i, prevCol), -tmpV.doubleValue(i, index)));
             }
@@ -415,7 +409,7 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         final long dim = this.getV().countColumns();
 
-        final Array1D<ComplexNumber> vector = Array1D.COMPLEX.makeZero(dim);
+        final Array1D<ComplexNumber> vector = Array1D.COMPLEX.make(dim);
         this.copyEigenvector(index, vector);
 
         final Array1D<ComplexNumber> values = this.getEigenvalues();
@@ -472,7 +466,7 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
+        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

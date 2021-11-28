@@ -16,25 +16,25 @@ public class ComposingStoreTest extends MatrixStoreTests {
     @Test
     public void firstInColumn() {
         int block = (int) Math.floor(Math.random() * BLOCK_COUNT);
-        TestUtils.assertEquals((block * 128) + SPARSE_SIZE, theMatrix.firstInColumn((block * 128) + SPARSE_SIZE + 64));
+        TestUtils.assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInColumn(block * 128 + SPARSE_SIZE + 64));
     }
 
     @Test
     public void firstInRow() {
         int block = (int) Math.floor(Math.random() * BLOCK_COUNT);
-        TestUtils.assertEquals((block * 128) + SPARSE_SIZE, theMatrix.firstInRow((block * 128) + SPARSE_SIZE + 64));
+        TestUtils.assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInRow(block * 128 + SPARSE_SIZE + 64));
     }
 
     @Test
     public void limitOfColumn() {
         int block = (int) Math.floor(Math.random() * BLOCK_COUNT);
-        TestUtils.assertEquals(((block + 1) * 128) + 128, theMatrix.limitOfColumn((block * 128) + 192));
+        TestUtils.assertEquals((block + 1) * 128 + 128, theMatrix.limitOfColumn(block * 128 + 192));
     }
 
     @Test
     public void limitOfRow() {
         int block = (int) Math.floor(Math.random() * BLOCK_COUNT);
-        TestUtils.assertEquals(((block + 1) * 128) + 128, theMatrix.limitOfRow((block * 128) + 192));
+        TestUtils.assertEquals((block + 1) * 128 + 128, theMatrix.limitOfRow(block * 128 + 192));
     }
 
     @BeforeEach
@@ -46,7 +46,7 @@ public class ComposingStoreTest extends MatrixStoreTests {
     }
 
     private MatrixStore<Double> blockMatrix(final MatrixStore<Double> upperLeft, final MatrixStore<Double> lowerRight) {
-        return upperLeft.logical().right((int) lowerRight.countColumns()).below(lowerRight.logical().left((int) upperLeft.countColumns()).get()).get();
+        return upperLeft.right((int) lowerRight.countColumns()).below(lowerRight.left((int) upperLeft.countColumns()));
     }
 
     private MatrixStore<Double> filledMatrix(final int rowCount, final int colCount) {
@@ -77,7 +77,7 @@ public class ComposingStoreTest extends MatrixStoreTests {
         for (int i = 0; i < nonzeroCount; i++) {
             int row = (int) Math.floor(Math.random() * rowCount);
             int col = (int) Math.floor(Math.random() * colCount);
-            matrix.set(row, col, (Math.random() * 5) + 1);
+            matrix.set(row, col, Math.random() * 5 + 1);
         }
         return matrix;
     }

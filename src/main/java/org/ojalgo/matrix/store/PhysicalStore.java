@@ -27,7 +27,9 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -52,21 +54,12 @@ import org.ojalgo.tensor.TensorFactory2D;
  */
 public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
 
-    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
-
-        default TensorFactory2D<N, I> tensor2D() {
-            return TensorFactory2D.of(this);
-        }
-
-        default TensorFactory1D<N, I> tensor1D() {
-            return TensorFactory1D.of(this.asFactory1D());
-        }
+    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>>
+            extends Factory2D.Dense<I>, Factory2D.MayBeSparse<I, PhysicalStore<N>, SparseStore<N>> {
 
         AggregatorSet<N> aggregator();
 
         DenseArray.Factory<N> array();
-
-        MatrixStore.Factory<N> builder();
 
         I conjugate(Access2D<?> source);
 
@@ -76,13 +69,43 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new ColumnsSupplier<>(this, numberOfRows);
         }
 
-        I makeEye(long rows, long columns);
+        default PhysicalStore<N> makeDense(final long rows, final long columns) {
+            return this.make(rows, columns);
+        }
+
+        default <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(this, mainDiagonal);
+        }
+
+        default I makeEye(final long rows, final long columns) {
+
+            I retVal = this.make(rows, columns);
+
+            N tmpVal = this.scalar().one().get();
+
+            retVal.fillDiagonal(tmpVal);
+
+            return retVal;
+        }
 
         default I makeEye(final Structure2D shape) {
             return this.makeEye(shape.countRows(), shape.countColumns());
         }
 
+        default I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+
+            I retVal = this.make(rows, columns);
+
+            retVal.fillAll(supplier);
+
+            return retVal;
+        }
+
         Householder<N> makeHouseholder(int length);
+
+        default MatrixStore<N> makeIdentity(final long dimension) {
+            return new IdentityStore<>(this, dimension);
+        }
 
         Rotation<N> makeRotation(int low, int high, double cos, double sin);
 
@@ -90,6 +113,14 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         default RowsSupplier<N> makeRowsSupplier(final int numberOfColumns) {
             return new RowsSupplier<>(this, numberOfColumns);
+        }
+
+        default MatrixStore<N> makeSingle(final N element) {
+            return new SingleStore<>(this, element);
+        }
+
+        default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
+            return SparseStore.makeSparse(this, rowsCount, columnsCount);
         }
 
         /**
@@ -112,7 +143,27 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return retVal;
         }
 
+        default MatrixStore<N> makeWrapper(final Access2D<?> access) {
+            return new WrapperStore<>(this, access);
+        }
+
+        default MatrixStore<N> makeZero(final Structure2D shape) {
+            return this.makeZero(shape.countRows(), shape.countColumns());
+        }
+
+        default MatrixStore<N> makeZero(final long rowsCount, final long columnsCount) {
+            return new ZeroStore<>(this, rowsCount, columnsCount);
+        }
+
         Scalar.Factory<N> scalar();
+
+        default TensorFactory1D<N, I> tensor1D() {
+            return TensorFactory1D.of(this.asFactory1D());
+        }
+
+        default TensorFactory2D<N, I> tensor2D() {
+            return TensorFactory2D.of(this);
+        }
 
         I transpose(Access2D<?> source);
 

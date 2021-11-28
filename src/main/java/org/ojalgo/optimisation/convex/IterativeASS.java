@@ -252,7 +252,7 @@ final class IterativeASS extends ActiveSetSolver {
 
             if (solved = this.solveFullKKT(tmpXL)) {
 
-                iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
+                iterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
 
                 for (int i = 0; i < this.countEqualityConstraints(); i++) {
                     this.getSolutionL().set(i, tmpXL.doubleValue(this.countVariables() + i));

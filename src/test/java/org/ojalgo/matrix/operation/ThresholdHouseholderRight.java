@@ -105,7 +105,7 @@ public class ThresholdHouseholderRight extends ThresholdTuner {
 
             super();
 
-            matrix = Primitive64Store.FACTORY.makeSPD(dim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get().copy();
+            matrix = Primitive64Store.FACTORY.makeSPD(dim).below(Primitive64Store.FACTORY.makeIdentity(dim)).copy();
 
             decomposition = Bidiagonal.PRIMITIVE.make(matrix);
         }

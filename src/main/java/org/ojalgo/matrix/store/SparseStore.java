@@ -401,8 +401,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
                 long col = element.column();
                 double value = element.doubleValue();
 
-                long first = MatrixStore.firstInRow(right, col, 0L);
-                long limit = MatrixStore.limitOfRow(right, col, numberOfColumns);
+                long first = Structure2D.firstInRow(right, col, 0L);
+                long limit = Structure2D.limitOfRow(right, col, numberOfColumns);
                 for (long j = first; j < limit; j++) {
                     long index = Structure2D.index(complexity, col, j);
                     double addition = value * right.doubleValue(index);
@@ -522,8 +522,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             long col = element.column();
             double value = element.doubleValue();
 
-            long first = MatrixStore.firstInColumn(left, row, 0L);
-            long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
+            long first = Structure2D.firstInColumn(left, row, 0L);
+            long limit = Structure2D.limitOfColumn(left, row, numberOfRows);
             for (long i = first; i < limit; i++) {
                 long index = Structure2D.index(numberOfRows, i, row);
                 double addition = value * left.doubleValue(index);

@@ -694,6 +694,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return Math.round(this.doubleValue(row, col));
     }
 
+    default ElementView2D<N, ?> nonzeros() {
+        return new Access2D.ElementView<>(Access1D.super.nonzeros(), this.countRows());
+    }
+
     default RowView<N> rows() {
         return new RowView<>(this);
     }

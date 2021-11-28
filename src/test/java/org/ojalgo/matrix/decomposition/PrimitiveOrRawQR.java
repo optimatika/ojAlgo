@@ -115,7 +115,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
         final int dim1 = dim;
 
         // body = MatrixUtils.makeSPD(dim).builder().below(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dim)).build();
-        body = Primitive64Store.FACTORY.makeSPD(dim1).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(dim).get()).get();
+        body = Primitive64Store.FACTORY.makeSPD(dim1).below(Primitive64Store.FACTORY.makeIdentity(dim));
         rhs = Primitive64Store.FACTORY.makeFilled(dim + dim, 1, new Uniform());
 
         preallocated = primitive.preallocate(body, rhs);

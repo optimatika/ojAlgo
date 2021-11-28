@@ -21,11 +21,16 @@
  */
 package org.ojalgo.function.polynomial;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.series.NumberSeries;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.TypeUtils;
 
 abstract class AbstractPolynomial<N extends Comparable<N>> implements PolynomialFunction<N> {
 
@@ -95,6 +100,32 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         this.estimate(Access1D.wrap(x), Access1D.wrap(y));
     }
 
+    void estimate(final Access1D<?> x, final Access1D<?> y, final PhysicalStore.Factory<N, ?> store, final QR.Factory<N> qr) {
+
+        int tmpRowDim = Math.min(x.size(), y.size());
+        int tmpColDim = this.size();
+
+        PhysicalStore<N> tmpBody = store.make(tmpRowDim, tmpColDim);
+        PhysicalStore<N> tmpRHS = store.make(tmpRowDim, 1);
+
+        for (int i = 0; i < tmpRowDim; i++) {
+
+            BigDecimal tmpX = BigMath.ONE;
+            BigDecimal tmpXfactor = TypeUtils.toBigDecimal(x.get(i));
+            BigDecimal tmpY = TypeUtils.toBigDecimal(y.get(i));
+
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpBody.set(i, j, tmpX);
+                tmpX = tmpX.multiply(tmpXfactor);
+            }
+            tmpRHS.set(i, 0, tmpY);
+        }
+
+        QR<N> tmpQR = qr.make(tmpBody);
+        tmpQR.decompose(tmpBody);
+        this.set(tmpQR.getSolution(tmpRHS));
+    }
+
     public final void estimate(final NumberSeries<?> samples) {
         this.estimate(samples.accessKeys(), samples.accessValues());
     }
@@ -110,7 +141,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         double retVal = this.doubleValue(power);
 
         while (--power >= 0) {
-            retVal = this.doubleValue(power) + (arg * retVal);
+            retVal = this.doubleValue(power) + arg * retVal;
         }
 
         return retVal;
@@ -123,7 +154,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         float retVal = this.floatValue(power);
 
         while (--power >= 0) {
-            retVal = this.floatValue(power) + (arg * retVal);
+            retVal = this.floatValue(power) + arg * retVal;
         }
 
         return retVal;

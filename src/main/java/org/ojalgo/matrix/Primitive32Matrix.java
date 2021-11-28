@@ -47,62 +47,59 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
 
-    public static final class DenseReceiver extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Mutator<PhysicalStore<Double>> {
+    public static final class DenseReceiver extends Mutator2D<Double, Primitive32Matrix, PhysicalStore<Double>> {
 
-        DenseReceiver(final Factory enclosing, final PhysicalStore<Double> delegate) {
-            enclosing.super(delegate);
+        DenseReceiver(final PhysicalStore<Double> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
 
         Factory() {
             super(Primitive32Matrix.class, Primitive32Store.FACTORY);
         }
 
         @Override
-        Primitive32Matrix.LogicalBuilder logical(final MatrixStore<Double> delegate) {
-            return new Primitive32Matrix.LogicalBuilder(this, delegate);
+        Primitive32Matrix.DenseReceiver dense(final PhysicalStore<Double> store) {
+            return new Primitive32Matrix.DenseReceiver(store);
         }
 
         @Override
-        Primitive32Matrix.DenseReceiver physical(final PhysicalStore<Double> delegate) {
-            return new Primitive32Matrix.DenseReceiver(this, delegate);
-        }
-
-        @Override
-        Primitive32Matrix.SparseReceiver physical(final SparseStore<Double> delegate) {
-            return new Primitive32Matrix.SparseReceiver(this, delegate);
+        Primitive32Matrix.SparseReceiver sparse(final SparseStore<Double> store) {
+            return new Primitive32Matrix.SparseReceiver(store);
         }
 
     }
 
-    public static final class LogicalBuilder extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Logical {
+    public static final class LogicalBuilder extends Pipeline2D<Double, Primitive32Matrix, LogicalBuilder> {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
-            enclosing.super(delegate);
-        }
-
-        LogicalBuilder(final Factory enclosing, final MatrixStore<Double> store) {
-            enclosing.super(store);
+        LogicalBuilder(final MatrixFactory<Double, Primitive32Matrix, ?, ?> factory, final ElementsSupplier<Double> supplier) {
+            super(factory, supplier);
         }
 
         @Override
-        LogicalBuilder self() {
-            return this;
+        LogicalBuilder wrap(final ElementsSupplier<Double> supplier) {
+            return new LogicalBuilder(FACTORY, supplier);
         }
 
     }
 
-    public static final class SparseReceiver extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Mutator<SparseStore<Double>> {
+    public static final class SparseReceiver extends Mutator2D<Double, Primitive32Matrix, SparseStore<Double>> {
 
-        SparseReceiver(final Factory enclosing, final SparseStore<Double> delegate) {
-            enclosing.super(delegate);
+        SparseReceiver(final SparseStore<Double> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
@@ -116,10 +113,9 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
         super(aStore);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Primitive32Matrix.DenseReceiver copy() {
-        return new Primitive32Matrix.DenseReceiver(FACTORY, this.getStore().copy());
+        return new Primitive32Matrix.DenseReceiver(this.getStore().copy());
     }
 
     @Override
@@ -127,31 +123,26 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
         return new Primitive32Matrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     ElementsSupplier<Double> cast(final Access1D<?> matrix) {
 
         if (matrix instanceof Primitive32Matrix) {
-
             return ((Primitive32Matrix) matrix).getStore();
-
-        } else if (matrix instanceof Primitive32Store) {
-
-            return (Primitive32Store) matrix;
-
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
-
-            return (ElementsSupplier<Double>) matrix;
-
-        } else if (matrix instanceof Access2D) {
-
-            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
-
-        } else {
-
-            return this.getStore().physical().columns(matrix);
         }
+
+        if (matrix instanceof Primitive32Store) {
+            return (Primitive32Store) matrix;
+        }
+
+        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Double) {
+            return (ElementsSupplier<Double>) matrix;
+        }
+
+        if (matrix instanceof Access2D) {
+            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
+        }
+
+        return this.getStore().physical().columns(matrix);
     }
 
     @Override

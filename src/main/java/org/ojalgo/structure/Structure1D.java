@@ -128,10 +128,7 @@ public interface Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof IntIndex)) {
+            if ((obj == null) || !(obj instanceof IntIndex)) {
                 return false;
             }
             final IntIndex other = (IntIndex) obj;
@@ -158,8 +155,6 @@ public interface Structure1D {
         B after(S after);
 
         B before(S before);
-
-        S get();
 
     }
 
@@ -192,10 +187,7 @@ public interface Structure1D {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof LongIndex)) {
+            if ((obj == null) || !(obj instanceof LongIndex)) {
                 return false;
             }
             final LongIndex other = (LongIndex) obj;

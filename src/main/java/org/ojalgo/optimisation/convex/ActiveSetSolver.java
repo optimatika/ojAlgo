@@ -372,16 +372,15 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         int retVal = -1;
 
-        final int[] tmpIncluded = myActivator.getIncluded();
+        int[] tmpIncluded = myActivator.getIncluded();
 
-        final int tmpLastIncluded = myActivator.getLastIncluded();
+        int tmpLastIncluded = myActivator.getLastIncluded();
         int tmpIndexOfLast = -1;
 
         double tmpMin = POSITIVE_INFINITY;
         double tmpVal;
 
-        // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
-        final MatrixStore<Double> tmpLI = this.getSolutionL().logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
+        MatrixStore<Double> tmpLI = this.getSolutionL().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded);
 
         if (this.isLogDebug() && tmpLI.count() > 0L) {
             this.log("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
@@ -562,7 +561,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     MatrixStore<Double> getSlackI(final int[] rows) {
-        return this.getSlackI().logical().row(rows).get();
+        return this.getSlackI().row(rows);
     }
 
     final void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {

@@ -66,7 +66,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     @Override
     protected Primitive64Store allocate(final long numberOfRows, final long numberOfColumns) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
-        return Primitive64Store.FACTORY.makeZero(numberOfRows, numberOfColumns);
+        return Primitive64Store.FACTORY.make(numberOfRows, numberOfColumns);
     }
 
     protected boolean checkSymmetry() {
@@ -86,7 +86,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
             return (MatrixStore<Double>) source;
         }
         if (source instanceof Access2D) {
-            return Primitive64Store.FACTORY.builder().makeWrapper((Access2D<?>) source).get();
+            return Primitive64Store.FACTORY.makeWrapper((Access2D<?>) source);
         }
         return source.collect(Primitive64Store.FACTORY);
     }
@@ -114,7 +114,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
-        return MatrixStore.PRIMITIVE64.makeWrapper(matrix);
+        return Primitive64Store.FACTORY.makeWrapper(matrix);
     }
 
     double[][] reset(final Structure2D template, final boolean transpose) {
@@ -129,7 +129,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
         if (myInternalData == null || myRowDim != templateRows || myColDim != templateCols) {
 
-            myInternalStore = RawStore.FACTORY.makeZero(internalRows, internalCols);
+            myInternalStore = RawStore.FACTORY.make(internalRows, internalCols);
             myInternalData = myInternalStore.data;
 
             myRowDim = templateRows;

@@ -154,15 +154,6 @@ public final class RawStore implements PhysicalStore<Double> {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
 
-        public RawStore makeEye(final long rows, final long columns) {
-
-            RawStore retVal = this.make(rows, columns);
-
-            retVal.fillDiagonal(0, 0, this.scalar().one().get());
-
-            return retVal;
-        }
-
         public RawStore rows(final Access1D<?>... source) {
 
             int tmpRowDim = source.length;

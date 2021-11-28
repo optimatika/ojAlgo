@@ -47,7 +47,7 @@ final class QPESolver extends ConstrainedSolver {
 
         super(matrices, solverOptions);
 
-        myIterationX = Primitive64Store.FACTORY.makeZero(this.countVariables(), 1L);
+        myIterationX = Primitive64Store.FACTORY.make(this.countVariables(), 1L);
     }
 
     private boolean isFeasible() {
@@ -55,7 +55,7 @@ final class QPESolver extends ConstrainedSolver {
         boolean retVal = true;
 
         final MatrixStore<Double> tmpSE = this.getSlackE();
-        for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
+        for (int i = 0; retVal && i < tmpSE.countRows(); i++) {
             if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;
             }
@@ -69,7 +69,7 @@ final class QPESolver extends ConstrainedSolver {
 
         boolean ok = super.initialise(kickStarter);
 
-        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+        if (kickStarter != null && kickStarter.getState().isFeasible()) {
 
             this.getSolutionX().fillMatching(kickStarter);
 
@@ -106,7 +106,7 @@ final class QPESolver extends ConstrainedSolver {
         // final Primitive64Store tmpIterL = Primitive64Store.FACTORY.make(tmpIterA.countRows(), 1L);
         final Primitive64Store tmpIterL = this.getSolutionL();
 
-        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (solved = this.isSolvableQ())) {
+        if (tmpIterA.countRows() < tmpIterA.countColumns() && (solved = this.isSolvableQ())) {
             // Q is SPD
             // Actual/normal optimisation problem
 
@@ -133,8 +133,8 @@ final class QPESolver extends ConstrainedSolver {
             final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
-                tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
-                tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+                tmpIterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
+                tmpIterL.fillMatching(tmpXL.offsets(this.countVariables(), 0));
             }
         }
 
@@ -150,17 +150,14 @@ final class QPESolver extends ConstrainedSolver {
 
             // this.getSolutionL().fillMatching(tmpIterL);
 
+        } else if (myFeasible) {
+
+            this.setState(State.FEASIBLE);
+
         } else {
 
-            if (myFeasible) {
-
-                this.setState(State.FEASIBLE);
-
-            } else {
-
-                this.setState(State.INFEASIBLE);
-                this.getSolutionX().fillAll(ZERO);
-            }
+            this.setState(State.INFEASIBLE);
+            this.getSolutionX().fillAll(ZERO);
         }
 
         this.incrementIterationsCount();
@@ -179,10 +176,9 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationB() {
         if (myFeasible) {
-            return MatrixStore.PRIMITIVE64.makeZero(this.countEqualityConstraints(), 1).get();
-        } else {
-            return this.getMatrixBE();
+            return Primitive64Store.FACTORY.makeZero(this.countEqualityConstraints(), 1);
         }
+        return this.getMatrixBE();
     }
 
     @Override
@@ -192,9 +188,8 @@ final class QPESolver extends ConstrainedSolver {
             final MatrixStore<Double> mtrxC = this.getMatrixC();
             final PhysicalStore<Double> solX = this.getSolutionX();
             return mtrxC.subtract(mtrxQ.multiply(solX));
-        } else {
-            return this.getMatrixC();
         }
+        return this.getMatrixC();
     }
 
 }

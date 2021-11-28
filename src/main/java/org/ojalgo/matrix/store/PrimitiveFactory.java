@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -44,25 +43,12 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
         return Primitive64Array.FACTORY;
     }
 
-    public MatrixStore.Factory<Double> builder() {
-        return MatrixStore.PRIMITIVE64;
-    }
-
     public final I conjugate(final Access2D<?> source) {
         return this.transpose(source);
     }
 
     public final FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
-    }
-
-    public final I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-
-        I retVal = this.make(rows, columns);
-
-        retVal.fillAll(supplier);
-
-        return retVal;
     }
 
     public Householder<Double> makeHouseholder(final int length) {

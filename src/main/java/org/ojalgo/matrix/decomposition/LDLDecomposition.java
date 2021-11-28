@@ -31,7 +31,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
@@ -45,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LDL<N> {
 
-    static class Complex extends LDLDecomposition<ComplexNumber> {
+    static final class Complex extends LDLDecomposition<ComplexNumber> {
 
         Complex() {
             super(GenericStore.COMPLEX);
@@ -53,7 +52,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
     }
 
-    static class Primitive extends LDLDecomposition<Double> {
+    static final class Primitive extends LDLDecomposition<Double> {
 
         Primitive() {
             super(Primitive64Store.FACTORY);
@@ -61,7 +60,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
     }
 
-    static class Quat extends LDLDecomposition<Quaternion> {
+    static final class Quat extends LDLDecomposition<Quaternion> {
 
         Quat() {
             super(GenericStore.QUATERNION);
@@ -69,7 +68,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
     }
 
-    static class Rational extends LDLDecomposition<RationalNumber> {
+    static final class Rational extends LDLDecomposition<RationalNumber> {
 
         Rational() {
             super(GenericStore.RATIONAL);
@@ -111,7 +110,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     }
 
     public MatrixStore<N> getD() {
-        return this.getInPlace().logical().diagonal().get();
+        return this.getInPlace().diagonal();
     }
 
     public N getDeterminant() {
@@ -122,9 +121,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (myPivot.signum() == -1) {
             return aggregator.toScalar().negate().get();
-        } else {
-            return aggregator.get();
         }
+        return aggregator.get();
     }
 
     @Override
@@ -151,14 +149,14 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.logical().row(myPivot.getInverseOrder()).get();
+        return preallocated.row(myPivot.getInverseOrder());
     }
 
     public MatrixStore<N> getL() {
         DecompositionStore<N> tmpInPlace = this.getInPlace();
-        LogicalBuilder<N> tmpBuilder = tmpInPlace.logical();
-        LogicalBuilder<N> tmpTriangular = tmpBuilder.triangular(false, true);
-        return tmpTriangular.get();
+        MatrixStore<N> tmpBuilder = tmpInPlace;
+        MatrixStore<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular;
     }
 
     public int[] getPivotOrder() {
@@ -182,7 +180,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         int[] order = myPivot.getOrder();
 
-        preallocated.fillMatching(this.collect(rhs).logical().row(order).get());
+        preallocated.fillMatching(this.collect(rhs).row(order));
 
         DecompositionStore<N> body = this.getInPlace();
 
@@ -195,7 +193,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.logical().row(myPivot.getInverseOrder()).get();
+        return preallocated.row(myPivot.getInverseOrder());
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
@@ -204,9 +202,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getInverse();
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -215,9 +212,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isPivoted() {
@@ -244,9 +240,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -255,9 +250,8 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {

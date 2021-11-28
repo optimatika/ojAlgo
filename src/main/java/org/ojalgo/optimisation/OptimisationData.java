@@ -138,7 +138,7 @@ public final class OptimisationData {
         if (mtrxAE instanceof MatrixStore) {
             myAE = (MatrixStore<Double>) mtrxAE;
         } else {
-            myAE = MatrixStore.PRIMITIVE64.makeWrapper(mtrxAE).get();
+            myAE = Primitive64Store.FACTORY.makeWrapper(mtrxAE);
         }
 
         if (mtrxBE instanceof MatrixStore) {

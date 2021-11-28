@@ -25,7 +25,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.Array2D;
 import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.Primitive64Matrix.DenseReceiver;
+import org.ojalgo.matrix.Primitive64Matrix.LogicalBuilder;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
@@ -34,6 +38,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -78,6 +83,31 @@ public class CaseQR extends MatrixDecompositionTests {
         // TODO See if possible to fix so that Q == I when the original A is already triangular
         //        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), new NumberContext(7, 6));
         //        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
+    }
+
+    @Test
+    public void testCompilation() {
+
+        // Just want to verify that this compiles and runs without throwing exceptions
+
+        QR<Double> tmpDecomp = QR.PRIMITIVE.make();
+
+        Array2D<Double> a2d = Array2D.PRIMITIVE64.makeFilled(3, 3, Normal.standard());
+
+        tmpDecomp.decompose(a2d);
+
+        DenseReceiver dr = Primitive64Matrix.FACTORY.makeDense(3, 3);
+        dr.fillAll(Normal.standard());
+        tmpDecomp.decompose(dr);
+
+        Primitive64Matrix ps = dr.get();
+        tmpDecomp.decompose(ps);
+
+        LogicalBuilder lb = dr.get().logical().below(2);
+        tmpDecomp.decompose(lb);
+
+        Primitive64Matrix bm = lb.get();
+        tmpDecomp.decompose(bm);
     }
 
     @Test
@@ -163,7 +193,7 @@ public class CaseQR extends MatrixDecompositionTests {
         MatrixOperation.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(tmpDim).get()).get();
+        final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.makeSPD(tmpDim).below(Primitive64Store.FACTORY.makeIdentity(tmpDim));
 
         final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
         final QR<Double> tmpRawQR = new RawQR();
@@ -178,7 +208,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
 
-            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE64.makeIdentity(tmpDim).get();
+            final MatrixStore<Double> tmpIdentity = Primitive64Store.FACTORY.makeIdentity(tmpDim);
             TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
             TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
 

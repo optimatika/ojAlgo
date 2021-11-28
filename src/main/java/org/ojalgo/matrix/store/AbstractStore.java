@@ -27,6 +27,79 @@ import org.ojalgo.structure.Access2D;
 
 abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> {
 
+    @SafeVarargs
+    static <N extends Comparable<N>> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount,
+            final Access2D<N>... columnStores) {
+        MatrixStore<N> retVal = AbstractStore.cast(factory, columnStores[0]);
+        for (int i = 1; i < columnStores.length; i++) {
+            retVal = new AboveBelowStore<>(retVal, AbstractStore.cast(factory, columnStores[i]));
+        }
+        long rowsSoFar = retVal.countRows();
+        if (rowsSoFar < rowsCount) {
+            retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), rowsCount - rowsSoFar, retVal.countColumns()));
+        }
+        return retVal;
+    }
+
+    static <N extends Comparable<N>> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount,
+            final Access2D<N> columnStore) {
+        MatrixStore<N> retVal = AbstractStore.cast(factory, columnStore);
+        long rowsSoFar = retVal.countRows();
+        if (rowsSoFar < rowsCount) {
+            retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), rowsCount - rowsSoFar, retVal.countColumns()));
+        }
+        return retVal;
+    }
+
+    @SafeVarargs
+    static <N extends Comparable<N>> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount, final N... columnElements) {
+        MatrixStore<N> retVal = factory.columns(columnElements);
+        long rowsSoFar = retVal.countRows();
+        if (rowsSoFar < rowsCount) {
+            retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, rowsCount - rowsSoFar, retVal.countColumns()));
+        }
+        return retVal;
+    }
+
+    @SafeVarargs
+    static <N extends Comparable<N>> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final Access2D<N>... rowStores) {
+        MatrixStore<N> retVal = AbstractStore.cast(factory, rowStores[0]);
+        for (int j = 1; j < rowStores.length; j++) {
+            retVal = new LeftRightStore<>(retVal, AbstractStore.cast(factory, rowStores[j]));
+        }
+        long colsSoFar = retVal.countColumns();
+        if (colsSoFar < colsCount) {
+            retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), retVal.countRows(), colsCount - colsSoFar));
+        }
+        return retVal;
+    }
+
+    static <N extends Comparable<N>> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final Access2D<N> rowStore) {
+        MatrixStore<N> retVal = AbstractStore.cast(factory, rowStore);
+        long colsSoFar = retVal.countColumns();
+        if (colsSoFar < colsCount) {
+            retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), retVal.countRows(), colsCount - colsSoFar));
+        }
+        return retVal;
+    }
+
+    @SafeVarargs
+    static <N extends Comparable<N>> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final N... rowElements) {
+        MatrixStore<N> retVal = new TransposedStore<>(factory.columns(rowElements));
+        long colsSoFar = retVal.countColumns();
+        if (colsSoFar < colsCount) {
+            retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, retVal.countRows(), colsCount - colsSoFar));
+        }
+        return retVal;
+    }
+
+    static <N extends Comparable<N>> MatrixStore<N> cast(final PhysicalStore.Factory<N, ?> factory, final Access2D<?> access) {
+        if (access instanceof MatrixStore<?>) {
+            return (MatrixStore<N>) access;
+        }
+        return new WrapperStore<>(factory, access);
+    }
+
     private final int myColDim;
     private transient Class<?> myComponentType = null;
     private final int myRowDim;
@@ -84,10 +157,6 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return true;
     }
 
-    public final MatrixStore<N> get() {
-        return this;
-    }
-
     public final int getColDim() {
         return myColDim;
     }
@@ -126,10 +195,10 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
         if (this.isPrimitive()) {
 
-            final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
+            final PhysicalStore<N> tmpStep1 = this.physical().make(1L, leftAndRight.count());
             tmpStep1.fillByMultiplying(leftAndRight, this);
 
-            final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
+            final PhysicalStore<N> tmpStep2 = this.physical().make(1L, 1L);
             tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
 
             return tmpStep2.get(0L);

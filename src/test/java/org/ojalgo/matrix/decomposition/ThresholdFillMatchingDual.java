@@ -90,7 +90,7 @@ public class ThresholdFillMatchingDual extends AbstractThresholdTuner {
 
         left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
         right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.makeZero(dim, dim);
+        target = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Override

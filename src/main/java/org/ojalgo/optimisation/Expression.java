@@ -300,7 +300,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(myModel.countVariables(), 1);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(myModel.countVariables(), 1);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
@@ -325,7 +325,7 @@ public final class Expression extends ModelEntity<Expression> {
     public MatrixStore<Double> getAdjustedHessian() {
 
         final int tmpCountVariables = myModel.countVariables();
-        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;

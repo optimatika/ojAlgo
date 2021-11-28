@@ -45,6 +45,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -64,17 +65,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-        implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
-
-    public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>>, Supplier<M> {
-
-        default M build() {
-            return this.get();
-        }
-
-    }
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements Matrix2D<N, M>, Access2D.Elements,
+        Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     private static final NumberContext EQUALS = NumberContext.of(8, 12);
 
@@ -119,11 +111,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private transient MatrixDecomposition<N> myDecomposition = null;
+    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient int myHashCode = 0;
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
     private final MatrixStore<N> myStore;
-    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient Boolean mySymmetric = null;
 
     BasicMatrix(final MatrixStore<N> store) {
@@ -259,9 +251,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     public boolean equals(final Object other) {
         if (other instanceof Access2D<?>) {
             return Access2D.equals(myStore, (Access2D<?>) other, EQUALS);
-        } else {
-            return super.equals(other);
         }
+        return super.equals(other);
     }
 
     /**
@@ -304,25 +295,24 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     public Scalar<N> getDeterminant() {
 
-        N tmpDeterminant = null;
+        N retVal = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Determinant)
-                && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
+        if (myDecomposition instanceof MatrixDecomposition.Determinant && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
 
-            tmpDeterminant = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
+            retVal = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
 
         } else {
 
-            final DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
+            DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
 
             if (tmpTask instanceof MatrixDecomposition.Determinant) {
                 myDecomposition = (MatrixDecomposition.Determinant<N>) tmpTask;
             }
 
-            tmpDeterminant = tmpTask.calculateDeterminant(myStore);
+            retVal = tmpTask.calculateDeterminant(myStore);
         }
 
-        return myStore.physical().scalar().convert(tmpDeterminant);
+        return myStore.physical().scalar().convert(retVal);
     }
 
     public List<Eigenpair> getEigenpairs() {
@@ -406,7 +396,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         MatrixStore<N> tmpInverse = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Solver
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
             tmpInverse = ((MatrixDecomposition.Solver<N>) myDecomposition).getInverse();
@@ -480,7 +470,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return mySymmetric.booleanValue();
     }
 
-    public abstract BasicMatrix.LogicalBuilder<N, M> logical();
+    public abstract Pipeline2D<N, M, ?> logical();
 
     public M multiply(final double scalarMultiplicand) {
 
@@ -569,7 +559,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         MatrixStore<N> tmpSolution = null;
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Solver
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
             tmpSolution = ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(this.cast(rhs));
@@ -638,7 +628,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.getFactory().instantiate(retVal);
     }
 
-    public final void supplyTo(final PhysicalStore<N> receiver) {
+    public final void supplyTo(final TransformableRegion<N> receiver) {
         myStore.supplyTo(receiver);
     }
 
@@ -690,7 +680,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     private MatrixDecomposition.RankRevealing<N> getRankRevealing(final MatrixStore<N> store) {
 
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.RankRevealing)
+        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.RankRevealing
                 && ((MatrixDecomposition.RankRevealing<?>) myDecomposition).isComputed()) {
 
         } else {
@@ -710,11 +700,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private boolean isComputedEigenvalue() {
-        return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
+        return myDecomposition != null && myDecomposition instanceof Eigenvalue && myDecomposition.isComputed();
     }
 
     private boolean isComputedSingularValue() {
-        return (myDecomposition != null) && (myDecomposition instanceof SingularValue) && myDecomposition.isComputed();
+        return myDecomposition != null && myDecomposition instanceof SingularValue && myDecomposition.isComputed();
     }
 
     abstract ElementsSupplier<N> cast(Access1D<?> matrix);
@@ -727,19 +717,17 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     LDU<N> getDecompositionLDU(final Structure2D typical) {
 
-        if ((myDecomposition != null) && (myDecomposition instanceof LDU)) {
+        if (myDecomposition != null && myDecomposition instanceof LDU) {
             return (LDU<N>) myDecomposition;
         }
 
-        if ((myHermitian != null) && myHermitian.booleanValue()) {
-            if ((mySPD != null) && mySPD.booleanValue()) {
-                return (LDU<N>) (myDecomposition = this.getDecompositionCholesky(typical));
-            } else {
-                return (LDU<N>) (myDecomposition = this.getDecompositionLDL(typical));
-            }
-        } else {
+        if (myHermitian == null || !myHermitian.booleanValue()) {
             return (LDU<N>) (myDecomposition = this.getDecompositionLDU(typical));
         }
+        if (mySPD != null && mySPD.booleanValue()) {
+            return (LDU<N>) (myDecomposition = this.getDecompositionCholesky(typical));
+        }
+        return (LDU<N>) (myDecomposition = this.getDecompositionLDL(typical));
     }
 
     abstract LU<N> getDecompositionLU(Structure2D typical);
@@ -748,7 +736,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ?, ?> getFactory();
+    abstract MatrixFactory<N, M, ?, ?> getFactory();
 
     final MatrixStore<N> getStore() {
         return myStore;

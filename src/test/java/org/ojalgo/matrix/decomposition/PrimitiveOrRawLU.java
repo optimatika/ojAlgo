@@ -110,7 +110,7 @@ public class PrimitiveOrRawLU extends AbstractPrimitiveOrRaw<LU<Double>> {
 
         matrix = Primitive64Store.FACTORY.makeSPD(dim);
 
-        preallocated = Primitive64Store.FACTORY.makeZero(dim, dim);
+        preallocated = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Override

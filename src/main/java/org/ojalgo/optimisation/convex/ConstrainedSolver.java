@@ -56,16 +56,16 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     @Override
     protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
-        final MatrixStore<Double> iterQ = this.getIterationQ();
-        final MatrixStore<Double> iterA = this.getIterationA();
-        return iterQ.logical().right(iterA.transpose()).below(iterA);
+        MatrixStore<Double> iterQ = this.getIterationQ();
+        MatrixStore<Double> iterA = this.getIterationA();
+        return iterQ.right(iterA.transpose()).below(iterA);
     }
 
     @Override
     protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
-        final MatrixStore<Double> iterC = this.getIterationC();
-        final MatrixStore<Double> iterB = this.getIterationB();
-        return iterC.logical().below(iterB);
+        MatrixStore<Double> iterC = this.getIterationC();
+        MatrixStore<Double> iterB = this.getIterationB();
+        return iterC.below(iterB);
     }
 
     @Override
@@ -85,11 +85,10 @@ abstract class ConstrainedSolver extends ConvexSolver {
                     fullRankA = false;
                     this.setState(State.INVALID);
 
-                    if (this.isLogDebug()) {
-                        this.log("A not full (row) rank!");
-                    } else {
+                    if (!this.isLogDebug()) {
                         throw new IllegalArgumentException("A not full (row) rank!");
                     }
+                    this.log("A not full (row) rank!");
                 }
             }
         }
@@ -113,9 +112,9 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         final int tmpCountE = this.countEqualityConstraints();
 
-        final MatrixStore<Double> tmpLI = mySolutionL.logical().offsets(tmpCountE, 0).row(included).get();
+        final MatrixStore<Double> tmpLI = mySolutionL.offsets(tmpCountE, 0).row(included);
 
-        return mySolutionL.logical().limits(tmpCountE, 1).below(tmpLI).get();
+        return mySolutionL.limits(tmpCountE, 1).below(tmpLI);
     }
 
     final PhysicalStore<Double> getIterationQ() {
@@ -128,7 +127,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
         MatrixStore<Double> mtrxBE = this.getMatrixBE();
         PhysicalStore<Double> mtrxX = this.getSolutionX();
 
-        if ((mtrxAE != null) && (mtrxAE.count() != 0L)) {
+        if (mtrxAE != null && mtrxAE.count() != 0L) {
             mtrxX.premultiply(mtrxAE).onMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
         }
 

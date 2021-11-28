@@ -235,7 +235,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             int nbIneq = this.countInequalityConstraints();
             int nbVars = this.countVariables();
 
-            MatrixStore<Double> rhs = MatrixStore.PRIMITIVE64.makeZero(nbVars, 1).get();
+            MatrixStore<Double> rhs = Primitive64Store.FACTORY.makeZero(nbVars, 1);
 
             if (nbEqus > 0) {
 
@@ -243,15 +243,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
                 if (nbIneq > 0) {
 
-                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate()).below(mtrxBI).get());
+                    retVal.objective(mtrxBE.below(mtrxBE.negate()).below(mtrxBI));
 
-                    retVal.equalities(transpAE.logical().right(transpAE.negate()).right(mtrxAI.transpose()).get(), rhs);
+                    retVal.equalities(transpAE.right(transpAE.negate()).right(mtrxAI.transpose()), rhs);
 
                 } else {
 
-                    retVal.objective(mtrxBE.logical().below(mtrxBE.negate()).get());
+                    retVal.objective(mtrxBE.below(mtrxBE.negate()));
 
-                    retVal.equalities(transpAE.logical().right(transpAE.negate()).get(), rhs);
+                    retVal.equalities(transpAE.right(transpAE.negate()), rhs);
                 }
 
             } else if (nbIneq > 0) {
@@ -293,14 +293,14 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             LinearSolver.GeneralBuilder retVal = LinearSolver.newGeneralBuilder();
 
-            retVal.objective(mtrxC.logical().below(mtrxC.negate()).get());
+            retVal.objective(mtrxC.below(mtrxC.negate()));
 
             if (mtrxAE != null && mtrxBE != null) {
-                retVal.equalities(mtrxAE.logical().right(mtrxAE.negate()).get(), mtrxBE);
+                retVal.equalities(mtrxAE.right(mtrxAE.negate()), mtrxBE);
             }
 
             if (mtrxAI != null && mtrxBI != null) {
-                retVal.inequalities(mtrxAI.logical().right(mtrxAI.negate()).get(), mtrxBI);
+                retVal.inequalities(mtrxAI.right(mtrxAI.negate()), mtrxBI);
             }
 
             return retVal;
@@ -682,7 +682,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected MatrixStore<Double> getMatrixBI(final int[] selector) {
-        return myMatrices.getBI().logical().row(selector).get();
+        return myMatrices.getBI().row(selector);
     }
 
     protected MatrixStore<Double> getMatrixC() {

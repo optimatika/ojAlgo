@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 
@@ -60,7 +61,7 @@ public class CaseLDL extends MatrixDecompositionTests {
         RawStore mtrxL = RawStore.wrap(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
         RawStore mtrxD = RawStore.wrap(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
 
-        MatrixStore<Double> permA = mtrxA.logical().row(3, 2, 1, 0).column(3, 2, 1, 0).get();
+        MatrixStore<Double> permA = mtrxA.row(3, 2, 1, 0).column(3, 2, 1, 0);
 
         this.doTest(permA, mtrxL, mtrxD);
     }
@@ -88,7 +89,7 @@ public class CaseLDL extends MatrixDecompositionTests {
 
     private void doTest(final MatrixStore<Double> mtrxA, final RawStore mtrxL, final RawStore mtrxD) {
 
-        MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE64.makeIdentity((int) mtrxA.countRows()).get();
+        MatrixStore<Double> mtrxIdentity = Primitive64Store.FACTORY.makeIdentity((int) mtrxA.countRows());
 
         RawStore reconstructed = mtrxL.multiply(mtrxD.multiply(mtrxL.transpose()));
         TestUtils.assertEquals(mtrxA, reconstructed);
@@ -98,7 +99,7 @@ public class CaseLDL extends MatrixDecompositionTests {
         rawLDL.decompose(mtrxA);
 
         LDL<Double> primLDL = new LDLDecomposition.Primitive();
-        primLDL.decompose(mtrxA.logical().triangular(false, false).get());
+        primLDL.decompose(mtrxA.triangular(false, false));
 
         if (MatrixDecompositionTests.DEBUG) {
 

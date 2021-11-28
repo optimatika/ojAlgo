@@ -30,7 +30,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
@@ -111,7 +110,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
+        AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -126,14 +125,14 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         if (myPivot.isModified()) {
             preallocated.fillAll(this.scalar().zero().get());
-            final int[] pivotOrder = myPivot.getOrder();
-            final int numbRows = this.getRowDim();
+            int[] pivotOrder = myPivot.getOrder();
+            int numbRows = this.getRowDim();
             for (int i = 0; i < numbRows; i++) {
                 preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
             }
         }
 
-        final DecompositionStore<N> body = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
@@ -143,12 +142,12 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public MatrixStore<N> getL() {
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(false, true);
+        MatrixStore<N> logical = this.getInPlace().triangular(false, true);
         int nbRows = this.getRowDim();
         if (nbRows < this.getColDim()) {
-            return logical.limits(nbRows, nbRows).get();
+            return logical.limits(nbRows, nbRows);
         }
-        return logical.get();
+        return logical;
 
     }
 
@@ -164,7 +163,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -187,9 +186,9 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
-        preallocated.fillMatching(this.collect(rhs).logical().row(myPivot.getOrder()).get());
+        preallocated.fillMatching(this.collect(rhs).row(myPivot.getOrder()));
 
-        final DecompositionStore<N> body = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, true, false, false);
 
@@ -199,15 +198,15 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public MatrixStore<N> getU() {
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(true, false);
+        MatrixStore<N> retVal = this.getInPlace().triangular(true, false);
         int nbCols = this.getColDim();
         if (this.getRowDim() > nbCols) {
-            logical.limits(nbCols, nbCols).get();
+            retVal = retVal.limits(nbCols, nbCols);
         }
-        return logical.get();
+        return retVal;
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -217,7 +216,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newMatrixNotInvertible();
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -237,7 +236,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
-        final long tmpCountRows = template.countRows();
+        long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }
 
@@ -265,26 +264,26 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
-    private final boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
+    private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
 
         this.reset();
 
-        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+        DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
-        final int tmpRowDim = this.getRowDim();
+        int tmpRowDim = this.getRowDim();
         this.getColDim();
-        final int tmpMinDim = this.getMinDim();
+        int tmpMinDim = this.getMinDim();
 
         myPivot.reset(tmpRowDim);
 
-        final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
+        BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
         // Main loop - along the diagonal
         for (int ij = 0; ij < tmpMinDim; ij++) {
 
             if (pivoting) {
                 // Find next pivot row
-                final int tmpPivotRow = (int) tmpInPlace.indexOfLargestInColumn(ij, ij);
+                int tmpPivotRow = (int) tmpInPlace.indexOfLargestInColumn(ij, ij);
 
                 // Pivot?
                 if (tmpPivotRow != ij) {
@@ -322,10 +321,10 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     int[] getReducedPivots() {
 
-        final int[] retVal = new int[this.getRank()];
-        final int[] tmpFullPivots = this.getPivotOrder();
+        int[] retVal = new int[this.getRank()];
+        int[] tmpFullPivots = this.getPivotOrder();
 
-        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        DecompositionStore<N> tmpInPlace = this.getInPlace();
 
         int tmpRedInd = 0;
         for (int ij = 0; ij < tmpFullPivots.length; ij++) {

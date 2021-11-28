@@ -106,7 +106,7 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
     }
 
     public MatrixStore<N> getLinearFactors() {
-        return myCoefficients.physical().builder().makeZero(this.arity(), 1L).get();
+        return myCoefficients.physical().makeZero(this.arity(), 1L);
     }
 
     @Override

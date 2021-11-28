@@ -126,8 +126,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-            final long numberOfEquations = rhs.countRows();
-            final DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
+            long numberOfEquations = rhs.countRows();
+            DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
             return this.getSolution(rhs, tmpPreallocated);
         }
 
@@ -145,7 +145,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         public PhysicalStore<Double> preallocate(final Structure2D template) {
-            final long numberOfEquations = template.countRows();
+            long numberOfEquations = template.countRows();
             return this.allocate(numberOfEquations, numberOfEquations);
         }
 
@@ -188,7 +188,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        double[][] tmpData = this.reset(matrix, false);
 
         this.getInternalStore().fillMatching(matrix);
 
@@ -199,7 +199,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        double[][] tmpData = this.reset(matrix, false);
 
         matrix.supplyTo(this.getInternalStore());
 
@@ -208,7 +208,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        double[][] tmpData = this.reset(matrix, false);
 
         matrix.supplyTo(this.getInternalStore());
 
@@ -220,13 +220,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @return D
      */
-    public final MatrixStore<Double> getD() {
+    public MatrixStore<Double> getD() {
         return this.makeD(d, e);
     }
 
     public Double getDeterminant() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
+        AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
@@ -235,10 +235,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public Array1D<ComplexNumber> getEigenvalues() {
 
-        final double[] tmpRe = this.getRealParts();
-        final double[] tmpIm = this.getImaginaryParts();
+        double[] tmpRe = this.getRealParts();
+        double[] tmpIm = this.getImaginaryParts();
 
-        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(tmpRe.length);
+        Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(tmpRe.length);
 
         for (int i = 0; i < retVal.size(); i++) {
             retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));
@@ -251,7 +251,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
 
-        final int length = realParts.length;
+        int length = realParts.length;
 
         System.arraycopy(this.getRealParts(), 0, realParts, 0, length);
 
@@ -261,7 +261,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> getInverse() {
-        final int n = this.getRowDim();
+        int n = this.getRowDim();
         return this.getInverse(this.allocate(n, n));
     }
 
@@ -269,21 +269,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         if (myInverse == null) {
 
-            final int dim = d.length;
+            int dim = d.length;
 
-            final RawStore tmpMtrx = new RawStore(dim, dim);
+            RawStore tmpMtrx = new RawStore(dim, dim);
 
             double max = ONE;
 
             for (int i = 0; i < dim; i++) {
-                final double val = d[i];
+                double val = d[i];
                 max = MAX.invoke(max, ABS.invoke(val));
                 if (PrimitiveScalar.isSmall(max, val)) {
                     for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, ZERO);
                     }
                 } else {
-                    final double[] colVi = myTransposedV[i];
+                    double[] colVi = myTransposedV[i];
                     for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, colVi[j] / val);
                     }
@@ -303,7 +303,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public ComplexNumber getTrace() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
+        AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
@@ -316,13 +316,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return V
      */
     public MatrixStore<Double> getV() {
-        final int n = this.getRowDim();
+        int n = this.getRowDim();
         return new RawStore(myTransposedV, n, n).transpose();
     }
 
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] tmpData = this.reset(original, false);
+        double[][] tmpData = this.reset(original, false);
 
         this.getInternalStore().fillMatching(original);
 
@@ -330,9 +330,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     @Override
@@ -342,7 +341,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] tmpData = this.reset(body, false);
+        double[][] tmpData = this.reset(body, false);
 
         this.getInternalStore().fillMatching(body);
 
@@ -354,9 +353,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             return this.getInverse().multiply(preallocated);
 
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
@@ -371,9 +369,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     protected abstract boolean doDecompose(double[][] data, boolean valuesOnly);
 
     protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
-        final int n = this.getRowDim();
-        final RawStore fullD = new RawStore(n, n);
-        final double[][] D = fullD.data;
+        int n = this.getRowDim();
+        RawStore fullD = new RawStore(n, n);
+        double[][] D = fullD.data;
         for (int i = 0; i < n; i++) {
             D[i][i] = d[i];
             if (e[i] > 0) {
@@ -382,14 +380,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 D[i][i - 1] = e[i];
             }
         }
-        return fullD.logical().tridiagonal().get();
+        return fullD.tridiagonal();
     }
 
-    final void doGeneral(final double[][] data, final boolean valuesOnly) {
+    void doGeneral(final double[][] data, final boolean valuesOnly) {
 
-        final int n = data.length;
+        int n = data.length;
 
-        if ((d == null) || (n != d.length)) {
+        if (d == null || n != d.length) {
             if (valuesOnly) {
                 myTransposedV = null;
             } else {
@@ -407,12 +405,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    final void doSymmetric(final double[][] data, final boolean valuesOnly) {
+    void doSymmetric(final double[][] data, final boolean valuesOnly) {
 
-        final int size = data.length;
-        final int last = size - 1;
+        int size = data.length;
+        int last = size - 1;
 
-        if ((d == null) || (size != d.length)) {
+        if (d == null || size != d.length) {
             d = new double[size]; // householder > main diagonal
             e = new double[size]; // work > off diagonal
         }
@@ -467,7 +465,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     g = -g;
                 }
                 e[m] = scale * g;
-                h = h - (f * g);
+                h = h - f * g;
                 d[m - 1] = f - g;
 
                 Arrays.fill(e, 0, m, ZERO);
@@ -478,7 +476,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     row = data[i];
                     f = d[i];
                     data[m][i] = f;
-                    g = e[i] + (row[i] * f);
+                    g = e[i] + row[i] * f;
                     for (int j = i + 1; j < m; j++) {
                         val = row[j];
                         g += val * d[j];
@@ -498,7 +496,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     f = d[i];
                     g = e[i];
                     for (int j = i; j < m; j++) { // rank-2 update
-                        row[j] -= ((f * e[j]) + (g * d[j]));
+                        row[j] -= f * e[j] + g * d[j];
                     }
                     d[i] = row[m - 1]; // Copy "next" row/column to work on
                     row[m] = ZERO;
@@ -544,10 +542,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Tridiagonalize > Diagonalize
 
-        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : (low, high, cos, sin) -> {
-            final double[] tmpVi0 = data[low];
+        RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : (low, high, cos, sin) -> {
+            double[] tmpVi0 = data[low];
             double tmpVi0k;
-            final double[] tmpVi1 = data[high];
+            double[] tmpVi1 = data[high];
             double tmpVi1k;
 
             for (int k = 0; k < size; k++) {
@@ -555,8 +553,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 tmpVi0k = tmpVi0[k];
                 tmpVi1k = tmpVi1[k];
 
-                tmpVi0[k] = (cos * tmpVi0k) - (sin * tmpVi1k);
-                tmpVi1[k] = (sin * tmpVi0k) + (cos * tmpVi1k);
+                tmpVi0[k] = cos * tmpVi0k - sin * tmpVi1k;
+                tmpVi1[k] = sin * tmpVi0k + cos * tmpVi1k;
             }
 
         };
@@ -565,8 +563,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         // Diagonalize > Sort
 
         if (this.isOrdered()) {
-            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : (colA, colB) -> {
-                final double[] tmp = data[colA];
+            ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : (colA, colB) -> {
+                double[] tmp = data[colA];
                 data[colA] = data[colB];
                 data[colB] = tmp;
 
@@ -596,19 +594,19 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     //    public MatrixStore<Double> getExponential() {
     //
-    //        final MatrixStore<Double> mtrxV = this.getV();
+    //          MatrixStore<Double> mtrxV = this.getV();
     //
-    //        final PhysicalStore<Double> tmpD = this.getD().copy();
+    //          PhysicalStore<Double> tmpD = this.getD().copy();
     //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
-    //        final MatrixStore<Double> mtrxD = tmpD.logical().diagonal().get();
+    //          MatrixStore<Double> mtrxD = tmpD.logical().diagonal().get();
     //
     //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
     //    }
     //
-    //    public MatrixStore<Double> getPower(final int exponent) {
+    //    public MatrixStore<Double> getPower(  int exponent) {
     //
-    //        final MatrixStore<Double> mtrxV = this.getV();
-    //        final MatrixStore<Double> mtrxD = this.getD();
+    //          MatrixStore<Double> mtrxV = this.getV();
+    //          MatrixStore<Double> mtrxD = this.getD();
     //
     //        MatrixStore<Double> retVal = mtrxV;
     //        for (int e = 0; e < exponent; e++) {

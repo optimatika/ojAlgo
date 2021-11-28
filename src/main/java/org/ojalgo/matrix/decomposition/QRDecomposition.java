@@ -28,7 +28,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
@@ -122,14 +121,14 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         this.reset();
 
-        final DecompositionStore<N> tmpStore = this.setInPlace(matrix);
+        DecompositionStore<N> tmpStore = this.setInPlace(matrix);
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        int tmpRowDim = this.getRowDim();
+        int tmpColDim = this.getColDim();
 
-        final Householder<N> tmpHouseholder = this.makeHouseholder(tmpRowDim);
+        Householder<N> tmpHouseholder = this.makeHouseholder(tmpRowDim);
 
-        final int tmpLimit = Math.min(tmpRowDim, tmpColDim);
+        int tmpLimit = Math.min(tmpRowDim, tmpColDim);
 
         for (int ij = 0; ij < tmpLimit; ij++) {
             if (ij + 1 < tmpRowDim && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholder)) {
@@ -143,7 +142,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> aggregator = this.aggregator().product();
+        AggregatorFunction<N> aggregator = this.aggregator().product();
 
         this.getInPlace().visitDiagonal(aggregator);
 
@@ -160,9 +159,9 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public MatrixStore<N> getQ() {
 
-        final DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
+        DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
 
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
+        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
 
         for (int j = this.getMinDim() - 1; j >= 0; j--) {
 
@@ -178,16 +177,16 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public MatrixStore<N> getR() {
 
-        LogicalBuilder<N> logical = this.getInPlace().logical().triangular(true, false);
+        MatrixStore<N> logical = this.getInPlace().triangular(true, false);
 
         int nbRows = this.getRowDim();
         int nbCols = this.getColDim();
 
         if (!myFullSize && nbRows > nbCols) {
-            return logical.limits(nbCols, -1).get();
+            return logical.limits(nbCols, -1);
         }
 
-        return logical.get();
+        return logical;
     }
 
     public double getRankThreshold() {
@@ -215,13 +214,13 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         rhs.supplyTo(preallocated);
 
-        final DecompositionStore<N> tmpStore = this.getInPlace();
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        DecompositionStore<N> tmpStore = this.getInPlace();
+        int tmpRowDim = this.getRowDim();
+        int tmpColDim = this.getColDim();
 
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
+        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
 
-        final int tmpLimit = this.getMinDim();
+        int tmpLimit = this.getMinDim();
         for (int j = 0; j < tmpLimit; j++) {
 
             tmpReference.point(j, j);
@@ -234,15 +233,15 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         preallocated.substituteBackwards(tmpStore, false, false, false);
 
         if (tmpColDim < tmpRowDim) {
-            return preallocated.logical().limits(tmpColDim, (int) preallocated.countColumns()).get();
+            return preallocated.limits(tmpColDim, preallocated.getColDim());
         }
         if (tmpColDim > tmpRowDim) {
-            return preallocated.logical().below(tmpColDim - tmpRowDim).get();
+            return preallocated.below(tmpColDim - tmpRowDim);
         }
         return preallocated;
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -252,7 +251,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newMatrixNotInvertible();
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -272,7 +271,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
-        final long tmpCountRows = template.countRows();
+        long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }
 
@@ -318,12 +317,12 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
      */
     protected DecompositionStore<N> getL() {
 
-        final int tmpRowDim = this.getColDim();
-        final int tmpColDim = this.getMinDim();
+        int tmpRowDim = this.getColDim();
+        int tmpColDim = this.getMinDim();
 
-        final DecompositionStore<N> retVal = this.makeZero(tmpRowDim, tmpColDim);
+        DecompositionStore<N> retVal = this.makeZero(tmpRowDim, tmpColDim);
 
-        final DecompositionStore<N> tmpStore = this.getInPlace();
+        DecompositionStore<N> tmpStore = this.getInPlace();
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = j; i < tmpRowDim; i++) {
                 retVal.set(i, j, tmpStore.get(j, i));

@@ -66,10 +66,10 @@ final class DirectASS extends ActiveSetSolver {
         final int numbVars = this.countVariables();
 
         final Primitive64Store iterX = this.getIterationX();
-        final Primitive64Store iterL = Primitive64Store.FACTORY.makeZero(numbConstr, 1L);
+        final Primitive64Store iterL = Primitive64Store.FACTORY.make(numbConstr, 1L);
         final Primitive64Store soluL = this.getSolutionL();
 
-        if ((numbConstr <= numbVars) && (solved = this.isSolvableQ())) {
+        if (numbConstr <= numbVars && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (numbConstr == 0L) {
@@ -119,8 +119,8 @@ final class DirectASS extends ActiveSetSolver {
 
             if (solved = this.solveFullKKT(tmpXL)) {
 
-                iterX.fillMatching(tmpXL.logical().limits(numbVars, 1).get());
-                iterL.fillMatching(tmpXL.logical().offsets(numbVars, 0).get());
+                iterX.fillMatching(tmpXL.limits(numbVars, 1));
+                iterL.fillMatching(tmpXL.offsets(numbVars, 0));
             }
         }
 
