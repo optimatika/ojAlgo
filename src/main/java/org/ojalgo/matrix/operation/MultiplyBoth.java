@@ -31,7 +31,6 @@ import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -218,8 +217,8 @@ public class MultiplyBoth implements MatrixOperation {
         for (int j = 0; j < tmpColDim; j++) {
             long tmpColBase = Structure2D.index(complexity, 0, j);
 
-            tmpFirst = MatrixStore.firstInColumn(right, j, 0);
-            tmpLimit = MatrixStore.limitOfColumn(right, j, complexity);
+            tmpFirst = Structure2D.firstInColumn(right, j, 0);
+            tmpLimit = Structure2D.limitOfColumn(right, j, complexity);
 
             tmpVal = zero;
             for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -233,12 +232,12 @@ public class MultiplyBoth implements MatrixOperation {
 
         int nbCols = product.getColDim();
 
-        int firstInRow = MatrixStore.firstInRow(right, 0, 0);
-        int limitOfRow = MatrixStore.firstInRow(right, 0, complexity);
+        int firstInRow = Structure2D.firstInRow(right, 0, 0);
+        int limitOfRow = Structure2D.firstInRow(right, 0, complexity);
 
         for (int j = 0; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, firstInRow);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, limitOfRow);
+            int firstInCol = Structure2D.firstInColumn(right, j, firstInRow);
+            int limitOfCol = Structure2D.firstInColumn(right, j, limitOfRow);
             product.set(j, DOT.invokeP64(left, 0, right, j * complexity, firstInCol, limitOfCol));
         }
     }
@@ -686,15 +685,15 @@ public class MultiplyBoth implements MatrixOperation {
 
         for (int i = 0; i < tmpRowDim; i++) {
 
-            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            int tmpFirstInRow = Structure2D.firstInRow(left, i, 0);
+            int tmpLimitOfRow = Structure2D.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
             }
 
-            tmpFirst = MatrixStore.firstInColumn(right, 0, tmpFirstInRow);
-            tmpLimit = MatrixStore.limitOfColumn(right, 0, tmpLimitOfRow);
+            tmpFirst = Structure2D.firstInColumn(right, 0, tmpFirstInRow);
+            tmpLimit = Structure2D.limitOfColumn(right, 0, tmpLimitOfRow);
 
             tmpVal = zero;
             for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -711,8 +710,8 @@ public class MultiplyBoth implements MatrixOperation {
 
         for (int i = 0; i < tmpRowDim; i++) {
 
-            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            int tmpFirstInRow = Structure2D.firstInRow(left, i, 0);
+            int tmpLimitOfRow = Structure2D.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.doubleValue(Structure2D.index(tmpRowDim, i, c));
@@ -762,8 +761,8 @@ public class MultiplyBoth implements MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            int tmpFirstInRow = Structure2D.firstInRow(left, i, 0);
+            int tmpLimitOfRow = Structure2D.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
@@ -772,8 +771,8 @@ public class MultiplyBoth implements MatrixOperation {
             for (int j = 0; j < tmpColDim; j++) {
                 long tmpColBase = Structure2D.index(complexity, 0, j);
 
-                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
+                tmpFirst = Structure2D.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = Structure2D.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = zero;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -797,8 +796,8 @@ public class MultiplyBoth implements MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            int tmpFirstInRow = Structure2D.firstInRow(left, i, 0);
+            int tmpLimitOfRow = Structure2D.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.floatValue(Structure2D.index(tmpRowDim, i, c));
@@ -807,8 +806,8 @@ public class MultiplyBoth implements MatrixOperation {
             for (int j = 0; j < tmpColDim; j++) {
                 long tmpColBase = Structure2D.index(complexity, 0, j);
 
-                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
+                tmpFirst = Structure2D.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = Structure2D.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = 0F;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -834,8 +833,8 @@ public class MultiplyBoth implements MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, tmpPlxDim);
+            int tmpFirstInRow = Structure2D.firstInRow(left, i, 0);
+            int tmpLimitOfRow = Structure2D.limitOfRow(left, i, tmpPlxDim);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.doubleValue(Structure2D.index(tmpRowDim, i, c));
@@ -844,8 +843,8 @@ public class MultiplyBoth implements MatrixOperation {
             for (int j = 0; j < tmpColDim; j++) {
                 long tmpColBase = Structure2D.index(complexity, 0, j);
 
-                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
+                tmpFirst = Structure2D.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = Structure2D.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {

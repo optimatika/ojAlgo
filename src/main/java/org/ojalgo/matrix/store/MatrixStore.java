@@ -72,38 +72,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = GenericStore.RATIONAL;
     PhysicalStore.Factory<Double, RawStore> RAW = RawStore.FACTORY;
 
-    static int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
-    }
-
-    static long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
-    }
-
-    static int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
-    }
-
-    static long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
-    }
-
-    static int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
-    }
-
-    static long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
-    }
-
-    static int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
-    }
-
-    static long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
-    }
-
     default MatrixStore<N> above(final Access2D<N>... matrices) {
         MatrixStore<N> above = AbstractStore.buildRow(this.physical(), this.countColumns(), matrices);
         return new AboveBelowStore<>(above, this);
@@ -282,27 +250,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     /**
-     * The default value is simply <code>0</code>, and if all elements are zeros then
-     * <code>this.countRows()</code>.
-     *
-     * @param col The column index
-     * @return The row index of the first non-zero element in the specified column
-     */
-    default int firstInColumn(final int col) {
-        return 0;
-    }
-
-    /**
-     * The default value is simply <code>0</code>, and if all elements are zeros then
-     * <code>this.countColumns()</code>.
-     *
-     * @return The column index of the first non-zero element in the specified row
-     */
-    default int firstInRow(final int row) {
-        return 0;
-    }
-
-    /**
      * @deprecated v50 No need as {@link MatrixStore} now implements {@link Logical} and this method simply
      *             return "this".
      */
@@ -418,28 +365,6 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     default MatrixStore<N> left(final long numberOfColumns) {
         MatrixStore<N> left = new ZeroStore<>(this.physical(), this.countRows(), numberOfColumns);
         return new LeftRightStore<>(left, this);
-    }
-
-    /**
-     * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
-     * <code>0</code>.
-     *
-     * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
-     *         the last non-zero + 1)
-     */
-    default int limitOfColumn(final int col) {
-        return this.getRowDim();
-    }
-
-    /**
-     * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
-     * <code>0</code>.
-     *
-     * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
-     *         the last non-zero + 1)
-     */
-    default int limitOfRow(final int row) {
-        return this.getColDim();
     }
 
     /**

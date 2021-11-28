@@ -527,8 +527,40 @@ public interface Structure2D extends Structure1D {
         return numberOfRows * numberOfColumnns;
     }
 
+    static int firstInColumn(final Structure1D structure, final int col, final int defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInColumn(final Structure1D structure, final long col, final long defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int firstInRow(final Structure1D structure, final int row, final int defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInRow(final Structure1D structure, final long row, final long defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
     static long index(final long structure, final long row, final long column) {
         return row + column * structure;
+    }
+
+    static int limitOfColumn(final Structure1D structure, final int col, final int defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfColumn(final Structure1D structure, final long col, final long defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static int limitOfRow(final Structure1D structure, final int row, final int defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfRow(final Structure1D structure, final long row, final long defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
     static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
@@ -582,6 +614,27 @@ public interface Structure2D extends Structure1D {
      * @return The number of rows
      */
     long countRows();
+
+    /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countRows()</code>.
+     *
+     * @param col The column index
+     * @return The row index of the first non-zero element in the specified column
+     */
+    default int firstInColumn(final int col) {
+        return 0;
+    }
+
+    /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countColumns()</code>.
+     *
+     * @return The column index of the first non-zero element in the specified row
+     */
+    default int firstInRow(final int row) {
+        return 0;
+    }
 
     default int getColDim() {
         return Math.toIntExact(this.countColumns());
@@ -666,6 +719,28 @@ public interface Structure2D extends Structure1D {
         return this.countColumns() == 1L || this.countRows() == 1L;
     }
 
+    /**
+     * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfColumn(final int col) {
+        return this.getRowDim();
+    }
+
+    /**
+     * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfRow(final int row) {
+        return this.getColDim();
+    }
+
     default void loopAll(final RowColumnCallback callback) {
         final long tmpCountRows = this.countRows();
         final long tmpCountColumns = this.countColumns();
@@ -704,5 +779,4 @@ public interface Structure2D extends Structure1D {
     default void loopRow(final long row, final RowColumnCallback callback) {
         this.loopRow(row, 0L, callback);
     }
-
 }

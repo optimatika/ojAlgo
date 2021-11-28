@@ -31,7 +31,6 @@ import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
@@ -176,8 +175,8 @@ public class MultiplyLeft implements MatrixOperation {
         double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
@@ -194,8 +193,8 @@ public class MultiplyLeft implements MatrixOperation {
         float[] leftColumn = new float[structure];
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
@@ -212,8 +211,8 @@ public class MultiplyLeft implements MatrixOperation {
         N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.get(Structure2D.index(structure, i, c));
@@ -231,8 +230,8 @@ public class MultiplyLeft implements MatrixOperation {
         double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
@@ -251,8 +250,8 @@ public class MultiplyLeft implements MatrixOperation {
         float[] leftColumn = new float[structure];
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
@@ -272,8 +271,8 @@ public class MultiplyLeft implements MatrixOperation {
         N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
 
-            int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
-            int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+            int firstInLeftColumn = Structure2D.firstInColumn(left, c, 0);
+            int limitOfLeftColumn = Structure2D.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.get(Structure2D.index(structure, i, c));

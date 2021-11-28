@@ -25,10 +25,10 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.array.operation.DOT;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Normal;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -247,8 +247,8 @@ public class MultiplyLeftImpl {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            final int tmpFirst = MatrixStore.firstInRow(left, i, 0);
-            final int tmpLimit = MatrixStore.limitOfRow(left, i, complexity);
+            final int tmpFirst = Structure2D.firstInRow(left, i, 0);
+            final int tmpLimit = Structure2D.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirst; c < tmpLimit; c++) {
                 tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
