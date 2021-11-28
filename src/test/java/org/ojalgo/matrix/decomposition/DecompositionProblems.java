@@ -368,7 +368,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
             TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
-            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
+            if (tmpDecomposition instanceof MatrixDecomposition.Solver<?> && ((Solver) tmpDecomposition).isSolvable()) {
                 tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
@@ -405,7 +405,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             }
             TestUtils.assertEquals(decomp.toString(), original, decomp.reconstruct(), new NumberContext(7, 5));
 
-            if ((decomp instanceof MatrixDecomposition.Solver<?>) && ((Solver<ComplexNumber>) decomp).isSolvable()) {
+            if (decomp instanceof MatrixDecomposition.Solver<?> && ((Solver<ComplexNumber>) decomp).isSolvable()) {
 
                 solution = ((Solver<ComplexNumber>) decomp).getSolution(original);
                 if (MatrixDecompositionTests.DEBUG) {
@@ -499,7 +499,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         int rows = data.length;
         int cols = data[0].length;
         MatrixStore<Double> zeros = factory.make(cols - rows, cols);
-        MatrixStore<Double> matrixB = matrixA.logical().below(zeros).collect(factory);
+        MatrixStore<Double> matrixB = matrixA.below(zeros).collect(factory);
         if (DEBUG) {
             // Print B to verify it.
             System.out.println("\nB matrix:\n" + matrixB);

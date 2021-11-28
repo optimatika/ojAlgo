@@ -64,7 +64,7 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
             return (MatrixStore<N>) source;
         }
         if (source instanceof Access2D) {
-            return myFactory.makeWrapper((Access2D<?>) source).get();
+            return myFactory.makeWrapper((Access2D<?>) source);
         }
         return source.collect(myFactory);
     }

@@ -60,7 +60,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
             MatrixStore<Double> tmpInverse = task.invert(original);
 
-            MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.makeIdentity((int) original.countRows()).get();
+            MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.makeIdentity((int) original.countRows());
             MatrixStore<Double> tmpActual = original.multiply(tmpInverse);
 
             TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);

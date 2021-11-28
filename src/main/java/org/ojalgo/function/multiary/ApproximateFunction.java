@@ -41,10 +41,7 @@ abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryF
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ApproximateFunction)) {
+        if (obj == null || !(obj instanceof ApproximateFunction)) {
             return false;
         }
         final ApproximateFunction<?> other = (ApproximateFunction<?>) obj;
@@ -59,14 +56,14 @@ abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryF
     }
 
     public MatrixStore<N> getLinearFactors() {
-        return this.getGradient(this.factory().builder().makeZero(this.arity(), 1).get());
+        return this.getGradient(this.factory().makeZero(this.arity(), 1));
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myPoint == null) ? 0 : myPoint.hashCode());
+        result = prime * result + (myPoint == null ? 0 : myPoint.hashCode());
         return result;
     }
 

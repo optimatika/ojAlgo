@@ -53,7 +53,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Mutate1D obj = retVal.objective();
 
-        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1).get() : convex.getC();
+        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
 
         for (int v = 0; v < numbVars; v++) {
             double valC = convexC.doubleValue(v);

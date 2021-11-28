@@ -48,7 +48,7 @@ final class DualSimplex extends SimplexSolver {
         Mutate2D constrBody = retVal.constraintsBody();
         Mutate1D constrRHS = retVal.constraintsRHS();
 
-        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1).get() : convex.getC();
+        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
 

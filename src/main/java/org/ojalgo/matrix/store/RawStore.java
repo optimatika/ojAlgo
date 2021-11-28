@@ -47,7 +47,6 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.operation.MultiplyBoth;
-import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -155,15 +154,6 @@ public final class RawStore implements PhysicalStore<Double> {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
 
-        public RawStore makeEye(final long rows, final long columns) {
-
-            RawStore retVal = this.make(rows, columns);
-
-            retVal.fillDiagonal(0, 0, this.scalar().one().get());
-
-            return retVal;
-        }
-
         public RawStore rows(final Access1D<?>... source) {
 
             int tmpRowDim = source.length;
@@ -258,30 +248,6 @@ public final class RawStore implements PhysicalStore<Double> {
             }
 
             return new RawStore(retVal);
-        }
-
-        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(this, mainDiagonal);
-        }
-
-        public MatrixStore<Double> makeIdentity(final int dimension) {
-            return new IdentityStore<>(this, dimension);
-        }
-
-        public MatrixStore<Double> makeSingle(final Double element) {
-            return new SingleStore<>(this, element);
-        }
-
-        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.PRIMITIVE64.make(rowsCount, columnsCount);
-        }
-
-        public MatrixStore<Double> makeWrapper(final Access2D<?> access) {
-            return new WrapperStore<>(this, access);
-        }
-
-        public MatrixStore<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new ZeroStore<>(this, rowsCount, columnsCount);
         }
 
     };

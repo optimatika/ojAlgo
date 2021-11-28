@@ -102,9 +102,8 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         }
         if (tmpNumber instanceof Double) {
             return (LU<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
         }
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -140,7 +139,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         MatrixStore<N> mtrxL = this.getL();
         MatrixStore<N> mtrxU = this.getU();
         int[] pivotOrder = this.getPivotOrder();
-        return mtrxL.multiply(mtrxU).logical().row(pivotOrder).get();
+        return mtrxL.multiply(mtrxU).row(pivotOrder);
     }
 
 }

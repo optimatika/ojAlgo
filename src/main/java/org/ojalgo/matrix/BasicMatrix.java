@@ -294,25 +294,24 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     public Scalar<N> getDeterminant() {
 
-        N tmpDeterminant = null;
+        N retVal = null;
 
-        if (myDecomposition != null && myDecomposition instanceof MatrixDecomposition.Determinant
-                && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
+        if (myDecomposition instanceof MatrixDecomposition.Determinant && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
 
-            tmpDeterminant = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
+            retVal = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
 
         } else {
 
-            final DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
+            DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
 
             if (tmpTask instanceof MatrixDecomposition.Determinant) {
                 myDecomposition = (MatrixDecomposition.Determinant<N>) tmpTask;
             }
 
-            tmpDeterminant = tmpTask.calculateDeterminant(myStore);
+            retVal = tmpTask.calculateDeterminant(myStore);
         }
 
-        return myStore.physical().scalar().convert(tmpDeterminant);
+        return myStore.physical().scalar().convert(retVal);
     }
 
     public List<Eigenpair> getEigenpairs() {

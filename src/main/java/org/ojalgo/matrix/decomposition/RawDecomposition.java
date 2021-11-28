@@ -86,7 +86,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
             return (MatrixStore<Double>) source;
         }
         if (source instanceof Access2D) {
-            return Primitive64Store.FACTORY.builder().makeWrapper((Access2D<?>) source).get();
+            return Primitive64Store.FACTORY.makeWrapper((Access2D<?>) source);
         }
         return source.collect(Primitive64Store.FACTORY);
     }

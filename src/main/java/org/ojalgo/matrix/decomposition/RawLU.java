@@ -115,12 +115,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        MatrixStore<Double> logical = this.getInternalStore().logical().triangular(false, true);
+        MatrixStore<Double> logical = this.getInternalStore().triangular(false, true);
         int nbRows = this.getRowDim();
         if (nbRows < this.getColDim()) {
-            return logical.limits(nbRows, nbRows).get();
+            return logical.limits(nbRows, nbRows);
         }
-        return logical.get();
+        return logical;
     }
 
     public int[] getPivotOrder() {
@@ -143,7 +143,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
-        this.collect(rhs).logical().row(myPivot.getOrder()).supplyTo(preallocated);
+        this.collect(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }

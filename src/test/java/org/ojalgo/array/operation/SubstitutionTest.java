@@ -39,8 +39,8 @@ public class SubstitutionTest extends StoreOperationsTests {
         int numbEquations = 4;
         int numbSolutions = 3;
 
-        MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations).get();
-        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations).get();
+        MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations);
+        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations);
 
         Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);
@@ -84,8 +84,8 @@ public class SubstitutionTest extends StoreOperationsTests {
         int numbEquations = 4;
         int numbSolutions = 3;
 
-        MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations).get();
-        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations).get();
+        MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations);
+        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations);
 
         Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);

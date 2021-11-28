@@ -99,7 +99,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     public M make(final long rows, final long columns) {
-        return this.instantiate(myPhysicalFactory.builder().makeZero((int) rows, (int) columns).get());
+        return this.instantiate(myPhysicalFactory.makeZero((int) rows, (int) columns));
     }
 
     public DR makeDense(final int count) {
@@ -114,7 +114,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         final int square = Math.min(rows, columns);
 
-        MatrixStore<N> retVal = myPhysicalFactory.builder().makeIdentity(square);
+        MatrixStore<N> retVal = myPhysicalFactory.makeIdentity(square);
 
         if (rows > square) {
             retVal = retVal.below(rows - square);
@@ -122,7 +122,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             retVal = retVal.right(columns - square);
         }
 
-        return this.instantiate(retVal.get());
+        return this.instantiate(retVal);
     }
 
     public M makeEye(final Structure2D shape) {
@@ -134,15 +134,15 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     public M makeIdentity(final int dimension) {
-        return this.instantiate(myPhysicalFactory.builder().makeIdentity(dimension).get());
+        return this.instantiate(myPhysicalFactory.makeIdentity(dimension));
     }
 
     public M makeSingle(final N element) {
-        return this.instantiate(myPhysicalFactory.builder().makeSingle(element).get());
+        return this.instantiate(myPhysicalFactory.makeSingle(element));
     }
 
     public SR makeSparse(final long rows, final long columns) {
-        return this.sparse(myPhysicalFactory.builder().makeSparse(rows, columns));
+        return this.sparse(myPhysicalFactory.makeSparse(rows, columns));
     }
 
     public SR makeSparse(final Structure2D shape) {
@@ -150,7 +150,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     public M makeWrapper(final Access2D<?> elements) {
-        return this.instantiate(myPhysicalFactory.builder().makeWrapper(elements).get());
+        return this.instantiate(myPhysicalFactory.makeWrapper(elements));
     }
 
     public M rows(final Access1D<?>... source) {

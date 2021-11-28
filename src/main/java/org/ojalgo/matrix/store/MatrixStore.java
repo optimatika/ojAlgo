@@ -87,7 +87,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> add(final N scalarAddend) {
-        return this.onAll(this.physical().function().add().second(scalarAddend)).get();
+        return this.onAll(this.physical().function().add().second(scalarAddend));
     }
 
     default N aggregateAll(final Aggregator aggregator) {
@@ -229,7 +229,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> divide(final N scalarDivisor) {
-        return this.onAll(this.physical().function().divide().second(scalarDivisor)).get();
+        return this.onAll(this.physical().function().divide().second(scalarDivisor));
     }
 
     default double doubleValue(final long row, final long col) {
@@ -395,7 +395,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> multiply(final N scalarMultiplicand) {
-        return this.onAll(this.physical().function().multiply().second(scalarMultiplicand)).get();
+        return this.onAll(this.physical().function().multiply().second(scalarMultiplicand));
     }
 
     /**
@@ -419,7 +419,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> negate() {
-        return this.onAll(this.physical().function().negate()).get();
+        return this.onAll(this.physical().function().negate());
     }
 
     default double norm() {
@@ -464,32 +464,27 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         PhysicalStore.Factory<N, ?> factory = this.physical();
 
         if (power == 0) {
-
-            return factory.builder().makeIdentity(this.countRows()).get();
-
+            return factory.makeIdentity(this.countRows());
         }
+
         if (power == 1) {
-
             return this;
-
         }
+
         if (power == 2) {
-
             return this.multiply(this);
-
         }
+
         if (power % 2 == 0) {
             // 4,6,8,10...
-
             return this.power(2).power(power / 2);
-
         }
+
         if (power > 8) {
             // 9,11,13,15...
-
             return this.power(power - 1).multiply(this);
-
         }
+
         PhysicalStore<N> right = factory.make(this);
         PhysicalStore<N> product = factory.make(this);
         PhysicalStore<N> temp;
@@ -672,7 +667,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default MatrixStore<N> subtract(final N scalarSubtrahend) {
-        return this.onAll(this.physical().function().subtract().second(scalarSubtrahend)).get();
+        return this.onAll(this.physical().function().subtract().second(scalarSubtrahend));
     }
 
     default MatrixStore<N> superimpose(final Access2D<N> matrix) {

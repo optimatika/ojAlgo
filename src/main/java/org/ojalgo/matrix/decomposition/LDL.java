@@ -78,7 +78,8 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
         if (tmpNumber instanceof RationalNumber) {
             return (LDL<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
+        }
+        if (tmpNumber instanceof Quaternion) {
             return (LDL<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LDL<N>) COMPLEX.make(typical);
@@ -113,6 +114,6 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
         int[] pivotOrder = this.getPivotOrder();
 
-        return mtrxL.multiply(mtrxD).multiply(mtrxR).logical().row(pivotOrder).column(pivotOrder).get();
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).row(pivotOrder).column(pivotOrder);
     }
 }

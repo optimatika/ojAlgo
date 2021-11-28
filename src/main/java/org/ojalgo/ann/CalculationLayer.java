@@ -147,7 +147,7 @@ final class CalculationLayer {
     }
 
     MatrixStore<Double> getLogicalWeights() {
-        return myWeights.logical().below(myBias).get();
+        return myWeights.below(myBias);
     }
 
     Structure2D getStructure() {

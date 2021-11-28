@@ -157,10 +157,6 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return true;
     }
 
-    public final MatrixStore<N> get() {
-        return this;
-    }
-
     public final int getColDim() {
         return myColDim;
     }

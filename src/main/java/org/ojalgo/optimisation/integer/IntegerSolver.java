@@ -584,7 +584,7 @@ public final class IntegerSolver extends GenericSolver {
         }
         final State tmpSate = State.INVALID;
         final double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(this.getIntegerModel().countVariables(), 1).get();
+        final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(this.getIntegerModel().countVariables(), 1);
 
         return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
     }

@@ -1388,7 +1388,7 @@ public class NextGenSysModTest {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances).get();
+        MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
 
         if (clean) {
 
@@ -1425,7 +1425,7 @@ public class NextGenSysModTest {
             for (int i = j + 1; i < size; i++) {
                 double rowVol = volatilities[i];
 
-                if ((rowVol <= PrimitiveMath.ZERO) || (colVol <= PrimitiveMath.ZERO)) {
+                if (rowVol <= PrimitiveMath.ZERO || colVol <= PrimitiveMath.ZERO) {
 
                     retVal.set(i, j, PrimitiveMath.ZERO);
                     retVal.set(j, i, PrimitiveMath.ZERO);
@@ -1489,7 +1489,7 @@ public class NextGenSysModTest {
 
         if (clean) {
 
-            MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances).get();
+            MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
 
             double largest = covarianceMtrx.aggregateDiagonal(Aggregator.LARGEST);
             double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;

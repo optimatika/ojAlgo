@@ -120,7 +120,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     }
 
     public final MatrixStore<N> getH() {
-        return this.getInPlace().logical().hessenberg(myUpper).get();
+        return this.getInPlace().hessenberg(myUpper);
     }
 
     public final MatrixStore<N> getQ() {

@@ -133,8 +133,8 @@ final class QPESolver extends ConstrainedSolver {
             final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
-                tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
-                tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+                tmpIterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
+                tmpIterL.fillMatching(tmpXL.offsets(this.countVariables(), 0));
             }
         }
 
@@ -176,7 +176,7 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationB() {
         if (myFeasible) {
-            return Primitive64Store.FACTORY.makeZero(this.countEqualityConstraints(), 1).get();
+            return Primitive64Store.FACTORY.makeZero(this.countEqualityConstraints(), 1);
         }
         return this.getMatrixBE();
     }

@@ -73,8 +73,8 @@ public class TestSpecificSizeImplementationRational {
                     GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
                     GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
 
-                    MatrixStore<RationalNumber> l = left.logical().tridiagonal().get();
-                    MatrixStore<RationalNumber> r = right.logical().tridiagonal().get();
+                    MatrixStore<RationalNumber> l = left.tridiagonal();
+                    MatrixStore<RationalNumber> r = right.tridiagonal();
 
                     MultiplyBoth.fillMxN_G(expected, l, c, r);
                     MultiplyBoth.Generic<RationalNumber> generic = MultiplyBoth.newGeneric(m, n);
@@ -120,7 +120,7 @@ public class TestSpecificSizeImplementationRational {
                     GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
                     GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
 
-                    MatrixStore<RationalNumber> l = left.logical().tridiagonal().get();
+                    MatrixStore<RationalNumber> l = left.tridiagonal();
 
                     MultiplyLeft.fillMxN(expected.data, l, c, right.data, RationalNumber.FACTORY);
                     MultiplyLeft.Generic<RationalNumber> generic = MultiplyLeft.newGeneric(m, n);
@@ -188,7 +188,7 @@ public class TestSpecificSizeImplementationRational {
                     GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
                     GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
 
-                    MatrixStore<RationalNumber> r = right.logical().tridiagonal().get();
+                    MatrixStore<RationalNumber> r = right.tridiagonal();
 
                     MultiplyRight.fillMxN(expected.data, left.data, c, r, RationalNumber.FACTORY);
                     MultiplyRight.Generic<RationalNumber> generic = MultiplyRight.newGeneric(m, n);

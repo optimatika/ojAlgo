@@ -105,13 +105,13 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return significant;
     }
 
-    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
         return this.compute(aStore, false);
     }
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product2();
+        AggregatorFunction<N> tmpAggrFunc = this.aggregator().product2();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -119,25 +119,25 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     }
 
     @Override
-    public final MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        final DecompositionStore<N> body = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, false, false, true);
         preallocated.substituteBackwards(body, false, true, true);
 
-        return preallocated.logical().hermitian(false).get();
+        return preallocated.hermitian(false);
     }
 
     public MatrixStore<N> getL() {
-        return this.getInPlace().logical().triangular(false, false).get();
+        return this.getInPlace().triangular(false, false);
     }
 
     public double getRankThreshold() {
         return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -160,11 +160,11 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 
-        final DecompositionStore<N> body = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
         preallocated.substituteForwards(body, false, false, false);
         preallocated.substituteBackwards(body, false, true, false);
@@ -172,29 +172,27 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return preallocated;
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse();
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
-    public final boolean isFullSize() {
+    public boolean isFullSize() {
         return true;
     }
 
@@ -208,7 +206,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
-        final long tmpCountRows = template.countRows();
+        long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }
 
@@ -230,9 +228,8 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
@@ -241,45 +238,44 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && (myMinDiag > this.getRankThreshold());
+        return mySPD && myMinDiag > this.getRankThreshold();
     }
 
-    final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
+    boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
 
         this.reset();
 
-        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+        DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
-        final int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
+        int tmpRowDim = this.getRowDim();
+        int tmpColDim = this.getColDim();
+        int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
 
         // true if (Hermitian) Positive Definite
         boolean tmpPositiveDefinite = tmpRowDim == tmpColDim;
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
 
-        final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
+        BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
         // Check if hermitian, maybe
         if (tmpPositiveDefinite && checkHermitian) {
             tmpPositiveDefinite &= Access2D.isHermitian(tmpInPlace);
         }
 
-        final UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();
+        UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();
 
         // Main loop - along the diagonal
-        for (int ij = 0; tmpPositiveDefinite && (ij < tmpMinDim); ij++) {
+        for (int ij = 0; tmpPositiveDefinite && ij < tmpMinDim; ij++) {
 
             // Do the calculations...
-            final double tmpVal = tmpInPlace.doubleValue(ij, ij);
+            double tmpVal = tmpInPlace.doubleValue(ij, ij);
             myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
             myMinDiag = MIN.invoke(myMinDiag, tmpVal);
             if (tmpVal > ZERO) {

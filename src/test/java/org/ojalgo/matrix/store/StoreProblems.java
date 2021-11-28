@@ -181,15 +181,15 @@ public class StoreProblems extends MatrixStoreTests {
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
-        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.logical().transpose().get());
+        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.transpose());
         tmpExpected = tmpMtrxC.copy();
-        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.logical().transpose().get());
+        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.transpose());
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
-        tmpMtrxC.fillByMultiplying(tmpMtrxA.logical().transpose().get(), tmpMtrxB);
+        tmpMtrxC.fillByMultiplying(tmpMtrxA.transpose(), tmpMtrxB);
         tmpExpected = tmpMtrxC.copy();
-        tmpMtrxC.fillByMultiplying(tmpMtrxA.logical().transpose().get(), tmpMtrxB);
+        tmpMtrxC.fillByMultiplying(tmpMtrxA.transpose(), tmpMtrxB);
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }

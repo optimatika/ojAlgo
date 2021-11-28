@@ -119,8 +119,8 @@ final class DirectASS extends ActiveSetSolver {
 
             if (solved = this.solveFullKKT(tmpXL)) {
 
-                iterX.fillMatching(tmpXL.logical().limits(numbVars, 1).get());
-                iterL.fillMatching(tmpXL.logical().offsets(numbVars, 0).get());
+                iterX.fillMatching(tmpXL.limits(numbVars, 1));
+                iterL.fillMatching(tmpXL.offsets(numbVars, 0));
             }
         }
 
