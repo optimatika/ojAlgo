@@ -236,7 +236,8 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
             return preallocated.limits(tmpColDim, preallocated.getColDim());
         }
         if (tmpColDim > tmpRowDim) {
-            return preallocated.below(tmpColDim - tmpRowDim);
+            int diff = tmpColDim - tmpRowDim;
+            return preallocated.below(diff);
         }
         return preallocated;
     }
