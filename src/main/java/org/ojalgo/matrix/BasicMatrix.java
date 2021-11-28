@@ -45,6 +45,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -64,8 +65,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-        implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements Matrix2D<N, M>, Access2D.Elements,
+        Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     private static final NumberContext EQUALS = NumberContext.of(8, 12);
 
@@ -627,7 +628,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.getFactory().instantiate(retVal);
     }
 
-    public final void supplyTo(final PhysicalStore<N> receiver) {
+    public final void supplyTo(final TransformableRegion<N> receiver) {
         myStore.supplyTo(receiver);
     }
 

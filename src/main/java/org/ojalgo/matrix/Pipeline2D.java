@@ -27,7 +27,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Operate2D;
@@ -35,7 +35,7 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 
 abstract class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, P extends Pipeline2D<N, M, P>>
-        implements Structure2D.Logical<Access2D<N>, P>, Operate2D<N, P>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+        implements Structure2D.Logical<Access2D<N>, P>, Operate2D<N, P>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     private final MatrixFactory<N, M, ?, ?> myFactory;
     private final MatrixStore<N> myStore;
@@ -188,7 +188,7 @@ abstract class Pipeline2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, 
         return this.wrap(this.store().superimpose(row, col, matrix));
     }
 
-    public void supplyTo(final PhysicalStore<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         mySupplier.supplyTo(receiver);
     }
 

@@ -27,14 +27,14 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
 abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, MR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>>
-        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>> {
 
     private final MR myDelegate;
     private boolean mySafe = true;
@@ -506,7 +506,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.set(row, col, value);
     }
 
-    public void supplyTo(final PhysicalStore<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         myDelegate.supplyTo(receiver);
     }
 
