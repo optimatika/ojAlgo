@@ -235,7 +235,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             int nbIneq = this.countInequalityConstraints();
             int nbVars = this.countVariables();
 
-            MatrixStore<Double> rhs = MatrixStore.PRIMITIVE64.makeZero(nbVars, 1).get();
+            MatrixStore<Double> rhs = Primitive64Store.FACTORY.makeZero(nbVars, 1).get();
 
             if (nbEqus > 0) {
 

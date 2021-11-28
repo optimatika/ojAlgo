@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -52,7 +53,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Mutate1D obj = retVal.objective();
 
-        MatrixStore<Double> convexC = zeroC ? MatrixStore.PRIMITIVE64.makeZero(convex.countVariables(), 1).get() : convex.getC();
+        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1).get() : convex.getC();
 
         for (int v = 0; v < numbVars; v++) {
             double valC = convexC.doubleValue(v);

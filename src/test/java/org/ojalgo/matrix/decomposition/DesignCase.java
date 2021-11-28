@@ -188,7 +188,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testSolveIdentity() {
 
-        Access2D<?> identity = MatrixStore.PRIMITIVE64.makeIdentity(9).get();
+        Access2D<?> identity = Primitive64Store.FACTORY.makeIdentity(9).get();
         Access2D<?> random = Primitive64Store.FACTORY.makeFilled(9, 1, new Uniform());
 
         List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();

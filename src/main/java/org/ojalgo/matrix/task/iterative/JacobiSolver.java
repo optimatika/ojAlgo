@@ -45,7 +45,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {
             tmpBody = (MatrixStore<Double>) body;
         } else {
-            tmpBody = MatrixStore.PRIMITIVE64.makeWrapper(body).get();
+            tmpBody = Primitive64Store.FACTORY.makeWrapper(body).get();
         }
         final MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.columns(tmpBody.sliceDiagonal());
 
@@ -53,7 +53,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         if ((rhs instanceof MatrixStore<?>) && (rhs.get(0L) instanceof Double)) {
             tmpRHS = (MatrixStore<Double>) rhs;
         } else {
-            tmpRHS = MatrixStore.PRIMITIVE64.makeWrapper(rhs).get();
+            tmpRHS = Primitive64Store.FACTORY.makeWrapper(rhs).get();
         }
 
         final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);

@@ -31,8 +31,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.Matrix2D;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -64,13 +62,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
         Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
-
-    PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = GenericStore.COMPLEX;
-    PhysicalStore.Factory<Double, Primitive32Store> PRIMITIVE32 = Primitive32Store.FACTORY;
-    PhysicalStore.Factory<Double, Primitive64Store> PRIMITIVE64 = Primitive64Store.FACTORY;
-    PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = GenericStore.QUATERNION;
-    PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = GenericStore.RATIONAL;
-    PhysicalStore.Factory<Double, RawStore> RAW = RawStore.FACTORY;
 
     default MatrixStore<N> above(final Access2D<N>... matrices) {
         MatrixStore<N> above = AbstractStore.buildRow(this.physical(), this.countColumns(), matrices);

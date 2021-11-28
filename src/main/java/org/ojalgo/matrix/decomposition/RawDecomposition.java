@@ -114,7 +114,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
-        return MatrixStore.PRIMITIVE64.makeWrapper(matrix);
+        return Primitive64Store.FACTORY.makeWrapper(matrix);
     }
 
     double[][] reset(final Structure2D template, final boolean transpose) {

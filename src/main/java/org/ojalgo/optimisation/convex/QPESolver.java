@@ -176,7 +176,7 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationB() {
         if (myFeasible) {
-            return MatrixStore.PRIMITIVE64.makeZero(this.countEqualityConstraints(), 1).get();
+            return Primitive64Store.FACTORY.makeZero(this.countEqualityConstraints(), 1).get();
         }
         return this.getMatrixBE();
     }
