@@ -83,6 +83,14 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
         };
     }
 
+    default I make(final int... structure) {
+        long[] shape = new long[structure.length];
+        for (int i = 0; i < shape.length; i++) {
+            shape[i] = structure[i];
+        }
+        return this.make(shape);
+    }
+
     I make(long... structure);
 
     default I make(final StructureAnyD shape) {

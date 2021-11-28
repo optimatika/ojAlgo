@@ -111,6 +111,10 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
         };
     }
 
+    default I make(final int rows, final int columns) {
+        return this.make((long) rows, (long) columns);
+    }
+
     I make(long rows, long columns);
 
     default I make(final Structure2D shape) {

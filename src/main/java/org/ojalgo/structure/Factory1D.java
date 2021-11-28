@@ -71,6 +71,10 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
     }
 
+    default I make(final int count) {
+        return this.make((long) count);
+    }
+
     I make(long count);
 
     default I make(final Structure1D shape) {
