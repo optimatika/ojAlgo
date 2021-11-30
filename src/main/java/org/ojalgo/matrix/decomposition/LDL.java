@@ -81,13 +81,14 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         }
         if (tmpNumber instanceof Quaternion) {
             return (LDL<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (LDL<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (LDL<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
         }
+        if (tmpNumber instanceof ComplexNumber) {
+            return (LDL<N>) COMPLEX.make(typical);
+        }
+        if (tmpNumber instanceof Double) {
+            return (LDL<N>) PRIMITIVE.make(typical);
+        }
+        throw new IllegalArgumentException();
     }
 
     MatrixStore<N> getD();

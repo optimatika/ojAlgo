@@ -21,11 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -60,8 +64,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Comparable<N>>
-        extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
+public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>,
+        MatrixDecomposition.Values<N>, Provider2D.Eigenpairs {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
 
@@ -347,11 +351,11 @@ public interface Eigenvalue<N extends Comparable<N>>
         }
         if (tmpNumber instanceof Quaternion) {
             return (Eigenvalue<N>) QUATERNION.make(typical, hermitian);
-        } else if (tmpNumber instanceof RationalNumber) {
-            return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
-        } else {
-            throw new IllegalArgumentException();
         }
+        if (tmpNumber instanceof RationalNumber) {
+            return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
+        }
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -418,6 +422,19 @@ public interface Eigenvalue<N extends Comparable<N>>
         return new Eigenpair(value, vector);
     }
 
+    default List<Eigenpair> getEigenpairs() {
+
+        List<Eigenpair> retVal = new ArrayList<>();
+
+        for (int i = 0, limit = this.getEigenvalues().size(); i < limit; i++) {
+            retVal.add(this.getEigenpair(i));
+        }
+
+        retVal.sort(Comparator.reverseOrder());
+
+        return retVal;
+    }
+
     /**
      * <p>
      * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
@@ -459,22 +476,6 @@ public interface Eigenvalue<N extends Comparable<N>>
         }
     }
 
-    /**
-     * @return A complex valued alternative to {@link #getV()}.
-     */
-    default MatrixStore<ComplexNumber> getEigenvectors() {
-
-        final long tmpDimension = this.getV().countColumns();
-
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
-
-        for (int j = 0; j < tmpDimension; j++) {
-            this.copyEigenvector(j, retVal.sliceColumn(0, j));
-        }
-
-        return retVal;
-    }
-
     //    /**
     //     * @return The matrix exponential
     //     */
@@ -505,6 +506,22 @@ public interface Eigenvalue<N extends Comparable<N>>
     //
     //        return retVal;
     //    }
+
+    /**
+     * @return A complex valued alternative to {@link #getV()}.
+     */
+    default MatrixStore<ComplexNumber> getEigenvectors() {
+
+        final long tmpDimension = this.getV().countColumns();
+
+        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
+
+        for (int j = 0; j < tmpDimension; j++) {
+            this.copyEigenvector(j, retVal.sliceColumn(0, j));
+        }
+
+        return retVal;
+    }
 
     /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method

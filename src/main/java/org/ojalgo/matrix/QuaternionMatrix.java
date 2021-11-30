@@ -110,8 +110,8 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    QuaternionMatrix(final MatrixStore<Quaternion> aStore) {
-        super(aStore);
+    QuaternionMatrix(final MatrixStore<Quaternion> store) {
+        super(store);
     }
 
     @Override
@@ -143,52 +143,52 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
-    Cholesky<Quaternion> getDecompositionCholesky(final Structure2D typical) {
+    QuaternionMatrix newInstance(final MatrixStore<Quaternion> store) {
+        return new QuaternionMatrix(store);
+    }
+
+    @Override
+    Cholesky<Quaternion> newCholesky(final Structure2D typical) {
         return Cholesky.QUATERNION.make(typical);
     }
 
     @Override
-    Eigenvalue<Quaternion> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<Quaternion> getDecompositionLDL(final Structure2D typical) {
-        return LDL.QUATERNION.make(typical);
-    }
-
-    @Override
-    LU<Quaternion> getDecompositionLU(final Structure2D typical) {
-        return LU.QUATERNION.make(typical);
-    }
-
-    @Override
-    QR<Quaternion> getDecompositionQR(final Structure2D typical) {
-        return QR.QUATERNION.make(typical);
-    }
-
-    @Override
-    SingularValue<Quaternion> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.QUATERNION.make(typical);
-    }
-
-    @Override
-    Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<Quaternion> getTaskDeterminant(final MatrixStore<Quaternion> template) {
+    DeterminantTask<Quaternion> newDeterminantTask(final MatrixStore<Quaternion> template) {
         return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<Quaternion> getTaskInverter(final MatrixStore<Quaternion> template) {
+    Eigenvalue<Quaternion> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+    }
+
+    @Override
+    InverterTask<Quaternion> newInverterTask(final Structure2D template) {
         return InverterTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Quaternion> getTaskSolver(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
+    LDL<Quaternion> newLDL(final Structure2D typical) {
+        return LDL.QUATERNION.make(typical);
+    }
+
+    @Override
+    LU<Quaternion> newLU(final Structure2D typical) {
+        return LU.QUATERNION.make(typical);
+    }
+
+    @Override
+    QR<Quaternion> newQR(final Structure2D typical) {
+        return QR.QUATERNION.make(typical);
+    }
+
+    @Override
+    SingularValue<Quaternion> newSingularValue(final Structure2D typical) {
+        return SingularValue.QUATERNION.make(typical);
+    }
+
+    @Override
+    SolverTask<Quaternion> newSolverTask(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.QUATERNION.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -13,6 +13,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.matrix
+
+- New interface `Provider2D` with a set of nested functional interfaces defining matrix properties and operations.
+
 #### org.ojalgo.optimisation
 
 - Possibility to read the QPS file format (QP related extensions to the MPS file format). More precisely added the ability to parse QUADOBJ and QMATRIX sections in "MPS" files.
@@ -27,7 +31,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
-- The `LogicalBuilder`:s of the various `BasicMatrix` subclasses now also implement `Operate2D`. There's aso a lot of refactoring among the package private code.
+- The `LogicalBuilder`:s of the various `BasicMatrix` subclasses now also implement `Operate2D`.
+- A lot of refactoring among the package private code.
 
 ### Deprecated
 

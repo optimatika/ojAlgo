@@ -403,13 +403,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
             // Difficult to test numerically
             // Will only check that they are the same order of magnitude
 
-            final int tmpExpCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(rAA.getCondition().doubleValue()));
+            long expected = Math.round(PrimitiveMath.LOG10.invoke(rAA.getCondition()));
 
-            int tmpActCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(p64AA.getCondition().doubleValue()));
-            TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
+            long actual = Math.round(PrimitiveMath.LOG10.invoke(p64AA.getCondition()));
+            TestUtils.assertEquals(expected, actual);
 
-            tmpActCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(cAA.getCondition().doubleValue()));
-            TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
+            actual = Math.round(PrimitiveMath.LOG10.invoke(cAA.getCondition()));
+            TestUtils.assertEquals(expected, actual);
         }
     }
 
@@ -424,14 +424,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
             Comparable<?> actual;
             Comparable<?> expected;
 
-            expected = rAA.getDeterminant().get();
+            expected = rAA.getDeterminant();
 
-            actual = cAA.getDeterminant().get();
+            actual = cAA.getDeterminant();
             TestUtils.assertEquals(expected, actual, ACCURACY);
 
-            actual = p64AA.getDeterminant().get();
+            actual = p64AA.getDeterminant();
             TestUtils.assertEquals(expected, actual, ACCURACY);
-
         }
     }
 
@@ -568,14 +567,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
         Comparable<?> actual;
         Comparable<?> expected;
 
-        expected = rAA.getTrace().get();
+        expected = rAA.getTrace();
 
-        actual = cAA.getTrace().get();
+        actual = cAA.getTrace();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.getTrace().get();
+        actual = p64AA.getTrace();
         TestUtils.assertEquals(expected, actual, ACCURACY);
-
     }
 
     /**
@@ -584,7 +582,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testInvert() {
 
-        if (rAA.isSquare() && (rAA.getRank() >= rAA.countColumns())) {
+        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
 
             BasicMatrix<?, ?> expected = rAA.invert();
             BasicMatrix<?, ?> actual;
@@ -930,7 +928,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSolveMatrix() {
 
-        if (rAA.isSquare() && (rAA.getRank() >= rAA.countColumns())) {
+        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
 
             BasicMatrix<?, ?> expected = rAA.solve(rAB);
             BasicMatrix<?, ?> actual;

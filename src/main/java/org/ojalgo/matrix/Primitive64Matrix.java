@@ -109,8 +109,8 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    Primitive64Matrix(final MatrixStore<Double> aStore) {
-        super(aStore);
+    Primitive64Matrix(final MatrixStore<Double> store) {
+        super(store);
     }
 
     @Override
@@ -146,52 +146,52 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
     }
 
     @Override
-    Cholesky<Double> getDecompositionCholesky(final Structure2D typical) {
+    Primitive64Matrix newInstance(final MatrixStore<Double> store) {
+        return new Primitive64Matrix(store);
+    }
+
+    @Override
+    Cholesky<Double> newCholesky(final Structure2D typical) {
         return Cholesky.PRIMITIVE.make(typical);
     }
 
     @Override
-    Eigenvalue<Double> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<Double> getDecompositionLDL(final Structure2D typical) {
-        return LDL.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    LU<Double> getDecompositionLU(final Structure2D typical) {
-        return LU.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    QR<Double> getDecompositionQR(final Structure2D typical) {
-        return QR.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    SingularValue<Double> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<Double> getTaskDeterminant(final MatrixStore<Double> template) {
+    DeterminantTask<Double> newDeterminantTask(final MatrixStore<Double> template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<Double> getTaskInverter(final MatrixStore<Double> base) {
+    Eigenvalue<Double> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    InverterTask<Double> newInverterTask(final Structure2D base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Double> getTaskSolver(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
+    LDL<Double> newLDL(final Structure2D typical) {
+        return LDL.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    LU<Double> newLU(final Structure2D typical) {
+        return LU.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    QR<Double> newQR(final Structure2D typical) {
+        return QR.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SingularValue<Double> newSingularValue(final Structure2D typical) {
+        return SingularValue.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SolverTask<Double> newSolverTask(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

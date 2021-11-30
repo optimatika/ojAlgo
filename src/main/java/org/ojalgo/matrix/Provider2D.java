@@ -21,32 +21,74 @@
  */
 package org.ojalgo.matrix;
 
-import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
-import org.ojalgo.algebra.ScalarOperation;
-import org.ojalgo.matrix.store.MatrixStore;
+import java.util.List;
+
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
-/**
- * Definition of what's common to {@link BasicMatrix} and {@link MatrixStore}. At this point, at least, it is
- * not recommended to write any code in terms of this interface. It's new, the definition may change and it
- * may even be removed again.
- *
- * @author apete
- */
-public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
-        extends Access2D<N>, Access2D.Aggregatable<N>, NormedVectorSpace<M, N>, Operation.Subtraction<M>, Operation.Multiplication<M>,
-        ScalarOperation.Addition<M, N>, ScalarOperation.Subtraction<M, N>, ScalarOperation.Division<M, N> {
+public interface Provider2D {
 
-    M transpose();
+    @FunctionalInterface
+    interface Condition extends Provider2D {
 
-    /**
-     * @return true if the same size/shape and elements are equal to the given accuracy. norm of the
-     *         difference between [this] and [another] is zero within the limits of [precision].
-     */
-    default boolean equals(final Access2D<?> another, final NumberContext accuracy) {
-        return Access2D.equals(this, another, accuracy);
+        double getCondition();
+
+    }
+
+    @FunctionalInterface
+    interface Determinant<N extends Comparable<N>> extends Provider2D {
+
+        N getDeterminant();
+
+    }
+
+    @FunctionalInterface
+    interface Eigenpairs extends Provider2D {
+
+        List<Eigenpair> getEigenpairs();
+
+    }
+
+    @FunctionalInterface
+    interface Hermitian extends Provider2D {
+
+        boolean isHermitian();
+
+    }
+
+    @FunctionalInterface
+    interface Inverse<M> extends Provider2D {
+
+        M invert();
+
+    }
+
+    @FunctionalInterface
+    interface Rank extends Provider2D {
+
+        int getRank();
+
+    }
+
+    @FunctionalInterface
+    interface Solution<M> extends Provider2D {
+
+        M solve(Access2D<?> rhs);
+
+    }
+
+    @FunctionalInterface
+    interface Symmetric extends Provider2D {
+
+        boolean isSymmetric();
+
+    }
+
+    @FunctionalInterface
+    interface Trace<N extends Comparable<N>> extends Provider2D {
+
+        N getTrace();
+
     }
 
 }

@@ -110,8 +110,8 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    RationalMatrix(final MatrixStore<RationalNumber> aStore) {
-        super(aStore);
+    RationalMatrix(final MatrixStore<RationalNumber> store) {
+        super(store);
     }
 
     @Override
@@ -143,52 +143,52 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
-    Cholesky<RationalNumber> getDecompositionCholesky(final Structure2D typical) {
+    RationalMatrix newInstance(final MatrixStore<RationalNumber> store) {
+        return new RationalMatrix(store);
+    }
+
+    @Override
+    Cholesky<RationalNumber> newCholesky(final Structure2D typical) {
         return Cholesky.RATIONAL.make(typical);
     }
 
     @Override
-    Eigenvalue<RationalNumber> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<RationalNumber> getDecompositionLDL(final Structure2D typical) {
-        return LDL.RATIONAL.make(typical);
-    }
-
-    @Override
-    LU<RationalNumber> getDecompositionLU(final Structure2D typical) {
-        return LU.RATIONAL.make(typical);
-    }
-
-    @Override
-    QR<RationalNumber> getDecompositionQR(final Structure2D typical) {
-        return QR.RATIONAL.make(typical);
-    }
-
-    @Override
-    SingularValue<RationalNumber> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.RATIONAL.make(typical);
-    }
-
-    @Override
-    Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<RationalNumber> getTaskDeterminant(final MatrixStore<RationalNumber> template) {
+    DeterminantTask<RationalNumber> newDeterminantTask(final MatrixStore<RationalNumber> template) {
         return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<RationalNumber> getTaskInverter(final MatrixStore<RationalNumber> template) {
+    Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    InverterTask<RationalNumber> newInverterTask(final Structure2D template) {
         return InverterTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<RationalNumber> getTaskSolver(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
+    LDL<RationalNumber> newLDL(final Structure2D typical) {
+        return LDL.RATIONAL.make(typical);
+    }
+
+    @Override
+    LU<RationalNumber> newLU(final Structure2D typical) {
+        return LU.RATIONAL.make(typical);
+    }
+
+    @Override
+    QR<RationalNumber> newQR(final Structure2D typical) {
+        return QR.RATIONAL.make(typical);
+    }
+
+    @Override
+    SingularValue<RationalNumber> newSingularValue(final Structure2D typical) {
+        return SingularValue.RATIONAL.make(typical);
+    }
+
+    @Override
+    SolverTask<RationalNumber> newSolverTask(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
