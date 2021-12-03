@@ -140,7 +140,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         BasicLogger.debug("Q1 get: ", aDecomposition.getLQ());
         BasicLogger.debug("D: ", aDecomposition.getD());
         BasicLogger.debug("Q2 get: ", aDecomposition.getRQ());
-        BasicLogger.debug("Reconstructed: ", Bidiagonal.reconstruct(aDecomposition));
+        BasicLogger.debug("Reconstructed: ", aDecomposition.reconstruct());
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
@@ -158,7 +158,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
             TestUtils.fail("Not equals, hard!");
         }
 
-        final MatrixStore<Double> tmpReconstructed = Bidiagonal.reconstruct(tmpDecomposition);
+        final MatrixStore<Double> tmpReconstructed = tmpDecomposition.reconstruct();
         if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");

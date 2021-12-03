@@ -92,37 +92,6 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
         return Access2D.equals(tmpStore, matrix, context);
     }
 
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> QR<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (QR<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (QR<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (QR<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (QR<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final QR<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
     MatrixStore<N> getQ();
 
     MatrixStore<N> getR();

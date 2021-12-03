@@ -64,37 +64,6 @@ public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Hessenberg<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Hessenberg<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Hessenberg<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Hessenberg<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Hessenberg<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
     boolean compute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean upper);
 
     MatrixStore<N> getH();

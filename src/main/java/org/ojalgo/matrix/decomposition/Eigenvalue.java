@@ -21,11 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -60,8 +64,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Comparable<N>>
-        extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
+public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>,
+        MatrixDecomposition.Values<N>, Provider2D.Eigenpairs {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
 
@@ -320,49 +324,6 @@ public interface Eigenvalue<N extends Comparable<N>>
     }
 
     /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical) {
-        return Eigenvalue.make(typical, Access2D.isHermitian(typical));
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
-
-        final N tmpNumber = typical.get(0L, 0L);
-
-        if (tmpNumber instanceof ComplexNumber) {
-            return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
-        }
-        if (tmpNumber instanceof Double) {
-            return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
-        }
-        if (tmpNumber instanceof Quaternion) {
-            return (Eigenvalue<N>) QUATERNION.make(typical, hermitian);
-        } else if (tmpNumber instanceof RationalNumber) {
-            return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
-    /**
      * @deprecated With Java 9 this will be made private. Use {@link #getEigenvectors()} or
      *             {@link #getEigenpair(int)} instead.
      */
@@ -418,6 +379,19 @@ public interface Eigenvalue<N extends Comparable<N>>
         return new Eigenpair(value, vector);
     }
 
+    default List<Eigenpair> getEigenpairs() {
+
+        List<Eigenpair> retVal = new ArrayList<>();
+
+        for (int i = 0, limit = this.getEigenvalues().size(); i < limit; i++) {
+            retVal.add(this.getEigenpair(i));
+        }
+
+        retVal.sort(Comparator.reverseOrder());
+
+        return retVal;
+    }
+
     /**
      * <p>
      * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
@@ -459,22 +433,6 @@ public interface Eigenvalue<N extends Comparable<N>>
         }
     }
 
-    /**
-     * @return A complex valued alternative to {@link #getV()}.
-     */
-    default MatrixStore<ComplexNumber> getEigenvectors() {
-
-        final long tmpDimension = this.getV().countColumns();
-
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
-
-        for (int j = 0; j < tmpDimension; j++) {
-            this.copyEigenvector(j, retVal.sliceColumn(0, j));
-        }
-
-        return retVal;
-    }
-
     //    /**
     //     * @return The matrix exponential
     //     */
@@ -505,6 +463,22 @@ public interface Eigenvalue<N extends Comparable<N>>
     //
     //        return retVal;
     //    }
+
+    /**
+     * @return A complex valued alternative to {@link #getV()}.
+     */
+    default MatrixStore<ComplexNumber> getEigenvectors() {
+
+        final long tmpDimension = this.getV().countColumns();
+
+        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
+
+        for (int j = 0; j < tmpDimension; j++) {
+            this.copyEigenvector(j, retVal.sliceColumn(0, j));
+        }
+
+        return retVal;
+    }
 
     /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method

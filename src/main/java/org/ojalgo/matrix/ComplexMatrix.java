@@ -111,8 +111,8 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    ComplexMatrix(final MatrixStore<ComplexNumber> aStore) {
-        super(aStore);
+    ComplexMatrix(final MatrixStore<ComplexNumber> store) {
+        super(store);
     }
 
     @Override
@@ -172,52 +172,52 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    Cholesky<ComplexNumber> getDecompositionCholesky(final Structure2D typical) {
+    ComplexMatrix newInstance(final MatrixStore<ComplexNumber> store) {
+        return new ComplexMatrix(store);
+    }
+
+    @Override
+    Cholesky<ComplexNumber> newCholesky(final Structure2D typical) {
         return Cholesky.COMPLEX.make(typical);
     }
 
     @Override
-    Eigenvalue<ComplexNumber> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<ComplexNumber> getDecompositionLDL(final Structure2D typical) {
-        return LDL.COMPLEX.make(typical);
-    }
-
-    @Override
-    LU<ComplexNumber> getDecompositionLU(final Structure2D typical) {
-        return LU.COMPLEX.make(typical);
-    }
-
-    @Override
-    QR<ComplexNumber> getDecompositionQR(final Structure2D typical) {
-        return QR.COMPLEX.make(typical);
-    }
-
-    @Override
-    SingularValue<ComplexNumber> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.COMPLEX.make(typical);
-    }
-
-    @Override
-    ComplexMatrix.Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<ComplexNumber> getTaskDeterminant(final MatrixStore<ComplexNumber> template) {
+    DeterminantTask<ComplexNumber> newDeterminantTask(final MatrixStore<ComplexNumber> template) {
         return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<ComplexNumber> getTaskInverter(final MatrixStore<ComplexNumber> base) {
+    Eigenvalue<ComplexNumber> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
+    }
+
+    @Override
+    InverterTask<ComplexNumber> newInverterTask(final Structure2D base) {
         return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<ComplexNumber> getTaskSolver(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
+    LDL<ComplexNumber> newLDL(final Structure2D typical) {
+        return LDL.COMPLEX.make(typical);
+    }
+
+    @Override
+    LU<ComplexNumber> newLU(final Structure2D typical) {
+        return LU.COMPLEX.make(typical);
+    }
+
+    @Override
+    QR<ComplexNumber> newQR(final Structure2D typical) {
+        return QR.COMPLEX.make(typical);
+    }
+
+    @Override
+    SingularValue<ComplexNumber> newSingularValue(final Structure2D typical) {
+        return SingularValue.COMPLEX.make(typical);
+    }
+
+    @Override
+    SolverTask<ComplexNumber> newSolverTask(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -21,7 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Optional;
+
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -58,7 +61,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2D {
 
-    interface Determinant<N extends Comparable<N>> extends MatrixDecomposition<N>, DeterminantTask<N> {
+    interface Determinant<N extends Comparable<N>> extends MatrixDecomposition<N>, DeterminantTask<N>, Provider2D.Determinant<N> {
 
         /**
          * <p>
@@ -68,6 +71,11 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return The matrix' determinant
          */
         N getDeterminant();
+
+        default Provider2D.Determinant<N> toDeterminantProvider(final Access2D<?> original) {
+            this.decompose(original.asCollectable2D());
+            return this;
+        }
 
     }
 
@@ -145,9 +153,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
             if (matrix.isHermitian()) {
                 return this.decompose(matrix);
-            } else {
-                return false;
             }
+            return false;
         }
     }
 
@@ -230,7 +237,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * particular implementation.
      * </p>
      */
-    interface RankRevealing<N extends Comparable<N>> extends Ordered<N> {
+    interface RankRevealing<N extends Comparable<N>> extends Ordered<N>, Provider2D.Rank {
 
         /**
          * @param threshold Significance limit
@@ -259,7 +266,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     }
 
-    interface Solver<N extends Comparable<N>> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N> {
+    interface Solver<N extends Comparable<N>> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N>, Provider2D.Inverse<Optional<MatrixStore<N>>>,
+            Provider2D.Solution<Optional<MatrixStore<N>>> {
 
         /**
          * @param matrix A matrix to decompose
@@ -322,6 +330,13 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          */
         MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
+        default Optional<MatrixStore<N>> invert() {
+            if (this.isSolvable()) {
+                return Optional.of(this.getInverse());
+            }
+            return Optional.empty();
+        }
+
         /**
          * Please note that producing a pseudoinverse and/or a least squares solution is ok! The return value,
          * of this method, is not an indication of if the decomposed matrix is square, has full rank, is
@@ -332,6 +347,29 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *         equation system solution (with some degree of numerical stability).
          */
         boolean isSolvable();
+
+        default Optional<MatrixStore<N>> solve(final Access2D<?> rhs) {
+            if (this.isSolvable()) {
+                return Optional.of(this.getSolution(rhs.asCollectable2D()));
+            }
+            return Optional.empty();
+        }
+
+        default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final Access2D<?> original) {
+            boolean ok = this.decompose(original.asCollectable2D());
+            if (ok && this.isSolvable()) {
+                return this;
+            }
+            return Optional::empty;
+        }
+
+        default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final Access2D<?> original) {
+            boolean ok = this.decompose(original.asCollectable2D());
+            if (ok && this.isSolvable()) {
+                return this;
+            }
+            return rhs -> Optional.empty();
+        }
 
     }
 

@@ -76,7 +76,7 @@ public class P20030528Case extends BasicMatrixTest {
 
         final PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
 
-        final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
+        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         // tmpSVD.equals(tmpA, EVALUATION);

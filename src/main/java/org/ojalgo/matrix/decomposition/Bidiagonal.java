@@ -113,37 +113,6 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
         return retVal;
     }
 
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Bidiagonal<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Bidiagonal<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Bidiagonal<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Bidiagonal<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Bidiagonal<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
     MatrixStore<N> getD();
 
     MatrixStore<N> getLQ();

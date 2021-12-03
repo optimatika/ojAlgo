@@ -56,7 +56,7 @@ public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecompositio
         boolean retVal = true;
 
         // Check that [A] == [Q][D][Q]<sup>T</sup>
-        retVal &= Access2D.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
+        retVal &= Access2D.equals(matrix, decomposition.reconstruct(), context);
 
         // Check that Q is orthogonal/unitary...
 
@@ -70,37 +70,6 @@ public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecompositio
         retVal &= qhq.equals(identity, context);
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Tridiagonal<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Tridiagonal<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Tridiagonal<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Tridiagonal<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Tridiagonal<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
-        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getD();

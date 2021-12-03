@@ -226,13 +226,13 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
     };
 
     static double calculate(final double a00, final double a10, final double a01, final double a11) {
-        return (a00 * a11) - (a10 * a01);
+        return a00 * a11 - a10 * a01;
     }
 
     static double calculate(final double a00, final double a10, final double a20, final double a01, final double a11, final double a21, final double a02,
             final double a12, final double a22) {
-        return ((a00 * AbstractDeterminator.calculate(a11, a21, a12, a22)) - (a10 * AbstractDeterminator.calculate(a01, a21, a02, a22)))
-                + (a20 * AbstractDeterminator.calculate(a01, a11, a02, a12));
+        return a00 * AbstractDeterminator.calculate(a11, a21, a12, a22) - a10 * AbstractDeterminator.calculate(a01, a21, a02, a22)
+                + a20 * AbstractDeterminator.calculate(a01, a11, a02, a12);
     }
 
     static double calculate(final double a00, final double a10, final double a20, final double a30, final double a01, final double a11, final double a21,
@@ -246,12 +246,12 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
         final double tmpDet2_13 = AbstractDeterminator.calculate(a12, a32, a13, a33);
         final double tmpDet2_23 = AbstractDeterminator.calculate(a22, a32, a23, a33);
 
-        final double tmpDet3_123 = ((a11 * tmpDet2_23) - (a21 * tmpDet2_13)) + (a31 * tmpDet2_12);
-        final double tmpDet3_023 = ((a01 * tmpDet2_23) - (a21 * tmpDet2_03)) + (a31 * tmpDet2_02);
-        final double tmpDet3_013 = ((a01 * tmpDet2_13) - (a11 * tmpDet2_03)) + (a31 * tmpDet2_01);
-        final double tmpDet3_012 = ((a01 * tmpDet2_12) - (a11 * tmpDet2_02)) + (a21 * tmpDet2_01);
+        final double tmpDet3_123 = a11 * tmpDet2_23 - a21 * tmpDet2_13 + a31 * tmpDet2_12;
+        final double tmpDet3_023 = a01 * tmpDet2_23 - a21 * tmpDet2_03 + a31 * tmpDet2_02;
+        final double tmpDet3_013 = a01 * tmpDet2_13 - a11 * tmpDet2_03 + a31 * tmpDet2_01;
+        final double tmpDet3_012 = a01 * tmpDet2_12 - a11 * tmpDet2_02 + a21 * tmpDet2_01;
 
-        return (((a00 * tmpDet3_123) - (a10 * tmpDet3_023)) + (a20 * tmpDet3_013)) - (a30 * tmpDet3_012);
+        return a00 * tmpDet3_123 - a10 * tmpDet3_023 + a20 * tmpDet3_013 - a30 * tmpDet3_012;
     }
 
     static double calculate(final double a00, final double a10, final double a20, final double a30, final double a40, final double a01, final double a11,
@@ -270,24 +270,24 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
         final double tmpDet2_24 = AbstractDeterminator.calculate(a23, a43, a24, a44);
         final double tmpDet2_34 = AbstractDeterminator.calculate(a33, a43, a34, a44);
 
-        final double tmpDet3_012 = ((a02 * tmpDet2_12) - (a12 * tmpDet2_02)) + (a22 * tmpDet2_01);
-        final double tmpDet3_013 = ((a02 * tmpDet2_13) - (a12 * tmpDet2_03)) + (a32 * tmpDet2_01);
-        final double tmpDet3_014 = ((a02 * tmpDet2_14) - (a12 * tmpDet2_04)) + (a42 * tmpDet2_01);
-        final double tmpDet3_023 = ((a02 * tmpDet2_23) - (a22 * tmpDet2_03)) + (a32 * tmpDet2_02);
-        final double tmpDet3_024 = ((a02 * tmpDet2_24) - (a22 * tmpDet2_04)) + (a42 * tmpDet2_02);
-        final double tmpDet3_034 = ((a02 * tmpDet2_34) - (a32 * tmpDet2_04)) + (a42 * tmpDet2_03);
-        final double tmpDet3_123 = ((a12 * tmpDet2_23) - (a22 * tmpDet2_13)) + (a32 * tmpDet2_12);
-        final double tmpDet3_124 = ((a12 * tmpDet2_24) - (a22 * tmpDet2_14)) + (a42 * tmpDet2_12);
-        final double tmpDet3_134 = ((a12 * tmpDet2_34) - (a32 * tmpDet2_14)) + (a42 * tmpDet2_13);
-        final double tmpDet3_234 = ((a22 * tmpDet2_34) - (a32 * tmpDet2_24)) + (a42 * tmpDet2_23);
+        final double tmpDet3_012 = a02 * tmpDet2_12 - a12 * tmpDet2_02 + a22 * tmpDet2_01;
+        final double tmpDet3_013 = a02 * tmpDet2_13 - a12 * tmpDet2_03 + a32 * tmpDet2_01;
+        final double tmpDet3_014 = a02 * tmpDet2_14 - a12 * tmpDet2_04 + a42 * tmpDet2_01;
+        final double tmpDet3_023 = a02 * tmpDet2_23 - a22 * tmpDet2_03 + a32 * tmpDet2_02;
+        final double tmpDet3_024 = a02 * tmpDet2_24 - a22 * tmpDet2_04 + a42 * tmpDet2_02;
+        final double tmpDet3_034 = a02 * tmpDet2_34 - a32 * tmpDet2_04 + a42 * tmpDet2_03;
+        final double tmpDet3_123 = a12 * tmpDet2_23 - a22 * tmpDet2_13 + a32 * tmpDet2_12;
+        final double tmpDet3_124 = a12 * tmpDet2_24 - a22 * tmpDet2_14 + a42 * tmpDet2_12;
+        final double tmpDet3_134 = a12 * tmpDet2_34 - a32 * tmpDet2_14 + a42 * tmpDet2_13;
+        final double tmpDet3_234 = a22 * tmpDet2_34 - a32 * tmpDet2_24 + a42 * tmpDet2_23;
 
-        final double tmpDet4_1234 = (((a11 * tmpDet3_234) - (a21 * tmpDet3_134)) + (a31 * tmpDet3_124)) - (a41 * tmpDet3_123);
-        final double tmpDet4_0234 = (((a01 * tmpDet3_234) - (a21 * tmpDet3_034)) + (a31 * tmpDet3_024)) - (a41 * tmpDet3_023);
-        final double tmpDet4_0134 = (((a01 * tmpDet3_134) - (a11 * tmpDet3_034)) + (a31 * tmpDet3_014)) - (a41 * tmpDet3_013);
-        final double tmpDet4_0124 = (((a01 * tmpDet3_124) - (a11 * tmpDet3_024)) + (a21 * tmpDet3_014)) - (a41 * tmpDet3_012);
-        final double tmpDet4_0123 = (((a01 * tmpDet3_123) - (a11 * tmpDet3_023)) + (a21 * tmpDet3_013)) - (a31 * tmpDet3_012);
+        final double tmpDet4_1234 = a11 * tmpDet3_234 - a21 * tmpDet3_134 + a31 * tmpDet3_124 - a41 * tmpDet3_123;
+        final double tmpDet4_0234 = a01 * tmpDet3_234 - a21 * tmpDet3_034 + a31 * tmpDet3_024 - a41 * tmpDet3_023;
+        final double tmpDet4_0134 = a01 * tmpDet3_134 - a11 * tmpDet3_034 + a31 * tmpDet3_014 - a41 * tmpDet3_013;
+        final double tmpDet4_0124 = a01 * tmpDet3_124 - a11 * tmpDet3_024 + a21 * tmpDet3_014 - a41 * tmpDet3_012;
+        final double tmpDet4_0123 = a01 * tmpDet3_123 - a11 * tmpDet3_023 + a21 * tmpDet3_013 - a31 * tmpDet3_012;
 
-        return ((((a00 * tmpDet4_1234) - (a10 * tmpDet4_0234)) + (a20 * tmpDet4_0134)) - (a30 * tmpDet4_0124)) + (a40 * tmpDet4_0123);
+        return a00 * tmpDet4_1234 - a10 * tmpDet4_0234 + a20 * tmpDet4_0134 - a30 * tmpDet4_0124 + a40 * tmpDet4_0123;
     }
 
     AbstractDeterminator() {
