@@ -324,49 +324,6 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
     }
 
     /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical) {
-        return Eigenvalue.make(typical, Access2D.isHermitian(typical));
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
-
-        final N tmpNumber = typical.get(0L, 0L);
-
-        if (tmpNumber instanceof ComplexNumber) {
-            return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
-        }
-        if (tmpNumber instanceof Double) {
-            return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
-        }
-        if (tmpNumber instanceof Quaternion) {
-            return (Eigenvalue<N>) QUATERNION.make(typical, hermitian);
-        }
-        if (tmpNumber instanceof RationalNumber) {
-            return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
-    /**
      * @deprecated With Java 9 this will be made private. Use {@link #getEigenvectors()} or
      *             {@link #getEigenpair(int)} instead.
      */

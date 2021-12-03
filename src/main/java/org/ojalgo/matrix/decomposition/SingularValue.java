@@ -146,38 +146,6 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     }
 
     /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> SingularValue<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (SingularValue<N>) RATIONAL.make(typical);
-        }
-        if (tmpNumber instanceof ComplexNumber) {
-            return (SingularValue<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (SingularValue<N>) PRIMITIVE.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (SingularValue<N>) QUATERNION.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
-    /**
      * The condition number.
      *
      * @return The largest singular value divided by the smallest singular value.

@@ -92,7 +92,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
-        final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
+        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         //tmpSVD.equals(tmpA, EVALUATION);

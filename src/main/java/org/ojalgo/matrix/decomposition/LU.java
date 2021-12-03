@@ -82,39 +82,6 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
     }
 
     /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> LU<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (LU<N>) RATIONAL.make(typical);
-        }
-        if (tmpNumber instanceof Quaternion) {
-            return (LU<N>) QUATERNION.make(typical);
-        }
-        if (tmpNumber instanceof ComplexNumber) {
-            return (LU<N>) COMPLEX.make(typical);
-        }
-        if (tmpNumber instanceof Double) {
-            return (LU<N>) PRIMITIVE.make(typical);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.reconstruct();
-    }
-
-    /**
      * @deprecated v48 Use {@link #decomposeWithoutPivoting(Access2D.Collectable)} instead.
      */
     @Deprecated
