@@ -172,30 +172,29 @@ public final class ComplexNumber
 
             return new ComplexNumber(norm);
 
-        } else if (PrimitiveMath.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        }
+        if (PrimitiveMath.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(-norm);
 
-        } else {
-
-            double tmpRe = PrimitiveMath.ZERO;
-            if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveMath.COS.invoke(tmpStdPhase);
-                if (tmpCos != PrimitiveMath.ZERO) {
-                    tmpRe = norm * tmpCos;
-                }
-            }
-
-            double tmpIm = PrimitiveMath.ZERO;
-            if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveMath.SIN.invoke(tmpStdPhase);
-                if (tmpSin != PrimitiveMath.ZERO) {
-                    tmpIm = norm * tmpSin;
-                }
-            }
-
-            return new ComplexNumber(tmpRe, tmpIm);
         }
+        double tmpRe = PrimitiveMath.ZERO;
+        if (norm != PrimitiveMath.ZERO) {
+            final double tmpCos = PrimitiveMath.COS.invoke(tmpStdPhase);
+            if (tmpCos != PrimitiveMath.ZERO) {
+                tmpRe = norm * tmpCos;
+            }
+        }
+
+        double tmpIm = PrimitiveMath.ZERO;
+        if (norm != PrimitiveMath.ZERO) {
+            final double tmpSin = PrimitiveMath.SIN.invoke(tmpStdPhase);
+            if (tmpSin != PrimitiveMath.ZERO) {
+                tmpIm = norm * tmpSin;
+            }
+        }
+
+        return new ComplexNumber(tmpRe, tmpIm);
     }
 
     public static ComplexNumber makeRotation(final double angle) {
@@ -212,9 +211,8 @@ public final class ComplexNumber
     public static ComplexNumber of(final double real, final double imaginary) {
         if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
-        } else {
-            return new ComplexNumber(real, imaginary);
         }
+        return new ComplexNumber(real, imaginary);
     }
 
     /**
@@ -234,10 +232,8 @@ public final class ComplexNumber
 
             return (ComplexNumber) number;
 
-        } else {
-
-            return new ComplexNumber(NumberDefinition.doubleValue(number));
         }
+        return new ComplexNumber(NumberDefinition.doubleValue(number));
     }
 
     /**
@@ -312,26 +308,18 @@ public final class ComplexNumber
     }
 
     /**
-     * Compares the specified {@code reference} and this. The numerical comparison uses following order :
-     * {@literal |Z| -> Re(Z) -> Im(Z)}.
-     *
-     * @param reference the complex number to compare with
-     * @return a negative value if {@code reference} is numerically greater than this, {@code 0} if this and
-     *         {@code reference} are numerically equal or a positive value if {@code reference} is numerically
-     *         lesser than this.
+     * First compares the real values. Only if they are equal will compare the imaginary part.
      */
     @Override
-    public int compareTo(final ComplexNumber reference) {
+    public int compareTo(final ComplexNumber other) {
 
-        int retVal = 0;
+        int retVal = Double.compare(myRealValue, other.doubleValue());
 
-        if ((retVal = NumberContext.compare(this.norm(), reference.norm())) == 0) {
-            if ((retVal = NumberContext.compare(this.doubleValue(), reference.doubleValue())) == 0) {
-                retVal = NumberContext.compare(i, reference.i);
-            }
+        if (retVal != 0) {
+            return retVal;
         }
 
-        return retVal;
+        return Double.compare(i, other.i);
     }
 
     /**
@@ -375,17 +363,15 @@ public final class ComplexNumber
         if (PrimitiveMath.ABS.invoke(tmpRe) > PrimitiveMath.ABS.invoke(tmpIm)) {
 
             final double r = tmpIm / tmpRe;
-            final double d = tmpRe + (r * tmpIm);
+            final double d = tmpRe + r * tmpIm;
 
-            return new ComplexNumber((myRealValue + (r * i)) / d, (i - (r * myRealValue)) / d);
+            return new ComplexNumber((myRealValue + r * i) / d, (i - r * myRealValue) / d);
 
-        } else {
-
-            final double r = tmpRe / tmpIm;
-            final double d = tmpIm + (r * tmpRe);
-
-            return new ComplexNumber(((r * myRealValue) + i) / d, ((r * i) - myRealValue) / d);
         }
+        final double r = tmpRe / tmpIm;
+        final double d = tmpIm + r * tmpRe;
+
+        return new ComplexNumber((r * myRealValue + i) / d, (r * i - myRealValue) / d);
     }
 
     /**
@@ -429,13 +415,14 @@ public final class ComplexNumber
     public double doubleValue(final long row, final long col) {
         if (row == col) {
             return myRealValue;
-        } else if (row == 1L) {
-            return i;
-        } else if (col == 1L) {
-            return -i;
-        } else {
-            throw new ArrayIndexOutOfBoundsException();
         }
+        if (row == 1L) {
+            return i;
+        }
+        if (col == 1L) {
+            return -i;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -459,10 +446,8 @@ public final class ComplexNumber
             return false;
         }
         ComplexNumber other = (ComplexNumber) obj;
-        if (Double.doubleToLongBits(myRealValue) != Double.doubleToLongBits(other.myRealValue)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(i) != Double.doubleToLongBits(other.i)) {
+        if (Double.doubleToLongBits(myRealValue) != Double.doubleToLongBits(other.myRealValue)
+                || Double.doubleToLongBits(i) != Double.doubleToLongBits(other.i)) {
             return false;
         }
         return true;
@@ -510,9 +495,9 @@ public final class ComplexNumber
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(i);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myRealValue);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         return result;
     }
 
@@ -535,9 +520,8 @@ public final class ComplexNumber
     public boolean isAbsolute() {
         if (myRealForSure) {
             return myRealValue >= PrimitiveMath.ZERO;
-        } else {
-            return !PrimitiveScalar.CONTEXT.isDifferent(this.norm(), myRealValue);
         }
+        return !PrimitiveScalar.CONTEXT.isDifferent(this.norm(), myRealValue);
     }
 
     public boolean isReal() {
@@ -566,7 +550,7 @@ public final class ComplexNumber
         final double tmpRe = arg.doubleValue();
         final double tmpIm = arg.i;
 
-        return new ComplexNumber((myRealValue * tmpRe) - (i * tmpIm), (myRealValue * tmpIm) + (i * tmpRe));
+        return new ComplexNumber(myRealValue * tmpRe - i * tmpIm, myRealValue * tmpIm + i * tmpRe);
     }
 
     /**
@@ -629,9 +613,8 @@ public final class ComplexNumber
     public ComplexNumber signum() {
         if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
-        } else {
-            return ComplexNumber.makeRotation(this.phase());
         }
+        return ComplexNumber.makeRotation(this.phase());
     }
 
     /**
@@ -809,8 +792,8 @@ public final class ComplexNumber
         final double ss = s * s;
         final double ii = i * i;
 
-        final double r00 = (ii + ss);
-        final double r11 = (ss - ii);
+        final double r00 = ii + ss;
+        final double r11 = ss - ii;
 
         if (transformable.count() == 2L) {
 

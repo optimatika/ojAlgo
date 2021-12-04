@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class LargerCholeskyCase extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 4);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
     public static RationalMatrix getOriginal() {
 

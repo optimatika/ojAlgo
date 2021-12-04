@@ -49,7 +49,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20061119Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 2);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 2);
 
     public static RationalMatrix getProblematic() {
 

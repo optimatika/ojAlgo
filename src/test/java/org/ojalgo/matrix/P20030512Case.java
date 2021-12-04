@@ -34,7 +34,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030512Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(16, 18);
+    private static final NumberContext DEFINITION = NumberContext.of(16, 18);
 
     public static RationalMatrix getProblematic() {
 

@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleEigenvalueCase extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 14);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 14);
 
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });

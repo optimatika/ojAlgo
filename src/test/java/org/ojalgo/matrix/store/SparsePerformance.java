@@ -23,6 +23,9 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -31,16 +34,24 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 
     static void fill(final Mutate2D mtrx) {
-        int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
-        for (int ij = 0; ij < limit; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
-            mtrx.set(Uniform.randomInteger(limit), ij, Math.random());
+
+        Set<Structure2D.IntRowColumn> refs = new TreeSet<>();
+
+        for (int ij = 0, limit = mtrx.getMinDim(); ij < limit; ij++) {
+            refs.add(new IntRowColumn(ij, Uniform.randomInteger(limit)));
+            refs.add(new IntRowColumn(Uniform.randomInteger(limit), ij));
+        }
+
+        for (IntRowColumn ref : refs) {
+            mtrx.set(ref.row, ref.column, Math.random());
         }
     }
 

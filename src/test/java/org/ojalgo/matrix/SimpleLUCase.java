@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static RationalMatrix getOrginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
