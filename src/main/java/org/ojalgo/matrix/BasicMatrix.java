@@ -23,7 +23,6 @@ package org.ojalgo.matrix;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.algebra.NormedVectorSpace;
@@ -47,7 +46,6 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -155,9 +153,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
+     * The returned instance can be have its elements mutated in various ways, while the size/shape is fixed.
+     *
+     * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix –
+     *         always creates a full dense copy.
+     * @see #logical()
      */
-    public abstract <R extends Mutate2D.ModifiableReceiver<N> & Supplier<M>> R copy();
+    public abstract Mutator2D<N, M, PhysicalStore<N>> copy();
 
     public long count() {
         return myStore.count();
@@ -356,6 +358,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return mySymmetric.booleanValue();
     }
 
+    /**
+     * Compared to {@link #copy()} this does not create a copy – not initially anyway. The returned instance
+     * is a starting point for logically composing a new matrix.
+     *
+     * @return A logical builder that tries to avoid unnecessary copying.
+     * @see #copy()
+     */
     public abstract Pipeline2D<N, M, ?> logical();
 
     public M multiply(final double scalarMultiplicand) {
