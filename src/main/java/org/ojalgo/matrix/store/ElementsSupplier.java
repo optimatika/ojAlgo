@@ -55,12 +55,12 @@ public interface ElementsSupplier<N extends Comparable<N>> extends Operate2D<N, 
         return new MatrixPipeline.ColumnsModifier<>(this, operator, right);
     }
 
-    default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
-        return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
-    }
-
     default ElementsSupplier<N> onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
         return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
+    }
+
+    default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
+        return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
     }
 
     default ElementsSupplier<N> onRows(final BinaryFunction<N> operator, final Access1D<N> right) {

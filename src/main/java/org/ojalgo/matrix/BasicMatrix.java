@@ -40,7 +40,6 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -109,7 +108,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private transient MatrixDecomposition<N> myDecomposition = null;
-
     private transient int myHashCode = 0;
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
@@ -124,38 +122,16 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M add(final double scalarAddend) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        N right = physical.scalar().cast(scalarAddend);
-
-        retVal.modifyAll(physical.function().add().second(right));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.add(scalarAddend));
     }
 
     public M add(final M addend) {
-
         ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
-
-        PhysicalStore<N> retVal = myStore.physical().copy(addend);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().add());
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.add(addend.getStore()));
     }
 
     public M add(final N scalarAddend) {
-
-        PhysicalStore.Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        retVal.modifyAll(physical.function().add().second(scalarAddend));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.add(scalarAddend));
     }
 
     public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
@@ -196,35 +172,19 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M divide(final double scalarDivisor) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        N right = physical.scalar().cast(scalarDivisor);
-
-        retVal.modifyAll(physical.function().divide().second(right));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.divide(scalarDivisor));
     }
 
     public M divide(final N scalarDivisor) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        retVal.modifyAll(physical.function().divide().second(scalarDivisor));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.divide(scalarDivisor));
     }
 
     public double doubleValue(final long index) {
         return myStore.doubleValue(index);
     }
 
-    public double doubleValue(final long i, final long j) {
-        return myStore.doubleValue(i, j);
+    public double doubleValue(final long row, final long col) {
+        return myStore.doubleValue(row, col);
     }
 
     public M enforce(final NumberContext context) {
@@ -274,8 +234,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return myStore.get(index);
     }
 
-    public N get(final long aRow, final long aColumn) {
-        return myStore.get(aRow, aColumn);
+    public N get(final long row, final long col) {
+        return myStore.get(row, col);
     }
 
     /**
@@ -399,16 +359,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     public abstract Pipeline2D<N, M, ?> logical();
 
     public M multiply(final double scalarMultiplicand) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        N right = physical.scalar().cast(scalarMultiplicand);
-
-        retVal.modifyAll(physical.function().multiply().second(right));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.multiply(scalarMultiplicand));
     }
 
     public M multiply(final M multiplicand) {
@@ -419,23 +370,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M multiply(final N scalarMultiplicand) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        retVal.modifyAll(physical.function().multiply().second(scalarMultiplicand));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.multiply(scalarMultiplicand));
     }
 
     public M negate() {
-
-        PhysicalStore<N> retVal = myStore.copy();
-
-        retVal.modifyAll(myStore.physical().function().negate());
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.negate());
     }
 
     /**
@@ -486,38 +425,16 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M subtract(final double scalarSubtrahend) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        N right = physical.scalar().cast(scalarSubtrahend);
-
-        retVal.modifyAll(physical.function().subtract().second(right));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.subtract(scalarSubtrahend));
     }
 
     public M subtract(final M subtrahend) {
-
         ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
-
-        PhysicalStore<N> retVal = myStore.physical().copy(subtrahend);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().subtract());
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.subtract(subtrahend.getStore()));
     }
 
     public M subtract(final N scalarSubtrahend) {
-
-        Factory<N, ?> physical = myStore.physical();
-
-        PhysicalStore<N> retVal = physical.copy(myStore);
-
-        retVal.modifyAll(physical.function().subtract().second(scalarSubtrahend));
-
-        return this.newInstance(retVal);
+        return this.newInstance(myStore.subtract(scalarSubtrahend));
     }
 
     public void supplyTo(final TransformableRegion<N> receiver) {
