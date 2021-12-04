@@ -35,7 +35,6 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -121,28 +120,6 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
     @Override
     public Primitive64Matrix.LogicalBuilder logical() {
         return new Primitive64Matrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    ElementsSupplier<Double> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof Primitive64Matrix) {
-            return ((Primitive64Matrix) matrix).getStore();
-        }
-
-        if (matrix instanceof Primitive64Store) {
-            return (Primitive64Store) matrix;
-        }
-
-        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Double) {
-            return (ElementsSupplier<Double>) matrix;
-        }
-
-        if (matrix instanceof Access2D) {
-            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
-        }
-
-        return this.getStore().physical().columns(matrix);
     }
 
     @Override

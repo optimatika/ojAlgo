@@ -36,7 +36,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -122,24 +121,6 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     @Override
     public RationalMatrix.LogicalBuilder logical() {
         return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    ElementsSupplier<RationalNumber> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof RationalMatrix) {
-            return ((RationalMatrix) matrix).getStore();
-        }
-
-        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof RationalNumber) {
-            return (ElementsSupplier<RationalNumber>) matrix;
-        }
-
-        if (matrix instanceof Access2D) {
-            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
-        }
-
-        return this.getStore().physical().columns(matrix);
     }
 
     @Override

@@ -38,7 +38,6 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -110,7 +109,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private transient MatrixDecomposition<N> myDecomposition = null;
-    private final PhysicalStore.Factory<N, ?> myFactory;
+
     private transient int myHashCode = 0;
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
@@ -122,7 +121,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         super();
 
         myStore = store;
-        myFactory = store.physical();
     }
 
     public M add(final double scalarAddend) {
@@ -417,7 +415,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
-        return this.newInstance(myStore.multiply(this.cast(multiplicand).collect(myFactory)));
+        return this.newInstance(myStore.multiply(multiplicand.getStore()));
     }
 
     public M multiply(final N scalarMultiplicand) {
@@ -456,11 +454,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M reduceColumns(final Aggregator aggregator) {
-        return this.newInstance(myStore.reduceColumns(aggregator).collect(myFactory));
+        return this.newInstance(myStore.reduceColumns(aggregator).collect(myStore.physical()));
     }
 
     public M reduceRows(final Aggregator aggregator) {
-        return this.newInstance(myStore.reduceRows(aggregator).collect(myFactory));
+        return this.newInstance(myStore.reduceRows(aggregator).collect(myStore.physical()));
     }
 
     public M signum() {
@@ -642,8 +640,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         return task.toSolutionProvider(myStore, rhs);
     }
-
-    abstract ElementsSupplier<N> cast(Access1D<?> matrix);
 
     MatrixStore<N> getStore() {
         return myStore;
