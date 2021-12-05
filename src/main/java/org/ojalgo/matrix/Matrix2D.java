@@ -30,16 +30,14 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * Definition of what's common to {@link BasicMatrix} and {@link MatrixStore}. At this point, at least, it is
- * not recommended to write any code in terms of this interface. It's new, the definition may change and it
- * may even be removed again.
+ * not recommended to write any code in terms of this interface. It's relatively new, the definition may
+ * change, and it may even be removed again.
  *
  * @author apete
  */
 public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
         extends Access2D<N>, Access2D.Aggregatable<N>, NormedVectorSpace<M, N>, Operation.Subtraction<M>, Operation.Multiplication<M>,
         ScalarOperation.Addition<M, N>, ScalarOperation.Subtraction<M, N>, ScalarOperation.Division<M, N> {
-
-    M transpose();
 
     /**
      * @return true if the same size/shape and elements are equal to the given accuracy. norm of the
@@ -48,5 +46,7 @@ public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
     default boolean equals(final Access2D<?> another, final NumberContext accuracy) {
         return Access2D.equals(this, another, accuracy);
     }
+
+    M transpose();
 
 }

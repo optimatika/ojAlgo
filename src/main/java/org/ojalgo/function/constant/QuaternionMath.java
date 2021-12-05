@@ -126,30 +126,8 @@ public abstract class QuaternionMath {
     public static final QuaternionFunction.Unary LOG1P = arg -> LOG.invoke(arg.add(1.0));
     public static final QuaternionFunction.Unary LOGISTIC = arg -> Quaternion.ONE.divide(Quaternion.ONE.add(EXP.invoke(arg.negate())));
     public static final QuaternionFunction.Unary LOGIT = arg -> LOG.invoke(Quaternion.ONE.divide(Quaternion.ONE.subtract(arg)));
-    public static final QuaternionFunction.Binary MAX = (arg1, arg2) -> {
-
-        Quaternion retVal = null;
-
-        if (arg1.norm() >= arg2.norm()) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
-    public static final QuaternionFunction.Binary MIN = (arg1, arg2) -> {
-
-        Quaternion retVal = null;
-
-        if (arg1.norm() <= arg2.norm()) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
+    public static final QuaternionFunction.Binary MAX = (arg1, arg2) -> arg1.compareTo(arg2) > 0 ? arg1 : arg2;
+    public static final QuaternionFunction.Binary MIN = (arg1, arg2) -> arg1.compareTo(arg2) < 0 ? arg1 : arg2;
     public static final QuaternionFunction.Binary MULTIPLY = Quaternion::multiply;
     public static final QuaternionFunction.Unary NEGATE = Quaternion::negate;
     public static final QuaternionFunction.Binary POW = (arg1, arg2) -> EXP.invoke(LOG.invoke(arg1).multiply(arg2));

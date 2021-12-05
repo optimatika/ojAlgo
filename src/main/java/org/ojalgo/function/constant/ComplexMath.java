@@ -136,30 +136,8 @@ public abstract class ComplexMath {
     };
     public static final ComplexFunction.Unary LOGISTIC = arg -> ComplexNumber.ONE.divide(ComplexNumber.ONE.add(EXP.invoke(arg.negate())));
     public static final ComplexFunction.Unary LOGIT = arg -> LOG.invoke(ComplexNumber.ONE.divide(ComplexNumber.ONE.subtract(arg)));
-    public static final ComplexFunction.Binary MAX = (arg1, arg2) -> {
-
-        ComplexNumber retVal = null;
-
-        if (arg1.norm() >= arg2.norm()) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
-    public static final ComplexFunction.Binary MIN = (arg1, arg2) -> {
-
-        ComplexNumber retVal = null;
-
-        if (arg1.norm() <= arg2.norm()) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
+    public static final ComplexFunction.Binary MAX = (arg1, arg2) -> arg1.compareTo(arg2) > 0 ? arg1 : arg2;
+    public static final ComplexFunction.Binary MIN = (arg1, arg2) -> arg1.compareTo(arg2) < 0 ? arg1 : arg2;
     public static final ComplexFunction.Binary MULTIPLY = ComplexNumber::multiply;
     public static final ComplexFunction.Unary NEGATE = ComplexNumber::negate;
     public static final ComplexFunction.Binary POW = (arg1, arg2) -> EXP.invoke(LOG.invoke(arg1).multiply(arg2));

@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.QuaternionMath;
@@ -53,15 +54,15 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class BasicMatrixTest extends MatrixTests {
 
-    protected static final NumberContext ACCURACY = new NumberContext(7, 7);
+    protected static final NumberContext ACCURACY = NumberContext.of(7, 5);
 
     public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
+        RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
         return tmpMtrx.enforce(context);
     }
 
     public static RationalMatrix getSafe(final long rows, final long columns, final NumberContext context) {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
+        RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
 
@@ -148,21 +149,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         RationalMatrix.DenseReceiver rBuilder = rAA.copy();
         rBuilder.add(row, col, scalar);
-        expected = rBuilder.build();
+        expected = rBuilder.get();
 
         ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
         cBuilder.add(row, col, scalar);
-        actual = cBuilder.build();
+        actual = cBuilder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
         p64Builder.add(row, col, scalar);
-        actual = p64Builder.build();
+        actual = p64Builder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
         p32Builder.add(row, col, scalar);
-        actual = p32Builder.build();
+        actual = p32Builder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -333,19 +334,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDotAccess1D() {
 
-        Comparable<?> actual;
-        Comparable<?> expected;
+        double actual;
+        double expected = 0.0;
 
-        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(rAA.countColumns()) };
+        int col = Uniform.randomInteger(rAA.getColDim());
 
-        expected = rAA.logical().column(tmpCol).get().dot(rSafe.logical().column(tmpCol).get());
+        for (int i = 0; i < rAA.getRowDim(); i++) {
+            expected += rAA.doubleValue(i, col) * rSafe.doubleValue(i, col);
+        }
 
-        actual = cAA.logical().column(tmpCol).get().dot(cSafe.logical().column(tmpCol).get());
+        actual = rAA.logical().column(col).get().dot(rSafe.logical().column(col).get());
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().column(tmpCol).get().dot(p64Safe.logical().column(tmpCol).get());
+        actual = cAA.logical().column(col).get().dot(cSafe.logical().column(col).get());
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
+        actual = p64AA.logical().column(col).get().dot(p64Safe.logical().column(col).get());
+        TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
     /**
@@ -357,8 +362,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         Comparable<?> actual;
         Comparable<?> expected;
 
-        final int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
-        final int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
+        int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
+        int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
 
         expected = rAA.doubleValue(tmpRow, tmpCol);
 
@@ -376,7 +381,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countColumns()))];
+        int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countColumns()))];
 
         for (int i = 0; i < tmpArr.length; i++) {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countColumns());
@@ -439,7 +444,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         if (rAA.isSquare() && rAA.isHermitian()) {
 
-            final List<Eigenpair> expected = rAA.getEigenpairs();
+            List<Eigenpair> expected = rAA.getEigenpairs();
             List<Eigenpair> actual;
 
             actual = cAA.getEigenpairs();
@@ -517,7 +522,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countRows()))];
+        int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countRows()))];
 
         for (int i = 0; i < tmpArr.length; i++) {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countRows());
@@ -573,6 +578,24 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         actual = p64AA.getTrace();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+    }
+
+    @Test
+    public void testLogicalBuilder() {
+
+        BasicMatrix<?, ?> actual;
+        RationalMatrix expected;
+
+        expected = rAA.logical().below(rSafe).repeat(1, 2).onAll(RationalMath.SIN).diagonal().get();
+
+        actual = rAA.logical().below(rSafe).repeat(1, 2).diagonal().onAll(RationalMath.SIN).get();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p64AA.logical().below(p64Safe).repeat(1, 2).diagonal().onAll(PrimitiveMath.SIN).get();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p64AA.logical().onAll(PrimitiveMath.SIN).below(p64Safe.logical().onAll(PrimitiveMath.SIN).get()).repeat(1, 2).diagonal().get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -892,6 +915,69 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
+    @Test
+    public void testReduceRowsAndColumns() {
+
+        BasicMatrix<?, ?> actual;
+        BasicMatrix<?, ?> intermediate;
+        BasicMatrix<?, ?> expected;
+
+        for (Aggregator aggregator : Aggregator.values()) {
+
+            if (aggregator == Aggregator.PRODUCT2) {
+                continue; // Likely to overflow
+            }
+
+            String name = aggregator.name();
+
+            // rows -> cols
+
+            intermediate = rAA.reduceRows(aggregator);
+            expected = intermediate.reduceColumns(aggregator);
+
+            TestUtils.assertEquals(1, expected.count());
+
+            intermediate = p32AA.reduceRows(aggregator);
+            actual = intermediate.reduceColumns(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = p64AA.reduceRows(aggregator);
+            actual = intermediate.reduceColumns(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = cAA.reduceRows(aggregator);
+            actual = intermediate.reduceColumns(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = qAA.reduceRows(aggregator);
+            actual = intermediate.reduceColumns(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            // cols -> rows
+
+            intermediate = rAA.reduceColumns(aggregator);
+            expected = intermediate.reduceRows(aggregator);
+
+            TestUtils.assertEquals(1, expected.count());
+
+            intermediate = p32AA.reduceColumns(aggregator);
+            actual = intermediate.reduceRows(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = p64AA.reduceColumns(aggregator);
+            actual = intermediate.reduceRows(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = cAA.reduceColumns(aggregator);
+            actual = intermediate.reduceRows(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+
+            intermediate = qAA.reduceColumns(aggregator);
+            actual = intermediate.reduceRows(aggregator);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+        }
+    }
+
     /**
      * @see BasicMatrix.PhysicalReceiver#set(long, long, Number)
      */
@@ -992,8 +1078,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         Comparable<?> actual;
         Comparable<?> expected;
 
-        final int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
-        final int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
+        int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
+        int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
 
         expected = ComplexNumber.valueOf(rAA.get(tmpRow, tmpCol));
 
@@ -1008,7 +1094,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = GenericStore.COMPLEX.copy(rAA);
+        PhysicalStore<ComplexNumber> tmpExpStore = GenericStore.COMPLEX.copy(rAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
         tmpActStore = GenericStore.COMPLEX.copy(cAA);
@@ -1025,10 +1111,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfColumns() {
 
-        final Iterable<ColumnView<RationalNumber>> tmpColumns = rAA.columns();
+        Iterable<ColumnView<RationalNumber>> tmpColumns = rAA.columns();
 
-        for (final ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
-            final long j = tmpColumnView.column();
+        for (ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
+            long j = tmpColumnView.column();
             for (long i = 0L; i < tmpColumnView.count(); i++) {
                 TestUtils.assertEquals(tmpColumnView.get(i), cAA.get(i, j), ACCURACY);
                 TestUtils.assertEquals(tmpColumnView.get(i), p64AA.get(i, j), ACCURACY);
@@ -1042,10 +1128,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfRows() {
 
-        final Iterable<RowView<RationalNumber>> tmpRows = rAA.rows();
+        Iterable<RowView<RationalNumber>> tmpRows = rAA.rows();
 
-        for (final RowView<RationalNumber> tmpRowView : tmpRows) {
-            final long i = tmpRowView.row();
+        for (RowView<RationalNumber> tmpRowView : tmpRows) {
+            long i = tmpRowView.row();
             for (long j = 0L; j < tmpRowView.count(); j++) {
                 TestUtils.assertEquals(tmpRowView.get(j), cAA.get(i, j), ACCURACY);
                 TestUtils.assertEquals(tmpRowView.get(j), p64AA.get(i, j), ACCURACY);
@@ -1056,7 +1142,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToPrimitiveStore() {
 
-        final PhysicalStore<Double> tmpExpStore = Primitive64Store.FACTORY.copy(rAA);
+        PhysicalStore<Double> tmpExpStore = Primitive64Store.FACTORY.copy(rAA);
         PhysicalStore<Double> tmpActStore;
 
         tmpActStore = Primitive64Store.FACTORY.copy(cAA);
@@ -1070,7 +1156,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRationalStore() {
 
-        final PhysicalStore<RationalNumber> tmpExpStore = GenericStore.RATIONAL.copy(rAA);
+        PhysicalStore<RationalNumber> tmpExpStore = GenericStore.RATIONAL.copy(rAA);
         PhysicalStore<RationalNumber> tmpActStore;
 
         tmpActStore = GenericStore.RATIONAL.copy(cAA);
@@ -1087,11 +1173,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRawCopy1D() {
 
-        final double[] tmpExpStore = rAA.toRawCopy1D();
+        double[] tmpExpStore = rAA.toRawCopy1D();
         double[] tmpActStore;
 
-        final int tmpFirstIndex = 0;
-        final int tmpLastIndex = (int) (rAA.count() - 1);
+        int tmpFirstIndex = 0;
+        int tmpLastIndex = (int) (rAA.count() - 1);
 
         tmpActStore = cAA.toRawCopy1D();
         TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], ACCURACY);

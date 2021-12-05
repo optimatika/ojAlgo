@@ -37,7 +37,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -151,24 +150,6 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     @Override
     public ComplexMatrix.LogicalBuilder logical() {
         return new ComplexMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    ElementsSupplier<ComplexNumber> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof ComplexMatrix) {
-            return ((ComplexMatrix) matrix).getStore();
-        }
-
-        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof ComplexNumber) {
-            return (ElementsSupplier<ComplexNumber>) matrix;
-        }
-
-        if (matrix instanceof Access2D) {
-            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
-        }
-
-        return this.getStore().physical().columns(matrix);
     }
 
     @Override

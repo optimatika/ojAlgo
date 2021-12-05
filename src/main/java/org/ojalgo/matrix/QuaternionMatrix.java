@@ -36,7 +36,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -122,24 +121,6 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     @Override
     public QuaternionMatrix.LogicalBuilder logical() {
         return new QuaternionMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    ElementsSupplier<Quaternion> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof QuaternionMatrix) {
-            return ((QuaternionMatrix) matrix).getStore();
-        }
-
-        if (matrix instanceof ElementsSupplier && matrix.count() > 0L && matrix.get(0) instanceof Quaternion) {
-            return (ElementsSupplier<Quaternion>) matrix;
-        }
-
-        if (matrix instanceof Access2D) {
-            return this.getStore().physical().makeWrapper((Access2D<?>) matrix);
-        }
-
-        return this.getStore().physical().columns(matrix);
     }
 
     @Override

@@ -69,11 +69,8 @@ public interface Structure2D extends Structure1D {
         }
 
         public int compareTo(final IntRowColumn ref) {
-
             if (column == ref.column) {
-
                 return Integer.compare(row, ref.row);
-
             }
             return Integer.compare(column, ref.column);
         }

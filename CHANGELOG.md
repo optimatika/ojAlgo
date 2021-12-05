@@ -28,11 +28,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.function
+
+- The `MIN` and `MAX` `BinaryFunction` constants of `ComplexMath` and `QuaternionMath` are changed to align with the scalar's compareTo methods (that are also changed).
+
 #### org.ojalgo.matrix
 
 - `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
 - The `LogicalBuilder`:s of the various `BasicMatrix` subclasses now also implement `Operate2D`.
 - A lot of refactoring among the package private code.
+
+#### org.ojalgo.scalar
+
+- `ComplexNumber` and `Quaternion` had their `compareTo` methods changed to first just compare then real part and only if they're equal compare the imaginary parts.
 
 ### Deprecated
 
