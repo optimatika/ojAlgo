@@ -334,19 +334,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDotAccess1D() {
 
-        Comparable<?> actual;
-        Comparable<?> expected;
+        double actual;
+        double expected = 0.0;
 
-        int[] tmpCol = new int[] { (int) Uniform.randomInteger(rAA.countColumns()) };
+        int col = Uniform.randomInteger(rAA.getColDim());
 
-        expected = rAA.logical().column(tmpCol).get().dot(rSafe.logical().column(tmpCol).get());
+        for (int i = 0; i < rAA.getRowDim(); i++) {
+            expected += rAA.doubleValue(i, col) * rSafe.doubleValue(i, col);
+        }
 
-        actual = cAA.logical().column(tmpCol).get().dot(cSafe.logical().column(tmpCol).get());
+        actual = rAA.logical().column(col).get().dot(rSafe.logical().column(col).get());
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().column(tmpCol).get().dot(p64Safe.logical().column(tmpCol).get());
+        actual = cAA.logical().column(col).get().dot(cSafe.logical().column(col).get());
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
+        actual = p64AA.logical().column(col).get().dot(p64Safe.logical().column(col).get());
+        TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
     /**
@@ -574,6 +578,24 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         actual = p64AA.getTrace();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+    }
+
+    @Test
+    public void testLogicalBuilder() {
+
+        BasicMatrix<?, ?> actual;
+        RationalMatrix expected;
+
+        expected = rAA.logical().below(rSafe).repeat(1, 2).onAll(RationalMath.SIN).diagonal().get();
+
+        actual = rAA.logical().below(rSafe).repeat(1, 2).diagonal().onAll(RationalMath.SIN).get();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p64AA.logical().below(p64Safe).repeat(1, 2).diagonal().onAll(PrimitiveMath.SIN).get();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p64AA.logical().onAll(PrimitiveMath.SIN).below(p64Safe.logical().onAll(PrimitiveMath.SIN).get()).repeat(1, 2).diagonal().get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
