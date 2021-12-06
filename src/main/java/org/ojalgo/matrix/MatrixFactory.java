@@ -58,8 +58,8 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
             Constructor<? extends BasicMatrix<?, ?>> retVal = template.getDeclaredConstructor(ElementsSupplier.class);
             retVal.setAccessible(true);
             return retVal;
-        } catch (final SecurityException | NoSuchMethodException cause) {
-            return null;
+        } catch (SecurityException | NoSuchMethodException cause) {
+            throw new ProgrammingError(cause);
         }
     }
 
@@ -223,8 +223,8 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     M instantiate(final ElementsSupplier<N> supplier) {
         try {
             return myConstructor.newInstance(supplier);
-        } catch (final IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException anException) {
-            throw new ProgrammingError(anException);
+        } catch (final IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException cause) {
+            throw new ProgrammingError(cause);
         }
     }
 

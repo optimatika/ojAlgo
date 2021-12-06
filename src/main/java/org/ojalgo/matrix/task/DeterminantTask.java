@@ -21,9 +21,12 @@
  */
 package org.ojalgo.matrix.task;
 
+import java.util.function.Supplier;
+
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -85,7 +88,8 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
                 }
                 if (tmpDim == 3L) {
                     return AbstractDeterminator.SYMMETRIC_3X3;
-                } else if (tmpDim == 4L) {
+                }
+                if (tmpDim == 4L) {
                     return AbstractDeterminator.SYMMETRIC_4X4;
                 } else if (tmpDim == 5L) {
                     return AbstractDeterminator.SYMMETRIC_5X5;
@@ -98,7 +102,8 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
             }
             if (tmpDim == 3L) {
                 return AbstractDeterminator.FULL_3X3;
-            } else if (tmpDim == 4L) {
+            }
+            if (tmpDim == 4L) {
                 return AbstractDeterminator.FULL_4X4;
             } else if (tmpDim == 5L) {
                 return AbstractDeterminator.FULL_5X5;
@@ -135,9 +140,9 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
 
     N calculateDeterminant(Access2D<?> matrix);
 
-    default Provider2D.Determinant<N> toDeterminantProvider(final Access2D<?> original) {
+    default Provider2D.Determinant<N> toDeterminantProvider(final ElementsSupplier<N> original, final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
 
-        N determinant = this.calculateDeterminant(original);
+        N determinant = this.calculateDeterminant(alternativeOriginalSupplier.get());
 
         return () -> determinant;
     }

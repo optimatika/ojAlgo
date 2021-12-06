@@ -493,27 +493,27 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M onAll(final UnaryFunction<N> operator) {
-        return this.newInstance(mySupplier.onAll(operator));
+        return this.newInstance(this.supplier().onAll(operator));
     }
 
     public M onAny(final Transformation2D<N> operator) {
-        return this.newInstance(mySupplier.onAny(operator));
+        return this.newInstance(this.supplier().onAny(operator));
     }
 
     public M onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
-        return this.newInstance(mySupplier.onColumns(operator, right));
+        return this.newInstance(this.supplier().onColumns(operator, right));
     }
 
     public M onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
-        return this.newInstance(mySupplier.onMatching(left, operator));
+        return this.newInstance(this.supplier().onMatching(left, operator));
     }
 
     public M onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
-        return this.newInstance(mySupplier.onMatching(operator, right));
+        return this.newInstance(this.supplier().onMatching(operator, right));
     }
 
     public M onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
-        return this.newInstance(mySupplier.onRows(operator, right));
+        return this.newInstance(this.supplier().onRows(operator, right));
     }
 
     public M power(final int power) {
@@ -590,7 +590,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public void supplyTo(final TransformableRegion<N> receiver) {
-        mySupplier.supplyTo(receiver);
+        this.supplier().supplyTo(receiver);
     }
 
     public M symmetric(final boolean upper) {
@@ -622,7 +622,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
      */
     public M transpose() {
-        return this.newInstance(mySupplier.transpose());
+        return this.newInstance(this.supplier().transpose());
     }
 
     public M triangular(final boolean upper, final boolean assumeOne) {
@@ -639,8 +639,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Condition) myDecomposition;
         }
 
-        SingularValue<N> provider = this.newSingularValue(mySupplier);
-        provider.decompose(mySupplier);
+        SingularValue<N> provider = this.newSingularValue(this.supplier());
+        provider.decompose(this.supplier());
         myDecomposition = provider;
 
         return provider;
@@ -652,13 +652,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Determinant<N>) myDecomposition;
         }
 
-        DeterminantTask<N> task = this.newDeterminantTask(mySupplier);
+        DeterminantTask<N> task = this.newDeterminantTask(this.supplier());
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toDeterminantProvider(this.store());
+        return task.toDeterminantProvider(this.supplier(), this::store);
     }
 
     private Provider2D.Eigenpairs getEigenpairsProvider() {
@@ -667,8 +667,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Eigenpairs) myDecomposition;
         }
 
-        Eigenvalue<N> provider = this.newEigenvalue(mySupplier);
-        provider.decompose(mySupplier);
+        Eigenvalue<N> provider = this.newEigenvalue(this.supplier());
+        provider.decompose(this.supplier());
         myDecomposition = provider;
 
         return provider;
@@ -680,13 +680,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Inverse<Optional<MatrixStore<N>>>) myDecomposition;
         }
 
-        InverterTask<N> task = safe ? this.newSingularValue(mySupplier) : this.newInverterTask(mySupplier);
+        InverterTask<N> task = safe ? this.newSingularValue(this.supplier()) : this.newInverterTask(this.supplier());
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toInverseProvider(this.store());
+        return task.toInverseProvider(this.supplier(), this::store);
     }
 
     private Provider2D.Rank getRankProvider() {
@@ -694,14 +694,14 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         if (!(myDecomposition instanceof Provider2D.Rank)) {
 
             if (this.store().isTall()) {
-                myDecomposition = this.newQR(mySupplier);
+                myDecomposition = this.newQR(this.supplier());
             } else if (this.store().isFat()) {
-                myDecomposition = this.newSingularValue(mySupplier);
+                myDecomposition = this.newSingularValue(this.supplier());
             } else {
-                myDecomposition = this.newLDU(mySupplier);
+                myDecomposition = this.newLDU(this.supplier());
             }
 
-            myDecomposition.decompose(mySupplier);
+            myDecomposition.decompose(this.supplier());
         }
 
         return (Provider2D.Rank) myDecomposition;
@@ -713,13 +713,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Solution<Optional<MatrixStore<N>>>) myDecomposition;
         }
 
-        SolverTask<N> task = safe ? this.newSingularValue(mySupplier) : this.newSolverTask(mySupplier, rhs);
+        SolverTask<N> task = safe ? this.newSingularValue(this.supplier()) : this.newSolverTask(this.supplier(), rhs);
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toSolutionProvider(this.store(), rhs);
+        return task.toSolutionProvider(this.supplier(), this::store, rhs);
     }
 
     abstract Cholesky<N> newCholesky(Structure2D typical);
@@ -762,6 +762,15 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         }
 
         return myStore;
+    }
+
+    ElementsSupplier<N> supplier() {
+
+        if (myStore != null) {
+            return myStore;
+        }
+
+        return mySupplier;
     }
 
 }
