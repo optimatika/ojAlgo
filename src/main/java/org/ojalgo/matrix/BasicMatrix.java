@@ -26,6 +26,8 @@ import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -37,6 +39,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
@@ -46,7 +49,9 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Operate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -58,10 +63,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
-        implements Matrix2D<N, M>, Access2D.Elements, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>,
-        Access2D.Collectable<N, TransformableRegion<N>>, Provider2D.Inverse<M>, Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric,
-        Provider2D.Hermitian, Provider2D.Trace<N>, Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs {
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements Matrix2D<N, M>, Access2D.Elements,
+        Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>, Provider2D.Inverse<M>,
+        Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>, Provider2D.Determinant<N>,
+        Provider2D.Solution<M>, Provider2D.Eigenpairs, Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
@@ -106,50 +111,92 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     private transient MatrixDecomposition<N> myDecomposition = null;
+    private final PhysicalStore.Factory<N, ?> myFactory;
     private transient int myHashCode = 0;
     private transient Boolean myHermitian = null;
     private transient Boolean mySPD = null;
-    private final MatrixStore<N> myStore;
+    private MatrixStore<N> myStore;
+    private final ElementsSupplier<N> mySupplier;
     private transient Boolean mySymmetric = null;
 
-    BasicMatrix(final MatrixStore<N> store) {
+    BasicMatrix(final PhysicalStore.Factory<N, ?> factory, final ElementsSupplier<N> supplier) {
 
         super();
 
-        myStore = store;
+        myFactory = factory;
+
+        mySupplier = supplier;
+
+        if (supplier instanceof MatrixStore<?>) {
+            myStore = (MatrixStore<N>) supplier;
+        } else {
+            myStore = null;
+        }
+    }
+
+    public M above(final Access2D<N>... above) {
+        return this.newInstance(this.store().above(above));
+    }
+
+    public M above(final Access2D<N> above) {
+        return this.newInstance(this.store().above(above));
+    }
+
+    public M above(final long numberOfRows) {
+        return this.newInstance(this.store().above(numberOfRows));
     }
 
     public M add(final double scalarAddend) {
-        return this.newInstance(myStore.add(scalarAddend));
+        return this.newInstance(this.store().add(scalarAddend));
     }
 
     public M add(final M addend) {
-        ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
-        return this.newInstance(myStore.add(addend.getStore()));
+        ProgrammingError.throwIfNotEqualDimensions(this.store(), addend);
+        return this.newInstance(this.store().add(addend.store()));
     }
 
     public M add(final N scalarAddend) {
-        return this.newInstance(myStore.add(scalarAddend));
+        return this.newInstance(this.store().add(scalarAddend));
     }
 
     public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
-        return myStore.aggregateColumn(row, col, aggregator);
+        return this.store().aggregateColumn(row, col, aggregator);
     }
 
     public N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
-        return myStore.aggregateDiagonal(row, col, aggregator);
+        return this.store().aggregateDiagonal(row, col, aggregator);
     }
 
     public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
-        return myStore.aggregateRange(first, limit, aggregator);
+        return this.store().aggregateRange(first, limit, aggregator);
     }
 
     public N aggregateRow(final long row, final long col, final Aggregator aggregator) {
-        return myStore.aggregateRow(row, col, aggregator);
+        return this.store().aggregateRow(row, col, aggregator);
+    }
+
+    public M below(final Access2D<N>... below) {
+        return this.newInstance(this.store().below(below));
+    }
+
+    public M below(final Access2D<N> below) {
+        return this.newInstance(this.store().below(below));
+    }
+
+    public M below(final long numberOfRows) {
+        return this.newInstance(this.store().below(numberOfRows));
+    }
+
+    public M bidiagonal(final boolean upper) {
+        return this.newInstance(this.store().bidiagonal(upper));
+    }
+
+    public M columns(final int[] columns) {
+        return this.newInstance(this.store().columns(columns));
     }
 
     public M conjugate() {
-        return this.newInstance(myStore.conjugate());
+        return this.newInstance(this.store().conjugate());
     }
 
     /**
@@ -162,38 +209,46 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     public abstract Mutator2D<N, M, PhysicalStore<N>> copy();
 
     public long count() {
-        return myStore.count();
+        return mySupplier.count();
     }
 
     public long countColumns() {
-        return myStore.countColumns();
+        return mySupplier.countColumns();
     }
 
     public long countRows() {
-        return myStore.countRows();
+        return mySupplier.countRows();
+    }
+
+    public M diagonal() {
+        return this.newInstance(this.store().diagonal());
+    }
+
+    public M diagonally(final Access2D<N>... diagonally) {
+        return this.newInstance(this.store().diagonally(diagonally));
     }
 
     public M divide(final double scalarDivisor) {
-        return this.newInstance(myStore.divide(scalarDivisor));
+        return this.newInstance(this.store().divide(scalarDivisor));
     }
 
     public M divide(final N scalarDivisor) {
-        return this.newInstance(myStore.divide(scalarDivisor));
+        return this.newInstance(this.store().divide(scalarDivisor));
     }
 
     public double doubleValue(final long index) {
-        return myStore.doubleValue(index);
+        return this.store().doubleValue(index);
     }
 
     public double doubleValue(final long row, final long col) {
-        return myStore.doubleValue(row, col);
+        return this.store().doubleValue(row, col);
     }
 
     public M enforce(final NumberContext context) {
 
-        PhysicalStore<N> tmpCopy = myStore.copy();
+        PhysicalStore<N> tmpCopy = this.store().copy();
 
-        tmpCopy.modifyAll(myStore.physical().function().enforce(context));
+        tmpCopy.modifyAll(this.store().physical().function().enforce(context));
 
         return this.newInstance(tmpCopy);
     }
@@ -205,7 +260,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public boolean equals(final Object other) {
         if (other instanceof Access2D<?>) {
-            return Access2D.equals(myStore, (Access2D<?>) other, EQUALS);
+            return Access2D.equals(this.store(), (Access2D<?>) other, EQUALS);
         }
         return super.equals(other);
     }
@@ -232,12 +287,20 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         mySPD = null;
     }
 
+    /**
+     * @deprecated v50 No need for this!
+     */
+    @Deprecated
+    public M get() {
+        return (M) this;
+    }
+
     public N get(final long index) {
-        return myStore.get(index);
+        return this.store().get(index);
     }
 
     public N get(final long row, final long col) {
-        return myStore.get(row, col);
+        return this.store().get(row, col);
     }
 
     /**
@@ -288,9 +351,17 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = Access1D.hashCode(myStore);
+            myHashCode = Access1D.hashCode(this.store());
         }
         return myHashCode;
+    }
+
+    public M hermitian(final boolean upper) {
+        return this.newInstance(this.store().hermitian(upper));
+    }
+
+    public M hessenberg(final boolean upper) {
+        return this.newInstance(this.store().hessenberg(upper));
     }
 
     /**
@@ -323,7 +394,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public boolean isAbsolute(final long row, final long col) {
-        return myStore.isAbsolute(row, col);
+        return this.store().isAbsolute(row, col);
     }
 
     /**
@@ -338,24 +409,40 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isHermitian() {
         if (myHermitian == null) {
-            myHermitian = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS));
+            myHermitian = Boolean.valueOf(this.isSquare() && this.store().equals(this.store().conjugate(), EQUALS));
         }
         return myHermitian.booleanValue();
     }
 
     public boolean isSmall(final double comparedTo) {
-        return myStore.isSmall(comparedTo);
+        return this.store().isSmall(comparedTo);
     }
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myStore.isSmall(row, col, comparedTo);
+        return this.store().isSmall(row, col, comparedTo);
     }
 
     public boolean isSymmetric() {
         if (mySymmetric == null) {
-            mySymmetric = Boolean.valueOf(this.isSquare() && myStore.equals(myStore.transpose(), EQUALS));
+            mySymmetric = Boolean.valueOf(this.isSquare() && this.store().equals(this.store().transpose(), EQUALS));
         }
         return mySymmetric.booleanValue();
+    }
+
+    public M left(final Access2D<N>... left) {
+        return this.newInstance(this.store().left(left));
+    }
+
+    public M left(final Access2D<N> left) {
+        return this.newInstance(this.store().left(left));
+    }
+
+    public M left(final long numberOfColumns) {
+        return this.newInstance(this.store().left(numberOfColumns));
+    }
+
+    public M limits(final long rowLimit, final long columnLimit) {
+        return this.newInstance(this.store().limits(rowLimit, columnLimit));
     }
 
     /**
@@ -364,26 +451,30 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      *
      * @return A logical builder that tries to avoid unnecessary copying.
      * @see #copy()
+     * @deprecated v50 No need for this!
      */
-    public abstract Pipeline2D<N, M, ?> logical();
+    @Deprecated
+    public final M logical() {
+        return (M) this;
+    }
 
     public M multiply(final double scalarMultiplicand) {
-        return this.newInstance(myStore.multiply(scalarMultiplicand));
+        return this.newInstance(this.store().multiply(scalarMultiplicand));
     }
 
     public M multiply(final M multiplicand) {
 
-        ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
+        ProgrammingError.throwIfMultiplicationNotPossible(this.store(), multiplicand);
 
-        return this.newInstance(myStore.multiply(multiplicand.getStore()));
+        return this.newInstance(this.store().multiply(multiplicand.store()));
     }
 
     public M multiply(final N scalarMultiplicand) {
-        return this.newInstance(myStore.multiply(scalarMultiplicand));
+        return this.newInstance(this.store().multiply(scalarMultiplicand));
     }
 
     public M negate() {
-        return this.newInstance(myStore.negate());
+        return this.newInstance(this.store().negate());
     }
 
     /**
@@ -394,23 +485,71 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * @return The matrix' Frobenius norm
      */
     public double norm() {
-        return myStore.norm();
+        return this.store().norm();
+    }
+
+    public M offsets(final long rowOffset, final long columnOffset) {
+        return this.newInstance(this.store().offsets(rowOffset, columnOffset));
+    }
+
+    public M onAll(final UnaryFunction<N> operator) {
+        return this.newInstance(mySupplier.onAll(operator));
+    }
+
+    public M onAny(final Transformation2D<N> operator) {
+        return this.newInstance(mySupplier.onAny(operator));
+    }
+
+    public M onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return this.newInstance(mySupplier.onColumns(operator, right));
+    }
+
+    public M onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
+        return this.newInstance(mySupplier.onMatching(left, operator));
+    }
+
+    public M onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
+        return this.newInstance(mySupplier.onMatching(operator, right));
+    }
+
+    public M onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return this.newInstance(mySupplier.onRows(operator, right));
     }
 
     public M power(final int power) {
-        return this.newInstance(myStore.power(power));
+        return this.newInstance(this.store().power(power));
     }
 
     public M reduceColumns(final Aggregator aggregator) {
-        return this.newInstance(myStore.reduceColumns(aggregator).collect(myStore.physical()));
+        return this.newInstance(this.store().reduceColumns(aggregator).collect(this.store().physical()));
     }
 
     public M reduceRows(final Aggregator aggregator) {
-        return this.newInstance(myStore.reduceRows(aggregator).collect(myStore.physical()));
+        return this.newInstance(this.store().reduceRows(aggregator).collect(this.store().physical()));
+    }
+
+    public M repeat(final int rowsRepetitions, final int columnsRepetitions) {
+        return this.newInstance(this.store().repeat(rowsRepetitions, columnsRepetitions));
+    }
+
+    public M right(final Access2D<N>... right) {
+        return this.newInstance(this.store().right(right));
+    }
+
+    public M right(final Access2D<N> right) {
+        return this.newInstance(this.store().right(right));
+    }
+
+    public M right(final long numberOfColumns) {
+        return this.newInstance(this.store().right(numberOfColumns));
+    }
+
+    public M rows(final int[] rows) {
+        return this.newInstance(this.store().rows(rows));
     }
 
     public M signum() {
-        return this.newInstance(myStore.signum());
+        return this.newInstance(this.store().signum());
     }
 
     /**
@@ -434,20 +573,28 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     public M subtract(final double scalarSubtrahend) {
-        return this.newInstance(myStore.subtract(scalarSubtrahend));
+        return this.newInstance(this.store().subtract(scalarSubtrahend));
     }
 
     public M subtract(final M subtrahend) {
-        ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
-        return this.newInstance(myStore.subtract(subtrahend.getStore()));
+        ProgrammingError.throwIfNotEqualDimensions(this.store(), subtrahend);
+        return this.newInstance(this.store().subtract(subtrahend.store()));
     }
 
     public M subtract(final N scalarSubtrahend) {
-        return this.newInstance(myStore.subtract(scalarSubtrahend));
+        return this.newInstance(this.store().subtract(scalarSubtrahend));
+    }
+
+    public M superimpose(final long row, final long col, final Access2D<N> matrix) {
+        return this.newInstance(this.store().superimpose(row, col, matrix));
     }
 
     public void supplyTo(final TransformableRegion<N> receiver) {
-        myStore.supplyTo(receiver);
+        mySupplier.supplyTo(receiver);
+    }
+
+    public M symmetric(final boolean upper) {
+        return this.newInstance(this.store().symmetric(upper));
     }
 
     /**
@@ -460,7 +607,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     @Deprecated
     public Scalar<N> toScalar(final long row, final long col) {
-        return myStore.toScalar(row, col);
+        return this.store().toScalar(row, col);
     }
 
     @Override
@@ -475,7 +622,15 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
      */
     public M transpose() {
-        return this.newInstance(myStore.transpose());
+        return this.newInstance(mySupplier.transpose());
+    }
+
+    public M triangular(final boolean upper, final boolean assumeOne) {
+        return this.newInstance(this.store().triangular(upper, assumeOne));
+    }
+
+    public M tridiagonal() {
+        return this.newInstance(this.store().tridiagonal());
     }
 
     private Provider2D.Condition getConditionProvider() {
@@ -484,8 +639,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Condition) myDecomposition;
         }
 
-        SingularValue<N> provider = this.newSingularValue(myStore);
-        provider.decompose(myStore);
+        SingularValue<N> provider = this.newSingularValue(mySupplier);
+        provider.decompose(mySupplier);
         myDecomposition = provider;
 
         return provider;
@@ -497,13 +652,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Determinant<N>) myDecomposition;
         }
 
-        DeterminantTask<N> task = this.newDeterminantTask(myStore);
+        DeterminantTask<N> task = this.newDeterminantTask(mySupplier);
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toDeterminantProvider(myStore);
+        return task.toDeterminantProvider(this.store());
     }
 
     private Provider2D.Eigenpairs getEigenpairsProvider() {
@@ -512,8 +667,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Eigenpairs) myDecomposition;
         }
 
-        Eigenvalue<N> provider = this.newEigenvalue(myStore);
-        provider.decompose(myStore);
+        Eigenvalue<N> provider = this.newEigenvalue(mySupplier);
+        provider.decompose(mySupplier);
         myDecomposition = provider;
 
         return provider;
@@ -525,28 +680,28 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Inverse<Optional<MatrixStore<N>>>) myDecomposition;
         }
 
-        InverterTask<N> task = safe ? this.newSingularValue(myStore) : this.newInverterTask(myStore);
+        InverterTask<N> task = safe ? this.newSingularValue(mySupplier) : this.newInverterTask(mySupplier);
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toInverseProvider(myStore);
+        return task.toInverseProvider(this.store());
     }
 
     private Provider2D.Rank getRankProvider() {
 
         if (!(myDecomposition instanceof Provider2D.Rank)) {
 
-            if (myStore.isTall()) {
-                myDecomposition = this.newQR(myStore);
-            } else if (myStore.isFat()) {
-                myDecomposition = this.newSingularValue(myStore);
+            if (this.store().isTall()) {
+                myDecomposition = this.newQR(mySupplier);
+            } else if (this.store().isFat()) {
+                myDecomposition = this.newSingularValue(mySupplier);
             } else {
-                myDecomposition = this.newLDU(myStore);
+                myDecomposition = this.newLDU(mySupplier);
             }
 
-            myDecomposition.decompose(myStore);
+            myDecomposition.decompose(mySupplier);
         }
 
         return (Provider2D.Rank) myDecomposition;
@@ -558,26 +713,22 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
             return (Provider2D.Solution<Optional<MatrixStore<N>>>) myDecomposition;
         }
 
-        SolverTask<N> task = safe ? this.newSingularValue(myStore) : this.newSolverTask(myStore, rhs);
+        SolverTask<N> task = safe ? this.newSingularValue(mySupplier) : this.newSolverTask(mySupplier, rhs);
 
         if (task instanceof MatrixDecomposition) {
             myDecomposition = (MatrixDecomposition<N>) task;
         }
 
-        return task.toSolutionProvider(myStore, rhs);
-    }
-
-    MatrixStore<N> getStore() {
-        return myStore;
+        return task.toSolutionProvider(this.store(), rhs);
     }
 
     abstract Cholesky<N> newCholesky(Structure2D typical);
 
-    abstract DeterminantTask<N> newDeterminantTask(MatrixStore<N> template);
+    abstract DeterminantTask<N> newDeterminantTask(Structure2D template);
 
     abstract Eigenvalue<N> newEigenvalue(Structure2D typical);
 
-    abstract M newInstance(MatrixStore<N> store);
+    abstract M newInstance(ElementsSupplier<N> store);
 
     abstract InverterTask<N> newInverterTask(Structure2D template);
 
@@ -602,6 +753,15 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     abstract SingularValue<N> newSingularValue(Structure2D typical);
 
-    abstract SolverTask<N> newSolverTask(MatrixStore<N> templateBody, Access2D<?> templateRHS);
+    abstract SolverTask<N> newSolverTask(Structure2D templateBody, Structure2D templateRHS);
+
+    MatrixStore<N> store() {
+
+        if (myStore == null) {
+            myStore = mySupplier.collect(myFactory);
+        }
+
+        return myStore;
+    }
 
 }

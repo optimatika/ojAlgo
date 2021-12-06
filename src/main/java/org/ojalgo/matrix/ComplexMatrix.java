@@ -37,7 +37,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -79,19 +78,6 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
 
     }
 
-    public static final class LogicalBuilder extends Pipeline2D<ComplexNumber, ComplexMatrix, LogicalBuilder> {
-
-        LogicalBuilder(final MatrixFactory<ComplexNumber, ComplexMatrix, ?, ?> factory, final ElementsSupplier<ComplexNumber> supplier) {
-            super(factory, supplier);
-        }
-
-        @Override
-        LogicalBuilder wrap(final ElementsSupplier<ComplexNumber> supplier) {
-            return new LogicalBuilder(FACTORY, supplier);
-        }
-
-    }
-
     public static final class SparseReceiver extends Mutator2D<ComplexNumber, ComplexMatrix, SparseStore<ComplexNumber>> {
 
         SparseReceiver(final SparseStore<ComplexNumber> delegate) {
@@ -110,51 +96,41 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    ComplexMatrix(final MatrixStore<ComplexNumber> store) {
-        super(store);
+    ComplexMatrix(final ElementsSupplier<ComplexNumber> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
     public ComplexMatrix.DenseReceiver copy() {
-        return new ComplexMatrix.DenseReceiver(this.getStore().copy());
+        return new ComplexMatrix.DenseReceiver(this.store().copy());
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
     public Primitive64Matrix getArgument() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.getStore()));
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
     public Primitive64Matrix getImaginary() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.getStore()));
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
     public Primitive64Matrix getModulus() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.getStore()));
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
     public Primitive64Matrix getReal() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.getStore()));
-    }
-
-    @Override
-    public ComplexMatrix.LogicalBuilder logical() {
-        return new ComplexMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    ComplexMatrix newInstance(final MatrixStore<ComplexNumber> store) {
-        return new ComplexMatrix(store);
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.store()));
     }
 
     @Override
@@ -163,13 +139,18 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    DeterminantTask<ComplexNumber> newDeterminantTask(final MatrixStore<ComplexNumber> template) {
+    DeterminantTask<ComplexNumber> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<ComplexNumber> newEigenvalue(final Structure2D typical) {
         return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
+    }
+
+    @Override
+    ComplexMatrix newInstance(final ElementsSupplier<ComplexNumber> store) {
+        return new ComplexMatrix(store);
     }
 
     @Override
@@ -198,7 +179,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    SolverTask<ComplexNumber> newSolverTask(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<ComplexNumber> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -29,7 +29,6 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.Primitive64Matrix.DenseReceiver;
-import org.ojalgo.matrix.Primitive64Matrix.LogicalBuilder;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
@@ -103,7 +102,7 @@ public class CaseQR extends MatrixDecompositionTests {
         Primitive64Matrix ps = dr.get();
         tmpDecomp.decompose(ps);
 
-        LogicalBuilder lb = dr.get().logical().below(2);
+        Primitive64Matrix lb = dr.get().logical().below(2);
         tmpDecomp.decompose(lb);
 
         Primitive64Matrix bm = lb.get();

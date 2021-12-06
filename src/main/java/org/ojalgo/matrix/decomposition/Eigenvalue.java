@@ -405,10 +405,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             retVal.add(this.getEigenpair(i));
         }
 
-        if (!this.isOrdered()) {
-            // If not already ordered, then sort here/now
-            retVal.sort(null);
-        }
+        retVal.sort(null);
 
         return retVal;
     }

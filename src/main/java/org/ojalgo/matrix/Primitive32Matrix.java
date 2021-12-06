@@ -35,7 +35,6 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -77,19 +76,6 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
 
     }
 
-    public static final class LogicalBuilder extends Pipeline2D<Double, Primitive32Matrix, LogicalBuilder> {
-
-        LogicalBuilder(final MatrixFactory<Double, Primitive32Matrix, ?, ?> factory, final ElementsSupplier<Double> supplier) {
-            super(factory, supplier);
-        }
-
-        @Override
-        LogicalBuilder wrap(final ElementsSupplier<Double> supplier) {
-            return new LogicalBuilder(FACTORY, supplier);
-        }
-
-    }
-
     public static final class SparseReceiver extends Mutator2D<Double, Primitive32Matrix, SparseStore<Double>> {
 
         SparseReceiver(final SparseStore<Double> delegate) {
@@ -108,23 +94,13 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    Primitive32Matrix(final MatrixStore<Double> store) {
-        super(store);
+    Primitive32Matrix(final ElementsSupplier<Double> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
     public Primitive32Matrix.DenseReceiver copy() {
-        return new Primitive32Matrix.DenseReceiver(this.getStore().copy());
-    }
-
-    @Override
-    public Primitive32Matrix.LogicalBuilder logical() {
-        return new Primitive32Matrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    Primitive32Matrix newInstance(final MatrixStore<Double> store) {
-        return new Primitive32Matrix(store);
+        return new Primitive32Matrix.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -133,13 +109,18 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     }
 
     @Override
-    DeterminantTask<Double> newDeterminantTask(final MatrixStore<Double> template) {
+    DeterminantTask<Double> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<Double> newEigenvalue(final Structure2D typical) {
         return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    Primitive32Matrix newInstance(final ElementsSupplier<Double> store) {
+        return new Primitive32Matrix(store);
     }
 
     @Override
@@ -168,7 +149,7 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     }
 
     @Override
-    SolverTask<Double> newSolverTask(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Double> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
