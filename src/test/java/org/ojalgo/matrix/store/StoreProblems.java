@@ -147,11 +147,11 @@ public class StoreProblems extends MatrixStoreTests {
         Primitive64Matrix Apow = Primitive64Matrix.FACTORY.copy(Aprime);
         final Primitive64Matrix tmp = Aprime.subtract(eye);
         sx = Primitive64Matrix.FACTORY.copy(eye);
-        sx = sx.logical().below(tmp).get();
+        sx = sx.below(tmp);
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
         for (int i = 0; i < hp - 2; i++) {
-            sx = sx.logical().below(tmp.multiply(Apow)).get();
+            sx = sx.below(tmp.multiply(Apow));
             Apow = Apow.multiply(Apow);
         }
         currentState = Primitive64Matrix.FACTORY.make(A.countRows(), 1);

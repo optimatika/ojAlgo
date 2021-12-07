@@ -102,10 +102,10 @@ public class CaseQR extends MatrixDecompositionTests {
         Primitive64Matrix ps = dr.get();
         tmpDecomp.decompose(ps);
 
-        Primitive64Matrix lb = dr.get().logical().below(2);
+        Primitive64Matrix lb = dr.get().below(2);
         tmpDecomp.decompose(lb);
 
-        Primitive64Matrix bm = lb.get();
+        Primitive64Matrix bm = lb;
         tmpDecomp.decompose(bm);
     }
 
