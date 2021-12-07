@@ -343,13 +343,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
             expected += rAA.doubleValue(i, col) * rSafe.doubleValue(i, col);
         }
 
-        actual = rAA.logical().column(col).get().dot(rSafe.logical().column(col).get());
+        actual = rAA.column(col).dot(rSafe.column(col));
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = cAA.logical().column(col).get().dot(cSafe.logical().column(col).get());
+        actual = cAA.column(col).dot(cSafe.column(col));
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().column(col).get().dot(p64Safe.logical().column(col).get());
+        actual = p64AA.column(col).dot(p64Safe.column(col));
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -387,12 +387,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countColumns());
         }
 
-        expected = rAA.logical().column(tmpArr).get();
+        expected = rAA.column(tmpArr);
 
-        actual = cAA.logical().column(tmpArr).get();
+        actual = cAA.column(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().column(tmpArr).get();
+        actual = p64AA.column(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
     }
@@ -528,12 +528,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countRows());
         }
 
-        expected = rAA.logical().row(tmpArr).get();
+        expected = rAA.row(tmpArr);
 
-        actual = cAA.logical().row(tmpArr).get();
+        actual = cAA.row(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().row(tmpArr).get();
+        actual = p64AA.row(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
     }
@@ -587,15 +587,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         RationalMatrix expected;
 
-        expected = rAA.logical().below(rSafe).repeat(1, 2).onAll(RationalMath.SIN).diagonal().get();
+        expected = rAA.below(rSafe).repeat(1, 2).onAll(RationalMath.SIN).diagonal();
 
-        actual = rAA.logical().below(rSafe).repeat(1, 2).diagonal().onAll(RationalMath.SIN).get();
+        actual = rAA.below(rSafe).repeat(1, 2).diagonal().onAll(RationalMath.SIN);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().below(p64Safe).repeat(1, 2).diagonal().onAll(PrimitiveMath.SIN).get();
+        actual = p64AA.below(p64Safe).repeat(1, 2).diagonal().onAll(PrimitiveMath.SIN);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.logical().onAll(PrimitiveMath.SIN).below(p64Safe.logical().onAll(PrimitiveMath.SIN).get()).repeat(1, 2).diagonal().get();
+        actual = p64AA.onAll(PrimitiveMath.SIN).below(p64Safe.onAll(PrimitiveMath.SIN)).repeat(1, 2).diagonal();
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -779,15 +779,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        expected = rAA.logical().below(rSafe).get();
+        expected = rAA.below(rSafe);
 
-        actual = p64AA.logical().below(p64Safe).get();
+        actual = p64AA.below(p64Safe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = cAA.logical().below(cSafe).get();
+        actual = cAA.below(cSafe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = qAA.logical().below(qSafe).get();
+        actual = qAA.below(qSafe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -797,15 +797,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        expected = rAA.logical().right(rSafe).get();
+        expected = rAA.right(rSafe);
 
-        actual = p64AA.logical().right(p64Safe).get();
+        actual = p64AA.right(p64Safe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = cAA.logical().right(cSafe).get();
+        actual = cAA.right(cSafe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = qAA.logical().right(qSafe).get();
+        actual = qAA.right(qSafe);
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 

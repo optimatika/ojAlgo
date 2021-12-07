@@ -144,8 +144,8 @@ public class LinearProblems extends OptimisationLinearTests {
         solutionBuilder.set(4, 0, 5);
         solutionBuilder.set(5, 0, 23);
         Primitive64Matrix claimedSolutionFull = solutionBuilder.get();
-        Primitive64Matrix claimedSolutionOdd = claimedSolutionFull.logical().rows(new int[] { 0, 2, 4 }).get();
-        Primitive64Matrix claimedSolutionEven = claimedSolutionFull.logical().rows(new int[] { 1, 3, 5 }).get();
+        Primitive64Matrix claimedSolutionOdd = claimedSolutionFull.rows(new int[] { 0, 2, 4 });
+        Primitive64Matrix claimedSolutionEven = claimedSolutionFull.rows(new int[] { 1, 3, 5 });
 
         TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(BigArray.FACTORY.copy(claimedSolutionFull), ACCURACY));
 
@@ -165,21 +165,21 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(true, modFull.validate(tmpFullResult, ACCURACY));
         int[] someRows2 = { 0, 1, 2 };
 
-        TestUtils.assertEquals(claimedSolutionEven, RationalMatrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows2).get(), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionEven, RationalMatrix.FACTORY.columns(tmpEvenResult).rows(someRows2), ACCURACY);
         int[] someRows3 = { 0, 1, 2 };
-        TestUtils.assertEquals(claimedSolutionOdd, RationalMatrix.FACTORY.columns(tmpOddResult).logical().rows(someRows3).get(), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionOdd, RationalMatrix.FACTORY.columns(tmpOddResult).rows(someRows3), ACCURACY);
         int[] someRows4 = { 0, 1, 2, 3, 4, 5 };
-        TestUtils.assertEquals(claimedSolutionFull, RationalMatrix.FACTORY.columns(tmpFullResult).logical().rows(someRows4).get(), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionFull, RationalMatrix.FACTORY.columns(tmpFullResult).rows(someRows4), ACCURACY);
         int[] someRows5 = { 0, 1, 2 };
 
-        BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modEven.objective().toFunction()
-                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows5).get()))));
+        BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
+                modEven.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpEvenResult).rows(someRows5)))));
         int[] someRows6 = { 0, 1, 2 };
-        BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modOdd.objective().toFunction()
-                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpOddResult).logical().rows(someRows6).get()))));
+        BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
+                modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpOddResult).rows(someRows6)))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
-        BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(modFull.objective().toFunction()
-                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpFullResult).logical().rows(someRows7).get()))));
+        BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
+                modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpFullResult).rows(someRows7)))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, claimedValue.compareTo(tmpFullValue));

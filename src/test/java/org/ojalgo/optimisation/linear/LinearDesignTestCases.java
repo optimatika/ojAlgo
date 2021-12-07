@@ -148,7 +148,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 5.0 }, { 4.0 }, { 0.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1, 2 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1, 2 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -180,7 +180,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1, 2 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1, 2 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -217,7 +217,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -255,7 +255,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1, 2 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1, 2 }));
         tmpActX.modifyAll(new NumberContext(7, 2).getFunction(PrimitiveFunction.getSet()));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -293,7 +293,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 5.0 }, { 5.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -346,7 +346,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 4.0 }, { 4.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1 }).get());
+        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -524,7 +524,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         MatrixStore<Double> tmpExpX = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
-        MatrixStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).get());
+        MatrixStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -539,7 +539,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         MatrixStore<Double> tmpExpX = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-        MatrixStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.logical().rows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).get());
+        MatrixStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
