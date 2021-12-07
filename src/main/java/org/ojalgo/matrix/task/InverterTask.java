@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.task;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.matrix.Provider2D;
@@ -29,6 +30,7 @@ import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -225,9 +227,10 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
      */
     PhysicalStore<N> preallocate(Structure2D template);
 
-    default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final Access2D<?> original) {
+    default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final ElementsSupplier<N> original,
+            final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
         try {
-            MatrixStore<N> invert = this.invert(original);
+            MatrixStore<N> invert = this.invert(alternativeOriginalSupplier.get());
             return () -> Optional.of(invert);
         } catch (RecoverableCondition cause) {
             return Optional::empty;

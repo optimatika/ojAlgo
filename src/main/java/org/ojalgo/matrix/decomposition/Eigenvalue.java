@@ -79,7 +79,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         }
 
         public int compareTo(final Eigenpair other) {
-            return other.value.compareTo(value);
+            return DESCENDING_NORM.compare(value, other.value);
         }
 
         @Override
@@ -237,6 +237,18 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
+    /**
+     * Sorts on the norm in descending order. If the 2 eigenvalues have equal norm then the usual
+     * {@link ComplexNumber} sort order is used (reversed).
+     */
+    Comparator<ComplexNumber> DESCENDING_NORM = (arg1, arg2) -> {
+        int retVal = Double.compare(arg2.norm(), arg1.norm());
+        if (retVal == 0) {
+            return arg2.compareTo(arg1);
+        }
+        return retVal;
+    };
+
     Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
@@ -379,6 +391,12 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         return new Eigenpair(value, vector);
     }
 
+    /**
+     * This list is always ordered in descending eigenvalue order – that's regardless of if
+     * {@link #isOrdered()} returns true or false.
+     *
+     * @see org.ojalgo.matrix.Provider2D.Eigenpairs#getEigenpairs()
+     */
     default List<Eigenpair> getEigenpairs() {
 
         List<Eigenpair> retVal = new ArrayList<>();
@@ -387,7 +405,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             retVal.add(this.getEigenpair(i));
         }
 
-        retVal.sort(Comparator.reverseOrder());
+        retVal.sort(null);
 
         return retVal;
     }

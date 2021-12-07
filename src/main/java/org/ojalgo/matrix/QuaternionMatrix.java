@@ -36,7 +36,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -78,19 +77,6 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
 
     }
 
-    public static final class LogicalBuilder extends Pipeline2D<Quaternion, QuaternionMatrix, LogicalBuilder> {
-
-        LogicalBuilder(final MatrixFactory<Quaternion, QuaternionMatrix, ?, ?> factory, final ElementsSupplier<Quaternion> supplier) {
-            super(factory, supplier);
-        }
-
-        @Override
-        LogicalBuilder wrap(final ElementsSupplier<Quaternion> supplier) {
-            return new LogicalBuilder(FACTORY, supplier);
-        }
-
-    }
-
     public static final class SparseReceiver extends Mutator2D<Quaternion, QuaternionMatrix, SparseStore<Quaternion>> {
 
         SparseReceiver(final SparseStore<Quaternion> delegate) {
@@ -109,23 +95,13 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    QuaternionMatrix(final MatrixStore<Quaternion> store) {
-        super(store);
+    QuaternionMatrix(final ElementsSupplier<Quaternion> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
     public QuaternionMatrix.DenseReceiver copy() {
-        return new QuaternionMatrix.DenseReceiver(this.getStore().copy());
-    }
-
-    @Override
-    public QuaternionMatrix.LogicalBuilder logical() {
-        return new QuaternionMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    QuaternionMatrix newInstance(final MatrixStore<Quaternion> store) {
-        return new QuaternionMatrix(store);
+        return new QuaternionMatrix.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -134,13 +110,18 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
-    DeterminantTask<Quaternion> newDeterminantTask(final MatrixStore<Quaternion> template) {
+    DeterminantTask<Quaternion> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<Quaternion> newEigenvalue(final Structure2D typical) {
         return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+    }
+
+    @Override
+    QuaternionMatrix newInstance(final ElementsSupplier<Quaternion> store) {
+        return new QuaternionMatrix(store);
     }
 
     @Override
@@ -169,7 +150,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
-    SolverTask<Quaternion> newSolverTask(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Quaternion> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.QUATERNION.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

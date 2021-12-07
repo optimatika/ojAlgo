@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.task;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.matrix.Provider2D;
@@ -29,6 +30,7 @@ import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -121,7 +123,8 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
                     }
                     if (tmpColDim == 1L) {
                         return AbstractSolver.FULL_1X1;
-                    } else if (tmpColDim == 2L) {
+                    }
+                    if (tmpColDim == 2L) {
                         return AbstractSolver.SYMMETRIC_2X2;
                     } else if (tmpColDim == 3L) {
                         return AbstractSolver.SYMMETRIC_3X3;
@@ -139,7 +142,8 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
                 }
                 if (tmpColDim == 1L) {
                     return AbstractSolver.FULL_1X1;
-                } else if (tmpColDim == 2L) {
+                }
+                if (tmpColDim == 2L) {
                     return AbstractSolver.FULL_2X2;
                 } else if (tmpColDim == 3L) {
                     return AbstractSolver.FULL_3X3;
@@ -268,9 +272,10 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
      */
     MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition;
 
-    default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final Access2D<?> body, final Access2D<?> rhs) {
+    default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final ElementsSupplier<N> body,
+            final Supplier<MatrixStore<N>> alternativeBodySupplier, final Access2D<?> rhs) {
         try {
-            MatrixStore<N> solution = this.solve(body, rhs);
+            MatrixStore<N> solution = this.solve(alternativeBodySupplier.get(), rhs);
             return r -> Optional.of(solution);
         } catch (RecoverableCondition cause) {
             return r -> Optional.empty();

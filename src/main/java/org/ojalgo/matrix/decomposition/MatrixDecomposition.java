@@ -22,9 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.Provider2D;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -72,8 +74,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          */
         N getDeterminant();
 
-        default Provider2D.Determinant<N> toDeterminantProvider(final Access2D<?> original) {
-            this.decompose(original.asCollectable2D());
+        default Provider2D.Determinant<N> toDeterminantProvider(final ElementsSupplier<N> original,
+                final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
+            this.decompose(original);
             return this;
         }
 
@@ -355,20 +358,22 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return Optional.empty();
         }
 
-        default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final Access2D<?> original) {
-            boolean ok = this.decompose(original.asCollectable2D());
+        default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final ElementsSupplier<N> original,
+                final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
+            boolean ok = this.decompose(original);
             if (ok && this.isSolvable()) {
                 return this;
             }
             return Optional::empty;
         }
 
-        default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final Access2D<?> original) {
-            boolean ok = this.decompose(original.asCollectable2D());
+        default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final ElementsSupplier<N> body,
+                final Supplier<MatrixStore<N>> alternativeBodySupplier, final Access2D<?> rhs) {
+            boolean ok = this.decompose(body);
             if (ok && this.isSolvable()) {
                 return this;
             }
-            return rhs -> Optional.empty();
+            return r -> Optional.empty();
         }
 
     }

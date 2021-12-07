@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.SparseStore;
@@ -52,13 +53,13 @@ import org.ojalgo.tensor.TensorFactory2D;
 public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>, SR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>>
         implements Factory2D.Dense<M>, Factory2D.MayBeSparse<M, DR, SR> {
 
-    private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> aTemplate) {
+    private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> template) {
         try {
-            final Constructor<? extends BasicMatrix<?, ?>> retVal = aTemplate.getDeclaredConstructor(MatrixStore.class);
+            Constructor<? extends BasicMatrix<?, ?>> retVal = template.getDeclaredConstructor(ElementsSupplier.class);
             retVal.setAccessible(true);
             return retVal;
-        } catch (final SecurityException | NoSuchMethodException exception) {
-            return null;
+        } catch (SecurityException | NoSuchMethodException cause) {
+            throw new ProgrammingError(cause);
         }
     }
 
@@ -210,23 +211,23 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         });
     }
 
-    /**
-     * This method is for internal use only - YOU should NOT use it!
-     */
-    M instantiate(final MatrixStore<N> store) {
-        try {
-            return myConstructor.newInstance(store);
-        } catch (final IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException anException) {
-            throw new ProgrammingError(anException);
-        }
-    }
-
     abstract DR dense(final PhysicalStore<N> store);
-
-    abstract SR sparse(final SparseStore<N> store);
 
     final PhysicalStore.Factory<N, ?> getPhysicalFactory() {
         return myPhysicalFactory;
     }
+
+    /**
+     * This method is for internal use only - YOU should NOT use it!
+     */
+    M instantiate(final ElementsSupplier<N> supplier) {
+        try {
+            return myConstructor.newInstance(supplier);
+        } catch (final IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException cause) {
+            throw new ProgrammingError(cause);
+        }
+    }
+
+    abstract SR sparse(final SparseStore<N> store);
 
 }

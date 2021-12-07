@@ -36,7 +36,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -78,19 +77,6 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
 
     }
 
-    public static final class LogicalBuilder extends Pipeline2D<RationalNumber, RationalMatrix, LogicalBuilder> {
-
-        LogicalBuilder(final MatrixFactory<RationalNumber, RationalMatrix, ?, ?> factory, final ElementsSupplier<RationalNumber> supplier) {
-            super(factory, supplier);
-        }
-
-        @Override
-        LogicalBuilder wrap(final ElementsSupplier<RationalNumber> supplier) {
-            return new LogicalBuilder(FACTORY, supplier);
-        }
-
-    }
-
     public static final class SparseReceiver extends Mutator2D<RationalNumber, RationalMatrix, SparseStore<RationalNumber>> {
 
         SparseReceiver(final SparseStore<RationalNumber> delegate) {
@@ -109,23 +95,13 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    RationalMatrix(final MatrixStore<RationalNumber> store) {
-        super(store);
+    RationalMatrix(final ElementsSupplier<RationalNumber> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
     public RationalMatrix.DenseReceiver copy() {
-        return new RationalMatrix.DenseReceiver(this.getStore().copy());
-    }
-
-    @Override
-    public RationalMatrix.LogicalBuilder logical() {
-        return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @Override
-    RationalMatrix newInstance(final MatrixStore<RationalNumber> store) {
-        return new RationalMatrix(store);
+        return new RationalMatrix.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -134,13 +110,18 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
-    DeterminantTask<RationalNumber> newDeterminantTask(final MatrixStore<RationalNumber> template) {
+    DeterminantTask<RationalNumber> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical) {
         return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    RationalMatrix newInstance(final ElementsSupplier<RationalNumber> store) {
+        return new RationalMatrix(store);
     }
 
     @Override
@@ -169,7 +150,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
-    SolverTask<RationalNumber> newSolverTask(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<RationalNumber> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
