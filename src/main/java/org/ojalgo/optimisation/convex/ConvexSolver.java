@@ -357,6 +357,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
     private static final double SMALL_DIAGONAL_FACTOR = RELATIVELY_SMALL + MACHINE_EPSILON;
@@ -658,6 +660,14 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    static ConvexSolver.Builder builder(final MatrixStore<Double>[] matrices) {
+        return new ConvexSolver.Builder(matrices);
+    }
+
+    static ConvexSolver of(final MatrixStore<Double>[] matrices) {
+        return ConvexSolver.builder(matrices).build();
     }
 
     static ConvexObjectiveFunction toObjectiveFunction(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {

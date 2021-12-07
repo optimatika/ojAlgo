@@ -302,9 +302,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             Result resultLP = this.solveLP();
 
-            if (feasible = resultLP.getState().isFeasible()) {
-                this.getSolutionX().fillMatching(resultLP);
-                this.getSolutionL().fillAll(ZERO);
+            this.getSolutionX().fillMatching(resultLP);
+            this.getSolutionL().fillAll(ZERO);
+
+            if (resultLP.getState().isFeasible()) {
+                feasible = true;
+            } else {
+                feasible = this.checkFeasibility();
             }
         }
 

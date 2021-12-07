@@ -1229,7 +1229,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     public void testSTAIR() {
-        CuteNetlibCase.doTest("STAIR.SIF", "-251.26695119296787", "-208.79999", NumberContext.of(7, 4));
+        CuteNetlibCase.doTest("STAIR.SIF", "-251.26695119296787", "-208.79999", NumberContext.of(7, 2));
     }
 
     /**

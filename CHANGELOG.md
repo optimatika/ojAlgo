@@ -38,6 +38,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - `BasicMatrix` now implements `Structure2D.Logical` as well as `Operate2D` directly. No need to call `logical()` to get a `LogicalBuilder`.
 - A lot of refactoring among the package private code.
 
+#### org.ojalgo.optimisation
+
+- Minor change regarding `LinearSolver` pivot point selection.
+
 #### org.ojalgo.scalar
 
 - `ComplexNumber` and `Quaternion` had their `compareTo` methods changed to first just compare then real part and only if they're equal compare the imaginary parts.
@@ -47,6 +51,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - The `logical()` method in `MatrixStore` is deprecated. No need for it as `MatrixStore`:s are now "logical".
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed rare multiplication problem when all involved matrices were `RawStore` instances and the left multiplcation matrix was a vector, but a column vector when a row vector was expected; in that case the multiplication code would fail.
 
 ### Removed
 

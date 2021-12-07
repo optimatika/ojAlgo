@@ -219,6 +219,8 @@ public final class IntegerSolver extends GenericSolver {
 
     }
 
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+
     private static volatile ForkJoinPool EXECUTOR;
 
     public static IntegerSolver make(final ExpressionsBasedModel model) {
@@ -330,7 +332,6 @@ public final class IntegerSolver extends GenericSolver {
             buffer.flush(receiver);
         }
     }
-
     private volatile Optimisation.Result myBestResultSoFar = null;
     private final Queue<NodeKey> myDeferredNodes = new ConcurrentLinkedQueue<>();
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;

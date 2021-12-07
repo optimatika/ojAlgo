@@ -94,23 +94,25 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     @Test
+    @Tag("slow")
     public void testAUG3D() {
         CuteMarosMeszarosCase.doTest("AUG3D.SIF", "5.5406773e+02");
     }
 
     @Test
+    @Tag("slow")
     public void testAUG3DC() {
         CuteMarosMeszarosCase.doTest("AUG3DC.SIF", "7.7126244e+02");
     }
 
     @Test
-    @Tag("unstable")
+    @Tag("slow")
     public void testAUG3DCQP() {
         CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF", "9.9336215e+02");
     }
 
     @Test
-    @Tag("unstable")
+    @Tag("slow")
     public void testAUG3DQP() {
         CuteMarosMeszarosCase.doTest("AUG3DQP.SIF", "6.7523767e+02");
     }
@@ -169,7 +171,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     public void testHS268() {
 
-        CuteMarosMeszarosCase.doTest("HS268.SIF", "5.7310705e-07", ACCURACY.withScale(5));
+        CuteMarosMeszarosCase.doTest("HS268.SIF", "5.7310705e-07", ACCURACY.withScale(4));
 
         ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
 
@@ -186,7 +188,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         TestUtils.assertLessThan(1.1702830307e-05, propVal.doubleValue()); // CPLEX
         TestUtils.assertTrue(propVal.compareTo(cplexVal) < 0); // From CPLEX solution
 
-        TestUtils.assertEquals(1.1702830307e-05, cplexVal.doubleValue(), ACCURACY.withPrecision(4));
+        TestUtils.assertEquals(1.1702830307e-05, cplexVal.doubleValue(), ACCURACY.withScale(4));
 
         // Assert proposed solution valid with very high precision, and that it gives objective function value 0.0
         NumberContext VERY_HIGH_PRECISION = NumberContext.of(24);
@@ -196,7 +198,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     @Test
     public void testHS35() {
-        CuteMarosMeszarosCase.doTest("HS35.SIF", "1.1111111e-01");
+        CuteMarosMeszarosCase.doTest("HS35.SIF", "1.1111111e-01", ACCURACY.withPrecision(6));
     }
 
     @Test
@@ -230,6 +232,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
+     * ojAlgo returns state FAILED
      * <p>
      * There are redundant constraints
      * <p>
@@ -238,27 +241,42 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQBORE3D() {
-        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", "3.1002008e+03");
+        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", "3.1002008e+03", ACCURACY.withScale(10));
     }
 
+    /**
+     * ojAlgo returns state INFEASIBLE
+     */
     @Test
     @Tag("unstable")
     public void testQFORPLAN() {
-        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", "7.4566315e+09");
+        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", "7.4566315e+09", ACCURACY.withScale(5));
     }
 
+    /**
+     * ojAlgo takes forever - ends up in some loop...
+     */
     @Test
     @Tag("unstable")
     public void testQGROW22() {
-        CuteMarosMeszarosCase.doTest("QGROW22.SIF", "-1.4962895e+08");
+        CuteMarosMeszarosCase.doTest("QGROW22.SIF", "-1.4962895e+08", ACCURACY.withScale(6));
     }
 
+    /**
+     * ojAlgo's optimal value is completely off
+     */
     @Test
     @Tag("unstable")
     public void testQPCBOEI1() {
-        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", "1.1503914e+07", ACCURACY.withScale(10));
+        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", "1.1503914e+07", ACCURACY.withScale(6));
     }
 
+    /**
+     * ojAlgo returns state INFEASIBLE
+     * <p>
+     * Problem with the LP solver. Switches to phase 2 with many artificials still in the basis, and doesn't
+     * get rid of them. Pick non-artificial rows with numer == 0.0 rather than anyof the artificials.
+     */
     @Test
     @Tag("unstable")
     public void testQPCSTAIR() {
@@ -271,6 +289,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
+     * ojAlgo finds a sub-optimal solution
      * <p>
      * Too many constraints are initially activated, making the KKT system unsolvable, and somehow cutting off
      * the optimal value
@@ -284,6 +303,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
+     * ojAlgo fails to solve the problems – returns state FAILED
      * <p>
      * There are redundant constraints
      */
@@ -293,21 +313,27 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("QSCORPIO.SIF", "1.8805096e+03");
     }
 
+    /**
+     * ojAlgo finds the problem to be INFEASIBLE
+     */
     @Test
     @Tag("unstable")
     public void testQSHARE1B() {
-        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", "7.2007832e+05");
+        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", "7.2007832e+05", ACCURACY.withPrecision(3).withScale(8));
     }
 
+    /**
+     * ojAlgo finds the problem to be INFEASIBLE
+     */
     @Test
     @Tag("unstable")
     public void testQSTAIR() {
-        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", "7.9854528e+06");
+        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", "7.9854528e+06", ACCURACY.withScale(8));
     }
 
     @Test
     public void testS268() {
-        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07", ACCURACY.withScale(5));
+        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07", ACCURACY.withScale(4));
     }
 
     @Test

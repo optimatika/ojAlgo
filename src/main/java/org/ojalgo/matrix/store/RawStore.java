@@ -396,33 +396,29 @@ public final class RawStore implements PhysicalStore<Double> {
         return retVal;
     }
 
-    private static double[][] extract(final Access1D<?> elements, final int structure) {
+    private static double[][] extract(final Access1D<?> elements, final int nbRows) {
 
         double[][] retVal = null;
 
-        if (elements instanceof RawStore) {
+        if (elements instanceof RawStore && ((RawStore) elements).getRowDim() == nbRows) {
 
             retVal = ((RawStore) elements).data;
 
-        } else if (elements instanceof Access2D) {
+        } else if (elements instanceof Access2D && ((Access2D) elements).getRowDim() == nbRows) {
 
             retVal = ((Access2D<?>) elements).toRawCopy2D();
 
         } else {
 
-            int tmpNumberOfColumns = (int) (structure != 0 ? elements.count() / structure : 0);
+            int nbColumns = nbRows != 0 ? Math.toIntExact(elements.count() / nbRows) : 0;
 
-            if (structure * tmpNumberOfColumns != elements.count()) {
-                throw new IllegalArgumentException("Array length must be a multiple of structure.");
-            }
-
-            retVal = new double[structure][];
+            retVal = new double[nbRows][];
 
             double[] tmpRow;
-            for (int i = 0; i < structure; i++) {
-                tmpRow = retVal[i] = new double[tmpNumberOfColumns];
-                for (int j = 0; j < tmpNumberOfColumns; j++) {
-                    tmpRow[j] = elements.doubleValue(Structure2D.index(structure, i, j));
+            for (int i = 0; i < nbRows; i++) {
+                tmpRow = retVal[i] = new double[nbColumns];
+                for (int j = 0; j < nbColumns; j++) {
+                    tmpRow[j] = elements.doubleValue(Structure2D.index(nbRows, i, j));
                 }
             }
         }
@@ -719,7 +715,7 @@ public final class RawStore implements PhysicalStore<Double> {
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        double[][] rawLeft = RawStore.extract(left, data.length);
+        double[][] rawLeft = RawStore.extract(left, this.getRowDim());
         double[][] rawRight = RawStore.extract(right, complexity);
 
         RawStore.multiply(data, rawLeft, rawRight);
