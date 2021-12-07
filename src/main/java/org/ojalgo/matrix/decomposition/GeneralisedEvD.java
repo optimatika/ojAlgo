@@ -67,7 +67,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
         return myEigenvalue.isOrdered();
     }
 
-    public boolean prepare(final Collectable<N, ? super PhysicalStore<N>> matrixB) {
+    public boolean prepare(final Collectable<? super PhysicalStore<N>> matrixB) {
         return myCholesky.decompose(matrixB);
     }
 
@@ -88,7 +88,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
         if (myCholesky.isComputed()) {
             myReduced = this.reduce(matrix);
         } else {
@@ -96,9 +96,8 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
         }
         if (valuesOnly) {
             return myEigenvalue.computeValuesOnly(myReduced);
-        } else {
-            return myEigenvalue.decompose(myReduced);
         }
+        return myEigenvalue.decompose(myReduced);
     }
 
     @Override
@@ -116,9 +115,8 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
         MatrixStore<N> subV = myEigenvalue.getV();
         if (myCholesky.isComputed()) {
             return this.recover(subV);
-        } else {
-            return subV;
         }
+        return subV;
     }
 
     MatrixStore<N> recover(final MatrixStore<N> reduced) {
@@ -141,12 +139,10 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
 
             if (reduced instanceof PhysicalStore<?>) {
                 myRecovered = (PhysicalStore<N>) reduced;
+            } else if (myRecovered != null) {
+                reduced.supplyTo(myRecovered);
             } else {
-                if (myRecovered != null) {
-                    reduced.supplyTo(myRecovered);
-                } else {
-                    myRecovered = reduced.collect(myFactory);
-                }
+                myRecovered = reduced.collect(myFactory);
             }
 
             myRecovered.substituteBackwards(mtrxL, false, true, false);
@@ -155,7 +151,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
         }
     }
 
-    PhysicalStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
+    PhysicalStore<N> reduce(final Access2D.Collectable<? super PhysicalStore<N>> original) {
 
         MatrixStore<N> mtrxL = myCholesky.getL();
 

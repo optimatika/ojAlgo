@@ -350,7 +350,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         myFullSize = fullSize;
     }
 
-    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true, false);
     }
 
@@ -364,7 +364,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, false, this.isFullSize());
     }
 
@@ -482,11 +482,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return mySingularValues;
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getInverse().multiply(this.collect(rhs));
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
     }
@@ -638,7 +638,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return true;
     }
 
-    protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
+    protected boolean compute(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
         this.reset();
 
@@ -668,11 +668,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return this.computed(computeOK);
     }
 
-    protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean fullSize) {
+    protected boolean computeBidiagonal(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean fullSize) {
         return myBidiagonal.decompose(matrix);
     }
 
-    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
         this.computeBidiagonal(matrix, fullSize);
 

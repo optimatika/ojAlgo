@@ -117,7 +117,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
 
         this.reset();
 
@@ -197,7 +197,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -210,7 +210,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
      *         MatrixStore.
      */
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 

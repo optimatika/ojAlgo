@@ -190,7 +190,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         myFullSize = fullSize;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
 
         this.reset();
 

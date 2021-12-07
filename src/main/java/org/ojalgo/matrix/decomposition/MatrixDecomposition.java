@@ -205,7 +205,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
          * implementation simply calls {@link #decompose(Access2D.Collectable)}.
          */
-        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean decomposeWithoutPivoting(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
 
@@ -276,7 +276,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @param matrix A matrix to decompose
          * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
          */
-        default boolean compute(final Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean compute(final Collectable<? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix) && this.isSolvable();
         }
 
@@ -309,7 +309,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * [A][X]=[B] or [this][return]=[rhs]
          */
-        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs);
+        MatrixStore<N> getSolution(Collectable<? super PhysicalStore<N>> rhs);
 
         /**
          * <p>
@@ -331,7 +331,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
+        MatrixStore<N> getSolution(Collectable<? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
         default Optional<MatrixStore<N>> invert() {
             if (this.isSolvable()) {
@@ -390,7 +390,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return The same as {@link Solver#compute(Collectable)} or {@link #decompose(Collectable)} if the
          *         instance does not implement {@link Solver}.
          */
-        boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
+        boolean computeValuesOnly(Access2D.Collectable<? super PhysicalStore<N>> matrix);
 
     }
 
@@ -410,7 +410,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * @param matrix A matrix to decompose
      * @return true if decomposition suceeded; false if not
      */
-    boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
+    boolean decompose(Access2D.Collectable<? super PhysicalStore<N>> matrix);
 
     /**
      * @return true if decomposition has been attemped and was successful; false if not.

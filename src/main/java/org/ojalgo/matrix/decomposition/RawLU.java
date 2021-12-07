@@ -73,7 +73,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
 
@@ -82,7 +82,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(data, true);
     }
 
-    public boolean decomposeWithoutPivoting(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
 
@@ -135,13 +135,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return epsilon * Math.max(MACHINE_SMALLEST, largest);
     }
 
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
         this.collect(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
 

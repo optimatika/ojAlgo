@@ -34,7 +34,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
 abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, MR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>>
-        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>> {
+        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<TransformableRegion<N>> {
 
     private final MR myDelegate;
     private boolean mySafe = true;

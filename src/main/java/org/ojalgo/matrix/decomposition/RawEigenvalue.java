@@ -125,7 +125,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+        public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs) {
             long numberOfEquations = rhs.countRows();
             DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
             return this.getSolution(rhs, tmpPreallocated);
@@ -197,7 +197,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.getDeterminant();
     }
 
-    public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
 
         double[][] tmpData = this.reset(matrix, false);
 
@@ -206,7 +206,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.doDecompose(tmpData, true);
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
 
         double[][] tmpData = this.reset(matrix, false);
 
@@ -296,7 +296,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return myInverse;
     }
 
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
     }

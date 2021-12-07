@@ -56,7 +56,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends Mutate1D> extends Structure1D {
+    public interface Collectable<R extends Mutate1D> extends Structure1D {
 
         default <I extends R> I collect(final Factory1D<I> factory) {
 
@@ -369,8 +369,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Comparable}
      * type.
      */
-    default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
-        return new Collectable<NN, R>() {
+    default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<R> asCollectable1D() {
+        return new Collectable<R>() {
 
             public long count() {
                 return Access1D.this.count();
@@ -378,8 +378,6 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
             public void supplyTo(final R receiver) {
                 receiver.accept(Access1D.this);
-                //                receiver.reset();
-                //                Access1D.this.nonzeros().forEach(nz -> receiver.set(nz.index(), nz.doubleValue()));
             }
 
         };

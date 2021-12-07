@@ -74,7 +74,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
         super(aFactory);
     }
 
-    public final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean upper) {
+    public final boolean compute(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean upper) {
 
         this.reset();
 
@@ -115,7 +115,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
         return this.computed(true);
     }
 
-    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public final boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true);
     }
 

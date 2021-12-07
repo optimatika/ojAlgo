@@ -198,8 +198,8 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
          *
          * @see #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)
          */
-        default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
-                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+        default boolean computeValuesOnly(final Access2D.Collectable<? super PhysicalStore<N>> matrixA,
+                final Access2D.Collectable<? super PhysicalStore<N>> matrixB) {
             return this.prepare(matrixB) && this.computeValuesOnly(matrixA);
         }
 
@@ -209,12 +209,11 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
          *
          * @see #decompose(org.ojalgo.structure.Access2D.Collectable)
          */
-        default boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
-                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+        default boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrixA, final Access2D.Collectable<? super PhysicalStore<N>> matrixB) {
             return this.prepare(matrixB) && this.decompose(matrixA);
         }
 
-        boolean prepare(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+        boolean prepare(Access2D.Collectable<? super PhysicalStore<N>> matrixB);
 
     }
 

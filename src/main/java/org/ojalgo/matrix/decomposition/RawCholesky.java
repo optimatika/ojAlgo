@@ -85,7 +85,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
 
         double[][] retVal = this.reset(matrix, false);
 
@@ -129,13 +129,13 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs) {
         DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 

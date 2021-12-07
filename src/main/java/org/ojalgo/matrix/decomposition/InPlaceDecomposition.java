@@ -59,7 +59,7 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
         return myInPlace;
     }
 
-    DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
+    DecompositionStore<N> setInPlace(final Access2D.Collectable<? super DecompositionStore<N>> matrix) {
 
         int tmpRowDim = (int) matrix.countRows();
         int tmpColDim = (int) matrix.countColumns();

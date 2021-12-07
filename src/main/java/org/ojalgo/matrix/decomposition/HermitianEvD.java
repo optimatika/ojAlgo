@@ -283,11 +283,11 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
         return myInverse;
     }
 
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public final MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getInverse().multiply(this.collect(rhs));
     }
 
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public final MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
     }
@@ -375,7 +375,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         final int size = (int) matrix.countRows();
 

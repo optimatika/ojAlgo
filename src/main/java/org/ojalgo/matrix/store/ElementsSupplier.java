@@ -41,7 +41,7 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Comparable<N>> extends Operate2D<N, ElementsSupplier<N>>, Access2D.Collectable<N, TransformableRegion<N>> {
+public interface ElementsSupplier<N extends Comparable<N>> extends Operate2D<N, ElementsSupplier<N>>, Access2D.Collectable<TransformableRegion<N>> {
 
     default ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);

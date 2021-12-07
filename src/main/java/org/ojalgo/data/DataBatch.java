@@ -37,7 +37,7 @@ import org.ojalgo.structure.Mutate2D.Receiver;
  *
  * @author apete
  */
-public final class DataBatch implements Access2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class DataBatch implements Access2D<Double>, Access2D.Collectable<Mutate2D.Receiver<Double>> {
 
     /**
      * With the batch size/capacity specified. The returned instance will throw an exception if too many rows

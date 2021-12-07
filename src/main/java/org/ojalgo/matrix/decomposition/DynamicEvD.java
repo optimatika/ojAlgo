@@ -68,17 +68,15 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     public N getDeterminant() {
         if (myHermitian) {
             return myHermitianDelegate.getDeterminant();
-        } else {
-            return myGeneralDelegate.getDeterminant();
         }
+        return myGeneralDelegate.getDeterminant();
     }
 
     public ComplexNumber getTrace() {
         if (myHermitian) {
             return myHermitianDelegate.getTrace();
-        } else {
-            return myGeneralDelegate.getTrace();
         }
+        return myGeneralDelegate.getTrace();
     }
 
     public boolean isHermitian() {
@@ -99,9 +97,9 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
-        if (matrix instanceof MatrixStore) {
+        if (matrix instanceof MatrixStore<?>) {
             myHermitian = ((MatrixStore<?>) matrix).isHermitian();
         } else {
             myHermitian = false;
@@ -109,36 +107,32 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
 
         if (myHermitian) {
             return myHermitianDelegate.doDecompose(matrix, valuesOnly);
-        } else {
-            return myGeneralDelegate.doDecompose(matrix, valuesOnly);
         }
+        return myGeneralDelegate.doDecompose(matrix, valuesOnly);
     }
 
     @Override
     protected MatrixStore<N> makeD() {
         if (myHermitian) {
             return myHermitianDelegate.getD();
-        } else {
-            return myGeneralDelegate.getD();
         }
+        return myGeneralDelegate.getD();
     }
 
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
         if (myHermitian) {
             return myHermitianDelegate.getEigenvalues();
-        } else {
-            return myGeneralDelegate.getEigenvalues();
         }
+        return myGeneralDelegate.getEigenvalues();
     }
 
     @Override
     protected MatrixStore<N> makeV() {
         if (myHermitian) {
             return myHermitianDelegate.getV();
-        } else {
-            return myGeneralDelegate.getV();
         }
+        return myGeneralDelegate.getV();
     }
 
 }

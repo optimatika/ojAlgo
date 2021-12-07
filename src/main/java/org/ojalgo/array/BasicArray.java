@@ -48,7 +48,7 @@ import org.ojalgo.structure.StructureAnyD;
  * @author apete
  */
 public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<Mutate1D> {
 
     public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
 

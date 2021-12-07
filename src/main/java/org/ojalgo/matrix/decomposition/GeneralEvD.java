@@ -106,7 +106,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         final int tmpDiagDim = (int) matrix.countRows();
 

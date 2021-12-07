@@ -73,11 +73,11 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return this.getDeterminant();
     }
 
-    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.decompose(matrix, true);
     }
 
-    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public final boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.decompose(matrix, false);
     }
 
@@ -142,7 +142,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         mySquareDim = 0;
     }
 
-    private final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    private final boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         this.reset();
 
@@ -161,7 +161,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return this.computed(retVal);
     }
 
-    protected abstract boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly);
+    protected abstract boolean doDecompose(final Collectable<? super PhysicalStore<N>> matrix, final boolean valuesOnly);
 
     protected abstract MatrixStore<N> makeD();
 

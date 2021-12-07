@@ -42,13 +42,13 @@ class SimultaneousTridiagonal extends TridiagonalDecomposition<Double> {
         super(Primitive64Store.FACTORY);
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
 
         this.setInPlace(matrix);
 
         final int size = this.getMinDim();
 
-        if ((myDiagD == null) || (myDiagD.count() == size)) {
+        if (myDiagD == null || myDiagD.count() == size) {
             myDiagD = Primitive64Array.make(size);
             myDiagE = Primitive64Array.make(size);
         }

@@ -51,7 +51,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  */
 public final class Array2D<N extends Comparable<N>>
         implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
-        Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
+        Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
     public static final class Factory<N extends Comparable<N>>
             implements Factory2D.Dense<Array2D<N>>, Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {

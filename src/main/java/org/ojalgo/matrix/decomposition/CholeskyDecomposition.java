@@ -105,7 +105,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> aStore) {
         return this.compute(aStore, false);
     }
 
@@ -137,7 +137,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -160,7 +160,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 
@@ -247,7 +247,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return mySPD && myMinDiag > this.getRankThreshold();
     }
 
-    boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
+    boolean compute(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
 
         this.reset();
 

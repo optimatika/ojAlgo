@@ -59,11 +59,11 @@ abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDec
         return myFactory.make(numberOfRows, numberOfColumns);
     }
 
-    protected final MatrixStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
-        if (source instanceof MatrixStore) {
+    protected final MatrixStore<N> collect(final Access2D.Collectable<? super DecompositionStore<N>> source) {
+        if (source instanceof MatrixStore<?>) {
             return (MatrixStore<N>) source;
         }
-        if (source instanceof Access2D) {
+        if (source instanceof Access2D<?>) {
             return myFactory.makeWrapper((Access2D<?>) source);
         }
         return source.collect(myFactory);

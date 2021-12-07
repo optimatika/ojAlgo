@@ -42,8 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public final class ComplexNumber
-        implements SelfDeclaringScalar<ComplexNumber>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D> {
+public final class ComplexNumber implements SelfDeclaringScalar<ComplexNumber>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Mutate2D> {
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 

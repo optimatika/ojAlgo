@@ -83,7 +83,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         super();
     }
 
-    public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -97,7 +97,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
@@ -175,12 +175,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         System.arraycopy(s, 0, values, 0, Math.min(s.length, values.length));
     }
 
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs) {
         return this.getSolution(rhs, this.allocate(this.getMinDim(), rhs.countColumns()));
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
     }
@@ -257,7 +257,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return true;
     }
 
-    boolean doDecompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix, final boolean factors) {
+    boolean doDecompose(final Access2D.Collectable<? super PhysicalStore<Double>> matrix, final boolean factors) {
 
         myTransposed = matrix.countRows() < matrix.countColumns();
 

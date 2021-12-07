@@ -64,7 +64,7 @@ public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
-    boolean compute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean upper);
+    boolean compute(Access2D.Collectable<? super PhysicalStore<N>> matrix, boolean upper);
 
     MatrixStore<N> getH();
 

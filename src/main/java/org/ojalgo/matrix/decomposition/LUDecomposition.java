@@ -100,11 +100,11 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -163,7 +163,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -184,7 +184,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         preallocated.fillMatching(this.collect(rhs).row(myPivot.getOrder()));
 
@@ -264,7 +264,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
-    private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
+    private boolean doDecompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean pivoting) {
 
         this.reset();
 

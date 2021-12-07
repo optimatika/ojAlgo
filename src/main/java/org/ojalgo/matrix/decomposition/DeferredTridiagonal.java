@@ -146,7 +146,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         super(factory);
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
 
         this.reset();
 

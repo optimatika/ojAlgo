@@ -55,14 +55,14 @@ abstract class ConstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
+    protected final Collectable<? super PhysicalStore<Double>> getIterationKKT() {
         MatrixStore<Double> iterQ = this.getIterationQ();
         MatrixStore<Double> iterA = this.getIterationA();
         return iterQ.right(iterA.transpose()).below(iterA);
     }
 
     @Override
-    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
+    protected final Collectable<? super PhysicalStore<Double>> getIterationRHS() {
         MatrixStore<Double> iterC = this.getIterationC();
         MatrixStore<Double> iterB = this.getIterationB();
         return iterC.below(iterB);

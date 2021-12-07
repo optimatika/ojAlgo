@@ -101,11 +101,11 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -171,12 +171,12 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         int[] order = myPivot.getOrder();
 
@@ -254,7 +254,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
-    private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
+    private boolean doDecompose(final Access2D.Collectable<? super PhysicalStore<N>> matrix, final boolean pivoting) {
 
         this.reset();
 

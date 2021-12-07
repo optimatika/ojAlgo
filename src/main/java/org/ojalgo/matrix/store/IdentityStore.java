@@ -81,7 +81,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     @SuppressWarnings("unchecked")
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         if (right instanceof Access2D.Collectable) {
-            ((Access2D.Collectable<N, TransformableRegion<N>>) right).supplyTo(target);
+            ((Access2D.Collectable<TransformableRegion<N>>) right).supplyTo(target);
         } else {
             super.multiply(right, target);
         }
