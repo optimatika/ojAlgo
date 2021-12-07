@@ -73,7 +73,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
-    public interface Collectable<R extends Mutate2D> extends Structure2D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate2D> extends Structure2D {
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 
@@ -468,8 +468,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return retVal;
     }
 
-    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<R>() {
+    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
+        return new Access2D.Collectable<Double, R>() {
 
             public long countColumns() {
                 return 1L;
@@ -487,8 +487,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         };
     }
 
-    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<R> newPrimitiveRowCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<R>() {
+    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveRowCollectable(final Access1D<?> anything1D) {
+        return new Access2D.Collectable<Double, R>() {
 
             public long countColumns() {
                 return anything1D.count();
@@ -611,8 +611,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         };
     }
 
-    default <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<R> asCollectable2D() {
-        return new Collectable<R>() {
+    default <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
+        return new Collectable<NN, R>() {
 
             public long countColumns() {
                 return Access2D.this.countColumns();

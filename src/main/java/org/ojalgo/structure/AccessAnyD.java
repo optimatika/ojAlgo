@@ -52,7 +52,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     }
 
-    public interface Collectable<R extends MutateAnyD> extends StructureAnyD {
+    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD> extends StructureAnyD {
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 
@@ -157,7 +157,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             tmpCount = accessA.count(d);
             retVal &= tmpCount == accessB.count(d);
             d++;
-        } while (retVal && (d <= 3 || tmpCount > 1));
+        } while (retVal && ((d <= 3) || (tmpCount > 1)));
 
         return retVal && Access1D.equals(accessA, accessB, accuracy);
     }
@@ -166,8 +166,8 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return Arrays.toString(array.shape()) + " " + Access1D.toString(array);
     }
 
-    default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<R> asCollectableAnyD() {
-        return new Collectable<R>() {
+    default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
+        return new Collectable<NN, R>() {
 
             public long count(final int dimension) {
                 return AccessAnyD.this.count(dimension);

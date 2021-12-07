@@ -80,7 +80,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     @SuppressWarnings("unchecked")
-    protected MatrixStore<Double> collect(final Access2D.Collectable<? super DecompositionStore<Double>> source) {
+    protected MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
         if (source instanceof MatrixStore) {
             return (MatrixStore<Double>) source;
@@ -113,7 +113,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return PrimitiveScalar.FACTORY;
     }
 
-    protected Collectable<? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
+    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
         return Primitive64Store.FACTORY.makeWrapper(matrix);
     }
 

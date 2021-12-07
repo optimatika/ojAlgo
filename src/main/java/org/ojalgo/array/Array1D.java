@@ -53,8 +53,8 @@ import org.ojalgo.tensor.TensorFactory1D;
  * @author apete
  */
 public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
-        implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Collectable<Mutate1D>,
-        Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+        implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf,
+        Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Comparable<N>>
             implements Factory1D.Dense<Array1D<N>>, Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {

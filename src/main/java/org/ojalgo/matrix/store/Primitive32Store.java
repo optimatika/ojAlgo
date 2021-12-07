@@ -50,14 +50,7 @@ import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.ColumnView;
-import org.ojalgo.structure.ElementView2D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.RowView;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.structure.*;
 import org.ojalgo.type.NumberDefinition;
 
 /**
@@ -390,6 +383,10 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     public Double aggregateRow(final long row, final long col, final Aggregator aggregator) {
         return myUtility.aggregateRow(row, col, aggregator);
+    }
+
+    public <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Access2D.Collectable<NN, R> asCollectable2D() {
+        return myUtility.asCollectable2D();
     }
 
     public Array1D<Double> asList() {
