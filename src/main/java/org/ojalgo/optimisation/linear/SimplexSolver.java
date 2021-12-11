@@ -258,25 +258,22 @@ public abstract class SimplexSolver extends LinearSolver {
             } else {
 
                 if (myPoint.isPhase2()) {
-
                     this.setState(State.UNBOUNDED);
-
                 } else {
-
                     this.setState(State.INFEASIBLE);
                 }
+
                 retVal = false;
             }
 
         } else {
+
             if (myPoint.isPhase1()) {
-
                 this.setState(State.INFEASIBLE);
-
             } else {
-
                 this.setState(State.OPTIMAL);
             }
+
             retVal = false;
         }
 
@@ -388,12 +385,12 @@ public abstract class SimplexSolver extends LinearSolver {
 
             if ((denom > ZERO || specialCase) && !PIVOT.isZero(denom)) {
 
-                if (ratio >= ZERO && ratio < minRatio || !RATIO.isDifferent(minRatio, ratio) && denom > curDenom) {
+                if (ratio >= ZERO && (ratio < minRatio || !RATIO.isDifferent(minRatio, ratio) && denom > curDenom)) {
 
                     retVal = i;
                     minRatio = ratio;
-                    curDenom = denom;
-                    // curDenom = degenerate ? MACHINE_LARGEST : denom;
+                    // curDenom = denom;
+                    curDenom = degenerate ? Math.max(denom, ONE) : denom;
 
                     if (this.isLogDebug()) {
                         this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {},\tArtificial: {}.", i, ratio, numer, denom, artificial);

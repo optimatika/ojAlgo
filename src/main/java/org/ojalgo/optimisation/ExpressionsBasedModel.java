@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
@@ -562,10 +563,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
-    private static final ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
     private static final List<ExpressionsBasedModel.Integration<?>> FALLBACK_INTEGRATIONS = new ArrayList<>();
-    private static final IntegerSolver.ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
-    private static final LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
@@ -1425,7 +1423,91 @@ public final class ExpressionsBasedModel extends AbstractModel {
      * @return A stream of variables that are not fixed
      */
     public Stream<Variable> variables() {
-        return myVariables.stream().filter((final Variable v) -> !v.isEqualityConstraint());
+        return myVariables.stream().filter(v -> !v.isEqualityConstraint());
+    }
+
+    /**
+     * Will indentify constarints with equal variables set, and check if those can be combined or not.
+     */
+    private void identifyRedundantConstraints() {
+
+        for (Entry<String, Expression> refEntry : myExpressions.entrySet()) {
+
+            String refName = refEntry.getKey();
+            Expression refExpression = refEntry.getValue();
+            if (refExpression.isConstraint() && !refExpression.isRedundant()) {
+                Set<IntIndex> refLinearKeySet = refExpression.getLinearKeySet();
+
+                for (Entry<String, Expression> subEntry : myExpressions.entrySet()) {
+
+                    String subName = subEntry.getKey();
+                    Expression subExpression = subEntry.getValue();
+                    if (subExpression.isConstraint() && !subExpression.isRedundant()) {
+                        Set<IntIndex> subLinearKeySet = subExpression.getLinearKeySet();
+
+                        if (!refName.equals(subName) && refLinearKeySet.equals(subLinearKeySet)) {
+
+                            BigDecimal fctVal = null;
+                            BigDecimal tmpVal = null;
+
+                            for (IntIndex index : refLinearKeySet) {
+
+                                tmpVal = BigMath.DIVIDE.invoke(refExpression.get(index), subExpression.get(index));
+
+                                if (fctVal == null) {
+                                    fctVal = tmpVal;
+                                } else if (tmpVal.compareTo(fctVal) != 0) {
+                                    fctVal = null;
+                                    break;
+                                }
+                            }
+
+                            if (fctVal != null) {
+
+                                BasicLogger.debug("Match! {}", fctVal);
+                                BasicLogger.debug("Ref: {}", refExpression);
+                                BasicLogger.debug("Sub: {}", subExpression);
+
+                                boolean pos = fctVal.signum() == 1;
+
+                                BigDecimal refLo = refExpression.getLowerLimit();
+                                BigDecimal refUp = refExpression.getUpperLimit();
+
+                                BigDecimal subLo = pos ? subExpression.getLowerLimit() : subExpression.getUpperLimit();
+                                BigDecimal subUp = pos ? subExpression.getUpperLimit() : subExpression.getLowerLimit();
+
+                                if (fctVal.compareTo(ONE) != 0) {
+                                    if (subLo != null) {
+                                        subLo = subLo.multiply(fctVal);
+                                    }
+                                    if (subUp != null) {
+                                        subUp = subUp.multiply(fctVal);
+                                    }
+                                }
+
+                                if (subLo != null) {
+                                    if (refLo != null) {
+                                        refExpression.lower(subLo.max(refLo));
+                                    } else {
+                                        refExpression.lower(subLo);
+                                    }
+                                }
+
+                                if (subUp != null) {
+                                    if (refUp != null) {
+                                        refExpression.upper(subUp.min(refUp));
+                                    } else {
+                                        refExpression.upper(subUp);
+                                    }
+                                }
+
+                                subExpression.setRedundant();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void scanEntities() {
@@ -1501,13 +1583,13 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         if (retVal == null) {
             if (this.isAnyVariableInteger()) {
-                if (INTEGER_INTEGRATION.isCapable(this)) {
-                    retVal = INTEGER_INTEGRATION;
+                if (IntegerSolver.INTEGRATION.isCapable(this)) {
+                    retVal = IntegerSolver.INTEGRATION;
                 }
-            } else if (CONVEX_INTEGRATION.isCapable(this)) {
-                retVal = CONVEX_INTEGRATION;
-            } else if (LINEAR_INTEGRATION.isCapable(this)) {
-                retVal = LINEAR_INTEGRATION;
+            } else if (ConvexSolver.INTEGRATION.isCapable(this)) {
+                retVal = ConvexSolver.INTEGRATION;
+            } else if (LinearSolver.INTEGRATION.isCapable(this)) {
+                retVal = LinearSolver.INTEGRATION;
             }
         }
 
@@ -1639,7 +1721,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
             Set<IntIndex> fixedVariables = this.getFixedVariables();
             for (Expression expr : this.getExpressions()) {
                 if (expr.isConstraint() && expr.isRedundant() && expr.countQuadraticFactors() == 0) {
-                    // Specifically need to check if constraints that have been determined redundant
+                    // Specifically need to check that constraints that have been determined redundant
                     // are not infeasible
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
@@ -1654,6 +1736,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
                     Presolvers.checkFeasibility(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
                 }
             }
+        }
+
+        if (!myShallowCopy) {
+            // this.identifyRedundantConstraints();
         }
 
         myVariablesCategorisation.update(myVariables);

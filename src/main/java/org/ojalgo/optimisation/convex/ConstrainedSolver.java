@@ -73,7 +73,6 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         boolean spdQ = super.initialise(kickStarter);
 
-        boolean fullRankA = true;
         if (options.validate) {
 
             MatrixStore<Double> iterationA = this.getIterationA();
@@ -82,7 +81,6 @@ abstract class ConstrainedSolver extends ConvexSolver {
                 this.computeGeneral(iterationA.countRows() < iterationA.countColumns() ? iterationA.transpose() : iterationA);
                 if (this.getRankGeneral() != iterationA.countRows()) {
 
-                    fullRankA = false;
                     this.setState(State.INVALID);
 
                     if (!this.isLogDebug()) {
@@ -93,7 +91,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
             }
         }
 
-        return spdQ && fullRankA;
+        return spdQ;
     }
 
     /**

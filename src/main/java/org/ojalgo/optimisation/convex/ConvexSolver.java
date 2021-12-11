@@ -25,10 +25,12 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.NumberList;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
@@ -355,6 +357,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
     private static final double SMALL_DIAGONAL_FACTOR = RELATIVELY_SMALL + MACHINE_EPSILON;
@@ -363,31 +367,29 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         destinationBuilder.reset();
 
-        final List<Variable> freeVariables = sourceModel.getFreeVariables();
-        final Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
+        List<Variable> freeVariables = sourceModel.getFreeVariables();
+        Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
 
-        final int numbVars = freeVariables.size();
+        int numbVars = freeVariables.size();
 
         // AE & BE
 
-        final List<Expression> tmpEqExpr = sourceModel.constraints()
-                .filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final int numbEqExpr = tmpEqExpr.size();
+        List<Expression> tmpEqExpr = sourceModel.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        int numbEqExpr = tmpEqExpr.size();
 
         if (numbEqExpr > 0) {
 
-            final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE64.make(numbEqExpr, numbVars);
-            final PhysicalStore<Double> mtrxBE = Primitive64Store.FACTORY.make(numbEqExpr, 1);
+            SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE64.make(numbEqExpr, numbVars);
+            PhysicalStore<Double> mtrxBE = Primitive64Store.FACTORY.make(numbEqExpr, 1);
 
             for (int i = 0; i < numbEqExpr; i++) {
 
-                final Expression tmpExpression = tmpEqExpr.get(i).compensate(fixedVariables);
+                Expression tmpExpression = tmpEqExpr.get(i).compensate(fixedVariables);
 
-                for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
-                    final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
-                    if (tmpIndex >= 0) {
-                        mtrxAE.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
-                    }
+                for (IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
+                    int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+                    mtrxAE.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                 }
                 mtrxBE.set(i, 0, tmpExpression.getAdjustedUpperLimit());
             }
@@ -397,22 +399,21 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         // Q & C
 
-        final Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
+        Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
             mtrxQ = Primitive64Store.FACTORY.make(numbVars, numbVars);
 
-            final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
+            BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
-            for (final IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
-                final int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
-                final int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
-                if (tmpRow >= 0 && tmpColumn >= 0) {
-                    tmpModifier = tmpBaseFunc.second(tmpObjExpr.getAdjustedQuadraticFactor(tmpKey));
-                    mtrxQ.modifyOne(tmpRow, tmpColumn, tmpModifier);
-                    mtrxQ.modifyOne(tmpColumn, tmpRow, tmpModifier);
-                }
+            for (IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
+                int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
+                int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
+                double adjustedQuadraticFactor = tmpObjExpr.getAdjustedQuadraticFactor(tmpKey);
+                tmpModifier = tmpBaseFunc.second(adjustedQuadraticFactor);
+                mtrxQ.modifyOne(tmpRow, tmpColumn, tmpModifier);
+                mtrxQ.modifyOne(tmpColumn, tmpRow, tmpModifier);
             }
         }
 
@@ -420,18 +421,14 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
             mtrxC = Primitive64Store.FACTORY.make(numbVars, 1);
             if (sourceModel.isMinimisation()) {
-                for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
-                    final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
-                    if (tmpIndex >= 0) {
-                        mtrxC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
-                    }
+                for (IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
+                    int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+                    mtrxC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
                 }
             } else {
-                for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
-                    final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
-                    if (tmpIndex >= 0) {
-                        mtrxC.set(tmpIndex, 0, tmpObjExpr.getAdjustedLinearFactor(tmpKey));
-                    }
+                for (IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
+                    int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+                    mtrxC.set(tmpIndex, 0, tmpObjExpr.getAdjustedLinearFactor(tmpKey));
                 }
             }
         }
@@ -449,34 +446,32 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         // AI & BI
 
-        final List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
+        List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
                 .collect(Collectors.toList());
-        final int numbUpExpr = tmpUpExpr.size();
+        int numbUpExpr = tmpUpExpr.size();
 
-        final List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
-        final int numbUpVar = tmpUpVar.size();
+        List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
+        int numbUpVar = tmpUpVar.size();
 
-        final List<Expression> tmpLoExpr = sourceModel.constraints()
-                .filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final int numbLoExpr = tmpLoExpr.size();
+        List<Expression> tmpLoExpr = sourceModel.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        int numbLoExpr = tmpLoExpr.size();
 
-        final List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
-        final int numbLoVar = tmpLoVar.size();
+        List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
+        int numbLoVar = tmpLoVar.size();
 
         if (numbUpExpr + numbUpVar + numbLoExpr + numbLoVar > 0) {
 
-            final RowsSupplier<Double> mtrxAI = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
-            final PhysicalStore<Double> mtrxBI = Primitive64Store.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
+            RowsSupplier<Double> mtrxAI = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
+            PhysicalStore<Double> mtrxBI = Primitive64Store.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
             if (numbUpExpr > 0) {
                 for (int i = 0; i < numbUpExpr; i++) {
-                    final SparseArray<Double> rowAI = mtrxAI.addRow();
-                    final Expression tmpExpression = tmpUpExpr.get(i).compensate(fixedVariables);
-                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
-                        final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
-                        if (tmpIndex >= 0) {
-                            rowAI.set(tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
-                        }
+                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    Expression tmpExpression = tmpUpExpr.get(i).compensate(fixedVariables);
+                    for (IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
+                        int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+                        rowAI.set(tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                     }
                     mtrxBI.set(i, 0, tmpExpression.getAdjustedUpperLimit());
                 }
@@ -484,8 +479,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbUpVar > 0) {
                 for (int i = 0; i < numbUpVar; i++) {
-                    final SparseArray<Double> rowAI = mtrxAI.addRow();
-                    final Variable tmpVariable = tmpUpVar.get(i);
+                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    Variable tmpVariable = tmpUpVar.get(i);
                     rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
                     mtrxBI.set(numbUpExpr + i, 0, tmpVariable.getAdjustedUpperLimit());
                 }
@@ -493,13 +488,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbLoExpr > 0) {
                 for (int i = 0; i < numbLoExpr; i++) {
-                    final SparseArray<Double> rowAI = mtrxAI.addRow();
-                    final Expression tmpExpression = tmpLoExpr.get(i).compensate(fixedVariables);
-                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
-                        final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
-                        if (tmpIndex >= 0) {
-                            rowAI.set(tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
-                        }
+                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    Expression tmpExpression = tmpLoExpr.get(i).compensate(fixedVariables);
+                    for (IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
+                        int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+                        rowAI.set(tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
                     }
                     mtrxBI.set(numbUpExpr + numbUpVar + i, 0, -tmpExpression.getAdjustedLowerLimit());
                 }
@@ -507,8 +500,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbLoVar > 0) {
                 for (int i = 0; i < numbLoVar; i++) {
-                    final SparseArray<Double> rowAI = mtrxAI.addRow();
-                    final Variable tmpVariable = tmpLoVar.get(i);
+                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    Variable tmpVariable = tmpLoVar.get(i);
                     rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
                     mtrxBI.set(numbUpExpr + numbUpVar + numbLoExpr + i, 0, -tmpVariable.getAdjustedLowerLimit());
                 }
@@ -516,6 +509,137 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             destinationBuilder.inequalities(mtrxAI, mtrxBI);
         }
+    }
+
+    public static void copyExperimental(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
+
+        destinationBuilder.reset();
+
+        List<Variable> freeVariables = sourceModel.getFreeVariables();
+        Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
+
+        int numbVars = freeVariables.size();
+
+        // Q & C
+
+        Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
+        boolean maximisation = sourceModel.isMaximisation();
+
+        PhysicalStore<Double> mtrxQ = null;
+        if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
+            mtrxQ = Primitive64Store.FACTORY.make(numbVars, numbVars);
+
+            for (IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
+
+                int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
+                int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
+
+                if (tmpRow >= 0 && tmpColumn >= 0) {
+                    double adjustedQuadraticFactor = tmpObjExpr.getAdjustedQuadraticFactor(tmpKey);
+                    double addition = maximisation ? -adjustedQuadraticFactor : adjustedQuadraticFactor;
+                    mtrxQ.add(tmpRow, tmpColumn, addition);
+                    mtrxQ.add(tmpColumn, tmpRow, addition);
+                }
+            }
+        }
+
+        PhysicalStore<Double> mtrxC = null;
+        if (tmpObjExpr.isAnyLinearFactorNonZero()) {
+            mtrxC = Primitive64Store.FACTORY.make(numbVars, 1);
+
+            for (IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
+
+                int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
+
+                if (tmpIndex >= 0) {
+                    double adjustedLinearFactor = tmpObjExpr.getAdjustedLinearFactor(tmpKey);
+                    double value = maximisation ? adjustedLinearFactor : -adjustedLinearFactor;
+                    mtrxC.set(tmpIndex, value);
+                }
+            }
+        }
+
+        if (mtrxQ == null && mtrxC == null) {
+            // In some very rare case the model was verified to be a quadratic
+            // problem, but then the presolver eliminated/fixed all variables
+            // part of the objective function - then we would end up here.
+            // Rather than always having to do very expensive checks we simply
+            // generate a well-behaved objective function here.
+            mtrxQ = Primitive64Store.FACTORY.makeEye(numbVars, numbVars);
+        }
+
+        destinationBuilder.objective(mtrxQ, mtrxC);
+
+        // AE & BE
+
+        // Defined as 2 inequalities
+
+        // AI & BI
+
+        RowsSupplier<Double> body = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
+        NumberList<Double> rhs = NumberList.factory(Primitive64Array.FACTORY).make();
+        AtomicInteger rowIndex = new AtomicInteger(0);
+
+        sourceModel.variables().forEach(variable -> {
+
+            if (variable.isLowerLimitSet()) {
+
+                SparseArray<Double> bodyRow = body.addRow();
+                int i = rowIndex.incrementAndGet();
+
+                int j = sourceModel.indexOfFreeVariable(variable);
+
+                bodyRow.set(j, -variable.getAdjustmentFactor());
+
+                rhs.add(-variable.getAdjustedLowerLimit());
+            }
+
+            if (variable.isUpperLimitSet()) {
+
+                SparseArray<Double> bodyRow = body.addRow();
+                int i = rowIndex.incrementAndGet();
+
+                int tmpIndex = sourceModel.indexOfFreeVariable(variable);
+
+                bodyRow.set(tmpIndex, variable.getAdjustmentFactor());
+
+                rhs.add(variable.getAdjustedUpperLimit());
+            }
+        });
+
+        sourceModel.constraints().forEach(constraint -> {
+
+            if (constraint.isLowerLimitSet()) {
+
+                SparseArray<Double> bodyRow = body.addRow();
+                int i = rowIndex.incrementAndGet();
+
+                for (IntIndex tmpKey : constraint.getLinearKeySet()) {
+                    int j = sourceModel.indexOfFreeVariable(tmpKey.index);
+
+                    bodyRow.set(j, -constraint.getAdjustedLinearFactor(tmpKey));
+
+                }
+                rhs.add(-constraint.getAdjustedLowerLimit());
+            }
+
+            if (constraint.isUpperLimitSet()) {
+
+                SparseArray<Double> bodyRow = body.addRow();
+                int i = rowIndex.incrementAndGet();
+
+                for (IntIndex tmpKey : constraint.getLinearKeySet()) {
+                    int j = sourceModel.indexOfFreeVariable(tmpKey.index);
+
+                    bodyRow.set(j, constraint.getAdjustedLinearFactor(tmpKey));
+
+                }
+                rhs.add(constraint.getAdjustedUpperLimit());
+            }
+        });
+
+        destinationBuilder.inequalities(body, rhs);
+
     }
 
     /**
@@ -536,6 +660,14 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    static ConvexSolver.Builder builder(final MatrixStore<Double>[] matrices) {
+        return new ConvexSolver.Builder(matrices);
+    }
+
+    static ConvexSolver of(final MatrixStore<Double>[] matrices) {
+        return ConvexSolver.builder(matrices).build();
     }
 
     static ConvexObjectiveFunction toObjectiveFunction(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
@@ -830,8 +962,28 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return false;
     }
 
+    /**
+     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}. IF
+     * the LP was solved to optimality but the Q matrix (or the entire objective function) was disregarded
+     * then the returned state will just be {@link State#FEASIBLE}.
+     */
     protected Optimisation.Result solveLP() {
-        return LinearSolver.solve(myMatrices, options, !myZeroQ);
+
+        Result resultLP = LinearSolver.solve(myMatrices, options, !myZeroQ);
+
+        if (!myZeroQ && resultLP.getState().isOptimal()) {
+            return resultLP.withState(State.FEASIBLE);
+        }
+
+        return resultLP;
+    }
+
+    boolean isPatchedQ() {
+        return myPatchedQ;
+    }
+
+    boolean isZeroQ() {
+        return myZeroQ;
     }
 
 }

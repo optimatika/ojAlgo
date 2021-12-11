@@ -44,13 +44,6 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
-    public static LinearSolver newSolver(final ExpressionsBasedModel model) {
-
-        SimplexTableau tableau = PrimalSimplex.build(model);
-
-        return new PrimalSimplex(tableau, model.options);
-    }
-
     /**
      * @deprecated v50 Use {@link StandardBuilder} instead
      */
@@ -325,6 +318,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+
     /**
      * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
      *             {@link LinearSolver#newGeneralBuilder()} instead.
@@ -345,6 +340,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
+    }
+
+    public static LinearSolver newSolver(final ExpressionsBasedModel model) {
+
+        SimplexTableau tableau = PrimalSimplex.build(model);
+
+        return new PrimalSimplex(tableau, model.options);
     }
 
     public static LinearSolver.StandardBuilder newStandardBuilder() {
