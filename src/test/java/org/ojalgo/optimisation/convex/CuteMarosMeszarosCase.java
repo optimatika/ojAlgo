@@ -21,7 +21,13 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -47,16 +53,85 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class CuteMarosMeszarosCase extends OptimisationConvexTests implements ModelFileMPS {
 
+    public static final class ModelInfo {
+
+        /**
+         * number of rows in A
+         */
+        public int M;
+        /**
+         * number of variables
+         */
+        public int N;
+        /**
+         * number of nonzeros in A
+         */
+        public int NZ;
+        /**
+         * solution value obtained by the default settings of BPMPD solver
+         */
+        public BigDecimal OPT;
+        /**
+         * number of quadratic variables
+         */
+        public int QN;
+        /**
+         * number of off-diagonal entries in the lower triangular part of Q
+         */
+        public int QNZ;
+
+    }
+
+    public static final Map<String, ModelInfo> MODEL_INFO;
+
     /**
      * The correct/optimal objective function value is given with 8 digits in the file 00README.QP.
      */
     private static final NumberContext ACCURACY = NumberContext.of(8, 12);
 
-    static void doTest(final String name, final String expMinValString) {
-        CuteMarosMeszarosCase.doTest(name, expMinValString, ACCURACY);
+    static {
+
+        Map<String, ModelInfo> modelInfo = new HashMap<>();
+
+        String line;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(TestUtils.getResource("optimisation", "marosmeszaros", "00README.CSV")))) {
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] parts = line.split("\\s+");
+
+                String key = parts[0].toUpperCase();
+
+                ModelInfo value = new ModelInfo();
+
+                value.M = Integer.parseInt(parts[1]);
+                value.N = Integer.parseInt(parts[2]);
+                value.NZ = Integer.parseInt(parts[3]);
+                value.QN = Integer.parseInt(parts[4]);
+                value.QNZ = Integer.parseInt(parts[5]);
+                value.OPT = new BigDecimal(parts[6]);
+
+                modelInfo.put(key, value);
+            }
+
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+
+        // Overide with values known to be better
+
+        modelInfo.get("HS268").OPT = BigMath.ZERO;
+
+        MODEL_INFO = Collections.unmodifiableMap(modelInfo);
     }
 
-    static void doTest(final String name, final String expMinValString, final NumberContext accuracy) {
+    static void doTest(final String name) {
+        CuteMarosMeszarosCase.doTest(name, ACCURACY);
+    }
+
+    static void doTest(final String name, final NumberContext accuracy) {
+        String expMinValString = MODEL_INFO.get(name.substring(0, name.indexOf("."))).OPT.toPlainString();
         ModelFileMPS.makeAndAssert("marosmeszaros", name, expMinValString, null, false, accuracy != null ? accuracy : ACCURACY, null);
     }
 
@@ -72,79 +147,79 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("slow")
     public void testAUG2D() {
-        CuteMarosMeszarosCase.doTest("AUG2D.SIF", "1.6874118e+06");
+        CuteMarosMeszarosCase.doTest("AUG2D.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG2DC() {
-        CuteMarosMeszarosCase.doTest("AUG2DC.SIF", "1.8183681e+06");
+        CuteMarosMeszarosCase.doTest("AUG2DC.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG2DCQP() {
-        CuteMarosMeszarosCase.doTest("AUG2DCQP.SIF", "6.4981348e+06");
+        CuteMarosMeszarosCase.doTest("AUG2DCQP.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG2DQP() {
-        CuteMarosMeszarosCase.doTest("AUG2DQP.SIF", "6.2370121e+06");
+        CuteMarosMeszarosCase.doTest("AUG2DQP.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG3D() {
-        CuteMarosMeszarosCase.doTest("AUG3D.SIF", "5.5406773e+02");
+        CuteMarosMeszarosCase.doTest("AUG3D.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG3DC() {
-        CuteMarosMeszarosCase.doTest("AUG3DC.SIF", "7.7126244e+02");
+        CuteMarosMeszarosCase.doTest("AUG3DC.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG3DCQP() {
-        CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF", "9.9336215e+02");
+        CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF");
     }
 
     @Test
     @Tag("slow")
     public void testAUG3DQP() {
-        CuteMarosMeszarosCase.doTest("AUG3DQP.SIF", "6.7523767e+02");
+        CuteMarosMeszarosCase.doTest("AUG3DQP.SIF");
     }
 
     @Test
     public void testDUALC1() {
-        CuteMarosMeszarosCase.doTest("DUALC1.SIF", "6.1552508e+03");
+        CuteMarosMeszarosCase.doTest("DUALC1.SIF");
     }
 
     @Test
     public void testDUALC2() {
-        CuteMarosMeszarosCase.doTest("DUALC2.SIF", "3.5513077e+03");
+        CuteMarosMeszarosCase.doTest("DUALC2.SIF");
     }
 
     @Test
     public void testDUALC5() {
-        CuteMarosMeszarosCase.doTest("DUALC5.SIF", "4.2723233e+02");
+        CuteMarosMeszarosCase.doTest("DUALC5.SIF");
     }
 
     @Test
     public void testDUALC8() {
-        CuteMarosMeszarosCase.doTest("DUALC8.SIF", "1.8309359e+04");
+        CuteMarosMeszarosCase.doTest("DUALC8.SIF");
     }
 
     @Test
     public void testGENHS28() {
-        CuteMarosMeszarosCase.doTest("GENHS28.SIF", "9.2717369e-01");
+        CuteMarosMeszarosCase.doTest("GENHS28.SIF");
     }
 
     @Test
     public void testHS21() {
-        CuteMarosMeszarosCase.doTest("HS21.SIF", "-9.9960000e+01");
+        CuteMarosMeszarosCase.doTest("HS21.SIF");
     }
 
     /**
@@ -165,13 +240,14 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * Find it somewhat surprising that:
      * <ol>
      * <li>The given value is so inexact. It's a small model. You can validate it with pen and paper.
-     * <li>CPLEX returns a very inexact solution resulting in a value worse than the given.
+     * <li>CPLEX returns a very inexact solution, it's only correct to 2 digits precision, resulting in a
+     * value worse than the given.
      * </ol>
      */
     @Test
     public void testHS268() {
 
-        CuteMarosMeszarosCase.doTest("HS268.SIF", "5.7310705e-07", ACCURACY.withScale(4));
+        CuteMarosMeszarosCase.doTest("HS268.SIF", ACCURACY.withScale(4));
 
         ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
 
@@ -198,37 +274,37 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     @Test
     public void testHS35() {
-        CuteMarosMeszarosCase.doTest("HS35.SIF", "1.1111111e-01", ACCURACY.withPrecision(6));
+        CuteMarosMeszarosCase.doTest("HS35.SIF", ACCURACY.withPrecision(6));
     }
 
     @Test
     public void testHS35MOD() {
-        CuteMarosMeszarosCase.doTest("HS35MOD.SIF", "2.5000000e-01");
+        CuteMarosMeszarosCase.doTest("HS35MOD.SIF");
     }
 
     @Test
     public void testHS51() {
-        CuteMarosMeszarosCase.doTest("HS51.SIF", "8.8817842e-16", ACCURACY.withScale(8));
+        CuteMarosMeszarosCase.doTest("HS51.SIF", ACCURACY.withScale(8));
     }
 
     @Test
     public void testHS52() {
-        CuteMarosMeszarosCase.doTest("HS52.SIF", "5.3266476e+00", ACCURACY.withScale(7));
+        CuteMarosMeszarosCase.doTest("HS52.SIF", ACCURACY.withScale(7));
     }
 
     @Test
     public void testHS53() {
-        CuteMarosMeszarosCase.doTest("HS53.SIF", "4.0930233e+00");
+        CuteMarosMeszarosCase.doTest("HS53.SIF");
     }
 
     @Test
     public void testHS76() {
-        CuteMarosMeszarosCase.doTest("HS76.SIF", "-4.6818182e+00");
+        CuteMarosMeszarosCase.doTest("HS76.SIF");
     }
 
     @Test
     public void testKSIP() {
-        CuteMarosMeszarosCase.doTest("KSIP.SIF", "5.7579794e-01");
+        CuteMarosMeszarosCase.doTest("KSIP.SIF");
     }
 
     /**
@@ -241,7 +317,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQBORE3D() {
-        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", "3.1002008e+03", ACCURACY.withScale(10));
+        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", ACCURACY.withScale(10));
     }
 
     /**
@@ -250,7 +326,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQFORPLAN() {
-        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", "7.4566315e+09", ACCURACY.withScale(5));
+        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", ACCURACY.withScale(5));
     }
 
     /**
@@ -259,7 +335,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQGROW22() {
-        CuteMarosMeszarosCase.doTest("QGROW22.SIF", "-1.4962895e+08", ACCURACY.withScale(6));
+        CuteMarosMeszarosCase.doTest("QGROW22.SIF", ACCURACY.withScale(6));
     }
 
     /**
@@ -268,7 +344,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQPCBOEI1() {
-        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", "1.1503914e+07", ACCURACY.withScale(6));
+        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", ACCURACY.withScale(6));
     }
 
     /**
@@ -280,12 +356,12 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQPCSTAIR() {
-        CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF", "6.2043875e+06");
+        CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF");
     }
 
     @Test
     public void testQPTEST() {
-        CuteMarosMeszarosCase.doTest("QPTEST.SIF", "4.3718750e+00");
+        CuteMarosMeszarosCase.doTest("QPTEST.SIF");
     }
 
     /**
@@ -299,7 +375,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQRECIPE() {
-        CuteMarosMeszarosCase.doTest("QRECIPE.SIF", "-2.6661600e+02", ACCURACY.withScale(7));
+        CuteMarosMeszarosCase.doTest("QRECIPE.SIF", ACCURACY.withScale(7));
     }
 
     /**
@@ -310,7 +386,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQSCORPIO() {
-        CuteMarosMeszarosCase.doTest("QSCORPIO.SIF", "1.8805096e+03");
+        CuteMarosMeszarosCase.doTest("QSCORPIO.SIF");
     }
 
     /**
@@ -319,7 +395,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQSHARE1B() {
-        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", "7.2007832e+05", ACCURACY.withPrecision(3).withScale(8));
+        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", ACCURACY.withPrecision(3).withScale(8));
     }
 
     /**
@@ -328,22 +404,22 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQSTAIR() {
-        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", "7.9854528e+06", ACCURACY.withScale(8));
+        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", ACCURACY.withScale(8));
     }
 
     @Test
     public void testS268() {
-        CuteMarosMeszarosCase.doTest("S268.SIF", "5.7310705e-07", ACCURACY.withScale(4));
+        CuteMarosMeszarosCase.doTest("S268.SIF", ACCURACY.withScale(4));
     }
 
     @Test
     public void testTAME() {
-        CuteMarosMeszarosCase.doTest("TAME.SIF", "0.0000000e+00");
+        CuteMarosMeszarosCase.doTest("TAME.SIF");
     }
 
     @Test
     public void testZECEVIC2() {
-        CuteMarosMeszarosCase.doTest("ZECEVIC2.SIF", "-4.1250000e+00");
+        CuteMarosMeszarosCase.doTest("ZECEVIC2.SIF");
     }
 
 }
