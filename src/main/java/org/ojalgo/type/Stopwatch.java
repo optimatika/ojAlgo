@@ -54,7 +54,7 @@ public class Stopwatch {
         T result;
         try {
             result = task.call();
-        } catch (Exception exception) {
+        } catch (Exception cause) {
             result = null;
         }
 
