@@ -187,7 +187,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
     //
     //        final PhysicalStore<N> tmpD = this.getD().copy();
     //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
-    //        final MatrixStore<N> mtrxD = tmpD.logical().diagonal().get();
+    //        final MatrixStore<N> mtrxD = tmpD.diagonal();
     //
     //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
     //    }

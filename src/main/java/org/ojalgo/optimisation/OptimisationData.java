@@ -256,7 +256,7 @@ public final class OptimisationData {
             }
         }
 
-        myBI = myBI.logical().below(mtrxBI).get();
+        myBI = myBI.below(mtrxBI);
     }
 
     public void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
