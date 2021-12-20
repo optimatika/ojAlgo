@@ -21,6 +21,8 @@
  */
 package org.ojalgo;
 
+import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.function.IntSupplier;
@@ -522,6 +524,14 @@ public abstract class TestUtils {
         Assertions.fail(cause.getMessage(), cause);
     }
 
+    public static InputStream getResource(final Class<?> root, final String name) {
+        return root.getResourceAsStream(name);
+    }
+
+    public static InputStream getResource(final String... pathElements) {
+        return TestUtils.getResource(TestUtils.class, TestUtils.buildAbsoluteResourcePath(pathElements));
+    }
+
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
         PhysicalStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(numberOfRows, numberOfColumns);
@@ -539,6 +549,17 @@ public abstract class TestUtils {
 
     public static void minimiseAllBranchLimits() {
         MatrixOperation.setAllOperationThresholds(2);
+    }
+
+    private static String buildAbsoluteResourcePath(final String... pathElements) {
+
+        File builder = new File(pathElements[0]);
+
+        for (int i = 1; i < pathElements.length; i++) {
+            builder = new File(builder, pathElements[i]);
+        }
+
+        return "/" + builder.toPath();
     }
 
     static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,

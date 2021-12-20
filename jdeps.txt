@@ -2,9 +2,11 @@ ojalgo-50.0.0-SNAPSHOT-tests.jar -> java.base
 ojalgo-50.0.0-SNAPSHOT-tests.jar -> java.logging
 ojalgo-50.0.0-SNAPSHOT-tests.jar -> not found
 ojalgo-50.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-50.0.0-SNAPSHOT.jar
+   org.ojalgo                                         -> java.io                                            java.base
    org.ojalgo                                         -> java.lang                                          java.base
    org.ojalgo                                         -> java.lang.invoke                                   java.base
    org.ojalgo                                         -> java.math                                          java.base
+   org.ojalgo                                         -> java.nio.file                                      java.base
    org.ojalgo                                         -> java.util                                          java.base
    org.ojalgo                                         -> java.util.concurrent                               java.base
    org.ojalgo                                         -> java.util.function                                 java.base
@@ -388,6 +390,7 @@ ojalgo-50.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-50.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-50.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix                                  ojalgo-50.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-50.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-50.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-50.0.0-SNAPSHOT-tests.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-50.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-50.0.0-SNAPSHOT.jar
@@ -785,6 +788,7 @@ ojalgo-50.0.0-SNAPSHOT.jar -> java.base
    org.ojalgo.optimisation.convex                     -> java.lang                                          java.base
    org.ojalgo.optimisation.convex                     -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.convex                     -> java.util                                          java.base
+   org.ojalgo.optimisation.convex                     -> java.util.concurrent.atomic                        java.base
    org.ojalgo.optimisation.convex                     -> java.util.function                                 java.base
    org.ojalgo.optimisation.convex                     -> java.util.stream                                   java.base
    org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-50.0.0-SNAPSHOT.jar
