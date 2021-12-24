@@ -54,7 +54,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <version.org.junit.jupiter>5.8.2</version.org.junit.jupiter>
-        <version.org.openjdk.jmh>1.33</version.org.openjdk.jmh>
+        <version.org.openjdk.jmh>1.34</version.org.openjdk.jmh>
         <sonar.organization>optimatika</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
