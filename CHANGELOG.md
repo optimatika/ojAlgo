@@ -51,6 +51,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - The `logical()` method in `MatrixStore` is deprecated. No need for it as `MatrixStore`:s are now "logical".
+- The `logical()` method in `BasicMatrix` is deprecated. No need for it as `BasicMatrix`:s are now "logical".
 
 ### Fixed
 
@@ -62,7 +63,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- The `MatrixStore.Factory` interface has been removed. Corresponding functionality have instead been added to `PhysicalStore.Factory`. This also mean that the various static factory instances `MatrixStore` have been removed. Instead use the instances available in each of the `PhysicalStore` instances.
+- The `MatrixStore.Factory` interface has been removed. Corresponding functionality have instead been added to `PhysicalStore.Factory`. This also mean that the various static factory instances in `MatrixStore` have been removed. Instead use the instances available in each of the `PhysicalStore` instances.
 - The `MatrixStore.LogicalBuilder` class has been removed. Instead `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
 - The `BasicMatrix.LogicalBuilder` class has been removed...
 
