@@ -115,11 +115,19 @@ public final class FrequencyMap<T> {
     }
 
     public long getMaximumFrequenecy() {
-        return this.getEntryWithHighestFrequenecy().getValue().longValue();
+        Entry<T, LongAdder> entryWithHighestFrequenecy = this.getEntryWithHighestFrequenecy();
+        if (entryWithHighestFrequenecy != null) {
+            return entryWithHighestFrequenecy.getValue().longValue();
+        }
+        return 0L;
     }
 
     public T getMode() {
-        return this.getEntryWithHighestFrequenecy().getKey();
+        Entry<T, LongAdder> entryWithHighestFrequenecy = this.getEntryWithHighestFrequenecy();
+        if (entryWithHighestFrequenecy != null) {
+            return entryWithHighestFrequenecy.getKey();
+        }
+        return null;
     }
 
     public double getRelativeFrequency(final T element) {
