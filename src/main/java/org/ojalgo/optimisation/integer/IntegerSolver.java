@@ -332,6 +332,7 @@ public final class IntegerSolver extends GenericSolver {
             buffer.flush(receiver);
         }
     }
+
     private volatile Optimisation.Result myBestResultSoFar = null;
     private final Queue<NodeKey> myDeferredNodes = new ConcurrentLinkedQueue<>();
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
