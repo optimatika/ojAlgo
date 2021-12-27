@@ -34,18 +34,15 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * <p>
  * A {@linkplain Scalar} is:
- * </p>
  * <ol>
- * <li>An abstraction of a vector/matrix element.</li>
- * <li>A {@linkplain Comparable} decorator, increasing the number of things you can do with them.</li>
+ * <li>An abstraction of a vector/matrix element.
+ * <li>A {@linkplain Number} decorator, increasing the number of things you can do with them.
  * </ol>
  * <p>
  * Theoretically it is a Field or at least a Division ring.
- * </p>
  * <p>
  * The intention is that implementors should be final immutable subclasses of {@link Comparable} and that they
  * should be inline with the requirements for ValueBased classes.
- * </p>
  *
  * @author apete
  */
@@ -82,57 +79,50 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
     static boolean booleanValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.booleanValue(number);
-        } else {
-            return false;
         }
+        return false;
     }
 
     static byte byteValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.byteValue(number);
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     static double doubleValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.doubleValue(number);
-        } else {
-            return 0D;
         }
+        return 0D;
     }
 
     static float floatValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.floatValue(number);
-        } else {
-            return 0F;
         }
+        return 0F;
     }
 
     static int intValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.intValue(number);
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     static long longValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.longValue(number);
-        } else {
-            return 0L;
         }
+        return 0L;
     }
 
     static short shortValue(final Comparable<?> number) {
         if (number != null) {
             return NumberDefinition.shortValue(number);
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     @Override
