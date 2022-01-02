@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ public class Random1D {
         super();
 
         final Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
-        tmpCholesky.decompose(MatrixStore.PRIMITIVE64.makeWrapper(correlations));
+        tmpCholesky.decompose(Primitive64Store.FACTORY.makeWrapper(correlations));
         myCholeskiedCorrelations = tmpCholesky.getL();
 
         tmpCholesky.reset();

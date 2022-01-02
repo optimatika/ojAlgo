@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,13 +43,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
-
-    public static LinearSolver newSolver(final ExpressionsBasedModel model) {
-
-        SimplexTableau tableau = PrimalSimplex.build(model);
-
-        return new PrimalSimplex(tableau, model.options);
-    }
 
     /**
      * @deprecated v50 Use {@link StandardBuilder} instead
@@ -123,12 +116,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
                 if (nbInequalites > 0) {
 
-                    mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+                    mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
 
-                    mtrxAE = this.getAE().logical().below(this.getAI()).right(nbInequalites).collect(FACTORY);
+                    mtrxAE = this.getAE().below(this.getAI()).right(nbInequalites).collect(FACTORY);
                     mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
-                    mtrxBE = this.getBE().logical().below(this.getBI()).collect(FACTORY);
+                    mtrxBE = this.getBE().below(this.getBI()).collect(FACTORY);
 
                 } else {
 
@@ -142,9 +135,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             } else if (nbInequalites > 0) {
 
-                mtrxC = this.getC().logical().below(nbInequalites).collect(FACTORY);
+                mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
 
-                mtrxAE = this.getAI().logical().right(nbInequalites).collect(FACTORY);
+                mtrxAE = this.getAI().right(nbInequalites).collect(FACTORY);
                 mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
                 mtrxBE = this.getBI().collect(FACTORY);
@@ -325,6 +318,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
+
     /**
      * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
      *             {@link LinearSolver#newGeneralBuilder()} instead.
@@ -345,6 +340,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
+    }
+
+    public static LinearSolver newSolver(final ExpressionsBasedModel model) {
+
+        SimplexTableau tableau = PrimalSimplex.build(model);
+
+        return new PrimalSimplex(tableau, model.options);
     }
 
     public static LinearSolver.StandardBuilder newStandardBuilder() {

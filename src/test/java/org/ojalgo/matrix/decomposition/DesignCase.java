@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -188,7 +188,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testSolveIdentity() {
 
-        Access2D<?> identity = MatrixStore.PRIMITIVE64.makeIdentity(9).get();
+        Access2D<?> identity = Primitive64Store.FACTORY.makeIdentity(9);
         Access2D<?> random = Primitive64Store.FACTORY.makeFilled(9, 1, new Uniform());
 
         List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
@@ -251,8 +251,8 @@ public class DesignCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(3, decompPriSVD.getV().countRows());
         TestUtils.assertEquals(3, decompPriSVD.getV().countColumns());
 
-        PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
-        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getV().logical().offsets(0, decompPriSVD.getRank()).get().copy();
+        PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().offsets(0, decompPriQR.getRank()).copy();
+        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getV().offsets(0, decompPriSVD.getRank()).copy();
 
         double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
         nullspacePriQR.modifyAll(PrimitiveMath.DIVIDE.second(scalePriQR));

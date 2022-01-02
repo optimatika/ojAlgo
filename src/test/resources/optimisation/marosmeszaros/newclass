@@ -1,0 +1,9 @@
+echo "adding $1 details to mastsif.html"
+echo " "
+
+htmlclass $1 >> marmes.html
+
+echo "adding $1.SIF to compressed mastsif"
+
+cp $1.SIF ../compressed_marosmeszaros/
+gzip -9 ../compressed_marosmeszaros/$1.SIF

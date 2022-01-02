@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -228,7 +228,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp01, tmp21);
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
-        final double tmpDet = tmpScale * (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -308,7 +308,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp02, tmp12, tmp32);
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp02, tmp12, tmp22);
 
-        final double tmpDet = tmpScale * ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -451,7 +451,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
                 tmp23, tmp33);
 
-        final double tmpDet = tmpScale * (((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -538,7 +538,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
-        final double tmpDet = tmpScale * (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
@@ -599,7 +599,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp20, tmp21, tmp22);
 
-        final double tmpDet = tmpScale * ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
@@ -701,7 +701,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
                 tmp32, tmp33);
 
-        final double tmpDet = tmpScale * (((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40));
+        final double tmpDet = tmpScale * (tmp00 * tmpMin00 - tmp10 * tmpMin10 + tmp20 * tmpMin20 - tmp30 * tmpMin30 + tmp40 * tmpMin40);
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
@@ -739,11 +739,11 @@ public abstract class AbstractInverter implements InverterTask<Double> {
     }
 
     public final MatrixStore<Double> invert(final Access2D<?> original) throws RecoverableCondition {
-        return this.invert(original, Primitive64Store.FACTORY.makeZero(this.dim(), this.dim()));
+        return this.invert(original, Primitive64Store.FACTORY.make(this.dim(), this.dim()));
     }
 
     public final PhysicalStore<Double> preallocate(final Structure2D template) {
-        return Primitive64Store.FACTORY.makeZero(this.dim(), this.dim());
+        return Primitive64Store.FACTORY.make(this.dim(), this.dim());
     }
 
     abstract long dim();

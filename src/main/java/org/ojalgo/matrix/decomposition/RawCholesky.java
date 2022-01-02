@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        final double[][] retVal = this.reset(matrix, false);
+        double[][] retVal = this.reset(matrix, false);
 
         this.doDecompose(retVal, matrix);
 
@@ -61,14 +61,12 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         if (mySPD) {
 
-            final double[][] retVal = this.reset(matrix, false);
+            double[][] retVal = this.reset(matrix, false);
 
             return this.doDecompose(retVal, matrix);
 
-        } else {
-
-            return this.computed(false);
         }
+        return this.computed(false);
     }
 
     public int countSignificant(final double threshold) {
@@ -89,9 +87,9 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] retVal = this.reset(matrix, false);
+        double[][] retVal = this.reset(matrix, false);
 
-        final RawStore tmpRawInPlaceStore = this.getInternalStore();
+        RawStore tmpRawInPlaceStore = this.getInternalStore();
 
         matrix.supplyTo(tmpRawInPlaceStore);
 
@@ -100,9 +98,9 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public Double getDeterminant() {
 
-        final double[][] tmpData = this.getInternalData();
+        double[][] tmpData = this.getInternalData();
 
-        final int tmpMinDim = this.getMinDim();
+        int tmpMinDim = this.getMinDim();
 
         double retVal = ONE;
         double tmpVal;
@@ -115,7 +113,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getInverse() {
-        final int tmpRowDim = this.getRowDim();
+        int tmpRowDim = this.getRowDim();
         return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
     }
 
@@ -124,7 +122,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getInternalStore().logical().triangular(false, false).get();
+        return this.getInternalStore().triangular(false, false);
     }
 
     public double getRankThreshold() {
@@ -132,7 +130,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
@@ -147,15 +145,14 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] retVal = this.reset(original, false);
+        double[][] retVal = this.reset(original, false);
 
         this.doDecompose(retVal, original);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     @Override
@@ -178,7 +175,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] retVal = this.reset(body, false);
+        double[][] retVal = this.reset(body, false);
 
         this.doDecompose(retVal, body);
 
@@ -188,15 +185,14 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
             return this.doSolve(preallocated);
 
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final double[][] data, final Access2D<?> input) {
 
-        final int tmpDiagDim = this.getRowDim();
-        mySPD = (this.getColDim() == tmpDiagDim);
+        int tmpDiagDim = this.getRowDim();
+        mySPD = this.getColDim() == tmpDiagDim;
         myMaxDiag = MACHINE_SMALLEST;
         myMinDiag = MACHINE_LARGEST;
 
@@ -205,14 +201,14 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         double tmpVal;
 
         // Main loop.
-        for (int ij = 0; mySPD && (ij < tmpDiagDim); ij++) { // For each row/column, along the diagonal
+        for (int ij = 0; mySPD && ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
             tmpVal = MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
             myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
             myMinDiag = MIN.invoke(myMinDiag, tmpVal);
             tmpVal = tmpRowIJ[ij] = SQRT.invoke(tmpVal);
-            mySPD = mySPD && (tmpVal > ZERO);
+            mySPD = mySPD && tmpVal > ZERO;
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
                 tmpRowI = data[i];
@@ -226,17 +222,17 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final RawStore body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
         preallocated.substituteForwards(body, false, false, true);
         preallocated.substituteBackwards(body, false, true, true);
 
-        return preallocated.logical().hermitian(false).get();
+        return preallocated.hermitian(false);
     }
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final RawStore body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
         preallocated.substituteForwards(body, false, false, false);
         preallocated.substituteBackwards(body, false, true, false);
@@ -246,7 +242,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && (myMinDiag > this.getRankThreshold());
+        return mySPD && myMinDiag > this.getRankThreshold();
     }
 
 }

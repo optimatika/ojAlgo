@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -192,7 +192,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int colRHS = myTableau.countConstraints() + myTableau.countVariables();
 
-        Primitive64Store solution = Primitive64Store.FACTORY.makeZero(myTableau.countVariables(), 1);
+        Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.countVariables(), 1);
 
         int numberOfConstraints = myTableau.countConstraints();
         for (int row = 0; row < numberOfConstraints; row++) {
@@ -258,25 +258,22 @@ public abstract class SimplexSolver extends LinearSolver {
             } else {
 
                 if (myPoint.isPhase2()) {
-
                     this.setState(State.UNBOUNDED);
-
                 } else {
-
                     this.setState(State.INFEASIBLE);
                 }
+
                 retVal = false;
             }
 
         } else {
+
             if (myPoint.isPhase1()) {
-
                 this.setState(State.INFEASIBLE);
-
             } else {
-
                 this.setState(State.OPTIMAL);
             }
+
             retVal = false;
         }
 
@@ -388,12 +385,12 @@ public abstract class SimplexSolver extends LinearSolver {
 
             if ((denom > ZERO || specialCase) && !PIVOT.isZero(denom)) {
 
-                if (ratio >= ZERO && ratio < minRatio || !RATIO.isDifferent(minRatio, ratio) && denom > curDenom) {
+                if (ratio >= ZERO && (ratio < minRatio || !RATIO.isDifferent(minRatio, ratio) && denom > curDenom)) {
 
                     retVal = i;
                     minRatio = ratio;
-                    curDenom = denom;
-                    // curDenom = degenerate ? MACHINE_LARGEST : denom;
+                    // curDenom = denom;
+                    curDenom = degenerate ? Math.max(denom, ONE) : denom;
 
                     if (this.isLogDebug()) {
                         this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {},\tArtificial: {}.", i, ratio, numer, denom, artificial);

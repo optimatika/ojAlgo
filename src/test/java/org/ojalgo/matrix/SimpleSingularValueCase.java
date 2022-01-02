@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleSingularValueCase extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
@@ -92,7 +92,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
-        final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
+        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         //tmpSVD.equals(tmpA, EVALUATION);

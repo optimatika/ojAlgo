@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ public class MultiplicationTest extends MatrixStoreTests {
         for (int s = 0; s < sizes.length; s++) {
             int dim = sizes[s];
 
-            Primitive64Store result = Primitive64Store.FACTORY.makeZero(dim, dim);
+            Primitive64Store result = Primitive64Store.FACTORY.make(dim, dim);
             MatrixStore<Double> matA = Primitive64Store.FACTORY.makeFilled(dim, dim, new Normal());
             MatrixStore<Double> matB = Primitive64Store.FACTORY.makeFilled(dim, dim, new Uniform());
 

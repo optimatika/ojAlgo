@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.TypeUtils;
 
@@ -37,10 +33,10 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
+public final class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     public BigPolynomial(final int degree) {
-        super(Array1D.BIG.makeZero(degree + 1));
+        super(Array1D.BIG.make(degree + 1));
     }
 
     BigPolynomial(final Array1D<BigDecimal> coefficients) {
@@ -49,36 +45,19 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
 
-        final int tmpRowDim = (int) Math.min(x.count(), y.count());
-        final int tmpColDim = this.size();
+        RationalPolynomial delegate = new RationalPolynomial(this.degree());
 
-        final PhysicalStore<RationalNumber> tmpBody = GenericStore.RATIONAL.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<RationalNumber> tmpRHS = GenericStore.RATIONAL.makeZero(tmpRowDim, 1);
+        delegate.estimate(x, y);
 
-        for (int i = 0; i < tmpRowDim; i++) {
-
-            BigDecimal tmpX = BigMath.ONE;
-            final BigDecimal tmpXfactor = TypeUtils.toBigDecimal(x.get(i));
-            final BigDecimal tmpY = TypeUtils.toBigDecimal(y.get(i));
-
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpBody.set(i, j, tmpX);
-                tmpX = tmpX.multiply(tmpXfactor);
-            }
-            tmpRHS.set(i, 0, tmpY);
-        }
-
-        final QR<RationalNumber> tmpQR = QR.RATIONAL.make();
-        tmpQR.decompose(tmpBody);
-        this.set(tmpQR.getSolution(tmpRHS));
+        this.set(delegate);
     }
 
     public BigDecimal integrate(final BigDecimal fromPoint, final BigDecimal toPoint) {
 
-        final PolynomialFunction<BigDecimal> tmpPrim = this.buildPrimitive();
+        PolynomialFunction<BigDecimal> tmpPrim = this.buildPrimitive();
 
-        final BigDecimal tmpFromVal = tmpPrim.invoke(fromPoint);
-        final BigDecimal tmpToVal = tmpPrim.invoke(toPoint);
+        BigDecimal tmpFromVal = tmpPrim.invoke(fromPoint);
+        BigDecimal tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }
@@ -97,7 +76,7 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
     }
 
     public void set(final Access1D<?> coefficients) {
-        final int tmpLimit = (int) Math.min(this.count(), coefficients.count());
+        int tmpLimit = Math.min(this.size(), coefficients.size());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, TypeUtils.toBigDecimal(coefficients.get(p)));
         }
@@ -105,7 +84,7 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     @Override
     protected BigDecimal getDerivativeFactor(final int power) {
-        final int tmpNextIndex = power + 1;
+        int tmpNextIndex = power + 1;
         return this.get(tmpNextIndex).multiply(new BigDecimal(tmpNextIndex));
     }
 
@@ -113,14 +92,13 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
     protected BigDecimal getPrimitiveFactor(final int power) {
         if (power <= 0) {
             return BigMath.ZERO;
-        } else {
-            return this.get(power - 1).divide(new BigDecimal(power));
         }
+        return this.get(power - 1).divide(new BigDecimal(power));
     }
 
     @Override
     protected AbstractPolynomial<BigDecimal> makeInstance(final int size) {
-        return new BigPolynomial(Array1D.BIG.makeZero(size));
+        return new BigPolynomial(Array1D.BIG.make(size));
     }
 
 }

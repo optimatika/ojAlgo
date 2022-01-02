@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -390,7 +390,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         BinaryFunction<N> divide = this.function().divide();
 
-        MatrixStore<N> tmp = v.logical().limits(-1, rank).onColumns(divide, values).collect(v.physical());
+        MatrixStore<N> tmp = v.limits(-1, rank).onColumns(divide, values).collect(v.physical());
 
         return tmp.multiply(tmp.transpose());
     }
@@ -427,10 +427,10 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (myInverse == null) {
 
-            final int rank = this.getRank();
+            int rank = this.getRank();
 
             MatrixStore<N> tmpV = this.getV();
-            PhysicalStore<N> tmpMtrx = tmpV.logical().limits(-1, rank).collect(tmpV.physical());
+            PhysicalStore<N> tmpMtrx = tmpV.limits(-1, rank).collect(tmpV.physical());
 
             Scalar.Factory<N> scalar = this.scalar();
             BinaryFunction<N> divide = this.function().divide();
@@ -440,7 +440,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
                 tmpMtrx.modifyColumn(0L, j, divide.by(scalar.cast(singularValues.doubleValue(j))));
             }
 
-            preallocated.fillByMultiplying(tmpMtrx, this.getU().logical().limits(-1, rank).conjugate().get());
+            preallocated.fillByMultiplying(tmpMtrx, this.getU().limits(-1, rank).conjugate());
             myInverse = preallocated;
         }
 
@@ -710,9 +710,9 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         MatrixStore<N> retVal = this.makeDiagonal(this.getSingularValues()).get();
         if (myFullSize) {
             if (myInputStructure.countRows() > retVal.countRows()) {
-                retVal = retVal.logical().below((int) (myInputStructure.countRows() - retVal.countRows())).get();
+                retVal = retVal.below((int) (myInputStructure.countRows() - retVal.countRows()));
             } else if (myInputStructure.countColumns() > retVal.countColumns()) {
-                retVal = retVal.logical().right((int) (myInputStructure.countColumns() - retVal.countColumns())).get();
+                retVal = retVal.right((int) (myInputStructure.countColumns() - retVal.countColumns()));
             }
         }
         return retVal;

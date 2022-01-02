@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -71,26 +71,14 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
     }
 
+    default I make(final int count) {
+        return this.make((long) count);
+    }
+
     I make(long count);
 
     default I make(final Structure1D shape) {
         return this.make(shape.count());
-    }
-
-    /**
-     * @deprecated v48 Use {@link #make(long)} instead
-     */
-    @Deprecated
-    default I makeZero(final long count) {
-        return this.make(count);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #make(Structure1D)} instead
-     */
-    @Deprecated
-    default I makeZero(final Structure1D shape) {
-        return this.make(shape);
     }
 
 }

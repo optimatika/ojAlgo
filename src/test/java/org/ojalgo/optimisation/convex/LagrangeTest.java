@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,9 +91,8 @@ public class LagrangeTest extends OptimisationConvexTests {
         // Setting the first as an equality constraint, and only the other as an
         // inequality should give the same result.
 
-        ConvexSolver mixConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC)
-                .equalities(mtrxAI.logical().row(0).get(), mtrxBI.logical().row(0).get())
-                .inequalities(mtrxAI.logical().row(1).get(), mtrxBI.logical().row(1).get()).build();
+        ConvexSolver mixConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).equalities(mtrxAI.row(0), mtrxBI.row(0))
+                .inequalities(mtrxAI.row(1), mtrxBI.row(1)).build();
 
         Result mixSolution = mixConstrainedSolver.solve();
         Access1D<?> mixMultipliers = mixSolution.getMultipliers().get();
@@ -129,9 +128,9 @@ public class LagrangeTest extends OptimisationConvexTests {
         Primitive64Store expectedX = FACTORY.column(2, -1, 1);
         Primitive64Store expectedDual = FACTORY.column(-3, 2);
 
-        MatrixStore<Double> bodyKKT = Q.logical().right(AE.transpose()).below(AE).get();
-        MatrixStore<Double> rhsKKT = C.negate().logical().below(BE).get();
-        MatrixStore<Double> solutionKKT = expectedX.logical().below(expectedDual).get();
+        MatrixStore<Double> bodyKKT = Q.right(AE.transpose()).below(AE);
+        MatrixStore<Double> rhsKKT = C.negate().below(BE);
+        MatrixStore<Double> solutionKKT = expectedX.below(expectedDual);
 
         SolverTask<Double> equationSolver = SolverTask.PRIMITIVE.make(bodyKKT, rhsKKT);
         MatrixStore<Double> combinedSolution = equationSolver.solve(bodyKKT, rhsKKT);
@@ -163,8 +162,8 @@ public class LagrangeTest extends OptimisationConvexTests {
         //  The result should be the same.
         Builder ieBuilder = ConvexSolver.newBuilder();
         ieBuilder.objective(Q, C.negate());
-        MatrixStore<Double> AI = AE.logical().below(AE.negate()).get();
-        MatrixStore<Double> BI = BE.logical().below(BE.negate()).get();
+        MatrixStore<Double> AI = AE.below(AE.negate());
+        MatrixStore<Double> BI = BE.below(BE.negate());
         ieBuilder.inequalities(AI, BI);
         ConvexSolver ieSolver = ieBuilder.build();
         Result ieResult = ieSolver.solve();

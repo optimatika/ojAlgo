@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
         BasicLogger.debug("Q get: ", aDecomposition.getQ());
         BasicLogger.debug("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
         BasicLogger.debug("H: ", aDecomposition.getH());
-        BasicLogger.debug("Reconstructed: ", Hessenberg.reconstruct(aDecomposition));
+        BasicLogger.debug("Reconstructed: ", aDecomposition.reconstruct());
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
@@ -78,7 +78,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
             TestUtils.fail("Not equals!");
         }
 
-        final MatrixStore<Double> tmpReconstructed = Hessenberg.reconstruct(tmpDecomposition);
+        final MatrixStore<Double> tmpReconstructed = tmpDecomposition.reconstruct();
         if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");

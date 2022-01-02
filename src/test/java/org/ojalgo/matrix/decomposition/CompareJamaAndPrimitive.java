@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -144,8 +144,8 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final int[] tmpEconSet = BasicArray.makeIncreasingRange(0, tmpMinDim);
 
-        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().logical().column(tmpEconSet).get(), COMPARE_CONTEXT);
-        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().logical().row(tmpEconSet).get(), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().column(tmpEconSet), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().row(tmpEconSet), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_QR.getRank(), PRIMITIVE_QR.getRank());
 
         TestUtils.assertEquals(JAMA_QR.isComputed(), PRIMITIVE_QR.isComputed());

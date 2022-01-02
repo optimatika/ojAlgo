@@ -1,0 +1,801 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+
+<link REL=STYLESHEET HREF="http://www.numerical.rl.ac.uk/css/main.css">
+
+<title>Maros and Meszaros's Convex QP Test Problem Set</title>
+
+<meta NAME="keywords" LANG="en-us" CONTENT="CCLRC, CSE, HSL">
+
+</head>
+
+<body bgcolor="#ffffff" text="#25244A" link="#bf0000" 
+      vlink="007f00" alink=3fff00">
+<p><center>
+<a href="http://www.cse.clrc.ac.uk/Home/">CSE HOME</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ListActivities/CLASS=Coordination;">Coordination</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ListActivities/CLASS=Data;">Databases and Software</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ListActivities/CLASS=Facilities;">Facilities</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/People/">People</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ListActivities/CLASS=Publications;">Publications</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ListActivities/CLASS=Research;">R&amp;D Programme</a>
+&nbsp;-&nbsp;
+<a href="http://www.cse.clrc.ac.uk/ComplexSearch/">SEARCH</a>
+&nbsp;-&nbsp;
+<a href="http://www.google.com/">GOOGLE</a>
+</center>
+
+<h1>The Maros and Meszaros Convex Quadratic Programming Test Problem Set</h1>
+<hr>
+<p align="justify">
+The Maros and Meszaros
+<a href="http://www.doc.ic.ac.uk/~im/">test set</a> 
+<a href="ftp://ftp.sztaki.hu/pub/oplab/QPDATA">(mirror)</a> 
+is a collection of convex quadratic programming examples from a variety 
+of sources. The examples are
+available in QPS format, which is a subset of the 
+<a href="http://www.numerical.rl.ac.uk/lancelot/sif/sifhtml.html">SIF</a> 
+format used by 
+<a href="http://cuter.rl.ac.uk/cuter-www/">CUTEr</a>.
+Thus, the Maros and Meszaros set provide a further collection of 
+interesting examples
+for those who have CUTE interfaces to their optimization packages.
+See
+
+<blockquote>
+Istvan Maros and Csaba Meszaros
+<br>
+"A repository of convex quadratic programming problems",
+<br>
+Optimization Methods and Software (OMS)
+Volumes 11&12 (December, 1999), 671-681,
+<br>
+Special Issue on Interior Point Methods (CD supplement with software)
+<br>
+Guest Editors: Florian Potra, Cornelis Roos and Tamas Terlaky
+</blockquote>
+
+
+<h2>The complete set</h2>
+The test problem set is available in a compressed (gzipped) 
+<a href="ftp://130.246.9.91/pub/cuter/marosmeszaros.tar.gz">tar file</a>
+(approximately 29.6 Mbytes in total).
+
+<h2>Individual test problems</h2>
+The test problems are also available individually:
+<p>
+
+<table border> 
+<tr align=left>
+<th> name </th> 
+<th align=center> files available </th>
+<th align=center> CUTEr
+<a href="http://cuter.rl.ac.uk/cuter-www/Problems/classification.html">
+classification</a> </th>
+</tr>
+
+<tr> <td> <b> AUG2D </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG2D.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG2D.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-20200-10000 </td> </tr>
+<tr> <td> <b> AUG2DC </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG2DC.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG2DC.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-20200-10000 </td> </tr>
+<tr> <td> <b> AUG2DCQP </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG2DCQP.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG2DCQP.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-20200-10000 </td> </tr>
+<tr> <td> <b> AUG2DQP </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG2DQP.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG2DQP.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-20200-10000 </td> </tr>
+<tr> <td> <b> AUG3D </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG3D.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG3D.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3873-1000 </td> </tr>
+<tr> <td> <b> AUG3DC </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG3DC.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG3DC.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3873-1000 </td> </tr>
+<tr> <td> <b> AUG3DCQP </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG3DCQP.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG3DCQP.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3873-1000 </td> </tr>
+<tr> <td> <b> AUG3DQP </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/AUG3DQP.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/AUG3DQP.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3873-1000 </td> </tr>
+<tr> <td> <b> BOYD1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/BOYD1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/BOYD1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-93261-18 </td> </tr>
+<tr> <td> <b> BOYD2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/BOYD2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/BOYD2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-93263-0 </td> </tr>
+<tr> <td> <b> CONT-050 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-050.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-050.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2597-2401 </td> </tr>
+<tr> <td> <b> CONT-100 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-100.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-100.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10197-9801 </td> </tr>
+<tr> <td> <b> CONT-101 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-101.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-101.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10197-10098 </td> </tr>
+<tr> <td> <b> CONT-200 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-200.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-200.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-40397-39601 </td> </tr>
+<tr> <td> <b> CONT-201 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-201.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-201.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-40397-40198 </td> </tr>
+<tr> <td> <b> CONT-300 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CONT-300.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CONT-300.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-90597-90298 </td> </tr>
+<tr> <td> <b> CVXQP1_L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP1_L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP1_L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-5000 </td> </tr>
+<tr> <td> <b> CVXQP1_M </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP1_M.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP1_M.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1000-500 </td> </tr>
+<tr> <td> <b> CVXQP1_S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP1_S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP1_S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-100-50 </td> </tr>
+<tr> <td> <b> CVXQP2_L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP2_L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP2_L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-2500 </td> </tr>
+<tr> <td> <b> CVXQP2_M </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP2_M.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP2_M.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1000-250 </td> </tr>
+<tr> <td> <b> CVXQP2_S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP2_S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP2_S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-100-25 </td> </tr>
+<tr> <td> <b> CVXQP3_L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP3_L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP3_L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-7500 </td> </tr>
+<tr> <td> <b> CVXQP3_M </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP3_M.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP3_M.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1000-750 </td> </tr>
+<tr> <td> <b> CVXQP3_S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/CVXQP3_S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/CVXQP3_S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-100-75 </td> </tr>
+<tr> <td> <b> DPKLO1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DPKLO1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DPKLO1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-133-77 </td> </tr>
+<tr> <td> <b> DTOC3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DTOC3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DTOC3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-14999-9998 </td> </tr>
+<tr> <td> <b> DUAL1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUAL1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUAL1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-85-1 </td> </tr>
+<tr> <td> <b> DUAL2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUAL2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUAL2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-96-1 </td> </tr>
+<tr> <td> <b> DUAL3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUAL3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUAL3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-111-1 </td> </tr>
+<tr> <td> <b> DUAL4 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUAL4.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUAL4.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-75-1 </td> </tr>
+<tr> <td> <b> DUALC1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUALC1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUALC1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-9-215 </td> </tr>
+<tr> <td> <b> DUALC2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUALC2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUALC2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-7-229 </td> </tr>
+<tr> <td> <b> DUALC5 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUALC5.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUALC5.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-8-278 </td> </tr>
+<tr> <td> <b> DUALC8 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/DUALC8.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/DUALC8.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-8-503 </td> </tr>
+<tr> <td> <b> EXDATA </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/EXDATA.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/EXDATA.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3000-3001 </td> </tr>
+<tr> <td> <b> GENHS28 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/GENHS28.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/GENHS28.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10-8 </td> </tr>
+<tr> <td> <b> GOULDQP2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/GOULDQP2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/GOULDQP2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-699-349 </td> </tr>
+<tr> <td> <b> GOULDQP3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/GOULDQP3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/GOULDQP3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-699-349 </td> </tr>
+<tr> <td> <b> HS118 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS118.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS118.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-15-17 </td> </tr>
+<tr> <td> <b> HS21 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS21.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS21.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2-1 </td> </tr>
+<tr> <td> <b> HS268 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS268.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS268.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5-5 </td> </tr>
+<tr> <td> <b> HS35 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS35.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS35.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3-1 </td> </tr>
+<tr> <td> <b> HS35MOD </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS35MOD.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS35MOD.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-3-1 </td> </tr>
+<tr> <td> <b> HS51 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS51.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS51.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5-3 </td> </tr>
+<tr> <td> <b> HS52 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS52.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS52.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5-3 </td> </tr>
+<tr> <td> <b> HS53 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS53.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS53.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5-3 </td> </tr>
+<tr> <td> <b> HS76 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HS76.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HS76.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-4-3 </td> </tr>
+<tr> <td> <b> HUES-MOD </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HUES-MOD.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HUES-MOD.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-2 </td> </tr>
+<tr> <td> <b> HUESTIS </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/HUESTIS.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/HUESTIS.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-2 </td> </tr>
+<tr> <td> <b> KSIP </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/KSIP.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/KSIP.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-20-1001 </td> </tr>
+<tr> <td> <b> LASER </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LASER.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LASER.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1002-1000 </td> </tr>
+<tr> <td> <b> LISWET1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET10 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET10.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET10.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET11 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET11.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET11.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET12 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET12.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET12.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET4 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET4.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET4.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET5 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET5.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET5.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET6 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET6.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET6.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET7 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET7.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET7.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET8 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET8.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET8.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LISWET9 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LISWET9.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LISWET9.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10002-10000 </td> </tr>
+<tr> <td> <b> LOTSCHD </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/LOTSCHD.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/LOTSCHD.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-12-7 </td> </tr>
+<tr> <td> <b> MOSARQP1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/MOSARQP1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/MOSARQP1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2500-700 </td> </tr>
+<tr> <td> <b> MOSARQP2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/MOSARQP2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/MOSARQP2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-900-600 </td> </tr>
+<tr> <td> <b> POWELL20 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/POWELL20.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/POWELL20.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-10000-10000 </td> </tr>
+<tr> <td> <b> PRIMAL1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMAL1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMAL1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-325-85 </td> </tr>
+<tr> <td> <b> PRIMAL2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMAL2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMAL2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-649-96 </td> </tr>
+<tr> <td> <b> PRIMAL3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMAL3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMAL3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-745-111 </td> </tr>
+<tr> <td> <b> PRIMAL4 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMAL4.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMAL4.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1489-75 </td> </tr>
+<tr> <td> <b> PRIMALC1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMALC1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMALC1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-230-9 </td> </tr>
+<tr> <td> <b> PRIMALC2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMALC2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMALC2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-231-7 </td> </tr>
+<tr> <td> <b> PRIMALC5 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMALC5.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMALC5.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-287-8 </td> </tr>
+<tr> <td> <b> PRIMALC8 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/PRIMALC8.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/PRIMALC8.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-520-8 </td> </tr>
+<tr> <td> <b> Q25FV47 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/Q25FV47.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/Q25FV47.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1571-820 </td> </tr>
+<tr> <td> <b> QADLITTL </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QADLITTL.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QADLITTL.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-97-56 </td> </tr>
+<tr> <td> <b> QAFIRO </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QAFIRO.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QAFIRO.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-32-27 </td> </tr>
+<tr> <td> <b> QBANDM </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QBANDM.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QBANDM.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-472-305 </td> </tr>
+<tr> <td> <b> QBEACONF </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QBEACONF.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QBEACONF.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-262-173 </td> </tr>
+<tr> <td> <b> QBORE3D </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QBORE3D.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QBORE3D.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-315-233 </td> </tr>
+<tr> <td> <b> QBRANDY </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QBRANDY.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QBRANDY.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-249-220 </td> </tr>
+<tr> <td> <b> QCAPRI </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QCAPRI.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QCAPRI.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-353-271 </td> </tr>
+<tr> <td> <b> QE226 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QE226.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QE226.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-282-223 </td> </tr>
+<tr> <td> <b> QETAMACR </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QETAMACR.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QETAMACR.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-688-400 </td> </tr>
+<tr> <td> <b> QFFFFF80 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QFFFFF80.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QFFFFF80.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-854-524 </td> </tr>
+<tr> <td> <b> QFORPLAN </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QFORPLAN.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QFORPLAN.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-421-161 </td> </tr>
+<tr> <td> <b> QGFRDXPN </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QGFRDXPN.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QGFRDXPN.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1092-616 </td> </tr>
+<tr> <td> <b> QGROW15 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QGROW15.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QGROW15.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-645-300 </td> </tr>
+<tr> <td> <b> QGROW22 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QGROW22.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QGROW22.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-946-440 </td> </tr>
+<tr> <td> <b> QGROW7 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QGROW7.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QGROW7.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-301-140 </td> </tr>
+<tr> <td> <b> QISRAEL </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QISRAEL.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QISRAEL.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-142-174 </td> </tr>
+<tr> <td> <b> QPCBLEND </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPCBLEND.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPCBLEND.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-83-74 </td> </tr>
+<tr> <td> <b> QPCBOEI1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPCBOEI1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPCBOEI1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-384-351 </td> </tr>
+<tr> <td> <b> QPCBOEI2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPCBOEI2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPCBOEI2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-143-166 </td> </tr>
+<tr> <td> <b> QPCSTAIR </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPCSTAIR.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPCSTAIR.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-467-356 </td> </tr>
+<tr> <td> <b> QPILOTNO </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPILOTNO.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPILOTNO.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2172-975 </td> </tr>
+<tr> <td> <b> QPTEST </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QPTEST.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QPTEST.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2-2 </td> </tr>
+<tr> <td> <b> QRECIPE </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QRECIPE.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QRECIPE.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-180-91 </td> </tr>
+<tr> <td> <b> QSC205 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSC205.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSC205.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-203-205 </td> </tr>
+<tr> <td> <b> QSCAGR25 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCAGR25.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCAGR25.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-500-471 </td> </tr>
+<tr> <td> <b> QSCAGR7 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCAGR7.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCAGR7.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-140-129 </td> </tr>
+<tr> <td> <b> QSCFXM1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCFXM1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCFXM1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-457-330 </td> </tr>
+<tr> <td> <b> QSCFXM2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCFXM2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCFXM2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-914-660 </td> </tr>
+<tr> <td> <b> QSCFXM3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCFXM3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCFXM3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1371-990 </td> </tr>
+<tr> <td> <b> QSCORPIO </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCORPIO.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCORPIO.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-358-388 </td> </tr>
+<tr> <td> <b> QSCRS8 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCRS8.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCRS8.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1169-490 </td> </tr>
+<tr> <td> <b> QSCSD1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCSD1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCSD1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-760-77 </td> </tr>
+<tr> <td> <b> QSCSD6 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCSD6.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCSD6.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1350-147 </td> </tr>
+<tr> <td> <b> QSCSD8 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCSD8.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCSD8.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2750-397 </td> </tr>
+<tr> <td> <b> QSCTAP1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCTAP1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCTAP1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-480-300 </td> </tr>
+<tr> <td> <b> QSCTAP2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCTAP2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCTAP2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1880-1090 </td> </tr>
+<tr> <td> <b> QSCTAP3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSCTAP3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSCTAP3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2480-1480 </td> </tr>
+<tr> <td> <b> QSEBA </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSEBA.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSEBA.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1028-515 </td> </tr>
+<tr> <td> <b> QSHARE1B </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHARE1B.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHARE1B.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-225-117 </td> </tr>
+<tr> <td> <b> QSHARE2B </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHARE2B.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHARE2B.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-79-96 </td> </tr>
+<tr> <td> <b> QSHELL </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHELL.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHELL.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1775-536 </td> </tr>
+<tr> <td> <b> QSHIP04L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP04L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP04L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2118-402 </td> </tr>
+<tr> <td> <b> QSHIP04S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP04S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP04S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1458-402 </td> </tr>
+<tr> <td> <b> QSHIP08L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP08L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP08L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-4283-778 </td> </tr>
+<tr> <td> <b> QSHIP08S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP08S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP08S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2387-778 </td> </tr>
+<tr> <td> <b> QSHIP12L </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP12L.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP12L.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5427-1151 </td> </tr>
+<tr> <td> <b> QSHIP12S </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSHIP12S.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSHIP12S.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2763-1151 </td> </tr>
+<tr> <td> <b> QSIERRA </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSIERRA.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSIERRA.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2036-1227 </td> </tr>
+<tr> <td> <b> QSTAIR </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSTAIR.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSTAIR.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-467-356 </td> </tr>
+<tr> <td> <b> QSTANDAT </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/QSTANDAT.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/QSTANDAT.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-1075-359 </td> </tr>
+<tr> <td> <b> S268 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/S268.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/S268.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-5-5 </td> </tr>
+<tr> <td> <b> STADAT1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/STADAT1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/STADAT1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2001-3999 </td> </tr>
+<tr> <td> <b> STADAT2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/STADAT2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/STADAT2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2001-3999 </td> </tr>
+<tr> <td> <b> STADAT3 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/STADAT3.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/STADAT3.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-4001-7999 </td> </tr>
+<tr> <td> <b> STCQP1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/STCQP1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/STCQP1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-4097-2052 </td> </tr>
+<tr> <td> <b> STCQP2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/STCQP2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/STCQP2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-4097-2052 </td> </tr>
+<tr> <td> <b> TAME </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/TAME.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/TAME.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2-1 </td> </tr>
+<tr> <td> <b> UBH1 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/UBH1.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/UBH1.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-18009-12000 </td> </tr>
+<tr> <td> <b> VALUES </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/VALUES.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/VALUES.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-202-1 </td> </tr>
+<tr> <td> <b> YAO </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/YAO.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/YAO.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2002-2000 </td> </tr>
+<tr> <td> <b> ZECEVIC2 </b> </td>
+<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/marosmeszaros/ZECEVIC2.SIF>ascii file</a>,
+<a href=ftp://ftp.numerical.rl.ac.uk/pub/cuter/compressed_marosmeszaros/ZECEVIC2.SIF.gz>
+gzipped file</a></td>
+<td> QLR2-AN-2-2 </td> </tr>
+
+<caption align=bottom> <p> <b>  Maros and Meszaros's QP test problems </b> 
+</caption>
+</table>                       
+
+<p align="justify">
+The CUTEr set of linear and nonlinear
+<a href="http://cuter.rl.ac.uk/cuter-www/Problems/mastsif.html">test problems</a>
+and the Netlib set of linear programming
+<a href="http://cuter.rl.ac.uk/cuter-www/Problems/netlib.html">test problems</a> 
+are also available.
+</ul>
+<hr>
+
+<h6 align=right>Last updated 12 December 2000 at 10:01 &nbsp;
+<a href="http://www.cse.clrc.ac.uk/Group/CSENAG">
+<img alt="Numerical Analysis Group" align=top border=0 
+ src="http://www.numerical.rl.ac.uk/img/num.gif"></a>
+<a href="http://www.cclrc.ac.uk/">
+<img alt="CCLRC" align=top border=0 height=30 
+ src="http://www.cclrc.ac.uk/img/clrc.gif"></a>
+</td>
+
+</h6>
+
+</body>
+</html>
+

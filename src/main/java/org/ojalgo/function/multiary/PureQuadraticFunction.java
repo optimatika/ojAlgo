@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -106,7 +106,7 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
     }
 
     public MatrixStore<N> getLinearFactors() {
-        return myCoefficients.physical().builder().makeZero(this.arity(), 1L).get();
+        return myCoefficients.physical().makeZero(this.arity(), 1L);
     }
 
     @Override

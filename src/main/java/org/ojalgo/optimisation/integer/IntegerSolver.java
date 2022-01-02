@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -218,6 +218,8 @@ public final class IntegerSolver extends GenericSolver {
         }
 
     }
+
+    public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
     private static volatile ForkJoinPool EXECUTOR;
 
@@ -584,7 +586,7 @@ public final class IntegerSolver extends GenericSolver {
         }
         final State tmpSate = State.INVALID;
         final double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE64.makeZero(this.getIntegerModel().countVariables(), 1).get();
+        final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(this.getIntegerModel().countVariables(), 1);
 
         return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
     }

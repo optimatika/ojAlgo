@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,35 +24,36 @@ package org.ojalgo.tensor;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayAnyD;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.array.RationalArray;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.RationalNumber;
 
 public class TensorTest {
 
     private static final int DIM = 2;
 
-    private static final Primitive64Matrix ELEMENTS_A = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final Primitive64Matrix ELEMENTS_B = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final Primitive64Matrix ELEMENTS_C = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final Primitive64Matrix ELEMENTS_D = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final RationalMatrix ELEMENTS_A = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final RationalMatrix ELEMENTS_B = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final RationalMatrix ELEMENTS_C = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final RationalMatrix ELEMENTS_D = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
 
-    private static final Primitive64Matrix.Factory FACTORY__M = Primitive64Matrix.FACTORY;
-    private static final TensorFactory1D<Double, VectorTensor<Double>> FACTORY_1 = VectorTensor.factory(Primitive64Array.FACTORY);
-    private static final TensorFactory2D<Double, MatrixTensor<Double>> FACTORY_2 = MatrixTensor.factory(Primitive64Array.FACTORY);
-    private static final TensorFactoryAnyD<Double, AnyTensor<Double>> FACTORY_N = AnyTensor.factory(Primitive64Array.FACTORY);
+    private static final RationalMatrix.Factory FACTORY__M = RationalMatrix.FACTORY;
+    private static final TensorFactory1D<RationalNumber, VectorTensor<RationalNumber>> FACTORY_1 = VectorTensor.factory(RationalArray.FACTORY);
+    private static final TensorFactory2D<RationalNumber, MatrixTensor<RationalNumber>> FACTORY_2 = MatrixTensor.factory(RationalArray.FACTORY);
+    private static final TensorFactoryAnyD<RationalNumber, AnyTensor<RationalNumber>> FACTORY_N = AnyTensor.factory(RationalArray.FACTORY);
 
     static final boolean DEBUG = false;
 
     @Test
     public void testCompareProductBetweenFactories() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
 
-        MatrixTensor<Double> prod2 = FACTORY_2.product(vectorA, vectorB);
-        AnyTensor<Double> prodN = FACTORY_N.product(vectorA, vectorB);
+        MatrixTensor<RationalNumber> prod2 = FACTORY_2.product(vectorA, vectorB);
+        AnyTensor<RationalNumber> prodN = FACTORY_N.product(vectorA, vectorB);
 
         if (DEBUG) {
             BasicLogger.debug("prod2: {}", prod2.toRawCopy1D());
@@ -65,14 +66,14 @@ public class TensorTest {
     @Test
     public void testCompareSumBetweenFactories() {
 
-        MatrixTensor<Double> matrixA = FACTORY_2.copy(ELEMENTS_A);
-        MatrixTensor<Double> matrixB = FACTORY_2.copy(ELEMENTS_B);
+        MatrixTensor<RationalNumber> matrixA = FACTORY_2.copy(ELEMENTS_A);
+        MatrixTensor<RationalNumber> matrixB = FACTORY_2.copy(ELEMENTS_B);
 
-        AnyTensor<Double> anyA = FACTORY_N.copy(ELEMENTS_A);
-        AnyTensor<Double> anyB = FACTORY_N.copy(ELEMENTS_B);
+        AnyTensor<RationalNumber> anyA = FACTORY_N.copy(ELEMENTS_A);
+        AnyTensor<RationalNumber> anyB = FACTORY_N.copy(ELEMENTS_B);
 
-        MatrixTensor<Double> sum2 = FACTORY_2.blocks(matrixA, matrixB);
-        AnyTensor<Double> sumN = FACTORY_N.blocks(anyA, anyB);
+        MatrixTensor<RationalNumber> sum2 = FACTORY_2.blocks(matrixA, matrixB);
+        AnyTensor<RationalNumber> sumN = FACTORY_N.blocks(anyA, anyB);
 
         if (DEBUG) {
             BasicLogger.debug("vecProd22: {}", sum2.toRawCopy1D());
@@ -85,12 +86,12 @@ public class TensorTest {
     @Test
     public void testConjugate2D() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
 
-        MatrixTensor<Double> original = FACTORY_2.product(vectorA, vectorB);
-        MatrixTensor<Double> reversed = FACTORY_2.product(vectorB, vectorA);
-        MatrixTensor<Double> conjugated = original.conjugate();
+        MatrixTensor<RationalNumber> original = FACTORY_2.product(vectorA, vectorB);
+        MatrixTensor<RationalNumber> reversed = FACTORY_2.product(vectorB, vectorA);
+        MatrixTensor<RationalNumber> conjugated = original.conjugate();
 
         if (DEBUG) {
             BasicLogger.debug("original", original);
@@ -104,13 +105,13 @@ public class TensorTest {
     @Test
     public void testConjugate3D() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
-        VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorC = FACTORY_1.copy(ELEMENTS_C);
 
-        AnyTensor<Double> original = FACTORY_N.product(vectorA, vectorB, vectorC);
-        AnyTensor<Double> reversed = FACTORY_N.product(vectorC, vectorB, vectorA);
-        AnyTensor<Double> conjugated = original.conjugate();
+        AnyTensor<RationalNumber> original = FACTORY_N.product(vectorA, vectorB, vectorC);
+        AnyTensor<RationalNumber> reversed = FACTORY_N.product(vectorC, vectorB, vectorA);
+        AnyTensor<RationalNumber> conjugated = original.conjugate();
 
         if (DEBUG) {
             BasicLogger.debug("original: {}", original);
@@ -124,14 +125,14 @@ public class TensorTest {
     @Test
     public void testConjugate4D() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
-        VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
-        VectorTensor<Double> vectorD = FACTORY_1.copy(ELEMENTS_D);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorC = FACTORY_1.copy(ELEMENTS_C);
+        VectorTensor<RationalNumber> vectorD = FACTORY_1.copy(ELEMENTS_D);
 
-        AnyTensor<Double> original = FACTORY_N.product(vectorA, vectorB, vectorC, vectorD);
-        AnyTensor<Double> reversed = FACTORY_N.product(vectorD, vectorC, vectorB, vectorA);
-        AnyTensor<Double> conjugated = original.conjugate();
+        AnyTensor<RationalNumber> original = FACTORY_N.product(vectorA, vectorB, vectorC, vectorD);
+        AnyTensor<RationalNumber> reversed = FACTORY_N.product(vectorD, vectorC, vectorB, vectorA);
+        AnyTensor<RationalNumber> conjugated = original.conjugate();
 
         if (DEBUG) {
             BasicLogger.debug("original: {}", original);
@@ -145,21 +146,21 @@ public class TensorTest {
     @Test
     public void testDeterminantAndTrace() {
 
-        MatrixTensor<Double> tensorA = FACTORY_2.copy(ELEMENTS_A);
-        MatrixTensor<Double> tensorB = FACTORY_2.copy(ELEMENTS_B);
-        MatrixTensor<Double> tensorC = FACTORY_2.copy(ELEMENTS_C);
-        MatrixTensor<Double> tensorD = FACTORY_2.copy(ELEMENTS_D);
+        MatrixTensor<RationalNumber> tensorA = FACTORY_2.copy(ELEMENTS_A);
+        MatrixTensor<RationalNumber> tensorB = FACTORY_2.copy(ELEMENTS_B);
+        MatrixTensor<RationalNumber> tensorC = FACTORY_2.copy(ELEMENTS_C);
+        MatrixTensor<RationalNumber> tensorD = FACTORY_2.copy(ELEMENTS_D);
 
-        MatrixTensor<Double> sum1 = FACTORY_2.blocks(tensorA, tensorB);
-        MatrixTensor<Double> sum2 = FACTORY_2.blocks(tensorC, tensorD);
+        MatrixTensor<RationalNumber> sum1 = FACTORY_2.blocks(tensorA, tensorB);
+        MatrixTensor<RationalNumber> sum2 = FACTORY_2.blocks(tensorC, tensorD);
 
-        MatrixTensor<Double> product1 = FACTORY_2.kronecker(tensorA, tensorB);
-        MatrixTensor<Double> product2 = FACTORY_2.kronecker(tensorC, tensorD);
+        MatrixTensor<RationalNumber> product1 = FACTORY_2.kronecker(tensorA, tensorB);
+        MatrixTensor<RationalNumber> product2 = FACTORY_2.kronecker(tensorC, tensorD);
 
-        Primitive64Matrix matrixS1 = FACTORY__M.copy(sum1);
-        Primitive64Matrix matrixS2 = FACTORY__M.copy(sum2);
-        Primitive64Matrix matrixP1 = FACTORY__M.copy(product1);
-        Primitive64Matrix matrixP2 = FACTORY__M.copy(product2);
+        RationalMatrix matrixS1 = FACTORY__M.copy(sum1);
+        RationalMatrix matrixS2 = FACTORY__M.copy(sum2);
+        RationalMatrix matrixP1 = FACTORY__M.copy(product1);
+        RationalMatrix matrixP2 = FACTORY__M.copy(product2);
 
         TestUtils.assertEquals(ELEMENTS_A.getDeterminant().multiply(ELEMENTS_B.getDeterminant()), matrixS1.getDeterminant());
         TestUtils.assertEquals(ELEMENTS_C.getDeterminant().multiply(ELEMENTS_D.getDeterminant()), matrixS2.getDeterminant());
@@ -177,16 +178,16 @@ public class TensorTest {
     @Test
     public void testKroneckerProduct() {
 
-        MatrixTensor<Double> matrixA = FACTORY_2.copy(ELEMENTS_A);
-        MatrixTensor<Double> matrixB = FACTORY_2.copy(ELEMENTS_B);
+        MatrixTensor<RationalNumber> matrixA = FACTORY_2.copy(ELEMENTS_A);
+        MatrixTensor<RationalNumber> matrixB = FACTORY_2.copy(ELEMENTS_B);
 
-        MatrixTensor<Double> identity = FACTORY_2.identity(3);
+        MatrixTensor<RationalNumber> identity = FACTORY_2.identity(3);
 
-        MatrixTensor<Double> left = FACTORY_2.kronecker(matrixA, identity);
-        MatrixTensor<Double> right = FACTORY_2.kronecker(identity, matrixB);
-        MatrixTensor<Double> both = FACTORY_2.kronecker(matrixA, matrixB);
+        MatrixTensor<RationalNumber> left = FACTORY_2.kronecker(matrixA, identity);
+        MatrixTensor<RationalNumber> right = FACTORY_2.kronecker(identity, matrixB);
+        MatrixTensor<RationalNumber> both = FACTORY_2.kronecker(matrixA, matrixB);
 
-        MatrixTensor<Double> blocks = FACTORY_2.blocks(matrixB, matrixB, matrixB);
+        MatrixTensor<RationalNumber> blocks = FACTORY_2.blocks(matrixB, matrixB, matrixB);
 
         if (DEBUG) {
             BasicLogger.debug("left", left);
@@ -201,17 +202,17 @@ public class TensorTest {
 
         TestUtils.assertEquals(blocks, right);
 
-        MatrixTensor<Double> matrixC = FACTORY_2.copy(ELEMENTS_C);
-        MatrixTensor<Double> matrixD = FACTORY_2.copy(ELEMENTS_D);
+        MatrixTensor<RationalNumber> matrixC = FACTORY_2.copy(ELEMENTS_C);
+        MatrixTensor<RationalNumber> matrixD = FACTORY_2.copy(ELEMENTS_D);
 
-        Primitive64Matrix matrixAkB = FACTORY__M.copy(FACTORY_2.kronecker(matrixA, matrixB));
-        Primitive64Matrix matrixCkD = FACTORY__M.copy(FACTORY_2.kronecker(matrixC, matrixD));
-        Primitive64Matrix matrixAkBmCkD = matrixAkB.multiply(matrixCkD);
+        RationalMatrix matrixAkB = FACTORY__M.copy(FACTORY_2.kronecker(matrixA, matrixB));
+        RationalMatrix matrixCkD = FACTORY__M.copy(FACTORY_2.kronecker(matrixC, matrixD));
+        RationalMatrix matrixAkBmCkD = matrixAkB.multiply(matrixCkD);
 
-        MatrixTensor<Double> matrixAmC = FACTORY_2.copy(ELEMENTS_A.multiply(ELEMENTS_C));
-        MatrixTensor<Double> matrixBmD = FACTORY_2.copy(ELEMENTS_B.multiply(ELEMENTS_D));
+        MatrixTensor<RationalNumber> matrixAmC = FACTORY_2.copy(ELEMENTS_A.multiply(ELEMENTS_C));
+        MatrixTensor<RationalNumber> matrixBmD = FACTORY_2.copy(ELEMENTS_B.multiply(ELEMENTS_D));
 
-        MatrixTensor<Double> matrixACkBD = FACTORY_2.kronecker(matrixAmC, matrixBmD);
+        MatrixTensor<RationalNumber> matrixACkBD = FACTORY_2.kronecker(matrixAmC, matrixBmD);
 
         TestUtils.assertEquals(matrixAkBmCkD, matrixACkBD);
     }
@@ -219,14 +220,14 @@ public class TensorTest {
     @Test
     public void testProductOfVectors() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
-        VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorC = FACTORY_1.copy(ELEMENTS_C);
 
         int length = DIM * DIM;
         int count = length * length * length;
 
-        AnyTensor<Double> vectorProduct = FACTORY_N.product(vectorA, vectorB, vectorC);
+        AnyTensor<RationalNumber> vectorProduct = FACTORY_N.product(vectorA, vectorB, vectorC);
 
         if (DEBUG) {
             BasicLogger.debug("vectorA: {}", vectorA);
@@ -252,13 +253,13 @@ public class TensorTest {
     @Test
     public void testSumOfVectors() {
 
-        VectorTensor<Double> vectorA = FACTORY_1.copy(ELEMENTS_A);
-        VectorTensor<Double> vectorB = FACTORY_1.copy(ELEMENTS_B);
-        VectorTensor<Double> vectorC = FACTORY_1.copy(ELEMENTS_C);
+        VectorTensor<RationalNumber> vectorA = FACTORY_1.copy(ELEMENTS_A);
+        VectorTensor<RationalNumber> vectorB = FACTORY_1.copy(ELEMENTS_B);
+        VectorTensor<RationalNumber> vectorC = FACTORY_1.copy(ELEMENTS_C);
 
         int length = DIM * DIM;
 
-        VectorTensor<Double> sum1 = FACTORY_1.sum(vectorA, vectorB, vectorC);
+        VectorTensor<RationalNumber> sum1 = FACTORY_1.sum(vectorA, vectorB, vectorC);
 
         if (DEBUG) {
             BasicLogger.debug("vectorA: {}", vectorA);
@@ -280,7 +281,7 @@ public class TensorTest {
             TestUtils.assertEquals(vectorC.doubleValue(i), sum1.doubleValue(length + length + i));
         }
 
-        AnyTensor<Double> sumN = FACTORY_N.sum(vectorA, vectorB, vectorC);
+        AnyTensor<RationalNumber> sumN = FACTORY_N.sum(vectorA, vectorB, vectorC);
 
         TestUtils.assertEquals(sum1, sumN);
     }
@@ -291,11 +292,11 @@ public class TensorTest {
     @Test
     public void testTensorProductOf3Vectors() {
 
-        VectorTensor<Double> u = FACTORY_1.values(1, 1);
-        VectorTensor<Double> v = FACTORY_1.values(1, -2);
-        VectorTensor<Double> w = FACTORY_1.values(-1, 3);
+        VectorTensor<RationalNumber> u = FACTORY_1.values(1, 1);
+        VectorTensor<RationalNumber> v = FACTORY_1.values(1, -2);
+        VectorTensor<RationalNumber> w = FACTORY_1.values(-1, 3);
 
-        ArrayAnyD<Double> expected = ArrayAnyD.PRIMITIVE64.make(2, 2, 2);
+        ArrayAnyD<RationalNumber> expected = ArrayAnyD.RATIONAL.make(2, 2, 2);
         expected.set(new long[] { 0, 0, 0 }, -1);
         expected.set(new long[] { 0, 0, 1 }, 3);
         expected.set(new long[] { 0, 1, 0 }, 2);
@@ -305,7 +306,7 @@ public class TensorTest {
         expected.set(new long[] { 1, 1, 0 }, 2);
         expected.set(new long[] { 1, 1, 1 }, -6);
 
-        AnyTensor<Double> actual = FACTORY_N.product(u, v, w);
+        AnyTensor<RationalNumber> actual = FACTORY_N.product(u, v, w);
 
         if (DEBUG) {
             BasicLogger.debug("expected: {}", expected);

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,16 @@
  */
 package org.ojalgo.matrix.task;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.ojalgo.RecoverableCondition;
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -89,14 +94,13 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.COMPLEX.make(templateBody);
-                } else {
-                    return LU.COMPLEX.make(templateBody);
                 }
-            } else if (templateBody.isTall()) {
-                return QR.COMPLEX.make(templateBody);
-            } else {
-                return SingularValue.COMPLEX.make(templateBody);
+                return LU.COMPLEX.make(templateBody);
             }
+            if (templateBody.isTall()) {
+                return QR.COMPLEX.make(templateBody);
+            }
+            return SingularValue.COMPLEX.make(templateBody);
         }
 
     };
@@ -116,9 +120,11 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
                     if (!tmpVectorRHS) {
                         return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
-                    } else if (tmpColDim == 1L) {
+                    }
+                    if (tmpColDim == 1L) {
                         return AbstractSolver.FULL_1X1;
-                    } else if (tmpColDim == 2L) {
+                    }
+                    if (tmpColDim == 2L) {
                         return AbstractSolver.SYMMETRIC_2X2;
                     } else if (tmpColDim == 3L) {
                         return AbstractSolver.SYMMETRIC_3X3;
@@ -130,37 +136,34 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
                         return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
                     }
 
+                }
+                if (!tmpVectorRHS) {
+                    return LU.PRIMITIVE.make(templateBody);
+                }
+                if (tmpColDim == 1L) {
+                    return AbstractSolver.FULL_1X1;
+                }
+                if (tmpColDim == 2L) {
+                    return AbstractSolver.FULL_2X2;
+                } else if (tmpColDim == 3L) {
+                    return AbstractSolver.FULL_3X3;
+                } else if (tmpColDim == 4L) {
+                    return AbstractSolver.FULL_4X4;
+                } else if (tmpColDim == 5L) {
+                    return AbstractSolver.FULL_5X5;
                 } else {
-
-                    if (!tmpVectorRHS) {
-                        return LU.PRIMITIVE.make(templateBody);
-                    } else if (tmpColDim == 1L) {
-                        return AbstractSolver.FULL_1X1;
-                    } else if (tmpColDim == 2L) {
-                        return AbstractSolver.FULL_2X2;
-                    } else if (tmpColDim == 3L) {
-                        return AbstractSolver.FULL_3X3;
-                    } else if (tmpColDim == 4L) {
-                        return AbstractSolver.FULL_4X4;
-                    } else if (tmpColDim == 5L) {
-                        return AbstractSolver.FULL_5X5;
-                    } else {
-                        return LU.PRIMITIVE.make(templateBody);
-                    }
+                    return LU.PRIMITIVE.make(templateBody);
                 }
 
-            } else if (templateBody.isTall()) {
-
-                if (tmpVectorRHS && (tmpColDim <= 5)) {
-                    return AbstractSolver.LEAST_SQUARES;
-                } else {
-                    return QR.PRIMITIVE.make(templateBody);
-                }
-
-            } else {
+            }
+            if (!templateBody.isTall()) {
 
                 return SingularValue.PRIMITIVE.make(templateBody);
             }
+            if (tmpVectorRHS && tmpColDim <= 5) {
+                return AbstractSolver.LEAST_SQUARES;
+            }
+            return QR.PRIMITIVE.make(templateBody);
         }
 
     };
@@ -173,14 +176,13 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.QUATERNION.make(templateBody);
-                } else {
-                    return LU.QUATERNION.make(templateBody);
                 }
-            } else if (templateBody.isTall()) {
-                return QR.QUATERNION.make(templateBody);
-            } else {
-                return SingularValue.QUATERNION.make(templateBody);
+                return LU.QUATERNION.make(templateBody);
             }
+            if (templateBody.isTall()) {
+                return QR.QUATERNION.make(templateBody);
+            }
+            return SingularValue.QUATERNION.make(templateBody);
         }
 
     };
@@ -193,14 +195,13 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.RATIONAL.make(templateBody);
-                } else {
-                    return LU.RATIONAL.make(templateBody);
                 }
-            } else if (templateBody.isTall()) {
-                return QR.RATIONAL.make(templateBody);
-            } else {
-                return SingularValue.RATIONAL.make(templateBody);
+                return LU.RATIONAL.make(templateBody);
             }
+            if (templateBody.isTall()) {
+                return QR.RATIONAL.make(templateBody);
+            }
+            return SingularValue.RATIONAL.make(templateBody);
         }
 
     };
@@ -270,5 +271,15 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
      * @return The solution
      */
     MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition;
+
+    default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final ElementsSupplier<N> body,
+            final Supplier<MatrixStore<N>> alternativeBodySupplier, final Access2D<?> rhs) {
+        try {
+            MatrixStore<N> solution = this.solve(alternativeBodySupplier.get(), rhs);
+            return r -> Optional.of(solution);
+        } catch (RecoverableCondition cause) {
+            return r -> Optional.empty();
+        }
+    }
 
 }

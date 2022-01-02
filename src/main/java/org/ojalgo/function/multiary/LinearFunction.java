@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,15 +89,14 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return this.factory().builder().makeZero(this.arity(), this.arity()).get();
+        return this.factory().makeZero(this.arity(), this.arity());
     }
 
     public MatrixStore<N> getLinearFactors() {
         if (myCoefficients.countRows() == 1L) {
             return myCoefficients.transpose();
-        } else {
-            return myCoefficients;
         }
+        return myCoefficients;
     }
 
     @Override

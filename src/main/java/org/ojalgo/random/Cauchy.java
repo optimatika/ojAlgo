@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ public class Cauchy extends AbstractContinuous {
     }
 
     public double getDistribution(final double value) {
-        return HALF + (Math.atan((value - myLocation) / myScale) / PI);
+        return HALF + Math.atan((value - myLocation) / myScale) / PI;
     }
 
     public double getExpected() {
@@ -64,7 +64,7 @@ public class Cauchy extends AbstractContinuous {
     }
 
     public double getQuantile(final double probability) {
-        return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
+        return myLocation + myScale * Math.tan(PI * (probability - HALF));
     }
 
     @Override

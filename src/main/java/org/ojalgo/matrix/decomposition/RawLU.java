@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -115,12 +115,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(false, true);
+        MatrixStore<Double> logical = this.getInternalStore().triangular(false, true);
         int nbRows = this.getRowDim();
         if (nbRows < this.getColDim()) {
-            return logical.limits(nbRows, nbRows).get();
+            return logical.limits(nbRows, nbRows);
         }
-        return logical.get();
+        return logical;
     }
 
     public int[] getPivotOrder() {
@@ -143,18 +143,18 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
-        this.collect(rhs).logical().row(myPivot.getOrder()).supplyTo(preallocated);
+        this.collect(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }
 
     public MatrixStore<Double> getU() {
-        LogicalBuilder<Double> logical = this.getInternalStore().logical().triangular(true, false);
+        MatrixStore<Double> retVal = this.getInternalStore().triangular(true, false);
         int nbCols = this.getColDim();
         if (this.getRowDim() > nbCols) {
-            logical.limits(nbCols, nbCols).get();
+            retVal = retVal.limits(nbCols, nbCols);
         }
-        return logical.get();
+        return retVal;
     }
 
     @Override
@@ -200,7 +200,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
 
-            MatrixStore.PRIMITIVE64.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+            Primitive64Store.FACTORY.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
 
             return this.doSolve(preallocated);
 

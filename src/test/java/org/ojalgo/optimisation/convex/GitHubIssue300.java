@@ -94,8 +94,8 @@ public class GitHubIssue300 extends OptimisationConvexTests {
 
         // to ensure the result will have all its elements positive, we set ai
         // to negative identity and bi to zero
-        ai = MatrixStore.PRIMITIVE64.makeIdentity(c.countRows()).get().negate();
-        bi = MatrixStore.PRIMITIVE64.makeZero(c.countRows(), 1).get();
+        ai = Primitive64Store.FACTORY.makeIdentity(c.countRows()).negate();
+        bi = Primitive64Store.FACTORY.makeZero(c.countRows(), 1);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class GitHubIssue300 extends OptimisationConvexTests {
     void setUp() throws IOException {
         qModel = MatrixReader.readMatrix("model_quadratic.csv");
         lModel = MatrixReader.readMatrix("model_linear.csv");
-        qRegul = MatrixReader.readMatrix("regul_quadratic.csv").get();
+        qRegul = MatrixReader.readMatrix("regul_quadratic.csv");
         someProfile = Access1D.wrap(SOME_PROFILE);
     }
 

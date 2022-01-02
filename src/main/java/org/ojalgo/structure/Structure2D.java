@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,11 +69,8 @@ public interface Structure2D extends Structure1D {
         }
 
         public int compareTo(final IntRowColumn ref) {
-
             if (column == ref.column) {
-
                 return Integer.compare(row, ref.row);
-
             }
             return Integer.compare(column, ref.column);
         }
@@ -83,14 +80,11 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || (this.getClass() != obj.getClass())) {
+            if (obj == null || this.getClass() != obj.getClass()) {
                 return false;
             }
             final IntRowColumn other = (IntRowColumn) obj;
-            if (column != other.column) {
-                return false;
-            }
-            if (row != other.row) {
+            if (column != other.column || row != other.row) {
                 return false;
             }
             return true;
@@ -135,7 +129,6 @@ public interface Structure2D extends Structure1D {
 
     }
 
-    @SuppressWarnings("unchecked")
     interface Logical<S extends Structure2D, B extends Logical<S, B>> extends Structure2D {
 
         B above(long numberOfRows);
@@ -144,15 +137,11 @@ public interface Structure2D extends Structure1D {
 
         B above(S above);
 
-        B above(S above1, S above2);
-
         B below(long numberOfRows);
 
         B below(S... below);
 
         B below(S below);
-
-        B below(S below1, S below2);
 
         B bidiagonal(boolean upper);
 
@@ -196,8 +185,6 @@ public interface Structure2D extends Structure1D {
 
         B diagonally(S... diagonally);
 
-        S get();
-
         /**
          * Similar to {@link #symmetric(boolean)} but in addition the mirrored elements are conjugated.
          */
@@ -210,8 +197,6 @@ public interface Structure2D extends Structure1D {
         B left(S... left);
 
         B left(S left);
-
-        B left(S left1, S left2);
 
         /**
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
@@ -235,8 +220,6 @@ public interface Structure2D extends Structure1D {
         B right(S... right);
 
         B right(S right);
-
-        B right(S right1, S right2);
 
         /**
          * @see #rows(int[])
@@ -340,14 +323,11 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof LongRowColumn)) {
+            if (obj == null || !(obj instanceof LongRowColumn)) {
                 return false;
             }
             final LongRowColumn other = (LongRowColumn) obj;
-            if (column != other.column) {
-                return false;
-            }
-            if (row != other.row) {
+            if (column != other.column || row != other.row) {
                 return false;
             }
             return true;
@@ -447,7 +427,7 @@ public interface Structure2D extends Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof RowColumnKey)) {
+            if (obj == null || !(obj instanceof RowColumnKey)) {
                 return false;
             }
             final RowColumnKey other = (RowColumnKey) obj;
@@ -544,8 +524,40 @@ public interface Structure2D extends Structure1D {
         return numberOfRows * numberOfColumnns;
     }
 
+    static int firstInColumn(final Structure1D structure, final int col, final int defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInColumn(final Structure1D structure, final long col, final long defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int firstInRow(final Structure1D structure, final int row, final int defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInRow(final Structure1D structure, final long row, final long defaultAndMinimum) {
+        return structure instanceof Structure2D ? Math.max(((Structure2D) structure).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
     static long index(final long structure, final long row, final long column) {
         return row + column * structure;
+    }
+
+    static int limitOfColumn(final Structure1D structure, final int col, final int defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfColumn(final Structure1D structure, final long col, final long defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static int limitOfRow(final Structure1D structure, final int row, final int defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfRow(final Structure1D structure, final long row, final long defaultAndMaximum) {
+        return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
     static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
@@ -599,6 +611,27 @@ public interface Structure2D extends Structure1D {
      * @return The number of rows
      */
     long countRows();
+
+    /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countRows()</code>.
+     *
+     * @param col The column index
+     * @return The row index of the first non-zero element in the specified column
+     */
+    default int firstInColumn(final int col) {
+        return 0;
+    }
+
+    /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countColumns()</code>.
+     *
+     * @return The column index of the first non-zero element in the specified row
+     */
+    default int firstInRow(final int row) {
+        return 0;
+    }
 
     default int getColDim() {
         return Math.toIntExact(this.countColumns());
@@ -683,6 +716,28 @@ public interface Structure2D extends Structure1D {
         return this.countColumns() == 1L || this.countRows() == 1L;
     }
 
+    /**
+     * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfColumn(final int col) {
+        return this.getRowDim();
+    }
+
+    /**
+     * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfRow(final int row) {
+        return this.getColDim();
+    }
+
     default void loopAll(final RowColumnCallback callback) {
         final long tmpCountRows = this.countRows();
         final long tmpCountColumns = this.countColumns();
@@ -721,5 +776,4 @@ public interface Structure2D extends Structure1D {
     default void loopRow(final long row, final RowColumnCallback callback) {
         this.loopRow(row, 0L, callback);
     }
-
 }

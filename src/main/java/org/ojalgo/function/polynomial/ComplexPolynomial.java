@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,13 @@ package org.ojalgo.function.polynomial;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 
-public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
+public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 
     public ComplexPolynomial(final int degree) {
-        super(Array1D.COMPLEX.makeZero(degree + 1));
+        super(Array1D.COMPLEX.make(degree + 1));
     }
 
     ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
@@ -39,37 +38,15 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-
-        final int tmpRowDim = (int) Math.min(x.count(), y.count());
-        final int tmpColDim = this.size();
-
-        final PhysicalStore<ComplexNumber> tmpBody = GenericStore.COMPLEX.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<ComplexNumber> tmpRHS = GenericStore.COMPLEX.makeZero(tmpRowDim, 1);
-
-        for (int i = 0; i < tmpRowDim; i++) {
-
-            ComplexNumber tmpX = ComplexNumber.ONE;
-            final ComplexNumber tmpXfactor = ComplexNumber.valueOf(x.get(i));
-            final ComplexNumber tmpY = ComplexNumber.valueOf(y.get(i));
-
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpBody.set(i, j, tmpX);
-                tmpX = tmpX.multiply(tmpXfactor);
-            }
-            tmpRHS.set(i, 0, tmpY);
-        }
-
-        final QR<ComplexNumber> tmpQR = QR.COMPLEX.make();
-        tmpQR.decompose(tmpBody);
-        this.set(tmpQR.getSolution(tmpRHS));
+        this.estimate(x, y, GenericStore.COMPLEX, QR.COMPLEX);
     }
 
     public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
 
-        final PolynomialFunction<ComplexNumber> tmpPrim = this.buildPrimitive();
+        PolynomialFunction<ComplexNumber> tmpPrim = this.buildPrimitive();
 
-        final ComplexNumber tmpFromVal = tmpPrim.invoke(fromPoint);
-        final ComplexNumber tmpToVal = tmpPrim.invoke(toPoint);
+        ComplexNumber tmpFromVal = tmpPrim.invoke(fromPoint);
+        ComplexNumber tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }
@@ -88,7 +65,7 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     }
 
     public void set(final Access1D<?> coefficients) {
-        final int tmpLimit = (int) Math.min(this.size(), coefficients.count());
+        int tmpLimit = Math.min(this.size(), coefficients.size());
         for (int p = 0; p < tmpLimit; p++) {
             this.set(p, ComplexNumber.valueOf(coefficients.get(p)));
         }
@@ -96,7 +73,7 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 
     @Override
     protected ComplexNumber getDerivativeFactor(final int power) {
-        final int tmpNextIndex = power + 1;
+        int tmpNextIndex = power + 1;
         return this.get(tmpNextIndex).multiply(tmpNextIndex);
     }
 
@@ -104,14 +81,13 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     protected ComplexNumber getPrimitiveFactor(final int power) {
         if (power <= 0) {
             return ComplexNumber.ZERO;
-        } else {
-            return this.get(power - 1).divide(power);
         }
+        return this.get(power - 1).divide(power);
     }
 
     @Override
     protected AbstractPolynomial<ComplexNumber> makeInstance(final int size) {
-        return new ComplexPolynomial(Array1D.COMPLEX.makeZero(size));
+        return new ComplexPolynomial(Array1D.COMPLEX.make(size));
     }
 
 }

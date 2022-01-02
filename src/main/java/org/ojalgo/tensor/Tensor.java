@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,10 @@ import org.ojalgo.array.ArrayAnyD;
  * An n:th-rank tensor in m-dimensional space is a mathematical object that has n indices and m^n components
  * and obeys certain transformation rules. Tensors are generalizations of scalars (that have no indices),
  * vectors (that have exactly one index), and matrices (that have exactly two indices) to an arbitrary number
- * of indices. If all you want is multi-dimesional arrays this interface and its implementations is NOT what
- * you're looking for. In that case just use {@link ArrayAnyD} instead.
+ * of indices.
+ * <p>
+ * If all you want is multi-dimesional arrays this interface and its implementations is NOT what you're
+ * looking for. In that case just use {@link ArrayAnyD} instead.
  *
  * @see https://mathworld.wolfram.com/Tensor.html
  * @author apete
@@ -50,7 +52,7 @@ public interface Tensor<N extends Comparable<N>, T extends Tensor<N, T>> extends
     int dimensions();
 
     default boolean isSameShape(final Tensor<?, ?> other) {
-        return (this.rank() == other.rank()) && (this.dimensions() == other.dimensions());
+        return this.rank() == other.rank() && this.dimensions() == other.dimensions();
     }
 
     /**

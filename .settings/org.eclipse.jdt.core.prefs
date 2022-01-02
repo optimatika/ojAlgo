@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+org.eclipse.jdt.core.builder.annotationPath.allLocations=disabled
 org.eclipse.jdt.core.compiler.annotation.inheritNullAnnotations=disabled
 org.eclipse.jdt.core.compiler.annotation.missingNonNullByDefaultAnnotation=ignore
 org.eclipse.jdt.core.compiler.annotation.nonnull=org.eclipse.jdt.annotation.NonNull
@@ -72,7 +73,7 @@ org.eclipse.jdt.core.compiler.problem.redundantNullAnnotation=warning
 org.eclipse.jdt.core.compiler.problem.redundantNullCheck=warning
 org.eclipse.jdt.core.compiler.problem.redundantSpecificationOfTypeArguments=warning
 org.eclipse.jdt.core.compiler.problem.redundantSuperinterface=warning
-org.eclipse.jdt.core.compiler.problem.reportMethodCanBePotentiallyStatic=info
+org.eclipse.jdt.core.compiler.problem.reportMethodCanBePotentiallyStatic=ignore
 org.eclipse.jdt.core.compiler.problem.reportMethodCanBeStatic=warning
 org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures=warning
 org.eclipse.jdt.core.compiler.problem.specialParameterHidingField=enabled

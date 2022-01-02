@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030528Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+    private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
@@ -76,7 +76,7 @@ public class P20030528Case extends BasicMatrixTest {
 
         final PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
 
-        final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
+        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         // tmpSVD.equals(tmpA, EVALUATION);

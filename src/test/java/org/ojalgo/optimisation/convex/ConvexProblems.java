@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -119,6 +119,25 @@ public class ConvexProblems extends OptimisationConvexTests {
         return model;
     }
 
+    public static ConvexSolver.Builder getDataP20140522() {
+
+        double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
+        RawStore mtrxQ = RawStore.FACTORY.rows(q);
+
+        double[] c = new double[] { 195.0, 59.0, -1.8, -11.7 };
+        RawStore mtrxC = RawStore.FACTORY.columns(c);
+
+        double[][] ai = new double[][] { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 },
+                { 1.0, 1.0, 1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 },
+                { -0.01, 0.0, 0.0, 0.0 }, { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
+        RawStore mtrxAI = RawStore.FACTORY.rows(ai);
+
+        double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
+        RawStore mtrxBI = RawStore.FACTORY.columns(bi);
+
+        return ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI);
+    }
+
     private static void builAndTestModel(final Primitive64Store[] matrices, final double[] expectedSolution, final NumberContext modelValidationContext,
             final boolean testSolverDirectly) {
 
@@ -189,7 +208,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     /**
      * Build model, and initialise variable values to the expected solution (if not null)
      */
-    static ExpressionsBasedModel buildModel(final Access2D<?>[] matrices, final Access2D<?> expectedSolution) {
+    static ExpressionsBasedModel buildModel(final Access2D<?>[] matrices, final Access1D<?> expectedSolution) {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1065,35 +1084,38 @@ public class ConvexProblems extends OptimisationConvexTests {
     /**
      * Infeasible problem, but solver reports optimal solution!
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testP20090924() {
 
-        MatrixStore<Double>[] tmpMtrxs = new MatrixStore[6];
+        MatrixStore<Double>[] mtrxs = new MatrixStore[6];
 
-        tmpMtrxs[0] = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } });
-        tmpMtrxs[1] = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 }, { 0.7027946085029227 } });
-        tmpMtrxs[2] = Primitive64Store.FACTORY.rows(new double[][] { { 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        mtrxs[0] = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } });
+        mtrxs[1] = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 }, { 0.7027946085029227 } });
+        mtrxs[2] = Primitive64Store.FACTORY.rows(new double[][] { { 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 } });
-        tmpMtrxs[3] = Primitive64Store.FACTORY.rows(new double[][] { { -0.0 }, { 0.5 }, { 0.25 }, { 0.25 }, { 0.3 }, { -0.0 }, { 0.62 } });
-        tmpMtrxs[4] = Primitive64Store.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 },
+        mtrxs[3] = Primitive64Store.FACTORY.rows(new double[][] { { -0.0 }, { 0.5 }, { 0.25 }, { 0.25 }, { 0.3 }, { -0.0 }, { 0.62 } });
+        mtrxs[4] = Primitive64Store.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 },
                 { 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 } });
-        tmpMtrxs[5] = Primitive64Store.FACTORY.rows(new double[][] { { 0.17 }, { 0.52 }, { 0.3 }, { 0.3 }, { 0.3 }, { 0.15 }, { 1.0 }, { 0.31 },
+        mtrxs[5] = Primitive64Store.FACTORY.rows(new double[][] { { 0.17 }, { 0.52 }, { 0.3 }, { 0.3 }, { 0.3 }, { 0.15 }, { 1.0 }, { 0.31 },
                 { -0.05960220972942152 }, { -0.1144024630877301 }, { -0.12289286964304823 }, { 0.0 }, { -0.02 }, { 0.0 } });
 
-        ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpMtrxs);
+        ConvexSolver.Builder builder = new ConvexSolver.Builder(mtrxs);
 
-        ConvexSolver tmpSolver = tmpBuilder.build();
+        ConvexSolver solver = builder.build();
 
-        Optimisation.Result tmpResult = tmpSolver.solve();
+        Optimisation.Result result = solver.solve();
 
-        TestUtils.assertStateLessThanFeasible(tmpResult);
+        TestUtils.assertStateLessThanFeasible(result);
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null, null);
+
+        ExpressionsBasedModel model = ConvexProblems.buildModel(mtrxs, result);
+
+        TestUtils.assertFalse(model.validate(result));
     }
 
     /**
@@ -1390,25 +1412,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         Optimisation.Result solverResult = solver.solve();
 
         TestUtils.assertStateAndSolution(expectedResult, solverResult);
-    }
-
-    public static ConvexSolver.Builder getDataP20140522() {
-
-        double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
-        RawStore mtrxQ = RawStore.FACTORY.rows(q);
-
-        double[] c = new double[] { 195.0, 59.0, -1.8, -11.7 };
-        RawStore mtrxC = RawStore.FACTORY.columns(c);
-
-        double[][] ai = new double[][] { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 },
-                { 1.0, 1.0, 1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 },
-                { -0.01, 0.0, 0.0, 0.0 }, { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
-        RawStore mtrxAI = RawStore.FACTORY.rows(ai);
-
-        double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
-        RawStore mtrxBI = RawStore.FACTORY.columns(bi);
-
-        return ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI);
     }
 
     /**

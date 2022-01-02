@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,6 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -47,62 +45,46 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
 
-    public static final class DenseReceiver extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Mutator<PhysicalStore<Double>> {
+    public static final class DenseReceiver extends Mutator2D<Double, Primitive32Matrix, PhysicalStore<Double>> {
 
-        DenseReceiver(final Factory enclosing, final PhysicalStore<Double> delegate) {
-            enclosing.super(delegate);
+        DenseReceiver(final PhysicalStore<Double> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
 
         Factory() {
             super(Primitive32Matrix.class, Primitive32Store.FACTORY);
         }
 
         @Override
-        Primitive32Matrix.LogicalBuilder logical(final MatrixStore<Double> delegate) {
-            return new Primitive32Matrix.LogicalBuilder(this, delegate);
+        Primitive32Matrix.DenseReceiver dense(final PhysicalStore<Double> store) {
+            return new Primitive32Matrix.DenseReceiver(store);
         }
 
         @Override
-        Primitive32Matrix.DenseReceiver physical(final PhysicalStore<Double> delegate) {
-            return new Primitive32Matrix.DenseReceiver(this, delegate);
-        }
-
-        @Override
-        Primitive32Matrix.SparseReceiver physical(final SparseStore<Double> delegate) {
-            return new Primitive32Matrix.SparseReceiver(this, delegate);
+        Primitive32Matrix.SparseReceiver sparse(final SparseStore<Double> store) {
+            return new Primitive32Matrix.SparseReceiver(store);
         }
 
     }
 
-    public static final class LogicalBuilder extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Logical {
+    public static final class SparseReceiver extends Mutator2D<Double, Primitive32Matrix, SparseStore<Double>> {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
-            enclosing.super(delegate);
-        }
-
-        LogicalBuilder(final Factory enclosing, final MatrixStore<Double> store) {
-            enclosing.super(store);
+        SparseReceiver(final SparseStore<Double> delegate) {
+            super(delegate);
         }
 
         @Override
-        LogicalBuilder self() {
-            return this;
-        }
-
-    }
-
-    public static final class SparseReceiver extends
-            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Mutator<SparseStore<Double>> {
-
-        SparseReceiver(final Factory enclosing, final SparseStore<Double> delegate) {
-            enclosing.super(delegate);
+        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
@@ -112,95 +94,62 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    Primitive32Matrix(final MatrixStore<Double> aStore) {
-        super(aStore);
+    Primitive32Matrix(final ElementsSupplier<Double> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Primitive32Matrix.DenseReceiver copy() {
-        return new Primitive32Matrix.DenseReceiver(FACTORY, this.getStore().copy());
+        return new Primitive32Matrix.DenseReceiver(this.store().copy());
     }
 
     @Override
-    public Primitive32Matrix.LogicalBuilder logical() {
-        return new Primitive32Matrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    ElementsSupplier<Double> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof Primitive32Matrix) {
-
-            return ((Primitive32Matrix) matrix).getStore();
-
-        } else if (matrix instanceof Primitive32Store) {
-
-            return (Primitive32Store) matrix;
-
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
-
-            return (ElementsSupplier<Double>) matrix;
-
-        } else if (matrix instanceof Access2D) {
-
-            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
-
-        } else {
-
-            return this.getStore().physical().columns(matrix);
-        }
-    }
-
-    @Override
-    Cholesky<Double> getDecompositionCholesky(final Structure2D typical) {
+    Cholesky<Double> newCholesky(final Structure2D typical) {
         return Cholesky.PRIMITIVE.make(typical);
     }
 
     @Override
-    Eigenvalue<Double> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<Double> getDecompositionLDL(final Structure2D typical) {
-        return LDL.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    LU<Double> getDecompositionLU(final Structure2D typical) {
-        return LU.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    QR<Double> getDecompositionQR(final Structure2D typical) {
-        return QR.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    SingularValue<Double> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.PRIMITIVE.make(typical);
-    }
-
-    @Override
-    Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<Double> getTaskDeterminant(final MatrixStore<Double> template) {
+    DeterminantTask<Double> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<Double> getTaskInverter(final MatrixStore<Double> base) {
+    Eigenvalue<Double> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    Primitive32Matrix newInstance(final ElementsSupplier<Double> store) {
+        return new Primitive32Matrix(store);
+    }
+
+    @Override
+    InverterTask<Double> newInverterTask(final Structure2D base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Double> getTaskSolver(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
+    LDL<Double> newLDL(final Structure2D typical) {
+        return LDL.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    LU<Double> newLU(final Structure2D typical) {
+        return LU.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    QR<Double> newQR(final Structure2D typical) {
+        return QR.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SingularValue<Double> newSingularValue(final Structure2D typical) {
+        return SingularValue.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SolverTask<Double> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

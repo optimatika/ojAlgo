@@ -11,13 +11,80 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [50.0.0] – 2022-01-02
+
+### Added
+
+#### org.ojalgo.matrix
+
+- New interface `Provider2D` with a set of nested functional interfaces defining matrix properties and operations.
+
+#### org.ojalgo.optimisation
+
+- Possibility to read the QPS file format (QP related extensions to the MPS file format). More precisely added the ability to parse QUADOBJ and QMATRIX sections in "MPS" files.
+- A bunch of convex test cases from https://www.cuter.rl.ac.uk/Problems/marmes.shtml
+
+#### org.ojalgo.random
+
+- New `FrequencyMap` class as well as a factory method in `SampleSet` that counts occurrences of different values.
+
+#### org.ojalgo.structure
+
+- Added a `nonzeros()` method to `Access2D` that returns a `ElementView2D<N, ?>`.
+
+### Changed
+
+#### org.ojalgo.function
+
+- The `MIN` and `MAX` `BinaryFunction` constants of `ComplexMath` and `QuaternionMath` are changed to align with the scalar's compareTo methods (that are also changed).
+
+#### org.ojalgo.matrix
+
+- `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
+- `BasicMatrix` now implements `Structure2D.Logical` as well as `Operate2D` directly. No need to call `logical()` to get a `LogicalBuilder`.
+- A lot of refactoring among the package private code.
+
+#### org.ojalgo.optimisation
+
+- Minor change regarding `LinearSolver` pivot point selection.
+
+#### org.ojalgo.scalar
+
+- `ComplexNumber` and `Quaternion` had their `compareTo` methods changed to first just compare then real part and only if they're equal compare the imaginary parts.
+
+### Deprecated
+
+#### org.ojalgo.matrix
+
+- The `logical()` method in `MatrixStore` is deprecated. No need for it as `MatrixStore`:s are now "logical".
+- The `logical()` method in `BasicMatrix` is deprecated. No need for it as `BasicMatrix`:s are now "logical".
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed rare multiplication problem when all involved matrices were `RawStore` instances and the left multiplcation matrix was a vector, but a column vector when a row vector was expected; in that case the multiplication code would fail.
+
+### Removed
+
+#### org.ojalgo.matrix
+
+- The `MatrixStore.Factory` interface has been removed. Corresponding functionality have instead been added to `PhysicalStore.Factory`. This also mean that the various static factory instances in `MatrixStore` have been removed. Instead use the instances available in each of the `PhysicalStore` instances.
+- The `MatrixStore.LogicalBuilder` class has been removed. Instead `MatrixStore` now implements `Structure2D.Logical` directly. No need to call `logical()` to get a `LogicalBuilder`.
+- The `BasicMatrix.LogicalBuilder` class has been removed...
+
+#### org.ojalgo.structure
+
+- The `Factory*D` interfaces had their `makeZero` methods removed. These had been deprecated for while, and are now removed.
+- The `Structure*D.Logical` interfaces had their `get` methods removed. Most implementors still have a `get` method. This is just to make it more flexible regarding what type is returned.
+
 ## [49.2.1] – 2021-10-26
 
 ### Changed
 
 #### org.ojalgo.optimisation
 
-- The LinearSolver (simplex) pivot selection cade has been refined.
+- The LinearSolver (simplex) pivot selection code has been refined.
 
 ## [49.2.0] – 2021-10-05
 
@@ -77,8 +144,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - Continued operations on a transposed `ElementsSupplier` in some cases reversed the transposition.
-
-#### 
 
 ## [49.0.1] – 2021-08-11
 

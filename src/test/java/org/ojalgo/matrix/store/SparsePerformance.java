@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -31,16 +34,24 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 
     static void fill(final Mutate2D mtrx) {
-        int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
-        for (int ij = 0; ij < limit; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
-            mtrx.set(Uniform.randomInteger(limit), ij, Math.random());
+
+        Set<Structure2D.IntRowColumn> refs = new TreeSet<>();
+
+        for (int ij = 0, limit = mtrx.getMinDim(); ij < limit; ij++) {
+            refs.add(new IntRowColumn(ij, Uniform.randomInteger(limit)));
+            refs.add(new IntRowColumn(Uniform.randomInteger(limit), ij));
+        }
+
+        for (IntRowColumn ref : refs) {
+            mtrx.set(ref.row, ref.column, Math.random());
         }
     }
 
@@ -141,7 +152,7 @@ public class SparsePerformance extends MatrixStoreTests {
         int n = 100_000;
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
-        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(1, n);
+        Primitive64Store vctr = Primitive64Store.FACTORY.make(1, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -166,7 +177,7 @@ public class SparsePerformance extends MatrixStoreTests {
         int n = 100_000;
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
-        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(n, 1);
+        Primitive64Store vctr = Primitive64Store.FACTORY.make(n, 1);
 
         Stopwatch clock = new Stopwatch();
 

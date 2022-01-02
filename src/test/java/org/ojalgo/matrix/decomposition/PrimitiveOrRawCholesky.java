@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -114,7 +114,7 @@ public class PrimitiveOrRawCholesky extends AbstractPrimitiveOrRaw<Cholesky<Doub
 
         matrix = Primitive64Store.FACTORY.makeSPD(dim1);
 
-        preallocated = Primitive64Store.FACTORY.makeZero(dim, dim);
+        preallocated = Primitive64Store.FACTORY.make(dim, dim);
     }
 
     @Override

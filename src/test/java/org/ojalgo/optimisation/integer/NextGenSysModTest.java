@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -1387,7 +1388,7 @@ public class NextGenSysModTest {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE64.makeWrapper(covariances).get();
+        MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
 
         if (clean) {
 
@@ -1424,7 +1425,7 @@ public class NextGenSysModTest {
             for (int i = j + 1; i < size; i++) {
                 double rowVol = volatilities[i];
 
-                if ((rowVol <= PrimitiveMath.ZERO) || (colVol <= PrimitiveMath.ZERO)) {
+                if (rowVol <= PrimitiveMath.ZERO || colVol <= PrimitiveMath.ZERO) {
 
                     retVal.set(i, j, PrimitiveMath.ZERO);
                     retVal.set(j, i, PrimitiveMath.ZERO);
@@ -1488,7 +1489,7 @@ public class NextGenSysModTest {
 
         if (clean) {
 
-            MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE64.makeWrapper(covariances).get();
+            MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
 
             double largest = covarianceMtrx.aggregateDiagonal(Aggregator.LARGEST);
             double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;

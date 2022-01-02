@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         super(segmentFactory);
 
         mySegmentSize = segments[0].count();
-        final int tmpIndexOfLastSegment = segments.length - 1;
+        int tmpIndexOfLastSegment = segments.length - 1;
         for (int s = 1; s < tmpIndexOfLastSegment; s++) {
             if (segments[s].count() != mySegmentSize) {
                 throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
@@ -68,7 +68,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         }
 
         myIndexBits = PowerOf2.find(mySegmentSize);
-        if ((myIndexBits < 0) || (mySegmentSize != (1L << myIndexBits))) {
+        if (myIndexBits < 0 || mySegmentSize != 1L << myIndexBits) {
             throw new IllegalArgumentException("The segment size must be a power of 2!");
         }
 
@@ -83,12 +83,12 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
         super(segmentFactory);
 
-        final long tmpSegmentSize = 1L << indexBits; // 2^bits
+        long tmpSegmentSize = 1L << indexBits; // 2^bits
 
-        final int tmpNumberOfUniformSegments = (int) (count / tmpSegmentSize);
-        final long tmpRemainder = count % tmpSegmentSize;
+        int tmpNumberOfUniformSegments = (int) (count / tmpSegmentSize);
+        long tmpRemainder = count % tmpSegmentSize;
 
-        final int tmpTotalNumberOfSegments = tmpRemainder == 0L ? (int) tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
+        int tmpTotalNumberOfSegments = tmpRemainder == 0L ? (int) tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
 
         mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
         for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
@@ -123,7 +123,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public long count() {
-        return (mySegments[0].count() * (mySegments.length - 1)) + mySegments[mySegments.length - 1].count();
+        return mySegments[0].count() * (mySegments.length - 1) + mySegments[mySegments.length - 1].count();
     }
 
     @Override
@@ -133,14 +133,14 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public void fillAll(final N value) {
-        for (final BasicArray<N> tmpSegment : mySegments) {
+        for (BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.fillAll(value);
         }
     }
 
     @Override
     public void fillAll(final NullaryFunction<?> supplier) {
-        for (final BasicArray<N> tmpSegment : mySegments) {
+        for (BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.fillAll(supplier);
         }
     }
@@ -163,32 +163,32 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     @Override
     public void fillRange(final long first, final long limit, final N value) {
 
-        final int tmpFirstSegment = (int) (first / mySegmentSize);
-        final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+        int tmpFirstSegment = (int) (first / mySegmentSize);
+        int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
 
-        long tmpFirstInSegment = (first % mySegmentSize);
+        long tmpFirstInSegment = first % mySegmentSize;
 
         for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
             mySegments[s].fillRange(tmpFirstInSegment, mySegmentSize, value);
             tmpFirstInSegment = 0L;
         }
-        mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), value);
+        mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, value);
 
     }
 
     @Override
     public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
 
-        final int tmpFirstSegment = (int) (first / mySegmentSize);
-        final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+        int tmpFirstSegment = (int) (first / mySegmentSize);
+        int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
 
-        long tmpFirstInSegment = (first % mySegmentSize);
+        long tmpFirstInSegment = first % mySegmentSize;
 
         for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
             mySegments[s].fillRange(tmpFirstInSegment, mySegmentSize, supplier);
             tmpFirstInSegment = 0L;
         }
-        mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), supplier);
+        mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, supplier);
 
     }
 
@@ -204,10 +204,10 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
      */
     public SegmentedArray<N> grow() {
 
-        final BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
-        final BasicArray<N> tmpNewSegment = mySegmentFactory.makeZero(mySegmentSize);
+        BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
+        BasicArray<N> tmpNewSegment = mySegmentFactory.make(mySegmentSize);
 
-        final long tmpLastSegmentSize = tmpLastSegment.count();
+        long tmpLastSegmentSize = tmpLastSegment.count();
 
         if (tmpLastSegmentSize < mySegmentSize) {
 
@@ -217,22 +217,20 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
             return this;
 
-        } else if (tmpLastSegmentSize == mySegmentSize) {
-
-            @SuppressWarnings("unchecked")
-            final BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
-
-            for (int i = 0; i < mySegments.length; i++) {
-                tmpSegments[i] = mySegments[i];
-            }
-            tmpSegments[mySegments.length] = tmpNewSegment;
-
-            return new SegmentedArray<>(tmpSegments, mySegmentFactory);
-
-        } else {
+        }
+        if (tmpLastSegmentSize != mySegmentSize) {
 
             throw new IllegalStateException();
         }
+        @SuppressWarnings("unchecked")
+        BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+
+        for (int i = 0; i < mySegments.length; i++) {
+            tmpSegments[i] = mySegments[i];
+        }
+        tmpSegments[mySegments.length] = tmpNewSegment;
+
+        return new SegmentedArray<>(tmpSegments, mySegmentFactory);
     }
 
     @Override
@@ -247,14 +245,14 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
-        final BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
-        final long tmpIndex = index & myIndexMask;
+        BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
+        long tmpIndex = index & myIndexMask;
         tmpSegment.set(tmpIndex, modifier.invoke(tmpSegment.get(tmpIndex)));
     }
 
     @Override
     public void reset() {
-        for (final BasicArray<N> tmpSegment : mySegments) {
+        for (BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.reset();
         }
     }
@@ -328,21 +326,21 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements
 
-            final int tmpFirstSegment = (int) (first / mySegmentSize);
-            final int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
+            int tmpFirstSegment = (int) (first / mySegmentSize);
+            int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
 
-            long tmpFirstInSegment = (first % mySegmentSize);
+            long tmpFirstInSegment = first % mySegmentSize;
 
             for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
                 mySegments[s].fill(tmpFirstInSegment, mySegmentSize, step, value);
-                final long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
+                long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
                 tmpFirstInSegment = tmpRemainder == 0L ? 0L : step - tmpRemainder;
             }
-            mySegments[tmpLastSegemnt].fill(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), step, value);
+            mySegments[tmpLastSegemnt].fill(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, step, value);
 
         } else if (this.isPrimitive()) {
 
-            final double tmpValue = NumberDefinition.doubleValue(value);
+            double tmpValue = NumberDefinition.doubleValue(value);
             for (long i = first; i < limit; i += step) {
                 this.set(i, tmpValue);
             }
@@ -361,17 +359,17 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements
 
-            final int tmpFirstSegment = (int) (first / mySegmentSize);
-            final int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
+            int tmpFirstSegment = (int) (first / mySegmentSize);
+            int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
 
-            long tmpFirstInSegment = (first % mySegmentSize);
+            long tmpFirstInSegment = first % mySegmentSize;
 
             for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
                 mySegments[s].fill(tmpFirstInSegment, mySegmentSize, step, supplier);
-                final long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
+                long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
                 tmpFirstInSegment = tmpRemainder == 0L ? 0L : step - tmpRemainder;
             }
-            mySegments[tmpLastSegemnt].fill(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), step, supplier);
+            mySegments[tmpLastSegemnt].fill(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, step, supplier);
 
         } else if (this.isPrimitive()) {
 
@@ -390,7 +388,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     @Override
     protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
         boolean retVal = true;
-        for (long i = first; retVal && (i < limit); i += step) {
+        for (long i = first; retVal && i < limit; i += step) {
             retVal &= this.isSmall(i, comparedTo);
         }
         return retVal;
@@ -428,17 +426,17 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements
 
-            final int tmpFirstSegment = (int) (first / mySegmentSize);
-            final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+            int tmpFirstSegment = (int) (first / mySegmentSize);
+            int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
 
-            long tmpFirstInSegment = (first % mySegmentSize);
+            long tmpFirstInSegment = first % mySegmentSize;
 
             for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
                 mySegments[s].modify(tmpFirstInSegment, mySegmentSize, step, function);
-                final long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
+                long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
                 tmpFirstInSegment = tmpRemainder == 0L ? 0L : step - tmpRemainder;
             }
-            mySegments[tmpLastSegemnt].modify(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), step, function);
+            mySegments[tmpLastSegemnt].modify(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, step, function);
 
         } else if (this.isPrimitive()) {
 
@@ -460,17 +458,17 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements
 
-            final int tmpFirstSegment = (int) (first / mySegmentSize);
-            final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+            int tmpFirstSegment = (int) (first / mySegmentSize);
+            int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
 
-            long tmpFirstInSegment = (first % mySegmentSize);
+            long tmpFirstInSegment = first % mySegmentSize;
 
             for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
                 mySegments[s].visit(tmpFirstInSegment, mySegmentSize, step, visitor);
-                final long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
+                long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
                 tmpFirstInSegment = tmpRemainder == 0L ? 0L : step - tmpRemainder;
             }
-            mySegments[tmpLastSegemnt].visit(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), step, visitor);
+            mySegments[tmpLastSegemnt].visit(tmpFirstInSegment, limit - tmpLastSegemnt * mySegmentSize, step, visitor);
 
         } else if (this.isPrimitive()) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,11 +62,10 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> PRIMITIVE = typical -> {
 
-        if ((512L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+        if (512L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
             return new LUDecomposition.Primitive();
-        } else {
-            return new RawLU();
         }
+        return new RawLU();
     };
 
     Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
@@ -75,42 +74,11 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
 
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final int[] tmpPivotOrder = decomposition.getPivotOrder();
+        MatrixStore<N> tmpL = decomposition.getL();
+        MatrixStore<N> tmpU = decomposition.getU();
+        int[] tmpPivotOrder = decomposition.getPivotOrder();
 
-        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> LU<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (LU<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (LU<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (LU<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (LU<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.reconstruct();
+        return Access2D.equals(matrix.rows(tmpPivotOrder), tmpL.multiply(tmpU), context);
     }
 
     /**
@@ -138,7 +106,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         MatrixStore<N> mtrxL = this.getL();
         MatrixStore<N> mtrxU = this.getU();
         int[] pivotOrder = this.getPivotOrder();
-        return mtrxL.multiply(mtrxU).logical().row(pivotOrder).get();
+        return mtrxL.multiply(mtrxU).row(pivotOrder);
     }
 
 }

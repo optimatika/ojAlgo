@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -252,7 +252,7 @@ final class IterativeASS extends ActiveSetSolver {
 
             if (solved = this.solveFullKKT(tmpXL)) {
 
-                iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
+                iterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
 
                 for (int i = 0; i < this.countEqualityConstraints(); i++) {
                     this.getSolutionL().set(i, tmpXL.doubleValue(this.countVariables() + i));

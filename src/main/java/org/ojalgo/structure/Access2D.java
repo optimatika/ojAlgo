@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -692,6 +692,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     default long longValue(final long row, final long col) {
         return Math.round(this.doubleValue(row, col));
+    }
+
+    default ElementView2D<N, ?> nonzeros() {
+        return new Access2D.ElementView<>(Access1D.super.nonzeros(), this.countRows());
     }
 
     default RowView<N> rows() {

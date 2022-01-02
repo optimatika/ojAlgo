@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -94,11 +94,11 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
     }
 
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return myFactory.builder().makeZero(myArity, myArity).get();
+        return myFactory.makeZero(myArity, myArity);
     }
 
     public MatrixStore<N> getLinearFactors() {
-        return myFactory.builder().makeZero(myArity, 1).get();
+        return myFactory.makeZero(myArity, 1);
     }
 
     public N invoke(final Access1D<N> arg) {

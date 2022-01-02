@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,11 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,7 +51,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
-        MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N> {
+        MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N>, Provider2D.Condition {
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<SingularValue<N>> {
 
@@ -70,11 +70,10 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
 
     Factory<Double> PRIMITIVE = (typical, fullSize) -> {
-        if (fullSize || ((1024L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE))) {
+        if (fullSize || 1024L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
             return new SingularValueDecomposition.Primitive(fullSize);
-        } else {
-            return new RawSingularValue();
         }
+        return new RawSingularValue();
     };
 
     Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
@@ -93,7 +92,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
 
-        boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
+        boolean retVal = tmpRowDim == tmpQ1.countRows() && tmpQ2.countRows() == tmpColDim;
 
         // Check that [A][V] == [U][D]
         if (retVal) {
@@ -105,7 +104,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         }
 
         // If Q1 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
+        if (retVal && tmpQ1.countRows() == tmpQ1.countColumns()) {
 
             tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
             tmpThat = tmpQ1.conjugate().multiply(tmpQ1);
@@ -114,7 +113,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         }
 
         // If Q2 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
+        if (retVal && tmpQ2.countRows() == tmpQ2.countColumns()) {
 
             tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
             tmpThat = tmpQ2.multiply(tmpQ2.conjugate());
@@ -132,48 +131,17 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         // Check that the singular values are sorted in descending order
         if (retVal) {
             final Array1D<Double> tmpSV = decomposition.getSingularValues();
-            for (int i = 1; retVal && (i < tmpSV.size()); i++) {
+            for (int i = 1; retVal && i < tmpSV.size(); i++) {
                 retVal &= tmpSV.doubleValue(i - 1) >= tmpSV.doubleValue(i);
             }
             if (retVal && decomposition.isOrdered()) {
-                for (int ij = 1; retVal && (ij < tmpD.countRows()); ij++) {
+                for (int ij = 1; retVal && ij < tmpD.countRows(); ij++) {
                     retVal &= tmpD.doubleValue(ij - 1, ij - 1) >= tmpD.doubleValue(ij, ij);
                 }
             }
         }
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> SingularValue<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (SingularValue<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (SingularValue<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (SingularValue<N>) PRIMITIVE.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (SingularValue<N>) QUATERNION.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return decomposition.reconstruct();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,8 +122,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
-                ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0),
-                ComplexNumber.makePolar(1.0, (4.0 * Math.PI) / 3.0) };
+                ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };
 
         Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
         SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
@@ -456,7 +455,8 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         for (SingularValue<Double> tmpImpl : tmpImpls) {
 
             tmpImpl.decompose(aMtrx);
-            MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpl);
+            final SingularValue<Double> decomposition = tmpImpl;
+            MatrixStore<Double> tmpReconstructed = decomposition.reconstruct();
             if (!Access2D.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpl.getClass().getName());
             }

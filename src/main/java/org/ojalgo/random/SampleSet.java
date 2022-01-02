@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,21 @@ public final class SampleSet implements Access1D<Double> {
      * @return The sample set's variance
      */
     public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
-        return ((numberOfValues * sumOfSquaredValues) - (sumOfValues * sumOfValues)) / (numberOfValues * (numberOfValues - 1));
+        return (numberOfValues * sumOfSquaredValues - sumOfValues * sumOfValues) / (numberOfValues * (numberOfValues - 1));
+    }
+
+    /**
+     * Create a sample set from counting occurrences of difference values in the iterable.
+     */
+    public static <T> SampleSet from(final Iterable<T> keys) {
+
+        FrequencyMap<T> frequencies = new FrequencyMap<>();
+
+        for (T key : keys) {
+            frequencies.increment(key);
+        }
+
+        return frequencies.sample();
     }
 
     public static SampleSet make() {
@@ -139,16 +153,15 @@ public final class SampleSet implements Access1D<Double> {
             retVal += (mySamples.doubleValue(i) - thisMean) * (otherValues.doubleValue(i) - thatMean);
         }
 
-        retVal /= (limit - 1L);
+        retVal /= limit - 1L;
         return retVal;
     }
 
     public double getFirst() {
         if (mySamples.count() > 0L) {
             return mySamples.doubleValue(0);
-        } else {
-            return ZERO;
         }
+        return ZERO;
     }
 
     public double getInterquartileRange() {
@@ -173,9 +186,8 @@ public final class SampleSet implements Access1D<Double> {
     public double getLast() {
         if (mySamples.count() > 0L) {
             return mySamples.doubleValue(mySamples.count() - 1L);
-        } else {
-            return ZERO;
         }
+        return ZERO;
     }
 
     /**
@@ -327,7 +339,7 @@ public final class SampleSet implements Access1D<Double> {
         double deviation;
         for (long i = 0L, limit = mySamples.count(); i < limit; i++) {
             deviation = mySamples.doubleValue(i) - mean;
-            retVal += (deviation * deviation);
+            retVal += deviation * deviation;
         }
 
         return retVal;
@@ -435,33 +447,33 @@ public final class SampleSet implements Access1D<Double> {
 
             case 1:
 
-                myQuartile1 = (0.25 * tmpSortedCopy[n - 1]) + (0.75 * tmpSortedCopy[n]);
+                myQuartile1 = 0.25 * tmpSortedCopy[n - 1] + 0.75 * tmpSortedCopy[n];
                 myQuartile2 = tmpSortedCopy[2 * n];
-                myQuartile3 = (0.75 * tmpSortedCopy[3 * n]) + (0.25 * tmpSortedCopy[(3 * n) + 1]);
+                myQuartile3 = 0.75 * tmpSortedCopy[3 * n] + 0.25 * tmpSortedCopy[3 * n + 1];
 
                 break;
 
             case 2:
 
                 myQuartile1 = tmpSortedCopy[n];
-                myQuartile2 = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
-                myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+                myQuartile2 = 0.5 * tmpSortedCopy[2 * n] + 0.5 * tmpSortedCopy[2 * n + 1];
+                myQuartile3 = tmpSortedCopy[3 * n + 1];
 
                 break;
 
             case 3:
 
-                myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
-                myQuartile2 = tmpSortedCopy[(2 * n) + 1];
-                myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
+                myQuartile1 = 0.75 * tmpSortedCopy[n] + 0.25 * tmpSortedCopy[n + 1];
+                myQuartile2 = tmpSortedCopy[2 * n + 1];
+                myQuartile3 = 0.25 * tmpSortedCopy[3 * n + 1] + 0.75 * tmpSortedCopy[3 * n + 2];
 
                 break;
 
             default:
 
-                myQuartile1 = (0.5 * tmpSortedCopy[n - 1]) + (0.5 * tmpSortedCopy[n]);
-                myQuartile2 = (0.5 * tmpSortedCopy[(2 * n) - 1]) + (0.5 * tmpSortedCopy[2 * n]);
-                myQuartile3 = (0.5 * tmpSortedCopy[(3 * n) - 1]) + (0.5 * tmpSortedCopy[3 * n]);
+                myQuartile1 = 0.5 * tmpSortedCopy[n - 1] + 0.5 * tmpSortedCopy[n];
+                myQuartile2 = 0.5 * tmpSortedCopy[2 * n - 1] + 0.5 * tmpSortedCopy[2 * n];
+                myQuartile3 = 0.5 * tmpSortedCopy[3 * n - 1] + 0.5 * tmpSortedCopy[3 * n];
 
                 break;
             }
@@ -479,7 +491,7 @@ public final class SampleSet implements Access1D<Double> {
         final Access1D<?> tmpSamples = this.getSamples();
         final int tmpSamplesCount = (int) tmpSamples.count();
 
-        if ((mySortedCopy == null) || (mySortedCopy.length < tmpSamplesCount) || (mySortedCopy.length == 0)) {
+        if (mySortedCopy == null || mySortedCopy.length < tmpSamplesCount || mySortedCopy.length == 0) {
             mySortedCopy = tmpSamples.toRawCopy1D();
             Arrays.parallelSort(mySortedCopy);
         } else if (mySortedCopy[0] == Double.POSITIVE_INFINITY) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -40,8 +41,8 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.multiary.AffineFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
-import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
@@ -75,10 +76,11 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
  */
 public final class Expression extends ModelEntity<Expression> {
 
+    private BigDecimal myConstant = null;
     private transient boolean myInfeasible = false;
-    private final HashMap<IntIndex, BigDecimal> myLinear;
+    private final Map<IntIndex, BigDecimal> myLinear;
     private final ExpressionsBasedModel myModel;
-    private final HashMap<IntRowColumn, BigDecimal> myQuadratic;
+    private final Map<IntRowColumn, BigDecimal> myQuadratic;
     private transient boolean myRedundant = false;
     /**
      * A shallow copy (typically created by presolver or integer solver) shares the Map:s holding the
@@ -100,6 +102,8 @@ public final class Expression extends ModelEntity<Expression> {
         super(expressionToCopy);
 
         myModel = destinationModel;
+
+        myConstant = expressionToCopy.getConstant();
 
         if (deep) {
 
@@ -261,7 +265,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
 
-        BigDecimal retVal = BigMath.ZERO;
+        BigDecimal retVal = this.getConstant();
 
         BigDecimal factor;
 
@@ -296,7 +300,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(myModel.countVariables(), 1);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(myModel.countVariables(), 1);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
@@ -321,7 +325,7 @@ public final class Expression extends ModelEntity<Expression> {
     public MatrixStore<Double> getAdjustedHessian() {
 
         final int tmpCountVariables = myModel.countVariables();
-        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
@@ -453,10 +457,10 @@ public final class Expression extends ModelEntity<Expression> {
     public Expression set(final IntIndex key, final Comparable<?> value) {
 
         if (key == null) {
-
             throw new IllegalArgumentException();
         }
-        final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
+
+        BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
 
         if (tmpValue.signum() != 0) {
             myLinear.put(key, tmpValue);
@@ -614,12 +618,15 @@ public final class Expression extends ModelEntity<Expression> {
         if (this.isFunctionQuadratic()) {
             return this.makeQuadraticFunction();
         }
+
         if (this.isFunctionPureQuadratic()) {
             return this.makePureQuadraticFunction();
         }
+
         if (this.isFunctionLinear()) {
-            return this.makeLinearFunction();
+            return this.makeAffineFunction();
         }
+
         return this.makeConstantFunction();
     }
 
@@ -643,13 +650,13 @@ public final class Expression extends ModelEntity<Expression> {
         return value;
     }
 
-    private ConstantFunction<Double> makeConstantFunction() {
-        return ConstantFunction.makePrimitive(myModel.countVariables());
+    private BigDecimal getConstant() {
+        return myConstant != null ? myConstant : BigMath.ZERO;
     }
 
-    private LinearFunction<Double> makeLinearFunction() {
+    private AffineFunction<Double> makeAffineFunction() {
 
-        final LinearFunction<Double> retVal = LinearFunction.makePrimitive(myModel.countVariables());
+        AffineFunction<Double> retVal = AffineFunction.makePrimitive(myModel.countVariables());
 
         if (this.isAnyLinearFactorNonZero()) {
             for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
@@ -657,25 +664,33 @@ public final class Expression extends ModelEntity<Expression> {
             }
         }
 
+        retVal.setConstant(this.getConstant());
+
         return retVal;
+    }
+
+    private ConstantFunction<Double> makeConstantFunction() {
+        return ConstantFunction.makePrimitive(myModel.countVariables(), this.getConstant());
     }
 
     private PureQuadraticFunction<Double> makePureQuadraticFunction() {
 
-        final PureQuadraticFunction<Double> retVal = PureQuadraticFunction.makePrimitive(myModel.countVariables());
+        PureQuadraticFunction<Double> retVal = PureQuadraticFunction.makePrimitive(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
                 retVal.quadratic().set(entry.getKey().row, entry.getKey().column, entry.getValue().doubleValue());
             }
         }
+
+        retVal.setConstant(this.getConstant());
 
         return retVal;
     }
 
     private QuadraticFunction<Double> makeQuadraticFunction() {
 
-        final QuadraticFunction<Double> retVal = QuadraticFunction.makePrimitive(myModel.countVariables());
+        QuadraticFunction<Double> retVal = QuadraticFunction.makePrimitive(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
@@ -688,6 +703,8 @@ public final class Expression extends ModelEntity<Expression> {
                 retVal.linear().set(entry.getKey().index, entry.getValue().doubleValue());
             }
         }
+
+        retVal.setConstant(this.getConstant());
 
         return retVal;
     }
@@ -754,6 +771,17 @@ public final class Expression extends ModelEntity<Expression> {
         BigDecimal upper = this.getUpperLimit();
         if (upper != null) {
             this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
+        }
+    }
+
+    void addObjectiveConstant(final BigDecimal value) {
+
+        BigDecimal weight = this.getContributionWeight();
+
+        if (weight != null && weight.signum() != 0) {
+            myModel.addObjectiveConstant(value.multiply(weight));
+        } else {
+            myModel.addObjectiveConstant(value);
         }
     }
 
@@ -908,7 +936,7 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    HashMap<IntIndex, BigDecimal> getLinear() {
+    Map<IntIndex, BigDecimal> getLinear() {
         return myLinear;
     }
 
@@ -920,7 +948,7 @@ public final class Expression extends ModelEntity<Expression> {
         return myModel;
     }
 
-    HashMap<IntRowColumn, BigDecimal> getQuadratic() {
+    Map<IntRowColumn, BigDecimal> getQuadratic() {
         return myQuadratic;
     }
 
@@ -932,6 +960,10 @@ public final class Expression extends ModelEntity<Expression> {
         final IntIndex tmpVarInd = variable.getIndex();
         return myLinear.containsKey(tmpVarInd)
                 || myQuadratic.size() > 0 && myQuadratic.keySet().stream().anyMatch(k -> (k.row == tmpVarInd.index || k.column == tmpVarInd.index));
+    }
+
+    boolean isConstantSet() {
+        return myConstant != null && myConstant.signum() != 0;
     }
 
     @Override
@@ -993,6 +1025,18 @@ public final class Expression extends ModelEntity<Expression> {
 
     Variable resolve(final Structure1D.IntIndex index) {
         return myModel.getVariable(index);
+    }
+
+    void setConstant(final Comparable<?> value) {
+        myConstant = ModelEntity.toBigDecimal(value);
+    }
+
+    void setConstant(final double value) {
+        myConstant = BigDecimal.valueOf(value);
+    }
+
+    void setConstant(final long value) {
+        myConstant = BigDecimal.valueOf(value);
     }
 
     void setInfeasible() {

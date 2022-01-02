@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -141,34 +141,33 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return new Quaternion(norm);
 
-        } else if (PrimitiveMath.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        }
+        if (PrimitiveMath.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new Quaternion(-norm);
 
-        } else {
-
-            double tmpScalar = PrimitiveMath.ZERO;
-            if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveMath.COS.invoke(tmpAngle);
-                if (tmpCos != PrimitiveMath.ZERO) {
-                    tmpScalar = norm * tmpCos;
-                }
-            }
-
-            double tmpI = PrimitiveMath.ZERO;
-            double tmpJ = PrimitiveMath.ZERO;
-            double tmpK = PrimitiveMath.ZERO;
-            if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveMath.SIN.invoke(tmpAngle);
-                if (tmpSin != PrimitiveMath.ZERO) {
-                    tmpI = unit[0] * norm * tmpSin;
-                    tmpJ = unit[1] * norm * tmpSin;
-                    tmpK = unit[2] * norm * tmpSin;
-                }
-            }
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+        double tmpScalar = PrimitiveMath.ZERO;
+        if (norm != PrimitiveMath.ZERO) {
+            final double tmpCos = PrimitiveMath.COS.invoke(tmpAngle);
+            if (tmpCos != PrimitiveMath.ZERO) {
+                tmpScalar = norm * tmpCos;
+            }
+        }
+
+        double tmpI = PrimitiveMath.ZERO;
+        double tmpJ = PrimitiveMath.ZERO;
+        double tmpK = PrimitiveMath.ZERO;
+        if (norm != PrimitiveMath.ZERO) {
+            final double tmpSin = PrimitiveMath.SIN.invoke(tmpAngle);
+            if (tmpSin != PrimitiveMath.ZERO) {
+                tmpI = unit[0] * norm * tmpSin;
+                tmpJ = unit[1] * norm * tmpSin;
+                tmpK = unit[2] * norm * tmpSin;
+            }
+        }
+
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
 
     }
 
@@ -223,15 +222,14 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return (Quaternion) number;
 
-        } else if (number instanceof ComplexNumber) {
+        }
+        if (number instanceof ComplexNumber) {
 
             ComplexNumber tmpComplex = (ComplexNumber) number;
             return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
-        } else {
-
-            return new Quaternion(NumberDefinition.doubleValue(number));
         }
+        return new Quaternion(NumberDefinition.doubleValue(number));
     }
 
     public static Quaternion valueOf(final double value) {
@@ -335,9 +333,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         if (this.isReal()) {
             return new Quaternion(myScalar + arg);
-        } else {
-            return new Quaternion(myScalar + arg, i, j, k);
         }
+        return new Quaternion(myScalar + arg, i, j, k);
     }
 
     @Override
@@ -352,35 +349,41 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return arg.add(myScalar);
 
-        } else {
-
-            final double tmpScalar = myScalar + arg.scalar();
-            final double tmpI = i + arg.i;
-            final double tmpJ = j + arg.j;
-            final double tmpK = k + arg.k;
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+        final double tmpScalar = myScalar + arg.scalar();
+        final double tmpI = i + arg.i;
+        final double tmpJ = j + arg.j;
+        final double tmpK = k + arg.k;
+
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
     public double angle() {
         return PrimitiveMath.ACOS.invoke(myScalar / this.norm());
     }
 
+    /**
+     * First compares the real values. Only if they are equal will compare the imaginary part.
+     */
     @Override
-    public int compareTo(final Quaternion reference) {
+    public int compareTo(final Quaternion other) {
 
-        int retVal = 0;
+        int retVal = Double.compare(myScalar, other.doubleValue());
 
-        if ((retVal = NumberContext.compare(this.norm(), reference.norm())) == 0) {
-            if ((retVal = NumberContext.compare(myScalar, reference.scalar())) == 0) {
-                if ((retVal = NumberContext.compare(i, reference.i)) == 0) {
-                    if ((retVal = NumberContext.compare(j, reference.j)) == 0) {
-                        retVal = NumberContext.compare(k, reference.k);
-                    }
-                }
-            }
+        if (retVal != 0) {
+            return retVal;
         }
+        retVal = Double.compare(i, other.i);
+
+        if (retVal != 0) {
+            return retVal;
+        }
+        retVal = Double.compare(j, other.j);
+
+        if (retVal != 0) {
+            return retVal;
+        }
+        retVal = Double.compare(k, other.k);
 
         return retVal;
     }
@@ -418,7 +421,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return new Quaternion(myScalar / arg);
 
-        } else if (this.isPure()) {
+        }
+        if (this.isPure()) {
 
             final double tmpI = i / arg;
             final double tmpJ = j / arg;
@@ -426,15 +430,13 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return new Quaternion(tmpI, tmpJ, tmpK);
 
-        } else {
-
-            final double tmpScalar = myScalar / arg;
-            final double tmpI = i / arg;
-            final double tmpJ = j / arg;
-            final double tmpK = k / arg;
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+        final double tmpScalar = myScalar / arg;
+        final double tmpI = i / arg;
+        final double tmpJ = j / arg;
+        final double tmpK = k / arg;
+
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
     @Override
@@ -503,9 +505,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     public double doubleValue(final long row, final long col) {
         if (row == col) {
             return myScalar;
-        } else {
-            return this.doubleValue(row + (col * 4L));
         }
+        return this.doubleValue(row + col * 4L);
     }
 
     @Override
@@ -528,16 +529,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
             return false;
         }
         Quaternion other = (Quaternion) obj;
-        if (Double.doubleToLongBits(myScalar) != Double.doubleToLongBits(other.myScalar)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(i) != Double.doubleToLongBits(other.i)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(j) != Double.doubleToLongBits(other.j)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(k) != Double.doubleToLongBits(other.k)) {
+        if (Double.doubleToLongBits(myScalar) != Double.doubleToLongBits(other.myScalar) || Double.doubleToLongBits(i) != Double.doubleToLongBits(other.i)
+                || Double.doubleToLongBits(j) != Double.doubleToLongBits(other.j) || Double.doubleToLongBits(k) != Double.doubleToLongBits(other.k)) {
             return false;
         }
         return true;
@@ -580,9 +573,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         if (tmpLength > 0.0) {
             return new Quaternion(i / tmpLength, j / tmpLength, k / tmpLength);
-        } else {
-            return IJK;
         }
+        return IJK;
 
     }
 
@@ -596,13 +588,13 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(i);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(j);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(k);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myScalar);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         return result;
     }
 
@@ -625,9 +617,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     public boolean isAbsolute() {
         if (myRealForSure) {
             return myScalar >= PrimitiveMath.ZERO;
-        } else {
-            return !PrimitiveScalar.CONTEXT.isDifferent(myScalar, this.norm());
         }
+        return !PrimitiveScalar.CONTEXT.isDifferent(myScalar, this.norm());
     }
 
     public boolean isPure() {
@@ -636,7 +627,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public boolean isReal() {
         final NumberContext cntxt = PrimitiveScalar.CONTEXT;
-        return myRealForSure || (cntxt.isSmall(myScalar, i) && cntxt.isSmall(myScalar, j) && cntxt.isSmall(myScalar, k));
+        return myRealForSure || cntxt.isSmall(myScalar, i) && cntxt.isSmall(myScalar, j) && cntxt.isSmall(myScalar, k);
     }
 
     @Override
@@ -656,7 +647,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return new Quaternion(myScalar * arg);
 
-        } else if (this.isPure()) {
+        }
+        if (this.isPure()) {
 
             final double tmpI = i * arg;
             final double tmpJ = j * arg;
@@ -664,15 +656,13 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return new Quaternion(tmpI, tmpJ, tmpK);
 
-        } else {
-
-            final double tmpScalar = myScalar * arg;
-            final double tmpI = i * arg;
-            final double tmpJ = j * arg;
-            final double tmpK = k * arg;
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+        final double tmpScalar = myScalar * arg;
+        final double tmpI = i * arg;
+        final double tmpJ = j * arg;
+        final double tmpK = k * arg;
+
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
     @Override
@@ -687,15 +677,13 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             return arg.multiply(myScalar);
 
-        } else {
-
-            final double tmpScalar = (myScalar * arg.scalar()) - (i * arg.i) - (j * arg.j) - (k * arg.k);
-            final double tmpI = ((myScalar * arg.i) + (i * arg.scalar()) + (j * arg.k)) - (k * arg.j);
-            final double tmpJ = ((myScalar * arg.j) - (i * arg.k)) + (j * arg.scalar()) + (k * arg.i);
-            final double tmpK = (((myScalar * arg.k) + (i * arg.j)) - (j * arg.i)) + (k * arg.scalar());
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+        final double tmpScalar = myScalar * arg.scalar() - i * arg.i - j * arg.j - k * arg.k;
+        final double tmpI = myScalar * arg.i + i * arg.scalar() + j * arg.k - k * arg.j;
+        final double tmpJ = myScalar * arg.j - i * arg.k + j * arg.scalar() + k * arg.i;
+        final double tmpK = myScalar * arg.k + i * arg.j - j * arg.i + k * arg.scalar();
+
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
     @Override
@@ -740,9 +728,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         if (this.isReal()) {
             return new Quaternion(myScalar - arg);
-        } else {
-            return new Quaternion(myScalar - arg, i, j, k);
         }
+        return new Quaternion(myScalar - arg, i, j, k);
     }
 
     @Override
@@ -832,9 +819,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         final double invs = 1.0 / (ii + jj + kk + ss);
 
-        final double r00 = ((ii + ss) - (jj + kk)) * invs;
-        final double r11 = ((jj + ss) - (ii + kk)) * invs;
-        final double r22 = ((kk + ss) - (ii + jj)) * invs;
+        final double r00 = (ii + ss - (jj + kk)) * invs;
+        final double r11 = (jj + ss - (ii + kk)) * invs;
+        final double r22 = (kk + ss - (ii + jj)) * invs;
 
         tmp1 = i * j;
         tmp2 = k * s;
@@ -955,9 +942,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         final double invs = 1.0 / (ii + jj + kk + ss);
 
-        final double r00 = ((ii + ss) - (jj + kk)) * invs;
-        final double r11 = ((jj + ss) - (ii + kk)) * invs;
-        final double r22 = ((kk + ss) - (ii + jj)) * invs;
+        final double r00 = (ii + ss - (jj + kk)) * invs;
+        final double r11 = (jj + ss - (ii + kk)) * invs;
+        final double r22 = (kk + ss - (ii + jj)) * invs;
 
         tmp1 = i * j;
         tmp2 = k * s;
@@ -980,9 +967,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
             final double y = transformable.doubleValue(1);
             final double z = transformable.doubleValue(2);
 
-            transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-            transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-            transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+            transformable.set(0, r00 * x + r01 * y + r02 * z);
+            transformable.set(1, r10 * x + r11 * y + r12 * z);
+            transformable.set(2, r20 * x + r21 * y + r22 * z);
 
         } else if (transformable.countRows() == 3L) {
 
@@ -992,9 +979,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
                 final double y = transformable.doubleValue(1, c);
                 final double z = transformable.doubleValue(2, c);
 
-                transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, c, r00 * x + r01 * y + r02 * z);
+                transformable.set(1, c, r10 * x + r11 * y + r12 * z);
+                transformable.set(2, c, r20 * x + r21 * y + r22 * z);
             }
 
         } else if (transformable.countColumns() == 3L) {
@@ -1005,9 +992,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
                 final double y = transformable.doubleValue(r, 1);
                 final double z = transformable.doubleValue(r, 2);
 
-                transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(r, 0, r00 * x + r01 * y + r02 * z);
+                transformable.set(r, 1, r10 * x + r11 * y + r12 * z);
+                transformable.set(r, 2, r20 * x + r21 * y + r22 * z);
             }
 
         } else {
@@ -1020,9 +1007,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         final double tmpLength = this.getVectorLength();
         if (tmpLength > 0.0) {
             return new double[] { i / tmpLength, j / tmpLength, k / tmpLength };
-        } else {
-            return new double[] { IJK.i, IJK.j, IJK.k };
         }
+        return new double[] { IJK.i, IJK.j, IJK.k };
     }
 
     public PhysicalStore<Double> vector() {
@@ -1042,19 +1028,19 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         if (this.isReal()) {
             return new Quaternion(myScalar / norm);
-        } else if (this.isPure()) {
-            return new Quaternion(i / norm, j / norm, k / norm);
-        } else {
-            return new Quaternion(myScalar / norm, i / norm, j / norm, k / norm);
         }
+        if (this.isPure()) {
+            return new Quaternion(i / norm, j / norm, k / norm);
+        }
+        return new Quaternion(myScalar / norm, i / norm, j / norm, k / norm);
     }
 
     private double calculateSumOfSquaresAll() {
-        return (myScalar * myScalar) + this.calculateSumOfSquaresVector();
+        return myScalar * myScalar + this.calculateSumOfSquaresVector();
     }
 
     private double calculateSumOfSquaresVector() {
-        return (i * i) + (j * j) + (k * k);
+        return i * i + j * j + k * k;
     }
 
     MatrixStore<Double> toRotationMatrixVersor() {
@@ -1071,9 +1057,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         double tmp1;
         double tmp2;
 
-        final double r00 = ((ii + ss) - (jj + kk));
-        final double r11 = ((jj + ss) - (ii + kk));
-        final double r22 = ((kk + ss) - (ii + jj));
+        final double r00 = ii + ss - (jj + kk);
+        final double r11 = jj + ss - (ii + kk);
+        final double r22 = kk + ss - (ii + jj);
 
         tmp1 = i * j;
         tmp2 = k * s;
@@ -1115,9 +1101,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         double tmp1;
         double tmp2;
 
-        final double r00 = ((ii + ss) - (jj + kk));
-        final double r11 = ((jj + ss) - (ii + kk));
-        final double r22 = ((kk + ss) - (ii + jj));
+        final double r00 = ii + ss - (jj + kk);
+        final double r11 = jj + ss - (ii + kk);
+        final double r22 = kk + ss - (ii + jj);
 
         tmp1 = i * j;
         tmp2 = k * s;
@@ -1140,9 +1126,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
             final double y = transformable.doubleValue(1);
             final double z = transformable.doubleValue(2);
 
-            transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-            transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-            transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+            transformable.set(0, r00 * x + r01 * y + r02 * z);
+            transformable.set(1, r10 * x + r11 * y + r12 * z);
+            transformable.set(2, r20 * x + r21 * y + r22 * z);
 
         } else if (transformable.countRows() == 3L) {
 
@@ -1152,9 +1138,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
                 final double y = transformable.doubleValue(1, c);
                 final double z = transformable.doubleValue(2, c);
 
-                transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, c, r00 * x + r01 * y + r02 * z);
+                transformable.set(1, c, r10 * x + r11 * y + r12 * z);
+                transformable.set(2, c, r20 * x + r21 * y + r22 * z);
             }
 
         } else if (transformable.countColumns() == 3L) {
@@ -1165,9 +1151,9 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
                 final double y = transformable.doubleValue(r, 1);
                 final double z = transformable.doubleValue(r, 2);
 
-                transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(r, 0, r00 * x + r01 * y + r02 * z);
+                transformable.set(r, 1, r10 * x + r11 * y + r12 * z);
+                transformable.set(r, 2, r20 * x + r21 * y + r22 * z);
             }
 
         } else {

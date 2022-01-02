@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -173,15 +173,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             return new Primitive64Store((int) rows, (int) columns);
         }
 
-        public Primitive64Store makeEye(final long rows, final long columns) {
-
-            final Primitive64Store retVal = this.make(rows, columns);
-
-            retVal.fillDiagonal(ONE);
-
-            return retVal;
-        }
-
         public Primitive64Store rows(final Access1D<?>... source) {
 
             final int tmpRowDim = source.length;
@@ -296,7 +287,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexArgument(arg, retVal);
 
@@ -311,7 +302,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexImaginary(arg, retVal);
 
@@ -326,7 +317,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexModulus(arg, retVal);
 
@@ -341,7 +332,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.make(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexReal(arg, retVal);
 

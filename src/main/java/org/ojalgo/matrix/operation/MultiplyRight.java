@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import org.ojalgo.concurrent.DivideAndConquer.Conquerer;
 import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
@@ -154,8 +153,8 @@ public class MultiplyRight implements MatrixOperation {
     static void add1xN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            int firstInCol = Structure2D.firstInColumn(right, j, 0);
+            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
             product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -163,8 +162,8 @@ public class MultiplyRight implements MatrixOperation {
     static void add1xN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            int firstInCol = Structure2D.firstInColumn(right, j, 0);
+            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
             product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -200,8 +199,8 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int c = 0; c < complexity; c++) {
 
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * nbRows, right.doubleValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
@@ -215,8 +214,8 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int c = 0; c < complexity; c++) {
 
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * nbRows, right.floatValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
@@ -231,8 +230,8 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int c = 0; c < complexity; c++) {
 
-            int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
+            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * nbRows, right.get(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
@@ -318,8 +317,8 @@ public class MultiplyRight implements MatrixOperation {
     static void fill1xN(final double[] product, final double[] left, final int complexity, final Access1D<?> right) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            int firstInCol = Structure2D.firstInColumn(right, j, 0);
+            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -327,8 +326,8 @@ public class MultiplyRight implements MatrixOperation {
     static void fill1xN(final float[] product, final float[] left, final int complexity, final Access1D<?> right) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            int firstInCol = Structure2D.firstInColumn(right, j, 0);
+            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -336,8 +335,8 @@ public class MultiplyRight implements MatrixOperation {
     static <N extends Scalar<N>> void fill1xN(final N[] product, final N[] left, final int complexity, final Access1D<N> right, final Factory<N> scalar) {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
-            int firstInCol = MatrixStore.firstInColumn(right, j, 0);
-            int limitOfCol = MatrixStore.firstInColumn(right, j, complexity);
+            int firstInCol = Structure2D.firstInColumn(right, j, 0);
+            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol, scalar);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 package org.ojalgo.matrix.store;
-
-import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,11 +65,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         @Override
         public DenseArray.Factory<Double> array() {
             return Primitive32Array.FACTORY;
-        }
-
-        @Override
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE32;
         }
 
         public Primitive32Store columns(final Access1D<?>... source) {
@@ -176,15 +169,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
         public Primitive32Store make(final long rows, final long columns) {
             return new Primitive32Store((int) rows, (int) columns);
-        }
-
-        public Primitive32Store makeEye(final long rows, final long columns) {
-
-            final Primitive32Store retVal = this.make(rows, columns);
-
-            retVal.fillDiagonal(ONE);
-
-            return retVal;
         }
 
         @Override
@@ -804,10 +788,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
 
         return tmpStep2.get(0L);
-    }
-
-    public ElementView1D<Double, ?> nonzeros() {
-        return myUtility.nonzeros();
     }
 
     public PhysicalStore.Factory<Double, ?> physical() {

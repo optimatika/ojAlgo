@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ public class ReductionTest {
     @Test
     public void test2To1D() {
 
-        final Array2D<Double> array = Array2D.PRIMITIVE64.makeZero(5, 3);
+        final Array2D<Double> array = Array2D.PRIMITIVE64.make(5, 3);
         array.fillAll(1.0);
 
         final Array1D<Double> reducedRows = array.reduceRows(Aggregator.SUM);

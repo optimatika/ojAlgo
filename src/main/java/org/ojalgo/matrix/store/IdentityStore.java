@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -34,12 +33,11 @@ import org.ojalgo.structure.Access2D;
  */
 final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
 
-    private IdentityStore(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
-        super(factory, rowsCount, columnsCount);
-        ProgrammingError.throwForIllegalInvocation();
+    IdentityStore(final PhysicalStore.Factory<N, ?> factory, final int dimension) {
+        super(factory, dimension, dimension);
     }
 
-    IdentityStore(final PhysicalStore.Factory<N, ?> factory, final int dimension) {
+    IdentityStore(final PhysicalStore.Factory<N, ?> factory, final long dimension) {
         super(factory, dimension, dimension);
     }
 
@@ -51,9 +49,8 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     public double doubleValue(final long aRow, final long aCol) {
         if (aRow == aCol) {
             return PrimitiveMath.ONE;
-        } else {
-            return PrimitiveMath.ZERO;
         }
+        return PrimitiveMath.ZERO;
     }
 
     public int firstInColumn(final int col) {
@@ -67,9 +64,8 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     public N get(final long aRow, final long aCol) {
         if (aRow == aCol) {
             return this.one().get();
-        } else {
-            return this.zero().get();
         }
+        return this.zero().get();
     }
 
     @Override
@@ -135,9 +131,8 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
             return this.one();
-        } else {
-            return this.zero();
         }
+        return this.zero();
     }
 
     @Override

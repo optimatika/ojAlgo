@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,6 +110,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
          */
         public MatrixStore<Double> getBE() {
             return myData.getBE();
+        }
+
+        /**
+         * Will replace each equality constraint with two inequality constraints
+         */
+        public void splitEqualities() {
+
+            if (this.hasEqualityConstraints()) {
+
+                myData.addInequalities(myData.getAE(), myData.getBE());
+                myData.addInequalities(myData.getAE().negate(), myData.getBE().negate());
+
+                myData.clearEqualities();
+            }
         }
 
         public MatrixStore<Double> getC() {

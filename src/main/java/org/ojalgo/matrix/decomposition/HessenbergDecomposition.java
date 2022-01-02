@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -120,7 +120,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     }
 
     public final MatrixStore<N> getH() {
-        return this.getInPlace().logical().hessenberg(myUpper).get();
+        return this.getInPlace().hessenberg(myUpper);
     }
 
     public final MatrixStore<N> getQ() {

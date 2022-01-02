@@ -1,0 +1,5 @@
+echo "<tr> <td> <b> $1 </b> </td>"
+echo "<td> <a href=ftp://ftp.numerical.rl.ac.uk/pub/cute/marosmeszaros/$1.SIF>ascii file</a>,"
+echo "<a href=ftp://ftp.numerical.rl.ac.uk/pub/cute/compressed_marosmeszaros/$1.SIF.gz>
+gzipped file</a></td>"
+echo "<td> `echo $1.SIF | cuteclass` </td> </tr>"

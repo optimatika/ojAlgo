@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -187,7 +187,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
     //
     //        final PhysicalStore<N> tmpD = this.getD().copy();
     //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
-    //        final MatrixStore<N> mtrxD = tmpD.logical().diagonal().get();
+    //        final MatrixStore<N> mtrxD = tmpD.diagonal();
     //
     //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
     //    }

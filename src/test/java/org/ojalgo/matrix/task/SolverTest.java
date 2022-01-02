@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -123,10 +123,10 @@ public class SolverTest extends MatrixTaskTests {
         int numEqs = 2;
         int numVars = 5;
 
-        Primitive64Store body = Primitive64Store.FACTORY.makeZero(numEqs, numVars);
-        Primitive64Store rhs = Primitive64Store.FACTORY.makeZero(numEqs, 1);
+        Primitive64Store body = Primitive64Store.FACTORY.make(numEqs, numVars);
+        Primitive64Store rhs = Primitive64Store.FACTORY.make(numEqs, 1);
 
-        Primitive64Store expected = Primitive64Store.FACTORY.makeZero(numVars, 1);
+        Primitive64Store expected = Primitive64Store.FACTORY.make(numVars, 1);
 
         Random tmpRandom = new Random();
         for (int i = 0; i < numEqs; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -134,13 +134,13 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final MatrixStore<Double> tmpM1 = this.getM1(evaluationPoint);
         final MatrixStore<Double> tmpM2differenses = this.getM2differenses();
 
-        final Primitive64Store tmpLocations = FACTORY.makeZero(tmpM1.countRows(), tmpM1.countColumns());
+        final Primitive64Store tmpLocations = FACTORY.make(tmpM1.countRows(), tmpM1.countColumns());
         tmpLocations.fillMatching(tmpM1, PrimitiveMath.ADD, tmpRegCoef.multiply(tmpM2differenses));
 
         final MatrixStore<Double> tmpC11 = this.getC11(evaluationPoint);
         final MatrixStore<Double> tmpC21 = this.getC21(evaluationPoint);
 
-        final Primitive64Store tmpCovariances = FACTORY.makeZero(tmpC11.countRows(), tmpC11.countColumns());
+        final Primitive64Store tmpCovariances = FACTORY.make(tmpC11.countRows(), tmpC11.countColumns());
         tmpCovariances.fillMatching(tmpC11, PrimitiveMath.SUBTRACT, tmpRegCoef.multiply(tmpC21));
 
         if (cleanCovariances) {
@@ -161,7 +161,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
                 }
             }
 
-            tmpCovariances.fillMatching(tmpV.multiply(tmpD).multiply(tmpV.logical().transpose().get()));
+            tmpCovariances.fillMatching(tmpV.multiply(tmpD).multiply(tmpV.transpose()));
         }
 
         return new Normal1D(tmpLocations, tmpCovariances);
@@ -175,7 +175,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpLength = args.length;
 
-        final Primitive64Store retVal = FACTORY.makeZero(tmpLength, tmpLength);
+        final Primitive64Store retVal = FACTORY.make(tmpLength, tmpLength);
 
         for (int j = 0; j < tmpLength; j++) {
             for (int i = 0; i < tmpLength; i++) {
@@ -193,7 +193,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final int tmpRowDim = args.length;
         final int tmpColDim = tmpObservations.size();
 
-        final Primitive64Store retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
+        final Primitive64Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -211,7 +211,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final int tmpRowDim = tmpObservations.size();
         final int tmpColDim = args.length;
 
-        final Primitive64Store retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
+        final Primitive64Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -228,7 +228,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final Primitive64Store tmpMatrix = FACTORY.makeZero(tmpSize, tmpSize);
+        final Primitive64Store tmpMatrix = FACTORY.make(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             final K tmpColumnKey = tmpObservations.get(j).key;
@@ -296,7 +296,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
     }
 
     MatrixStore<Double> getRegressionCoefficients(final K[] args) {
-        return this.getC22().getSolution(this.getC21(args)).logical().transpose().get();
+        return this.getC22().getSolution(this.getC21(args)).transpose();
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -111,26 +111,14 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
         };
     }
 
+    default I make(final int rows, final int columns) {
+        return this.make((long) rows, (long) columns);
+    }
+
     I make(long rows, long columns);
 
     default I make(final Structure2D shape) {
         return this.make(shape.countRows(), shape.countColumns());
-    }
-
-    /**
-     * @deprecated v48 Use {@link #make(long,long)} instead
-     */
-    @Deprecated
-    default I makeZero(final long rows, final long columns) {
-        return this.make(rows, columns);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #make(Structure2D)} instead
-     */
-    @Deprecated
-    default I makeZero(final Structure2D shape) {
-        return this.make(shape);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
@@ -48,62 +46,46 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
-    public static final class DenseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<PhysicalStore<RationalNumber>> {
+    public static final class DenseReceiver extends Mutator2D<RationalNumber, RationalMatrix, PhysicalStore<RationalNumber>> {
 
-        DenseReceiver(final Factory enclosing, final PhysicalStore<RationalNumber> delegate) {
-            enclosing.super(delegate);
+        DenseReceiver(final PhysicalStore<RationalNumber> delegate) {
+            super(delegate);
+        }
+
+        @Override
+        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory
-            extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
 
         Factory() {
             super(RationalMatrix.class, GenericStore.RATIONAL);
         }
 
         @Override
-        RationalMatrix.LogicalBuilder logical(final MatrixStore<RationalNumber> delegate) {
-            return new RationalMatrix.LogicalBuilder(this, delegate);
+        RationalMatrix.DenseReceiver dense(final PhysicalStore<RationalNumber> store) {
+            return new RationalMatrix.DenseReceiver(store);
         }
 
         @Override
-        RationalMatrix.DenseReceiver physical(final PhysicalStore<RationalNumber> delegate) {
-            return new RationalMatrix.DenseReceiver(this, delegate);
-        }
-
-        @Override
-        RationalMatrix.SparseReceiver physical(final SparseStore<RationalNumber> delegate) {
-            return new RationalMatrix.SparseReceiver(this, delegate);
+        RationalMatrix.SparseReceiver sparse(final SparseStore<RationalNumber> store) {
+            return new RationalMatrix.SparseReceiver(store);
         }
 
     }
 
-    public static final class LogicalBuilder extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Logical {
+    public static final class SparseReceiver extends Mutator2D<RationalNumber, RationalMatrix, SparseStore<RationalNumber>> {
 
-        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<RationalNumber> delegate) {
-            enclosing.super(delegate);
-        }
-
-        LogicalBuilder(final Factory enclosing, final MatrixStore<RationalNumber> store) {
-            enclosing.super(store);
+        SparseReceiver(final SparseStore<RationalNumber> delegate) {
+            super(delegate);
         }
 
         @Override
-        LogicalBuilder self() {
-            return this;
-        }
-
-    }
-
-    public static final class SparseReceiver extends
-            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Mutator<SparseStore<RationalNumber>> {
-
-        SparseReceiver(final Factory enclosing, final SparseStore<RationalNumber> delegate) {
-            enclosing.super(delegate);
+        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+            return FACTORY.instantiate(store);
         }
 
     }
@@ -113,91 +95,62 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    RationalMatrix(final MatrixStore<RationalNumber> aStore) {
-        super(aStore);
+    RationalMatrix(final ElementsSupplier<RationalNumber> supplier) {
+        super(FACTORY.getPhysicalFactory(), supplier);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RationalMatrix.DenseReceiver copy() {
-        return new RationalMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+        return new RationalMatrix.DenseReceiver(this.store().copy());
     }
 
     @Override
-    public RationalMatrix.LogicalBuilder logical() {
-        return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    ElementsSupplier<RationalNumber> cast(final Access1D<?> matrix) {
-
-        if (matrix instanceof RationalMatrix) {
-
-            return ((RationalMatrix) matrix).getStore();
-
-        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof RationalNumber)) {
-
-            return (ElementsSupplier<RationalNumber>) matrix;
-
-        } else if (matrix instanceof Access2D) {
-
-            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
-
-        } else {
-
-            return this.getStore().physical().columns(matrix);
-        }
-    }
-
-    @Override
-    Cholesky<RationalNumber> getDecompositionCholesky(final Structure2D typical) {
+    Cholesky<RationalNumber> newCholesky(final Structure2D typical) {
         return Cholesky.RATIONAL.make(typical);
     }
 
     @Override
-    Eigenvalue<RationalNumber> getDecompositionEigenvalue(final Structure2D typical) {
-        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
-    }
-
-    @Override
-    LDL<RationalNumber> getDecompositionLDL(final Structure2D typical) {
-        return LDL.RATIONAL.make(typical);
-    }
-
-    @Override
-    LU<RationalNumber> getDecompositionLU(final Structure2D typical) {
-        return LU.RATIONAL.make(typical);
-    }
-
-    @Override
-    QR<RationalNumber> getDecompositionQR(final Structure2D typical) {
-        return QR.RATIONAL.make(typical);
-    }
-
-    @Override
-    SingularValue<RationalNumber> getDecompositionSingularValue(final Structure2D typical) {
-        return SingularValue.RATIONAL.make(typical);
-    }
-
-    @Override
-    Factory getFactory() {
-        return FACTORY;
-    }
-
-    @Override
-    DeterminantTask<RationalNumber> getTaskDeterminant(final MatrixStore<RationalNumber> template) {
+    DeterminantTask<RationalNumber> newDeterminantTask(final Structure2D template) {
         return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    InverterTask<RationalNumber> getTaskInverter(final MatrixStore<RationalNumber> template) {
+    Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical) {
+        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    RationalMatrix newInstance(final ElementsSupplier<RationalNumber> store) {
+        return new RationalMatrix(store);
+    }
+
+    @Override
+    InverterTask<RationalNumber> newInverterTask(final Structure2D template) {
         return InverterTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<RationalNumber> getTaskSolver(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
+    LDL<RationalNumber> newLDL(final Structure2D typical) {
+        return LDL.RATIONAL.make(typical);
+    }
+
+    @Override
+    LU<RationalNumber> newLU(final Structure2D typical) {
+        return LU.RATIONAL.make(typical);
+    }
+
+    @Override
+    QR<RationalNumber> newQR(final Structure2D typical) {
+        return QR.RATIONAL.make(typical);
+    }
+
+    @Override
+    SingularValue<RationalNumber> newSingularValue(final Structure2D typical) {
+        return SingularValue.RATIONAL.make(typical);
+    }
+
+    @Override
+    SolverTask<RationalNumber> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
         return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

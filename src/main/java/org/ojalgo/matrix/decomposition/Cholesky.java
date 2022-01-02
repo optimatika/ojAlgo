@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,37 +76,6 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
         retVal = Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
-     *             innstead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    static <N extends Comparable<N>> Cholesky<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Cholesky<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Cholesky<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Cholesky<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Cholesky<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * @deprecated v48 Use {@link #reconstruct()} instead
-     */
-    @Deprecated
-    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
-        return decomposition.reconstruct();
     }
 
     /**

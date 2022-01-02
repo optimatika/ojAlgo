@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -398,9 +398,9 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 myRows[r] = mySparseFactory.limit(totNumbVars).make();
             }
 
-            myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
+            myRHS = ARRAY1D_FACTORY.make(numberOfConstraints);
 
-            myObjectiveWeights = ARRAY1D_FACTORY.makeZero(totNumbVars);
+            myObjectiveWeights = ARRAY1D_FACTORY.make(totNumbVars);
             myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
         }
 
@@ -732,7 +732,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         Primitive64Store transpose() {
 
-            final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(this.countColumns(), this.countRows());
+            final Primitive64Store retVal = Primitive64Store.FACTORY.make(this.countColumns(), this.countRows());
 
             for (int i = 0; i < myRows.length; i++) {
                 for (final NonzeroView<Double> nz : myRows[i].nonzeros()) {
@@ -786,13 +786,13 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         int constraintsCount = tableau.countConstraints();
         int variablesCount = tableau.countVariables();
 
-        MatrixStore.LogicalBuilder<Double> tableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
-        tableauBuilder = tableauBuilder.left(builder.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, constraintsCount).get()).get());
+        MatrixStore<Double> tableauBuilder = Primitive64Store.FACTORY.makeZero(1, 1);
+        tableauBuilder = tableauBuilder.left(builder.getC().transpose().right(Primitive64Store.FACTORY.makeZero(1, constraintsCount)));
 
         if (constraintsCount >= 1) {
-            tableauBuilder = tableauBuilder.above(builder.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(constraintsCount).get(), builder.getBE());
+            tableauBuilder = tableauBuilder.above(builder.getAE(), Primitive64Store.FACTORY.makeIdentity(constraintsCount), builder.getBE());
         }
-        tableauBuilder = tableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, variablesCount).get(),
+        tableauBuilder = tableauBuilder.below(Primitive64Store.FACTORY.makeZero(1, variablesCount),
                 Primitive64Store.FACTORY.makeFilled(1, constraintsCount, new NullaryFunction<Double>() {
 
                     public double doubleValue() {

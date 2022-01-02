@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,12 @@
  */
 package org.ojalgo.matrix.task;
 
+import java.util.function.Supplier;
+
+import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -64,9 +68,8 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
         public DeterminantTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.COMPLEX.make(template);
-            } else {
-                return LU.COMPLEX.make(template);
             }
+            return LU.COMPLEX.make(template);
         }
 
     };
@@ -78,30 +81,34 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
             final long tmpDim = template.countRows();
             if (tmpDim == 1L) {
                 return AbstractDeterminator.FULL_1X1;
-            } else if (symmetric) {
+            }
+            if (symmetric) {
                 if (tmpDim == 2L) {
                     return AbstractDeterminator.SYMMETRIC_2X2;
-                } else if (tmpDim == 3L) {
+                }
+                if (tmpDim == 3L) {
                     return AbstractDeterminator.SYMMETRIC_3X3;
-                } else if (tmpDim == 4L) {
+                }
+                if (tmpDim == 4L) {
                     return AbstractDeterminator.SYMMETRIC_4X4;
                 } else if (tmpDim == 5L) {
                     return AbstractDeterminator.SYMMETRIC_5X5;
                 } else {
                     return positiveDefinite ? Cholesky.PRIMITIVE.make(template) : LU.PRIMITIVE.make(template);
                 }
+            }
+            if (tmpDim == 2L) {
+                return AbstractDeterminator.FULL_2X2;
+            }
+            if (tmpDim == 3L) {
+                return AbstractDeterminator.FULL_3X3;
+            }
+            if (tmpDim == 4L) {
+                return AbstractDeterminator.FULL_4X4;
+            } else if (tmpDim == 5L) {
+                return AbstractDeterminator.FULL_5X5;
             } else {
-                if (tmpDim == 2L) {
-                    return AbstractDeterminator.FULL_2X2;
-                } else if (tmpDim == 3L) {
-                    return AbstractDeterminator.FULL_3X3;
-                } else if (tmpDim == 4L) {
-                    return AbstractDeterminator.FULL_4X4;
-                } else if (tmpDim == 5L) {
-                    return AbstractDeterminator.FULL_5X5;
-                } else {
-                    return LU.PRIMITIVE.make(template);
-                }
+                return LU.PRIMITIVE.make(template);
             }
         }
 
@@ -113,9 +120,8 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
         public DeterminantTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.QUATERNION.make(template);
-            } else {
-                return LU.QUATERNION.make(template);
             }
+            return LU.QUATERNION.make(template);
         }
 
     };
@@ -126,13 +132,18 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
         public DeterminantTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.RATIONAL.make(template);
-            } else {
-                return LU.RATIONAL.make(template);
             }
+            return LU.RATIONAL.make(template);
         }
 
     };
 
     N calculateDeterminant(Access2D<?> matrix);
 
+    default Provider2D.Determinant<N> toDeterminantProvider(final ElementsSupplier<N> original, final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
+
+        N determinant = this.calculateDeterminant(alternativeOriginalSupplier.get());
+
+        return () -> determinant;
+    }
 }

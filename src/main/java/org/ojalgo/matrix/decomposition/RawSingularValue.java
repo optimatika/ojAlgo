@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2021 Optimatika
+ * Copyright 1997-2022 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         int rank = this.getRank();
 
-        MatrixStore<Double> tmp = v.logical().limits(-1, rank).onColumns(DIVIDE, values).collect(v.physical());
+        MatrixStore<Double> tmp = v.limits(-1, rank).onColumns(DIVIDE, values).collect(v.physical());
 
         return tmp.multiply(tmp.transpose());
     }
@@ -190,11 +190,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getU() {
-        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
+        return myTransposed ? new RawStore(myVt, n, n).transpose() : new RawStore(myUt, n, m).transpose();
     }
 
     public MatrixStore<Double> getV() {
-        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
+        return myTransposed ? new RawStore(myUt, n, m).transpose() : new RawStore(myVt, n, n).transpose();
     }
 
     @Override
@@ -204,9 +204,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
-        } else {
-            throw RecoverableCondition.newMatrixNotInvertible();
         }
+        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isFullRank() {
@@ -249,9 +248,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         if (this.isSolvable()) {
             return this.getSolution(rhs.asCollectable2D(), preallocated);
-        } else {
-            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     @Override
@@ -274,16 +272,16 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         m = this.getMaxDim();
         n = this.getMinDim();
 
-        if ((s == null) || (s.length != n)) {
+        if (s == null || s.length != n) {
             s = new double[n];
             e = new double[n];
         }
-        if ((w == null) || (w.length != m)) {
+        if (w == null || w.length != m) {
             w = new double[m];
         }
         if (factors) {
             myUt = input;
-            if ((myVt == null) || (myVt.length != n) || (myVt[0].length != n)) {
+            if (myVt == null || myVt.length != n || myVt[0].length != n) {
                 myVt = new double[n][n];
             }
         } else {
@@ -342,7 +340,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 e[j] = input[j][k];
             }
 
-            if (factors && (k < nct)) {
+            if (factors && k < nct) {
                 // Place the transformation in U for subsequent back multiplication.
                 for (int i = k; i < m; i++) {
                     myUt[k][i] = tmpArr[i];
@@ -396,7 +394,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (nct < n) { // Only happens when m == n, then nct == n-1
             s[nct] = input[nct][nct];
         }
-        if ((nrt + 1) < p) {
+        if (nrt + 1 < p) {
             e[nrt] = input[p - 1][nrt];
         }
         e[p - 1] = ZERO;
@@ -438,7 +436,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (factors) {
             for (int k = n - 1; k >= 0; k--) {
                 tmpArr = myVt[k];
-                if ((k < nrt) && (e[k] != ZERO)) {
+                if (k < nrt && e[k] != ZERO) {
                     for (int j = k + 1; j < n; j++) {
                         tmpVal = DOT.invoke(tmpArr, 0, myVt[j], 0, k + 1, n);
                         tmpVal /= tmpArr[k + 1];
@@ -460,8 +458,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int i = 0; i < m; i++) {
                 valLow = colLow[i];
                 valHigh = colHigh[i];
-                colLow[i] = (-sin * valHigh) + (cos * valLow);
-                colHigh[i] = (cos * valHigh) + (sin * valLow);
+                colLow[i] = -sin * valHigh + cos * valLow;
+                colHigh[i] = cos * valHigh + sin * valLow;
             }
         } : RotateRight.NULL;
 
@@ -473,8 +471,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int i = 0; i < n; i++) {
                 valLow = colLow[i];
                 valHigh = colHigh[i];
-                colLow[i] = (-sin * valHigh) + (cos * valLow);
-                colHigh[i] = (cos * valHigh) + (sin * valLow);
+                colLow[i] = -sin * valHigh + cos * valLow;
+                colHigh[i] = cos * valHigh + sin * valLow;
             }
         } : RotateRight.NULL;
 
