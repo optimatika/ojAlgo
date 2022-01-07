@@ -22,11 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.random.Uniform;
-import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -63,31 +58,28 @@ ThresholdMultiplyNeither.tune    128    1  thrpt    5      21722.580 ±  26793.0
 ThresholdMultiplyNeither.tune    128    2  thrpt    5      66277.842 ±    836.778  ops/min
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-19 => 32
+ * MacBook Pro (16-inch, 2019): 2022-01-06 => 32 (maybe 16)
  *
  * <pre>
-Benchmark                      (dim)  (z)   Mode  Cnt          Score         Error    Units
-ThresholdMultiplyNeither.tune      8    1  thrpt    3  329143532.371 ± 8081114.486  ops/min
-ThresholdMultiplyNeither.tune      8    2  thrpt    3    5274249.808 ±  332192.154  ops/min
-ThresholdMultiplyNeither.tune      8    4  thrpt    3    2941137.564 ± 1088718.511  ops/min
-ThresholdMultiplyNeither.tune     16    1  thrpt    3   23029954.309 ± 6123392.045  ops/min
-ThresholdMultiplyNeither.tune     16    2  thrpt    3    4907197.704 ± 2725316.417  ops/min
-ThresholdMultiplyNeither.tune     16    4  thrpt    3    2829635.574 ±  338626.686  ops/min
-ThresholdMultiplyNeither.tune     32    1  thrpt    3    3291888.141 ±  689253.631  ops/min
-ThresholdMultiplyNeither.tune     32    2  thrpt    3    2620563.560 ±  366185.744  ops/min
-ThresholdMultiplyNeither.tune     32    4  thrpt    3    2030877.577 ±  800971.434  ops/min
-ThresholdMultiplyNeither.tune     64    1  thrpt    3     480794.827 ±   25598.245  ops/min
-ThresholdMultiplyNeither.tune     64    2  thrpt    3     671739.271 ±   37969.385  ops/min
-ThresholdMultiplyNeither.tune     64    4  thrpt    3     833359.571 ±  130093.930  ops/min
-ThresholdMultiplyNeither.tune    128    1  thrpt    3      62390.313 ±    9636.965  ops/min
-ThresholdMultiplyNeither.tune    128    2  thrpt    3     108447.628 ±    6690.205  ops/min
-ThresholdMultiplyNeither.tune    128    4  thrpt    3     165042.252 ±   50054.999  ops/min
+Benchmark                      (dim)  (z)   Mode  Cnt         Score         Error    Units
+ThresholdMultiplyNeither.tune     16    1  thrpt    3  21084009.287 ± 3258299.677  ops/min
+ThresholdMultiplyNeither.tune     16    2  thrpt    3   5204243.161 ±  296473.952  ops/min
+ThresholdMultiplyNeither.tune     16    4  thrpt    3   2401115.498 ± 1183573.514  ops/min
+ThresholdMultiplyNeither.tune     32    1  thrpt    3   2818699.905 ± 1630469.319  ops/min
+ThresholdMultiplyNeither.tune     32    2  thrpt    3   2999934.179 ±  738472.613  ops/min
+ThresholdMultiplyNeither.tune     32    4  thrpt    3   1951145.428 ±  924230.954  ops/min
+ThresholdMultiplyNeither.tune     64    1  thrpt    3    385491.666 ±   65830.668  ops/min
+ThresholdMultiplyNeither.tune     64    2  thrpt    3    676951.262 ±  269298.379  ops/min
+ThresholdMultiplyNeither.tune     64    4  thrpt    3    838715.568 ±  506708.696  ops/min
+ThresholdMultiplyNeither.tune    128    1  thrpt    3     47859.384 ±   13448.113  ops/min
+ThresholdMultiplyNeither.tune    128    2  thrpt    3    107449.078 ±     983.852  ops/min
+ThresholdMultiplyNeither.tune    128    4  thrpt    3    149453.928 ±   80750.534  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdMultiplyNeither extends ThresholdTuner {
+public class ThresholdMultiplyNeither extends MultiplyThresholdTuner {
 
     public static void main(final String[] args) throws RunnerException {
         BenchmarkUtils.run(ThresholdTuner.options(), ThresholdMultiplyNeither.class);
@@ -96,28 +88,13 @@ public class ThresholdMultiplyNeither extends ThresholdTuner {
     @Param({ "16", "32", "64", "128" })
     public int dim;
 
-    MatrixStore<Double> left;
-    MatrixStore<Double> right;
-    PhysicalStore<Double> target;
-
     @Override
     @Setup
     public void setup() {
 
         MultiplyNeither.THRESHOLD = dim / z;
 
-        final Uniform tmpSupplier = new Uniform();
-
-        left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.make(dim, dim);
-    }
-
-    @Override
-    @Benchmark
-    public Object tune() {
-        target.fillByMultiplying(left, right);
-        return target;
+        benchmark = new MultiplyThresholdTuner.CodeAndData(dim, false, false);
     }
 
 }

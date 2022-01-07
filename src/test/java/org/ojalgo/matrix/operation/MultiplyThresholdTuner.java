@@ -21,53 +21,52 @@
  */
 package org.ojalgo.matrix.operation;
 
-import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.operation.ThresholdHouseholderRight.CodeAndData;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.RunnerException;
 
-/**
- * Mac Pro:
- *
- * <pre>
- * </pre>
- *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
- *
- * <pre>
-Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.399 ± 0.007  ops/min
-ParallelismHouseholderRight.tune          CORES  thrpt    3  0.800 ± 0.085  ops/min
-ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.755 ± 0.111  ops/min
- * </pre>
- *
- * @author apete
- */
 @State(Scope.Benchmark)
-public class ParallelismHouseholderRight extends ParallelismTuner {
+abstract class MultiplyThresholdTuner extends ThresholdTuner {
 
-    public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderRight.class);
+    static final class CodeAndData {
+
+        private static final Uniform UNIFORM = new Uniform();
+
+        final MatrixStore<Double> left;
+        final MatrixStore<Double> right;
+        final Primitive64Store target;
+
+        CodeAndData(final int dim) {
+            this(dim, false, false);
+        }
+
+        CodeAndData(final int dim, final boolean transposeLeft, final boolean transposeRight) {
+
+            Primitive64Store tmpL = Primitive64Store.FACTORY.makeFilled(dim, dim, UNIFORM);
+            left = transposeLeft ? tmpL.transpose() : tmpL;
+
+            Primitive64Store tmpR = Primitive64Store.FACTORY.makeFilled(dim, dim, UNIFORM);
+            right = transposeRight ? tmpR.transpose() : tmpR;
+
+            target = Primitive64Store.FACTORY.make(dim, dim);
+        }
+
+        Primitive64Store execute() {
+            target.fillByMultiplying(left, right);
+            return target;
+        }
+
     }
 
-    CodeAndData benchmark;
-
-    @Override
-    @Setup
-    public void setup() {
-
-        HouseholderLeft.PARALLELISM = parallelism;
-
-        benchmark = new CodeAndData(DIM);
-    }
+    MultiplyThresholdTuner.CodeAndData benchmark = null;
 
     @Override
     @Benchmark
-    public Object tune() {
-        return benchmark.tune();
+    public final Primitive64Store tune() {
+        return benchmark.execute();
     }
 
 }

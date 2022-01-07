@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.operation.ThresholdHouseholderRight.CodeAndData;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -35,39 +34,39 @@ import org.openjdk.jmh.runner.RunnerException;
  * <pre>
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
+ * MacBook Pro (16-inch, 2019): 2022-01-06 => CORES
  *
  * <pre>
-Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.399 ± 0.007  ops/min
-ParallelismHouseholderRight.tune          CORES  thrpt    3  0.800 ± 0.085  ops/min
-ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.755 ± 0.111  ops/min
+Benchmark                     (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismMultiplyLeft.tune          UNITS  thrpt    3  0.581 ± 1.557  ops/min
+ParallelismMultiplyLeft.tune          CORES  thrpt    3  0.975 ± 0.029  ops/min
+ParallelismMultiplyLeft.tune        THREADS  thrpt    3  0.955 ± 0.055  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ParallelismHouseholderRight extends ParallelismTuner {
+public class ParallelismMultiplyLeft extends ParallelismTuner {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderRight.class);
+        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismMultiplyLeft.class);
     }
 
-    CodeAndData benchmark;
+    MultiplyThresholdTuner.CodeAndData benchmark;
 
     @Override
     @Setup
     public void setup() {
 
-        HouseholderLeft.PARALLELISM = parallelism;
+        MultiplyLeft.PARALLELISM = parallelism;
 
-        benchmark = new CodeAndData(DIM);
+        benchmark = new MultiplyThresholdTuner.CodeAndData(DIM, true, false);
     }
 
     @Override
     @Benchmark
     public Object tune() {
-        return benchmark.tune();
+        return benchmark.execute();
     }
 
 }
