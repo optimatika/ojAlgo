@@ -34,13 +34,13 @@ import org.openjdk.jmh.runner.RunnerException;
  * <pre>
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2022-01-06 => CORES
+ * MacBook Pro (16-inch, 2019): 2022-01-07 => CORES
  *
  * <pre>
 Benchmark                     (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismMultiplyLeft.tune          UNITS  thrpt    3  0.581 ± 1.557  ops/min
-ParallelismMultiplyLeft.tune          CORES  thrpt    3  0.975 ± 0.029  ops/min
-ParallelismMultiplyLeft.tune        THREADS  thrpt    3  0.955 ± 0.055  ops/min
+ParallelismMultiplyLeft.tune          UNITS  thrpt    3  0.723 ± 0.520  ops/min
+ParallelismMultiplyLeft.tune          CORES  thrpt    3  3.495 ± 5.283  ops/min
+ParallelismMultiplyLeft.tune        THREADS  thrpt    3  3.221 ± 1.674  ops/min
  * </pre>
  *
  * @author apete
