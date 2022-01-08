@@ -29,9 +29,13 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro:
+ * Mac Pro (Early 2009): 2022-01-08 => CORES/THREADS
  *
  * <pre>
+Benchmark                        (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismMultiplyNeither.tune          UNITS  thrpt    3  0.291 ± 0.057  ops/min
+ParallelismMultiplyNeither.tune          CORES  thrpt    3  1.278 ± 0.880  ops/min
+ParallelismMultiplyNeither.tune        THREADS  thrpt    3  1.450 ± 0.401  ops/min
  * </pre>
  *
  * MacBook Pro (16-inch, 2019): 2022-01-06 => THREADS

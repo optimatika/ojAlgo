@@ -29,12 +29,12 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro:
+ * Mac Pro (Early 2009): 2022-01-07 => CORES
  *
  * <pre>
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2022-01-07 => CORES
+ * MacBook Pro (16-inch, 2019): 2022-01-07 => CORES/THREADS
  *
  * <pre>
 Benchmark                     (parallelism)   Mode  Cnt  Score   Error    Units
