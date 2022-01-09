@@ -34,57 +34,79 @@ import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderRight implements MatrixOperation {
 
-    public static IntSupplier PARALLELISM = Parallelism.CORES;
-    public static int THRESHOLD = 512;
+    public static IntSupplier PARALLELISM = Parallelism.THREADS;
+    public static int THRESHOLD = 256;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
 
-    public static void call(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
-            final Householder.Primitive64 householder, final double[] work) {
-        HouseholderRight.divide(first, limit, (f, l) -> HouseholderRight.invoke(data, structure, f, l, numberOfColumns, householder, work));
+    public static void call(final double[] data, final int structure, final int first, final Householder.Primitive64 householder, final double[] work) {
+
+        int nbRows = structure;
+        int nbCols = data.length / structure;
+
+        double[] hVector = householder.vector;
+        int hFirst = householder.first;
+        double hBeta = householder.beta;
+
+        HouseholderRight.step1(data, structure, first, work, nbRows, nbCols, hVector, hFirst, hBeta);
+
+        if (nbCols > THRESHOLD) {
+            HouseholderRight.divide(hFirst, nbCols, (f, l) -> HouseholderRight.step2(data, structure, first, work, nbRows, l, hVector, f));
+        } else {
+            HouseholderRight.step2(data, structure, first, work, nbRows, nbCols, hVector, hFirst);
+        }
     }
 
-    public static void call(final float[] data, final int structure, final int first, final int limit, final int numberOfColumns,
-            final Householder.Primitive32 householder, final float[] work) {
-        HouseholderRight.divide(first, limit, (f, l) -> HouseholderRight.invoke(data, structure, f, l, numberOfColumns, householder, work));
+    public static void call(final float[] data, final int structure, final int first, final Householder.Primitive32 householder, final float[] work) {
+
+        int nbRows = structure;
+        int nbCols = data.length / structure;
+
+        float[] hVector = householder.vector;
+        int hFirst = householder.first;
+        float hBeta = householder.beta;
+
+        HouseholderRight.step1(data, structure, first, work, nbRows, nbCols, hVector, hFirst, hBeta);
+
+        if (nbCols > THRESHOLD) {
+            HouseholderRight.divide(hFirst, nbCols, (f, l) -> HouseholderRight.step2(data, structure, first, work, nbRows, l, hVector, f));
+        } else {
+            HouseholderRight.step2(data, structure, first, work, nbRows, nbCols, hVector, hFirst);
+        }
     }
 
-    public static <N extends Scalar<N>> void call(final N[] data, final int structure, final int first, final int limit, final int numberOfColumns,
-            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
-        HouseholderRight.divide(first, limit, (f, l) -> HouseholderRight.invoke(data, structure, f, l, numberOfColumns, householder, scalar));
+    public static <N extends Scalar<N>> void call(final N[] data, final int structure, final int first, final Householder.Generic<N> householder,
+            final Scalar.Factory<N> scalar) {
+
+        int nbRows = structure;
+        int nbCols = data.length / structure;
+
+        HouseholderRight.divide(first, nbRows, (f, l) -> HouseholderRight.invoke(data, structure, f, l, nbCols, householder, scalar));
     }
 
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+    private static void invoke(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
             final Householder.Primitive64 householder, final double[] work) {
 
         double[] hVector = householder.vector;
         int hFirst = householder.first;
         double hBeta = householder.beta;
 
-        for (int j = hFirst; j < numberOfColumns; j++) {
-            AXPY.invoke(work, 0, hBeta * hVector[j], data, j * structure, first, limit);
-        }
-        for (int j = hFirst; j < numberOfColumns; j++) {
-            AXPY.invoke(data, j * structure, -hVector[j], work, 0, first, limit);
-        }
+        HouseholderRight.step1(data, structure, first, work, limit, numberOfColumns, hVector, hFirst, hBeta);
+        HouseholderRight.step2(data, structure, first, work, limit, numberOfColumns, hVector, hFirst);
     }
 
-    public static void invoke(final float[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+    private static void invoke(final float[] data, final int structure, final int first, final int limit, final int numberOfColumns,
             final Householder.Primitive32 householder, final float[] work) {
 
         float[] hVector = householder.vector;
         int hFirst = householder.first;
         float hBeta = householder.beta;
 
-        for (int j = hFirst; j < numberOfColumns; j++) {
-            AXPY.invoke(work, 0, hBeta * hVector[j], data, j * structure, first, limit);
-        }
-        for (int j = hFirst; j < numberOfColumns; j++) {
-            AXPY.invoke(data, j * structure, -hVector[j], work, 0, first, limit);
-        }
+        HouseholderRight.step1(data, structure, first, work, limit, numberOfColumns, hVector, hFirst, hBeta);
+        HouseholderRight.step2(data, structure, first, work, limit, numberOfColumns, hVector, hFirst);
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+    private static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final int numberOfColumns,
             final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
 
         N[] hVector = householder.vector;
@@ -109,6 +131,27 @@ public final class HouseholderRight implements MatrixOperation {
         }
     }
 
+    private static void invoke2new(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+            final Householder.Primitive64 householder) {
+
+        double[] hVector = householder.vector;
+        int hFirst = householder.first;
+        double hBeta = householder.beta;
+
+        double tmpScale;
+        for (int i = first; i < limit; i++) {
+            tmpScale = PrimitiveMath.ZERO;
+            for (int j = hFirst; j < numberOfColumns; j++) {
+                tmpScale += hVector[j] * data[i + j * structure];
+            }
+            tmpScale *= hBeta;
+            for (int j = hFirst; j < numberOfColumns; j++) {
+                data[i + j * structure] -= hVector[j] * tmpScale;
+            }
+        }
+
+    }
+
     private static void invoke2old(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
             final Householder.Primitive64 householder) {
 
@@ -131,6 +174,34 @@ public final class HouseholderRight implements MatrixOperation {
                 data[tmpIndex] -= tmpScale * hVector[j];
                 tmpIndex += structure;
             }
+        }
+    }
+
+    private static void step1(final double[] data, final int structure, final int first, final double[] work, final int nbRows, final int nbCols,
+            final double[] hVector, final int hFirst, final double hBeta) {
+        for (int j = hFirst; j < nbCols; j++) {
+            AXPY.invoke(work, 0, hBeta * hVector[j], data, j * structure, first, nbRows);
+        }
+    }
+
+    private static void step1(final float[] data, final int structure, final int first, final float[] work, final int nbRows, final int nbCols,
+            final float[] hVector, final int hFirst, final float hBeta) {
+        for (int j = hFirst; j < nbCols; j++) {
+            AXPY.invoke(work, 0, hBeta * hVector[j], data, j * structure, first, nbRows);
+        }
+    }
+
+    private static void step2(final double[] data, final int structure, final int first, final double[] work, final int nbRows, final int nbCols,
+            final double[] hVector, final int hFirst) {
+        for (int j = hFirst; j < nbCols; j++) {
+            AXPY.invoke(data, j * structure, -hVector[j], work, 0, first, nbRows);
+        }
+    }
+
+    private static void step2(final float[] data, final int structure, final int first, final float[] work, final int nbRows, final int nbCols,
+            final float[] hVector, final int hFirst) {
+        for (int j = hFirst; j < nbCols; j++) {
+            AXPY.invoke(data, j * structure, -hVector[j], work, 0, first, nbRows);
         }
     }
 

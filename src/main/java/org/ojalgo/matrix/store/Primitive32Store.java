@@ -924,7 +924,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
-        HouseholderLeft.call(data, myRowDim, firstColumn, myColDim, Primitive32Store.cast(transformation));
+        HouseholderLeft.call(data, myRowDim, firstColumn, Primitive32Store.cast(transformation));
     }
 
     public void transformLeft(final Rotation<Double> transformation) {
@@ -950,7 +950,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
-        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, Primitive32Store.cast(transformation), this.getWorkerColumn());
+        HouseholderRight.call(data, myRowDim, firstRow, Primitive32Store.cast(transformation), this.getWorkerColumn());
     }
 
     public void transformRight(final Rotation<Double> transformation) {
