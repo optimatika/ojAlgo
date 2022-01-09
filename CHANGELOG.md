@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Matrix multiplication performance regression introduced with v49.
+
 ## [50.0.0] – 2022-01-02
 
 ### Added
