@@ -37,6 +37,10 @@ public interface ParallelismSupplier extends IntSupplier {
         return () -> PowerOf2.adjustUp(this.getAsInt());
     }
 
+    default ParallelismSupplier average(final IntSupplier other) {
+        return () -> (this.getAsInt() + other.getAsInt()) / 2;
+    }
+
     default ParallelismSupplier decrement() {
         return () -> Math.max(1, this.getAsInt() - 1);
     }

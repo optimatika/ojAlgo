@@ -35,43 +35,49 @@ abstract class AbstractModel implements Optimisation.Model {
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     public final boolean isMaximisation() {
         return this.getOptimisationSense() == Optimisation.Sense.MAX;
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     public final boolean isMinimisation() {
         return this.getOptimisationSense() == Optimisation.Sense.MIN;
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     public final void setMaximisation() {
         this.setOptimisationSense(Optimisation.Sense.MAX);
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     public final void setMinimisation() {
         this.setOptimisationSense(Optimisation.Sense.MIN);
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     protected final Optimisation.Sense getOptimisationSense() {
         return myOptimisationSense;
     }
 
     /**
-     * @deprected v49 Will be removed or at least made private
+     * @deprecated v49 Will be removed or at least made private
      */
+    @Deprecated
     protected final void setOptimisationSense(final Optimisation.Sense optimisationSense) {
         myOptimisationSense = optimisationSense;
     }

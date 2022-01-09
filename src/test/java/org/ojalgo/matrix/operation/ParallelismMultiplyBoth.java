@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.operation.ThresholdHouseholderRight.CodeAndData;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -30,44 +29,44 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro:
+ * Mac Pro (Early 2009): 2022-01-07 => CORES
  *
  * <pre>
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
+ * MacBook Pro (16-inch, 2019): 2022-01-07 => CORES/THREADS
  *
  * <pre>
-Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.399 ± 0.007  ops/min
-ParallelismHouseholderRight.tune          CORES  thrpt    3  0.800 ± 0.085  ops/min
-ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.755 ± 0.111  ops/min
+Benchmark                     (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismMultiplyBoth.tune          UNITS  thrpt    3  0.020 ± 0.222  ops/min
+ParallelismMultiplyBoth.tune          CORES  thrpt    3  0.206 ± 0.505  ops/min
+ParallelismMultiplyBoth.tune        THREADS  thrpt    3  0.223 ± 0.069  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ParallelismHouseholderRight extends ParallelismTuner {
+public class ParallelismMultiplyBoth extends ParallelismTuner {
 
     public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderRight.class);
+        BenchmarkUtils.run(ParallelismTuner.options(), ParallelismMultiplyBoth.class);
     }
 
-    CodeAndData benchmark;
+    MultiplyThresholdTuner.CodeAndData benchmark;
 
     @Override
     @Setup
     public void setup() {
 
-        HouseholderLeft.PARALLELISM = parallelism;
+        MultiplyBoth.PARALLELISM = parallelism;
 
-        benchmark = new CodeAndData(DIM);
+        benchmark = new MultiplyThresholdTuner.CodeAndData(DIM, true, true);
     }
 
     @Override
     @Benchmark
     public Object tune() {
-        return benchmark.tune();
+        return benchmark.execute();
     }
 
 }
