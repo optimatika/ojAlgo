@@ -22,11 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.random.Uniform;
-import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -94,7 +89,7 @@ ThresholdMultiplyLeft.tune    256    4  thrpt    3     17060.206 ±    2651.255 
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdMultiplyLeft extends ThresholdTuner {
+public class ThresholdMultiplyLeft extends MultiplyThresholdTuner {
 
     public static void main(final String[] args) throws RunnerException {
         BenchmarkUtils.run(ThresholdTuner.options(), ThresholdMultiplyLeft.class);
@@ -103,28 +98,13 @@ public class ThresholdMultiplyLeft extends ThresholdTuner {
     @Param({ "16", "32", "64", "128", "256" })
     public int dim;
 
-    MatrixStore<Double> left;
-    MatrixStore<Double> right;
-    PhysicalStore<Double> target;
-
     @Override
     @Setup
     public void setup() {
 
         MultiplyLeft.THRESHOLD = dim / z;
 
-        final Uniform tmpSupplier = new Uniform();
-
-        left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier).transpose();
-        right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.make(dim, dim);
-    }
-
-    @Override
-    @Benchmark
-    public Object tune() {
-        target.fillByMultiplying(left, right);
-        return target;
+        benchmark = new MultiplyThresholdTuner.CodeAndData(dim, true, false);
     }
 
 }

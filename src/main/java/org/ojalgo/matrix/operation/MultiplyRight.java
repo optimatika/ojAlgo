@@ -197,13 +197,12 @@ public class MultiplyRight implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-
-            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * nbRows, right.doubleValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
+                double a = right.doubleValue(Structure2D.index(complexity, c, j));
+                if (a != 0D) {
+                    AXPY.invoke(product, j * nbRows, a, left, c * nbRows, 0, nbRows);
+                }
             }
         }
     }
@@ -212,13 +211,12 @@ public class MultiplyRight implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-
-            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * nbRows, right.floatValue(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
+                float a = right.floatValue(Structure2D.index(complexity, c, j));
+                if (a != 0F) {
+                    AXPY.invoke(product, j * nbRows, a, left, c * nbRows, 0, nbRows);
+                }
             }
         }
     }
@@ -228,13 +226,12 @@ public class MultiplyRight implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-
-            int firstInRightRow = Structure2D.firstInRow(right, c, firstColumn);
-            int limitOfRightRow = Structure2D.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * nbRows, right.get(Structure2D.index(complexity, c, j)), left, c * nbRows, 0, nbRows);
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
+                N a = right.get(Structure2D.index(complexity, c, j));
+                if (!a.isSmall(1.0)) {
+                    AXPY.invoke(product, j * nbRows, a, left, c * nbRows, 0, nbRows);
+                }
             }
         }
     }

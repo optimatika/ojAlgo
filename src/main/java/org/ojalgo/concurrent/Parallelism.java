@@ -41,7 +41,8 @@ public enum Parallelism implements ParallelismSupplier {
      */
     CORES(() -> OjAlgoUtils.ENVIRONMENT.cores),
     /**
-     * The number of top level (L2 or L3) cache units
+     * The number of CPU:s or, more precisely, top level (L3) cache units. It is generally assumed that there
+     * is one L3 cache unit per CPU.
      */
     UNITS(() -> OjAlgoUtils.ENVIRONMENT.units),
     /**

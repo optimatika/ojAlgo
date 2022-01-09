@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.matrix.operation.ThresholdHouseholderLeft.CodeAndData;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -62,8 +61,7 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
 
         HouseholderLeft.PARALLELISM = parallelism;
 
-        int dim = 2 * HouseholderLeft.THRESHOLD * OjAlgoUtils.ENVIRONMENT.threads;
-        benchmark = new CodeAndData(dim);
+        benchmark = new CodeAndData(DIM);
     }
 
     @Override
