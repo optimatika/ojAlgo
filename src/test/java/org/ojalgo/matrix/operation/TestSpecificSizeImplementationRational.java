@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.operation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.GenericStore;
@@ -38,6 +39,11 @@ public class TestSpecificSizeImplementationRational {
     private static final NumberContext ACCURACY_P64 = NumberContext.of(12, 14);
 
     static final int[] DIMS = new int[] { 1, 10, 100 };
+
+    @BeforeEach
+    public void configure() {
+        MatrixOperation.setAllOperationThresholds(50);
+    }
 
     @Test
     public void testMultiplyBoth() {

@@ -34,7 +34,7 @@ public abstract class BenchmarkUtils {
 
     public static ChainedOptionsBuilder options() {
         return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(7).mode(Mode.Throughput).timeUnit(TimeUnit.MINUTES)
-                .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-Xmx6g");
+                .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-Xmx8g");
     }
 
     public static void run(final ChainedOptionsBuilder options, final Class<?> clazz) throws RunnerException {

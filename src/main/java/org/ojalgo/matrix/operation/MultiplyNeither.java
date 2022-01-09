@@ -193,8 +193,8 @@ public class MultiplyNeither implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-            for (int j = firstColumn; j < columnLimit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
                 AXPY.invoke(product, j * nbRows, right[c + j * complexity], left, c * nbRows, 0, nbRows);
             }
         }
@@ -204,8 +204,8 @@ public class MultiplyNeither implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-            for (int j = firstColumn; j < columnLimit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
                 AXPY.invoke(product, j * nbRows, right[c + j * complexity], left, c * nbRows, 0, nbRows);
             }
         }
@@ -216,8 +216,8 @@ public class MultiplyNeither implements MatrixOperation {
 
         int nbRows = left.length / complexity;
 
-        for (int c = 0; c < complexity; c++) {
-            for (int j = firstColumn; j < columnLimit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
                 AXPY.invoke(product, j * nbRows, right[c + j * complexity], left, c * nbRows, 0, nbRows);
             }
         }
