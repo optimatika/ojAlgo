@@ -15,7 +15,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- Implementation of `HouseholderRight`, and re-tuned` HouseholderLeft` and `HouseholderRight`.
+- Modified the `HouseholderRight` implementation, and re-tuned the concurrency configuration of `HouseholderLeft` and `HouseholderRight`.
 
 ## [50.0.1] – 2022-01-09
 
