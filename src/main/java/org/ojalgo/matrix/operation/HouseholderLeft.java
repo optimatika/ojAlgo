@@ -34,25 +34,50 @@ import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderLeft implements MatrixOperation {
 
-    public static IntSupplier PARALLELISM = Parallelism.CORES;
+    public static IntSupplier PARALLELISM = Parallelism.THREADS;
     public static int THRESHOLD = 64;
 
     private static final DivideAndConquer.Divider DIVIDER = ProcessingService.INSTANCE.divider();
 
-    public static void call(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {
-        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
+    public static void call(final double[] data, final int structure, final int first, final Householder.Primitive64 householder) {
+
+        int nbCols = data.length / structure;
+
+        if (nbCols > THRESHOLD) {
+            HouseholderLeft.divide(first, nbCols, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
+        } else {
+            HouseholderLeft.invoke(data, structure, first, nbCols, householder);
+        }
     }
 
-    public static void call(final float[] data, final int structure, final int first, final int limit, final Householder.Primitive32 householder) {
-        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
+    public static void call(final float[] data, final int structure, final int first, final Householder.Primitive32 householder) {
+
+        int nbCols = data.length / structure;
+
+        if (nbCols > THRESHOLD) {
+            HouseholderLeft.divide(first, nbCols, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder));
+        } else {
+            HouseholderLeft.invoke(data, structure, first, nbCols, householder);
+        }
     }
 
-    public static <N extends Scalar<N>> void call(final N[] data, final int structure, final int first, final int limit,
-            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
-        HouseholderLeft.divide(first, limit, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder, scalar));
+    public static <N extends Scalar<N>> void call(final N[] data, final int structure, final int first, final Householder.Generic<N> householder,
+            final Scalar.Factory<N> scalar) {
+
+        int nbCols = data.length / structure;
+
+        if (nbCols > THRESHOLD) {
+            HouseholderLeft.divide(first, nbCols, (f, l) -> HouseholderLeft.invoke(data, structure, f, l, householder, scalar));
+        } else {
+            HouseholderLeft.invoke(data, structure, first, nbCols, householder, scalar);
+        }
     }
 
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {
+    static void divide(final int first, final int limit, final Conquerer conquerer) {
+        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
+    }
+
+    static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {
 
         double[] hVector = householder.vector;
         int hFirst = householder.first;
@@ -66,7 +91,7 @@ public final class HouseholderLeft implements MatrixOperation {
         }
     }
 
-    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Householder.Primitive32 householder) {
+    static void invoke(final float[] data, final int structure, final int first, final int limit, final Householder.Primitive32 householder) {
 
         float[] hVector = householder.vector;
         int hFirst = householder.first;
@@ -80,8 +105,8 @@ public final class HouseholderLeft implements MatrixOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit,
-            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
+    static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Householder.Generic<N> householder,
+            final Scalar.Factory<N> scalar) {
 
         N[] hVector = householder.vector;
         int hFirst = householder.first;
@@ -102,10 +127,6 @@ public final class HouseholderLeft implements MatrixOperation {
                 tmpIndex++;
             }
         }
-    }
-
-    static void divide(final int first, final int limit, final Conquerer conquerer) {
-        DIVIDER.parallelism(PARALLELISM).threshold(THRESHOLD).divide(first, limit, conquerer);
     }
 
 }

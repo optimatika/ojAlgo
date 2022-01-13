@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.matrix
+
+- Implementation of `HouseholderRight`, and re-tuned` HouseholderLeft` and `HouseholderRight`.
+
 ## [50.0.1] – 2022-01-09
 
 ### Fixed

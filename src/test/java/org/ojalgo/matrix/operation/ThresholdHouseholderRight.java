@@ -25,6 +25,7 @@ import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -33,62 +34,52 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro. 2015-06-24 => 512
+ * Mac Pro (Early 2009): 2022-01-13 => 256
  *
  * <pre>
- * # Run complete. Total time: 00:32:32
- *
- * Benchmark                            (dim)  (z)   Mode  Cnt    Score    Error    Units
- * ThresholdHouseholderRight.decompose    512    1  thrpt    3  160,486 ± 18,885  ops/min
- * ThresholdHouseholderRight.decompose    512    2  thrpt    3  157,054 ± 17,449  ops/min
- * ThresholdHouseholderRight.decompose   1024    1  thrpt    3   29,190 ±  1,876  ops/min
- * ThresholdHouseholderRight.decompose   1024    2  thrpt    3   30,504 ± 17,942  ops/min
- * ThresholdHouseholderRight.decompose   2048    1  thrpt    3    3,960 ±  0,354  ops/min
- * ThresholdHouseholderRight.decompose   2048    2  thrpt    3    4,465 ±  0,299  ops/min
- * ThresholdHouseholderRight.decompose   4096    1  thrpt    3    0,539 ±  0,036  ops/min
- * ThresholdHouseholderRight.decompose   4096    2  thrpt    3    0,626 ±  0,013  ops/min
+Benchmark                       (dim)  (z)   Mode  Cnt       Score      Error    Units
+ThresholdHouseholderRight.tune     64    1  thrpt    3  110612.297 ± 9065.663  ops/min
+ThresholdHouseholderRight.tune     64    2  thrpt    3   44077.718 ± 4643.325  ops/min
+ThresholdHouseholderRight.tune     64    4  thrpt    3   22107.514 ±  592.447  ops/min
+ThresholdHouseholderRight.tune    128    1  thrpt    3    9643.418 ± 3135.729  ops/min
+ThresholdHouseholderRight.tune    128    2  thrpt    3    8661.197 ± 1040.084  ops/min
+ThresholdHouseholderRight.tune    128    4  thrpt    3    5651.640 ±  250.043  ops/min
+ThresholdHouseholderRight.tune    256    1  thrpt    3    1581.234 ±   47.155  ops/min
+ThresholdHouseholderRight.tune    256    2  thrpt    3    1458.823 ±   99.917  ops/min
+ThresholdHouseholderRight.tune    256    4  thrpt    3    1386.028 ±   85.117  ops/min
+ThresholdHouseholderRight.tune    512    1  thrpt    3     258.619 ±   53.413  ops/min
+ThresholdHouseholderRight.tune    512    2  thrpt    3     262.324 ±   50.952  ops/min
+ThresholdHouseholderRight.tune    512    4  thrpt    3     280.717 ±    7.375  ops/min
+ThresholdHouseholderRight.tune   1024    1  thrpt    3      36.970 ±    5.826  ops/min
+ThresholdHouseholderRight.tune   1024    2  thrpt    3      40.612 ±    7.569  ops/min
+ThresholdHouseholderRight.tune   1024    4  thrpt    3      44.500 ±    2.200  ops/min
+ThresholdHouseholderRight.tune   2048    1  thrpt    3       4.651 ±    0.215  ops/min
+ThresholdHouseholderRight.tune   2048    2  thrpt    3       5.297 ±    0.479  ops/min
+ThresholdHouseholderRight.tune   2048    4  thrpt    3       5.837 ±    1.816  ops/min
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => 512
+ * MacBook Pro (16-inch, 2019): 2022-01-13 => 128 (256)
  *
  * <pre>
-Benchmark                       (dim)  (z)   Mode  Cnt     Score      Error    Units
-ThresholdHouseholderRight.tune    128    1  thrpt    3  9510.973 ±  468.728  ops/min
-ThresholdHouseholderRight.tune    128    2  thrpt    3  7262.200 ± 3798.119  ops/min
-ThresholdHouseholderRight.tune    128    4  thrpt    3  4891.214 ± 1662.073  ops/min
-ThresholdHouseholderRight.tune    256    1  thrpt    3  1895.646 ±  468.174  ops/min
-ThresholdHouseholderRight.tune    256    2  thrpt    3  1514.779 ±  478.991  ops/min
-ThresholdHouseholderRight.tune    256    4  thrpt    3  1126.434 ±  283.917  ops/min
-ThresholdHouseholderRight.tune    512    1  thrpt    3   354.724 ±  116.550  ops/min
-ThresholdHouseholderRight.tune    512    2  thrpt    3   339.003 ±    3.934  ops/min
-ThresholdHouseholderRight.tune    512    4  thrpt    3   239.940 ±  146.999  ops/min
-ThresholdHouseholderRight.tune   1024    1  thrpt    3    54.753 ±   14.236  ops/min
-ThresholdHouseholderRight.tune   1024    2  thrpt    3    66.600 ±    3.543  ops/min
-ThresholdHouseholderRight.tune   1024    4  thrpt    3    53.725 ±    3.405  ops/min
-ThresholdHouseholderRight.tune   2048    1  thrpt    3     6.124 ±    0.447  ops/min
-ThresholdHouseholderRight.tune   2048    2  thrpt    3     7.451 ±    1.540  ops/min
-ThresholdHouseholderRight.tune   2048    4  thrpt    3     7.081 ±    0.699  ops/min
- * </pre>
- *
- * old/alternate code
- *
- * <pre>
-Benchmark                       (dim)  (z)   Mode  Cnt     Score      Error    Units
-ThresholdHouseholderRight.tune    128    1  thrpt    3  7502.753 ±  565.919  ops/min
-ThresholdHouseholderRight.tune    128    2  thrpt    3  7337.924 ± 2539.952  ops/min
-ThresholdHouseholderRight.tune    128    4  thrpt    3  5124.327 ±  995.457  ops/min
-ThresholdHouseholderRight.tune    256    1  thrpt    3  1029.643 ±   45.015  ops/min
-ThresholdHouseholderRight.tune    256    2  thrpt    3  1297.135 ±  365.526  ops/min
-ThresholdHouseholderRight.tune    256    4  thrpt    3  1251.378 ±   47.748  ops/min
-ThresholdHouseholderRight.tune    512    1  thrpt    3   133.748 ±   15.840  ops/min
-ThresholdHouseholderRight.tune    512    2  thrpt    3   200.476 ±   59.299  ops/min
-ThresholdHouseholderRight.tune    512    4  thrpt    3   229.117 ±  107.045  ops/min
-ThresholdHouseholderRight.tune   1024    1  thrpt    3    17.097 ±    3.473  ops/min
-ThresholdHouseholderRight.tune   1024    2  thrpt    3    27.048 ±    8.516  ops/min
-ThresholdHouseholderRight.tune   1024    4  thrpt    3    32.631 ±   12.436  ops/min
-ThresholdHouseholderRight.tune   2048    1  thrpt    3     1.582 ±    1.027  ops/min
-ThresholdHouseholderRight.tune   2048    2  thrpt    3     2.350 ±    0.394  ops/min
-ThresholdHouseholderRight.tune   2048    4  thrpt    3     3.020 ±    1.307  ops/min
+Benchmark                       (dim)  (z)   Mode  Cnt       Score       Error    Units
+ThresholdHouseholderRight.tune     64    1  thrpt    3  282050.993 ± 15109.702  ops/min
+ThresholdHouseholderRight.tune     64    2  thrpt    3  107553.881 ± 24204.942  ops/min
+ThresholdHouseholderRight.tune     64    4  thrpt    3   62519.219 ±  2201.527  ops/min
+ThresholdHouseholderRight.tune    128    1  thrpt    3   26150.846 ±   612.641  ops/min
+ThresholdHouseholderRight.tune    128    2  thrpt    3   21585.088 ±  3202.590  ops/min
+ThresholdHouseholderRight.tune    128    4  thrpt    3   14967.346 ± 14426.271  ops/min
+ThresholdHouseholderRight.tune    256    1  thrpt    3    4352.582 ±   168.386  ops/min
+ThresholdHouseholderRight.tune    256    2  thrpt    3    4325.733 ±   170.975  ops/min
+ThresholdHouseholderRight.tune    256    4  thrpt    3    4046.382 ±  1189.641  ops/min
+ThresholdHouseholderRight.tune    512    1  thrpt    3     713.736 ±    82.786  ops/min
+ThresholdHouseholderRight.tune    512    2  thrpt    3     759.927 ±    43.905  ops/min
+ThresholdHouseholderRight.tune    512    4  thrpt    3     759.048 ±   149.099  ops/min
+ThresholdHouseholderRight.tune   1024    1  thrpt    3     105.325 ±    25.630  ops/min
+ThresholdHouseholderRight.tune   1024    2  thrpt    3     118.275 ±    18.851  ops/min
+ThresholdHouseholderRight.tune   1024    4  thrpt    3     125.592 ±    24.284  ops/min
+ThresholdHouseholderRight.tune   2048    1  thrpt    3      10.245 ±     4.537  ops/min
+ThresholdHouseholderRight.tune   2048    2  thrpt    3      12.916 ±     2.133  ops/min
+ThresholdHouseholderRight.tune   2048    4  thrpt    3      13.672 ±     0.216  ops/min
  * </pre>
  *
  * @author apete
@@ -105,7 +96,7 @@ public class ThresholdHouseholderRight extends ThresholdTuner {
 
             super();
 
-            matrix = Primitive64Store.FACTORY.makeSPD(dim).below(Primitive64Store.FACTORY.makeIdentity(dim)).copy();
+            matrix = Primitive64Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
 
             decomposition = Bidiagonal.PRIMITIVE.make(matrix);
         }
@@ -122,7 +113,7 @@ public class ThresholdHouseholderRight extends ThresholdTuner {
         BenchmarkUtils.run(ThresholdTuner.options(), ThresholdHouseholderRight.class);
     }
 
-    @Param({ "128", "256", "512", "1024", "2048" })
+    @Param({ "64", "128", "256", "512", "1024", "2048" })
     public int dim;
 
     CodeAndData benchmark;
