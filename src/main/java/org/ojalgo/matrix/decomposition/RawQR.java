@@ -25,10 +25,12 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.NRM2;
+import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -139,9 +141,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         int m = this.getRowDim();
         int n = this.getColDim();
-        int r = Math.min(m, n);
+        int r = this.getMinDim();
 
-        double[][] tmpData = this.getInternalData();
+        double[][] internalData = this.getInternalData();
 
         RawStore retVal = new RawStore(m, r);
         double[][] retData = retVal.data;
@@ -152,14 +154,14 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             }
             retData[k][k] = ONE;
             for (int j = k; j < r; j++) {
-                if (tmpData[k][k] != 0) {
+                if (internalData[k][k] != 0) {
                     double s = ZERO;
                     for (int i = k; i < m; i++) {
-                        s += tmpData[k][i] * retData[i][j];
+                        s += internalData[k][i] * retData[i][j];
                     }
-                    s = -s / tmpData[k][k];
+                    s = -s / internalData[k][k];
                     for (int i = k; i < m; i++) {
-                        retData[i][j] += s * tmpData[k][i];
+                        retData[i][j] += s * internalData[k][i];
                     }
                 }
             }
@@ -176,9 +178,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         int m = this.getRowDim();
         int n = this.getColDim();
-        int r = Math.min(m, n);
+        int r = this.getMinDim();
 
-        double[][] tmpData = this.getInternalData();
+        double[][] internalData = this.getInternalData();
 
         RawStore retVal = new RawStore(r, n);
         double[][] retData = retVal.data;
@@ -188,7 +190,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             tmpRow = retData[i];
             tmpRow[i] = myDiagonalR[i];
             for (int j = i + 1; j < n; j++) {
-                tmpRow[j] = tmpData[j][i];
+                tmpRow[j] = internalData[j][i];
             }
         }
 
@@ -208,8 +210,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
+        return this.getSolution(rhs, this.allocate(rhs.countRows(), rhs.countColumns()));
     }
 
     @Override
@@ -287,43 +288,40 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         int m = this.getRowDim();
         int n = this.getColDim();
+        int r = this.getMinDim();
 
-        myDiagonalR = new double[n];
+        myDiagonalR = new double[r];
 
-        double[] tmpColK;
-        double nrm;
+        double[] colK;
+        for (int k = 0; k < r; k++) {
+            colK = data[k];
 
-        // Main loop.
-        for (int k = 0; k < n; k++) {
+            // Compute Infinity-norm of k-th column
+            double norm = NRMINF.invoke(colK, k, m);
+            if (norm == ZERO) {
+                break;
+            }
+            // Compute 2-norm of k-th column
+            norm = NRM2.invoke(colK, norm, k, m);
 
-            tmpColK = data[k];
+            myNumberOfHouseholderTransformations++;
 
-            // Compute 2-norm of k-th column without under/overflow.
-            nrm = ZERO;
+            // Form k-th Householder vector.
+            if (colK[k] < 0) {
+                norm = -norm;
+            }
+
             for (int i = k; i < m; i++) {
-                double a = nrm;
-                nrm = HYPOT.invoke(a, tmpColK[i]);
+                colK[i] /= norm;
             }
+            colK[k] += ONE;
 
-            if (nrm != ZERO) {
+            // Apply transformation to remaining columns
+            double hBeta = ONE / colK[k];
 
-                myNumberOfHouseholderTransformations++;
+            HouseholderLeft.call(data, m, k + 1, colK, k, hBeta);
 
-                // Form k-th Householder vector.
-                if (tmpColK[k] < 0) {
-                    nrm = -nrm;
-                }
-                for (int i = k; i < m; i++) {
-                    tmpColK[i] /= nrm;
-                }
-                tmpColK[k] += ONE;
-
-                // Apply transformation to remaining columns.
-                for (int j = k + 1; j < n; j++) {
-                    AXPY.invoke(data[j], 0, -(DOT.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k]), tmpColK, 0, k, m);
-                }
-            }
-            myDiagonalR[k] = -nrm;
+            myDiagonalR[k] = -norm;
         }
 
         return this.computed(true);
@@ -341,46 +339,47 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     private MatrixStore<Double> doSolve(final Primitive64Store preallocated) {
 
-        double[] tmpRHSdata = preallocated.data;
+        double[] dataRHS = preallocated.data;
 
         int m = this.getRowDim();
         int n = this.getColDim();
-        int s = (int) preallocated.countColumns();
+        int s = preallocated.getColDim();
 
-        if ((int) preallocated.countRows() != m) {
-            throw new IllegalArgumentException("RawStore row dimensions must agree.");
+        if (preallocated.getRowDim() != m) {
+            throw new IllegalArgumentException("Row dimensions must agree!");
         }
         if (!this.isFullRank()) {
-            throw new RuntimeException("RawStore is rank deficient.");
+            throw new RuntimeException("Rank deficient!");
         }
 
-        double[][] tmpData = this.getInternalData();
+        double[][] dataInternal = this.getInternalData();
 
-        double[] tmpColK;
+        double[] colK;
+        double beta;
 
         // Compute Y = transpose(Q)*B
         for (int k = 0; k < n; k++) {
 
-            tmpColK = tmpData[k];
+            colK = dataInternal[k];
+            beta = ONE / colK[k];
 
-            for (int j = 0; j < s; j++) {
-                double tmpVal = -(DOT.invoke(tmpColK, 0, tmpRHSdata, m * j, k, m) / tmpColK[k]);
-                AXPY.invoke(tmpRHSdata, m * j, tmpVal, tmpColK, 0, k, m);
-            }
+            HouseholderLeft.call(dataRHS, m, 0, colK, k, beta);
         }
 
         // Solve R*X = Y;
         for (int k = n - 1; k >= 0; k--) {
 
-            tmpColK = tmpData[k];
+            colK = dataInternal[k];
             double tmpDiagK = myDiagonalR[k];
 
             for (int j = 0; j < s; j++) {
-                tmpRHSdata[k + j * m] /= tmpDiagK;
-                AXPY.invoke(tmpRHSdata, j * m, -tmpRHSdata[k + j * m], tmpColK, 0, 0, k);
+                dataRHS[k + j * m] /= tmpDiagK;
+                AXPY.invoke(dataRHS, j * m, -dataRHS[k + j * m], colK, 0, 0, k);
             }
+
         }
-        return preallocated.limits(n, (int) preallocated.countColumns());
+
+        return preallocated.limits(n, s);
     }
 
     @Override

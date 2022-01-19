@@ -123,16 +123,15 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         DecompositionStore<N> tmpStore = this.setInPlace(matrix);
 
-        int tmpRowDim = this.getRowDim();
-        int tmpColDim = this.getColDim();
+        int m = this.getRowDim();
+        int n = this.getColDim();
+        int r = this.getMinDim();
 
-        Householder<N> tmpHouseholder = this.makeHouseholder(tmpRowDim);
+        Householder<N> tmpHouseholder = this.makeHouseholder(m);
 
-        int tmpLimit = Math.min(tmpRowDim, tmpColDim);
-
-        for (int ij = 0; ij < tmpLimit; ij++) {
-            if (ij + 1 < tmpRowDim && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholder)) {
-                tmpStore.transformLeft(tmpHouseholder, ij + 1);
+        for (int k = 0; k < r; k++) {
+            if (k + 1 < m && tmpStore.generateApplyAndCopyHouseholderColumn(k, k, tmpHouseholder)) {
+                tmpStore.transformLeft(tmpHouseholder, k + 1);
                 myNumberOfHouseholderTransformations++;
             }
         }
@@ -149,6 +148,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         if (myNumberOfHouseholderTransformations % 2 != 0) {
             return this.scalar().one().negate().multiply(aggregator.get()).get();
         }
+
         return aggregator.get();
     }
 

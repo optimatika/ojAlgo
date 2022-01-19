@@ -32,6 +32,24 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
+ * MacBook Pro (16-inch, 2019): 2022-01-14
+ *
+ * <pre>
+Benchmark                              (dim)   Mode  Cnt      Score      Error    Units
+PrimitiveOrRawSingularValue.primitive    100  thrpt    3  12388.028 ± 3156.079  ops/min
+PrimitiveOrRawSingularValue.primitive    200  thrpt    3   1727.477 ±  199.262  ops/min
+PrimitiveOrRawSingularValue.primitive    500  thrpt    3    154.924 ±   19.048  ops/min
+PrimitiveOrRawSingularValue.primitive   1000  thrpt    3     20.482 ±    2.324  ops/min
+PrimitiveOrRawSingularValue.primitive   2000  thrpt    3      2.130 ±    0.527  ops/min
+PrimitiveOrRawSingularValue.primitive   5000  thrpt    3      0.131 ±    0.021  ops/min
+PrimitiveOrRawSingularValue.raw          100  thrpt    3  22058.402 ± 4968.277  ops/min
+PrimitiveOrRawSingularValue.raw          200  thrpt    3   3326.747 ±  282.988  ops/min
+PrimitiveOrRawSingularValue.raw          500  thrpt    3    184.981 ±   18.746  ops/min
+PrimitiveOrRawSingularValue.raw         1000  thrpt    3     23.172 ±    1.375  ops/min
+PrimitiveOrRawSingularValue.raw         2000  thrpt    3      2.170 ±    0.019  ops/min
+PrimitiveOrRawSingularValue.raw         5000  thrpt    3      0.111 ±    0.108  ops/min
+ * </pre>
+ *
  * Mac Pro: 2017-04-17 => 2048
  *
  * <pre>
@@ -90,8 +108,8 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
 
         primitive.compute(matrix);
 
-        primitive.getQ1();
-        primitive.getQ2();
+        primitive.getU();
+        primitive.getV();
 
         return primitive.getD();
     }
@@ -102,8 +120,8 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
 
         raw.compute(matrix);
 
-        raw.getQ1();
-        raw.getQ2();
+        raw.getU();
+        raw.getV();
 
         return raw.getD();
     }

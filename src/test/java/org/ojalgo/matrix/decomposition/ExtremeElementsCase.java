@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
@@ -52,9 +51,11 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     /**
      * 146 = (308/2) - (16/2)
      */
-    static NumberContext ACCURACY = new NumberContext(12, 146);
+    static final NumberContext ACCURACY = NumberContext.of(12, 146);
 
     private static void performInvertTest(final Primitive64Store original, final InverterTask<Double> task, final NumberContext context) {
+
+        String clazz = task.getClass().toString();
 
         try {
 
@@ -63,15 +64,16 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
             MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.makeIdentity((int) original.countRows());
             MatrixStore<Double> tmpActual = original.multiply(tmpInverse);
 
-            TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);
+            TestUtils.assertEquals(clazz, tmpExpected, tmpActual, context);
 
-        } catch (RecoverableCondition exception) {
-            TestUtils.fail(task.getClass() + " " + exception.toString());
+        } catch (RecoverableCondition cause) {
+            TestUtils.fail(clazz + " " + cause.toString());
         }
-
     }
 
     private static void performSolveTest(final Primitive64Store body, final Primitive64Store rhs, final SolverTask<Double> task, final NumberContext context) {
+
+        String clazz = task.getClass().toString();
 
         try {
 
@@ -80,43 +82,42 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
             MatrixStore<Double> tmpExpected = rhs;
             MatrixStore<Double> tmpActual = body.multiply(tmpSolution);
 
-            TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);
+            TestUtils.assertEquals(clazz, tmpExpected, tmpActual, context);
 
-        } catch (RecoverableCondition exception) {
-            TestUtils.fail(task.getClass() + " " + exception.toString());
+        } catch (RecoverableCondition cause) {
+            TestUtils.fail(clazz + " " + cause.toString());
         }
-
     }
 
     static void doTestInvert(final boolean large) {
 
         for (int precision = 1; precision <= 16; precision++) {
-            NumberContext tmpContext = NumberContext.getGeneral(precision, Integer.MIN_VALUE);
+            NumberContext accuracy = ACCURACY.withoutScale().withPrecision(precision);
 
             for (int dim = 1; dim <= 10; dim++) {
 
                 // exp = 308 could potentially create numbers that are 2E308 which is larger than Double.MAX_VALUE
                 for (int exp = 0; exp < 308; exp++) {
-                    double tmpScale = POWER.invoke(TEN, large ? exp : -exp);
+                    double scale = POWER.invoke(TEN, large ? exp : -exp);
 
-                    Primitive64Store tmpOriginal = Primitive64Store.FACTORY.makeSPD(dim);
+                    Primitive64Store original = Primitive64Store.FACTORY.makeSPD(dim);
                     if (DEBUG) {
-                        BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, tmpScale, tmpContext);
-                        BasicLogger.debug("Original (unscaled) {}", tmpOriginal.toString());
+                        BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, scale, accuracy);
+                        BasicLogger.debug("Original (unscaled) {}", original.toString());
 
                     }
-                    tmpOriginal.modifyAll(MULTIPLY.second(tmpScale));
+                    original.modifyAll(MULTIPLY.by(scale));
 
-                    ExtremeElementsCase.performInvertTest(tmpOriginal, InverterTask.PRIMITIVE.make(tmpOriginal), tmpContext);
+                    ExtremeElementsCase.performInvertTest(original, InverterTask.PRIMITIVE.make(original), accuracy);
 
-                    List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getPrimitiveAll();
-                    for (MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
+                    List<MatrixDecomposition<Double>> allDecomps = MatrixDecompositionTests.getPrimitiveAll();
+                    for (MatrixDecomposition<Double> decomp : allDecomps) {
 
                         if (DEBUG) {
-                            BasicLogger.debug("{} at dim={} for scale={}", tmpDecomp.getClass(), dim, tmpScale);
+                            BasicLogger.debug("{} at dim={} for scale={}", decomp.getClass(), dim, scale);
                         }
-                        if (tmpDecomp instanceof MatrixDecomposition.Solver) {
-                            ExtremeElementsCase.performInvertTest(tmpOriginal, (InverterTask<Double>) tmpDecomp, tmpContext);
+                        if (decomp instanceof MatrixDecomposition.Solver) {
+                            ExtremeElementsCase.performInvertTest(original, (InverterTask<Double>) decomp, accuracy);
                         }
                     }
                 }
@@ -264,7 +265,6 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("det() Big vs Complex", tmpBig.getDeterminant(), tmpComplex.getDeterminant(), ACCURACY);
         TestUtils.assertEquals("det() Complex vs Primitive", tmpComplex.getDeterminant(), tmpPrimitive.getDeterminant(), ACCURACY);
         TestUtils.assertEquals("det() Primitive vs Jama", tmpPrimitive.getDeterminant(), tmpJama.getDeterminant(), ACCURACY);
-
     }
 
     @Test
@@ -295,9 +295,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         RawEigenvalue.Symmetric tmpAlgorithm = new RawEigenvalue.Symmetric();
 
-        NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
 
     @Test
@@ -309,9 +307,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         Primitive tmpAlgorithm = new HermitianEvD.Primitive();
 
-        NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
 
     @Test
@@ -328,9 +324,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         RawSingularValue tmpAlgorithm = new RawSingularValue();
 
-        NumberContext tmpContext = NumberContext.getGeneral(2, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(2));
     }
 
     @Test
@@ -352,9 +346,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         SingularValueDecomposition.Primitive tmpAlgorithm = new SingularValueDecomposition.Primitive();
 
-        NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
 
     @Test
@@ -366,13 +358,10 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
 
-        NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
 
     @Test
-    @Disabled
     public void testLU() {
 
         MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
@@ -414,28 +403,23 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
         TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
         TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
-
     }
 
     @Test
-    @Disabled
     public void testOverflowInvert() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Disabled
     public void testOverflowRank() {
         ExtremeElementsCase.doTestRank(true);
     }
 
     @Test
-    @Disabled
     public void testOverflowSolve() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
-    @Disabled("Underscored before JUnit 5")
     @Test
     public void testQR() {
 
@@ -470,7 +454,6 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
         TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
         TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
-
     }
 
     @Test
@@ -485,25 +468,20 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         SolverTask<Double> tmpAlgorithm = new LUDecomposition.Primitive();
 
-        NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, tmpContext);
+        ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
 
     @Test
-    @Disabled
     public void testUnderflowInvert() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Disabled
     public void testUnderflowRank() {
         ExtremeElementsCase.doTestRank(false);
     }
 
     @Test
-    @Disabled
     public void testUnderflowSolve() {
         ExtremeElementsCase.doTestSolve(false);
     }

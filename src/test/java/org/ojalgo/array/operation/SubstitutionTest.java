@@ -31,7 +31,7 @@ import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.RationalNumber;
 
-public class SubstitutionTest extends StoreOperationsTests {
+public class SubstitutionTest extends ArrayOperationTests {
 
     @Test
     public void testSubstituteBackwards() {

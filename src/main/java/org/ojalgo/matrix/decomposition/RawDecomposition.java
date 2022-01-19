@@ -44,6 +44,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
+    protected final static <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
+        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
+    }
+
     private int myColDim;
     private double[][] myInternalData;
     private RawStore myInternalStore;
@@ -104,10 +108,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myInternalStore;
     }
 
-    protected final <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
-        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
-    }
-
     @Override
     protected final Scalar.Factory<Double> scalar() {
         return PrimitiveScalar.FACTORY;
@@ -121,8 +121,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
         this.reset();
 
-        final int templateRows = (int) template.countRows();
-        final int templateCols = (int) template.countColumns();
+        final int templateRows = template.getRowDim();
+        final int templateCols = template.getColDim();
 
         final int internalRows = transpose ? templateCols : templateRows;
         final int internalCols = transpose ? templateRows : templateCols;

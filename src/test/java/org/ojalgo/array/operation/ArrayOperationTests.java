@@ -21,24 +21,16 @@
  */
 package org.ojalgo.array.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.TestUtils;
 
-/**
- * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res
- * is a value containing the Euclidean norm of the elements of x.
- *
- * @author apete
- */
-public final class NRM2 implements ArrayOperation {
+public abstract class ArrayOperationTests {
 
-    public static double invoke(final double[] data, final double scale, final int first, final int limit) {
-        double tmpVal;
-        double sum2 = ZERO;
-        for (int i = first; i < limit; i++) {
-            tmpVal = data[i] / scale;
-            sum2 += tmpVal * tmpVal;
-        }
-        return scale * Math.sqrt(sum2);
+    static final boolean DEBUG = false;
+
+    @BeforeEach
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
 }

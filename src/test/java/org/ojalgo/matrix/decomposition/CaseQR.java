@@ -67,21 +67,22 @@ public class CaseQR extends MatrixDecompositionTests {
     @Test
     public void testDiagonalCase() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.PRIMITIVE.make();
         tmpDecomp.decompose(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug("This is A", tmpOriginalMatrix);
             BasicLogger.debug("Should be I", tmpDecomp.getQ());
             BasicLogger.debug("Should be A", tmpDecomp.getR());
         }
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
         // TODO See if possible to fix so that Q == I when the original A is already triangular
-        //        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), new NumberContext(7, 6));
-        //        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
+        TestUtils.assertEquals(Primitive64Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
     }
 
     @Test

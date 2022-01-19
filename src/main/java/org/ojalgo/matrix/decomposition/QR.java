@@ -71,11 +71,10 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
     Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
 
     Factory<Double> PRIMITIVE = (typical, fullSize) -> {
-        if (fullSize || (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)))) {
+        if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
             return new QRDecomposition.Primitive(fullSize);
-        } else {
-            return new RawQR();
         }
+        return new RawQR();
     };
 
     Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);

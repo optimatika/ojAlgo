@@ -21,16 +21,21 @@
  */
 package org.ojalgo.array.operation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.TestUtils;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-public abstract class StoreOperationsTests {
+/**
+ * Infinity norm - largest absolute value
+ *
+ * @author apete
+ */
+public final class NRMINF implements ArrayOperation {
 
-    static final boolean DEBUG = false;
-
-    @BeforeEach
-    public void minimiseAllBranchLimits() {
-        TestUtils.minimiseAllBranchLimits();
+    public static double invoke(final double[] data, final int first, final int limit) {
+        double retVal = ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal = Math.max(retVal, Math.abs(data[i]));
+        }
+        return retVal;
     }
 
 }
