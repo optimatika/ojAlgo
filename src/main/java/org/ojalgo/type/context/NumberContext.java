@@ -116,13 +116,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
      */
     @Deprecated
     public static NumberContext getGeneral(final int precision, final int scale) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = precision;
-        final int tmpScale = scale;
-        final RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+        return NumberContext.of(precision, scale);
     }
 
     /**
@@ -232,7 +226,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return PrimitiveMath.ABS.invoke(value) <= tolerance;
+        return Math.abs(value) <= tolerance;
     }
 
     private final double myEpsilon;
@@ -455,7 +449,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        double norm = PrimitiveMath.ABS.invoke(comparedTo);
+        double norm = Math.abs(comparedTo);
         if (NumberContext.isZero(norm, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         }

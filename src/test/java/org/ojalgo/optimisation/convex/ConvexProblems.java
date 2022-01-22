@@ -200,8 +200,8 @@ public class ConvexProblems extends OptimisationConvexTests {
             Optimisation.Result tmpResult = tmpSolver.solve();
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
-            TestUtils.assertEquals((Access1D<?>) expectedResult, (Access1D<?>) tmpResult, NumberContext.getGeneral(2, 4));
-            TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+            TestUtils.assertEquals((Access1D<?>) expectedResult, (Access1D<?>) tmpResult, NumberContext.of(2, 4));
+            TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.of(4, 8));
         }
     }
 
@@ -880,7 +880,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
 
         // Compare to MatLab using 2 digits and 6 decimal places
-        NumberContext accuracy = NumberContext.getGeneral(2, 6);
+        NumberContext accuracy = NumberContext.of(2, 6);
 
         ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, false);
     }
@@ -933,7 +933,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844, 0.00284500680371 });
 
         // Compare to MatLab using 2 digits and 6 decimal places
-        NumberContext accuracy = NumberContext.getGeneral(2, 6);
+        NumberContext accuracy = NumberContext.of(2, 6);
 
         ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, false);
     }
@@ -1315,7 +1315,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMatrices[5] = tmpBI;
 
         // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
-        NumberContext accuracy = NumberContext.getGeneral(4, 8); // ojAlgo can only get roughly the same solution
+        NumberContext accuracy = NumberContext.of(4, 8); // ojAlgo can only get roughly the same solution
 
         ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, accuracy, true);
     }
@@ -1638,7 +1638,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Result result = solver.solve();
 
-        NumberContext accuracy = NumberContext.getGeneral(12, 12);
+        NumberContext accuracy = NumberContext.of(12, 12);
         Primitive64Store expectedX = Primitive64Store.FACTORY.rows(new double[][] { { 2 }, { -1 }, { 1 } });
         TestUtils.assertEquals(expectedX, result, accuracy);
 

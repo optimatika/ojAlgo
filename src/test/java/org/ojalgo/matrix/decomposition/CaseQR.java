@@ -47,6 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class CaseQR extends MatrixDecompositionTests {
 
+    private static final NumberContext ACCURACY = NumberContext.of(7, 6);
     private static final int DIMENSION = 4;
 
     /**
@@ -79,10 +80,10 @@ public class CaseQR extends MatrixDecompositionTests {
             BasicLogger.debug("Should be A", tmpDecomp.getR());
         }
 
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
-        // TODO See if possible to fix so that Q == I when the original A is already triangular
-        TestUtils.assertEquals(Primitive64Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, ACCURACY);
+        // TODO Fix so that Q == I when the original A is already triangular, even for RawQR
+        TestUtils.assertEquals(Primitive64Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), ACCURACY);
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), ACCURACY);
     }
 
     @Test
@@ -177,14 +178,14 @@ public class CaseQR extends MatrixDecompositionTests {
             BasicLogger.debug("Forward R", tmpForwardR);
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, ACCURACY);
 
-        TestUtils.assertEquals(tmpDecompQ, tmpNowQ, new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpDecompQ, tmpForwardQ, new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpDecompQ, tmpReverseQ, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpDecompQ, tmpNowQ, ACCURACY);
+        TestUtils.assertEquals(tmpDecompQ, tmpForwardQ, ACCURACY);
+        TestUtils.assertEquals(tmpDecompQ, tmpReverseQ, ACCURACY);
 
-        TestUtils.assertEquals(tmpDecompR, tmpNowR, new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpDecompR, tmpForwardR, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpDecompR, tmpNowR, ACCURACY);
+        TestUtils.assertEquals(tmpDecompR, tmpForwardR, ACCURACY);
     }
 
     @Test

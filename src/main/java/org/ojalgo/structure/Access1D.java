@@ -248,19 +248,40 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     /**
      * Tests if the two data strauctures are numerically equal to the given accuracy. (Only works with real
-     * numbers, and can't handle more than "double precision".)
+     * numbers, and can't handle more than "double precision".) You have to implement your own version to
+     * handle other cases.
      */
     static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext accuracy) {
 
         long length = accessA.count();
 
-        boolean retVal = length == accessB.count();
-
-        for (int i = 0; retVal && i < length; i++) {
-            retVal &= !accuracy.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
+        if (length != accessB.count()) {
+            return false;
         }
 
-        return retVal;
+        double magnitudeA = 0D;
+        for (long i = 0; i < length; i++) {
+            magnitudeA = Math.max(magnitudeA, Math.abs(accessA.doubleValue(i)));
+        }
+
+        double magnitudeB = 0D;
+        for (long i = 0; i < length; i++) {
+            magnitudeB = Math.max(magnitudeB, Math.abs(accessB.doubleValue(i)));
+        }
+
+        if (accuracy.isDifferent(magnitudeA, magnitudeB)) {
+            return false;
+        }
+
+        double magnitude = Math.max(magnitudeA, magnitudeB);
+
+        for (long i = 0; i < length; i++) {
+            if (!accuracy.isSmall(magnitude, accessA.doubleValue(i) - accessB.doubleValue(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

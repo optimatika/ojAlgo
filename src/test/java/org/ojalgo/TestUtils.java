@@ -30,6 +30,7 @@ import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -248,14 +249,21 @@ public abstract class TestUtils {
             TestUtils.assertEquals(message + ", different shape()", ((StructureAnyD) expected).shape(), ((StructureAnyD) actual).shape());
         }
 
-        double tmpFrobNormDiff = 0.0;
-        double tmpFrobNormExpt = 0.0;
-        for (long i = 0L; i < expected.count(); i++) {
-            tmpFrobNormDiff = PrimitiveMath.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
-            tmpFrobNormExpt = PrimitiveMath.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
+        if (!Access1D.equals(expected, actual, context)) {
+
+            double diffNorm = 0.0;
+            double expNorm = 0.0;
+            for (long i = 0L; i < expected.count(); i++) {
+
+                double act = actual.doubleValue(i);
+                double exp = expected.doubleValue(i);
+
+                diffNorm = MissingMath.hypot(diffNorm, act - exp);
+                expNorm = MissingMath.hypot(expNorm, exp);
+            }
+
+            TestUtils.assertTrue(message + ", large norm differences " + diffNorm + " !<< " + expNorm, Access1D.equals(expected, actual, context));
         }
-        TestUtils.assertTrue(message + ", large norm differences " + tmpFrobNormDiff + " !<< " + tmpFrobNormExpt,
-                context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));
     }
 
     public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual) {
