@@ -15,7 +15,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- Modified the `HouseholderRight` implementation, and re-tuned the concurrency configuration of `HouseholderLeft` and `HouseholderRight`.
+- Refactoring and re-tuning of Householder related code. The QR decomposition in particular.
 
 ## [50.0.1] – 2022-01-09
 

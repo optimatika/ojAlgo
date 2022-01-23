@@ -155,4 +155,8 @@ public final class HouseholderLeft implements MatrixOperation {
         }
     }
 
+    private HouseholderLeft() {
+        super();
+    }
+
 }

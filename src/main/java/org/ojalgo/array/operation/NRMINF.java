@@ -38,4 +38,8 @@ public final class NRMINF implements ArrayOperation {
         return retVal;
     }
 
+    private NRMINF() {
+        super();
+    }
+
 }
