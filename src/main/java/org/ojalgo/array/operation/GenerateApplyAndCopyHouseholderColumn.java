@@ -39,7 +39,7 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
         for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
+            tmpNormInf = Math.max(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;

@@ -300,7 +300,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testSimplificationGitHubIssue309() {
 
-        NumberContext precision = NumberContext.getGeneral(14, 12);
+        NumberContext precision = NumberContext.of(14, 12);
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
         Variable varX = model.addVariable("X").binary();

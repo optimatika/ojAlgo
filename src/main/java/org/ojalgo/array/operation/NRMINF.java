@@ -24,24 +24,21 @@ package org.ojalgo.array.operation;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 /**
- * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res
- * is a value containing the Euclidean norm of the elements of x.
+ * Infinity norm - largest absolute value
  *
  * @author apete
  */
-public final class NRM2 implements ArrayOperation {
+public final class NRMINF implements ArrayOperation {
 
-    public static double invoke(final double[] data, final double scale, final int first, final int limit) {
-        double tmpVal;
-        double sum2 = ZERO;
+    public static double invoke(final double[] data, final int first, final int limit) {
+        double retVal = ZERO;
         for (int i = first; i < limit; i++) {
-            tmpVal = data[i] / scale;
-            sum2 += tmpVal * tmpVal;
+            retVal = Math.max(retVal, Math.abs(data[i]));
         }
-        return scale * Math.sqrt(sum2);
+        return retVal;
     }
 
-    private NRM2() {
+    private NRMINF() {
         super();
     }
 

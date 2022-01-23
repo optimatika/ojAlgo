@@ -220,7 +220,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Test
     public void testPresolverCase2() {
 
-        NumberContext precision = NumberContext.getGeneral(14, 12);
+        NumberContext precision = NumberContext.of(14, 12);
         Collections.emptySet();
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 

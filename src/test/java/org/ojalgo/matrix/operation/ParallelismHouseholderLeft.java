@@ -22,7 +22,8 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.operation.ThresholdHouseholderLeft.CodeAndData;
+import org.ojalgo.matrix.decomposition.PrimitiveOrRawQR;
+import org.ojalgo.matrix.decomposition.QR;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -57,7 +58,8 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
         BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderLeft.class);
     }
 
-    CodeAndData benchmark;
+    PrimitiveOrRawQR.CodeAndData benchmark;
+    QR<Double> decomposition;
 
     @Override
     @Setup
@@ -65,13 +67,14 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
 
         HouseholderLeft.PARALLELISM = parallelism;
 
-        benchmark = new CodeAndData(DIM);
+        benchmark = new PrimitiveOrRawQR.CodeAndData(DIM);
+        decomposition = PrimitiveOrRawQR.CodeAndData.newPrimitive();
     }
 
     @Override
     @Benchmark
     public Object tune() {
-        return benchmark.tune();
+        return benchmark.execute(decomposition);
     }
 
 }

@@ -104,7 +104,6 @@ public interface MatrixOperation extends ArrayOperation {
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(max, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.min(max, HermitianRank2Update.THRESHOLD);
-        // HouseholderHermitian
         HouseholderLeft.THRESHOLD = Math.min(max, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.min(max, HouseholderRight.THRESHOLD);
         IndexOf.THRESHOLD = Math.min(max, IndexOf.THRESHOLD);
@@ -114,7 +113,6 @@ public interface MatrixOperation extends ArrayOperation {
         MultiplyLeft.THRESHOLD = Math.min(max, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.min(max, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.min(max, MultiplyRight.THRESHOLD);
-        NRM2.THRESHOLD = Math.min(max, NRM2.THRESHOLD);
         OperationBinary.THRESHOLD = Math.min(max, OperationBinary.THRESHOLD);
         OperationParameter.THRESHOLD = Math.min(max, OperationParameter.THRESHOLD);
         OperationUnary.THRESHOLD = Math.min(max, OperationUnary.THRESHOLD);
@@ -161,7 +159,6 @@ public interface MatrixOperation extends ArrayOperation {
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(min, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.max(min, HermitianRank2Update.THRESHOLD);
-        // HouseholderHermitian
         HouseholderLeft.THRESHOLD = Math.max(min, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.max(min, HouseholderRight.THRESHOLD);
         IndexOf.THRESHOLD = Math.max(min, IndexOf.THRESHOLD);
@@ -171,7 +168,6 @@ public interface MatrixOperation extends ArrayOperation {
         MultiplyLeft.THRESHOLD = Math.max(min, MultiplyLeft.THRESHOLD);
         MultiplyNeither.THRESHOLD = Math.max(min, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.max(min, MultiplyRight.THRESHOLD);
-        NRM2.THRESHOLD = Math.max(min, NRM2.THRESHOLD);
         OperationBinary.THRESHOLD = Math.max(min, OperationBinary.THRESHOLD);
         OperationParameter.THRESHOLD = Math.max(min, OperationParameter.THRESHOLD);
         OperationUnary.THRESHOLD = Math.max(min, OperationUnary.THRESHOLD);
