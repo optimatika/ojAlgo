@@ -96,7 +96,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @param matrix Rectangular matrix
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "rawtypes" })
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         double[][] retVal = this.reset(matrix, true);
@@ -118,8 +118,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         VisitAll.visit(myDiagonalR, aggregator);
 
         if (myNumberOfHouseholderTransformations % 2 != 0) {
-            return -aggregator.get();
+            return Double.valueOf(-aggregator.get().doubleValue());
         }
+
         return aggregator.get();
     }
 
@@ -140,12 +141,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     public RawStore getQ() {
 
         int m = this.getRowDim();
-        int n = this.getColDim();
         int r = this.getMinDim();
 
         double[][] internalData = this.getInternalData();
 
-        RawStore retVal = new RawStore(m, r);
+        RawStore retVal = RawDecomposition.make(m, r);
         double[][] retData = retVal.data;
 
         for (int k = r - 1; k >= 0; k--) {
@@ -176,13 +176,12 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     public MatrixStore<Double> getR() {
 
-        int m = this.getRowDim();
         int n = this.getColDim();
         int r = this.getMinDim();
 
         double[][] internalData = this.getInternalData();
 
-        RawStore retVal = new RawStore(r, n);
+        RawStore retVal = RawDecomposition.make(r, n);
         double[][] retData = retVal.data;
 
         double[] tmpRow;
@@ -287,7 +286,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     private boolean doDecompose(final double[][] data) {
 
         int m = this.getRowDim();
-        int n = this.getColDim();
         int r = this.getMinDim();
 
         myDiagonalR = new double[r];
