@@ -44,7 +44,11 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
-    protected final static <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
+    static RawStore make(final int nbRows, final int nbCols) {
+        return RawStore.FACTORY.make(nbRows, nbCols);
+    }
+
+    final static <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
         return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
     }
 
