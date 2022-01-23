@@ -124,7 +124,6 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         DecompositionStore<N> tmpStore = this.setInPlace(matrix);
 
         int m = this.getRowDim();
-        int n = this.getColDim();
         int r = this.getMinDim();
 
         Householder<N> tmpHouseholder = this.makeHouseholder(m);
