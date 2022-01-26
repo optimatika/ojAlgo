@@ -59,7 +59,9 @@ PrimitiveOrRawQR.raw         1000  thrpt    3        87.984 ±       6.549  ops/
 PrimitiveOrRawQR.raw         2000  thrpt    3        11.877 ±       1.328  ops/min
 PrimitiveOrRawQR.raw         5000  thrpt    3         0.889 ±       0.149  ops/min
  * </pre>
+ * 
  * Mac Pro (Early 2009): 2022-01-19 (Modified code with multi-threading removed)
+ * 
  * <pre>
  * new
 Benchmark                   (dim)   Mode  Cnt         Score          Error    Units
@@ -82,7 +84,6 @@ PrimitiveOrRawQR.raw          500  thrpt    3       489.794 ±      512.251  ops
 PrimitiveOrRawQR.raw         1000  thrpt    3        83.007 ±       13.119  ops/min
 PrimitiveOrRawQR.raw         2000  thrpt    3         6.959 ±        2.280  ops/min
  * </pre>
- *
  *
  * <pre>
  * </pre>

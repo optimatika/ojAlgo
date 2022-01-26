@@ -11,11 +11,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [50.0.2] – 2022-01-26
+
 ### Changed
 
 #### org.ojalgo.matrix
 
 - Refactoring and re-tuning of Householder related code. The QR decomposition in particular.
+
+#### org.ojalgo.structure
+
+- Modified the behaviour of the `Access1D.equals(Access1D<?>,Access1D<?>,NumberContext)` utility method. It's used to determine if two 1D data structures are numerically similar/equal. This change also affects the behaviour of corresponding functionality in `Access2D` and `AccessAnyD` as well as various `TestUtils` methods.
 
 ## [50.0.1] – 2022-01-09
 
