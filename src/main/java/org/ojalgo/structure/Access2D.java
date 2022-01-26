@@ -643,8 +643,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default double doubleValue(final long index) {
-        final long structure = this.countRows();
-        return this.doubleValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+        long structure = this.countRows();
+        long row = Structure2D.row(index, structure);
+        long col = Structure2D.column(index, structure);
+        return this.doubleValue(row, col);
     }
 
     /**

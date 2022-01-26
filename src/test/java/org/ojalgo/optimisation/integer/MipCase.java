@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
 @Tag("slow")
 public final class MipCase extends OptimisationIntegerTests implements ModelFileMPS {
 
-    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+    static final NumberContext PRECISION = NumberContext.of(8, 6);
 
     static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         ModelFileMPS.makeAndAssert("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);

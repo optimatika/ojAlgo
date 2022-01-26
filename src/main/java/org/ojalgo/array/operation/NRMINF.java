@@ -19,33 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.operation;
+package org.ojalgo.array.operation;
 
-import java.util.concurrent.TimeUnit;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.concurrent.Parallelism;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
+/**
+ * Infinity norm - largest absolute value
+ *
+ * @author apete
+ */
+public final class NRMINF implements ArrayOperation {
 
-@State(Scope.Benchmark)
-public abstract class ParallelismTuner {
-
-    private static final TimeValue MEASUREMENT_TIME = new TimeValue(5L, TimeUnit.MINUTES);
-    protected static final int DIM = 5_000;
-
-    public static ChainedOptionsBuilder options() {
-        return BenchmarkUtils.options().warmupIterations(0).measurementTime(MEASUREMENT_TIME);
+    public static double invoke(final double[] data, final int first, final int limit) {
+        double retVal = ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal = Math.max(retVal, Math.abs(data[i]));
+        }
+        return retVal;
     }
 
-    @Param({ "UNITS", "CORES", "THREADS" })
-    public Parallelism parallelism;
-
-    public abstract void setup();
-
-    public abstract Object tune();
+    private NRMINF() {
+        super();
+    }
 
 }

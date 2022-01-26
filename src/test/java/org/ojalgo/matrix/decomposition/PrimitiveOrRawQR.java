@@ -34,47 +34,58 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro 2015-06-24 => 256
+ * Mac Pro (Early 2009): 2022-01-19 (THRESHOLD=128)
  *
  * <pre>
- * # Run complete. Total time: 00:02:08
- *
- * Benchmark                   (dim)   Mode  Cnt        Score        Error    Units
- * PrimitiveOrRawQR.primitive     10  thrpt    3  7005064,903 ± 529385,425  ops/min
- * PrimitiveOrRawQR.primitive     20  thrpt    3  1506248,641 ± 386383,563  ops/min
- * PrimitiveOrRawQR.primitive     50  thrpt    3   155327,525 ±  17646,625  ops/min
- * PrimitiveOrRawQR.primitive    100  thrpt    3    23010,318 ±   2628,191  ops/min
- * PrimitiveOrRawQR.primitive    200  thrpt    3     3878,911 ±    228,663  ops/min
- * PrimitiveOrRawQR.primitive    500  thrpt    3      469,588 ±     48,837  ops/min
- * PrimitiveOrRawQR.primitive   1000  thrpt    3       99,547 ±     34,182  ops/min
- * PrimitiveOrRawQR.raw           10  thrpt    3  8179336,175 ± 106054,067  ops/min
- * PrimitiveOrRawQR.raw           20  thrpt    3  1715730,663 ±  52624,893  ops/min
- * PrimitiveOrRawQR.raw           50  thrpt    3   192468,663 ±  17281,973  ops/min
- * PrimitiveOrRawQR.raw          100  thrpt    3    31189,874 ±    876,228  ops/min
- * PrimitiveOrRawQR.raw          200  thrpt    3     4518,101 ±     38,338  ops/min
- * PrimitiveOrRawQR.raw          500  thrpt    3      323,669 ±      3,898  ops/min
- * PrimitiveOrRawQR.raw         1000  thrpt    3       35,908 ±      2,514  ops/min
+Benchmark                   (dim)   Mode  Cnt         Score         Error    Units
+PrimitiveOrRawQR.primitive      5  thrpt    3  26636294.883 ± 5760740.613  ops/min
+PrimitiveOrRawQR.primitive     10  thrpt    3   6949046.412 ± 1167689.550  ops/min
+PrimitiveOrRawQR.primitive     20  thrpt    3   1552741.769 ±  155000.245  ops/min
+PrimitiveOrRawQR.primitive     50  thrpt    3    161902.638 ±   16821.535  ops/min
+PrimitiveOrRawQR.primitive    100  thrpt    3     25754.908 ±     492.051  ops/min
+PrimitiveOrRawQR.primitive    200  thrpt    3      3994.875 ±    2550.248  ops/min
+PrimitiveOrRawQR.primitive    500  thrpt    3       435.366 ±      10.623  ops/min
+PrimitiveOrRawQR.primitive   1000  thrpt    3        79.496 ±       2.469  ops/min
+PrimitiveOrRawQR.primitive   2000  thrpt    3        11.180 ±       0.672  ops/min
+PrimitiveOrRawQR.primitive   5000  thrpt    3         0.835 ±       0.031  ops/min
+PrimitiveOrRawQR.raw            5  thrpt    3  14850704.026 ±  721068.421  ops/min
+PrimitiveOrRawQR.raw           10  thrpt    3   3779094.662 ±  352186.659  ops/min
+PrimitiveOrRawQR.raw           20  thrpt    3    858292.024 ±   87312.352  ops/min
+PrimitiveOrRawQR.raw           50  thrpt    3    118714.314 ±   15174.010  ops/min
+PrimitiveOrRawQR.raw          100  thrpt    3     26581.289 ±    2393.740  ops/min
+PrimitiveOrRawQR.raw          200  thrpt    3      4324.070 ±     611.890  ops/min
+PrimitiveOrRawQR.raw          500  thrpt    3       490.001 ±      18.495  ops/min
+PrimitiveOrRawQR.raw         1000  thrpt    3        87.984 ±       6.549  ops/min
+PrimitiveOrRawQR.raw         2000  thrpt    3        11.877 ±       1.328  ops/min
+PrimitiveOrRawQR.raw         5000  thrpt    3         0.889 ±       0.149  ops/min
+ * </pre>
+ * 
+ * Mac Pro (Early 2009): 2022-01-19 (Modified code with multi-threading removed)
+ * 
+ * <pre>
+ * new
+Benchmark                   (dim)   Mode  Cnt         Score          Error    Units
+PrimitiveOrRawQR.primitive      5  thrpt    3  82083258.994 ±  4463646.037  ops/min
+PrimitiveOrRawQR.primitive     10  thrpt    3  21246661.298 ±  1960486.264  ops/min
+PrimitiveOrRawQR.primitive     20  thrpt    3   4673525.744 ±   462739.631  ops/min
+PrimitiveOrRawQR.primitive     50  thrpt    3    426339.598 ±    67903.478  ops/min
+PrimitiveOrRawQR.primitive    100  thrpt    3     53988.736 ±     5648.318  ops/min
+PrimitiveOrRawQR.primitive    200  thrpt    3      9740.146 ±     2586.553  ops/min
+PrimitiveOrRawQR.primitive    500  thrpt    3      1168.068 ±       58.006  ops/min
+PrimitiveOrRawQR.primitive   1000  thrpt    3       181.626 ±       57.049  ops/min
+PrimitiveOrRawQR.primitive   2000  thrpt    3        19.205 ±        2.080  ops/min
+PrimitiveOrRawQR.raw            5  thrpt    3  34622967.750 ± 10131278.531  ops/min
+PrimitiveOrRawQR.raw           10  thrpt    3   9068261.483 ±  2711079.692  ops/min
+PrimitiveOrRawQR.raw           20  thrpt    3   2008622.896 ±   516713.797  ops/min
+PrimitiveOrRawQR.raw           50  thrpt    3    195235.046 ±    39308.275  ops/min
+PrimitiveOrRawQR.raw          100  thrpt    3     35639.909 ±    12453.238  ops/min
+PrimitiveOrRawQR.raw          200  thrpt    3      4689.203 ±     5259.302  ops/min
+PrimitiveOrRawQR.raw          500  thrpt    3       489.794 ±      512.251  ops/min
+PrimitiveOrRawQR.raw         1000  thrpt    3        83.007 ±       13.119  ops/min
+PrimitiveOrRawQR.raw         2000  thrpt    3         6.959 ±        2.280  ops/min
  * </pre>
  *
- * MacBook Air: 2015-05-28
- *
  * <pre>
- * Result: 0,065 ±(99.9%) 0,000 ops/s [Average]
- *   Statistics: (min, avg, max) = (0,064, 0,065, 0,066), stdev = 0,000
- *   Confidence interval (99.9%): [0,065, 0,066]
- *
- *
- * # Run complete. Total time: 04:20:53
- *
- * Benchmark                   (dim)   Mode  Cnt        Score       Error  Units
- * PrimitiveOrRawQR.primitive      2  thrpt  200  2078858,455 ± 14771,019  ops/s
- * PrimitiveOrRawQR.raw            2  thrpt  200  2820820,335 ± 11903,626  ops/s
- * PrimitiveOrRawQR.primitive     20  thrpt  200    27346,494 ±   137,346  ops/s
- * PrimitiveOrRawQR.raw           20  thrpt  200    28785,751 ±    66,570  ops/s
- * PrimitiveOrRawQR.primitive    200  thrpt  200       58,159 ±     0,062  ops/s
- * PrimitiveOrRawQR.raw          200  thrpt  200       75,317 ±     0,072  ops/s
- * PrimitiveOrRawQR.primitive   2000  thrpt  200        0,056 ±     0,000  ops/s
- * PrimitiveOrRawQR.raw         2000  thrpt  200        0,065 ±     0,000  ops/s
  * </pre>
  *
  * @author apete
@@ -82,29 +93,61 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Benchmark)
 public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
 
+    public static final class CodeAndData {
+
+        public static QR<Double> newInstance(final int dim) {
+            return QR.PRIMITIVE.make(2 * dim, dim);
+        }
+
+        public static QR<Double> newPrimitive() {
+            return new QRDecomposition.Primitive();
+        }
+
+        public static QR<Double> newRaw() {
+            return new RawQR();
+        }
+
+        final Primitive64Store body;
+        transient PhysicalStore<Double> preallocated = null;
+        final Primitive64Store rhs;
+
+        public CodeAndData(final int dim) {
+
+            super();
+
+            body = Primitive64Store.FACTORY.makeFilled(2 * dim, dim, Uniform.standard());
+            rhs = Primitive64Store.FACTORY.makeFilled(2 * dim, 1, Uniform.standard());
+        }
+
+        public MatrixStore<Double> execute(final QR<Double> decomposition) {
+            if (preallocated == null) {
+                preallocated = decomposition.preallocate(body, rhs);
+            }
+            decomposition.decompose(body);
+            return decomposition.getSolution(rhs, preallocated);
+        }
+
+    }
+
     public static void main(final String[] args) throws RunnerException {
         BenchmarkUtils.run(PrimitiveOrRawQR.class);
     }
 
-    @Param({ "10", "20", "50", "100", "200", "500", "1000" })
+    @Param({ "5", "10", "20", "50", "100", "200", "500", "1000", "2000" })
     public int dim;
 
-    MatrixStore<Double> body;
-    PhysicalStore<Double> preallocated;
-    MatrixStore<Double> rhs;
+    CodeAndData codeAndData;
 
     @Override
     @Benchmark
     public MatrixStore<Double> primitive() {
-        primitive.compute(body);
-        return primitive.getSolution(rhs, preallocated);
+        return codeAndData.execute(primitive);
     }
 
     @Override
     @Benchmark
     public MatrixStore<Double> raw() {
-        raw.compute(body);
-        return raw.getSolution(rhs, preallocated);
+        return codeAndData.execute(raw);
     }
 
     @Override
@@ -112,13 +155,8 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
     public void setup() {
 
         super.setup();
-        final int dim1 = dim;
 
-        // body = MatrixUtils.makeSPD(dim).builder().below(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dim)).build();
-        body = Primitive64Store.FACTORY.makeSPD(dim1).below(Primitive64Store.FACTORY.makeIdentity(dim));
-        rhs = Primitive64Store.FACTORY.makeFilled(dim + dim, 1, new Uniform());
-
-        preallocated = primitive.preallocate(body, rhs);
+        codeAndData = new CodeAndData(dim);
     }
 
     @Override

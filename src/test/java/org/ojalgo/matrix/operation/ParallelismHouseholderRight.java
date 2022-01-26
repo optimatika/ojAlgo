@@ -30,18 +30,22 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro:
- *
- * <pre>
- * </pre>
- *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
+ * Mac Pro (Early 2009): 2022-01-13 => THREADS
  *
  * <pre>
 Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
-ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.399 ± 0.007  ops/min
-ParallelismHouseholderRight.tune          CORES  thrpt    3  0.800 ± 0.085  ops/min
-ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.755 ± 0.111  ops/min
+ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.315 ± 0.445  ops/min
+ParallelismHouseholderRight.tune          CORES  thrpt    3  0.465 ± 0.216  ops/min
+ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.474 ± 0.086  ops/min
+ * </pre>
+ *
+ * MacBook Pro (16-inch, 2019): 2022-01-13 => CORES/THREADS
+ *
+ * <pre>
+Benchmark                         (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismHouseholderRight.tune          UNITS  thrpt    3  0.661 ± 0.196  ops/min
+ParallelismHouseholderRight.tune          CORES  thrpt    3  0.746 ± 0.110  ops/min
+ParallelismHouseholderRight.tune        THREADS  thrpt    3  0.747 ± 0.028  ops/min
  * </pre>
  *
  * @author apete
@@ -59,7 +63,7 @@ public class ParallelismHouseholderRight extends ParallelismTuner {
     @Setup
     public void setup() {
 
-        HouseholderLeft.PARALLELISM = parallelism;
+        HouseholderRight.PARALLELISM = parallelism;
 
         benchmark = new CodeAndData(DIM);
     }

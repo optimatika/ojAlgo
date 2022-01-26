@@ -22,7 +22,8 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.operation.ThresholdHouseholderLeft.CodeAndData;
+import org.ojalgo.matrix.decomposition.PrimitiveOrRawQR;
+import org.ojalgo.matrix.decomposition.QR;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -30,18 +31,22 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro:
+ * Mac Pro (Early 2009): 2022-01-13 => THREADS
  *
  * <pre>
+Benchmark                        (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismHouseholderLeft.tune          UNITS  thrpt    3  0.192 ± 0.153  ops/min
+ParallelismHouseholderLeft.tune          CORES  thrpt    3  0.736 ± 0.178  ops/min
+ParallelismHouseholderLeft.tune        THREADS  thrpt    3  0.852 ± 0.025  ops/min
  * </pre>
  *
- * MacBook Pro (16-inch, 2019): 2021-07-04 => CORES
+ * MacBook Pro (16-inch, 2019): 2022-01-13 => CORES
  *
  * <pre>
-Benchmark                        (parallelism)   Mode  Cnt   Score   Error    Units
-ParallelismHouseholderLeft.tune          UNITS  thrpt    3   5.113 ± 4.680  ops/min
-ParallelismHouseholderLeft.tune          CORES  thrpt    3  16.535 ± 5.715  ops/min
-ParallelismHouseholderLeft.tune        THREADS  thrpt    3  15.904 ± 5.683  ops/min
+Benchmark                        (parallelism)   Mode  Cnt  Score   Error    Units
+ParallelismHouseholderLeft.tune          UNITS  thrpt    3  0.448 ± 0.067  ops/min
+ParallelismHouseholderLeft.tune          CORES  thrpt    3  1.126 ± 0.137  ops/min
+ParallelismHouseholderLeft.tune        THREADS  thrpt    3  1.080 ± 0.062  ops/min
  * </pre>
  *
  * @author apete
@@ -53,7 +58,8 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
         BenchmarkUtils.run(ParallelismTuner.options(), ParallelismHouseholderLeft.class);
     }
 
-    CodeAndData benchmark;
+    PrimitiveOrRawQR.CodeAndData benchmark;
+    QR<Double> decomposition;
 
     @Override
     @Setup
@@ -61,13 +67,14 @@ public class ParallelismHouseholderLeft extends ParallelismTuner {
 
         HouseholderLeft.PARALLELISM = parallelism;
 
-        benchmark = new CodeAndData(DIM);
+        benchmark = new PrimitiveOrRawQR.CodeAndData(DIM);
+        decomposition = PrimitiveOrRawQR.CodeAndData.newPrimitive();
     }
 
     @Override
     @Benchmark
     public Object tune() {
-        return benchmark.tune();
+        return benchmark.execute(decomposition);
     }
 
 }

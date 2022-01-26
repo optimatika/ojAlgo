@@ -1021,7 +1021,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public void transformLeft(final Householder<N> transformation, final int firstColumn) {
-        HouseholderLeft.call(data, myRowDim, firstColumn, myColDim, this.cast(transformation), myFactory.scalar());
+        HouseholderLeft.call(data, myRowDim, firstColumn, this.cast(transformation), myFactory.scalar());
     }
 
     public void transformLeft(final Rotation<N> transformation) {
@@ -1047,7 +1047,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public void transformRight(final Householder<N> transformation, final int firstRow) {
-        HouseholderRight.call(data, myRowDim, firstRow, myRowDim, myColDim, this.cast(transformation), myFactory.scalar());
+        HouseholderRight.call(data, myRowDim, firstRow, this.cast(transformation), myFactory.scalar());
     }
 
     public void transformRight(final Rotation<N> transformation) {

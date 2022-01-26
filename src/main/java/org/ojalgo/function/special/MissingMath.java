@@ -29,11 +29,11 @@ import java.math.MathContext;
 public abstract class MissingMath {
 
     public static double acosh(final double arg) {
-        return Math.log(arg + Math.sqrt((arg * arg) - 1.0));
+        return Math.log(arg + Math.sqrt(arg * arg - 1.0));
     }
 
     public static double asinh(final double arg) {
-        return Math.log(arg + Math.sqrt((arg * arg) + 1.0));
+        return Math.log(arg + Math.sqrt(arg * arg + 1.0));
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class MissingMath {
      */
     public static double atan2(final double y, final double x) {
 
-        if ((y == 0.0) && (x == 0.0)) {
+        if (y == 0.0 && x == 0.0) {
             return 0.0;
         }
 
@@ -55,7 +55,7 @@ public abstract class MissingMath {
         double a = Math.min(ay, ax) / Math.max(ay, ax);
         double s = a * a;
 
-        double retVal = (((((-0.0464964749 * s) + 0.15931422) * s) - 0.327622764) * s * a) + a;
+        double retVal = ((-0.0464964749 * s + 0.15931422) * s - 0.327622764) * s * a + a;
 
         if (ay > ax) {
             retVal = 1.570796326794897 - retVal;
@@ -85,15 +85,17 @@ public abstract class MissingMath {
     public static double factorial(final int arg) {
         if (arg < 0) {
             throw new IllegalArgumentException();
-        } else if (arg < 2) {
-            return ONE;
-        } else if (arg < 13) {
-            return MissingMath.factorialInt(arg);
-        } else if (arg < 21) {
-            return MissingMath.factorialLong(arg);
-        } else {
-            return MissingMath.factorialDouble(arg);
         }
+        if (arg < 2) {
+            return ONE;
+        }
+        if (arg < 13) {
+            return MissingMath.factorialInt(arg);
+        }
+        if (arg < 21) {
+            return MissingMath.factorialLong(arg);
+        }
+        return MissingMath.factorialDouble(arg);
     }
 
     /**
@@ -152,8 +154,8 @@ public abstract class MissingMath {
             return Double.NaN;
         }
 
-        final double abs1 = Math.abs(arg1);
-        final double abs2 = Math.abs(arg2);
+        double abs1 = Math.abs(arg1);
+        double abs2 = Math.abs(arg2);
 
         double retVal = 0.0;
 
@@ -172,9 +174,8 @@ public abstract class MissingMath {
     public static double log10(final double arg, final double replacement) {
         if (Math.abs(arg) < Double.MIN_NORMAL) {
             return replacement;
-        } else {
-            return Math.log10(arg);
         }
+        return Math.log10(arg);
     }
 
     public static double logistic(final double arg) {
@@ -328,13 +329,14 @@ public abstract class MissingMath {
     public static BigDecimal pow(final BigDecimal arg1, final BigDecimal arg2) {
         if (arg2.signum() == 0) {
             return BigDecimal.ONE;
-        } else if (arg1.signum() == 0) {
-            return BigDecimal.ZERO;
-        } else if (arg2.compareTo(BigDecimal.ONE) == 0) {
-            return arg1;
-        } else {
-            return BigDecimal.valueOf(Math.pow(arg1.doubleValue(), arg2.doubleValue()));
         }
+        if (arg1.signum() == 0) {
+            return BigDecimal.ZERO;
+        }
+        if (arg2.compareTo(BigDecimal.ONE) == 0) {
+            return arg1;
+        }
+        return BigDecimal.valueOf(Math.pow(arg1.doubleValue(), arg2.doubleValue()));
     }
 
     public static BigDecimal power(final BigDecimal arg, final int param) {
@@ -361,36 +363,36 @@ public abstract class MissingMath {
 
             return 1.0 / MissingMath.power(arg, -param);
 
-        } else {
-
-            double retVal = 1.0;
-
-            while (param > 0) {
-                retVal = retVal * arg;
-                param--;
-            }
-
-            return retVal;
         }
+        double retVal = 1.0;
+
+        while (param > 0) {
+            retVal = retVal * arg;
+            param--;
+        }
+
+        return retVal;
     }
 
     public static long power(final long arg, final int param) {
 
         if (param == 0) {
             return 1L;
-        } else if (param == 1) {
-            return arg;
-        } else if (param == 2) {
-            return arg * arg;
-        } else if (param < 0) {
-            return Math.round(Math.pow(arg, param));
-        } else {
-            long retVal = arg;
-            for (int p = 1; p < param; p++) {
-                retVal *= arg;
-            }
-            return retVal;
         }
+        if (param == 1) {
+            return arg;
+        }
+        if (param == 2) {
+            return arg * arg;
+        }
+        if (param < 0) {
+            return Math.round(Math.pow(arg, param));
+        }
+        long retVal = arg;
+        for (int p = 1; p < param; p++) {
+            retVal *= arg;
+        }
+        return retVal;
     }
 
     public static BigDecimal root(final BigDecimal arg, final int param) {
@@ -399,36 +401,34 @@ public abstract class MissingMath {
 
             throw new IllegalArgumentException();
 
-        } else if (param == 1) {
+        }
+        if (param == 1) {
 
             return arg;
 
-        } else {
-
-            final BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
-            final BigDecimal bigParam = BigDecimal.valueOf(param);
-
-            BigDecimal retVal = BigDecimal.ZERO;
-            final double primArg = bigArg.doubleValue();
-            if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
-                retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
-            }
-
-            BigDecimal shouldBeZero;
-            while ((shouldBeZero = MissingMath.power(retVal, param).subtract(bigArg)).signum() != 0) {
-                retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
-            }
-
-            return retVal;
         }
+        BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
+        BigDecimal bigParam = BigDecimal.valueOf(param);
+
+        BigDecimal retVal = BigDecimal.ZERO;
+        double primArg = bigArg.doubleValue();
+        if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
+            retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
+        }
+
+        BigDecimal shouldBeZero;
+        while ((shouldBeZero = MissingMath.power(retVal, param).subtract(bigArg)).signum() != 0) {
+            retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
+        }
+
+        return retVal;
     }
 
     public static double root(final double arg, final int param) {
         if (param != 0) {
             return Math.pow(arg, 1.0 / param);
-        } else {
-            throw new IllegalArgumentException();
         }
+        throw new IllegalArgumentException();
     }
 
     public static int roundToInt(final double value) {
@@ -441,7 +441,8 @@ public abstract class MissingMath {
 
             return 1.0;
 
-        } else if (param < 0) {
+        }
+        if (param < 0) {
 
             int factor = 1;
             while (param < 0) {
@@ -451,16 +452,14 @@ public abstract class MissingMath {
 
             return Math.rint(factor / arg) * factor;
 
-        } else {
-
-            int factor = 1;
-            while (param > 0) {
-                factor *= 10;
-                param--;
-            }
-
-            return Math.rint(factor * arg) / factor;
         }
+        int factor = 1;
+        while (param > 0) {
+            factor *= 10;
+            param--;
+        }
+
+        return Math.rint(factor * arg) / factor;
     }
 
     public static BigDecimal signum(final BigDecimal arg) {
@@ -475,7 +474,7 @@ public abstract class MissingMath {
     }
 
     public static double sqrt1px2(final double arg) {
-        return Math.sqrt(1.0 + (arg * arg));
+        return Math.sqrt(1.0 + arg * arg);
     }
 
     public static int toMinIntExact(final long... values) {

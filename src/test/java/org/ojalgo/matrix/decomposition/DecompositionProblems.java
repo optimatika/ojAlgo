@@ -431,7 +431,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
             MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
 
-            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
+            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.of(6, 6));
 
         } catch (RecoverableCondition exception) {
             exception.printStackTrace();

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 /**
  * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res
  * is a value containing the Euclidean norm of the elements of x.
@@ -29,6 +31,18 @@ package org.ojalgo.array.operation;
  */
 public final class NRM2 implements ArrayOperation {
 
-    public static int THRESHOLD = 128;
+    public static double invoke(final double[] data, final double scale, final int first, final int limit) {
+        double tmpVal;
+        double sum2 = ZERO;
+        for (int i = first; i < limit; i++) {
+            tmpVal = data[i] / scale;
+            sum2 += tmpVal * tmpVal;
+        }
+        return scale * Math.sqrt(sum2);
+    }
+
+    private NRM2() {
+        super();
+    }
 
 }

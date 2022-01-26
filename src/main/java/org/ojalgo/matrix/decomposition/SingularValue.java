@@ -82,55 +82,55 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
+        int nbRows = matrix.getRowDim();
+        int nbCols = matrix.getColDim();
 
-        final MatrixStore<N> tmpQ1 = decomposition.getU();
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpQ2 = decomposition.getV();
+        MatrixStore<N> tmpU = decomposition.getU();
+        MatrixStore<N> tmpD = decomposition.getD();
+        MatrixStore<N> tmpV = decomposition.getV();
 
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
 
-        boolean retVal = tmpRowDim == tmpQ1.countRows() && tmpQ2.countRows() == tmpColDim;
+        boolean retVal = nbRows == tmpU.countRows() && tmpV.countRows() == nbCols;
 
         // Check that [A][V] == [U][D]
         if (retVal) {
 
-            tmpThis = matrix.multiply(tmpQ2);
-            tmpThat = tmpQ1.multiply(tmpD);
+            tmpThis = matrix.multiply(tmpV);
+            tmpThat = tmpU.multiply(tmpD);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
 
         // If Q1 is square, then check if it is orthogonal/unitary.
-        if (retVal && tmpQ1.countRows() == tmpQ1.countColumns()) {
+        if (retVal && tmpU.countRows() == tmpU.countColumns()) {
 
-            tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.conjugate().multiply(tmpQ1);
+            tmpThis = tmpU.physical().makeEye(nbRows, nbRows);
+            tmpThat = tmpU.conjugate().multiply(tmpU);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
 
         // If Q2 is square, then check if it is orthogonal/unitary.
-        if (retVal && tmpQ2.countRows() == tmpQ2.countColumns()) {
+        if (retVal && tmpV.countRows() == tmpV.countColumns()) {
 
-            tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
-            tmpThat = tmpQ2.multiply(tmpQ2.conjugate());
+            tmpThis = tmpV.physical().makeEye(nbCols, nbCols);
+            tmpThat = tmpV.multiply(tmpV.conjugate());
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
 
         // Check the pseudoinverse.
         if (retVal) {
-            final MatrixStore<N> inverse = decomposition.getInverse();
-            final MatrixStore<N> multiplied = matrix.multiply(inverse.multiply(matrix));
+            MatrixStore<N> inverse = decomposition.getInverse();
+            MatrixStore<N> multiplied = matrix.multiply(inverse.multiply(matrix));
             retVal &= matrix.equals(multiplied, context);
         }
 
         // Check that the singular values are sorted in descending order
         if (retVal) {
-            final Array1D<Double> tmpSV = decomposition.getSingularValues();
+            Array1D<Double> tmpSV = decomposition.getSingularValues();
             for (int i = 1; retVal && i < tmpSV.size(); i++) {
                 retVal &= tmpSV.doubleValue(i - 1) >= tmpSV.doubleValue(i);
             }
@@ -215,9 +215,9 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
         ProgrammingError.throwIfNull(values);
 
-        final Array1D<Double> singulars = this.getSingularValues();
+        Array1D<Double> singulars = this.getSingularValues();
 
-        final int length = values.length;
+        int length = values.length;
         for (int i = 0; i < length; i++) {
             values[i] = singulars.doubleValue(i);
         }

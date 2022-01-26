@@ -24,7 +24,7 @@ package org.ojalgo.array.operation;
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
 
-public abstract class StoreOperationsTests {
+public abstract class ArrayOperationTests {
 
     static final boolean DEBUG = false;
 
