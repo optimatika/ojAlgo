@@ -1437,6 +1437,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return myVariables.stream().filter(v -> !v.isEqualityConstraint());
     }
 
+    /**
+     * Save this instance to file. The file format is {@link FileFormat#EBM} and the file name is therefore
+     * recommended to end with ".ebm".
+     *
+     * @param file The path/name of the file to write.
+     */
     public void writeTo(final File file) {
         try (FileOutputStream output = new FileOutputStream(file)) {
             FileFormatEBM.write(this, output);

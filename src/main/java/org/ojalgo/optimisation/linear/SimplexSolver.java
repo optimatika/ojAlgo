@@ -85,30 +85,30 @@ public abstract class SimplexSolver extends LinearSolver {
 
     static abstract class Primitive1D implements Access1D<Double>, Mutate1D {
 
-        public long count() {
+        public final long count() {
             return this.size();
         }
 
-        public double doubleValue(final long index) {
+        public final double doubleValue(final long index) {
             return this.doubleValue(Math.toIntExact(index));
         }
 
-        public Double get(final long index) {
+        public final Double get(final long index) {
             return Double.valueOf(this.doubleValue(Math.toIntExact(index)));
         }
 
-        public void set(final long index, final Comparable<?> value) {
+        public final void set(final long index, final Comparable<?> value) {
             this.set(Math.toIntExact(index), NumberDefinition.doubleValue(value));
         }
 
-        public void set(final long index, final double value) {
+        public final void set(final long index, final double value) {
             this.set(Math.toIntExact(index), value);
         }
 
         public abstract int size();
 
         @Override
-        public String toString() {
+        public final String toString() {
             return Access1D.toString(this);
         }
 
@@ -120,19 +120,19 @@ public abstract class SimplexSolver extends LinearSolver {
 
     static abstract class Primitive2D implements Access2D<Double>, Mutate2D {
 
-        public long countColumns() {
+        public final long countColumns() {
             return this.getColDim();
         }
 
-        public long countRows() {
+        public final long countRows() {
             return this.getRowDim();
         }
 
-        public double doubleValue(final long row, final long col) {
+        public final double doubleValue(final long row, final long col) {
             return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
         }
 
-        public Double get(final long row, final long col) {
+        public final Double get(final long row, final long col) {
             return Double.valueOf(this.doubleValue(Math.toIntExact(row), Math.toIntExact(col)));
         }
 
@@ -140,16 +140,16 @@ public abstract class SimplexSolver extends LinearSolver {
 
         public abstract int getRowDim();
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public final void set(final long row, final long col, final Comparable<?> value) {
             this.set(Math.toIntExact(row), Math.toIntExact(col), NumberDefinition.doubleValue(value));
         }
 
-        public void set(final long row, final long col, final double value) {
+        public final void set(final long row, final long col, final double value) {
             this.set(Math.toIntExact(row), Math.toIntExact(col), value);
         }
 
         @Override
-        public String toString() {
+        public final String toString() {
             return Access2D.toString(this);
         }
 

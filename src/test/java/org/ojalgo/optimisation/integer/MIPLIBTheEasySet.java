@@ -45,9 +45,14 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * <ul>
+     * <li>2019-01-28: 300s suffice with optimal solution
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: 300s suffice with optimal solution (actually found after less than 5s)
      * </ul>
      */
     @Test
@@ -58,9 +63,14 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_flugpl.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 1s finsihed with optimal solution</li>
+     * <ul>
+     * <li>2019-01-28: 1s finsihed with optimal solution
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: 0s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -70,9 +80,14 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_gr4x6.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 0s finsihed with optimal solution</li>
+     * <ul>
+     * <li>2019-01-28: 0s finsihed with optimal solution
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: 0s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -82,9 +97,14 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_markshare_4_0.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 15s finsihed with optimal solution</li>
+     * <ul>
+     * <li>2019-01-28: 15s finsihed with optimal solution
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: 11s finsihed with optimal solution
      * </ul>
      */
     @Test
@@ -94,9 +114,14 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_neos5.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * <ul>
+     * <li>2019-01-28: 300s suffice with optimal solution
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: 300s suffice with optimal solution found (after just a few seconds)
      * </ul>
      */
     @Test
@@ -107,18 +132,23 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     /**
      * https://miplib.zib.de/instance_details_pk1.html
-     * <ul>
+     * <p>
      * Mac Pro (Early 2009)
-     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
-     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
-     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
-     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
-     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
-     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
-     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
-     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
-     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
+     * <ul>
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min
+     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s
+     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s
+     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s
+     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution
+     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s
+     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s
+     * <li>2018-08-16: sufficed: <11.0> but was: <14.0>
+     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979>
+     * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-02-11: Finished with optimal solution in 251s. (optimal solution found after about 150s)
      * </ul>
      */
     @Test
