@@ -34,7 +34,8 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
@@ -47,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  * http://miplib.zib.de/miplib2010/markshare_5_0.php Objective Value min < MIP < max: 0.00000000e+00 <
  * 1.00000000e+00 < ?
  */
-public final class MarketShareCase extends OptimisationIntegerTests implements ModelFileMPS {
+public final class MarketShareCase extends OptimisationIntegerTests implements ModelFileTest {
 
     private static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
     private static final Map<String, BigDecimal> SOLUTION;
@@ -113,7 +114,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         //
         //        return tmpMPS.getExpressionsBasedModel();
 
-        return ModelFileMPS.makeModel("miplib", "markshare_5_0.mps", false);
+        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false, FileFormat.MPS);
     }
 
     @Test

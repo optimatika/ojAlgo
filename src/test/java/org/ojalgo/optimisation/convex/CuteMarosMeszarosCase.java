@@ -36,7 +36,8 @@ import org.ojalgo.array.BigArray;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.context.NumberContext;
@@ -51,7 +52,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class CuteMarosMeszarosCase extends OptimisationConvexTests implements ModelFileMPS {
+public class CuteMarosMeszarosCase extends OptimisationConvexTests implements ModelFileTest {
 
     public static final class ModelInfo {
 
@@ -126,17 +127,17 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         MODEL_INFO = Collections.unmodifiableMap(modelInfo);
     }
 
+    private static void doTest(final String name, final NumberContext accuracy) {
+        String expMinValString = MODEL_INFO.get(name.substring(0, name.indexOf("."))).OPT.toPlainString();
+        ModelFileTest.makeAndAssert("marosmeszaros", name, FileFormat.MPS, false, expMinValString, null, accuracy != null ? accuracy : ACCURACY);
+    }
+
+    private static ExpressionsBasedModel makeModel(final String name) {
+        return ModelFileTest.makeModel("marosmeszaros", name, false, FileFormat.MPS);
+    }
+
     static void doTest(final String name) {
         CuteMarosMeszarosCase.doTest(name, ACCURACY);
-    }
-
-    static void doTest(final String name, final NumberContext accuracy) {
-        String expMinValString = MODEL_INFO.get(name.substring(0, name.indexOf("."))).OPT.toPlainString();
-        ModelFileMPS.makeAndAssert("marosmeszaros", name, expMinValString, null, false, accuracy != null ? accuracy : ACCURACY, null);
-    }
-
-    static ExpressionsBasedModel makeModel(final String name) {
-        return ModelFileMPS.makeModel("marosmeszaros", name, false);
     }
 
     /**
@@ -199,7 +200,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     @Test
     public void testDUALC2() {
-        CuteMarosMeszarosCase.doTest("DUALC2.SIF");
+        CuteMarosMeszarosCase.doTest("DUALC2.SIF", ACCURACY.withPrecision(7));
     }
 
     @Test

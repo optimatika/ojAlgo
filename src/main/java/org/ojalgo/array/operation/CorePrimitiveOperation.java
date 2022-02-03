@@ -25,6 +25,18 @@ public final class CorePrimitiveOperation implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
+    public static void add(final double[] data, final int first, final int limit, final double right) {
+        CorePrimitiveOperation.add(data, first, limit, 1, data, right);
+    }
+
+    public static void divide(final double[] data, final int first, final int limit, final double right) {
+        CorePrimitiveOperation.divide(data, first, limit, 1, data, right);
+    }
+
+    public static void multiply(final double[] data, final int first, final int limit, final double right) {
+        CorePrimitiveOperation.multiply(data, first, limit, 1, data, right);
+    }
+
     public static void negate(final double[] data, final int first, final int limit, final int step, final double[] values) {
         for (int i = first; i < limit; i += step) {
             data[i] = -values[i];
@@ -35,6 +47,10 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         for (int i = first; i < limit; i += step) {
             data[i] = -values[i];
         }
+    }
+
+    public static void subtract(final double[] data, final int first, final int limit, final double right) {
+        CorePrimitiveOperation.subtract(data, first, limit, 1, data, right);
     }
 
     static void add(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {

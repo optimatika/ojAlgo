@@ -26,15 +26,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
-public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFileMPS {
+public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFileTest {
 
-    static final NumberContext PRECISION = NumberContext.of(8, 6);
+    private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
-    static void doTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
-        ModelFileMPS.makeAndAssert("miplib", name, expMinValString, expMaxValString, true, PRECISION, solution);
+    private static void doTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
+        ModelFileTest.makeAndAssert("miplib", name, FileFormat.MPS, true, expMinValString, expMaxValString, ACCURACY);
     }
 
     /**

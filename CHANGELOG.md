@@ -11,6 +11,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- Now possible to save and reload optimisation models from files - new `ExpressionsBasedModel` specific file format.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Cleanup and refactoring of `LinearSolver` and related classes.
+
 ## [50.0.2] – 2022-01-26
 
 ### Changed

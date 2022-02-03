@@ -31,6 +31,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 
 /**
  * A user reported that ojAlgo had problems solving this. (results unstable between execution, and
@@ -398,9 +399,18 @@ public class P20140819 extends OptimisationIntegerTests {
             parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
         }
 
+        if (DEBUG) {
+            BasicLogger.debug(parentModel);
+            parentModel.options.debug(LinearSolver.class);
+        }
+
         parentModel.setMinimisation();
         Intermediate intermediate = parentModel.prepare();
         Result parentResult = intermediate.solve();
+
+        if (DEBUG) {
+            BasicLogger.debug(parentResult);
+        }
 
         TestUtils.assertStateNotLessThanOptimal(parentResult);
         TestUtils.assertTrue(parentModel.validate(parentResult, BasicLogger.DEBUG));

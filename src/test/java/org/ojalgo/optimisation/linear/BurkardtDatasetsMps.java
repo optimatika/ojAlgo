@@ -30,7 +30,8 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
@@ -40,12 +41,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class BurkardtDatasetsMps extends OptimisationLinearTests implements ModelFileMPS {
+public class BurkardtDatasetsMps extends OptimisationLinearTests implements ModelFileTest {
 
-    private static final NumberContext PRECISION = NumberContext.of(11, 9);
+    private static final NumberContext ACCURACY = NumberContext.of(11, 9);
 
-    static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
-        return ModelFileMPS.makeAndAssert("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
+    private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
+        return ModelFileTest.makeAndAssert("burkardt", modelName, FileFormat.MPS, false, expMinValString, expMaxValString, BurkardtDatasetsMps.ACCURACY);
     }
 
     /**
@@ -182,23 +183,23 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
         Result tmpExpMinRes = reimplementedModel.minimise();
         Result tmpActMinRes = parsedModel.minimise();
 
-        TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), BurkardtDatasetsMps.PRECISION);
+        TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), BurkardtDatasetsMps.ACCURACY);
 
         TestUtils.assertEquals(tmpVariables.length, tmpExpMinRes.count());
         TestUtils.assertEquals(tmpVariables.length, tmpActMinRes.count());
 
-        TestUtils.assertStateAndSolution(tmpExpMinRes, tmpActMinRes, BurkardtDatasetsMps.PRECISION);
+        TestUtils.assertStateAndSolution(tmpExpMinRes, tmpActMinRes, BurkardtDatasetsMps.ACCURACY);
 
         for (int i = 0; i < tmpVariables.length; i++) {
-            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), BurkardtDatasetsMps.PRECISION);
+            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), BurkardtDatasetsMps.ACCURACY);
         }
 
-        if (!reimplementedModel.validate(tmpExpMinRes, BurkardtDatasetsMps.PRECISION)) {
-            TestUtils.fail(ModelFileMPS.SOLUTION_NOT_VALID);
+        if (!reimplementedModel.validate(tmpExpMinRes, BurkardtDatasetsMps.ACCURACY)) {
+            TestUtils.fail("Solution not valid!");
         }
 
-        if (!parsedModel.validate(tmpActMinRes, BurkardtDatasetsMps.PRECISION)) {
-            TestUtils.fail(ModelFileMPS.SOLUTION_NOT_VALID);
+        if (!parsedModel.validate(tmpActMinRes, BurkardtDatasetsMps.ACCURACY)) {
+            TestUtils.fail("Solution not valid!");
         }
     }
 }

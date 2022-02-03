@@ -27,12 +27,14 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -121,7 +123,16 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
         model.relax(false);
 
+        if (DEBUG) {
+            BasicLogger.debug(model);
+            model.options.debug(LinearSolver.class);
+        }
+
         Optimisation.Result result = model.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
 
         TestUtils.assertStateAndSolution(expected, result, PRECISION);
         TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
