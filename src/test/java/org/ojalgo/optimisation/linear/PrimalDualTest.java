@@ -29,14 +29,15 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexProblems;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 
-public class PrimalDualTest extends OptimisationLinearTests {
+public class PrimalDualTest extends OptimisationLinearTests implements ModelFileTest {
 
     /**
      * @param primModel Assume to maximise
@@ -167,63 +168,14 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
 
+    private static ExpressionsBasedModel makeModel() {
+        return ModelFileTest.makeModel("marosmeszaros", "QPCSTAIR.SIF", false, FileFormat.MPS);
+    }
+
     LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
 
     public PrimalDualTest() {
         super();
-    }
-
-    /**
-     * This model had problems with the LP initialising
-     */
-    @Test
-    @Tag("unstable")
-    public void testConvexQPCSTAIR() {
-
-        ExpressionsBasedModel model = ModelFileMPS.makeModel("marosmeszaros", "QPCSTAIR.SIF", false);
-
-        int nbVars = model.countVariables();
-
-        if (DEBUG) {
-            model.options.debug(LinearSolver.class);
-        }
-
-        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
-        ConvexSolver.copy(model, convex);
-
-        Result result = LinearSolver.solve(convex, model.options, true);
-        result = ConvexSolver.INTEGRATION.toModelState(result, model);
-        int nbVars3 = result.size();
-        boolean valid = model.validate(result, BasicLogger.DEBUG);
-        TestUtils.assertStateNotLessThanOptimal(result);
-
-        Result result2 = LinearSolver.solve(convex, model.options, false);
-        result2 = ConvexSolver.INTEGRATION.toModelState(result2, model);
-        int nbVars2 = result2.size();
-        boolean valid2 = model.validate(result2, BasicLogger.DEBUG);
-        TestUtils.assertStateNotLessThanOptimal(result2);
-
-        GeneralBuilder feasibility = convex.toFeasibilityChecker();
-        Result feasResult = feasibility.build(model.options).solve();
-
-        TestUtils.assertStateNotLessThanOptimal(feasResult);
-
-        GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
-        Result lineResult = linear.build(model.options).solve();
-
-        if (OptimisationLinearTests.DEBUG) {
-
-            BasicLogger.debug(model);
-
-            BasicLogger.debug(result);
-
-            BasicLogger.debug(lineResult);
-
-            BasicLogger.debug(result.getMultipliers().get());
-
-            BasicLogger.debug(lineResult.getMultipliers().get());
-        }
-
     }
 
     /**
@@ -305,6 +257,59 @@ public class PrimalDualTest extends OptimisationLinearTests {
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 11, 0.5 });
 
         PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY, true);
+    }
+
+    /**
+     * This model had problems with the LP initialising
+     */
+    @Test
+    @Tag("unstable")
+    public void testConvexQPCSTAIR() {
+
+        ExpressionsBasedModel model = PrimalDualTest.makeModel();
+
+        int nbVars = model.countVariables();
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
+        ConvexSolver.copy(model, convex);
+
+        Result result = LinearSolver.solve(convex, model.options, true);
+        result = ConvexSolver.INTEGRATION.toModelState(result, model);
+        int nbVars3 = result.size();
+        boolean valid = model.validate(result, BasicLogger.DEBUG);
+        TestUtils.assertStateNotLessThanOptimal(result);
+
+        Result result2 = LinearSolver.solve(convex, model.options, false);
+        result2 = ConvexSolver.INTEGRATION.toModelState(result2, model);
+        int nbVars2 = result2.size();
+        boolean valid2 = model.validate(result2, BasicLogger.DEBUG);
+        TestUtils.assertStateNotLessThanOptimal(result2);
+
+        GeneralBuilder feasibility = convex.toFeasibilityChecker();
+        Result feasResult = feasibility.build(model.options).solve();
+
+        TestUtils.assertStateNotLessThanOptimal(feasResult);
+
+        GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
+        Result lineResult = linear.build(model.options).solve();
+
+        if (OptimisationLinearTests.DEBUG) {
+
+            BasicLogger.debug(model);
+
+            BasicLogger.debug(result);
+
+            BasicLogger.debug(lineResult);
+
+            BasicLogger.debug(result.getMultipliers().get());
+
+            BasicLogger.debug(lineResult.getMultipliers().get());
+        }
+
     }
 
     @Test

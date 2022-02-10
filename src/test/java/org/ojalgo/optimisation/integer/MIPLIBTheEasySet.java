@@ -23,7 +23,8 @@ package org.ojalgo.optimisation.integer;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -34,12 +35,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelFileMPS {
+public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelFileTest {
 
-    static final NumberContext PRECISION = NumberContext.of(8, 6);
+    private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
-    static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
-        ModelFileMPS.makeAndAssert("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
+    private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
+        ModelFileTest.makeAndAssert("miplib", modelName, FileFormat.MPS, false, expMinValString, expMaxValString, ACCURACY);
     }
 
     /**

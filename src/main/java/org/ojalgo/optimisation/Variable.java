@@ -164,10 +164,16 @@ public final class Variable extends ModelEntity<Variable> {
         return myInteger;
     }
 
+    /**
+     * The range includes something < 0.0
+     */
     public boolean isNegative() {
         return !this.isLowerLimitSet() || this.getLowerLimit().signum() < 0;
     }
 
+    /**
+     * The range includes something > 0.0
+     */
     public boolean isPositive() {
         return !this.isUpperLimitSet() || this.getUpperLimit().signum() > 0;
     }

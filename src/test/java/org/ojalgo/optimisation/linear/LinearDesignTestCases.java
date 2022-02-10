@@ -144,6 +144,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.upper(new BigDecimal("30.0"));
 
+        // tmpModel.options.debug(LinearSolver.class);
+
         Optimisation.Result tmpResult = tmpModel.maximise();
         RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 

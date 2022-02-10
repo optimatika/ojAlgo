@@ -6,10 +6,13 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ModelFileTest;
+import org.ojalgo.optimisation.Optimisation.Result;
 
-public class InterruptionTest {
+public class InterruptionTest implements ModelFileTest {
 
     private static class ThreadInterrupter implements Runnable {
 
@@ -32,9 +35,13 @@ public class InterruptionTest {
 
     public static final int TIMEOUT_DURATION = 4;
 
+    private static ExpressionsBasedModel makeModel() {
+        return ModelFileTest.makeModel("netlib", "D6CUBE.SIF", false, FileFormat.MPS);
+    }
+
     private void launchSlowMinimization() {
-        ExpressionsBasedModel model = ModelFileMPS.makeModel("netlib", "25FV47.SIF", false);
-        model.minimise();
+        Result result = InterruptionTest.makeModel().minimise();
+        TestUtils.assertStateNotLessThanFeasible(result);
     }
 
     @Test

@@ -42,7 +42,7 @@ final class DualSimplex extends SimplexSolver {
         int numbEqus = convex.countEqualityConstraints();
         int numbInes = convex.countInequalityConstraints();
 
-        SimplexTableau retVal = SimplexTableau.make(numbVars, numbEqus + numbEqus + numbInes, 0, options);
+        SimplexTableau retVal = SimplexTableau.make(numbVars, numbEqus + numbEqus + numbInes, 0, 0, true, options);
 
         Mutate1D obj = retVal.objective();
         Mutate2D constrBody = retVal.constraintsBody();
@@ -105,7 +105,7 @@ final class DualSimplex extends SimplexSolver {
         int numbEqus = convex.countEqualityConstraints();
         int numbInes = convex.countInequalityConstraints();
 
-        return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0);
+        return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0, 0, true);
     }
 
     static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
