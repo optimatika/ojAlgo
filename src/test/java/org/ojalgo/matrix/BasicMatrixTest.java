@@ -54,7 +54,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class BasicMatrixTest extends MatrixTests {
 
-    protected static final NumberContext ACCURACY = NumberContext.of(7, 5);
+    protected static final NumberContext ACCURACY = NumberContext.of(6, 4);
 
     public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
         RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
