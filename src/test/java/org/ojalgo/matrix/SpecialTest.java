@@ -41,7 +41,7 @@ public class SpecialTest extends MatrixTests {
         rDR.set(4, 2, 1D);
         p32DR.set(4, 2, 1D);
 
-        TestUtils.assertEquals(rDR.build(), p32DR.build());
+        TestUtils.assertEquals(rDR.get(), p32DR.get());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class SpecialTest extends MatrixTests {
         rSR.set(4, 2, 1D);
         p32SR.set(4, 2, 1D);
 
-        TestUtils.assertEquals(rSR.build(), p32SR.build());
+        TestUtils.assertEquals(rSR.get(), p32SR.get());
     }
 
 }

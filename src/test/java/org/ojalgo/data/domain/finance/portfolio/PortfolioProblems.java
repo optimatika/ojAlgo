@@ -108,12 +108,12 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpCovarsBuilder.set(2, 0, 0.02);
         tmpCovarsBuilder.set(2, 1, 0.01);
         tmpCovarsBuilder.set(2, 2, 0.16);
-        final Primitive64Matrix tmpCovars = tmpCovarsBuilder.build();
+        final Primitive64Matrix tmpCovars = tmpCovarsBuilder.get();
         final Primitive64Matrix.DenseReceiver tmpReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(3, 1);
         tmpReturnsBuilder.set(0, 0, 0.10);
         tmpReturnsBuilder.set(1, 0, 0.15);
         tmpReturnsBuilder.set(2, 0, 0.18);
-        final Primitive64Matrix tmpReturs = tmpReturnsBuilder.build();
+        final Primitive64Matrix tmpReturs = tmpReturnsBuilder.get();
 
         final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
 
@@ -206,7 +206,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         final Primitive64Matrix.DenseReceiver tmpExcessReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
-        final Primitive64Matrix tmpExcessReturns = tmpExcessReturnsBuilder.build();
+        final Primitive64Matrix tmpExcessReturns = tmpExcessReturnsBuilder.get();
 
         final MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
         tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);
@@ -371,12 +371,12 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpBuilder.add(0, 1, 0.1000);
         tmpBuilder.add(1, 0, 0.1000);
         tmpBuilder.add(1, 1, 0.250000);
-        final Primitive64Matrix covariances = tmpBuilder.build();
+        final Primitive64Matrix covariances = tmpBuilder.get();
 
         tmpBuilder = Primitive64Matrix.FACTORY.makeDense(2);
         tmpBuilder.add(0, 0.20000);
         tmpBuilder.add(1, 0.40000);
-        final Primitive64Matrix returns = tmpBuilder.build();
+        final Primitive64Matrix returns = tmpBuilder.get();
 
         final MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
         final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
@@ -431,8 +431,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
             assetsReturnsMatrix.set(i, 0, assetsReturns[i]);
         }
 
-        final MarketEquilibrium marketEq = new MarketEquilibrium(assetsCovariancesMatrix.build());
-        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, assetsReturnsMatrix.build());
+        final MarketEquilibrium marketEq = new MarketEquilibrium(assetsCovariancesMatrix.get());
+        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, assetsReturnsMatrix.get());
         final BigDecimal value = StandardType.PERCENT.enforce(BigDecimal.valueOf(targetReturn));
 
         markowitzModel.setTargetReturn(value);

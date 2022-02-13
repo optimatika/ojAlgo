@@ -60,7 +60,7 @@ class P20090115 {
             }
         }
 
-        return builder.build();
+        return builder.get();
     }
 
     Primitive64Matrix getExpectedExcessReturns(final double[][] returns) {
@@ -87,7 +87,7 @@ class P20090115 {
             builder.set(i, tmp - riskFreeReturn);
         }
 
-        return builder.build();
+        return builder.get();
     }
 
 }

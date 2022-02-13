@@ -268,7 +268,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
             }
         }
 
-        return retVal.build();
+        return retVal.get();
     }
 
     /**
@@ -291,7 +291,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
             retVal.set(i, 0, PrimitiveMath.DIVIDE.invoke(tmpRet, tmpRAF));
         }
 
-        return retVal.build();
+        return retVal.get();
     }
 
     protected List<FinancePortfolio> getViews() {
@@ -326,7 +326,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
             }
         }
 
-        return retVal.build();
+        return retVal.get();
     }
 
     BigDecimal calculateVariance(final Primitive64Matrix weights) {

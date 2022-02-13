@@ -88,9 +88,9 @@ public class TestEquilibrium extends FinancePortfolioTests {
         expectedExcessReturns1.set(14, 0, 0.006162067);
         expectedExcessReturns1.set(15, 0, 0.003081388);
 
-        System.out.println("Return Matrix" + expectedExcessReturns1.build());
+        System.out.println("Return Matrix" + expectedExcessReturns1.get());
 
-        MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns1.build());
+        MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns1.get());
 
         //markowitzModel.setTargetReturn(new BigDecimal("0.01051787"));
         markowitzModel.setTargetReturn(new BigDecimal("0.003081388"));
@@ -131,7 +131,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
             }
 
         }
-        return covariances.build();
+        return covariances.get();
     }
 
     @Test

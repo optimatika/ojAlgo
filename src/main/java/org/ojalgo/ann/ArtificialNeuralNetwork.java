@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.ojalgo.data.DataBatch;
-import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -45,7 +44,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
+public final class ArtificialNeuralNetwork {
 
     /**
      * https://en.wikipedia.org/wiki/Activation_function
@@ -58,12 +57,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          * (-,+)
          */
         IDENTITY(ArtificialNeuralNetwork::doIdentity, arg -> ONE, true),
-        /**
-         * ReLU: [0,+)
-         *
-         * @deprecated v49 Use {@link #RELU} instead
-         */
-        RECTIFIER(ArtificialNeuralNetwork::doReLU, arg -> arg > ZERO ? ONE : ZERO, true),
         /**
          * ReLU: [0,+)
          */
@@ -330,14 +323,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         int result = 1;
         result = prime * result + Arrays.hashCode(myLayers);
         return result;
-    }
-
-    /**
-     * @deprecated v49 Use {@link #newInvoker()} and then {@link NetworkInvoker#invoke(Access1D)} instead
-     */
-    @Deprecated
-    public MatrixStore<Double> invoke(final Access1D<Double> input) {
-        return this.newInvoker().invoke(input);
     }
 
     /**

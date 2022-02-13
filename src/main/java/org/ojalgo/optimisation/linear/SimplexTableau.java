@@ -989,19 +989,13 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         MatrixStore<Double> mtrxBE = builder.getBE();
         Mutate1D rhs = tableau.constraintsRHS();
         for (int i = 0; i < mtrxBE.size(); i++) {
-            double value = mtrxBE.doubleValue(i);
-            if (Math.abs(value) > MACHINE_EPSILON) {
-                rhs.set(i, value);
-            }
+            rhs.set(i, mtrxBE.doubleValue(i));
         }
 
         MatrixStore<Double> mtrxC = builder.getC();
         Mutate1D obj = tableau.objective();
         for (int i = 0; i < mtrxC.size(); i++) {
-            double value = mtrxC.doubleValue(i);
-            if (Math.abs(value) > MACHINE_EPSILON) {
-                obj.set(i, value);
-            }
+            obj.set(i, mtrxC.doubleValue(i));
         }
 
     }
@@ -1022,19 +1016,15 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
     static SimplexTableau make(final LinearSolver.Builder builder, final Optimisation.Options options) {
 
-        int numberOfConstraints = builder.countConstraints();
-        int numberOfProblemVariables = builder.countVariables();
-        int numberOfSlackVariables = 0;
+        int nbConstraints = builder.countConstraints();
+        int nbProblemVariables = builder.countVariables();
+        int nbSlackVariables = 0;
+        int nbIdentitySlackVariables = 0;
+        boolean needDual = true;
 
-        if (SimplexTableau.isSparse(options)) {
-            SparseTableau sparseTableau = new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables, 0, true);
-            SimplexTableau.copy(builder, sparseTableau);
-            return sparseTableau;
-        }
-
-        SimplexTableau denseTableau = new DenseTransposedTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables, 0, true);
-        SimplexTableau.copy(builder, denseTableau);
-        return denseTableau;
+        SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
+        SimplexTableau.copy(builder, tableau);
+        return tableau;
     }
 
     static SimplexTableau newDense(final LinearSolver.Builder matrices) {

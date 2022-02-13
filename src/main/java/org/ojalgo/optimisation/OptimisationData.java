@@ -39,11 +39,14 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.RowView;
 
 /**
- * Should be able hold data for any problem solvable by ojAlgo's built-in solvers.
+ * Should be able hold data for any problem solvable by ojAlgo's built-in solvers. This class is typically
+ * wrapped by different solver specific builders. Those builders apply various additional context on how to
+ * interpret this data. Are variables assumed positive or not? In the objective function linear or convex? Are
+ * the RHS:s required to be positive or not? Is this a max or min problem?...
  *
  * @author apete
  */
-public final class OptimisationData {
+final class OptimisationData {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
@@ -61,19 +64,84 @@ public final class OptimisationData {
         super();
     }
 
-    public int countAdditionalConstraints() {
+    @Override
+    public String toString() {
+
+        StringBuilder retVal = new StringBuilder();
+
+        retVal.append("[ variables=");
+        retVal.append(this.countVariables());
+
+        retVal.append(", equalities=");
+        retVal.append(this.countEqualityConstraints());
+
+        retVal.append(", inequalities=");
+        retVal.append(this.countInequalityConstraints());
+
+        retVal.append(" ]");
+
+        return retVal.toString();
+    }
+
+    void addConstraint(final String key, final TwiceDifferentiable<Double> value) {
+        if (myAdditionalConstraints == null) {
+            myAdditionalConstraints = new HashMap<>();
+        }
+        myAdditionalConstraints.put(key, value);
+    }
+
+    void addInequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
+
+        ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
+        ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
+
+        if (myAI == null || myBI == null) {
+            this.setInequalities(mtrxAI, mtrxBI);
+        }
+
+        int offset = myAI.getRowDim();
+
+        myAI.addRows(mtrxAI.getRowDim());
+
+        if (mtrxAI instanceof SparseStore) {
+
+            ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow(offset + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
+
+        } else {
+
+            double value;
+            for (int i = 0; i < mtrxAI.getRowDim(); i++) {
+                SparseArray<Double> tmpRow = myAI.getRow(offset + i);
+                for (int j = 0; j < mtrxAI.getColDim(); j++) {
+                    value = mtrxAI.doubleValue(i, j);
+                    if (value != PrimitiveMath.ZERO) {
+                        tmpRow.set(j, value);
+                    }
+                }
+            }
+        }
+
+        myBI = myBI.below(mtrxBI);
+    }
+
+    void clearEqualities() {
+        myAE = null;
+        myBE = null;
+    }
+
+    int countAdditionalConstraints() {
         return myAdditionalConstraints != null ? myAdditionalConstraints.size() : 0;
     }
 
-    public int countEqualityConstraints() {
+    int countEqualityConstraints() {
         return myAE != null ? myAE.getRowDim() : 0;
     }
 
-    public int countInequalityConstraints() {
+    int countInequalityConstraints() {
         return myAI != null ? myAI.getRowDim() : 0;
     }
 
-    public int countVariables() {
+    int countVariables() {
 
         if (myAE != null) {
             return myAE.getColDim();
@@ -93,68 +161,85 @@ public final class OptimisationData {
     /**
      * Equality constraints body: [AE][X] == [BE]
      */
-    public MatrixStore<Double> getAE() {
+    MatrixStore<Double> getAE() {
         return myAE;
     }
 
     /**
      * Inequality constraints body: [AI][X] &lt;= [BI]
      */
-    public MatrixStore<Double> getAI() {
+    MatrixStore<Double> getAI() {
         return myAI.get();
     }
 
-    public SparseArray<Double> getAI(final int row) {
+    SparseArray<Double> getAI(final int row) {
         return myAI.getRow(row);
     }
 
-    public RowsSupplier<Double> getAI(final int... rows) {
+    RowsSupplier<Double> getAI(final int... rows) {
         return myAI.selectRows(rows);
     }
 
     /**
      * Equality constraints RHS: [AE][X] == [BE]
      */
-    public MatrixStore<Double> getBE() {
+    MatrixStore<Double> getBE() {
         return myBE;
     }
 
     /**
      * Inequality constraints RHS: [AI][X] &lt;= [BI]
      */
-    public MatrixStore<Double> getBI() {
+    MatrixStore<Double> getBI() {
         return myBI;
     }
 
-    public double getBI(final int row) {
+    double getBI(final int row) {
         return myBI.doubleValue(row);
     }
 
-    public <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
+    <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
         return (T) myObjective;
     }
 
-    public RowView<Double> getRowsAI() {
+    RowView<Double> getRowsAI() {
         return myAI.rows();
     }
 
-    public boolean hasAdditionalConstraints() {
+    boolean hasAdditionalConstraints() {
         return this.countAdditionalConstraints() > 0;
     }
 
-    public boolean hasEqualityConstraints() {
+    boolean hasEqualityConstraints() {
         return this.countEqualityConstraints() > 0;
     }
 
-    public boolean hasInequalityConstraints() {
+    boolean hasInequalityConstraints() {
         return this.countInequalityConstraints() > 0;
     }
 
-    public boolean isObjectiveSet() {
+    boolean isObjectiveSet() {
         return myObjective != null;
     }
 
-    public void reset() {
+    void newEqualities(final int nbEqualities, final int nbVariables) {
+
+        MatrixStore<Double> mtrxAE = FACTORY.make(nbEqualities, nbVariables);
+        MatrixStore<Double> mtrxBE = FACTORY.make(nbEqualities, 1);
+
+        this.setEqualities(mtrxAE, mtrxBE);
+    }
+
+    void newInequalities(final int nbInequalities, final int nbVariables) {
+
+        RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(nbVariables);
+        mtrxAI.addRows(nbInequalities);
+        MatrixStore<Double> mtrxBI = FACTORY.make(nbInequalities, 1);
+
+        this.setInequalities(mtrxAI, mtrxBI);
+    }
+
+    void reset() {
         myAE = null;
         myAI = null;
         myBE = null;
@@ -162,7 +247,7 @@ public final class OptimisationData {
         myObjective = null;
     }
 
-    public void setEqualities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
+    void setEqualities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
 
         ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
@@ -180,12 +265,7 @@ public final class OptimisationData {
         }
     }
 
-    public void clearEqualities() {
-        myAE = null;
-        myBE = null;
-    }
-
-    public void setInequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+    void setInequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
 
         ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
@@ -225,67 +305,14 @@ public final class OptimisationData {
         }
     }
 
-    public void addInequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
-
-        ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
-        ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
-
-        if (myAI == null || myBI == null) {
-            this.setInequalities(mtrxAI, mtrxBI);
-        }
-
-        int offset = myAI.getRowDim();
-
-        myAI.addRows(mtrxAI.getRowDim());
-
-        if (mtrxAI instanceof SparseStore) {
-
-            ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow(offset + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
-
-        } else {
-
-            double value;
-            for (int i = 0; i < mtrxAI.getRowDim(); i++) {
-                SparseArray<Double> tmpRow = myAI.getRow(offset + i);
-                for (int j = 0; j < mtrxAI.getColDim(); j++) {
-                    value = mtrxAI.doubleValue(i, j);
-                    if (value != PrimitiveMath.ZERO) {
-                        tmpRow.set(j, value);
-                    }
-                }
-            }
-        }
-
-        myBI = myBI.below(mtrxBI);
-    }
-
-    public void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
+    void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
 
         ProgrammingError.throwIfNull(objective);
 
         myObjective = objective;
     }
 
-    @Override
-    public String toString() {
-
-        StringBuilder retVal = new StringBuilder();
-
-        retVal.append("[ variables=");
-        retVal.append(this.countVariables());
-
-        retVal.append(", equalities=");
-        retVal.append(this.countEqualityConstraints());
-
-        retVal.append(", inequalities=");
-        retVal.append(this.countInequalityConstraints());
-
-        retVal.append(" ]");
-
-        return retVal.toString();
-    }
-
-    public void validate() {
+    void validate() {
 
         // Reset to trigger input validation
 
@@ -322,30 +349,6 @@ public final class OptimisationData {
         if (myObjective != null && myObjective.arity() != nbVariables) {
             throw new ProgrammingError("The objective function has the wrong arity!");
         }
-    }
-
-    void addConstraint(final String key, final TwiceDifferentiable<Double> value) {
-        if (myAdditionalConstraints == null) {
-            myAdditionalConstraints = new HashMap<>();
-        }
-        myAdditionalConstraints.put(key, value);
-    }
-
-    void newEqualities(final int nbEqualities, final int nbVariables) {
-
-        MatrixStore<Double> mtrxAE = FACTORY.make(nbEqualities, nbVariables);
-        MatrixStore<Double> mtrxBE = FACTORY.make(nbEqualities, 1);
-
-        this.setEqualities(mtrxAE, mtrxBE);
-    }
-
-    void newInequalities(final int nbInequalities, final int nbVariables) {
-
-        RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(nbVariables);
-        mtrxAI.addRows(nbInequalities);
-        MatrixStore<Double> mtrxBI = FACTORY.make(nbInequalities, 1);
-
-        this.setInequalities(mtrxAI, mtrxBI);
     }
 
 }

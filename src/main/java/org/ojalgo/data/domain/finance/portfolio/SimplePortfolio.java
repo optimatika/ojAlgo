@@ -141,7 +141,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
                 tmpReturns.set(i, 0, this.getMeanReturn(i));
             }
 
-            myAssetReturns = tmpReturns.build();
+            myAssetReturns = tmpReturns.get();
         }
 
         return myAssetReturns;
@@ -159,7 +159,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
                 tmpVolatilities.set(i, 0, this.getVolatility(i));
             }
 
-            myAssetVolatilities = tmpVolatilities.build();
+            myAssetVolatilities = tmpVolatilities.get();
         }
 
         return myAssetVolatilities;
@@ -203,7 +203,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
                 }
             }
 
-            myCovariances = tmpCovaris.build();
+            myCovariances = tmpCovaris.get();
         }
 
         return myCovariances;
@@ -310,7 +310,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
                 tmpWeights.set(i, 0, this.getWeight(i));
             }
 
-            myAssetWeights = tmpWeights.build();
+            myAssetWeights = tmpWeights.get();
         }
 
         return myAssetWeights;

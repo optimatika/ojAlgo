@@ -385,39 +385,37 @@ final class PrimalSimplex extends SimplexSolver {
 
     static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
 
-        int numbVars = convex.countVariables();
-        int numbEqus = convex.countEqualityConstraints();
-        int numbInes = convex.countInequalityConstraints();
+        int nbVars = convex.countVariables();
+        int nbEqus = convex.countEqualityConstraints();
+        int nbInes = convex.countInequalityConstraints();
 
-        SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes, 0, true, options);
-
-        Mutate1D obj = retVal.objective();
+        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars + nbVars, nbInes, 0, true, options);
+        Primitive2D constraintsBody = retVal.constraintsBody();
+        Primitive1D constraintsRHS = retVal.constraintsRHS();
+        Primitive1D objective = retVal.objective();
 
         MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
 
-        for (int v = 0; v < numbVars; v++) {
+        for (int v = 0; v < nbVars; v++) {
             double valC = convexC.doubleValue(v);
-            obj.set(v, -valC);
-            obj.set(numbVars + v, valC);
+            objective.set(v, -valC);
+            objective.set(nbVars + v, valC);
         }
-
-        Mutate2D constrBody = retVal.constraintsBody();
-        Mutate1D constrRHS = retVal.constraintsRHS();
 
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
 
-        for (int i = 0; i < numbEqus; i++) {
+        for (int i = 0; i < nbEqus; i++) {
             double rhs = convexBE.doubleValue(i);
 
             boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
 
-            for (int j = 0; j < numbVars; j++) {
+            for (int j = 0; j < nbVars; j++) {
                 double valA = convexAE.doubleValue(i, j);
-                constrBody.set(i, j, neg ? -valA : valA);
-                constrBody.set(i, numbVars + j, neg ? valA : -valA);
+                constraintsBody.set(i, j, neg ? -valA : valA);
+                constraintsBody.set(i, nbVars + j, neg ? valA : -valA);
             }
-            constrRHS.set(i, neg ? -rhs : rhs);
+            constraintsRHS.set(i, neg ? -rhs : rhs);
         }
 
         for (RowView<Double> rowAI : convex.getRowsAI()) {
@@ -426,12 +424,12 @@ final class PrimalSimplex extends SimplexSolver {
 
             double rhs = convex.getBI(r);
 
-            boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = retVal.negative[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
 
-            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            rowAI.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
-            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-            constrRHS.set(numbEqus + r, neg ? -rhs : rhs);
+            rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            constraintsBody.set(nbEqus + r, nbVars + nbVars + r, neg ? NEG : ONE);
+            constraintsRHS.set(nbEqus + r, neg ? -rhs : rhs);
         }
 
         return retVal;

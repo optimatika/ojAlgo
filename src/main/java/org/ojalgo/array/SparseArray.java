@@ -237,14 +237,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     /**
-     * @deprecated v49 Use {@link #factory(org.ojalgo.array.DenseArray.Factory)} instead
-     */
-    @Deprecated
-    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
-        return SparseArray.factory(denseFactory).limit(count);
-    }
-
-    /**
      * The actual number of nonzwero elements
      */
     private int myActualLength = 0;

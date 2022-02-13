@@ -63,22 +63,6 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
         return myFormatter.format((Temporal) object);
     }
 
-    /**
-     * @deprecated v49 Use {@link #withAdjuster(TemporalAdjuster)} instead
-     */
-    @Deprecated
-    public TemporalContext<T> newAdjuster(final TemporalAdjuster adjuster) {
-        return this.withAdjuster(adjuster);
-    }
-
-    /**
-     * @deprecated v49 Use {@link #withFormatter(DateTimeFormatter)} instead
-     */
-    @Deprecated
-    public TemporalContext<T> newFormatter(final DateTimeFormatter formatter) {
-        return this.withFormatter(formatter);
-    }
-
     @SuppressWarnings("unchecked")
     public T parse(final CharSequence text) {
         return (T) myFormatter.parse(text);
