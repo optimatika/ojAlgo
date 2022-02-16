@@ -289,8 +289,12 @@ public abstract class SimplexSolver extends LinearSolver {
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
-    private double objective() {
-        return -myTableau.value(myPoint.isPhase1());
+    private double infeasibility() {
+        return -myTableau.value(true);
+    }
+
+    private double value() {
+        return -myTableau.value(false);
     }
 
     private int phase() {
@@ -376,7 +380,8 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             this.log();
-            this.log("Needs Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
+            this.log("Needs Another Iteration? Phase={} Artificials={} Infeasibility={} Objective={}", this.phase(), myTableau.countBasisDeficit(),
+                    this.infeasibility(), this.value());
         }
 
         boolean retVal = false;
@@ -384,16 +389,14 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (myPoint.isPhase1()) {
 
-            double phaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countVariablesTotally());
-
-            if (PHASE1.isZero(phaseOneValue) || !myTableau.isBasicArtificials()) {
+            if (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials()) {
 
                 this.cleanUpPhase1Artificials();
 
                 if (this.isLogDebug()) {
                     this.log();
                     this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
-                            phaseOneValue);
+                            this.infeasibility());
                     this.log();
                 }
 

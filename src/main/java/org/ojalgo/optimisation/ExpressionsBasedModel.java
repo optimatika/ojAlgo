@@ -37,7 +37,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -988,7 +987,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         final Array1D<BigDecimal> retSolution = Array1D.BIG.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
-        boolean shouldCheckGradient = false;
 
         for (int i = 0; i < numberOfVariables; i++) {
             final Variable tmpVariable = myVariables.get(i);
@@ -1001,7 +999,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 retSolution.set(i, tmpVariable.getLowerLimit());
             } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
                 retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
-                shouldCheckGradient = true;
             } else if (tmpVariable.isLowerLimitSet()) {
                 retSolution.set(i, tmpVariable.getLowerLimit());
             } else if (tmpVariable.isUpperLimitSet()) {
@@ -1010,29 +1007,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 retSolution.set(i, ZERO);
                 allVarsSomeInfo = false; // This var no info
             }
-        }
-
-        if (shouldCheckGradient && this.isAnyObjectiveQuadratic()) {
-
-            MatrixStore<Double> gradient = this.objective().getAdjustedGradient(retSolution);
-
-            double grad = 0.0;
-            for (int i = 0; i < numberOfVariables; i++) {
-                final Variable tmpVariable = myVariables.get(i);
-
-                if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    grad = gradient.doubleValue(i);
-                    if (this.isMinimisation()) {
-                        grad = -grad;
-                    }
-                    if (grad < 0.0) {
-                        retSolution.set(i, tmpVariable.getLowerLimit());
-                    } else {
-                        retSolution.set(i, tmpVariable.getUpperLimit());
-                    }
-                }
-            }
-
         }
 
         if (allVarsSomeInfo) {

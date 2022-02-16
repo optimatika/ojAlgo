@@ -339,11 +339,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            final ConvexSolver.Builder tmpBuilder = ConvexSolver.newBuilder();
+            final ConvexSolver.Builder builder = ConvexSolver.newBuilder();
 
-            ConvexSolver.copy(model, tmpBuilder);
+            ConvexSolver.copy(model, builder);
 
-            return tmpBuilder.build(model.options);
+            return builder.build(model.options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
@@ -735,14 +735,21 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             this.resetIterationsCount();
 
-            do {
+            if (this.isIteratingPossible()) {
 
-                this.performIteration();
+                do {
 
-            } while (this.isIterationAllowed() && this.needsAnotherIteration());
+                    this.performIteration();
+
+                } while (this.isIterationAllowed() && this.needsAnotherIteration());
+            }
         }
 
         return this.buildResult();
+    }
+
+    protected boolean isIteratingPossible() {
+        return true;
     }
 
     @Override
@@ -971,7 +978,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         Result resultLP = LinearSolver.solve(myMatrices, options, !myZeroQ);
 
-        if (!myZeroQ && resultLP.getState().isOptimal()) {
+        if (!myZeroQ && resultLP.getState().isFeasible()) {
             return resultLP.withState(State.FEASIBLE);
         }
 

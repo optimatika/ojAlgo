@@ -36,9 +36,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
@@ -383,7 +380,7 @@ final class PrimalSimplex extends SimplexSolver {
         }
     }
 
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
@@ -394,7 +391,7 @@ final class PrimalSimplex extends SimplexSolver {
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = zeroC ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
+        MatrixStore<Double> convexC = checkFeasibility ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
 
         for (int v = 0; v < nbVars; v++) {
             double valC = convexC.doubleValue(v);
@@ -753,25 +750,23 @@ final class PrimalSimplex extends SimplexSolver {
 
     static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
 
-        int numbVars = convex.countVariables();
+        int nbVars = convex.countVariables();
 
-        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
+        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexSolver.Primitive1D() {
 
-            public long count() {
-                return numbVars;
-            }
-
-            public double doubleValue(final long index) {
-                return result.doubleValue(index) - result.doubleValue(numbVars + index);
-            }
-
-            public Double get(final long index) {
-                return this.doubleValue(index);
+            @Override
+            public int size() {
+                return nbVars;
             }
 
             @Override
-            public String toString() {
-                return Access1D.toString(this);
+            double doubleValue(final int index) {
+                return result.doubleValue(index) - result.doubleValue(nbVars + index);
+            }
+
+            @Override
+            void set(final int index, final double value) {
+                throw new IllegalArgumentException();
             }
 
         });

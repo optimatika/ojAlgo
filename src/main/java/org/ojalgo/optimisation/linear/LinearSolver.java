@@ -33,7 +33,6 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -448,29 +447,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         int primSize = PrimalSimplex.size(convex);
         boolean dual = dualSize <= primSize;
 
-        Optimisation.Result result = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
+        Optimisation.Result retVal = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
 
-        if (options.validate) {
-
-            Optimisation.Result altResult = dual ? PrimalSimplex.doSolve(convex, options, zeroC) : DualSimplex.doSolve(convex, options, zeroC);
-
-            if (result.getMultipliers().isPresent()
-                    && !Access1D.equals(result.getMultipliers().get(), altResult.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
-
-                Optimisation.Result primRes = dual ? altResult : result;
-                Optimisation.Result dualRes = dual ? result : altResult;
-
-                BasicLogger.error();
-                BasicLogger.error("Prim sol: {}", primRes);
-                BasicLogger.error("Dual sol: {}", dualRes);
-
-                BasicLogger.error("Prim mul: {}", primRes.getMultipliers().get());
-                BasicLogger.error("Dual mul: {}", dualRes.getMultipliers().get());
-                BasicLogger.error();
-            }
-        }
-
-        return result;
+        return retVal;
     }
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {

@@ -71,6 +71,7 @@ public interface ModelFileTest {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel(dataset, modelName, relax, fileFormat);
 
+        // model.options.debug(Optimisation.Solver.class);
         // model.options.debug(IntegerSolver.class);
         // model.options.debug(ConvexSolver.class);
         // model.options.debug(LinearSolver.class);

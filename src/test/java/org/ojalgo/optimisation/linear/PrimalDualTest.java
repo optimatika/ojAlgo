@@ -29,12 +29,12 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexProblems;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.convex.CuteMarosMeszarosCase;
 import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 
 public class PrimalDualTest extends OptimisationLinearTests implements ModelFileTest {
@@ -44,7 +44,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
      * @param dualModel Assume to minimise
      * @param detailed TODO
      */
-    private static void doCompare(final ExpressionsBasedModel primModel, final ExpressionsBasedModel dualModel, final double optimalValue,
+    private static void doCompareModels(final ExpressionsBasedModel primModel, final ExpressionsBasedModel dualModel, final double optimalValue,
             final DenseArray<Double> optimalX, final DenseArray<Double> optimalY, final boolean detailed) {
 
         if (DEBUG) {
@@ -71,6 +71,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         TestUtils.assertEquals(optimalX, primResult);
         TestUtils.assertEquals(optimalY, dualResult);
         TestUtils.assertEquals(primResult.getState().isOptimal(), dualResult.getState().isOptimal());
+
+        PrimalDualTest.comparePrimalAndDualSolvers(primModel, false);
+        PrimalDualTest.comparePrimalAndDualSolvers(dualModel, true);
 
         ConvexSolver.Builder primConvex = ConvexSolver.newBuilder();
         ConvexSolver.copy(primModel, primConvex);
@@ -168,8 +171,30 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
 
-    private static ExpressionsBasedModel makeModel() {
-        return ModelFileTest.makeModel("marosmeszaros", "QPCSTAIR.SIF", false, FileFormat.MPS);
+    private static void comparePrimalAndDualSolvers(final ExpressionsBasedModel model, final boolean minimise) {
+
+        Result modResult = minimise ? model.minimise() : model.maximise();
+
+        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
+        ConvexSolver.copy(model, convex);
+
+        Result primResult = PrimalSimplex.doSolve(convex, model.options, false);
+        Result dualResult = DualSimplex.doSolve(convex, model.options, false);
+
+        if (DEBUG) {
+
+            BasicLogger.debug(model);
+
+            BasicLogger.debug(modResult);
+            BasicLogger.debug(primResult);
+            BasicLogger.debug(dualResult);
+
+            BasicLogger.debug(primResult.getMultipliers().get());
+            BasicLogger.debug(dualResult.getMultipliers().get());
+        }
+
+        TestUtils.assertEquals(primResult.getValue(), dualResult.getValue());
+        TestUtils.assertStateAndSolution(primResult, dualResult);
     }
 
     LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
@@ -202,7 +227,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.5, 1.25 });
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
 
-        PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY, true);
+        PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
 
     /**
@@ -229,7 +254,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 3.0, 8.0 });
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 0.2, 0.0, 0.6 });
 
-        PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY, true);
+        PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
 
     /**
@@ -256,7 +281,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 36.0, 0.0, 6.0 });
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 11, 0.5 });
 
-        PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY, true);
+        PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
 
     /**
@@ -266,7 +291,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
     @Tag("unstable")
     public void testConvexQPCSTAIR() {
 
-        ExpressionsBasedModel model = PrimalDualTest.makeModel();
+        ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("QPCSTAIR.SIF");
 
         int nbVars = model.countVariables();
 
@@ -312,8 +337,20 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
     }
 
+    /**
+     * This model had problems with the LP initialising
+     */
     @Test
-    public void testP20080117() {
+    @Tag("unstable")
+    public void testConvexHS268() {
+
+        ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
+
+        PrimalDualTest.comparePrimalAndDualSolvers(model, true);
+    }
+
+    @Test
+    public void testConvexP20080117() {
 
         ExpressionsBasedModel model = ConvexProblems.buildP20080117();
 
@@ -376,7 +413,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         TestUtils.assertEquals(1, dualModelDualSolver.size());
         TestUtils.assertEquals(2, dualModelDualSolver.getMultipliers().get().size());
 
-        PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY, false);
+        PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, false);
     }
 
 }

@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.GenericSolver;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
@@ -280,25 +281,31 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     @Override
+    protected boolean isIteratingPossible() {
+        return !this.isZeroQ();// Can't iterate, return what we have, maybe it's the LP solution
+    }
+
+    @Override
     protected boolean initialise(final Result kickStarter) {
 
         boolean ok = super.initialise(kickStarter);
 
         myInvQC = this.getSolutionQ(this.getIterationC());
 
-        boolean feasible = false;
+        Optimisation.State state = this.getState();
+
         boolean usableKickStarter = kickStarter != null && kickStarter.getState().isApproximate();
 
         if (usableKickStarter) {
             this.getSolutionX().fillMatching(kickStarter);
             if (kickStarter.getState().isFeasible()) {
-                feasible = true;
-            } else {
-                feasible = this.checkFeasibility();
+                state = kickStarter.getState();
+            } else if (this.checkFeasibility()) {
+                state = Optimisation.State.FEASIBLE;
             }
         }
 
-        if (!feasible) {
+        if (!state.isFeasible()) {
 
             Result resultLP = this.solveLP();
 
@@ -306,22 +313,15 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.getSolutionL().fillAll(ZERO);
 
             if (resultLP.getState().isFeasible()) {
-                feasible = true;
-            } else {
-                feasible = this.checkFeasibility();
+                state = resultLP.getState();
+            } else if (this.checkFeasibility()) {
+                state = Optimisation.State.FEASIBLE;
             }
         }
 
-        if (feasible) {
-
-            this.setState(State.FEASIBLE);
-
+        if (state.isFeasible()) {
             this.resetActivator();
-
         } else {
-
-            this.setState(State.INFEASIBLE);
-
             this.getSolutionX().fillAll(ZERO);
         }
 
@@ -332,7 +332,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.checkFeasibility();
         }
 
-        return ok && this.getState().isFeasible();
+        this.setState(state);
+        return ok && state.isFeasible();
     }
 
     @Override

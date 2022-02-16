@@ -86,9 +86,10 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     public static final Map<String, ModelInfo> MODEL_INFO;
 
     /**
-     * The correct/optimal objective function value is given with 8 digits in the file 00README.QP.
+     * The optimal objective function value is given with 8 digits in the file 00README.QP, but they don't
+     * seem to be exact.
      */
-    private static final NumberContext ACCURACY = NumberContext.of(8, 12);
+    private static final NumberContext ACCURACY = NumberContext.of(6, 8);
 
     static {
 
@@ -127,70 +128,17 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         MODEL_INFO = Collections.unmodifiableMap(modelInfo);
     }
 
+    public static ExpressionsBasedModel makeModel(final String name) {
+        return ModelFileTest.makeModel("marosmeszaros", name, false, FileFormat.MPS);
+    }
+
     private static void doTest(final String name, final NumberContext accuracy) {
         String expMinValString = MODEL_INFO.get(name.substring(0, name.indexOf("."))).OPT.toPlainString();
         ModelFileTest.makeAndAssert("marosmeszaros", name, FileFormat.MPS, false, expMinValString, null, accuracy != null ? accuracy : ACCURACY);
     }
 
-    private static ExpressionsBasedModel makeModel(final String name) {
-        return ModelFileTest.makeModel("marosmeszaros", name, false, FileFormat.MPS);
-    }
-
     static void doTest(final String name) {
         CuteMarosMeszarosCase.doTest(name, ACCURACY);
-    }
-
-    /**
-     * <ul>
-     * <li>
-     * </ul>
-     */
-    @Test
-    @Tag("slow")
-    public void testAUG2D() {
-        CuteMarosMeszarosCase.doTest("AUG2D.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG2DC() {
-        CuteMarosMeszarosCase.doTest("AUG2DC.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG2DCQP() {
-        CuteMarosMeszarosCase.doTest("AUG2DCQP.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG2DQP() {
-        CuteMarosMeszarosCase.doTest("AUG2DQP.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG3D() {
-        CuteMarosMeszarosCase.doTest("AUG3D.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG3DC() {
-        CuteMarosMeszarosCase.doTest("AUG3DC.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG3DCQP() {
-        CuteMarosMeszarosCase.doTest("AUG3DCQP.SIF");
-    }
-
-    @Test
-    @Tag("slow")
-    public void testAUG3DQP() {
-        CuteMarosMeszarosCase.doTest("AUG3DQP.SIF");
     }
 
     @Test
@@ -309,16 +257,15 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo returns state FAILED
-     * <p>
      * There are redundant constraints
      * <p>
      * The fixed variables (from presolve) completely zeros the Q-matrix – no longer suitable for ConvexSolver
+     * <p>
+     * The returned solution comes from LP in initialisation
      */
     @Test
-    @Tag("unstable")
     public void testQBORE3D() {
-        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", ACCURACY.withScale(10));
+        CuteMarosMeszarosCase.doTest("QBORE3D.SIF", ACCURACY.withScale(6));
     }
 
     /**
@@ -327,7 +274,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQFORPLAN() {
-        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF", ACCURACY.withScale(5));
+        CuteMarosMeszarosCase.doTest("QFORPLAN.SIF");
     }
 
     /**
@@ -336,7 +283,21 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQGROW22() {
-        CuteMarosMeszarosCase.doTest("QGROW22.SIF", ACCURACY.withScale(6));
+        CuteMarosMeszarosCase.doTest("QGROW22.SIF");
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQGROW7() {
+        CuteMarosMeszarosCase.doTest("QGROW7.SIF");
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testQPCBLEND() {
+        CuteMarosMeszarosCase.doTest("QPCBLEND.SIF");
     }
 
     /**
@@ -345,7 +306,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQPCBOEI1() {
-        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF", ACCURACY.withScale(6));
+        CuteMarosMeszarosCase.doTest("QPCBOEI1.SIF");
     }
 
     /**
@@ -355,7 +316,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * get rid of them. Pick non-artificial rows with numer == 0.0 rather than anyof the artificials.
      */
     @Test
-    @Tag("unstable")
     public void testQPCSTAIR() {
         CuteMarosMeszarosCase.doTest("QPCSTAIR.SIF");
     }
@@ -374,9 +334,14 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * Several iterations with very small step lengths
      */
     @Test
-    @Tag("unstable")
     public void testQRECIPE() {
         CuteMarosMeszarosCase.doTest("QRECIPE.SIF", ACCURACY.withScale(7));
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testQSCAGR7() {
+        CuteMarosMeszarosCase.doTest("QSCAGR7.SIF");
     }
 
     /**
@@ -396,7 +361,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQSHARE1B() {
-        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF", ACCURACY.withPrecision(3).withScale(8));
+        CuteMarosMeszarosCase.doTest("QSHARE1B.SIF");
     }
 
     /**
@@ -405,7 +370,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Test
     @Tag("unstable")
     public void testQSTAIR() {
-        CuteMarosMeszarosCase.doTest("QSTAIR.SIF", ACCURACY.withScale(8));
+        CuteMarosMeszarosCase.doTest("QSTAIR.SIF");
     }
 
     @Test
