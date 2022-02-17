@@ -299,21 +299,21 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
 
         // test evaluation context
-        final NumberContext tmpPrecision = StandardType.PERCENT.withPrecision(4);
+        NumberContext accuracy = StandardType.PERCENT.withPrecision(4);
 
         for (int r = 0; r < tmpPortfolioReturn.length; r++) {
             tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
             tmpMarkowitz.setTargetReturn(BigDecimal.valueOf(tmpPortfolioReturn[r]));
             tmpMarkowitz.getWeights();
             // BasicLogger.debug("Exp={}, Act={}, Quoat={}", tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpMarkowitz.getMeanReturn()  / tmpPortfolioReturn[r]);
-            TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpPrecision);
+            TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), accuracy);
         }
 
         for (int v = 0; v < tmpPortfolioVariance.length; v++) {
             tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
             tmpMarkowitz.setTargetVariance(BigDecimal.valueOf(tmpPortfolioVariance[v]));
             tmpMarkowitz.getWeights();
-            TestUtils.assertEquals("Variance: " + tmpRiskAversions[v], tmpPortfolioVariance[v], tmpMarkowitz.getReturnVariance(), tmpPrecision);
+            TestUtils.assertEquals("Variance: " + tmpRiskAversions[v], tmpPortfolioVariance[v], tmpMarkowitz.getReturnVariance(), accuracy);
         }
 
     }

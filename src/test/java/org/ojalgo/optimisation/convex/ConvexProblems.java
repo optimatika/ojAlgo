@@ -1465,8 +1465,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertStateNotLessThanFeasible(tmpResult1);
 
-            TestUtils.assertEquals("Model 1 State @" + l, baseResult1.getState(), tmpResult1.getState());
-            TestUtils.assertEquals("Model 1 Value @" + l, baseResult1.getValue(), tmpResult1.getValue());
+            TestUtils.assertEquals("Model 1 State @" + l, baseResult1.getState(), tmpResult1.getState(), accuracy);
+            TestUtils.assertEquals("Model 1 Value @" + l, baseResult1.getValue(), tmpResult1.getValue(), accuracy);
             TestUtils.assertEquals("Model 1 Solution @" + l, (Access1D<?>) baseResult1, tmpResult1, accuracy);
 
             Result tmpResult2 = model2.maximise();

@@ -273,7 +273,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * a correct solution.
      */
     @Test
-    @Tag("unstable")
     public void testQFORPLAN() {
         CuteMarosMeszarosCase.doTest("QFORPLAN.SIF");
     }

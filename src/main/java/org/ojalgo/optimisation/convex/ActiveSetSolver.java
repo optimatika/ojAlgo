@@ -30,11 +30,14 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.IndexSelector;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
+
+    private static final NumberContext NORM = ACCURACY.withPrecision(8);
+    private static final NumberContext DIFFERENT = ACCURACY.withPrecision(6).withScale(4);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -65,8 +68,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         iterX.modifyMatching(SUBTRACT, soluX);
 
-        double normCurrX = soluX.aggregateAll(Aggregator.LARGEST);
-        double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
+        double normCurrX = soluX.aggregateAll(Aggregator.LARGEST).doubleValue();
+        double normStepX = iterX.aggregateAll(Aggregator.LARGEST).doubleValue();
 
         if (this.isLogDebug()) {
             this.log("Current: {} - {}", normCurrX, soluX.asList());
@@ -87,7 +90,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         }
 
-        if (!options.solution.isSmall(normCurrX, normStepX) && !ACCURACY.isSmall(normStepX, Math.max(normCurrX, ONE))) {
+        if (ACCURACY.isSmall(normStepX, Math.max(normCurrX, ONE))) {
+            if (this.isLogDebug()) {
+                this.log("Freak solution!");
+            }
+            return;
+        }
+
+        if (!DIFFERENT.isSmall(normCurrX, normStepX)) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -118,12 +128,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     double currentSlack = slack.doubleValue(i);
                     double slackChange = excludedInequalityRow.dot(iterX);
-                    double fraction = Math.signum(currentSlack) == Math.signum(slackChange) && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO
+                    double fraction = Math.signum(currentSlack) == Math.signum(slackChange) && ACCURACY.isSmall(slackChange, currentSlack) ? ZERO
                             : Math.abs(currentSlack) / slackChange;
                     // If the current slack is negative something has already gone wrong.
                     // Taking the abs value is to handle small negative values due to rounding errors
 
-                    if (slackChange <= ZERO || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
+                    if (slackChange <= ZERO || ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
                     } else if (fraction >= ZERO) {
                         // Must check the step length
@@ -138,7 +148,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if (GenericSolver.ACCURACY.isZero(stepLength) && this.getConstraintToInclude() == this.getLastExcluded()) {
+            if (ACCURACY.isZero(stepLength) && this.getConstraintToInclude() == this.getLastExcluded()) {
                 if (this.isLogProgress()) {
                     this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
                 }
@@ -398,7 +408,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = tmpLI.doubleValue(i, 0);
 
-                if (tmpVal < ZERO && tmpVal < tmpMin && !GenericSolver.ACCURACY.isZero(tmpVal)) {
+                if (tmpVal < ZERO && tmpVal < tmpMin && !ACCURACY.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
@@ -416,7 +426,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
 
-            if (tmpVal < ZERO && tmpVal < tmpMin && !GenericSolver.ACCURACY.isZero(tmpVal)) {
+            if (tmpVal < ZERO && tmpVal < tmpMin && !ACCURACY.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
                 if (this.isLogProgress()) {
