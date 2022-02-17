@@ -269,7 +269,8 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo returns state INFEASIBLE
+     * The QP solver ends up (de)activating inequality constraints "forever", but does eventually finish with
+     * a correct solution.
      */
     @Test
     @Tag("unstable")
@@ -278,7 +279,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo takes forever - ends up in some loop...
+     * The QP solver ends up (de)activating inequality constraints "forever"...
      */
     @Test
     @Tag("unstable")
@@ -286,6 +287,9 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("QGROW22.SIF");
     }
 
+    /**
+     * The QP solver ends up (de)activating inequality constraints "forever"...
+     */
     @Test
     @Tag("unstable")
     public void testQGROW7() {
@@ -310,10 +314,6 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo returns state INFEASIBLE
-     * <p>
-     * Problem with the LP solver. Switches to phase 2 with many artificials still in the basis, and doesn't
-     * get rid of them. Pick non-artificial rows with numer == 0.0 rather than anyof the artificials.
      */
     @Test
     public void testQPCSTAIR() {
@@ -326,18 +326,18 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo finds a sub-optimal solution
-     * <p>
-     * Too many constraints are initially activated, making the KKT system unsolvable, and somehow cutting off
-     * the optimal value
-     * <p>
-     * Several iterations with very small step lengths
      */
     @Test
     public void testQRECIPE() {
         CuteMarosMeszarosCase.doTest("QRECIPE.SIF", ACCURACY.withScale(7));
     }
 
+    /**
+     * <p>
+     * TIMEOUT
+     * <p>
+     * Phase2 of LP initialisation never finishes
+     */
     @Test
     @Tag("unstable")
     public void testQSCAGR7() {
@@ -356,7 +356,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo finds the problem to be INFEASIBLE
+     * Returns an incorrect solution
      */
     @Test
     @Tag("unstable")
@@ -365,7 +365,8 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     }
 
     /**
-     * ojAlgo finds the problem to be INFEASIBLE
+     * The QP solver ends up (de)activating inequality constraints "forever"... Does eventually finish with a
+     * solution it claims to be feasible.
      */
     @Test
     @Tag("unstable")

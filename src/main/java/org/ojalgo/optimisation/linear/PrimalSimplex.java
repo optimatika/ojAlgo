@@ -42,6 +42,60 @@ import org.ojalgo.type.context.NumberContext;
 
 final class PrimalSimplex extends SimplexSolver {
 
+    /**
+     * Variant of
+     * {@link #build(org.ojalgo.optimisation.convex.ConvexSolver.Builder, org.ojalgo.optimisation.Optimisation.Options, boolean)}
+     * that assumes all variables positive.
+     */
+    private static SimplexTableau buildAlt(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
+
+        int nbVars = convex.countVariables();
+        int nbEqus = convex.countEqualityConstraints();
+        int nbInes = convex.countInequalityConstraints();
+
+        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars, nbInes, 0, true, options);
+        Primitive2D constraintsBody = retVal.constraintsBody();
+        Primitive1D constraintsRHS = retVal.constraintsRHS();
+        Primitive1D objective = retVal.objective();
+
+        MatrixStore<Double> convexC = checkFeasibility ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getC();
+
+        for (int v = 0; v < nbVars; v++) {
+            double valC = convexC.doubleValue(v);
+            objective.set(v, -valC);
+        }
+
+        MatrixStore<Double> convexAE = convex.getAE();
+        MatrixStore<Double> convexBE = convex.getBE();
+
+        for (int i = 0; i < nbEqus; i++) {
+            double rhs = convexBE.doubleValue(i);
+
+            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+
+            for (int j = 0; j < nbVars; j++) {
+                double valA = convexAE.doubleValue(i, j);
+                constraintsBody.set(i, j, neg ? -valA : valA);
+            }
+            constraintsRHS.set(i, neg ? -rhs : rhs);
+        }
+
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
+
+            int r = Math.toIntExact(rowAI.row());
+
+            double rhs = convex.getBI(r);
+
+            boolean neg = retVal.negative[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+
+            rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            constraintsBody.set(nbEqus + r, nbVars + nbVars + r, neg ? NEG : ONE);
+            constraintsRHS.set(nbEqus + r, neg ? -rhs : rhs);
+        }
+
+        return retVal;
+    }
+
     private static SimplexTableau buildOldVersion(final ExpressionsBasedModel model) {
 
         List<Variable> posVariables = model.getPositiveVariables();
@@ -378,6 +432,51 @@ final class PrimalSimplex extends SimplexSolver {
         if (tmpNegInd >= 0) {
             constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
         }
+    }
+
+    /**
+     * @see #buildAlt(org.ojalgo.optimisation.convex.ConvexSolver.Builder,
+     *      org.ojalgo.optimisation.Optimisation.Options, boolean)
+     */
+    private static int sizeAlt(final ConvexSolver.Builder convex) {
+
+        int numbVars = convex.countVariables();
+        int numbEqus = convex.countEqualityConstraints();
+        int numbInes = convex.countInequalityConstraints();
+
+        return SimplexTableau.size(numbEqus + numbInes, numbVars, numbInes, 0, true);
+    }
+
+    /**
+     * @see #buildAlt(org.ojalgo.optimisation.convex.ConvexSolver.Builder,
+     *      org.ojalgo.optimisation.Optimisation.Options, boolean)
+     */
+    private static Optimisation.Result toConvexStateAlt(final Result result, final ConvexSolver.Builder convex) {
+
+        int nbVars = convex.countVariables();
+
+        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexSolver.Primitive1D() {
+
+            @Override
+            public int size() {
+                return nbVars;
+            }
+
+            @Override
+            double doubleValue(final int index) {
+                return result.doubleValue(index);
+            }
+
+            @Override
+            void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+        });
+
+        retVal.multipliers(result.getMultipliers().get());
+
+        return retVal;
     }
 
     static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {

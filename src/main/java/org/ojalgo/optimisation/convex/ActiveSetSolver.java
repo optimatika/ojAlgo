@@ -131,7 +131,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                             stepLength = fraction;
                             this.setConstraintToInclude(excluded[i]);
                             if (this.isLogDebug()) {
-                                this.log("Best so far: {} @ {} ({}).", stepLength, i, excluded[i]);
+                                this.log("Best so far: {} @ {} ({}) ––– {} / {}.", stepLength, i, excluded[i], currentSlack, slackChange);
                             }
                         }
                     }
@@ -327,9 +327,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.isLogDebug()) {
 
-            this.log("Initial solution: {}", this.getSolutionX().copy().asList());
-
             this.checkFeasibility();
+
+            this.log("Initial solution: {}", this.getSolutionX().copy().asList());
         }
 
         this.setState(state);

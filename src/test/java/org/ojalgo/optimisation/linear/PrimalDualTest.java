@@ -197,6 +197,42 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         TestUtils.assertStateAndSolution(primResult, dualResult);
     }
 
+    private static void comparePrimalAndDualSolvers2(final ExpressionsBasedModel model, final boolean minimise) {
+
+        ExpressionsBasedModel simplified = model.simplify();
+
+        if (minimise) {
+            simplified.setMinimisation();
+        } else {
+            simplified.isMaximisation();
+        }
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
+        ConvexSolver.copy(simplified, convex);
+
+        convex.getC().fillAll(0.0);
+        convex.getQ().fillAll(0.0);
+
+        Result primResult = PrimalSimplex.doSolve(convex, simplified.options, false);
+        Result dualResult = DualSimplex.doSolve(convex, simplified.options, false);
+
+        if (DEBUG) {
+
+            BasicLogger.debug(primResult);
+            BasicLogger.debug(dualResult);
+
+            BasicLogger.debug(primResult.getMultipliers().get());
+            BasicLogger.debug(dualResult.getMultipliers().get());
+        }
+
+        TestUtils.assertEquals(primResult.getValue(), dualResult.getValue());
+        TestUtils.assertStateAndSolution(primResult, dualResult);
+    }
+
     LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
 
     public PrimalDualTest() {
@@ -347,6 +383,18 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
 
         PrimalDualTest.comparePrimalAndDualSolvers(model, true);
+    }
+
+    /**
+     * This model had problems with the LP initialising
+     */
+    @Test
+    @Tag("unstable")
+    public void testConvexQSCAGR7() {
+
+        ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("QSCAGR7.SIF");
+
+        PrimalDualTest.comparePrimalAndDualSolvers2(model, true);
     }
 
     @Test
