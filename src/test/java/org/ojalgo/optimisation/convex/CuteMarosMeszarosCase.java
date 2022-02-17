@@ -256,6 +256,16 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         CuteMarosMeszarosCase.doTest("KSIP.SIF");
     }
 
+    @Test
+    public void testPRIMALC2() {
+        CuteMarosMeszarosCase.doTest("PRIMALC2.SIF", ACCURACY.withScale(6));
+    }
+
+    @Test
+    public void testPRIMALC8() {
+        CuteMarosMeszarosCase.doTest("PRIMALC8.SIF", ACCURACY.withScale(6));
+    }
+
     /**
      * There are redundant constraints
      * <p>
