@@ -36,8 +36,9 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
-    private static final NumberContext NORM = ACCURACY.withPrecision(8);
-    private static final NumberContext DIFFERENT = ACCURACY.withPrecision(6).withScale(4);
+    private static final NumberContext LAGRANGE = ACCURACY.withScale(6);
+    private static final NumberContext SOLUTION = ACCURACY.withPrecision(6).withScale(4);
+    private static final NumberContext SLACK = ACCURACY.withPrecision(6).withScale(10);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -90,14 +91,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         }
 
-        if (ACCURACY.isSmall(normStepX, Math.max(normCurrX, ONE))) {
+        if (!ACCURACY.isZero(normCurrX) && ACCURACY.isSmall(normStepX, normCurrX)) {
             if (this.isLogDebug()) {
                 this.log("Freak solution!");
             }
             return;
         }
 
-        if (!DIFFERENT.isSmall(normCurrX, normStepX)) {
+        if (!SOLUTION.isSmall(normCurrX, normStepX)) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -128,21 +129,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     double currentSlack = slack.doubleValue(i);
                     double slackChange = excludedInequalityRow.dot(iterX);
-                    double fraction = Math.signum(currentSlack) == Math.signum(slackChange) && ACCURACY.isSmall(slackChange, currentSlack) ? ZERO
-                            : Math.abs(currentSlack) / slackChange;
+                    double fraction = Math.abs(currentSlack) / slackChange;
                     // If the current slack is negative something has already gone wrong.
                     // Taking the abs value is to handle small negative values due to rounding errors
+                    if (slackChange > ZERO && !SLACK.isZero(slackChange) && SLACK.isSmall(slackChange, currentSlack)) {
+                        fraction = ZERO;
+                    } else if (slackChange <= ZERO || SLACK.isZero(slackChange)) {
+                        fraction = ONE;
+                    }
 
-                    if (slackChange <= ZERO || ACCURACY.isSmall(normStepX, slackChange)) {
-                        // This constraint not affected
-                    } else if (fraction >= ZERO) {
-                        // Must check the step length
-                        if (fraction < stepLength) {
-                            stepLength = fraction;
-                            this.setConstraintToInclude(excluded[i]);
-                            if (this.isLogDebug()) {
-                                this.log("Best so far: {} @ {} ({}) ––– {} / {}.", stepLength, i, excluded[i], currentSlack, slackChange);
-                            }
+                    if (ZERO <= fraction && fraction < stepLength) {
+                        stepLength = fraction;
+                        this.setConstraintToInclude(excluded[i]);
+                        if (this.isLogDebug()) {
+                            this.log("\tBest so far: {} @ {} ({}) ––– {} / {}.", stepLength, i, excluded[i], currentSlack, slackChange);
                         }
                     }
                 }
@@ -167,7 +167,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             // Zero solution
 
             if (this.isLogDebug()) {
-                this.log("Step too small (or freaky large)!");
+                this.log("Step too small!");
             }
 
             this.setState(State.FEASIBLE);
@@ -387,50 +387,50 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         int retVal = -1;
 
-        int[] tmpIncluded = myActivator.getIncluded();
+        int[] included = myActivator.getIncluded();
+        int lastIncluded = myActivator.getLastIncluded();
+        int indexOfLastIncluded = -1;
 
-        int tmpLastIncluded = myActivator.getLastIncluded();
-        int tmpIndexOfLast = -1;
-
-        double tmpMin = POSITIVE_INFINITY;
+        double tmpMin = ZERO;
         double tmpVal;
 
-        //   MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
-        MatrixStore<Double> tmpLI = this.getSolutionL().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded);
+        int nbEqus = this.countEqualityConstraints();
+        Primitive64Store soluL = this.getSolutionL();
 
-        if (this.isLogDebug() && tmpLI.count() > 0L) {
-            this.log("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
+        if (this.isLogDebug() && included.length > 0) {
+            double[] multipliers = soluL.offsets(nbEqus, 0).row(included).toRawCopy1D();
+            this.log("Looking for the largest negative lagrange multiplier among these: {}.", multipliers);
         }
 
-        for (int i = 0; i < tmpLI.countRows(); i++) {
+        for (int i = 0, limit = included.length; i < limit; i++) {
 
-            if (tmpIncluded[i] != tmpLastIncluded) {
+            if (included[i] != lastIncluded) {
 
-                tmpVal = tmpLI.doubleValue(i, 0);
+                tmpVal = soluL.doubleValue(nbEqus + included[i], 0);
 
-                if (tmpVal < ZERO && tmpVal < tmpMin && !ACCURACY.isZero(tmpVal)) {
+                if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
-                        this.log("Best so far: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[i]);
+                        this.log("\tBest so far: {} @ {} ({}).", tmpMin, retVal, included[retVal]);
                     }
                 }
 
             } else {
 
-                tmpIndexOfLast = i;
+                indexOfLastIncluded = i;
             }
         }
 
-        if (retVal < 0 && tmpIndexOfLast >= 0) {
+        if (retVal < 0 && indexOfLastIncluded >= 0) {
 
-            tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
+            tmpVal = soluL.doubleValue(nbEqus + included[indexOfLastIncluded], 0);
 
-            if (tmpVal < ZERO && tmpVal < tmpMin && !ACCURACY.isZero(tmpVal)) {
+            if (tmpVal < tmpMin && !LAGRANGE.isZero(tmpVal)) {
                 tmpMin = tmpVal;
-                retVal = tmpIndexOfLast;
+                retVal = indexOfLastIncluded;
                 if (this.isLogProgress()) {
-                    this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
+                    this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, included[retVal]);
                 }
             }
         }
@@ -439,11 +439,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (retVal < 0) {
                 this.log("Nothing to exclude");
             } else {
-                this.log("Suggest to exclude: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
+                this.log("Suggest to exclude: {} @ {} ({}).", tmpMin, retVal, included[retVal]);
             }
         }
 
-        return retVal >= 0 ? tmpIncluded[retVal] : retVal;
+        return retVal >= 0 ? included[retVal] : retVal;
     }
 
     /**
@@ -626,11 +626,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator.excludeAll();
 
-        int numbEqus = this.countEqualityConstraints();
-        int numbVars = this.countVariables();
-        int maxToInclude = numbVars - numbEqus;
+        int nbEqus = this.countEqualityConstraints();
+        int nbVars = this.countVariables();
+        int maxToInclude = nbVars - nbEqus;
 
-        if (this.isLogDebug() && numbEqus > numbVars) {
+        if (this.isLogDebug() && nbEqus > nbVars) {
             this.log("Redundant contraints!");
         }
 
@@ -638,7 +638,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             MatrixStore<Double> inqSlack = this.getSlackI();
             int[] excl = this.getExcluded();
 
-            Primitive64Store lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
                 if (ACCURACY.isZero(slack) && this.countIncluded() < maxToInclude) {
