@@ -91,15 +91,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         }
 
-        if (!ACCURACY.isZero(normCurrX) && ACCURACY.isSmall(normStepX, normCurrX)) {
-            if (this.isLogDebug()) {
-                this.log("Freak solution!");
-            }
-            return;
-        }
-
         if (!SOLUTION.isSmall(normCurrX, normStepX)) {
-            // Non-zero && non-freak solution
+            // Non-zero solution
 
             double stepLength = ONE;
 
@@ -626,25 +619,29 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator.excludeAll();
 
+        int nbInes = this.countInequalityConstraints();
         int nbEqus = this.countEqualityConstraints();
         int nbVars = this.countVariables();
+
         int maxToInclude = nbVars - nbEqus;
 
-        if (this.isLogDebug() && nbEqus > nbVars) {
+        if (this.isLogDebug() && maxToInclude < 0) {
             this.log("Redundant contraints!");
         }
 
-        if (this.hasInequalityConstraints()) {
-            MatrixStore<Double> inqSlack = this.getSlackI();
-            int[] excl = this.getExcluded();
+        if (nbInes > 0 && maxToInclude > 0) {
 
-            for (int i = 0; i < excl.length; i++) {
-                double slack = inqSlack.doubleValue(excl[i]);
-                if (ACCURACY.isZero(slack) && this.countIncluded() < maxToInclude) {
+            MatrixStore<Double> ineqSlack = this.getSlackI();
+
+            for (int i = 0; i < nbInes; i++) {
+
+                double slack = ineqSlack.doubleValue(i);
+
+                if (slack >= ZERO && ACCURACY.isZero(slack) && this.countIncluded() < maxToInclude) {
                     if (this.isLogDebug()) {
                         this.log("Will inlcude ineq {} with slack={}", i, slack);
                     }
-                    this.include(excl[i]);
+                    this.include(i);
                 }
             }
         }

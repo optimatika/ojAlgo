@@ -81,15 +81,65 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
          */
         public int QNZ;
 
-    }
+        /**
+         * The fraction of variables that are quadratic.
+         *
+         * @return [0,1]
+         */
+        public double getRatioQP() {
+            return (double) QN / (double) N;
+        }
 
-    public static final Map<String, ModelInfo> MODEL_INFO;
+        /**
+         * All variables are quadratic
+         */
+        public boolean isPureQP() {
+            return QN == N;
+        }
+
+        /**
+         * The quadratic problem is called separable if Q has no off-diagonal nonzeros.
+         */
+        public boolean isSeparable() {
+            return QNZ == 0;
+        }
+
+        /**
+         * Number of variables and constraints are less than 1000 – can then use the community edition of
+         * CPLEX.
+         */
+        public boolean isSmall() {
+            return M <= 1_000 && N <= 1_000;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("ModelInfo [M=");
+            builder.append(M);
+            builder.append(", N=");
+            builder.append(N);
+            builder.append(", NZ=");
+            builder.append(NZ);
+            builder.append(", QN=");
+            builder.append(QN);
+            builder.append(", QNZ=");
+            builder.append(QNZ);
+            builder.append(", OPT=");
+            builder.append(OPT);
+            builder.append("]");
+            return builder.toString();
+        }
+
+    }
 
     /**
      * The optimal objective function value is given with 8 digits in the file 00README.QP, but they don't
      * seem to be exact.
      */
     private static final NumberContext ACCURACY = NumberContext.of(6, 8);
+
+    private static final Map<String, ModelInfo> MODEL_INFO;
 
     static {
 
@@ -128,14 +178,30 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
         MODEL_INFO = Collections.unmodifiableMap(modelInfo);
     }
 
+    public static Map<String, ModelInfo> getModelInfo() {
+        return MODEL_INFO;
+    }
+
+    public static ModelInfo getModelInfo(final String model) {
+        String key = model.toUpperCase();
+        key = key.replaceAll("_", "");
+        int dotIndex = key.indexOf(".");
+        if (dotIndex > 0) {
+            key = key.substring(0, dotIndex);
+        }
+        return MODEL_INFO.get(key);
+    }
+
     public static ExpressionsBasedModel makeModel(final String name) {
         return ModelFileTest.makeModel("marosmeszaros", name, false, FileFormat.MPS);
     }
 
     private static void doTest(final String name, final NumberContext accuracy) {
-        String name1 = name.replaceAll("_", "");
-        String name2 = name1.substring(0, name1.indexOf("."));
-        String expMinValString = MODEL_INFO.get(name2).OPT.toPlainString();
+
+        String expMinValString = CuteMarosMeszarosCase.getModelInfo(name).OPT.toPlainString();
+
+        //  BasicLogger.debug(CuteMarosMeszarosCase.getModelInfo(name));
+
         ModelFileTest.makeAndAssert("marosmeszaros", name, FileFormat.MPS, false, expMinValString, null, accuracy != null ? accuracy : ACCURACY);
     }
 
@@ -161,6 +227,16 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     @Tag("unstable")
     public void testCVXQP2_M() {
         CuteMarosMeszarosCase.doTest("CVXQP2_M.SIF");
+    }
+
+    /**
+     * <p>
+     * The QP solver ends up (de)activating inequality constraints "forever"...
+     */
+    @Test
+    @Tag("unstable")
+    public void testCVXQP3_M() {
+        CuteMarosMeszarosCase.doTest("CVXQP3_M.SIF");
     }
 
     /**
@@ -330,6 +406,16 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
     /**
      * <p>
+     * Just takes way too long – 275s
+     */
+    @Test
+    @Tag("unstable")
+    public void testMOSARQP2() {
+        CuteMarosMeszarosCase.doTest("MOSARQP2.SIF");
+    }
+
+    /**
+     * <p>
      */
     @Test
     public void testPRIMAL1() {
@@ -429,7 +515,14 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
      * <p>
      * The QP solver ends up (de)activating inequality constraints "forever"...
      * <p>
-     * Initial solution very close to 0.0 and there fore ends up with "Freak solution!"
+     * Initial solution very close to 0.0 and therefore ends up with "Freak solution!"
+     * <p>
+     * Q matrix is not SPD, Cholesky fails and the matrix is patched. Both Q and C are very sparse. Patching
+     * probabbly changes the structure Q significantly.
+     * <p>
+     * Objective function (Q matrix) adjusted by -1
+     * <p>
+     * With adjustments turned off, and no inequalities active, the full KKT system is unsolvable!
      */
     @Test
     @Tag("unstable")
@@ -539,9 +632,10 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
     /**
      * <p>
      * The QP solver ends up (de)activating inequality constraints "forever"... Does eventually finish with a
-     * solution it claims to be feasible.
+     * solution, but still tagged "unstable" since it simply takes too long.
      */
     @Test
+    @Tag("unstable")
     public void testQSTAIR() {
         CuteMarosMeszarosCase.doTest("QSTAIR.SIF");
     }

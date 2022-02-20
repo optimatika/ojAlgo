@@ -35,6 +35,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Cleanup and refactoring of `LinearSolver` and related classes.
+- Improved numerical stability of `ConvexSolver`.
 
 ## [50.0.2] – 2022-01-26
 
