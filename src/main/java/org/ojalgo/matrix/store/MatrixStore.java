@@ -35,6 +35,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Structure2D.Logical;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 

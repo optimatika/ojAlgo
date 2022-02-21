@@ -112,14 +112,6 @@ public final class DateContext extends FormatContext<Date> {
         }
     }
 
-    /**
-     * @deprecated v49 Use {@link #withFormat(DatePart,DateStyle,Locale)} instead
-     */
-    @Deprecated
-    public TypeContext<Date> newFormat(final DatePart part, final DateStyle style, final Locale locale) {
-        return this.withFormat(part, style, locale);
-    }
-
     public TypeContext<Date> withFormat(final DatePart part, final DateStyle style, final Locale locale) {
 
         final DatePart tmpPart = part != null ? part : this.getPart();

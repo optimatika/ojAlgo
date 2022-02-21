@@ -19,10 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.linear;
+package org.ojalgo.data.domain.finance.series;
 
-import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
 
-abstract class SimplexDictionary implements AlgorithmStore {
+/**
+ * SymbolDataTest
+ *
+ * @author stefanvanegmond
+ */
+@Disabled
+public class IEXTradingTest extends FinanceDataTests {
+
+    public IEXTradingTest() {
+        super();
+    }
+
+    @Test
+    public void testDeriveDistributions() {
+
+        final DataSource dataSource = DataSource.newIEXTrading("AAPL");
+
+        FinanceDataTests.doTestDeriveDistribution(dataSource);
+    }
+
+    @Test
+    public void testFetchDaily() {
+
+        if (DataSource.newIEXTrading("AAPL").getHistoricalPrices().size() <= 1) {
+            TestUtils.fail("No data!");
+        }
+    }
+
+    @Test
+    public void testIEXTradingDailyMSFT() {
+
+        final DataSource dataSource = DataSource.newIEXTrading("MSFT");
+
+        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1258);
+    }
 
 }

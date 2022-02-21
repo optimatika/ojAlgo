@@ -82,7 +82,7 @@ public class FileFormatTest extends ANNTest {
 
         File file = new File(invocationDir, "ojAlgo.ann");
 
-        ArtificialNeuralNetwork network1 = ArtificialNeuralNetwork.builder(factory, 5).layer(6, Activator.IDENTITY).layer(3, Activator.RECTIFIER)
+        ArtificialNeuralNetwork network1 = ArtificialNeuralNetwork.builder(factory, 5).layer(6, Activator.IDENTITY).layer(3, Activator.RELU)
                 .layer(9, Activator.SIGMOID).layer(2, Activator.TANH).get();
 
         network1.writeTo(file);

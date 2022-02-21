@@ -103,14 +103,6 @@ public class Password {
         return retVal;
     }
 
-    /**
-     * @deprecated v49 Use {@link #makePlainText(int)} instead
-     */
-    @Deprecated
-    public static String makeClearText(final int length) {
-        return Password.makePlainText(length);
-    }
-
     public static String makePlainText(final int length) {
 
         final char[] retVal = new char[length];

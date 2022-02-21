@@ -33,6 +33,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest extends OptimisationTests {
@@ -193,6 +194,11 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         tmpMYEQN.level(SEVEN);
 
         TestUtils.assertTrue(tmpModel.validate());
+
+        if (OptimisationTests.DEBUG) {
+            BasicLogger.debug(tmpModel);
+            tmpModel.options.debug(LinearSolver.class);
+        }
 
         Result tmpMinRes = tmpModel.minimise();
         Result tmpMaxRes = tmpModel.maximise();

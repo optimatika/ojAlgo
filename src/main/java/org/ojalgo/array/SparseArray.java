@@ -188,7 +188,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
             if (remaining > 1) {
 
-                final int split = myCursor + (remaining / 2);
+                final int split = myCursor + remaining / 2;
 
                 // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor, myCursor, split, split, myLastCursor);
 
@@ -198,10 +198,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
                 return retVal;
 
-            } else {
-
-                return null;
             }
+            return null;
         }
 
     }
@@ -236,14 +234,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new SparseFactory<>(denseFactory);
-    }
-
-    /**
-     * @deprecated v49 Use {@link #factory(org.ojalgo.array.DenseArray.Factory)} instead
-     */
-    @Deprecated
-    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
-        return SparseArray.factory(denseFactory).limit(count);
     }
 
     /**
@@ -342,9 +332,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return this.doubleValueInternally(tmpIndex);
-        } else {
-            return myZeroValue;
         }
+        return myZeroValue;
     }
 
     @Override
@@ -422,9 +411,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
         if (tmpFoundAt >= myActualLength) {
             return rangeLimit;
-        } else {
-            return Math.min(myIndices[tmpFoundAt], rangeLimit);
         }
+        return Math.min(myIndices[tmpFoundAt], rangeLimit);
     }
 
     @Override
@@ -433,9 +421,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return this.getInternally(tmpIndex);
-        } else {
-            return myZeroNumber;
         }
+        return myZeroNumber;
     }
 
     @Override
@@ -443,9 +430,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return myValues.isAbsolute(tmpIndex);
-        } else {
-            return true;
         }
+        return true;
     }
 
     @Override
@@ -453,9 +439,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return myValues.isSmall(tmpIndex, comparedTo);
-        } else {
-            return true;
         }
+        return true;
     }
 
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
@@ -465,24 +450,20 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
         if (tmpFoundAt < 0) {
             return rangeFirst;
-        } else {
-            return Math.min(myIndices[tmpFoundAt] + 1L, rangeLimit);
         }
+        return Math.min(myIndices[tmpFoundAt] + 1L, rangeLimit);
     }
 
     @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
 
-        final double tmpZeroValue = modifier.invoke(myZeroValue);
+        double zeroValue = modifier.invoke(myZeroValue);
 
-        if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
-
-            myValues.modifyAll(modifier);
-
-        } else {
-
-            throw new IllegalArgumentException("SparseArray zero modification!");
+        if (MATH_CONTEXT.isDifferent(myZeroValue, zeroValue)) {
+            throw new IllegalArgumentException("SparseArray zero-value modification!");
         }
+
+        myValues.modifyAll(modifier);
     }
 
     @Override
@@ -574,7 +555,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             localLimit = -(localLimit + 1);
         }
 
-        if ((limit - first) > (localLimit - localFirst)) {
+        if (limit - first > localLimit - localFirst) {
             visitor.invoke(myZeroValue);
         }
 
@@ -613,7 +594,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             // Not existing value, insert new
             final int tmpInsInd = -(internalIndex + 1);
 
-            if ((myActualLength + 1) <= myIndices.length) {
+            if (myActualLength + 1 <= myIndices.length) {
                 // No need to grow the backing arrays
 
                 for (int i = myActualLength; i > tmpInsInd; i--) {
@@ -622,8 +603,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                 }
                 myIndices[tmpInsInd] = externalIndex;
                 myValues.set(tmpInsInd, value);
-
-                myActualLength++;
 
             } else {
                 // Needs to grow the backing arrays
@@ -648,8 +627,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
                 myIndices = tmpIndices;
                 myValues = tmpValues;
-                myActualLength++;
             }
+            myActualLength++;
         }
     }
 
@@ -663,11 +642,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
             myValues.set(internalIndex, value);
 
-        } else if (shouldStoreZero || (NumberContext.compare(value, PrimitiveMath.ZERO) != 0)) {
+        } else if (shouldStoreZero || NumberContext.compare(value, PrimitiveMath.ZERO) != 0) {
             // Not existing value, insert new
             final int tmpInsInd = -(internalIndex + 1);
 
-            if ((myActualLength + 1) <= myIndices.length) {
+            if (myActualLength + 1 <= myIndices.length) {
                 // No need to grow the backing arrays
 
                 for (int i = myActualLength; i > tmpInsInd; i--) {
@@ -676,8 +655,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                 }
                 myIndices[tmpInsInd] = externalIndex;
                 myValues.set(tmpInsInd, value);
-
-                myActualLength++;
 
             } else {
                 // Needs to grow the backing arrays
@@ -702,8 +679,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
                 myIndices = tmpIndices;
                 myValues = tmpValues;
-                myActualLength++;
             }
+            myActualLength++;
         }
     }
 
@@ -769,8 +746,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                if (((tmpIndex - first) % step) == 0L) {
+            if (tmpIndex >= first && tmpIndex < limit) {
+                if ((tmpIndex - first) % step == 0L) {
                     tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
                     if (tmpValue > tmpLargest) {
                         tmpLargest = tmpValue;
@@ -788,10 +765,10 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         boolean retVal = true;
 
-        for (int i = 0; retVal && (i < myIndices.length); i++) {
+        for (int i = 0; retVal && i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                if (((tmpIndex - first) % step) == 0L) {
+            if (tmpIndex >= first && tmpIndex < limit) {
+                if ((tmpIndex - first) % step == 0L) {
                     retVal &= myValues.isSmall(i, comparedTo);
                 }
             }
@@ -805,20 +782,17 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
-
-            for (int i = 0; i < myIndices.length; i++) {
-                final long tmpIndex = myIndices[i];
-                if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                    if (((tmpIndex - first) % step) == 0L) {
-                        myValues.modify(tmpIndex, i, left, function);
-                    }
-                }
-            }
-
-        } else {
+        if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             throw new IllegalArgumentException("SparseArray zero modification!");
+        }
+        for (int i = 0; i < myIndices.length; i++) {
+            final long tmpIndex = myIndices[i];
+            if (tmpIndex >= first && tmpIndex < limit) {
+                if ((tmpIndex - first) % step == 0L) {
+                    myValues.modify(tmpIndex, i, left, function);
+                }
+            }
         }
     }
 
@@ -827,18 +801,15 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
-
-            for (int i = 0; i < myIndices.length; i++) {
-                final long tmpIndex = myIndices[i];
-                if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                    myValues.modify(tmpIndex, i, function, right);
-                }
-            }
-
-        } else {
+        if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             throw new IllegalArgumentException("SparseArray zero modification!");
+        }
+        for (int i = 0; i < myIndices.length; i++) {
+            final long tmpIndex = myIndices[i];
+            if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
+                myValues.modify(tmpIndex, i, function, right);
+            }
         }
     }
 
@@ -847,18 +818,15 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO);
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
-
-            for (int i = 0; i < myIndices.length; i++) {
-                final long tmpIndex = myIndices[i];
-                if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                    myValues.modify(tmpIndex, i, function);
-                }
-            }
-
-        } else {
+        if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             throw new IllegalArgumentException("SparseArray zero modification!");
+        }
+        for (int i = 0; i < myIndices.length; i++) {
+            final long tmpIndex = myIndices[i];
+            if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
+                myValues.modify(tmpIndex, i, function);
+            }
         }
     }
 
@@ -867,7 +835,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         boolean tmpOnlyOnce = true;
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
+            if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 myValues.visitOne(i, visitor);
             } else if (tmpOnlyOnce) {
                 visitor.invoke(myZeroValue);

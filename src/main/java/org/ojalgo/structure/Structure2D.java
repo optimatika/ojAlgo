@@ -90,22 +90,6 @@ public interface Structure2D extends Structure1D {
             return true;
         }
 
-        /**
-         * @deprecated v49 Use {@link #column()} instead
-         */
-        @Deprecated
-        public IntIndex getColumn() {
-            return this.column();
-        }
-
-        /**
-         * @deprecated v49 Use {@link #row()} instead
-         */
-        @Deprecated
-        public IntIndex getRow() {
-            return this.row();
-        }
-
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -331,22 +315,6 @@ public interface Structure2D extends Structure1D {
                 return false;
             }
             return true;
-        }
-
-        /**
-         * @deprecated v49 Use {@link #column()} instead
-         */
-        @Deprecated
-        public LongIndex getColumn() {
-            return this.column();
-        }
-
-        /**
-         * @deprecated v49 Use {@link #row()} instead
-         */
-        @Deprecated
-        public LongIndex getRow() {
-            return this.row();
         }
 
         @Override

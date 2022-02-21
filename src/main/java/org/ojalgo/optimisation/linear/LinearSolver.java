@@ -28,19 +28,23 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.linear.SimplexSolver.Primitive1D;
+import org.ojalgo.optimisation.linear.SimplexSolver.Primitive2D;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.type.IndexSelector;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
@@ -163,8 +167,92 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         @Override
         protected LinearSolver doBuild(final Options options) {
-            // TODO Do it better
-            return this.toStandardForm().build(options);
+
+            int nbInequalites = this.countInequalityConstraints();
+            int nbEqualites = this.countEqualityConstraints();
+            int nbVariables = this.countVariables();
+
+            IndexSelector ineqSign = new IndexSelector(nbInequalites);
+
+            if (nbInequalites > 0) {
+
+                MatrixStore<Double> mtrxBI = this.getBI();
+
+                for (int i = 0; i < nbInequalites; i++) {
+                    double valRHS = mtrxBI.doubleValue(i);
+                    if (valRHS < ZERO) {
+                        ineqSign.exclude(i);
+                    } else {
+                        ineqSign.include(i);
+                    }
+                }
+            }
+
+            int nbIdentitySlackVariables = ineqSign.countIncluded();
+            int nbSlackVariables = ineqSign.countExcluded();
+            int nbProblemVariables = nbVariables;
+            int nbConstraints = nbEqualites + nbInequalites;
+            boolean needDual = true;
+
+            SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
+            Primitive2D constraintsBody = tableau.constraintsBody();
+            Primitive1D constraintsRHS = tableau.constraintsRHS();
+            Primitive1D objective = tableau.objective();
+
+            if (nbInequalites > 0) {
+
+                int insIdSlack = 0;
+                int insGnSlack = 0;
+
+                for (int i = 0; i < nbInequalites; i++) {
+
+                    SparseArray<Double> body = this.getAI(i);
+                    double valRHS = this.getBI(i);
+                    boolean positive = ineqSign.isIncluded(i);
+
+                    int row = positive ? insIdSlack : nbIdentitySlackVariables + insGnSlack;
+                    int col = positive ? nbProblemVariables + nbSlackVariables + insIdSlack++ : nbProblemVariables + insGnSlack++;
+
+                    for (NonzeroView<Double> nz : body.nonzeros()) {
+                        constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
+                    }
+
+                    constraintsBody.set(row, col, positive ? ONE : NEG);
+
+                    constraintsRHS.set(row, positive ? valRHS : -valRHS);
+                }
+            }
+
+            if (nbEqualites > 0) {
+
+                MatrixStore<Double> mtrxAE = this.getAE();
+                MatrixStore<Double> mtrxBE = this.getBE();
+
+                for (int i = 0; i < nbEqualites; i++) {
+
+                    double valRHS = mtrxBE.doubleValue(i);
+                    boolean positive = valRHS >= ZERO;
+
+                    int row = nbInequalites + i;
+
+                    for (int j = 0; j < nbVariables; j++) {
+                        double value = mtrxAE.doubleValue(i, j);
+                        if (Math.abs(value) > MACHINE_EPSILON) {
+                            constraintsBody.set(row, j, positive ? value : -value);
+                        }
+                    }
+
+                    constraintsRHS.set(row, positive ? valRHS : -valRHS);
+                }
+            }
+
+            MatrixStore<Double> mtrxC = this.getC();
+
+            for (int i = 0; i < nbVariables; i++) {
+                objective.set(i, mtrxC.doubleValue(i));
+            }
+
+            return new PrimalSimplex(tableau, options);
         }
 
     }
@@ -281,7 +369,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      * </ul>
      * <p>
      * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements
-     * in [BE]). Don't think that's an LP standard form requirement, but it is required here.
+     * in [BE]). Don't think that's an actual LP standard form requirement, but it is required here.
      * </p>
      * <p>
      * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
@@ -359,29 +447,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         int primSize = PrimalSimplex.size(convex);
         boolean dual = dualSize <= primSize;
 
-        Optimisation.Result result = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
+        Optimisation.Result retVal = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
 
-        if (options.validate) {
-
-            Optimisation.Result altResult = dual ? PrimalSimplex.doSolve(convex, options, zeroC) : DualSimplex.doSolve(convex, options, zeroC);
-
-            if (result.getMultipliers().isPresent()
-                    && !Access1D.equals(result.getMultipliers().get(), altResult.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
-
-                Optimisation.Result primRes = dual ? altResult : result;
-                Optimisation.Result dualRes = dual ? result : altResult;
-
-                BasicLogger.error();
-                BasicLogger.error("Prim sol: {}", primRes);
-                BasicLogger.error("Dual sol: {}", dualRes);
-
-                BasicLogger.error("Prim mul: {}", primRes.getMultipliers().get());
-                BasicLogger.error("Dual mul: {}", dualRes.getMultipliers().get());
-                BasicLogger.error();
-            }
-        }
-
-        return result;
+        return retVal;
     }
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {

@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -36,7 +37,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -104,7 +104,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class ExpressionsBasedModel extends AbstractModel {
 
     public enum FileFormat {
-        MPS;
+        EBM, MPS;
     }
 
     /**
@@ -605,27 +605,37 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     /**
-     * Currently only supports the MPS file format, but with some of the various extensions. In particular it
-     * is possible to parse QP models using QUADOBJ or QMATRIX file sections.
+     * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some of
+     * the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX file
+     * sections.
      */
     public static ExpressionsBasedModel parse(final File file) {
 
         String lowerCasePath = file.getPath().toLowerCase();
 
-        if (!lowerCasePath.endsWith("mps") && !lowerCasePath.endsWith("sif")) {
-            throw new IllegalArgumentException();
-        }
         try (FileInputStream input = new FileInputStream(file)) {
-            return ExpressionsBasedModel.parse(input, FileFormat.MPS);
+
+            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
+                return ExpressionsBasedModel.parse(input, FileFormat.MPS);
+            }
+
+            if (lowerCasePath.endsWith("ebm")) {
+                return ExpressionsBasedModel.parse(input, FileFormat.EBM);
+            }
+
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
+
+        throw new IllegalArgumentException();
     }
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
         switch (format) {
         case MPS:
             return MathProgSysModel.parse(input).getExpressionsBasedModel();
+        case EBM:
+            return FileFormatEBM.read(input);
         default:
             throw new IllegalArgumentException();
         }
@@ -838,7 +848,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     /**
-     * @return A stream of variables that are constraints and not fixed
+     * @return A prefiltered stream of variables that are constraints and not fixed
      */
     public Stream<Variable> bounds() {
         return this.variables().filter(v -> v.isConstraint() && !v.isFixed());
@@ -977,7 +987,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         final Array1D<BigDecimal> retSolution = Array1D.BIG.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
-        boolean shouldCheckGradient = false;
 
         for (int i = 0; i < numberOfVariables; i++) {
             final Variable tmpVariable = myVariables.get(i);
@@ -990,7 +999,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 retSolution.set(i, tmpVariable.getLowerLimit());
             } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
                 retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
-                shouldCheckGradient = true;
             } else if (tmpVariable.isLowerLimitSet()) {
                 retSolution.set(i, tmpVariable.getLowerLimit());
             } else if (tmpVariable.isUpperLimitSet()) {
@@ -999,29 +1007,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 retSolution.set(i, ZERO);
                 allVarsSomeInfo = false; // This var no info
             }
-        }
-
-        if (shouldCheckGradient && this.isAnyObjectiveQuadratic()) {
-
-            MatrixStore<Double> gradient = this.objective().getAdjustedGradient(retSolution);
-
-            double grad = 0.0;
-            for (int i = 0; i < numberOfVariables; i++) {
-                final Variable tmpVariable = myVariables.get(i);
-
-                if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    grad = gradient.doubleValue(i);
-                    if (this.isMinimisation()) {
-                        grad = -grad;
-                    }
-                    if (grad < 0.0) {
-                        retSolution.set(i, tmpVariable.getLowerLimit());
-                    } else {
-                        retSolution.set(i, tmpVariable.getUpperLimit());
-                    }
-                }
-            }
-
         }
 
         if (allVarsSomeInfo) {
@@ -1201,7 +1186,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     /**
-     * This is generated on demend – you should not cache this. More specifically, modifications made to this
+     * This is generated on demand – you should not cache this. More specifically, modifications made to this
      * expression will not be part of the optimisation model. You define the objective by setting the
      * {@link Variable#weight(Comparable)}/{@link Expression#weight(Comparable)} on one or more variables
      * and/or expressions.
@@ -1424,6 +1409,20 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     public Stream<Variable> variables() {
         return myVariables.stream().filter(v -> !v.isEqualityConstraint());
+    }
+
+    /**
+     * Save this instance to file. The file format is {@link FileFormat#EBM} and the file name is therefore
+     * recommended to end with ".ebm".
+     *
+     * @param file The path/name of the file to write.
+     */
+    public void writeTo(final File file) {
+        try (FileOutputStream output = new FileOutputStream(file)) {
+            FileFormatEBM.write(this, output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
     }
 
     /**

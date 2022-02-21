@@ -87,14 +87,6 @@ public abstract class FormatContext<T> implements TypeContext<T> {
     }
 
     /**
-     * @deprecated v49 Use {@link #withFormat(F)} instead
-     */
-    @Deprecated
-    public final <G> TypeContext<G> newFormat(final Format format) {
-        return this.withFormat(format);
-    }
-
-    /**
      * @see org.ojalgo.type.context.TypeContext#parse(CharSequence)
      */
     @Override

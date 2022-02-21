@@ -33,8 +33,11 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -45,8 +48,114 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class SimplexSolver extends LinearSolver {
 
-    interface AlgorithmStore {
+    static final class IterationPoint {
 
+        private boolean myPhase1 = true;
+
+        int col;
+        int row;
+
+        IterationPoint() {
+            super();
+            this.reset();
+        }
+
+        boolean isPhase1() {
+            return myPhase1;
+        }
+
+        boolean isPhase2() {
+            return !myPhase1;
+        }
+
+        void reset() {
+            row = -1;
+            col = -1;
+        }
+
+        void returnToPhase1() {
+            myPhase1 = true;
+        }
+
+        void switchToPhase2() {
+            myPhase1 = false;
+        }
+
+    }
+
+    static abstract class Primitive1D implements Access1D<Double>, Mutate1D {
+
+        public final long count() {
+            return this.size();
+        }
+
+        public final double doubleValue(final long index) {
+            return this.doubleValue(Math.toIntExact(index));
+        }
+
+        public final Double get(final long index) {
+            return Double.valueOf(this.doubleValue(Math.toIntExact(index)));
+        }
+
+        public final void set(final long index, final Comparable<?> value) {
+            this.set(Math.toIntExact(index), NumberDefinition.doubleValue(value));
+        }
+
+        public final void set(final long index, final double value) {
+            this.set(Math.toIntExact(index), value);
+        }
+
+        public abstract int size();
+
+        @Override
+        public final String toString() {
+            return Access1D.toString(this);
+        }
+
+        abstract double doubleValue(final int index);
+
+        abstract void set(final int index, final double value);
+
+    }
+
+    static abstract class Primitive2D implements Access2D<Double>, Mutate2D {
+
+        public final long countColumns() {
+            return this.getColDim();
+        }
+
+        public final long countRows() {
+            return this.getRowDim();
+        }
+
+        public final double doubleValue(final long row, final long col) {
+            return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
+        }
+
+        public final Double get(final long row, final long col) {
+            return Double.valueOf(this.doubleValue(Math.toIntExact(row), Math.toIntExact(col)));
+        }
+
+        public abstract int getColDim();
+
+        public abstract int getRowDim();
+
+        public final void set(final long row, final long col, final Comparable<?> value) {
+            this.set(Math.toIntExact(row), Math.toIntExact(col), NumberDefinition.doubleValue(value));
+        }
+
+        public final void set(final long row, final long col, final double value) {
+            this.set(Math.toIntExact(row), Math.toIntExact(col), value);
+        }
+
+        @Override
+        public final String toString() {
+            return Access2D.toString(this);
+        }
+
+        abstract double doubleValue(final int row, final int col);
+
+        abstract void set(final int row, final int col, final double value);
     }
 
     private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
@@ -56,7 +165,7 @@ public abstract class SimplexSolver extends LinearSolver {
     private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
 
     private LongToNumberMap<Double> myFixedVariables = null;
-    private final IterationPoint myPoint;
+    private final SimplexSolver.IterationPoint myPoint;
     private final SimplexTableau myTableau;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
@@ -65,7 +174,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         myTableau = tableau;
 
-        myPoint = new IterationPoint();
+        myPoint = new SimplexSolver.IterationPoint();
 
         if (this.isLogProgress()) {
             this.log("");
@@ -76,7 +185,6 @@ public abstract class SimplexSolver extends LinearSolver {
             this.log("countArtificialVariables: {}", tableau.countArtificialVariables());
             this.log("countVariablesTotally: {}", tableau.countVariablesTotally());
             this.log("countConstraints: {}", tableau.countConstraints());
-            this.log("countBasicArtificials: {}", tableau.countBasicArtificials());
             this.log("countBasisDeficit: {}", tableau.countBasisDeficit());
         }
 
@@ -123,7 +231,49 @@ public abstract class SimplexSolver extends LinearSolver {
             }
         }
 
+        // BasicLogger.debug("Total iters: {}", this.countIterations());
+
         return this.buildResult();
+    }
+
+    /**
+     * https://math.stackexchange.com/questions/3254444/artificial-variables-in-two-phase-simplex-method
+     */
+    private void cleanUpPhase1Artificials() {
+
+        int[] basis = myTableau.getBasis();
+        int[] excluded = myTableau.getExcluded();
+
+        int colRHS = myTableau.countVariablesTotally();
+
+        for (int i = 0; i < basis.length; i++) {
+
+            if (basis[i] < 0) {
+
+                double rhs = myTableau.doubleValue(i, colRHS);
+
+                if (options.validate && !PHASE1.isZero(rhs)) {
+                    this.log("Non-zero RHS artificial variable: {} = {}", i, rhs);
+                }
+
+                int enter = -1;
+                double maxPivot = ZERO;
+                for (int j = 0; j < excluded.length; j++) {
+                    int posEnt = excluded[j];
+                    double pivot = myTableau.doubleValue(i, posEnt);
+                    if (pivot > maxPivot && !PIVOT.isZero(pivot)) {
+                        maxPivot = pivot;
+                        enter = posEnt;
+                    }
+                }
+
+                if (enter >= 0) {
+                    myPoint.row = i;
+                    myPoint.col = enter;
+                    this.performIteration(myPoint);
+                }
+            }
+        }
     }
 
     private int getRowObjective() {
@@ -139,8 +289,12 @@ public abstract class SimplexSolver extends LinearSolver {
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
-    private double objective() {
-        return -myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+    private double infeasibility() {
+        return -myTableau.value(true);
+    }
+
+    private double value() {
+        return -myTableau.value(false);
     }
 
     private int phase() {
@@ -149,12 +303,17 @@ public abstract class SimplexSolver extends LinearSolver {
 
     @Override
     protected Result buildResult() {
-        return super.buildResult().multipliers(this.extractMultipliers());
+        Result result = super.buildResult();
+        if (myTableau.isAbleToExtractDual()) {
+            return result.multipliers(this.extractMultipliers());
+        }
+        return result;
+
     }
 
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
-        return this.objective();
+        return -myTableau.value(false);
     }
 
     protected Access1D<?> extractMultipliers() {
@@ -190,7 +349,7 @@ public abstract class SimplexSolver extends LinearSolver {
     @Override
     protected Access1D<?> extractSolution() {
 
-        int colRHS = myTableau.countConstraints() + myTableau.countVariables();
+        int colRHS = myTableau.countVariablesTotally();
 
         Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.countVariables(), 1);
 
@@ -221,7 +380,8 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             this.log();
-            this.log("Needs Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
+            this.log("Needs Another Iteration? Phase={} Artificials={} Infeasibility={} Objective={}", this.phase(), myTableau.countBasisDeficit(),
+                    this.infeasibility(), this.value());
         }
 
         boolean retVal = false;
@@ -229,16 +389,18 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (myPoint.isPhase1()) {
 
-            double phaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+            if (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials()) {
 
-            if (!myTableau.isBasicArtificials() || PHASE1.isZero(phaseOneValue)) {
+                this.cleanUpPhase1Artificials();
 
                 if (this.isLogDebug()) {
                     this.log();
-                    this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasicArtificials(),
-                            phaseOneValue);
+                    this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
+                            this.infeasibility());
                     this.log();
                 }
+
+                // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
 
                 myPoint.switchToPhase2();
                 this.setState(Optimisation.State.FEASIBLE);
@@ -298,15 +460,16 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotCol() {
 
-        int rowObjective = this.getRowObjective();
-        int[] excluded = myTableau.getExcluded();
+        int row = this.getRowObjective();
 
-        boolean phase1 = myPoint.isPhase1();
         boolean phase2 = myPoint.isPhase2();
+
+        int nbVariables = myTableau.countVariables();
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(rowObjective);
+                int[] excluded = myTableau.getExcluded();
+                Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(row);
                 double[] exclVals = new double[excluded.length];
                 for (int i = 0; i < exclVals.length; i++) {
                     exclVals[i] = sliceTableauRow.doubleValue(excluded[i]);
@@ -319,18 +482,19 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int retVal = -1;
 
-        int tmpCol;
         double tmpVal;
         double minVal = phase2 ? -GenericSolver.ACCURACY.epsilon() : ZERO;
 
-        for (int e = 0; e < excluded.length; e++) {
-            tmpCol = excluded[e];
-            tmpVal = myTableau.doubleValue(rowObjective, tmpCol);
-            if (tmpVal < minVal && (retVal < 0 || WEIGHT.isDifferent(minVal, tmpVal))) {
-                retVal = tmpCol;
-                minVal = tmpVal;
-                if (this.isLogDebug()) {
-                    this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
+        // for (int e = 0; e < excluded.length; e++) {
+        for (int j = 0; j < nbVariables; j++) {
+            if (myTableau.isExcluded(j)) {
+                tmpVal = myTableau.doubleValue(row, j);
+                if (tmpVal < minVal && (retVal < 0 || WEIGHT.isDifferent(minVal, tmpVal))) {
+                    retVal = j;
+                    minVal = tmpVal;
+                    if (this.isLogDebug()) {
+                        this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", j, tmpVal);
+                    }
                 }
             }
         }
@@ -340,7 +504,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        int numerCol = myTableau.countConstraints() + myTableau.countVariables();
+        int numerCol = myTableau.countVariablesTotally();
         int denomCol = myPoint.col;
 
         boolean phase1 = myPoint.isPhase1();
@@ -348,8 +512,8 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                Access1D<Double> numerators = myTableau.sliceTableauColumn(numerCol);
-                Access1D<Double> denominators = myTableau.sliceTableauColumn(denomCol);
+                Access1D<Double> numerators = myTableau.sliceBodyColumn(numerCol);
+                Access1D<Double> denominators = myTableau.sliceBodyColumn(denomCol);
                 Array1D<Double> ratios = Array1D.PRIMITIVE64.copy(numerators);
                 ratios.modifyMatching(DIVIDE, denominators);
                 this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", numerators, denominators,
@@ -366,7 +530,7 @@ public abstract class SimplexSolver extends LinearSolver {
         for (int i = 0; i < constraintsCount; i++) {
 
             // Numerator/RHS: Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
-            numer = ABS.invoke(myTableau.doubleValue(i, numerCol));
+            numer = Math.abs(myTableau.doubleValue(i, numerCol));
 
             // Denominator/Pivot
             denom = myTableau.doubleValue(i, denomCol);
@@ -402,10 +566,10 @@ public abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    void performIteration(final IterationPoint pivot) {
+    void performIteration(final SimplexSolver.IterationPoint pivot) {
 
         double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
-        int tmpColRHS = myTableau.countConstraints() + myTableau.countVariables();
+        int tmpColRHS = myTableau.countVariablesTotally();
         double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
 
         myTableau.pivot(pivot);
@@ -418,7 +582,7 @@ public abstract class SimplexSolver extends LinearSolver {
         if (options.validate) {
 
             // Right-most column of the tableau
-            Array1D<Double> colRHS = myTableau.sliceConstraintsRHS();
+            Access1D<Double> colRHS = myTableau.sliceConstraintsRHS();
 
             double tmpRHS;
             double minRHS = Double.MAX_VALUE;
@@ -428,6 +592,7 @@ public abstract class SimplexSolver extends LinearSolver {
                     minRHS = tmpRHS;
                     if (minRHS < ZERO) {
                         this.log("Negative RHS {} @ Row: {}", minRHS, i);
+                        this.log();
                     }
                 }
             }

@@ -226,7 +226,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return Math.abs(value) <= tolerance;
+        return value == 0D || Math.abs(value) <= tolerance;
     }
 
     private final double myEpsilon;

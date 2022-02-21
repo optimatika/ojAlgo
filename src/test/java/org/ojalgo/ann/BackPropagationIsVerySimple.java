@@ -45,7 +45,7 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     @Override
     protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
 
-        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 3).layer(3, RECTIFIER).layer(3, SIGMOID).layer(3, SOFTMAX).get();
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 3).layer(3, RELU).layer(3, SIGMOID).layer(3, SOFTMAX).get();
 
         NetworkTrainer trainer = network.newTrainer();
 

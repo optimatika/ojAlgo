@@ -54,7 +54,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class BasicMatrixTest extends MatrixTests {
 
-    protected static final NumberContext ACCURACY = NumberContext.of(7, 5);
+    protected static final NumberContext ACCURACY = NumberContext.of(6, 4);
 
     public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
         RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
@@ -989,22 +989,22 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         RationalMatrix.DenseReceiver rBuilder = rAA.copy();
         rBuilder.set(tmpRow, tmpCol, scalar);
-        BasicMatrix<?, ?> expected = rBuilder.build();
+        BasicMatrix<?, ?> expected = rBuilder.get();
         BasicMatrix<?, ?> actual;
 
         ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
         cBuilder.set(tmpRow, tmpCol, scalar);
-        actual = cBuilder.build();
+        actual = cBuilder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
         p64Builder.set(tmpRow, tmpCol, scalar);
-        actual = p64Builder.build();
+        actual = p64Builder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
         Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
         p32Builder.set(tmpRow, tmpCol, scalar);
-        actual = p32Builder.build();
+        actual = p32Builder.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 

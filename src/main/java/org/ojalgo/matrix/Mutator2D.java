@@ -81,14 +81,6 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.add(row, col, value);
     }
 
-    /**
-     * @deprecated v49 Just use {@link #get()} instead
-     */
-    @Deprecated
-    public M build() {
-        return this.get();
-    }
-
     public long count() {
         return myDelegate.count();
     }

@@ -11,6 +11,34 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [51.0.0] – 2022-02-21
+
+### Added
+
+#### org.ojalgo.data
+
+- ojAlgo-finance is no longer maintained as a separate repository. Most of its contents have been moved here:
+
+- ojAlgo-finance:org.ojalgo.finance -> org.ojalgo.data.domain.finance
+- ojAlgo-finance:org.ojalgo.finance.portfolio -> org.ojalgo.data.domain.finance.portfolio
+- ojAlgo-finance:org.ojalgo.finance.portfolio.simulator -> org.ojalgo.data.domain.finance.portfolio.simulator
+- ojAlgo-finance:org.ojalgo.finance.data -> org.ojalgo.data.domain.finance.
+- ojAlgo-finance:org.ojalgo.finance.data.fetcher -> org.ojalgo.data.domain.finance.
+- ojAlgo-finance:org.ojalgo.finance.data.parser -> org.ojalgo.data.domain.finance.
+- ojAlgo-finance:org.ojalgo.finance.scalar -> org.ojalgo.scalar
+- ojAlgo-finance:org.ojalgo.finance.business -> *not moved, wont be maintained*
+
+#### org.ojalgo.optimisation
+
+- Now possible to save and reload optimisation models from files - new `ExpressionsBasedModel` specific file format.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Cleanup and refactoring of `LinearSolver` and related classes.
+- Improved numerical stability of `ConvexSolver`.
+
 ## [50.0.2] – 2022-01-26
 
 ### Changed

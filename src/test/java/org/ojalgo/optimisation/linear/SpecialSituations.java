@@ -27,7 +27,6 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
-import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 /**
@@ -59,13 +58,13 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = SimplexTableau.newDense(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder);
         SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexTableau.IterationPoint pivot = new SimplexTableau.IterationPoint();
+        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 1;
@@ -126,12 +125,12 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = SimplexTableau.newDense(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder);
         SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexTableau.IterationPoint pivot = new SimplexTableau.IterationPoint();
+        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 0;
@@ -166,12 +165,12 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        DenseTableau dense = SimplexTableau.newDense(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder);
         SparseTableau sparse = SimplexTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexTableau.IterationPoint pivot = new SimplexTableau.IterationPoint();
+        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 0;

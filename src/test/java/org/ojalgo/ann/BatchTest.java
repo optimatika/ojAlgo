@@ -40,7 +40,7 @@ public class BatchTest extends ANNTest {
     private static final int NB_OUTPUTS = 2;
 
     static ArtificialNeuralNetwork generate() {
-        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, NB_INPUTS).layer(3, Activator.RECTIFIER).layer(5, Activator.SIGMOID)
+        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, NB_INPUTS).layer(3, Activator.RELU).layer(5, Activator.SIGMOID)
                 .layer(NB_OUTPUTS, Activator.SOFTMAX).get();
     }
 
