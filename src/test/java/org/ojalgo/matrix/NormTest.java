@@ -31,12 +31,12 @@ import org.ojalgo.scalar.Quaternion;
 
 public class NormTest extends MatrixTests {
 
+    private static final Random RANDOM = new Random();
+
     @Test
     public void testCompareComplexNumber() {
 
-        Random rnd = new Random();
-
-        final ComplexNumber cmplx = ComplexNumber.of(rnd.nextDouble(), rnd.nextDouble());
+        final ComplexNumber cmplx = ComplexNumber.of(RANDOM.nextDouble(), RANDOM.nextDouble());
 
         final double expected = cmplx.norm();
 
@@ -53,9 +53,7 @@ public class NormTest extends MatrixTests {
     @Test
     public void testCompareQuaternion() {
 
-        Random rnd = new Random();
-
-        final Quaternion quat = Quaternion.of(rnd.nextDouble(), rnd.nextDouble(), rnd.nextDouble(), rnd.nextDouble());
+        final Quaternion quat = Quaternion.of(RANDOM.nextDouble(), RANDOM.nextDouble(), RANDOM.nextDouble(), RANDOM.nextDouble());
 
         final double expected = quat.norm();
 

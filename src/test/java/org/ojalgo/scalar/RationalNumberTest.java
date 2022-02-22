@@ -32,6 +32,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 
 public class RationalNumberTest extends ScalarTests {
 
+    private static final Random RANDOM = new Random();
+
     private static RationalNumber rational2(final double d) {
         final boolean negative = d < 0;
         double g = Math.abs(d);
@@ -178,9 +180,8 @@ public class RationalNumberTest extends ScalarTests {
 
     @Test
     public void testRationals() {
-        Random r = new Random();
         for (int i = 0; i < 100; i++) {
-            double d = r.nextGaussian();
+            double d = RANDOM.nextGaussian();
             TestUtils.assertEquals("Failing for " + d, RationalNumberTest.rational2(d), RationalNumber.rational(d));
         }
     }

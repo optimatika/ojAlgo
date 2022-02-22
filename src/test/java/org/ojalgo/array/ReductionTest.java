@@ -31,6 +31,8 @@ import org.ojalgo.structure.StructureAnyD;
 
 public class ReductionTest {
 
+    private static final Random RANDOM = new Random();
+
     public ReductionTest() {
         super();
     }
@@ -105,11 +107,9 @@ public class ReductionTest {
     @Test
     public void testDifferentPaths() {
 
-        final Random rnd = new Random();
-
         final long[] structure = new long[5];
         for (int d = 0; d < structure.length; d++) {
-            structure[d] = 1 + rnd.nextInt(9);
+            structure[d] = 1 + RANDOM.nextInt(9);
         }
 
         final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);

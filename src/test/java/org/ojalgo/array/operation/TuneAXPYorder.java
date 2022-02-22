@@ -35,6 +35,8 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Benchmark)
 public class TuneAXPYorder {
 
+    private static final Random RANDOM = new Random();
+
     public static void invokeBIS(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
@@ -127,14 +129,12 @@ public class TuneAXPYorder {
     @Setup
     public void setup() {
 
-        final Random tmpRandom = new Random();
-
         mat = new double[dim * dim];
         for (int i = 0; i < mat.length; i++) {
-            mat[i] = tmpRandom.nextDouble();
+            mat[i] = RANDOM.nextDouble();
         }
 
-        a = tmpRandom.nextDouble();
+        a = RANDOM.nextDouble();
 
         row = Uniform.randomInteger(dim);
         col = Uniform.randomInteger(dim);

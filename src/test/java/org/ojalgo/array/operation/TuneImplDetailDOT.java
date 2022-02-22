@@ -39,6 +39,8 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Benchmark)
 public class TuneImplDetailDOT {
 
+    private static final Random RANDOM = new Random();
+
     public static void main(final String[] args) throws RunnerException {
         BenchmarkUtils.run(TuneImplDetailDOT.class);
     }
@@ -112,17 +114,15 @@ public class TuneImplDetailDOT {
     @Setup
     public void setup() {
 
-        Random rnd = new Random();
+        a0 = RANDOM.nextDouble();
+        a1 = RANDOM.nextDouble();
+        a2 = RANDOM.nextDouble();
+        a3 = RANDOM.nextDouble();
 
-        a0 = rnd.nextDouble();
-        a1 = rnd.nextDouble();
-        a2 = rnd.nextDouble();
-        a3 = rnd.nextDouble();
-
-        b0 = rnd.nextDouble();
-        b1 = rnd.nextDouble();
-        b2 = rnd.nextDouble();
-        b3 = rnd.nextDouble();
+        b0 = RANDOM.nextDouble();
+        b1 = RANDOM.nextDouble();
+        b2 = RANDOM.nextDouble();
+        b3 = RANDOM.nextDouble();
 
         aa = new double[] { a0, a1, a2, a3 };
         bb = new double[] { b0, b1, b2, b3 };
