@@ -81,14 +81,6 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         return Access2D.equals(matrix.rows(tmpPivotOrder), tmpL.multiply(tmpU), context);
     }
 
-    /**
-     * @deprecated v48 Use {@link #decomposeWithoutPivoting(Access2D.Collectable)} instead.
-     */
-    @Deprecated
-    default boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
-        return this.decomposeWithoutPivoting(matrix) && this.isSolvable();
-    }
-
     MatrixStore<N> getL();
 
     /**

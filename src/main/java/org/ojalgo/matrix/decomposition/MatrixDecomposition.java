@@ -136,19 +136,6 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *
          * @param matrix A matrix to check and then (maybe) decompose
          * @return true if the hermitian check passed and decomposition suceeded; false if not
-         * @deprecated v48 Use {@link #checkAndDecompose(MatrixStore<N>)} instead
-         */
-        @Deprecated
-        default boolean checkAndCompute(final MatrixStore<N> matrix) {
-            return this.checkAndDecompose(matrix);
-        }
-
-        /**
-         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
-         * paths can be chosen - compute or not / choose different algorithms...
-         *
-         * @param matrix A matrix to check and then (maybe) decompose
-         * @return true if the hermitian check passed and decomposition suceeded; false if not
          */
         default boolean checkAndDecompose(final MatrixStore<N> matrix) {
 
