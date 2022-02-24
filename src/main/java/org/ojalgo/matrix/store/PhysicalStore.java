@@ -52,7 +52,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.IndexOf {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>>
             extends Factory2D.Dense<I>, Factory2D.MayBeSparse<I, PhysicalStore<N>, SparseStore<N>> {

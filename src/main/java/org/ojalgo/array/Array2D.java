@@ -49,8 +49,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public final class Array2D<N extends Comparable<N>>
-        implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
+public final class Array2D<N extends Comparable<N>> implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.IndexOf,
         Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
     public static final class Factory<N extends Comparable<N>>
@@ -594,44 +593,6 @@ public final class Array2D<N extends Comparable<N>>
         final long tmpStep = 1L + myRowsCount;
 
         return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep) / myRowsCount;
-    }
-
-    @Override
-    public boolean isAbsolute(final long index) {
-        return myDelegate.isAbsolute(index);
-    }
-
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public boolean isAbsolute(final long row, final long col) {
-        return myDelegate.isAbsolute(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public boolean isAllSmall(final double comparedTo) {
-        return myDelegate.isSmall(0L, this.count(), 1L, comparedTo);
-    }
-
-    @Override
-    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, comparedTo);
-    }
-
-    @Override
-    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return myDelegate.isSmall(index, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), comparedTo);
     }
 
     @Override

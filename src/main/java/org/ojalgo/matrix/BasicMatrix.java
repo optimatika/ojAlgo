@@ -63,10 +63,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements Matrix2D<N, M>, Access2D.Elements,
-        Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>, Provider2D.Inverse<M>,
-        Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>, Provider2D.Determinant<N>,
-        Provider2D.Solution<M>, Provider2D.Eigenpairs, Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
+        implements Matrix2D<N, M>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, TransformableRegion<N>>,
+        Provider2D.Inverse<M>, Provider2D.Condition, Provider2D.Rank, Provider2D.Symmetric, Provider2D.Hermitian, Provider2D.Trace<N>,
+        Provider2D.Determinant<N>, Provider2D.Solution<M>, Provider2D.Eigenpairs, Structure2D.Logical<Access2D<N>, M>, Operate2D<N, M> {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
@@ -416,10 +416,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     public boolean isSmall(final double comparedTo) {
         return this.store().isSmall(comparedTo);
-    }
-
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return this.store().isSmall(row, col, comparedTo);
     }
 
     public boolean isSymmetric() {

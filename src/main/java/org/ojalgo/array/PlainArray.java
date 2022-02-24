@@ -126,22 +126,6 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
         return this.get((int) index);
     }
 
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public final boolean isAbsolute(final long index) {
-        return this.isAbsolute(Math.toIntExact(index));
-    }
-
-    /**
-     * @see Scalar#isSmall(double)
-     */
-    @Override
-    public final boolean isSmall(final long index, final double comparedTo) {
-        return this.isSmall(Math.toIntExact(index), comparedTo);
-    }
-
     @Override
     public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
         this.modifyOne(Math.toIntExact(index), modifier);
@@ -242,11 +226,6 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
      * @see Scalar#isSmall(double)
      */
     protected abstract boolean isSmall(int index, double comparedTo);
-
-    @Override
-    protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-        return this.isSmall(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), comparedTo);
-    }
 
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
 

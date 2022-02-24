@@ -47,8 +47,8 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
+public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>,
+        Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
 
     public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -248,8 +248,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     protected long indexOfLargest(final long first, final long limit, final long step) {
         return AMAX.invoke(this, first, limit, step);
     }
-
-    protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);
 
     protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
 

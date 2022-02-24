@@ -833,22 +833,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         return myUtility.indexOfLargestOnDiagonal(first);
     }
 
-    public boolean isAbsolute(final long row, final long col) {
-        return myUtility.isAbsolute(row, col);
-    }
-
-    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isColumnSmall(row, col, comparedTo);
-    }
-
-    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isRowSmall(row, col, comparedTo);
-    }
-
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isSmall(row, col, comparedTo);
-    }
-
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
 

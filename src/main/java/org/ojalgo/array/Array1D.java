@@ -52,9 +52,8 @@ import org.ojalgo.tensor.TensorFactory1D;
  *
  * @author apete
  */
-public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
-        implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf,
-        Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+public final class Array1D<N extends Comparable<N>> extends AbstractList<N> implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>,
+        Access1D.IndexOf, Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Comparable<N>>
             implements Factory1D.Dense<Array1D<N>>, Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
@@ -432,30 +431,9 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N>
         return (myDelegate.indexOfLargest(this.convert(first), this.convert(limit), myStep) - myFirst) / myStep;
     }
 
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public boolean isAbsolute(final long index) {
-        return myDelegate.isAbsolute(this.convert(index));
-    }
-
-    @Override
-    public boolean isAllSmall(final double comparedTo) {
-        return myDelegate.isSmall(myFirst, myLimit, myStep, comparedTo);
-    }
-
     @Override
     public boolean isEmpty() {
         return length == 0;
-    }
-
-    /**
-     * @see Scalar#isSmall(double)
-     */
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return myDelegate.isSmall(this.convert(index), comparedTo);
     }
 
     @Override

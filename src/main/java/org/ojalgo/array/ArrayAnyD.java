@@ -51,8 +51,8 @@ import org.ojalgo.tensor.TensorFactoryAnyD;
  * @author apete
  */
 public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>,
-        AccessAnyD.Elements, AccessAnyD.IndexOf, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>,
-        AccessAnyD.Collectable<N, MutateAnyD>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
+        AccessAnyD.IndexOf, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Collectable<N, MutateAnyD>,
+        MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
 
     public static final class Factory<N extends Comparable<N>>
             implements FactoryAnyD.Dense<ArrayAnyD<N>>, FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
@@ -342,29 +342,6 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public long indexOfLargestInRange(final long first, final long limit) {
         return myDelegate.indexOfLargestInRange(first, limit);
-    }
-
-    @Override
-    public boolean isAbsolute(final long index) {
-        return myDelegate.isAbsolute(index);
-    }
-
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public boolean isAbsolute(final long[] reference) {
-        return myDelegate.isAbsolute(StructureAnyD.index(myStructure, reference));
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return myDelegate.isSmall(index, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long[] reference, final double comparedTo) {
-        return myDelegate.isSmall(StructureAnyD.index(myStructure, reference), comparedTo);
     }
 
     @Override

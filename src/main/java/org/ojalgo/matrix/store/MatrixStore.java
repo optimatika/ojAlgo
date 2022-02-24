@@ -62,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
+        Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
 
     default MatrixStore<N> above(final Access2D<N>... matrices) {
         MatrixStore<N> above = AbstractStore.buildRow(this.physical(), this.countColumns(), matrices);

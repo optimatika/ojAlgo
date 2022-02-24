@@ -71,41 +71,6 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
-    /**
-     * @deprecated v48 Will be removed
-     */
-    @Deprecated
-    public interface Elements extends Structure1D {
-
-        /**
-         * @see Scalar#isAbsolute()
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        boolean isAbsolute(long index);
-
-        /**
-         * @see Scalar#isSmall(double)
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default boolean isAllSmall(final double comparedTo) {
-            boolean retVal = true;
-            for (long i = 0L, limit = this.count(); retVal && i < limit; i++) {
-                retVal &= this.isSmall(i, comparedTo);
-            }
-            return retVal;
-        }
-
-        /**
-         * @see Scalar#isSmall(double)
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        boolean isSmall(long index, double comparedTo);
-
-    }
-
     public static final class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
 
         private long myCursor;

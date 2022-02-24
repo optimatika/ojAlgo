@@ -624,24 +624,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.intValue(row, col);
     }
 
-    public boolean isAbsolute(final long row, final long col) {
-        return myUtility.isAbsolute(row, col);
-    }
-
     public boolean isAcceptable(final Structure2D supplier) {
         return myUtility.isAcceptable(supplier);
-    }
-
-    public boolean isAllSmall(final double comparedTo) {
-        return myUtility.isAllSmall(comparedTo);
-    }
-
-    public boolean isColumnSmall(final long col, final double comparedTo) {
-        return myUtility.isColumnSmall(col, comparedTo);
-    }
-
-    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isColumnSmall(row, col, comparedTo);
     }
 
     public boolean isEmpty() {
@@ -652,20 +636,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.isFat();
     }
 
-    public boolean isRowSmall(final long row, final double comparedTo) {
-        return myUtility.isRowSmall(row, comparedTo);
-    }
-
-    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isRowSmall(row, col, comparedTo);
-    }
-
     public boolean isScalar() {
         return myUtility.isScalar();
-    }
-
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isSmall(row, col, comparedTo);
     }
 
     public boolean isSquare() {
