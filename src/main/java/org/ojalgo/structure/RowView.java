@@ -119,14 +119,6 @@ public class RowView<N extends Comparable<N>>
         return StreamSupport.stream(this, false);
     }
 
-    /**
-     * @deprecated v48 Use {@link #stream()} instead
-     */
-    @Deprecated
-    public Stream<RowView<N>> stream(final boolean parallel) {
-        return this.stream();
-    }
-
     @Override
     public final String toString() {
         return Access1D.toString(this);

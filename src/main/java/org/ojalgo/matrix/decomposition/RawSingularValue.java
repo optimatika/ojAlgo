@@ -118,7 +118,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getD() {
-        return this.makeDiagonal(this.getSingularValues()).get();
+        return RawDecomposition.makeDiagonal(this.getSingularValues()).get();
     }
 
     public double getFrobeniusNorm() {
@@ -190,11 +190,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getU() {
-        return myTransposed ? new RawStore(myVt, n, n).transpose() : new RawStore(myUt, n, m).transpose();
+        return myTransposed ? this.wrap(myVt).transpose() : this.wrap(myUt).transpose();
     }
 
     public MatrixStore<Double> getV() {
-        return myTransposed ? new RawStore(myUt, n, m).transpose() : new RawStore(myVt, n, n).transpose();
+        return myTransposed ? this.wrap(myUt).transpose() : this.wrap(myVt).transpose();
     }
 
     @Override
@@ -517,7 +517,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final double[][] tmpQ1t = myTransposed ? myVt : myUt;
             final double[] tmpSingular = s;
 
-            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1t[0].length);
+            final RawStore tmpMtrx = this.newRawStore(tmpSingular.length, tmpQ1t[0].length);
             final double[][] tmpMtrxData = tmpMtrx.data;
 
             final double small = this.getRankThreshold();
