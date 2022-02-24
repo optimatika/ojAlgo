@@ -47,22 +47,22 @@ public interface ModelFileTest {
 
             Result result = model.minimise();
 
-            TestUtils.assertStateNotLessThanOptimal(result);
-
             TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMinVal, result.getValue(), accuracy);
+
+            TestUtils.assertStateNotLessThanOptimal(result);
         }
 
         if (expMaxVal != null) {
 
             Result result = model.maximise();
 
-            TestUtils.assertStateNotLessThanOptimal(result);
-
             TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMaxVal, result.getValue(), accuracy);
+
+            TestUtils.assertStateNotLessThanOptimal(result);
         }
     }
 
@@ -77,7 +77,8 @@ public interface ModelFileTest {
         // model.options.debug(LinearSolver.class);
         // model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
-        // model.options.mip_defer = 0.0;
+        // model.options.mip_defer = 0.6;
+        // model.options.mip_gap = 1.0E-4;
 
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;

@@ -264,6 +264,47 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
     }
 
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/415
+     */
+    @Test
+    public void testSimpleInfeasibleSimplification() {
+
+        //
+
+        ExpressionsBasedModel original1 = new ExpressionsBasedModel();
+
+        Variable x1 = original1.addVariable("x").weight(1.0);
+
+        Expression c01 = original1.addExpression("c0").upper(1);
+        c01.set(x1, 1);
+
+        Expression c11 = original1.addExpression("c1").lower(2);
+        c11.set(x1, 1);
+
+        ExpressionsBasedModel simplified1 = original1.simplify();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified1.minimise().getState());
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified1.maximise().getState());
+
+        //
+
+        ExpressionsBasedModel original2 = new ExpressionsBasedModel();
+
+        Variable x2 = original2.addVariable("x").weight(1.0);
+
+        Expression c02 = original2.addExpression("c0").level(1);
+        c02.set(x2, 1);
+
+        Expression c12 = original2.addExpression("c1").level(2);
+        c12.set(x2, 1);
+
+        ExpressionsBasedModel simplified2 = original2.simplify();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified2.minimise().getState());
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified2.maximise().getState());
+    }
+
     @Test
     public void testSimplyLowerAndUpperBounds() {
 
