@@ -104,7 +104,28 @@ import org.ojalgo.type.context.NumberContext;
 public final class ExpressionsBasedModel extends AbstractModel {
 
     public enum FileFormat {
+
         EBM, MPS;
+
+        /**
+         * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
+         * of the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX
+         * file sections.
+         */
+        public static FileFormat from(final File file) {
+
+            String lowerCasePath = file.getPath().toLowerCase();
+
+            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
+                return FileFormat.MPS;
+            }
+
+            if (lowerCasePath.endsWith("ebm")) {
+                return FileFormat.EBM;
+            }
+
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -611,23 +632,13 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     public static ExpressionsBasedModel parse(final File file) {
 
-        String lowerCasePath = file.getPath().toLowerCase();
+        FileFormat fileFormat = FileFormat.from(file);
 
         try (FileInputStream input = new FileInputStream(file)) {
-
-            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
-                return ExpressionsBasedModel.parse(input, FileFormat.MPS);
-            }
-
-            if (lowerCasePath.endsWith("ebm")) {
-                return ExpressionsBasedModel.parse(input, FileFormat.EBM);
-            }
-
+            return ExpressionsBasedModel.parse(input, fileFormat);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
-
-        throw new IllegalArgumentException();
     }
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
@@ -715,14 +726,14 @@ public final class ExpressionsBasedModel extends AbstractModel {
         for (Expression tmpExpr : modelToCopy.getExpressions()) {
             if (shallow) {
                 if (prune) {
-                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
                         myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
                     }
                 } else {
                     myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
                 }
             } else if (prune) {
-                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
                     myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true).compensate(fixedVariables));
                 }
             } else {

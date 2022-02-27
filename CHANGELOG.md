@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Calling `model.simplify()` no longer discards constraints flagged both redundant and infeasible – info about the model being infeasible is no longer lost.
+
 ## [51.0.0] – 2022-02-21
 
 ### Added
