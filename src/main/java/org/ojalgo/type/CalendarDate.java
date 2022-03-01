@@ -453,41 +453,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return OffsetDateTime.of(this.toLocalDateTime(offset), offset);
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public Date toSqlDate() {
-        final LocalDate tmpDateOnly = this.toLocalDate(ZoneOffset.UTC);
-        final int tmpYear = tmpDateOnly.getYear() - 1900;
-        final int tmpMonth = tmpDateOnly.getMonthValue() - 1;
-        final int tmpDayOfMonth = tmpDateOnly.getDayOfMonth();
-        return new Date(tmpYear, tmpMonth, tmpDayOfMonth);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public Date toSqlTime() {
-        final LocalTime tmpTimeOnly = this.toLocalTime(ZoneOffset.UTC);
-        final int tmpYear = 0;
-        final int tmpMonth = 0;
-        final int tmpDate = 1;
-        final int tmpHour = tmpTimeOnly.getHour();
-        final int tmpMinute = tmpTimeOnly.getMinute();
-        final int tmpSecond = tmpTimeOnly.getSecond();
-        return new Date(tmpYear, tmpMonth, tmpDate, tmpHour, tmpMinute, tmpSecond);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public Date toSqlTimestamp() {
-        return new Date(millis);
-    }
-
     @Override
     public String toString() {
         return StandardType.SQL_DATETIME.format(this.toDate());

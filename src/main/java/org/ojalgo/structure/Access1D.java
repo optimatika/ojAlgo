@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 

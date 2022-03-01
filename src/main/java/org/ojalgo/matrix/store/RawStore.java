@@ -752,16 +752,8 @@ public final class RawStore implements PhysicalStore<Double> {
         return retVal;
     }
 
-    public boolean isAbsolute(final long index) {
-        return PrimitiveScalar.isAbsolute(this.doubleValue(index));
-    }
-
     public boolean isAbsolute(final long row, final long col) {
         return PrimitiveScalar.isAbsolute(this.doubleValue(row, col));
-    }
-
-    public boolean isSmall(final long index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(index));
     }
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {
