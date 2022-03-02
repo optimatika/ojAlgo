@@ -271,7 +271,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
             if (pivoting) {
                 // Find next pivot row
-                int pivotRow = (int) store.indexOfLargestOnDiagonal(ij);
+                int pivotRow = store.indexOfLargestOnDiagonal(ij, ij);
                 // Pivot?
                 if (pivotRow != ij) {
                     store.exchangeHermitian(pivotRow, ij);

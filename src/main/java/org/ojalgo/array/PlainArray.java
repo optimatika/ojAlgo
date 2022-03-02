@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
+public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 

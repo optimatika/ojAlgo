@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.ModifyAll;
@@ -643,7 +644,7 @@ public final class RawStore implements PhysicalStore<Double> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         result = prime * result + Arrays.deepHashCode(data);
         result = prime * result + myNumberOfColumns;
@@ -651,109 +652,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public long indexOfLargest() {
-
-        int tmpRowDim = data.length;
-
-        long retVal = 0;
-        double tmpLargest = ZERO;
-        double tmpValue;
-        double[] tmpRow;
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            tmpRow = data[i];
-
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
-                if (tmpValue > tmpLargest) {
-                    tmpLargest = tmpValue;
-                    retVal = Structure2D.index(tmpRowDim, i, j);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInColumn(final long row, final long col) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = Math.toIntExact(row);
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = Math.toIntExact(row); i < tmpRowDim; i++) {
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][Math.toIntExact(col)]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = 0;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int index = 0; index < this.count(); index++) {
-            int i = Structure2D.row(index, tmpRowDim);
-            int j = Structure2D.column(index, tmpRowDim);
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = index;
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-
-        int retVal = Math.toIntExact(col);
-        double tmpLargest = ZERO;
-        double tmpValue;
-        double[] tmpRow = data[Math.toIntExact(row)];
-
-        for (int j = Math.toIntExact(col); j < myNumberOfColumns; j++) {
-            tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = j;
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = (int) first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = (int) first, j = (int) first; i < tmpRowDim && j < myNumberOfColumns; i++, j++) {
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
-    }
-
-    public boolean isAbsolute(final long row, final long col) {
-        return PrimitiveScalar.isAbsolute(this.doubleValue(row, col));
+        return AMAX.invoke(data);
     }
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {

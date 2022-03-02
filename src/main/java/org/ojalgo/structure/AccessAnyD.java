@@ -42,8 +42,8 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         N aggregateSet(long[] initial, int dimension, Aggregator aggregator);
 
         default void reduce(final int dimension, final Aggregator aggregator, final Mutate1D receiver) {
-            final long count1 = this.count(dimension);
-            final long count2 = receiver.count();
+            long count1 = this.count(dimension);
+            long count2 = receiver.count();
             for (long i = 0L, limit = Math.min(count1, count2); i < limit; i++) {
                 receiver.set(i, this.aggregateSet(dimension, i, aggregator));
             }
@@ -55,7 +55,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 
-            final I retVal = factory.make(this.shape());
+            I retVal = factory.make(this.shape());
 
             this.supplyTo(retVal);
 
@@ -66,17 +66,9 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     }
 
-    /**
-     * @deprecated v48 Will be removed
-     */
-    @Deprecated
-    public interface IndexOf extends StructureAnyD, Access1D.IndexOf {
-
-    }
-
     public interface Sliceable<N extends Comparable<N>> extends StructureAnyD, Access1D.Sliceable<N> {
 
-        Access1D<N> sliceSet(final long[] initial, final int dimension);
+        Access1D<N> sliceSet(long[] initial, int dimension);
 
     }
 
@@ -134,7 +126,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             tmpCount = accessA.count(d);
             retVal &= tmpCount == accessB.count(d);
             d++;
-        } while (retVal && ((d <= 3) || (tmpCount > 1)));
+        } while (retVal && (d <= 3 || tmpCount > 1));
 
         return retVal && Access1D.equals(accessA, accessB, accuracy);
     }

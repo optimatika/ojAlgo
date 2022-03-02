@@ -21,11 +21,15 @@
  */
 package org.ojalgo.array.operation;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * Given a vector x, the i?amax functions return the position of the vector element x[i] that has the largest
@@ -52,6 +56,7 @@ public final class AMAX implements ArrayOperation {
                 retVal = i;
             }
         }
+
         return retVal;
     }
 
@@ -68,6 +73,7 @@ public final class AMAX implements ArrayOperation {
                 retVal = i;
             }
         }
+
         return retVal;
     }
 
@@ -84,6 +90,33 @@ public final class AMAX implements ArrayOperation {
                 retVal = i;
             }
         }
+
+        return retVal;
+    }
+
+    public static long invoke(final double[][] data) {
+
+        int nbRows = data.length;
+        int nbCols = nbRows != 0 ? data[0].length : 0;
+
+        long retVal = 0;
+        double largest = ZERO;
+        double candidate;
+
+        double[] tmpRow;
+
+        for (int i = 0; i < nbRows; i++) {
+            tmpRow = data[i];
+
+            for (int j = 0; j < nbCols; j++) {
+                candidate = Math.abs(tmpRow[j]);
+                if (candidate > largest) {
+                    largest = candidate;
+                    retVal = Structure2D.index(nbRows, i, j);
+                }
+            }
+        }
+
         return retVal;
     }
 
@@ -100,6 +133,7 @@ public final class AMAX implements ArrayOperation {
                 retVal = i;
             }
         }
+
         return retVal;
     }
 
@@ -116,6 +150,24 @@ public final class AMAX implements ArrayOperation {
                 retVal = i;
             }
         }
+
+        return retVal;
+    }
+
+    public static int invoke(final PlainArray<?> data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        double largest = 0D;
+        double candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = Math.abs(data.doubleValue(i));
+            if (candidate > largest) {
+                largest = candidate;
+                retVal = i;
+            }
+        }
+
         return retVal;
     }
 

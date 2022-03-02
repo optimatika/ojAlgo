@@ -53,7 +53,7 @@ import org.ojalgo.tensor.TensorFactory1D;
  * @author apete
  */
 public final class Array1D<N extends Comparable<N>> extends AbstractList<N> implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>,
-        Access1D.IndexOf, Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+        Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Comparable<N>>
             implements Factory1D.Dense<Array1D<N>>, Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
@@ -142,7 +142,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
             long i = low, j = high;
 
-            final double pivot = myArray.doubleValue(low + (high - low) / 2);
+            double pivot = myArray.doubleValue(low + (high - low) / 2);
 
             while (i <= j) {
 
@@ -205,7 +205,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
             long i = low, j = high;
 
-            final double pivot = myArray.doubleValue(low + (high - low) / 2);
+            double pivot = myArray.doubleValue(low + (high - low) / 2);
 
             while (i <= j) {
 
@@ -392,7 +392,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (length ^ length >>> 32);
         result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
@@ -404,7 +404,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     @Override
     public int indexOf(final Object obj) {
-        final int tmpLength = this.size();
+        int tmpLength = this.size();
         if (obj == null) {
             for (int i = 0; i < tmpLength; i++) {
                 if (this.get(i) == null) {
@@ -423,12 +423,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     @Override
     public long indexOfLargest() {
-        return this.indexOfLargestInRange(myFirst, myLimit);
-    }
-
-    @Override
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return (myDelegate.indexOfLargest(this.convert(first), this.convert(limit), myStep) - myFirst) / myStep;
+        long first = this.convert(myFirst);
+        long limit = this.convert(myLimit);
+        long step = myStep;
+        return (myDelegate.indexOfLargest(first, limit, step) - first) / step;
     }
 
     @Override
@@ -440,8 +438,8 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final double oldValue = this.doubleValue(index);
-            final double newValue = mixer.invoke(oldValue, addend);
+            double oldValue = this.doubleValue(index);
+            double newValue = mixer.invoke(oldValue, addend);
             this.set(index, newValue);
             return newValue;
         }
@@ -451,8 +449,8 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final N oldValue = this.get(index);
-            final N newValue = mixer.invoke(oldValue, addend);
+            N oldValue = this.get(index);
+            N newValue = mixer.invoke(oldValue, addend);
             this.set(index, newValue);
             return newValue;
         }
@@ -630,13 +628,13 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         if (myDelegate.isPrimitive()) {
 
-            final double tmpVal = this.doubleValue(indexA);
+            double tmpVal = this.doubleValue(indexA);
             this.set(indexA, this.doubleValue(indexB));
             this.set(indexB, tmpVal);
 
         } else {
 
-            final N tmpVal = this.get(indexA);
+            N tmpVal = this.get(indexA);
             this.set(indexA, this.get(indexB));
             this.set(indexB, tmpVal);
         }
@@ -650,7 +648,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         long i = low, j = high;
 
-        final double pivot = this.doubleValue(low + (high - low) / 2);
+        double pivot = this.doubleValue(low + (high - low) / 2);
 
         while (i <= j) {
 
@@ -680,7 +678,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         long i = low, j = high;
 
-        final double pivot = this.doubleValue(low + (high - low) / 2);
+        double pivot = this.doubleValue(low + (high - low) / 2);
 
         while (i <= j) {
 

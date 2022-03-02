@@ -373,6 +373,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.aggregateDiagonal(row, col, aggregator);
     }
 
+    @Override
     public Double aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         return myUtility.aggregateRange(first, limit, aggregator);
     }
@@ -594,30 +595,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         result = prime * result + myColDim;
         result = prime * result + myRowDim;
         return result;
-    }
-
-    public long indexOfLargestInColumn(final long col) {
-        return myUtility.indexOfLargestInColumn(col);
-    }
-
-    public long indexOfLargestInColumn(final long row, final long col) {
-        return myUtility.indexOfLargestInColumn(row, col);
-    }
-
-    public long indexOfLargestInRow(final long row) {
-        return myUtility.indexOfLargestInRow(row);
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-        return myUtility.indexOfLargestInRow(row, col);
-    }
-
-    public long indexOfLargestOnDiagonal() {
-        return myUtility.indexOfLargestOnDiagonal();
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-        return myUtility.indexOfLargestOnDiagonal(first);
     }
 
     public int intValue(final long row, final long col) {
@@ -861,6 +838,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
             SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
         }
+    }
+
+    @Override
+    public long indexOfLargest() {
+        return myUtility.indexOfLargest();
     }
 
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {

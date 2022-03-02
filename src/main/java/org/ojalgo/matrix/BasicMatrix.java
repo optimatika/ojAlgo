@@ -364,6 +364,10 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.newInstance(this.store().hessenberg(upper));
     }
 
+    public long indexOfLargest() {
+        return this.store().indexOfLargest();
+    }
+
     /**
      * <p>
      * About inverting matrices:
@@ -391,10 +395,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     public M invert() {
         return this.newInstance(this.getInverseProvider(false).invert().orElseGet(() -> this.getInverseProvider(true).invert().get()));
-    }
-
-    public boolean isAbsolute(final long row, final long col) {
-        return this.store().isAbsolute(row, col);
     }
 
     /**

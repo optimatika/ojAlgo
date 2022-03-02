@@ -800,16 +800,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         return result;
     }
 
-    public long indexOfLargestInColumn(final long row, final long col) {
-        return myUtility.indexOfLargestInColumn(row, col);
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-        return myUtility.indexOfLargestInRow(row, col);
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-        return myUtility.indexOfLargestOnDiagonal(first);
+    @Override
+    public long indexOfLargest() {
+        return myUtility.indexOfLargest();
     }
 
     @Override

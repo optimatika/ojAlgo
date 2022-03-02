@@ -76,7 +76,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 
-            final I retVal = factory.make(this.countRows(), this.countColumns());
+            I retVal = factory.make(this.countRows(), this.countColumns());
 
             this.supplyTo(retVal);
 
@@ -87,7 +87,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
-    public static final class ElementView<N extends Comparable<N>> implements ElementView2D<N, ElementView<N>> {
+    public static class ElementView<N extends Comparable<N>> implements ElementView2D<N, ElementView<N>> {
 
         private final ElementView1D<N, ?> myDelegate;
         private final long myStructure;
@@ -156,75 +156,13 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         public ElementView<N> trySplit() {
 
-            final ElementView1D<N, ?> delegateSpliterator = myDelegate.trySplit();
+            ElementView1D<N, ?> delegateSpliterator = myDelegate.trySplit();
 
             if (delegateSpliterator != null) {
                 return new ElementView<>(delegateSpliterator, myStructure);
             }
             return null;
         }
-
-    }
-
-    /**
-     * @deprecated v48 Will be removed
-     */
-    @Deprecated
-    public interface IndexOf extends Structure2D, Access1D.IndexOf {
-
-        /**
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default long indexOfLargestInColumn(final long col) {
-            return this.indexOfLargestInColumn(0L, col);
-        }
-
-        /**
-         * @param row First row to investigate
-         * @param col The column
-         * @return The row-index of the largest absolute value in a column, starting at the specified row.
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default long indexOfLargestInColumn(final long row, final long col) {
-            long structure = this.countRows();
-            return this.indexOfLargestInRange(Structure2D.index(structure, row, col), Structure2D.index(structure, 0, col + 1));
-        }
-
-        /**
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default long indexOfLargestInRow(final long row) {
-            return this.indexOfLargestInRow(row, 0L);
-        }
-
-        /**
-         * @param row The row
-         * @param col The first column to investigate
-         * @return The column-index of the largest absolute value in a row, starting at the specified column.
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        long indexOfLargestInRow(final long row, final long col);
-
-        /**
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default long indexOfLargestOnDiagonal() {
-            return this.indexOfLargestOnDiagonal(0L);
-        }
-
-        /**
-         * @param first The first row/column to investigate
-         * @return The row/column-index of the largest absolute value on the main diagonal, starting at the
-         *         specified row/column.
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        long indexOfLargestOnDiagonal(final long first);
 
     }
 
@@ -272,7 +210,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         void visitOne(long row, long col, VoidFunction<N> visitor);
 
         default void visitOne(final long index, final VoidFunction<N> visitor) {
-            final long tmpStructure = this.countRows();
+            long tmpStructure = this.countRows();
             this.visitOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), visitor);
         }
 
@@ -318,7 +256,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             }
 
             @Override
-            public final String toString() {
+            public String toString() {
                 return Access2D.toString(this);
             }
 
@@ -482,7 +420,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             }
 
             @Override
-            public final String toString() {
+            public String toString() {
                 return Access2D.toString(this);
             }
 
@@ -517,7 +455,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             }
 
             @Override
-            public final String toString() {
+            public String toString() {
                 return Access2D.toString(this);
             }
 
@@ -543,7 +481,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default byte byteValue(final long index) {
-        final long structure = this.countRows();
+        long structure = this.countRows();
         return this.byteValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
@@ -576,7 +514,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default float floatValue(final long index) {
-        final long structure = this.countRows();
+        long structure = this.countRows();
         return this.floatValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
@@ -585,14 +523,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default N get(final long index) {
-        final long tmpStructure = this.countRows();
+        long tmpStructure = this.countRows();
         return this.get(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
     }
 
     N get(long row, long col);
 
     default int intValue(final long index) {
-        final long structure = this.countRows();
+        long structure = this.countRows();
         return this.intValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
@@ -601,7 +539,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default long longValue(final long index) {
-        final long structure = this.countRows();
+        long structure = this.countRows();
         return this.longValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
@@ -618,7 +556,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default short shortValue(final long index) {
-        final long structure = this.countRows();
+        long structure = this.countRows();
         return this.shortValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
@@ -628,10 +566,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     default double[][] toRawCopy2D() {
 
-        final int tmpRowDim = (int) this.countRows();
-        final int tmpColDim = (int) this.countColumns();
+        int tmpRowDim = (int) this.countRows();
+        int tmpColDim = (int) this.countColumns();
 
-        final double[][] retVal = new double[tmpRowDim][tmpColDim];
+        double[][] retVal = new double[tmpRowDim][tmpColDim];
 
         double[] tmpRow;
         for (int i = 0; i < tmpRowDim; i++) {
