@@ -407,7 +407,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
         final Result tmpResult = tmpModel.minimise();
 
-        final NumberContext tmpContext = new NumberContext(8, 13);
+        final NumberContext tmpContext = NumberContext.of(8, 13);
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpContext);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {

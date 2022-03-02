@@ -72,7 +72,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        NumberContext accuracy = new NumberContext(4, 3);
+        NumberContext accuracy = NumberContext.of(4, 3);
 
         final RationalMatrix tmpA = SimpleCholeskyCase.getOriginal();
         final RationalMatrix tmpL = SimpleCholeskyCase.getFactorL();

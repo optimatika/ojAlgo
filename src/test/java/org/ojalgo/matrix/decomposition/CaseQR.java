@@ -253,9 +253,9 @@ public class CaseQR extends MatrixDecompositionTests {
             BasicLogger.debug("Primitive R", tmpPrimitiveR);
         }
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpOriginal), tmpBigDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(GenericStore.COMPLEX.copy(tmpOriginal), tmpComplexDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));
+        TestUtils.assertEquals(GenericStore.COMPLEX.copy(tmpOriginal), tmpComplexDecomp, NumberContext.of(7, 14));
+        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
     }
 
 }

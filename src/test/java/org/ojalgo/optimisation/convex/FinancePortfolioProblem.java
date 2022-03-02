@@ -122,7 +122,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
             BasicLogger.debug(result);
         }
 
-        NumberContext accuracy = new NumberContext(8, 8);
+        NumberContext accuracy = NumberContext.of(8, 8);
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertTrue(model.validate());

@@ -68,7 +68,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testFullSize() {
 
-        NumberContext precision = new NumberContext(12, 8);
+        NumberContext precision = NumberContext.of(12, 8);
 
         MatrixStore<Double> tall = Primitive64Store.FACTORY.makeFilled(7, 5, new Uniform());
         MatrixStore<Double> fat = Primitive64Store.FACTORY.makeFilled(5, 7, new Uniform());
@@ -225,7 +225,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
-        TestUtils.assertTrue(Tridiagonal.equals(tmpOriginalMatrix, tmpDecomposition, new NumberContext(7, 6)));
+        TestUtils.assertTrue(Tridiagonal.equals(tmpOriginalMatrix, tmpDecomposition, NumberContext.of(7, 6)));
     }
 
     /**
@@ -237,7 +237,7 @@ public class DesignCase extends MatrixDecompositionTests {
         PhysicalStore<Double> mtrxA = Primitive64Store.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
         MatrixStore<Double> mtrxAt = mtrxA.transpose();
 
-        NumberContext precision = new NumberContext(14, 8);
+        NumberContext precision = NumberContext.of(14, 8);
 
         QR<Double> decompPriQR = QR.PRIMITIVE.make(true);
         decompPriQR.decompose(mtrxAt);
@@ -288,7 +288,7 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpNewDecomp.getU();
         tmpNewDecomp.getV();
 
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, NumberContext.of(7, 6));
     }
 
     private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> solver, final MatrixStore<Double> matrix) {

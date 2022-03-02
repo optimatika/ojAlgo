@@ -50,7 +50,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
     @Test
     public void testInverseOfRandomCase() {
 
-        final NumberContext tmpEqualsNumberContext = new NumberContext(7, 10);
+        final NumberContext tmpEqualsNumberContext = NumberContext.of(7, 10);
 
         final int tmpDim = 99;
         final PhysicalStore<Double> tmpRandom = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
@@ -87,7 +87,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.copy(SimpleEquationCase.getSolution());
 
         for (final MatrixDecomposition.Solver<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
-            this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution, new NumberContext(7, 6));
+            this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution, NumberContext.of(7, 6));
         }
     }
 

@@ -95,7 +95,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     private static final double INIT = PrimitiveMath.SQRT.invoke(PrimitiveMath.TEN);
     private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
     private static final double MIN = PrimitiveMath.HUNDREDTH;
-    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(5, 4);
+    private static final NumberContext TARGET_CONTEXT = NumberContext.of(5, 4);
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
     private transient ExpressionsBasedModel myOptimisationModel;

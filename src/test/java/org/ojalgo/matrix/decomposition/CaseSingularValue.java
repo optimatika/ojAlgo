@@ -59,10 +59,10 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
     private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
 
-    static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(3, 2);
-    static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
-    static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(3, 2);
-    static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
+    static final NumberContext CNTXT_CPLX_DECOMP = NumberContext.of(3, 2);
+    static final NumberContext CNTXT_CPLX_VALUES = NumberContext.of(7, 7);
+    static final NumberContext CNTXT_REAL_DECOMP = NumberContext.of(3, 2);
+    static final NumberContext CNTXT_REAL_VALUES = NumberContext.of(7, 10);
 
     @Override
     @BeforeEach
@@ -143,7 +143,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 BasicLogger.debug("Q2", tmpBidiagonal.getRQ());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
-            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
+            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, NumberContext.of(7, 6));
         }
 
         for (ComplexNumber tmpScale : tmpScales) {
@@ -164,14 +164,14 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 BasicLogger.debug("Expected = {}", tmpExpectedSingularValues);
                 BasicLogger.debug("Actual = {}", tmpActualSingularValues);
             }
-            TestUtils.assertEquals(tmpExpectedSingularValues, tmpActualSingularValues, new NumberContext(7, 6));
+            TestUtils.assertEquals(tmpExpectedSingularValues, tmpActualSingularValues, NumberContext.of(7, 6));
 
             MatrixStore<ComplexNumber> tmpReconstructed = tmpSVD.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug("Original", tmpOriginalMtrx);
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
-            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
+            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, NumberContext.of(7, 6));
         }
 
     }
@@ -273,10 +273,10 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
-        if (!Access2D.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(tmpOriginal, tmpReconstructed, NumberContext.of(7, 6))) {
             BasicLogger.error("Recreation failed for: {}", tmpDecomposition.getClass().getName());
         }
-        if (!SingularValue.equals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!SingularValue.equals(tmpOriginal, tmpDecomposition, NumberContext.of(7, 6))) {
             BasicLogger.error("Decomposition not correct for: {}", tmpDecomposition.getClass().getName());
         }
         if (MatrixDecompositionTests.DEBUG) {
@@ -293,8 +293,8 @@ public class CaseSingularValue extends MatrixDecompositionTests {
             BasicLogger.debug("Diff", tmpCopy);
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, NumberContext.of(7, 6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, NumberContext.of(7, 6));
 
     }
 
@@ -457,10 +457,10 @@ public class CaseSingularValue extends MatrixDecompositionTests {
             tmpImpl.decompose(aMtrx);
             final SingularValue<Double> decomposition = tmpImpl;
             MatrixStore<Double> tmpReconstructed = decomposition.reconstruct();
-            if (!Access2D.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
+            if (!Access2D.equals(aMtrx, tmpReconstructed, NumberContext.of(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpl.getClass().getName());
             }
-            if (!SingularValue.equals(aMtrx, tmpImpl, new NumberContext(7, 6))) {
+            if (!SingularValue.equals(aMtrx, tmpImpl, NumberContext.of(7, 6))) {
                 BasicLogger.error("Decomposition not correct for: {}", tmpImpl.getClass().getName());
             }
             if (MatrixDecompositionTests.DEBUG) {

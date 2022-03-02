@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.special.PowerOf2;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * LongToNumberMap
@@ -38,7 +37,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class LongToNumberMapTest {
 
-    private static final NumberContext CONTEXT = new NumberContext();
     private static final Random RANDOM = new Random();
 
     @Test
@@ -96,10 +94,10 @@ public class LongToNumberMapTest {
 
         for (final Entry<Long, Double> entry : expectedMap.entrySet()) {
             final double expectedValue = entry.getValue().doubleValue();
-            TestUtils.assertEquals(expectedValue, primit64Map.get(entry.getKey()).doubleValue(), CONTEXT);
-            TestUtils.assertEquals(expectedValue, primit64Map.doubleValue(entry.getKey()), CONTEXT);
-            TestUtils.assertEquals(expectedValue, direct64Map.get(entry.getKey()).doubleValue(), CONTEXT);
-            TestUtils.assertEquals(expectedValue, direct64Map.doubleValue(entry.getKey()), CONTEXT);
+            TestUtils.assertEquals(expectedValue, primit64Map.get(entry.getKey()).doubleValue());
+            TestUtils.assertEquals(expectedValue, primit64Map.doubleValue(entry.getKey()));
+            TestUtils.assertEquals(expectedValue, direct64Map.get(entry.getKey()).doubleValue());
+            TestUtils.assertEquals(expectedValue, direct64Map.doubleValue(entry.getKey()));
         }
 
     }
