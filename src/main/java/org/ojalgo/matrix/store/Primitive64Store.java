@@ -821,34 +821,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         return result;
     }
 
-    public long indexOfLargestInColumn(final long row, final long col) {
-        return myUtility.indexOfLargestInColumn(row, col);
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-        return myUtility.indexOfLargestInRow(row, col);
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-        return myUtility.indexOfLargestOnDiagonal(first);
-    }
-
-    public boolean isAbsolute(final long row, final long col) {
-        return myUtility.isAbsolute(row, col);
-    }
-
-    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isColumnSmall(row, col, comparedTo);
-    }
-
-    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isRowSmall(row, col, comparedTo);
-    }
-
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myUtility.isSmall(row, col, comparedTo);
-    }
-
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
 
@@ -1084,6 +1056,11 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         } else {
             myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
+    }
+
+    @Override
+    public long indexOfLargest() {
+        return myUtility.indexOfLargest();
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {

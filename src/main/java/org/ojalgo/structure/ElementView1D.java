@@ -85,14 +85,6 @@ public interface ElementView1D<N extends Comparable<N>, V extends ElementView1D<
         return StreamSupport.stream(this, false);
     }
 
-    /**
-     * @deprecated v48 Use {@link #stream()} instead
-     */
-    @Deprecated
-    default Stream<V> stream(final boolean parallel) {
-        return this.stream();
-    }
-
     default boolean tryAdvance(final Consumer<? super V> action) {
         if (this.hasNext()) {
             action.accept(this.next());

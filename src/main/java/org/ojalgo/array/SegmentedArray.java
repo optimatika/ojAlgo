@@ -234,16 +234,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public boolean isAbsolute(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isAbsolute(index & myIndexMask);
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return mySegments[(int) (index >> myIndexBits)].isSmall(index & myIndexMask, comparedTo);
-    }
-
-    @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
         long tmpIndex = index & myIndexMask;
@@ -383,15 +373,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
                 this.set(i, supplier.invoke());
             }
         }
-    }
-
-    @Override
-    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-        boolean retVal = true;
-        for (long i = first; retVal && i < limit; i += step) {
-            retVal &= this.isSmall(i, comparedTo);
-        }
-        return retVal;
     }
 
     @Override

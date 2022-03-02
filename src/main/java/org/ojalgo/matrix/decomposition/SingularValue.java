@@ -188,22 +188,6 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     double getOperatorNorm();
 
     /**
-     * @deprecated v48 Use {@link #getU()} instead
-     */
-    @Deprecated
-    default MatrixStore<N> getQ1() {
-        return this.getU();
-    }
-
-    /**
-     * @deprecated v48 Use {@link #getV()} instead
-     */
-    @Deprecated
-    default MatrixStore<N> getQ2() {
-        return this.getV();
-    }
-
-    /**
      * @return The singular values ordered in descending order.
      */
     Array1D<Double> getSingularValues();

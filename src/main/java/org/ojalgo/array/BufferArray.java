@@ -21,10 +21,7 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.Buffer;
@@ -37,6 +34,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -268,53 +266,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
             final long tmpSize = DOUBLE_ELEMENT_SIZE * tmpCount;
 
-            if (tmpCount > (1L << 8)) {
-
-                final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<Double>() {
-
-                    long offset = 0L;
-
-                    @Override
-                    public AggregatorSet<Double> aggregator() {
-                        return PrimitiveAggregator.getSet();
-                    }
-
-                    @Override
-                    public FunctionSet<Double> function() {
-                        return PrimitiveFunction.getSet();
-                    }
-
-                    @Override
-                    public Scalar.Factory<Double> scalar() {
-                        return PrimitiveScalar.FACTORY;
-                    }
-
-                    @Override
-                    long getElementSize() {
-                        return DOUBLE_ELEMENT_SIZE;
-                    }
-
-                    @Override
-                    PlainArray<Double> makeDenseArray(final long size) {
-
-                        final long tmpSize2 = size * DOUBLE_ELEMENT_SIZE;
-                        try {
-
-                            final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
-                            tmpMap.order(ByteOrder.nativeOrder());
-                            return new DoubleBufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
-                        } catch (final IOException exception) {
-                            throw new RuntimeException(exception);
-                        } finally {
-                            offset += tmpSize2;
-                        }
-                    }
-
-                };
-
-                return tmpFactory.makeSegmented(structure);
-
-            } else {
+            if (tmpCount <= 1L << 8) {
 
                 final MappedByteBuffer tmpMappedByteBuffer = tmpFileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, tmpSize);
                 tmpMappedByteBuffer.order(ByteOrder.nativeOrder());
@@ -323,9 +275,50 @@ public abstract class BufferArray extends PlainArray<Double> {
 
                 return new DoubleBufferArray(tmpDoubleBuffer, tmpRandomAccessFile);
             }
+            final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<Double>() {
 
-        } catch (final FileNotFoundException exception) {
-            throw new RuntimeException(exception);
+                long offset = 0L;
+
+                @Override
+                public AggregatorSet<Double> aggregator() {
+                    return PrimitiveAggregator.getSet();
+                }
+
+                @Override
+                public FunctionSet<Double> function() {
+                    return PrimitiveFunction.getSet();
+                }
+
+                @Override
+                public Scalar.Factory<Double> scalar() {
+                    return PrimitiveScalar.FACTORY;
+                }
+
+                @Override
+                long getElementSize() {
+                    return DOUBLE_ELEMENT_SIZE;
+                }
+
+                @Override
+                PlainArray<Double> makeDenseArray(final long size) {
+
+                    final long tmpSize2 = size * DOUBLE_ELEMENT_SIZE;
+                    try {
+
+                        final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
+                        tmpMap.order(ByteOrder.nativeOrder());
+                        return new DoubleBufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
+                    } catch (final IOException exception) {
+                        throw new RuntimeException(exception);
+                    } finally {
+                        offset += tmpSize2;
+                    }
+                }
+
+            };
+
+            return tmpFactory.makeSegmented(structure);
+
         } catch (final IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -495,25 +488,12 @@ public abstract class BufferArray extends PlainArray<Double> {
 
     @Override
     protected Double get(final int index) {
-        return this.doubleValue(index);
+        return Double.valueOf(this.doubleValue(index));
     }
 
     @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = PrimitiveMath.ABS.invoke(this.doubleValue(i));
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
+        return AMAX.invoke(this, first, limit, step);
     }
 
     @Override

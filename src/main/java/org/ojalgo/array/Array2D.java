@@ -49,8 +49,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public final class Array2D<N extends Comparable<N>>
-        implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements, Access2D.IndexOf,
+public final class Array2D<N extends Comparable<N>> implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
         Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
 
     public static final class Factory<N extends Comparable<N>>
@@ -65,15 +64,15 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> columns(final Access1D<?>... source) {
 
-            final int tmpColumns = source.length;
-            final long tmpRows = source[0].count();
+            int tmpColumns = source.length;
+            long tmpRows = source[0].count();
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 long tmpIndex = 0L;
                 for (int j = 0; j < tmpColumns; j++) {
-                    final Access1D<?> tmpColumn = source[j];
+                    Access1D<?> tmpColumn = source[j];
                     for (long i = 0L; i < tmpRows; i++) {
                         tmpDelegate.set(tmpIndex++, tmpColumn.doubleValue(i));
                     }
@@ -81,7 +80,7 @@ public final class Array2D<N extends Comparable<N>>
             } else {
                 long tmpIndex = 0L;
                 for (int j = 0; j < tmpColumns; j++) {
-                    final Access1D<?> tmpColumn = source[j];
+                    Access1D<?> tmpColumn = source[j];
                     for (long i = 0L; i < tmpRows; i++) {
                         tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
                     }
@@ -93,14 +92,14 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> columns(final Comparable<?>[]... source) {
 
-            final int tmpColumns = source.length;
-            final int tmpRows = source[0].length;
+            int tmpColumns = source.length;
+            int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final Comparable<?>[] tmpColumn = source[j];
+                Comparable<?>[] tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn[i]);
                 }
@@ -111,14 +110,14 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> columns(final double[]... source) {
 
-            final int tmpColumns = source.length;
-            final int tmpRows = source[0].length;
+            int tmpColumns = source.length;
+            int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final double[] tmpColumn = source[j];
+                double[] tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn[i]);
                 }
@@ -129,14 +128,14 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> columns(final List<? extends Comparable<?>>... source) {
 
-            final int tmpColumns = source.length;
-            final int tmpRows = source[0].size();
+            int tmpColumns = source.length;
+            int tmpRows = source[0].size();
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final List<? extends Comparable<?>> tmpColumn = source[j];
+                List<? extends Comparable<?>> tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
                 }
@@ -183,21 +182,21 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> rows(final Access1D<?>... source) {
 
-            final int tmpRows = source.length;
-            final long tmpColumns = source[0].count();
+            int tmpRows = source.length;
+            long tmpColumns = source[0].count();
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 for (int i = 0; i < tmpRows; i++) {
-                    final Access1D<?> tmpRow = source[i];
+                    Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
                         tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.doubleValue(j));
                     }
                 }
             } else {
                 for (int i = 0; i < tmpRows; i++) {
-                    final Access1D<?> tmpRow = source[i];
+                    Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
                         tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                     }
@@ -209,13 +208,13 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> rows(final Comparable<?>[]... source) {
 
-            final int tmpRows = source.length;
-            final int tmpColumns = source[0].length;
+            int tmpRows = source.length;
+            int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final Comparable<?>[] tmpRow = source[i];
+                Comparable<?>[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
@@ -226,13 +225,13 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> rows(final double[]... source) {
 
-            final int tmpRows = source.length;
-            final int tmpColumns = source[0].length;
+            int tmpRows = source.length;
+            int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final double[] tmpRow = source[i];
+                double[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
@@ -243,13 +242,13 @@ public final class Array2D<N extends Comparable<N>>
 
         public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
-            final int tmpRows = source.length;
-            final int tmpColumns = source[0].size();
+            int tmpRows = source.length;
+            int tmpColumns = source[0].size();
 
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final List<? extends Comparable<?>> tmpRow = source[i];
+                List<? extends Comparable<?>> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                 }
@@ -424,8 +423,8 @@ public final class Array2D<N extends Comparable<N>>
     @Override
     public void fillColumn(final long row, final long col, final Access1D<N> values) {
 
-        final long offset = Structure2D.index(myRowsCount, row, col);
-        final long limit = Math.min(this.countRows() - row, values.count());
+        long offset = Structure2D.index(myRowsCount, row, col);
+        long limit = Math.min(this.countRows() - row, values.count());
 
         if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < limit; i++) {
@@ -450,13 +449,13 @@ public final class Array2D<N extends Comparable<N>>
 
     @Override
     public void fillDiagonal(final long row, final long col, final N value) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, value);
     }
 
     @Override
     public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, supplier);
     }
 
@@ -503,8 +502,8 @@ public final class Array2D<N extends Comparable<N>>
     @Override
     public void fillRow(final long row, final long col, final Access1D<N> values) {
 
-        final long offset = Structure2D.index(myRowsCount, row, col);
-        final long limit = Math.min(this.countColumns() - col, values.count());
+        long offset = Structure2D.index(myRowsCount, row, col);
+        long limit = Math.min(this.countColumns() - col, values.count());
 
         if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < limit; i++) {
@@ -549,7 +548,7 @@ public final class Array2D<N extends Comparable<N>>
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         result = prime * result + (int) (myColumnsCount ^ myColumnsCount >>> 32);
         result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
@@ -562,84 +561,12 @@ public final class Array2D<N extends Comparable<N>>
         return myDelegate.indexOfLargest();
     }
 
-    /**
-     * @return The row-index of the largest absolute value in a column, starting at the specified row.
-     */
-    @Override
-    public long indexOfLargestInColumn(final long row, final long col) {
-        return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
-    }
-
-    @Override
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return myDelegate.indexOfLargestInRange(first, limit);
-    }
-
-    /**
-     * @return The column-index of the largest absolute value in a row, starting at the specified column.
-     */
-    @Override
-    public long indexOfLargestInRow(final long row, final long col) {
-        return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount)
-                / myRowsCount;
-    }
-
-    @Override
-    public long indexOfLargestOnDiagonal(final long first) {
-
-        final long tmpMinCount = Math.min(myRowsCount, myColumnsCount);
-
-        final long tmpFirst = Structure2D.index(myRowsCount, first, first);
-        final long tmpLimit = Structure2D.index(myRowsCount, tmpMinCount, tmpMinCount);
-        final long tmpStep = 1L + myRowsCount;
-
-        return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep) / myRowsCount;
-    }
-
-    @Override
-    public boolean isAbsolute(final long index) {
-        return myDelegate.isAbsolute(index);
-    }
-
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public boolean isAbsolute(final long row, final long col) {
-        return myDelegate.isAbsolute(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public boolean isAllSmall(final double comparedTo) {
-        return myDelegate.isSmall(0L, this.count(), 1L, comparedTo);
-    }
-
-    @Override
-    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, comparedTo);
-    }
-
-    @Override
-    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return myDelegate.isSmall(index, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), comparedTo);
-    }
-
     @Override
     public double mix(final long row, final long col, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final double oldValue = this.doubleValue(row, col);
-            final double newValue = mixer.invoke(oldValue, addend);
+            double oldValue = this.doubleValue(row, col);
+            double newValue = mixer.invoke(oldValue, addend);
             this.set(row, col, newValue);
             return newValue;
         }
@@ -649,8 +576,8 @@ public final class Array2D<N extends Comparable<N>>
     public N mix(final long row, final long col, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final N oldValue = this.get(row, col);
-            final N newValue = mixer.invoke(oldValue, addend);
+            N oldValue = this.get(row, col);
+            N newValue = mixer.invoke(oldValue, addend);
             this.set(row, col, newValue);
             return newValue;
         }
@@ -673,7 +600,7 @@ public final class Array2D<N extends Comparable<N>>
 
     @Override
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, modifier);
     }
 
@@ -774,7 +701,7 @@ public final class Array2D<N extends Comparable<N>>
 
     @Override
     public Array1D<N> sliceDiagonal(final long row, final long col) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount),
                 1L + myRowsCount);
     }
@@ -815,7 +742,7 @@ public final class Array2D<N extends Comparable<N>>
 
     @Override
     public void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
     }
 

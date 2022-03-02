@@ -62,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
+        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
 
     default MatrixStore<N> above(final Access2D<N>... matrices) {
         MatrixStore<N> above = AbstractStore.buildRow(this.physical(), this.countColumns(), matrices);
@@ -264,36 +264,8 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LowerHessenbergStore<>(this);
     }
 
-    default long indexOfLargestInColumn(final long row, final long col) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, row, col);
-        long limit = Structure2D.index(structure, 0L, col + 1L);
-        long step = 1L;
-        return AMAX.invoke(this, first, limit, step);
-    }
-
-    default long indexOfLargestInRange(final long first, final long limit) {
-        return AMAX.invoke(this, first, limit, 1L);
-    }
-
-    default long indexOfLargestInRow(final long row, final long col) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, row, col);
-        long limit = Structure2D.index(structure, row, this.countColumns());
-        long step = structure;
-        return AMAX.invoke(this, first, limit, step);
-    }
-
-    default long indexOfLargestOnDiagonal(final long start) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, start, start);
-        long limit = Structure2D.index(structure, structure, this.countColumns());
-        long step = structure + 1L;
-        return AMAX.invoke(this, first, limit, step);
-    }
-
-    default boolean isAbsolute(final long row, final long col) {
-        return this.toScalar(row, col).isAbsolute();
+    default long indexOfLargest() {
+        return AMAX.invoke(this, 0L, this.count(), 1L);
     }
 
     default boolean isHermitian() {

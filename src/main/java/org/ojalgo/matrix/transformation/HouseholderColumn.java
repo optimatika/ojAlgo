@@ -1,9 +1,12 @@
 package org.ojalgo.matrix.transformation;
 
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.ColumnView;
+import org.ojalgo.type.NumberDefinition;
 
 final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> implements HouseholderReference<N> {
 
@@ -27,11 +30,11 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
     public double doubleValue(final long index) {
         if (index > myFirst) {
             return myStore.doubleValue(index, this.column());
-        } else if (index == myFirst) {
-            return PrimitiveMath.ONE;
-        } else {
-            return PrimitiveMath.ZERO;
         }
+        if (index == myFirst) {
+            return PrimitiveMath.ONE;
+        }
+        return PrimitiveMath.ZERO;
     }
 
     public int first() {
@@ -42,11 +45,11 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
     public N get(final long index) {
         if (index > myFirst) {
             return myStore.get(index, this.column());
-        } else if (index == myFirst) {
-            return myStore.physical().scalar().one().get();
-        } else {
-            return myStore.physical().scalar().zero().get();
         }
+        if (index == myFirst) {
+            return myStore.physical().scalar().one().get();
+        }
+        return myStore.physical().scalar().zero().get();
     }
 
     @SuppressWarnings("unchecked")
@@ -58,7 +61,8 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
     }
 
     public boolean isZero() {
-        return myStore.isColumnSmall(myFirst + 1L, this.column(), PrimitiveMath.ONE);
+        double largest = NumberDefinition.doubleValue(myStore.aggregateColumn(myFirst + 1L, this.column(), Aggregator.LARGEST));
+        return PrimitiveScalar.isSmall(PrimitiveMath.ONE, largest);
     }
 
     public void point(final long row, final long col) {

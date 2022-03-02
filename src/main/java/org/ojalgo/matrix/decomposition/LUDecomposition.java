@@ -283,7 +283,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
             if (pivoting) {
                 // Find next pivot row
-                int tmpPivotRow = (int) tmpInPlace.indexOfLargestInColumn(ij, ij);
+                int tmpPivotRow = tmpInPlace.indexOfLargestInColumn(ij, ij);
 
                 // Pivot?
                 if (tmpPivotRow != ij) {

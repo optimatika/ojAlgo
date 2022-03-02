@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import java.util.List;
 
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.FunctionSet;
@@ -52,7 +53,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access2D.Elements, Access2D.IndexOf {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N> {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>>
             extends Factory2D.Dense<I>, Factory2D.MayBeSparse<I, PhysicalStore<N>, SparseStore<N>> {
@@ -254,5 +255,32 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * @see #transformLeft(Rotation)
      */
     void transformRight(Rotation<N> transformation);
+
+    default int indexOfLargestInColumn(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, col + 1L);
+        long step = 1L;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest % structure);
+    }
+
+    default int indexOfLargestInRow(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, this.countColumns());
+        long step = structure;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest / structure);
+    }
+
+    default int indexOfLargestOnDiagonal(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, this.countColumns());
+        long step = structure + 1L;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest / structure);
+    }
 
 }

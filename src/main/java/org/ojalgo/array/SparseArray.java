@@ -425,24 +425,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return myZeroNumber;
     }
 
-    @Override
-    public boolean isAbsolute(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isAbsolute(tmpIndex);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isSmall(tmpIndex, comparedTo);
-        }
-        return true;
-    }
-
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
         int tmpFoundAt = this.index(rangeLimit - 1L);
         if (tmpFoundAt < 0) {
@@ -753,23 +735,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                         tmpLargest = tmpValue;
                         retVal = i;
                     }
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
-    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-
-        boolean retVal = true;
-
-        for (int i = 0; retVal && i < myIndices.length; i++) {
-            final long tmpIndex = myIndices[i];
-            if (tmpIndex >= first && tmpIndex < limit) {
-                if ((tmpIndex - first) % step == 0L) {
-                    retVal &= myValues.isSmall(i, comparedTo);
                 }
             }
         }

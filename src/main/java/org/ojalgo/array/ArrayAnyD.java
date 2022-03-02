@@ -51,8 +51,8 @@ import org.ojalgo.tensor.TensorFactoryAnyD;
  * @author apete
  */
 public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>,
-        AccessAnyD.Elements, AccessAnyD.IndexOf, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>,
-        AccessAnyD.Collectable<N, MutateAnyD>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
+        StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Collectable<N, MutateAnyD>,
+        MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N>, StructureAnyD.Reshapable {
 
     public static final class Factory<N extends Comparable<N>>
             implements FactoryAnyD.Dense<ArrayAnyD<N>>, FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
@@ -327,7 +327,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
         result = prime * result + Arrays.hashCode(myStructure);
@@ -340,39 +340,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return myDelegate.indexOfLargestInRange(first, limit);
-    }
-
-    @Override
-    public boolean isAbsolute(final long index) {
-        return myDelegate.isAbsolute(index);
-    }
-
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public boolean isAbsolute(final long[] reference) {
-        return myDelegate.isAbsolute(StructureAnyD.index(myStructure, reference));
-    }
-
-    @Override
-    public boolean isSmall(final long index, final double comparedTo) {
-        return myDelegate.isSmall(index, comparedTo);
-    }
-
-    @Override
-    public boolean isSmall(final long[] reference, final double comparedTo) {
-        return myDelegate.isSmall(StructureAnyD.index(myStructure, reference), comparedTo);
-    }
-
-    @Override
     public double mix(final long[] reference, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final double oldValue = this.doubleValue(reference);
-            final double newValue = mixer.invoke(oldValue, addend);
+            double oldValue = this.doubleValue(reference);
+            double newValue = mixer.invoke(oldValue, addend);
             this.set(reference, newValue);
             return newValue;
         }
@@ -382,8 +354,8 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public N mix(final long[] reference, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
-            final N oldValue = this.get(reference);
-            final N newValue = mixer.invoke(oldValue, addend);
+            N oldValue = this.get(reference);
+            N newValue = mixer.invoke(oldValue, addend);
             this.set(reference, newValue);
             return newValue;
         }
@@ -441,7 +413,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public Array1D<N> reduce(final int dimension, final Aggregator aggregator) {
-        final long reduceToCount = StructureAnyD.count(myStructure, dimension);
+        long reduceToCount = StructureAnyD.count(myStructure, dimension);
         Array1D<N> retVal = myDelegate.factory().make(reduceToCount).wrapInArray1D();
         this.reduce(dimension, aggregator, retVal);
         return retVal;
@@ -457,15 +429,15 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
 
-        final boolean primitive = myDelegate.isPrimitive();
+        boolean primitive = myDelegate.isPrimitive();
 
         Array2D<N> retVal = myDelegate.factory().make(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
 
         for (long j = 0L; j < numberOfColumns; j++) {
-            final long colInd = j;
+            long colInd = j;
 
             for (long i = 0L; i < numberOfRows; i++) {
-                final long rowInd = i;
+                long rowInd = i;
 
                 visitor.reset();
                 this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
@@ -580,7 +552,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public String toString() {
 
-        final StringBuilder retVal = new StringBuilder();
+        StringBuilder retVal = new StringBuilder();
 
         retVal.append('<');
         retVal.append(myStructure[0]);
@@ -590,7 +562,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         }
         retVal.append('>');
 
-        final int tmpLength = (int) this.count();
+        int tmpLength = (int) this.count();
         if (tmpLength >= 1 && tmpLength <= 100) {
             retVal.append(' ');
             retVal.append(myDelegate.toString());

@@ -27,6 +27,8 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
@@ -47,7 +49,7 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
+public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>, Access1D.Aggregatable<N>, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Collectable<N, Mutate1D> {
 
     public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
@@ -166,6 +168,15 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         myFactory = factory;
     }
 
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
+
+        AggregatorFunction<N> visitor = aggregator.getFunction(myFactory.aggregator());
+
+        this.visitRange(first, limit, visitor);
+
+        return visitor.get();
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -195,10 +206,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return this.indexOfLargest(first, limit, 1L);
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
@@ -248,8 +255,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     protected long indexOfLargest(final long first, final long limit, final long step) {
         return AMAX.invoke(this, first, limit, step);
     }
-
-    protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);
 
     protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
 

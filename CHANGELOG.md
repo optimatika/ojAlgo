@@ -17,6 +17,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Calling `model.simplify()` no longer discards constraints flagged both redundant and infeasible – info about the model being infeasible is no longer lost.
 
+### Removed
+
+- A bunch of stuff that's been deprecated for a while is now removed. Only some of which is specifically mentioned below.
+
+#### org.ojalgo.structure
+
+- The interfaces `Access*D.Elements` and `Access*D.IndexOf` have been removed. Some parts of what they defined are still available via other interfaces. Like for instance the `Access1D.Aggregatable` interface took over the `indexOfLargest()` method.
+
 ## [51.0.0] – 2022-02-21
 
 ### Added

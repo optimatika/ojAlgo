@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
+public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 
@@ -124,22 +124,6 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     public final N get(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.get((int) index);
-    }
-
-    /**
-     * @see Scalar#isAbsolute()
-     */
-    @Override
-    public final boolean isAbsolute(final long index) {
-        return this.isAbsolute(Math.toIntExact(index));
-    }
-
-    /**
-     * @see Scalar#isSmall(double)
-     */
-    @Override
-    public final boolean isSmall(final long index, final double comparedTo) {
-        return this.isSmall(Math.toIntExact(index), comparedTo);
     }
 
     @Override
@@ -242,11 +226,6 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
      * @see Scalar#isSmall(double)
      */
     protected abstract boolean isSmall(int index, double comparedTo);
-
-    @Override
-    protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-        return this.isSmall(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), comparedTo);
-    }
 
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
 

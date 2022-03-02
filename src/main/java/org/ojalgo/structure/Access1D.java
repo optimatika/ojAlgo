@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -54,6 +53,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
         N aggregateRange(long first, long limit, Aggregator aggregator);
 
+        long indexOfLargest();
+
     }
 
     public interface Collectable<N extends Comparable<N>, R extends Mutate1D> extends Structure1D {
@@ -71,45 +72,10 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
-    /**
-     * @deprecated v48 Will be removed
-     */
-    @Deprecated
-    public interface Elements extends Structure1D {
-
-        /**
-         * @see Scalar#isAbsolute()
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        boolean isAbsolute(long index);
-
-        /**
-         * @see Scalar#isSmall(double)
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        default boolean isAllSmall(final double comparedTo) {
-            boolean retVal = true;
-            for (long i = 0L, limit = this.count(); retVal && i < limit; i++) {
-                retVal &= this.isSmall(i, comparedTo);
-            }
-            return retVal;
-        }
-
-        /**
-         * @see Scalar#isSmall(double)
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        boolean isSmall(long index, double comparedTo);
-
-    }
-
-    public static final class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
+    public static class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
 
         private long myCursor;
-        private final long myLastCursor;
+        private long myLastCursor;
         private final Access1D<N> myValues;
 
         private ElementView(final Access1D<N> values, final long initial, final long last) {
@@ -119,7 +85,6 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             myValues = values;
             myCursor = initial;
             myLastCursor = last;
-
         }
 
         ElementView(final Access1D<N> values) {
@@ -171,35 +136,21 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
         public ElementView<N> trySplit() {
 
-            final long remaining = myLastCursor - myCursor;
+            long remaining = myLastCursor - myCursor;
 
             if (remaining > 1L) {
 
-                final long split = myCursor + remaining / 2L;
+                long split = myCursor + remaining / 2L;
 
-                final ElementView<N> retVal = new ElementView<>(myValues, myCursor, split);
+                ElementView<N> retVal = new ElementView<>(myValues, myCursor, split);
 
                 myCursor = split;
 
                 return retVal;
-
             }
+
             return null;
         }
-
-    }
-
-    public interface IndexOf extends Structure1D {
-
-        default long indexOfLargest() {
-            return this.indexOfLargestInRange(0L, this.count());
-        }
-
-        /**
-         * @deprecated v48 Will be removed
-         */
-        @Deprecated
-        long indexOfLargestInRange(final long first, final long limit);
 
     }
 
@@ -289,7 +240,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      */
     @Deprecated
     static int hashCode(final Access1D<?> access) {
-        final int limit = access.size();
+        int limit = access.size();
         int retVal = limit + 31;
         for (int ij = 0; ij < limit; ij++) {
             retVal *= access.intValue(ij);
@@ -427,7 +378,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * @return The dot product
      */
     default double dot(final Access1D<?> vector) {
-        final DoubleAdder retVal = new DoubleAdder();
+        DoubleAdder retVal = new DoubleAdder();
         Structure1D.loopMatching(this, vector, i -> retVal.add(this.doubleValue(i) * vector.doubleValue(i)));
         return retVal.doubleValue();
     }
@@ -465,7 +416,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     default void supplyTo(final double[] receiver) {
-        final int limit = Math.min(receiver.length, (int) this.count());
+        int limit = Math.min(receiver.length, (int) this.count());
         for (int i = 0; i < limit; i++) {
             receiver[i] = this.doubleValue(i);
         }
@@ -473,9 +424,9 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     default double[] toRawCopy1D() {
 
-        final int tmpLength = (int) this.count();
+        int tmpLength = (int) this.count();
 
-        final double[] retVal = new double[tmpLength];
+        double[] retVal = new double[tmpLength];
 
         this.supplyTo(retVal);
 

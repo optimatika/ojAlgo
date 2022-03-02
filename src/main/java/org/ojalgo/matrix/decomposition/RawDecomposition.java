@@ -121,6 +121,10 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return Primitive64Store.FACTORY.makeWrapper(matrix);
     }
 
+    RawStore newRawStore(final int m, final int n) {
+        return RawStore.FACTORY.make(m, n);
+    }
+
     double[][] reset(final Structure2D template, final boolean transpose) {
 
         this.reset();
@@ -141,6 +145,10 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         }
 
         return myInternalData;
+    }
+
+    RawStore wrap(final double[][] data) {
+        return RawStore.wrap(data);
     }
 
 }
