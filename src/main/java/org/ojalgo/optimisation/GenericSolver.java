@@ -37,6 +37,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.RowView;
+import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.context.NumberContext;
@@ -112,20 +113,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getBE();
         }
 
-        /**
-         * Will replace each equality constraint with two inequality constraints
-         */
-        public void splitEqualities() {
-
-            if (this.hasEqualityConstraints()) {
-
-                myData.addInequalities(myData.getAE(), myData.getBE());
-                myData.addInequalities(myData.getAE().negate(), myData.getBE().negate());
-
-                myData.clearEqualities();
-            }
-        }
-
         public MatrixStore<Double> getC() {
             return myData.getObjective().getLinearFactors();
         }
@@ -148,6 +135,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         public void reset() {
             myData.reset();
+        }
+
+        /**
+         * Will replace each equality constraint with two inequality constraints
+         */
+        public void splitEqualities() {
+
+            if (this.hasEqualityConstraints()) {
+
+                myData.addInequalities(myData.getAE(), myData.getBE());
+                myData.addInequalities(myData.getAE().negate(), myData.getBE().negate());
+
+                myData.clearEqualities();
+            }
         }
 
         @Override
@@ -237,6 +238,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     public final Optimisation.Options options;
 
+    private transient String myClassSimpleName = null;
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
     private State myState = State.UNEXPLORED;
     private final Stopwatch myStopwatch = new Stopwatch();
@@ -246,8 +248,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         this(new Optimisation.Options());
     }
 
-    /**
-     */
     protected GenericSolver(final Optimisation.Options solverOptions) {
 
         super();
@@ -270,6 +270,9 @@ public abstract class GenericSolver implements Optimisation.Solver {
         return myIterationsCount.get();
     }
 
+    /**
+     * The number of ms since solver instantiated or iterations count reset.
+     */
     protected final long countTime() {
         return myStopwatch.countMillis();
     }
@@ -285,6 +288,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected abstract Access1D<?> extractSolution();
 
+    protected final String getClassSimpleName() {
+        if (myClassSimpleName == null) {
+            myClassSimpleName = this.getClass().getSimpleName();
+        }
+        return myClassSimpleName;
+    }
+
+    /**
+     * The number of s since solver instantiated or iterations count reset.
+     */
+    protected final CalendarDateDuration getDuration() {
+        return myStopwatch.stop(CalendarDateUnit.SECOND);
+    }
+
     protected State getState() {
         return myState;
     }
@@ -296,7 +313,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final int incrementIterationsCount() {
         int iterationsDone = myIterationsCount.incrementAndGet();
         if (this.isLogProgress() && iterationsDone % 100_000 == 0) {
-            this.log("Done {} {} iterations after {}.", iterationsDone, this.getClass().getSimpleName(), myStopwatch.stop(CalendarDateUnit.SECOND));
+            this.logProgress(iterationsDone, this.getClassSimpleName(), this.getDuration());
         }
         return iterationsDone;
     }
@@ -356,6 +373,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
         if (options.logger_appender != null) {
             options.logger_appender.println(messagePattern, arguments);
         }
+    }
+
+    protected void logProgress(final int iterationsDone, final String classSimpleName, final CalendarDateDuration duration) {
+        this.log("Done {} {} iterations in {}.", iterationsDone, classSimpleName, duration);
     }
 
     protected final void resetIterationsCount() {

@@ -76,6 +76,12 @@ public final class COPY implements ArrayOperation {
         return retVal;
     }
 
+    public static int[] invoke(final int[] source, final int[] destination) {
+        int limit = Math.min(source.length, destination.length);
+        System.arraycopy(source, 0, destination, 0, limit);
+        return destination;
+    }
+
     public static void row(final Access2D<?> source, final long row, final double[] destination, final int first, final int limit) {
         for (int j = first; j < limit; j++) {
             destination[j] = source.doubleValue(row, j);

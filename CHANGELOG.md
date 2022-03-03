@@ -23,6 +23,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The `IntIndex` and `IntRowColumn` variants of the `Expression` `add` and `set` methods are deprecated. You should use the alternatives taking a `Variable` or simply an `int` instead.
 
+#### org.ojalgo.concurrent
+
+- New class `MultiviewSet` that combines a `Set` with multiple `PriorityQueue`:s. This allows to have multiple task queues, with different priorities, all backed by a common set of tasks.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+Big changes for the `IntegerSolver`!
+
+- New way to multi-thread the `IntegerSolver`. It no longer does fork-join, but instead makes use of ojAlgo's `ProcessingService`.
+- The `Optimisation.Options.mip_defer` and `Optimisation.Options.mip_gap` configurations are no longer used. Instead there is a whole new framework for how to control the `IntegerSolver`. This framework will be a work in progress for quite some time. Please use it, and give feedback, bit don't expect it to be a stable API.
+
 ### Fixed
 
 #### org.ojalgo.optimisation

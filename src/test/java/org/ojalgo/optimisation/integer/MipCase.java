@@ -21,10 +21,9 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -34,14 +33,24 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@Disabled("Too slow")
-@Tag("slow")
-public final class MipCase extends OptimisationIntegerTests implements ModelFileTest {
+public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
-        ModelFileTest.makeAndAssert("miplib", modelName, FileFormat.MPS, false, expMinValString, expMaxValString, ACCURACY);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", modelName, false);
+
+        // model.options.debug(Optimisation.Solver.class);
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.mip_defer = 0.25;
+        // model.options.mip_gap = 1.0E-5;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 
     /**
@@ -50,8 +59,13 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * Mac Pro (Early 2009)
      * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      */
     @Test
+    @Tag("slow")
     public void testEj() {
         MipCase.doTest("ej.mps", "25508", null);
     }
@@ -62,8 +76,13 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * Mac Pro (Early 2009)
      * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      */
     @Test
+    @Tag("slow")
     public void testGen_ip002() {
         MipCase.doTest("gen-ip002.mps", "-4783.733392", null);
     }
@@ -74,8 +93,14 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * Mac Pro (Early 2009)
      * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 165.6s
+     * <li>2022-03-08: ojAlgo returned 2361.4541951915994 after 5min
+     * </ul>
      */
     @Test
+    @Tag("unstable")
     public void testGen_ip021() {
         MipCase.doTest("gen-ip021.mps", "2361.45419519", null);
     }
@@ -86,8 +111,14 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * Mac Pro (Early 2009)
      * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 193.1s
+     * <li>2022-03-08: ojAlgo returned -4598.0754963044 after 5min
+     * </ul>
      */
     @Test
+    @Tag("unstable")
     public void testGen_ip036() {
         MipCase.doTest("gen-ip036.mps", "-4606.67961", null);
     }
@@ -98,8 +129,13 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * Mac Pro (Early 2009)
      * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      */
     @Test
+    @Tag("slow")
     public void testGen_ip054() {
         MipCase.doTest("gen-ip054.mps", "6840.966", null);
     }
@@ -115,8 +151,13 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: sufficed with optimal solution</li>
      * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      */
     @Test
+    @Tag("slow")
     public void testMarkshare_5_0() {
         MipCase.doTest("markshare_5_0.mps", "1.00000000e+00", null);
     }
@@ -134,8 +175,13 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: sufficed: <1.0> but was: <8.0></li>
      * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      */
     @Test
+    @Tag("slow")
     public void testMarkshare1() {
         MipCase.doTest("markshare1.mps", "1.00000000e+00", null);
     }
@@ -151,9 +197,14 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0></li>
      * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <16.00000000000005></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testMarkshare2()
      */
+    @Tag("slow")
     @Test
     public void testMarkshare2() {
         MipCase.doTest("markshare2.mps", "1", null);
@@ -173,10 +224,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 10.0s
+     * <li>2022-03-08: ojAlgo ran full 5min, but optimal solution found after about 20s
+     * </ul>
      *
      * @see RelaxedMIPCase#testMas76()
      */
     @Test
+    @Tag("unstable")
     public void testMas76() {
         MipCase.doTest("mas76.mps", "4.00050541e+04", null);
     }
@@ -192,10 +249,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7></li>
      * <li>2019-01-28: MacPro sufficed 300s - expected: <2.07405081E7> but was: <2.4548449266857613E7></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 0.3s
+     * <li>2022-03-08: ojAlgo returned 2.158101453372183E7 after 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testModglob()
      */
     @Test
+    @Tag("unstable")
     public void testModglob() {
         MipCase.doTest("modglob.mps", "2.07405081e+07", null);
     }
@@ -208,15 +271,23 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro aborted with no integer solution</li>
      * <li>2019-01-28: MacPro aborted with no integer solution 900s</li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX not able to find solution within 5min
+     * <li>2022-03-08: ojAlgo returned 78.36 after 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testNeos911880()
      */
     @Test
+    @Tag("slow")
+    @Tag("unstable")
     public void testNeos911880() {
         MipCase.doTest("neos-911880.mps", "54.76", null);
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/120
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
      * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0></li>
@@ -225,11 +296,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * <li>2019-01-28: MacPro sufficed 300s - expected: <-41.0> but was: <-40.0></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 17.1s
+     * <li>2022-03-08: ojAlgo returned -14 after 7.3s (Wrong solution!)
+     * </ul>
      *
      * @see RelaxedMIPCase#testNoswot()
      */
     @Test
-    @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
+    @Tag("unstable")
     public void testNoswot() {
         MipCase.doTest("noswot.mps", "-4.10000000e+01", null);
     }
@@ -243,10 +319,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0></li>
      * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7490.0></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 0.5s
+     * <li>2022-03-08: ojAlgo returned 7780.0 after 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testPp08a()
      */
     @Test
+    @Tag("unstable")
     public void testPp08a() {
         MipCase.doTest("pp08a.mps", "7.35000000e+03", null);
     }
@@ -259,10 +341,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0></li>
      * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7550.000000000001></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 0.6s
+     * <li>2022-03-08: ojAlgo returned 7430 after 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testPp08aCUTS()
      */
     @Test
+    @Tag("unstable")
     public void testPp08aCUTS() {
         MipCase.doTest("pp08aCUTS.mps", "7.35000000e+03", null);
     }
@@ -275,10 +363,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962></li>
      * <li>2019-01-28: MacPro sufficed 300s: expected: <764772.0> but was: <1256281.99999962></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 82.0s
+     * <li>2022-03-08: ojAlgo no integer solution within 15min
+     * </ul>
      *
      * @see RelaxedMIPCase#testTimtab1()
      */
     @Test
+    @Tag("unstable")
     public void testTimtab1() {
         MipCase.doTest("timtab1.mps", "7.64772000e+05", null);
     }
@@ -293,10 +387,16 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5></li>
      * <li>2019-01-28: MacPro sufficed 300s: <13.75> but was: <16.5></li>
      * </ul>
+     * MacBook Pro (16-inch, 2019)
+     * <ul>
+     * <li>2022-03-08: CPLEX verified solution in 0.2s
+     * <li>2022-03-08: ojAlgo returned 14.5 after 5min
+     * </ul>
      *
      * @see RelaxedMIPCase#testVpm2()
      */
     @Test
+    @Tag("unstable")
     public void testVpm2() {
         MipCase.doTest("vpm2.mps", "1.37500000e+01", null);
     }

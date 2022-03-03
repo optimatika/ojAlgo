@@ -21,8 +21,9 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -32,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class IntegerUserFiles extends OptimisationIntegerTests implements ModelFileTest {
 
-    private static final NumberContext ACCURACY = NumberContext.of(8, 6);
+    private static final NumberContext ACCURACY = NumberContext.of(8);
 
     private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         return IntegerUserFiles.doTest(modelName, expMinValString, expMaxValString, ACCURACY);
@@ -40,7 +41,40 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
 
     private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString,
             final NumberContext accuracy) {
-        return ModelFileTest.makeAndAssert("usersupplied", modelName, FileFormat.EBM, false, expMinValString, expMaxValString, accuracy);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", modelName, false);
+
+        // model.options.debug(IntegerSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(4)));
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
+
+        return model;
+    }
+
+    /**
+     * <ul>
+     * <li>v51.0.0 took about 30min to solve, first integer soltion after 30s
+     * <li>v51.1.0 (WIP) ≈6min
+     * </ul>
+     */
+    @Test
+    @Tag("slow")
+    public void testBigBinary() {
+        IntegerUserFiles.doTest("BigBinary.ebm", null, "139.4070725458");
+    }
+
+    /**
+     * <ul>
+     * <li>v51.1.0 (WIP) ≈1min (times halved with every digit less required – gap)
+     * </ul>
+     */
+    @Test
+    @Tag("slow")
+    public void testEnergyApp() {
+        IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null);
     }
 
 }

@@ -34,7 +34,6 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -114,7 +113,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         //
         //        return tmpMPS.getExpressionsBasedModel();
 
-        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false, FileFormat.MPS);
+        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false);
     }
 
     @Test
