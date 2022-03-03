@@ -37,7 +37,7 @@ public class SeriesInterpolator {
     private final CoordinationSet<Double> myOriginalSet = new CoordinationSet<>();
 
     public SeriesInterpolator() {
-        this(NumberContext.getGeneral(15));
+        this(NumberContext.ofScale(15));
     }
 
     public SeriesInterpolator(final NumberContext context) {

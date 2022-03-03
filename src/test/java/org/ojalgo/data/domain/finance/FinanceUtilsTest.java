@@ -38,8 +38,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class FinanceUtilsTest extends FinanceTests {
 
-    private static final NumberContext ACCEPTABLE_ACCURACY = NumberContext.getGeneral(14, 14);
-    private static final NumberContext IDENTICAL_ACCURACY = NumberContext.getGeneral(16, 16);
+    private static final NumberContext ACCEPTABLE_ACCURACY = NumberContext.of(14, 14);
+    private static final NumberContext IDENTICAL_ACCURACY = NumberContext.of(16, 16);
 
     private static void doTestCleaning(final double[][] rawOriginal) {
 

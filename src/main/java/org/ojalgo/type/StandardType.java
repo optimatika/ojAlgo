@@ -65,7 +65,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext DECIMAL_032 = NumberContext.getGeneral(MathContext.DECIMAL32);
+    public static final NumberContext DECIMAL_032 = NumberContext.ofMath(MathContext.DECIMAL32).withScale(MathContext.DECIMAL32.getPrecision() / 2);
     /**
      * <ul>
      * <li>Precision: 16</li>
@@ -75,7 +75,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext DECIMAL_064 = NumberContext.getGeneral(MathContext.DECIMAL64);
+    public static final NumberContext DECIMAL_064 = NumberContext.ofMath(MathContext.DECIMAL64).withScale(MathContext.DECIMAL64.getPrecision() / 2);
     /**
      * <ul>
      * <li>Precision: 34</li>
@@ -85,7 +85,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext DECIMAL_128 = NumberContext.getGeneral(MathContext.DECIMAL128);
+    public static final NumberContext DECIMAL_128 = NumberContext.ofMath(MathContext.DECIMAL128).withScale(MathContext.DECIMAL128.getPrecision() / 2);
     /**
      * <ul>
      * <li>Precision: 7</li>
@@ -95,7 +95,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext MATH_032 = NumberContext.getMath(MathContext.DECIMAL32);
+    public static final NumberContext MATH_032 = NumberContext.ofMath(MathContext.DECIMAL32).withScale(MathContext.DECIMAL32.getPrecision());
     /**
      * <ul>
      * <li>Precision: 16</li>
@@ -105,7 +105,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext MATH_064 = NumberContext.getMath(MathContext.DECIMAL64);
+    public static final NumberContext MATH_064 = NumberContext.ofMath(MathContext.DECIMAL64).withScale(MathContext.DECIMAL64.getPrecision());
     /**
      * <ul>
      * <li>Precision: 34</li>
@@ -115,7 +115,7 @@ public abstract class StandardType {
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
      */
-    public static final NumberContext MATH_128 = NumberContext.getMath(MathContext.DECIMAL128);
+    public static final NumberContext MATH_128 = NumberContext.ofMath(MathContext.DECIMAL128).withScale(MathContext.DECIMAL128.getPrecision());
     /**
      * <ul>
      * <li>Precision: 7</li>
@@ -138,7 +138,7 @@ public abstract class StandardType {
      * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
      * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
      */
-    public static final NumberContext PRICE = NumberContext.getGeneral(8);
+    public static final NumberContext PRICE = NumberContext.ofScale(8);
     /**
      * <ul>
      * <li>Precision: 16</li>
@@ -150,7 +150,7 @@ public abstract class StandardType {
      * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
      * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
      */
-    public static final NumberContext QUANTITY = NumberContext.getGeneral(6);
+    public static final NumberContext QUANTITY = NumberContext.ofScale(6);
     public static final DateContext SQL_DATE = new DateContext(DatePart.DATE, DateStyle.SQL, null);
     public static final DateContext SQL_DATETIME = new DateContext(DatePart.DATETIME, DateStyle.SQL, null);
     public static final DateContext SQL_TIME = new DateContext(DatePart.TIME, DateStyle.SQL, null);

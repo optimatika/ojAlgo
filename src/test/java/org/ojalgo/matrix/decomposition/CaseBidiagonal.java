@@ -72,8 +72,8 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
             BasicLogger.debug("Q2 orthogonal (right)", tmpQ2.multiply(tmpQ2.conjugate()));
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 4));
-        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, NumberContext.of(7, 4));
+        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, NumberContext.of(7, 6));
     }
 
     @Test
@@ -148,23 +148,23 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         final BidiagonalDecomposition<Double> tmpDecomposition = (BidiagonalDecomposition<Double>) Bidiagonal.PRIMITIVE.make();
         tmpDecomposition.decompose(aMatrix);
 
-        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, easy!");
         }
 
-        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, hard!");
         }
 
         final MatrixStore<Double> tmpReconstructed = tmpDecomposition.reconstruct();
-        if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(aMatrix, tmpReconstructed, NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }
 
-        TestUtils.assertEquals(aMatrix, tmpDecomposition, new NumberContext(7, 6));
+        TestUtils.assertEquals(aMatrix, tmpDecomposition, NumberContext.of(7, 6));
     }
 
     private Primitive64Store makeEye(final int aRowDim, final int aColDim) {

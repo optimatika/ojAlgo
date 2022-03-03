@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * NumberListTest
@@ -38,7 +37,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class NumberListTest {
 
-    private static final NumberContext CONTEXT = new NumberContext();
     private static final Random RANDOM = new Random();
 
     @Test
@@ -104,10 +102,10 @@ public class NumberListTest {
         TestUtils.assertEquals(expectedList.size(), direct64List.size());
 
         for (int i = 0; i < expectedList.size(); i++) {
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.get(i).doubleValue(), CONTEXT);
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.doubleValue(i), CONTEXT);
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.get(i).doubleValue(), CONTEXT);
-            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.doubleValue(i), CONTEXT);
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.get(i).doubleValue());
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.doubleValue(i));
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.get(i).doubleValue());
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.doubleValue(i));
         }
 
     }
@@ -141,7 +139,7 @@ public class NumberListTest {
             tmNumberList.add(i);
         }
         TestUtils.assertEquals(chunk * 3L, tmNumberList.capacity());
-        TestUtils.assertEquals((2L * chunk) + 1L, tmNumberList.count());
+        TestUtils.assertEquals(2L * chunk + 1L, tmNumberList.count());
     }
 
 }

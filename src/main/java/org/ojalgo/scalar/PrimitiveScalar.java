@@ -73,7 +73,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     public static final PrimitiveScalar TWO = new PrimitiveScalar(PrimitiveMath.TWO);
     public static final PrimitiveScalar ZERO = new PrimitiveScalar(PrimitiveMath.ZERO);
 
-    static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+    static final NumberContext CONTEXT = NumberContext.ofMath(MathContext.DECIMAL64);
 
     public static boolean isAbsolute(final double value) {
         return value >= PrimitiveMath.ZERO;

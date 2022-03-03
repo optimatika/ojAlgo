@@ -43,7 +43,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
 
             super();
 
-            myContext = new NumberContext(19, scale);
+            myContext = NumberContext.of(19, scale);
             myDenominator = Math.round(Math.pow(10.0, scale));
         }
 
@@ -143,7 +143,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
 
     @Override
     public final S divide(final S scalarDivisor) {
-        return this.wrap((myNumerator * this.descriptor().denominator()) / scalarDivisor.numerator());
+        return this.wrap(myNumerator * this.descriptor().denominator() / scalarDivisor.numerator());
     }
 
     @Override
@@ -207,7 +207,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
 
     @Override
     public final S multiply(final S scalarMultiplicand) {
-        return this.wrap((myNumerator * scalarMultiplicand.numerator()) / this.descriptor().denominator());
+        return this.wrap(myNumerator * scalarMultiplicand.numerator() / this.descriptor().denominator());
     }
 
     @Override
@@ -228,14 +228,15 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
 
             return this.wrap(this.descriptor().denominator());
 
-        } else if (power == 1) {
+        }
+        if (power == 1) {
 
             return (S) this;
 
         } else {
 
             long numer = MissingMath.power(myNumerator, power);
-            long denom = MissingMath.power(this.descriptor().denominator(), (power - 1));
+            long denom = MissingMath.power(this.descriptor().denominator(), power - 1);
 
             return this.wrap(numer / denom);
         }
@@ -245,7 +246,8 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     public final S signum() {
         if (myNumerator == 0L) {
             return this.wrap(0L);
-        } else if (myNumerator < 0L) {
+        }
+        if (myNumerator < 0L) {
             return this.wrap(-this.descriptor().denominator());
         } else {
             return this.wrap(this.descriptor().denominator());

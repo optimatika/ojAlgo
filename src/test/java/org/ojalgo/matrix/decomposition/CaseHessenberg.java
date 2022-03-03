@@ -73,25 +73,25 @@ public class CaseHessenberg extends MatrixDecompositionTests {
         final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.PRIMITIVE.make();
         tmpDecomposition.decompose(aMatrix);
 
-        if (!Hessenberg.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Hessenberg.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals!");
         }
 
         final MatrixStore<Double> tmpReconstructed = tmpDecomposition.reconstruct();
-        if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(aMatrix, tmpReconstructed, NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }
 
         if (!Access2D.equals(tmpDecomposition.getQ(),
                 tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))),
-                new NumberContext(7, 6))) {
+                NumberContext.of(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("get and do Q are different!");
         }
 
-        TestUtils.assertEquals(aMatrix, tmpDecomposition, new NumberContext(7, 6));
+        TestUtils.assertEquals(aMatrix, tmpDecomposition, NumberContext.of(7, 6));
     }
 
     private Primitive64Store makeEye(final int aRowDim, final int aColDim) {

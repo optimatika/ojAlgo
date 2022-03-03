@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
-    private static NumberContext COMPARE_CONTEXT = NumberContext.getGeneral(8);
+    private static NumberContext COMPARE_CONTEXT = NumberContext.ofScale(8);
     private static Cholesky<Double> JAMA_CHOLESKY = new RawCholesky();
     private static Eigenvalue<Double> JAMA_EvD = new RawEigenvalue.Dynamic();
     private static LU<Double> JAMA_LU = new RawLU();

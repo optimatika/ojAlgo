@@ -30,7 +30,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class ApproximationCase extends MultiaryFunctionTests {
 
-    private static final NumberContext ACCURACY = new NumberContext(7, 14);
+    private static final NumberContext ACCURACY = NumberContext.of(7, 14);
 
     @Test
     public void testFirstOrderApproximation() {

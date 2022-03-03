@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class DecompositionProblems extends MatrixDecompositionTests {
 
-    private static final NumberContext TOP_ACCURACY = new NumberContext(14, 14);
+    private static final NumberContext TOP_ACCURACY = NumberContext.of(14, 14);
     private static final double ZERO = 1e-9; // tolerance for zero checks
 
     /**
@@ -226,12 +226,12 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("D", tmpSVD.getD(), new NumberContext(7, 6));
-            BasicLogger.debug("Q1", tmpSVD.getU(), new NumberContext(7, 6));
-            BasicLogger.debug("Q2", tmpSVD.getV(), new NumberContext(7, 6));
+            BasicLogger.debug("D", tmpSVD.getD(), NumberContext.of(7, 6));
+            BasicLogger.debug("Q1", tmpSVD.getU(), NumberContext.of(7, 6));
+            BasicLogger.debug("Q2", tmpSVD.getV(), NumberContext.of(7, 6));
         }
 
-        TestUtils.assertEquals(tmpA, tmpSVD, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpA, tmpSVD, NumberContext.of(7, 6));
     }
 
     /**
@@ -245,7 +245,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpA, tmpQR, NumberContext.of(7, 6));
     }
 
     /**
@@ -262,7 +262,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpA, tmpQR, NumberContext.of(7, 6));
     }
 
     @Test
@@ -289,14 +289,14 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         tmpDecomp.decompose(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpDecomp, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpA, tmpDecomp, NumberContext.of(7, 6));
 
         MatrixStore<Double> tmpExpected = tmpDecomp.getSolution(tmpI);
 
         tmpDecomp.decompose(tmpA);
         MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
 
-        TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpExpected, tmpActual, NumberContext.of(7, 6));
     }
 
     /**
@@ -307,7 +307,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20110223() {
 
-        NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
+        NumberContext tmpEqualsNumberContext = NumberContext.of(7, 11);
 
         int tmpDim = 99;
         PhysicalStore<Double> tmpRandom = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
@@ -367,13 +367,13 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 BasicLogger.debug("Original", tmpHermitian);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
-            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
+            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), NumberContext.of(8, 5));
             if (tmpDecomposition instanceof MatrixDecomposition.Solver<?> && ((Solver) tmpDecomposition).isSolvable()) {
                 tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }
-                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
+                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, NumberContext.of(7, 6));
             }
         }
     }
@@ -403,7 +403,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 BasicLogger.debug("Original", original);
                 BasicLogger.debug("Recretaed", decomp.reconstruct());
             }
-            TestUtils.assertEquals(decomp.toString(), original, decomp.reconstruct(), new NumberContext(7, 5));
+            TestUtils.assertEquals(decomp.toString(), original, decomp.reconstruct(), NumberContext.of(7, 5));
 
             if (decomp instanceof MatrixDecomposition.Solver<?> && ((Solver<ComplexNumber>) decomp).isSolvable()) {
 
@@ -411,7 +411,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", solution);
                 }
-                TestUtils.assertEquals(decomp.toString(), identity, solution, new NumberContext(7, 6));
+                TestUtils.assertEquals(decomp.toString(), identity, solution, NumberContext.of(7, 6));
             }
         }
     }
@@ -532,7 +532,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20180617() {
 
-        NumberContext precision = new NumberContext(12, 8);
+        NumberContext precision = NumberContext.of(12, 8);
 
         Primitive64Store matrix = Primitive64Store.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
                 { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });

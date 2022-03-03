@@ -50,8 +50,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BlackLittermanTest extends FinancePortfolioTests {
 
-    private static final NumberContext DEF_CNTXT = new NumberContext(7, 6);
-    private static final NumberContext EVAL_CNTXT = new NumberContext(2, 2);
+    private static final NumberContext DEF_CNTXT = NumberContext.of(7, 6);
+    private static final NumberContext EVAL_CNTXT = NumberContext.of(2, 2);
 
     public static String[] getAssetNames() {
         return new String[] { "US Bonds", "Int Bonds", "US Large Growth", "US Large Value", "US Small Growth", "US Small Value", "Int Dev Equity",

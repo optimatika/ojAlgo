@@ -84,7 +84,7 @@ public class GaussianProcessTest {
                         { 0.8807634427271873, 1.3472073239852407, 1.5170744874003474, 1.7029, 1.5948565596534579, 1.4888943550870049 },
                         { 0.7384394292014367, 1.2174807940480699, 1.423379254178694, 1.5948565596534579, 1.7029, 1.5632762838868954 },
                         { 0.5236319646022823, 0.9782733010505065, 1.2174807940480699, 1.4888943550870049, 1.5632762838868954, 1.7029 } });
-        TestUtils.assertEquals(tmpExpected, tmpProc.getCovariances(), new NumberContext(8, 2));
+        TestUtils.assertEquals(tmpExpected, tmpProc.getCovariances(), NumberContext.of(8, 2));
 
         final Normal tmpDistr = tmpProc.getDistribution(0.2);
         TestUtils.assertEquals("Mean", 0.911277527445648, tmpDistr.getExpected(), 0.005);

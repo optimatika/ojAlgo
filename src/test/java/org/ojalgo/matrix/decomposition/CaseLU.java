@@ -61,7 +61,7 @@ public class CaseLU extends MatrixDecompositionTests {
         final LU<Double> tmpJama = new RawLU();
         tmpJama.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
-        final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
+        final NumberContext tmpPrintContext = NumberContext.ofScale(20);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Big L", tmpBig.getL(), tmpPrintContext);

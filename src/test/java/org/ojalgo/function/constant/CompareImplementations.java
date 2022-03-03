@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
 public class CompareImplementations {
 
     private static final Uniform AROUND_ZERO = new Uniform(NEG, TWO);
-    private static final NumberContext CONTEXT = new NumberContext(7, 14);
+    private static final NumberContext CONTEXT = NumberContext.of(7, 14);
     private static final Uniform POSITIVE = new Uniform(E - TWO, TWO);
 
     @Test

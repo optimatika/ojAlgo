@@ -72,7 +72,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             tmpEigenvalue.decompose(matrix);
 
-            TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL32));
+            TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.ofMath(MathContext.DECIMAL32));
 
             Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
 
@@ -154,7 +154,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         }
 
         for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
-            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
+            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, NumberContext.of(7, 6));
         }
     }
 
@@ -170,7 +170,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         ComplexNumber tmp44 = tmp33;
 
         Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
-        NumberContext accuracyContext = new NumberContext(7, 6);
+        NumberContext accuracyContext = NumberContext.of(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
@@ -318,7 +318,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testRandomGeneralisedA_B() throws RecoverableCondition {
 
-        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext accuracy = NumberContext.ofMath(MathContext.DECIMAL32);
 
         for (int dim = 2; dim < 10; dim++) {
 
@@ -365,7 +365,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testRandomGeneralisedAB() throws RecoverableCondition {
 
-        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext accuracy = NumberContext.ofMath(MathContext.DECIMAL32);
 
         for (int dim = 2; dim < 10; dim++) {
 
@@ -416,7 +416,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testRandomGeneralisedBA() throws RecoverableCondition {
 
-        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext accuracy = NumberContext.ofMath(MathContext.DECIMAL32);
 
         for (int dim = 2; dim < 10; dim++) {
 
@@ -463,7 +463,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testRandomGeneralisedUnprepared() throws RecoverableCondition {
 
-        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext accuracy = NumberContext.ofMath(MathContext.DECIMAL32);
 
         for (int dim = 2; dim < 10; dim++) {
 
@@ -486,7 +486,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testRandomSymmetricValuesOnly() {
 
-        NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext evaluationContext = NumberContext.ofMath(MathContext.DECIMAL32);
 
         for (int dim = 1; dim < 10; dim++) {
 

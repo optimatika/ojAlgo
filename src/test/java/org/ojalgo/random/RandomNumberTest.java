@@ -123,7 +123,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpStdDevCount;
         double tmpConfidence;
-        double tmpError = new NumberContext(7, 12).epsilon();
+        double tmpError = NumberContext.of(7, 12).epsilon();
 
         tmpStdDevCount = ZERO;
         tmpConfidence = ZERO;
@@ -155,7 +155,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
         TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
-        tmpError = new NumberContext(7, 8).epsilon();
+        tmpError = NumberContext.of(7, 8).epsilon();
 
         tmpStdDevCount = SIX;
         tmpConfidence = 0.999999998027;
@@ -193,7 +193,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpConfidenceLevel;
         double tmpExpected;
-        final NumberContext tmpNewScale = new NumberContext(2, 5);
+        final NumberContext tmpNewScale = NumberContext.of(2, 5);
 
         tmpConfidenceLevel = 0.80;
         tmpExpected = 1.28155;
@@ -257,7 +257,7 @@ public class RandomNumberTest extends RandomTests {
         final int tmpSize = 1000;
 
         final double tmpFactoryExpected = 1.05;
-        final double tmpFactoryStdDev = ABS.invoke(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
+        final double tmpFactoryStdDev = ABS.invoke(new Normal(0.0, tmpFactoryExpected - ONE).doubleValue());
         final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / THREE);
@@ -292,7 +292,7 @@ public class RandomNumberTest extends RandomTests {
         double tmpSumSqrDiff = ZERO;
         for (int i = 0; i < tmpSize; i++) {
             tmpVal = tmpLogValues.data[i] - tmpLogGeoMean;
-            tmpSumSqrDiff += (tmpVal * tmpVal);
+            tmpSumSqrDiff += tmpVal * tmpVal;
         }
         TestUtils.assertEquals(tmpGeometricStandardDeviation / tmpGeometricStandardDeviation,
                 EXP.invoke(SQRT.invoke(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.00005);
@@ -368,7 +368,7 @@ public class RandomNumberTest extends RandomTests {
             final double tmpLowerBound = tmpDistribution.getQuantile(tmpHalfSideRemainder);
 
             final double tmpExpected = tmpStdDevCount[c];
-            final double tmpActual = (tmpUpperBound - tmpLowerBound) / (TWO_PI); // Std Dev is PI
+            final double tmpActual = (tmpUpperBound - tmpLowerBound) / TWO_PI; // Std Dev is PI
 
             TestUtils.assertEquals(tmpExpected, tmpActual, 5.0E-3);
         }
@@ -474,7 +474,7 @@ public class RandomNumberTest extends RandomTests {
     public void testWeibullWithShape1() {
 
         // Weibull with shape=1.0 shoud be equivalent to Exponential with the same lambda
-        final double tmpEpsilon = (1E-14 / THREE) * THOUSAND * TEN;
+        final double tmpEpsilon = 1E-14 / THREE * THOUSAND * TEN;
 
         for (double lambda = HUNDREDTH; lambda <= HUNDRED; lambda *= TEN) {
             final Exponential tmpExpected = new Exponential(lambda);

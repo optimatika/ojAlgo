@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20050827Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = NumberContext.getGeneral(12);
+    private static final NumberContext DEFINITION = NumberContext.ofScale(12);
 
     /**
      * @return A fat, 3x5, matrix with complex valued elements.

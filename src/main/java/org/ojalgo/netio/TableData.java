@@ -13,7 +13,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class TableData<R> {
 
-    private static final NumberContext GENERAL = NumberContext.getGeneral(8);
+    private static final NumberContext GENERAL = NumberContext.ofScale(8);
 
     private static final MapFactory<Double> COLUMN_FACTORY = LongToNumberMap.factory(Primitive64Array.FACTORY);
 

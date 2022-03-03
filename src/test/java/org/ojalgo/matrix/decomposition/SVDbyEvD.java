@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SVDbyEvD extends MatrixDecompositionTests {
 
-    private static final NumberContext CONTEXT = new NumberContext(7, 6);
+    private static final NumberContext CONTEXT = NumberContext.of(7, 6);
 
     @Override
     @BeforeEach

@@ -118,7 +118,7 @@ public class LagrangeTest extends OptimisationConvexTests {
     @Test
     public void testNocedalAndWrightExample() throws RecoverableCondition {
 
-        NumberContext accuracy = NumberContext.getMath(12);
+        NumberContext accuracy = NumberContext.of(12);
 
         Primitive64Store Q = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
         Primitive64Store C = FACTORY.column(-8, -3, -3);

@@ -29,7 +29,6 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.BigMath;
@@ -95,96 +94,30 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     public static NumberContext getCurrency(final Locale locale) {
 
-        final NumberFormat tmpFormat = NumberStyle.CURRENCY.getFormat(locale);
-        final int tmpPrecision = DEFAULT_MATH.getPrecision();
-        final int tmpScale = 2;
-        final RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getGeneral(final int scale) {
-        return NumberContext.ofScale(scale);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getGeneral(final int precision, final int scale) {
-        return NumberContext.of(precision, scale);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getGeneral(final int scale, final RoundingMode roundingMode) {
-        return NumberContext.ofScale(scale).withMode(roundingMode);
-    }
-
-    /**
-     * The scale will be set to half the precision.
-     *
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getGeneral(final MathContext context) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = context.getPrecision();
-        final int tmpScale = tmpPrecision / 2;
-        final RoundingMode tmpRoundingMode = context.getRoundingMode();
+        NumberFormat tmpFormat = NumberStyle.CURRENCY.getFormat(locale);
+        int tmpPrecision = DEFAULT_MATH.getPrecision();
+        int tmpScale = 2;
+        RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
     public static NumberContext getInteger(final Locale locale) {
 
-        final NumberFormat tmpFormat = NumberStyle.INTEGER.getFormat(locale);
-        final int tmpPrecision = 0;
-        final int tmpScale = 0;
-        final RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
+        NumberFormat tmpFormat = NumberStyle.INTEGER.getFormat(locale);
+        int tmpPrecision = 0;
+        int tmpScale = 0;
+        RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getMath(final int precisionAndScale) {
-        return NumberContext.of(precisionAndScale);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getMath(final int precisionAndScale, final RoundingMode roundingMode) {
-        return NumberContext.of(precisionAndScale).withMode(roundingMode);
-    }
-
-    /**
-     * The scale will be undefined/unlimited.
-     *
-     * @deprecated v49
-     */
-    @Deprecated
-    public static NumberContext getMath(final MathContext context) {
-        return NumberContext.ofMath(context);
-    }
-
     public static NumberContext getPercent(final int scale, final Locale locale) {
 
-        final NumberFormat tmpFormat = NumberStyle.PERCENT.getFormat(locale);
-        final int tmpPrecision = MathContext.DECIMAL32.getPrecision();
-        final int tmpScale = scale;
-        final RoundingMode tmpRoundingMode = MathContext.DECIMAL32.getRoundingMode();
+        NumberFormat tmpFormat = NumberStyle.PERCENT.getFormat(locale);
+        int tmpPrecision = MathContext.DECIMAL32.getPrecision();
+        int tmpScale = scale;
+        RoundingMode tmpRoundingMode = MathContext.DECIMAL32.getRoundingMode();
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
@@ -235,61 +168,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     private final int myScale;
     private final double myZeroError;
 
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext() {
-        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext(final int precision, final int scale) {
-        this(DEFAULT_STYLE.getFormat(), precision, scale, DEFAULT_MATH.getRoundingMode());
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext(final int precision, final int scale, final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext(final int scale, final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), scale, mode);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext(final NumberFormat format, final int precision, final int scale, final RoundingMode mode) {
+    private NumberContext(final NumberFormat format, final int precision, final int scale, final RoundingMode mode) {
         this(format, new MathContext(precision, mode), scale);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    public NumberContext(final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, mode);
-    }
-
-    /**
-     * @deprecated v49
-     */
-    @Deprecated
-    private NumberContext(final NumberFormat format) {
-        this(format, DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     NumberContext(final NumberFormat format, final MathContext math, final int scale) {
@@ -368,7 +248,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (!super.equals(obj) || !(obj instanceof NumberContext)) {
             return false;
         }
-        final NumberContext other = (NumberContext) obj;
+        NumberContext other = (NumberContext) obj;
         if (myMathContext == null) {
             if (other.myMathContext != null) {
                 return false;
@@ -426,7 +306,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myMathContext == null ? 0 : myMathContext.hashCode());
         result = prime * result + myScale;
@@ -465,7 +345,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
      */
     public BigDecimal toBigDecimal(final double number) {
 
-        final BigDecimal decimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
+        BigDecimal decimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
 
         return this.scale(decimal);
     }
@@ -612,9 +492,9 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
         if (format instanceof DecimalFormat) {
 
-            final DecimalFormat tmpDF = (DecimalFormat) format;
+            DecimalFormat tmpDF = (DecimalFormat) format;
 
-            final int tmpModScale = myScale - PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
+            int tmpModScale = myScale - PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
             tmpDF.setMinimumFractionDigits(Math.min(2, tmpModScale));

@@ -67,7 +67,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(4, 4); // TODO Something must be wrong here!
+        // ACCURACY = NumberContext.of(4,4); // TODO Something must be wrong here!
 
         rAA = SimpleLeastSquaresCase.getFactorR();
         rAX = SimpleLeastSquaresCase.getSolution();
@@ -85,7 +85,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         BasicMatrix<?, ?> actMtrx;
         BasicMatrix<?, ?> expMtrx;
 
-        NumberContext accuracy = new NumberContext(4, 4); // TODO Something must be wrong here!
+        NumberContext accuracy = NumberContext.of(4, 4); // TODO Something must be wrong here!
 
         expMtrx = SimpleLeastSquaresCase.getTransformedRHS();
         actMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
