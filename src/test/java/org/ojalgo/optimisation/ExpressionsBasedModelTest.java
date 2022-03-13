@@ -34,6 +34,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest extends OptimisationTests {
@@ -63,6 +64,33 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(1.0, result.doubleValue(0) + result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(4.0, result.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    @Test
+    public void testExpressionSetAdd() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable var0 = model.addVariable();
+        Variable var1 = model.addVariable();
+        Variable var2 = model.addVariable();
+
+        Expression expr = model.addExpression();
+
+        expr.set(var1, BigMath.ONE);
+        expr.set(var2, BigMath.TWO);
+
+        expr.add(var0, BigMath.TWO);
+        expr.add(1, BigMath.THREE);
+        expr.add(var2, BigMath.FOUR);
+
+        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(IntIndex.of(0), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(IntIndex.of(1), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(IntIndex.of(2), false));
+
+        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(var0.getIndex(), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(var1.getIndex(), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(var2.getIndex(), false));
     }
 
     /**
