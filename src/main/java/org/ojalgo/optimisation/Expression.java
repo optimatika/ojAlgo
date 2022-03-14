@@ -138,12 +138,58 @@ public final class Expression extends ModelEntity<Expression> {
         myQuadratic = new HashMap<>();
     }
 
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int index, final Comparable<?> value) {
+        return this.add(myModel.getVariable(index), value);
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int index, final double value) {
+        return this.add(index, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int row, final int column, final Comparable<?> value) {
+        return this.add(new IntRowColumn(row, column), value);
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int row, final int column, final double value) {
+        return this.add(row, column, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int row, final int column, final long value) {
+        return this.add(row, column, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final int index, final long value) {
+        return this.add(index, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression add(final IntIndex key, final Comparable<?> value) {
 
-        final BigDecimal tmpExisting = myLinear.get(key);
+        BigDecimal existing = myLinear.get(key);
 
-        if (tmpExisting != null) {
-            this.set(key, ModelEntity.toBigDecimal(value).add(tmpExisting));
+        if (existing != null) {
+            this.set(key, ModelEntity.toBigDecimal(value).add(existing));
         } else {
             this.set(key, value);
         }
@@ -151,17 +197,119 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
+    public Expression add(final IntIndex key, final double value) {
+        return this.add(key, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
+    public Expression add(final IntIndex row, final IntIndex column, final Comparable<?> value) {
+        return this.add(new IntRowColumn(row, column), value);
+    }
+
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
+    public Expression add(final IntIndex row, final IntIndex column, final double value) {
+        return this.add(row, column, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
+    public Expression add(final IntIndex row, final IntIndex column, final long value) {
+        return this.add(row, column, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
+    public Expression add(final IntIndex key, final long value) {
+        return this.add(key, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
     public Expression add(final IntRowColumn key, final Comparable<?> value) {
 
-        final BigDecimal tmpExisting = myQuadratic.get(key);
+        BigDecimal existing = myQuadratic.get(key);
 
-        if (tmpExisting != null) {
-            this.set(key, ModelEntity.toBigDecimal(value).add(tmpExisting));
+        if (existing != null) {
+            this.set(key, ModelEntity.toBigDecimal(value).add(existing));
         } else {
             this.set(key, value);
         }
 
         return this;
+    }
+
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
+    public Expression add(final IntRowColumn key, final double value) {
+        return this.add(key, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
+    public Expression add(final IntRowColumn key, final long value) {
+        return this.add(key, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * Will add the value to this variable's factor.
+     */
+    public Expression add(final Variable variable, final Comparable<?> value) {
+        return this.add(variable.getIndex(), value);
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final Variable variable, final double value) {
+        return this.add(variable, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final Variable variable, final long value) {
+        return this.add(variable, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final Variable variable1, final Variable variable2, final Comparable<?> value) {
+        return this.add(variable1.getIndex().index, variable2.getIndex().index, value);
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final Variable variable1, final Variable variable2, final double value) {
+        return this.add(variable1, variable2, BigDecimal.valueOf(value));
+    }
+
+    /**
+     * @see #add(Variable, Comparable)
+     */
+    public Expression add(final Variable variable1, final Variable variable2, final long value) {
+        return this.add(variable1, variable2, BigDecimal.valueOf(value));
     }
 
     public int compareTo(final Expression obj) {
@@ -183,16 +331,16 @@ public final class Expression extends ModelEntity<Expression> {
             return this; // No need to copy/compensate anything
 
         }
-        final ExpressionsBasedModel tmpModel = this.getModel();
+        ExpressionsBasedModel tmpModel = this.getModel();
 
-        final Expression retVal = new Expression(this.getName(), tmpModel);
+        Expression retVal = new Expression(this.getName(), tmpModel);
 
         BigDecimal tmpFixedValue = BigMath.ZERO;
 
-        for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
+        for (Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
 
-            final IntIndex tmpKey = tmpEntry.getKey();
-            final BigDecimal tmpFactor = tmpEntry.getValue();
+            IntIndex tmpKey = tmpEntry.getKey();
+            BigDecimal tmpFactor = tmpEntry.getValue();
 
             if (fixedVariables.contains(tmpKey)) {
                 // Fixed
@@ -209,25 +357,25 @@ public final class Expression extends ModelEntity<Expression> {
             }
         }
 
-        for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
+        for (Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
 
-            final IntRowColumn tmpKey = tmpEntry.getKey();
-            final BigDecimal tmpFactor = tmpEntry.getValue();
+            IntRowColumn tmpKey = tmpEntry.getKey();
+            BigDecimal tmpFactor = tmpEntry.getValue();
 
-            final Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
-            final Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
+            Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
+            Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
 
-            final IntIndex tmpRowKey = tmpRowVariable.getIndex();
-            final IntIndex tmpColKey = tmpColVariable.getIndex();
+            IntIndex tmpRowKey = tmpRowVariable.getIndex();
+            IntIndex tmpColKey = tmpColVariable.getIndex();
 
             if (fixedVariables.contains(tmpRowKey)) {
 
-                final BigDecimal tmpRowValue = tmpRowVariable.getValue();
+                BigDecimal tmpRowValue = tmpRowVariable.getValue();
 
                 if (fixedVariables.contains(tmpColKey)) {
                     // Both fixed
 
-                    final BigDecimal tmpColValue = tmpColVariable.getValue();
+                    BigDecimal tmpColValue = tmpColVariable.getValue();
 
                     tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
 
@@ -240,7 +388,7 @@ public final class Expression extends ModelEntity<Expression> {
             } else if (fixedVariables.contains(tmpColKey)) {
                 // Column fixed
 
-                final BigDecimal tmpColValue = tmpColVariable.getValue();
+                BigDecimal tmpColValue = tmpColVariable.getValue();
 
                 retVal.add(tmpRowKey, tmpFactor.multiply(tmpColValue));
 
@@ -291,7 +439,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     public BigDecimal get(final Variable variable) {
-        final IntIndex tmpIndex = variable.getIndex();
+        IntIndex tmpIndex = variable.getIndex();
         if (tmpIndex != null) {
             return this.get(tmpIndex);
         }
@@ -300,12 +448,12 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(myModel.countVariables(), 1);
+        Primitive64Store retVal = Primitive64Store.FACTORY.make(myModel.countVariables(), 1);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
+        BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
         UnaryFunction<Double> tmpModFunc;
-        for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
+        for (IntRowColumn tmpKey : this.getQuadraticKeySet()) {
             tmpAdjustedFactor = this.getAdjustedQuadraticFactor(tmpKey);
             tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor * point.doubleValue(tmpKey.column));
             retVal.modifyOne(tmpKey.row, 0, tmpModFunc);
@@ -313,7 +461,7 @@ public final class Expression extends ModelEntity<Expression> {
             retVal.modifyOne(tmpKey.column, 0, tmpModFunc);
         }
 
-        for (final IntIndex tmpKey : this.getLinearKeySet()) {
+        for (IntIndex tmpKey : this.getLinearKeySet()) {
             tmpAdjustedFactor = this.getAdjustedLinearFactor(tmpKey);
             tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor);
             retVal.modifyOne(tmpKey.index, 0, tmpModFunc);
@@ -324,12 +472,12 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedHessian() {
 
-        final int tmpCountVariables = myModel.countVariables();
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
+        int tmpCountVariables = myModel.countVariables();
+        Primitive64Store retVal = Primitive64Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
+        BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
-        for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
+        for (IntRowColumn tmpKey : this.getQuadraticKeySet()) {
             tmpModFunc = tmpBaseFunc.second(this.getAdjustedQuadraticFactor(tmpKey));
             retVal.modifyOne(tmpKey.row, tmpKey.column, tmpModFunc);
             retVal.modifyOne(tmpKey.column, tmpKey.row, tmpModFunc);
@@ -430,30 +578,52 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size() == 0 && myLinear.size() > 0 && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int index, final Comparable<?> value) {
         return this.set(myModel.getVariable(index), value);
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int index, final double value) {
         return this.set(index, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int row, final int column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int row, final int column, final double value) {
         return this.set(row, column, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int row, final int column, final long value) {
         return this.set(row, column, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final int index, final long value) {
         return this.set(index, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex key, final Comparable<?> value) {
 
         if (key == null) {
@@ -472,33 +642,57 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex key, final double value) {
         return this.set(key, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex row, final IntIndex column, final double value) {
         return this.set(row, column, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex row, final IntIndex column, final long value) {
         return this.set(row, column, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with a {@link Variable} or an int as the key/index instead.
+     */
+    @Deprecated
     public Expression set(final IntIndex key, final long value) {
         return this.set(key, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
     public Expression set(final IntRowColumn key, final Comparable<?> value) {
 
         if (key == null) {
 
             throw new IllegalArgumentException();
         }
-        final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
+        BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
 
         if (tmpValue.signum() != 0) {
             myQuadratic.put(key, tmpValue);
@@ -511,34 +705,60 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
     public Expression set(final IntRowColumn key, final double value) {
         return this.set(key, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @deprecated Use the alternatives with {@link Variable}:s or int:s as the key instead.
+     */
+    @Deprecated
     public Expression set(final IntRowColumn key, final long value) {
         return this.set(key, BigDecimal.valueOf(value));
     }
 
+    /**
+     * Will set (replace) the variable's factor to this value
+     */
     public Expression set(final Variable variable, final Comparable<?> value) {
         return this.set(variable.getIndex(), value);
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final Variable variable, final double value) {
         return this.set(variable, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final Variable variable, final long value) {
         return this.set(variable, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.set(variable1.getIndex().index, variable2.getIndex().index, value);
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final Variable variable1, final Variable variable2, final double value) {
         return this.set(variable1, variable2, BigDecimal.valueOf(value));
     }
 
+    /**
+     * @see #set(Variable, Comparable)
+     */
     public Expression set(final Variable variable1, final Variable variable2, final long value) {
         return this.set(variable1, variable2, BigDecimal.valueOf(value));
     }
@@ -552,13 +772,13 @@ public final class Expression extends ModelEntity<Expression> {
      */
     public void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> point) {
 
-        final int tmpLength = variables.size();
+        int tmpLength = variables.size();
 
         if (point.count() != tmpLength) {
             throw new IllegalArgumentException();
         }
 
-        final BigDecimal tmpLinearWeight = BigMath.TWO.negate();
+        BigDecimal tmpLinearWeight = BigMath.TWO.negate();
 
         Variable tmpVariable;
         BigDecimal tmpVal;
@@ -575,7 +795,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public void setLinearFactors(final List<Variable> variables, final Access1D<?> factors) {
 
-        final int tmpLimit = variables.size();
+        int tmpLimit = variables.size();
 
         if (factors.count() != tmpLimit) {
             throw new IllegalArgumentException();
@@ -592,21 +812,21 @@ public final class Expression extends ModelEntity<Expression> {
      * @param variables The relevant variables
      */
     public void setLinearFactorsSimple(final List<Variable> variables) {
-        for (final Variable tmpVariable : variables) {
+        for (Variable tmpVariable : variables) {
             this.set(tmpVariable, BigMath.ONE);
         }
     }
 
     public void setQuadraticFactors(final List<Variable> variables, final Access2D<?> factors) {
 
-        final int tmpLimit = variables.size();
+        int tmpLimit = variables.size();
 
         if (factors.countRows() != tmpLimit || factors.countColumns() != tmpLimit) {
             throw new IllegalArgumentException();
         }
 
         for (int j = 0; j < tmpLimit; j++) {
-            final Variable tmpVar2 = variables.get(j);
+            Variable tmpVar2 = variables.get(j);
             for (int i = 0; i < tmpLimit; i++) {
                 this.set(variables.get(i), tmpVar2, factors.get(i, j));
             }
@@ -640,7 +860,7 @@ public final class Expression extends ModelEntity<Expression> {
 
             return value;
         }
-        final int tmpAdjExp = this.getAdjustmentExponent();
+        int tmpAdjExp = this.getAdjustmentExponent();
 
         if (tmpAdjExp != 0) {
 
@@ -922,11 +1142,11 @@ public final class Expression extends ModelEntity<Expression> {
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
 
-        final HashSet<Variable> retVal = new HashSet<>();
+        HashSet<Variable> retVal = new HashSet<>();
 
-        for (final IntIndex varInd : myLinear.keySet()) {
+        for (IntIndex varInd : myLinear.keySet()) {
             if (subset.contains(varInd)) {
-                final Variable variable = myModel.getVariable(varInd.index);
+                Variable variable = myModel.getVariable(varInd.index);
                 if (variable.isBinary()) {
                     retVal.add(variable);
                 }
@@ -957,7 +1177,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     boolean includes(final Variable variable) {
-        final IntIndex tmpVarInd = variable.getIndex();
+        IntIndex tmpVarInd = variable.getIndex();
         return myLinear.containsKey(tmpVarInd)
                 || myQuadratic.size() > 0 && myQuadratic.keySet().stream().anyMatch(k -> (k.row == tmpVarInd.index || k.column == tmpVarInd.index));
     }

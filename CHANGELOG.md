@@ -11,6 +11,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- `Expression` gained `add` methods corresponding to each of the existing `set` methods.
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- The `IntIndex` and `IntRowColumn` variants of the `Expression` `add` and `set` methods are deprecated. You should use the alternatives taking a `Variable` or simply an `int` instead.
+
 ### Fixed
 
 #### org.ojalgo.optimisation
