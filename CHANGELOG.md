@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [51.1.0] – 2022-03-17
+
 ### Added
 
 #### org.ojalgo.optimisation
@@ -34,7 +36,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 Big changes for the `IntegerSolver`!
 
 - New way to multi-thread the `IntegerSolver`. It no longer does fork-join, but instead makes use of ojAlgo's `ProcessingService`.
-- The `Optimisation.Options.mip_defer` and `Optimisation.Options.mip_gap` configurations are no longer used. Instead there is a whole new framework for how to control the `IntegerSolver`. This framework will be a work in progress for quite some time. Please use it, and give feedback, bit don't expect it to be a stable API.
+- The `Optimisation.Options.mip_defer` and `Optimisation.Options.mip_gap` configurations are no longer used. Instead there is a whole new framework for how to control the `IntegerSolver`. This framework will be a work in progress for quite some time. Please use it, and give feedback, but don't expect it to be a stable API.
 
 ### Fixed
 
