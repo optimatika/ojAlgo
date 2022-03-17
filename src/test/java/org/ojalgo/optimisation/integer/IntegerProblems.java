@@ -96,7 +96,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         }
         tmpC3.level(THREE);
 
-        //tmpModel.options.debug(LinearSolver.class);
+        // tmpModel.options.progress(IntegerSolver.class);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
 

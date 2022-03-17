@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -113,8 +114,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
          * file sections.
          */
         public static FileFormat from(final File file) {
+            return FileFormat.from(file.getPath());
+        }
 
-            String lowerCasePath = file.getPath().toLowerCase();
+        public static FileFormat from(final String path) {
+
+            String lowerCasePath = path.toLowerCase();
 
             if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
                 return FileFormat.MPS;
@@ -168,8 +173,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 }
 
                 return new Result(solverState.getState(), modelSolution);
-
             }
+
             if (solverState.count() != numbVariables) {
                 throw new IllegalStateException();
             }
@@ -914,11 +919,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         myVariablesCategorisation.reset();
     }
 
-    public Expression generateCut(final Expression constraint, final Optimisation.Result solution) {
-
-        return null;
-    }
-
     public Expression getExpression(final String name) {
         return myExpressions.get(name);
     }
@@ -1436,6 +1436,52 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
+    private void generateCuts() {
+
+        Map<String, Expression> cuts = new HashMap<>();
+
+        for (Entry<String, Expression> expressionEntry : myExpressions.entrySet()) {
+            String expressionName = expressionEntry.getKey();
+            Expression expression = expressionEntry.getValue();
+
+            if (expression.isEqualityConstraint() && expression.getUpperLimit().signum() != 0 && expression.isLinearAndAllInteger()) {
+
+                BigDecimal level = expression.getUpperLimit();
+                level = level.add(level);
+
+                String cutName = "CUT_" + expressionName;
+                Expression cut = new Expression(cutName, this);
+
+                for (Entry<IntIndex, BigDecimal> linear : expression.getLinearEntrySet()) {
+
+                    BigDecimal lin = BigMath.DIVIDE.invoke(linear.getValue(), level);
+
+                    BigDecimal lowInt = lin.setScale(0, RoundingMode.FLOOR);
+
+                    BigDecimal fract = lin.subtract(lowInt);
+
+                    if (fract.signum() == 1) {
+                        cut.add(linear.getKey(), fract);
+                    }
+
+                }
+
+                if (cut.countLinearFactors() > 0) {
+
+                    cut.lower(BigMath.HALF);
+
+                    cuts.put(cutName, cut);
+                }
+
+            }
+        }
+
+        myExpressions.putAll(cuts);
+        cuts.clear();
+
+        this.identifyRedundantConstraints();
+    }
+
     /**
      * Will indentify constarints with equal variables set, and check if those can be combined or not.
      */
@@ -1512,6 +1558,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                                 }
 
                                 subExpression.setRedundant();
+
+                                BasicLogger.debug("Redundant: {} <<= {}", subExpression, refExpression);
                             }
                         }
                     }

@@ -29,10 +29,16 @@ import org.ojalgo.function.special.PowerOf2;
 @FunctionalInterface
 public interface ParallelismSupplier extends IntSupplier {
 
+    /**
+     * @see PowerOf2#adjustDown(double)
+     */
     default ParallelismSupplier adjustDown() {
         return () -> PowerOf2.adjustDown(this.getAsInt());
     }
 
+    /**
+     * @see PowerOf2#adjustUp(double)
+     */
     default ParallelismSupplier adjustUp() {
         return () -> PowerOf2.adjustUp(this.getAsInt());
     }

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 
@@ -36,7 +35,7 @@ public class InterruptionTest implements ModelFileTest {
     public static final int TIMEOUT_DURATION = 4;
 
     private static ExpressionsBasedModel makeModel() {
-        return ModelFileTest.makeModel("netlib", "D6CUBE.SIF", false, FileFormat.MPS);
+        return ModelFileTest.makeModel("netlib", "D6CUBE.SIF", false);
     }
 
     private void launchSlowMinimization() {

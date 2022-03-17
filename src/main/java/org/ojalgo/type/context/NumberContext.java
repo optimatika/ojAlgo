@@ -218,7 +218,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         if (object instanceof Enforceable<?>) {
             return (Comparable<?>) ((Enforceable<?>) object).enforce(this);
         }
-        return this.enforce(NumberDefinition.doubleValue(object));
+        return Double.valueOf(this.enforce(NumberDefinition.doubleValue(object)));
     }
 
     /**

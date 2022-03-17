@@ -1,0 +1,4124 @@
+V	ESS_00:00_Power	-10000	10000		false
+V	ESS_00:00_Discharge_Power	0	10000		false
+V	ESS_00:00_Charge_Power	0	0		false
+V	ESS_00:00_Energy	0	2640000		false
+V	EV_00:00_Charge_Power	0	11000		false
+V	EV_00:00_Charge_Mode	0	1		true
+V	EV_00:00Energy	0	3000000		false
+V	Grid_00:00_Power				false
+V	Grid_00:00_Buy_Power	0	30000		false
+V	Grid_00:00_Sell_Power	0	0		false
+V	ESS_00:15_Power	-10000	10000		false
+V	ESS_00:15_Discharge_Power	0	10000		false
+V	ESS_00:15_Charge_Power	0	0		false
+V	ESS_00:15_Energy	0	2640000		false
+V	EV_00:15_Charge_Power	0	11000		false
+V	EV_00:15_Charge_Mode	0	1		true
+V	EV_00:15Energy	0	3000000		false
+V	Grid_00:15_Power				false
+V	Grid_00:15_Buy_Power	0	30000		false
+V	Grid_00:15_Sell_Power	0	0		false
+V	ESS_00:30_Power	-10000	10000		false
+V	ESS_00:30_Discharge_Power	0	10000		false
+V	ESS_00:30_Charge_Power	0	0		false
+V	ESS_00:30_Energy	0	2640000		false
+V	EV_00:30_Charge_Power	0	11000		false
+V	EV_00:30_Charge_Mode	0	1		true
+V	EV_00:30Energy	0	3000000		false
+V	Grid_00:30_Power				false
+V	Grid_00:30_Buy_Power	0	30000		false
+V	Grid_00:30_Sell_Power	0	0		false
+V	ESS_00:45_Power	-10000	10000		false
+V	ESS_00:45_Discharge_Power	0	10000		false
+V	ESS_00:45_Charge_Power	0	0		false
+V	ESS_00:45_Energy	0	2640000		false
+V	EV_00:45_Charge_Power	0	11000		false
+V	EV_00:45_Charge_Mode	0	1		true
+V	EV_00:45Energy	0	3000000		false
+V	Grid_00:45_Power				false
+V	Grid_00:45_Buy_Power	0	30000		false
+V	Grid_00:45_Sell_Power	0	0		false
+V	ESS_01:00_Power	-10000	10000		false
+V	ESS_01:00_Discharge_Power	0	10000		false
+V	ESS_01:00_Charge_Power	0	0		false
+V	ESS_01:00_Energy	0	2640000		false
+V	EV_01:00_Charge_Power	0	11000		false
+V	EV_01:00_Charge_Mode	0	1		true
+V	EV_01:00Energy	0	3000000		false
+V	Grid_01:00_Power				false
+V	Grid_01:00_Buy_Power	0	30000		false
+V	Grid_01:00_Sell_Power	0	0		false
+V	ESS_01:15_Power	-10000	10000		false
+V	ESS_01:15_Discharge_Power	0	10000		false
+V	ESS_01:15_Charge_Power	0	0		false
+V	ESS_01:15_Energy	0	2640000		false
+V	EV_01:15_Charge_Power	0	11000		false
+V	EV_01:15_Charge_Mode	0	1		true
+V	EV_01:15Energy	0	3000000		false
+V	Grid_01:15_Power				false
+V	Grid_01:15_Buy_Power	0	30000		false
+V	Grid_01:15_Sell_Power	0	0		false
+V	ESS_01:30_Power	-10000	10000		false
+V	ESS_01:30_Discharge_Power	0	10000		false
+V	ESS_01:30_Charge_Power	0	0		false
+V	ESS_01:30_Energy	0	2640000		false
+V	EV_01:30_Charge_Power	0	11000		false
+V	EV_01:30_Charge_Mode	0	1		true
+V	EV_01:30Energy	0	3000000		false
+V	Grid_01:30_Power				false
+V	Grid_01:30_Buy_Power	0	30000		false
+V	Grid_01:30_Sell_Power	0	0		false
+V	ESS_01:45_Power	-10000	10000		false
+V	ESS_01:45_Discharge_Power	0	10000		false
+V	ESS_01:45_Charge_Power	0	0		false
+V	ESS_01:45_Energy	0	2640000		false
+V	EV_01:45_Charge_Power	0	11000		false
+V	EV_01:45_Charge_Mode	0	1		true
+V	EV_01:45Energy	0	3000000		false
+V	Grid_01:45_Power				false
+V	Grid_01:45_Buy_Power	0	30000		false
+V	Grid_01:45_Sell_Power	0	0		false
+V	ESS_02:00_Power	-10000	10000		false
+V	ESS_02:00_Discharge_Power	0	10000		false
+V	ESS_02:00_Charge_Power	0	0		false
+V	ESS_02:00_Energy	0	2640000		false
+V	EV_02:00_Charge_Power	0	11000		false
+V	EV_02:00_Charge_Mode	0	1		true
+V	EV_02:00Energy	0	3000000		false
+V	Grid_02:00_Power				false
+V	Grid_02:00_Buy_Power	0	30000		false
+V	Grid_02:00_Sell_Power	0	0		false
+V	ESS_02:15_Power	-10000	10000		false
+V	ESS_02:15_Discharge_Power	0	10000		false
+V	ESS_02:15_Charge_Power	0	0		false
+V	ESS_02:15_Energy	0	2640000		false
+V	EV_02:15_Charge_Power	0	11000		false
+V	EV_02:15_Charge_Mode	0	1		true
+V	EV_02:15Energy	0	3000000		false
+V	Grid_02:15_Power				false
+V	Grid_02:15_Buy_Power	0	30000		false
+V	Grid_02:15_Sell_Power	0	0		false
+V	ESS_02:30_Power	-10000	10000		false
+V	ESS_02:30_Discharge_Power	0	10000		false
+V	ESS_02:30_Charge_Power	0	0		false
+V	ESS_02:30_Energy	0	2640000		false
+V	EV_02:30_Charge_Power	0	11000		false
+V	EV_02:30_Charge_Mode	0	1		true
+V	EV_02:30Energy	0	3000000		false
+V	Grid_02:30_Power				false
+V	Grid_02:30_Buy_Power	0	30000		false
+V	Grid_02:30_Sell_Power	0	0		false
+V	ESS_02:45_Power	-10000	10000		false
+V	ESS_02:45_Discharge_Power	0	10000		false
+V	ESS_02:45_Charge_Power	0	0		false
+V	ESS_02:45_Energy	0	2640000		false
+V	EV_02:45_Charge_Power	0	11000		false
+V	EV_02:45_Charge_Mode	0	1		true
+V	EV_02:45Energy	0	3000000		false
+V	Grid_02:45_Power				false
+V	Grid_02:45_Buy_Power	0	30000		false
+V	Grid_02:45_Sell_Power	0	0		false
+V	ESS_03:00_Power	-10000	10000		false
+V	ESS_03:00_Discharge_Power	0	10000		false
+V	ESS_03:00_Charge_Power	0	0		false
+V	ESS_03:00_Energy	0	2640000		false
+V	EV_03:00_Charge_Power	0	11000		false
+V	EV_03:00_Charge_Mode	0	1		true
+V	EV_03:00Energy	0	3000000		false
+V	Grid_03:00_Power				false
+V	Grid_03:00_Buy_Power	0	30000		false
+V	Grid_03:00_Sell_Power	0	0		false
+V	ESS_03:15_Power	-10000	10000		false
+V	ESS_03:15_Discharge_Power	0	10000		false
+V	ESS_03:15_Charge_Power	0	0		false
+V	ESS_03:15_Energy	0	2640000		false
+V	EV_03:15_Charge_Power	0	11000		false
+V	EV_03:15_Charge_Mode	0	1		true
+V	EV_03:15Energy	0	3000000		false
+V	Grid_03:15_Power				false
+V	Grid_03:15_Buy_Power	0	30000		false
+V	Grid_03:15_Sell_Power	0	0		false
+V	ESS_03:30_Power	-10000	10000		false
+V	ESS_03:30_Discharge_Power	0	10000		false
+V	ESS_03:30_Charge_Power	0	0		false
+V	ESS_03:30_Energy	0	2640000		false
+V	EV_03:30_Charge_Power	0	11000		false
+V	EV_03:30_Charge_Mode	0	1		true
+V	EV_03:30Energy	0	3000000		false
+V	Grid_03:30_Power				false
+V	Grid_03:30_Buy_Power	0	30000		false
+V	Grid_03:30_Sell_Power	0	0		false
+V	ESS_03:45_Power	-10000	10000		false
+V	ESS_03:45_Discharge_Power	0	10000		false
+V	ESS_03:45_Charge_Power	0	0		false
+V	ESS_03:45_Energy	0	2640000		false
+V	EV_03:45_Charge_Power	0	11000		false
+V	EV_03:45_Charge_Mode	0	1		true
+V	EV_03:45Energy	0	3000000		false
+V	Grid_03:45_Power				false
+V	Grid_03:45_Buy_Power	0	30000		false
+V	Grid_03:45_Sell_Power	0	0		false
+V	ESS_04:00_Power	-10000	10000		false
+V	ESS_04:00_Discharge_Power	0	10000		false
+V	ESS_04:00_Charge_Power	0	0		false
+V	ESS_04:00_Energy	0	2640000		false
+V	EV_04:00_Charge_Power	0	11000		false
+V	EV_04:00_Charge_Mode	0	1		true
+V	EV_04:00Energy	0	3000000		false
+V	Grid_04:00_Power				false
+V	Grid_04:00_Buy_Power	0	30000		false
+V	Grid_04:00_Sell_Power	0	0		false
+V	ESS_04:15_Power	-10000	10000		false
+V	ESS_04:15_Discharge_Power	0	10000		false
+V	ESS_04:15_Charge_Power	0	0		false
+V	ESS_04:15_Energy	0	2640000		false
+V	EV_04:15_Charge_Power	0	11000		false
+V	EV_04:15_Charge_Mode	0	1		true
+V	EV_04:15Energy	0	3000000		false
+V	Grid_04:15_Power				false
+V	Grid_04:15_Buy_Power	0	30000		false
+V	Grid_04:15_Sell_Power	0	0		false
+V	ESS_04:30_Power	-10000	10000		false
+V	ESS_04:30_Discharge_Power	0	10000		false
+V	ESS_04:30_Charge_Power	0	0		false
+V	ESS_04:30_Energy	0	2640000		false
+V	EV_04:30_Charge_Power	0	11000		false
+V	EV_04:30_Charge_Mode	0	1		true
+V	EV_04:30Energy	0	3000000		false
+V	Grid_04:30_Power				false
+V	Grid_04:30_Buy_Power	0	30000		false
+V	Grid_04:30_Sell_Power	0	0		false
+V	ESS_04:45_Power	-10000	10000		false
+V	ESS_04:45_Discharge_Power	0	10000		false
+V	ESS_04:45_Charge_Power	0	21		false
+V	ESS_04:45_Energy	0	2640000		false
+V	EV_04:45_Charge_Power	0	11000		false
+V	EV_04:45_Charge_Mode	0	1		true
+V	EV_04:45Energy	0	3000000		false
+V	Grid_04:45_Power				false
+V	Grid_04:45_Buy_Power	0	30000		false
+V	Grid_04:45_Sell_Power	0	21		false
+V	ESS_05:00_Power	-10000	10000		false
+V	ESS_05:00_Discharge_Power	0	10000		false
+V	ESS_05:00_Charge_Power	0	46		false
+V	ESS_05:00_Energy	0	2640000		false
+V	EV_05:00_Charge_Power	0	11000		false
+V	EV_05:00_Charge_Mode	0	1		true
+V	EV_05:00Energy	0	3000000		false
+V	Grid_05:00_Power				false
+V	Grid_05:00_Buy_Power	0	30000		false
+V	Grid_05:00_Sell_Power	0	46		false
+V	ESS_05:15_Power	-10000	10000		false
+V	ESS_05:15_Discharge_Power	0	10000		false
+V	ESS_05:15_Charge_Power	0	45		false
+V	ESS_05:15_Energy	0	2640000		false
+V	EV_05:15_Charge_Power	0	11000		false
+V	EV_05:15_Charge_Mode	0	1		true
+V	EV_05:15Energy	0	3000000		false
+V	Grid_05:15_Power				false
+V	Grid_05:15_Buy_Power	0	30000		false
+V	Grid_05:15_Sell_Power	0	45		false
+V	ESS_05:30_Power	-10000	10000		false
+V	ESS_05:30_Discharge_Power	0	10000		false
+V	ESS_05:30_Charge_Power	0	175		false
+V	ESS_05:30_Energy	0	2640000		false
+V	EV_05:30_Charge_Power	0	11000		false
+V	EV_05:30_Charge_Mode	0	1		true
+V	EV_05:30Energy	0	3000000		false
+V	Grid_05:30_Power				false
+V	Grid_05:30_Buy_Power	0	30000		false
+V	Grid_05:30_Sell_Power	0	175		false
+V	ESS_05:45_Power	-10000	10000		false
+V	ESS_05:45_Discharge_Power	0	10000		false
+V	ESS_05:45_Charge_Power	0	214		false
+V	ESS_05:45_Energy	0	2640000		false
+V	EV_05:45_Charge_Power	0	11000		false
+V	EV_05:45_Charge_Mode	0	1		true
+V	EV_05:45Energy	0	3000000		false
+V	Grid_05:45_Power				false
+V	Grid_05:45_Buy_Power	0	30000		false
+V	Grid_05:45_Sell_Power	0	214		false
+V	ESS_06:00_Power	-10000	10000		false
+V	ESS_06:00_Discharge_Power	0	10000		false
+V	ESS_06:00_Charge_Power	0	468		false
+V	ESS_06:00_Energy	0	2640000		false
+V	EV_06:00_Charge_Power	0	11000		false
+V	EV_06:00_Charge_Mode	0	1		true
+V	EV_06:00Energy	0	3000000		false
+V	Grid_06:00_Power				false
+V	Grid_06:00_Buy_Power	0	30000		false
+V	Grid_06:00_Sell_Power	0	468		false
+V	ESS_06:15_Power	-10000	10000		false
+V	ESS_06:15_Discharge_Power	0	10000		false
+V	ESS_06:15_Charge_Power	0	468		false
+V	ESS_06:15_Energy	0	2640000		false
+V	EV_06:15_Charge_Power	0	11000		false
+V	EV_06:15_Charge_Mode	0	1		true
+V	EV_06:15Energy	0	3000000		false
+V	Grid_06:15_Power				false
+V	Grid_06:15_Buy_Power	0	30000		false
+V	Grid_06:15_Sell_Power	0	468		false
+V	ESS_06:30_Power	-10000	10000		false
+V	ESS_06:30_Discharge_Power	0	10000		false
+V	ESS_06:30_Charge_Power	0	594		false
+V	ESS_06:30_Energy	0	2640000		false
+V	EV_06:30_Charge_Power	0	11000		false
+V	EV_06:30_Charge_Mode	0	1		true
+V	EV_06:30Energy	0	3000000		false
+V	Grid_06:30_Power				false
+V	Grid_06:30_Buy_Power	0	30000		false
+V	Grid_06:30_Sell_Power	0	594		false
+V	ESS_06:45_Power	-10000	10000		false
+V	ESS_06:45_Discharge_Power	0	10000		false
+V	ESS_06:45_Charge_Power	0	500		false
+V	ESS_06:45_Energy	0	2640000		false
+V	EV_06:45_Charge_Power	0	11000		false
+V	EV_06:45_Charge_Mode	0	1		true
+V	EV_06:45Energy	0	3000000		false
+V	Grid_06:45_Power				false
+V	Grid_06:45_Buy_Power	0	30000		false
+V	Grid_06:45_Sell_Power	0	500		false
+V	ESS_07:00_Power	-10000	10000		false
+V	ESS_07:00_Discharge_Power	0	10000		false
+V	ESS_07:00_Charge_Power	0	805		false
+V	ESS_07:00_Charge_Mode	0	1		true
+V	ESS_07:00_Energy	0	2640000		false
+V	EV_07:00_Charge_Power	0	11000		false
+V	EV_07:00_Charge_Mode	0	1		true
+V	EV_07:00Energy	0	3000000		false
+V	Grid_07:00_Power				false
+V	Grid_07:00_Buy_Power	0	30000		false
+V	Grid_07:00_Sell_Power	0	805		false
+V	ESS_07:15_Power	-10000	10000		false
+V	ESS_07:15_Discharge_Power	0	10000		false
+V	ESS_07:15_Charge_Power	0	1847		false
+V	ESS_07:15_Charge_Mode	0	1		true
+V	ESS_07:15_Energy	0	2640000		false
+V	EV_07:15_Charge_Power	0	11000		false
+V	EV_07:15_Charge_Mode	0	1		true
+V	EV_07:15Energy	0	3000000		false
+V	Grid_07:15_Power				false
+V	Grid_07:15_Buy_Power	0	30000		false
+V	Grid_07:15_Sell_Power	0	1847		false
+V	ESS_07:30_Power	-10000	10000		false
+V	ESS_07:30_Discharge_Power	0	10000		false
+V	ESS_07:30_Charge_Power	0	2189		false
+V	ESS_07:30_Charge_Mode	0	1		true
+V	ESS_07:30_Energy	0	2640000		false
+V	EV_07:30_Charge_Power	0	11000		false
+V	EV_07:30_Charge_Mode	0	1		true
+V	EV_07:30Energy	0	3000000		false
+V	Grid_07:30_Power				false
+V	Grid_07:30_Buy_Power	0	30000		false
+V	Grid_07:30_Sell_Power	0	2189		false
+V	ESS_07:45_Power	-10000	10000		false
+V	ESS_07:45_Discharge_Power	0	10000		false
+V	ESS_07:45_Charge_Power	0	1152		false
+V	ESS_07:45_Charge_Mode	0	1		true
+V	ESS_07:45_Energy	0	2640000		false
+V	EV_07:45_Charge_Power	0	11000		false
+V	EV_07:45_Charge_Mode	0	1		true
+V	EV_07:45Energy	0	3000000		false
+V	Grid_07:45_Power				false
+V	Grid_07:45_Buy_Power	0	30000		false
+V	Grid_07:45_Sell_Power	0	1152		false
+V	ESS_08:00_Power	-10000	10000		false
+V	ESS_08:00_Discharge_Power	0	10000		false
+V	ESS_08:00_Charge_Power	0	1892		false
+V	ESS_08:00_Charge_Mode	0	1		true
+V	ESS_08:00_Energy	0	2640000		false
+V	EV_08:00_Charge_Power	0	11000		false
+V	EV_08:00_Charge_Mode	0	1		true
+V	EV_08:00Energy	0	3000000		false
+V	Grid_08:00_Power				false
+V	Grid_08:00_Buy_Power	0	30000		false
+V	Grid_08:00_Sell_Power	0	1892		false
+V	ESS_08:15_Power	-10000	10000		false
+V	ESS_08:15_Discharge_Power	0	10000		false
+V	ESS_08:15_Charge_Power	0	2786		false
+V	ESS_08:15_Charge_Mode	0	1		true
+V	ESS_08:15_Energy	0	2640000		false
+V	EV_08:15_Charge_Power	0	11000		false
+V	EV_08:15_Charge_Mode	0	1		true
+V	EV_08:15Energy	0	3000000		false
+V	Grid_08:15_Power				false
+V	Grid_08:15_Buy_Power	0	30000		false
+V	Grid_08:15_Sell_Power	0	2786		false
+V	ESS_08:30_Power	-10000	10000		false
+V	ESS_08:30_Discharge_Power	0	10000		false
+V	ESS_08:30_Charge_Power	0	4193		false
+V	ESS_08:30_Charge_Mode	0	1		true
+V	ESS_08:30_Energy	0	2640000		false
+V	EV_08:30_Charge_Power	0	11000		false
+V	EV_08:30_Charge_Mode	0	1		true
+V	EV_08:30Energy	0	3000000		false
+V	Grid_08:30_Power				false
+V	Grid_08:30_Buy_Power	0	30000		false
+V	Grid_08:30_Sell_Power	0	4193		false
+V	ESS_08:45_Power	-10000	10000		false
+V	ESS_08:45_Discharge_Power	0	10000		false
+V	ESS_08:45_Charge_Power	0	3404		false
+V	ESS_08:45_Charge_Mode	0	1		true
+V	ESS_08:45_Energy	0	2640000		false
+V	EV_08:45_Charge_Power	0	11000		false
+V	EV_08:45_Charge_Mode	0	1		true
+V	EV_08:45Energy	0	3000000		false
+V	Grid_08:45_Power				false
+V	Grid_08:45_Buy_Power	0	30000		false
+V	Grid_08:45_Sell_Power	0	3404		false
+V	ESS_09:00_Power	-10000	10000		false
+V	ESS_09:00_Discharge_Power	0	10000		false
+V	ESS_09:00_Charge_Power	0	3070		false
+V	ESS_09:00_Charge_Mode	0	1		true
+V	ESS_09:00_Energy	0	2640000		false
+V	EV_09:00_Charge_Power	0	11000		false
+V	EV_09:00_Charge_Mode	0	1		true
+V	EV_09:00Energy	0	3000000		false
+V	Grid_09:00_Power				false
+V	Grid_09:00_Buy_Power	0	30000		false
+V	Grid_09:00_Sell_Power	0	3070		false
+V	ESS_09:15_Power	-10000	10000		false
+V	ESS_09:15_Discharge_Power	0	10000		false
+V	ESS_09:15_Charge_Power	0	2978		false
+V	ESS_09:15_Charge_Mode	0	1		true
+V	ESS_09:15_Energy	0	2640000		false
+V	EV_09:15_Charge_Power	0	11000		false
+V	EV_09:15_Charge_Mode	0	1		true
+V	EV_09:15Energy	0	3000000		false
+V	Grid_09:15_Power				false
+V	Grid_09:15_Buy_Power	0	30000		false
+V	Grid_09:15_Sell_Power	0	2978		false
+V	ESS_09:30_Power	-10000	10000		false
+V	ESS_09:30_Discharge_Power	0	10000		false
+V	ESS_09:30_Charge_Power	0	2683		false
+V	ESS_09:30_Charge_Mode	0	1		true
+V	ESS_09:30_Energy	0	2640000		false
+V	EV_09:30_Charge_Power	0	11000		false
+V	EV_09:30_Charge_Mode	0	1		true
+V	EV_09:30Energy	0	3000000		false
+V	Grid_09:30_Power				false
+V	Grid_09:30_Buy_Power	0	30000		false
+V	Grid_09:30_Sell_Power	0	2683		false
+V	ESS_09:45_Power	-10000	10000		false
+V	ESS_09:45_Discharge_Power	0	10000		false
+V	ESS_09:45_Charge_Power	0	2883		false
+V	ESS_09:45_Charge_Mode	0	1		true
+V	ESS_09:45_Energy	0	2640000		false
+V	EV_09:45_Charge_Power	0	11000		false
+V	EV_09:45_Charge_Mode	0	1		true
+V	EV_09:45Energy	0	3000000		false
+V	Grid_09:45_Power				false
+V	Grid_09:45_Buy_Power	0	30000		false
+V	Grid_09:45_Sell_Power	0	2883		false
+V	ESS_10:00_Power	-10000	10000		false
+V	ESS_10:00_Discharge_Power	0	10000		false
+V	ESS_10:00_Charge_Power	0	2763		false
+V	ESS_10:00_Charge_Mode	0	1		true
+V	ESS_10:00_Energy	0	2640000		false
+V	EV_10:00_Charge_Power	0	11000		false
+V	EV_10:00_Charge_Mode	0	1		true
+V	EV_10:00Energy	0	3000000		false
+V	Grid_10:00_Power				false
+V	Grid_10:00_Buy_Power	0	30000		false
+V	Grid_10:00_Sell_Power	0	2763		false
+V	ESS_10:15_Power	-10000	10000		false
+V	ESS_10:15_Discharge_Power	0	10000		false
+V	ESS_10:15_Charge_Power	0	3803		false
+V	ESS_10:15_Charge_Mode	0	1		true
+V	ESS_10:15_Energy	0	2640000		false
+V	EV_10:15_Charge_Power	0	11000		false
+V	EV_10:15_Charge_Mode	0	1		true
+V	EV_10:15Energy	0	3000000		false
+V	Grid_10:15_Power				false
+V	Grid_10:15_Buy_Power	0	30000		false
+V	Grid_10:15_Sell_Power	0	3803		false
+V	ESS_10:30_Power	-10000	10000		false
+V	ESS_10:30_Discharge_Power	0	10000		false
+V	ESS_10:30_Charge_Power	0	3490		false
+V	ESS_10:30_Charge_Mode	0	1		true
+V	ESS_10:30_Energy	0	2640000		false
+V	EV_10:30_Charge_Power	0	11000		false
+V	EV_10:30_Charge_Mode	0	1		true
+V	EV_10:30Energy	0	3000000		false
+V	Grid_10:30_Power				false
+V	Grid_10:30_Buy_Power	0	30000		false
+V	Grid_10:30_Sell_Power	0	3490		false
+V	ESS_10:45_Power	-10000	10000		false
+V	ESS_10:45_Discharge_Power	0	10000		false
+V	ESS_10:45_Charge_Power	0	6343		false
+V	ESS_10:45_Charge_Mode	0	1		true
+V	ESS_10:45_Energy	0	2640000		false
+V	EV_10:45_Charge_Power	0	11000		false
+V	EV_10:45_Charge_Mode	0	1		true
+V	EV_10:45Energy	0	3000000		false
+V	Grid_10:45_Power				false
+V	Grid_10:45_Buy_Power	0	30000		false
+V	Grid_10:45_Sell_Power	0	6343		false
+V	ESS_11:00_Power	-10000	10000		false
+V	ESS_11:00_Discharge_Power	0	10000		false
+V	ESS_11:00_Charge_Power	0	6167		false
+V	ESS_11:00_Charge_Mode	0	1		true
+V	ESS_11:00_Energy	0	2640000		false
+V	EV_11:00_Charge_Power	0	11000		false
+V	EV_11:00_Charge_Mode	0	1		true
+V	EV_11:00Energy	0	3000000		false
+V	Grid_11:00_Power				false
+V	Grid_11:00_Buy_Power	0	30000		false
+V	Grid_11:00_Sell_Power	0	6167		false
+V	ESS_11:15_Power	-10000	10000		false
+V	ESS_11:15_Discharge_Power	0	10000		false
+V	ESS_11:15_Charge_Power	0	5486		false
+V	ESS_11:15_Charge_Mode	0	1		true
+V	ESS_11:15_Energy	0	2640000		false
+V	EV_11:15_Charge_Power	0	11000		false
+V	EV_11:15_Charge_Mode	0	1		true
+V	EV_11:15Energy	0	3000000		false
+V	Grid_11:15_Power				false
+V	Grid_11:15_Buy_Power	0	30000		false
+V	Grid_11:15_Sell_Power	0	5486		false
+V	ESS_11:30_Power	-10000	10000		false
+V	ESS_11:30_Discharge_Power	0	10000		false
+V	ESS_11:30_Charge_Power	0	6522		false
+V	ESS_11:30_Charge_Mode	0	1		true
+V	ESS_11:30_Energy	0	2640000		false
+V	EV_11:30_Charge_Power	0	11000		false
+V	EV_11:30_Charge_Mode	0	1		true
+V	EV_11:30Energy	0	3000000		false
+V	Grid_11:30_Power				false
+V	Grid_11:30_Buy_Power	0	30000		false
+V	Grid_11:30_Sell_Power	0	6522		false
+V	ESS_11:45_Power	-10000	10000		false
+V	ESS_11:45_Discharge_Power	0	10000		false
+V	ESS_11:45_Charge_Power	0	3742		false
+V	ESS_11:45_Charge_Mode	0	1		true
+V	ESS_11:45_Energy	0	2640000		false
+V	EV_11:45_Charge_Power	0	11000		false
+V	EV_11:45_Charge_Mode	0	1		true
+V	EV_11:45Energy	0	3000000		false
+V	Grid_11:45_Power				false
+V	Grid_11:45_Buy_Power	0	30000		false
+V	Grid_11:45_Sell_Power	0	3742		false
+V	ESS_12:00_Power	-10000	10000		false
+V	ESS_12:00_Discharge_Power	0	10000		false
+V	ESS_12:00_Charge_Power	0	2604		false
+V	ESS_12:00_Charge_Mode	0	1		true
+V	ESS_12:00_Energy	0	2640000		false
+V	EV_12:00_Charge_Power	0	11000		false
+V	EV_12:00_Charge_Mode	0	1		true
+V	EV_12:00Energy	0	3000000		false
+V	Grid_12:00_Power				false
+V	Grid_12:00_Buy_Power	0	30000		false
+V	Grid_12:00_Sell_Power	0	2604		false
+V	ESS_12:15_Power	-10000	10000		false
+V	ESS_12:15_Discharge_Power	0	10000		false
+V	ESS_12:15_Charge_Power	0	5124		false
+V	ESS_12:15_Charge_Mode	0	1		true
+V	ESS_12:15_Energy	0	2640000		false
+V	EV_12:15_Charge_Power	0	11000		false
+V	EV_12:15_Charge_Mode	0	1		true
+V	EV_12:15Energy	0	3000000		false
+V	Grid_12:15_Power				false
+V	Grid_12:15_Buy_Power	0	30000		false
+V	Grid_12:15_Sell_Power	0	5124		false
+V	ESS_12:30_Power	-10000	10000		false
+V	ESS_12:30_Discharge_Power	0	10000		false
+V	ESS_12:30_Charge_Power	0	5300		false
+V	ESS_12:30_Charge_Mode	0	1		true
+V	ESS_12:30_Energy	0	2640000		false
+V	EV_12:30_Charge_Power	0	11000		false
+V	EV_12:30_Charge_Mode	0	1		true
+V	EV_12:30Energy	0	3000000		false
+V	Grid_12:30_Power				false
+V	Grid_12:30_Buy_Power	0	30000		false
+V	Grid_12:30_Sell_Power	0	5300		false
+V	ESS_12:45_Power	-10000	10000		false
+V	ESS_12:45_Discharge_Power	0	10000		false
+V	ESS_12:45_Charge_Power	0	5608		false
+V	ESS_12:45_Charge_Mode	0	1		true
+V	ESS_12:45_Energy	0	2640000		false
+V	EV_12:45_Charge_Power	0	11000		false
+V	EV_12:45_Charge_Mode	0	1		true
+V	EV_12:45Energy	0	3000000		false
+V	Grid_12:45_Power				false
+V	Grid_12:45_Buy_Power	0	30000		false
+V	Grid_12:45_Sell_Power	0	5608		false
+V	ESS_13:00_Power	-10000	10000		false
+V	ESS_13:00_Discharge_Power	0	10000		false
+V	ESS_13:00_Charge_Power	0	4972		false
+V	ESS_13:00_Charge_Mode	0	1		true
+V	ESS_13:00_Energy	0	2640000		false
+V	EV_13:00_Charge_Power	0	11000		false
+V	EV_13:00_Charge_Mode	0	1		true
+V	EV_13:00Energy	0	3000000		false
+V	Grid_13:00_Power				false
+V	Grid_13:00_Buy_Power	0	30000		false
+V	Grid_13:00_Sell_Power	0	4972		false
+V	ESS_13:15_Power	-10000	10000		false
+V	ESS_13:15_Discharge_Power	0	10000		false
+V	ESS_13:15_Charge_Power	0	4280		false
+V	ESS_13:15_Charge_Mode	0	1		true
+V	ESS_13:15_Energy	0	2640000		false
+V	EV_13:15_Charge_Power	0	11000		false
+V	EV_13:15_Charge_Mode	0	1		true
+V	EV_13:15Energy	0	3000000		false
+V	Grid_13:15_Power				false
+V	Grid_13:15_Buy_Power	0	30000		false
+V	Grid_13:15_Sell_Power	0	4280		false
+V	ESS_13:30_Power	-10000	10000		false
+V	ESS_13:30_Discharge_Power	0	10000		false
+V	ESS_13:30_Charge_Power	0	3593		false
+V	ESS_13:30_Charge_Mode	0	1		true
+V	ESS_13:30_Energy	0	2640000		false
+V	EV_13:30_Charge_Power	0	11000		false
+V	EV_13:30_Charge_Mode	0	1		true
+V	EV_13:30Energy	0	3000000		false
+V	Grid_13:30_Power				false
+V	Grid_13:30_Buy_Power	0	30000		false
+V	Grid_13:30_Sell_Power	0	3593		false
+V	ESS_13:45_Power	-10000	10000		false
+V	ESS_13:45_Discharge_Power	0	10000		false
+V	ESS_13:45_Charge_Power	0	3433		false
+V	ESS_13:45_Charge_Mode	0	1		true
+V	ESS_13:45_Energy	0	2640000		false
+V	EV_13:45_Charge_Power	0	11000		false
+V	EV_13:45_Charge_Mode	0	1		true
+V	EV_13:45Energy	0	3000000		false
+V	Grid_13:45_Power				false
+V	Grid_13:45_Buy_Power	0	30000		false
+V	Grid_13:45_Sell_Power	0	3433		false
+V	ESS_14:00_Power	-10000	10000		false
+V	ESS_14:00_Discharge_Power	0	10000		false
+V	ESS_14:00_Charge_Power	0	3901		false
+V	ESS_14:00_Charge_Mode	0	1		true
+V	ESS_14:00_Energy	0	2640000		false
+V	EV_14:00_Charge_Power	0	11000		false
+V	EV_14:00_Charge_Mode	0	1		true
+V	EV_14:00Energy	0	3000000		false
+V	Grid_14:00_Power				false
+V	Grid_14:00_Buy_Power	0	30000		false
+V	Grid_14:00_Sell_Power	0	3901		false
+V	ESS_14:15_Power	-10000	10000		false
+V	ESS_14:15_Discharge_Power	0	10000		false
+V	ESS_14:15_Charge_Power	0	3126		false
+V	ESS_14:15_Charge_Mode	0	1		true
+V	ESS_14:15_Energy	0	2640000		false
+V	EV_14:15_Charge_Power	0	11000		false
+V	EV_14:15_Charge_Mode	0	1		true
+V	EV_14:15Energy	0	3000000		false
+V	Grid_14:15_Power				false
+V	Grid_14:15_Buy_Power	0	30000		false
+V	Grid_14:15_Sell_Power	0	3126		false
+V	ESS_14:30_Power	-10000	10000		false
+V	ESS_14:30_Discharge_Power	0	10000		false
+V	ESS_14:30_Charge_Power	0	3811		false
+V	ESS_14:30_Charge_Mode	0	1		true
+V	ESS_14:30_Energy	0	2640000		false
+V	EV_14:30_Charge_Power	0	11000		false
+V	EV_14:30_Charge_Mode	0	1		true
+V	EV_14:30Energy	0	3000000		false
+V	Grid_14:30_Power				false
+V	Grid_14:30_Buy_Power	0	30000		false
+V	Grid_14:30_Sell_Power	0	3811		false
+V	ESS_14:45_Power	-10000	10000		false
+V	ESS_14:45_Discharge_Power	0	10000		false
+V	ESS_14:45_Charge_Power	0	3759		false
+V	ESS_14:45_Charge_Mode	0	1		true
+V	ESS_14:45_Energy	0	2640000		false
+V	EV_14:45_Charge_Power	0	11000		false
+V	EV_14:45_Charge_Mode	0	1		true
+V	EV_14:45Energy	0	3000000		false
+V	Grid_14:45_Power				false
+V	Grid_14:45_Buy_Power	0	30000		false
+V	Grid_14:45_Sell_Power	0	3759		false
+V	ESS_15:00_Power	-10000	10000		false
+V	ESS_15:00_Discharge_Power	0	10000		false
+V	ESS_15:00_Charge_Power	0	3514		false
+V	ESS_15:00_Charge_Mode	0	1		true
+V	ESS_15:00_Energy	0	2640000		false
+V	EV_15:00_Charge_Power	0	11000		false
+V	EV_15:00_Charge_Mode	0	1		true
+V	EV_15:00Energy	0	3000000		false
+V	Grid_15:00_Power				false
+V	Grid_15:00_Buy_Power	0	30000		false
+V	Grid_15:00_Sell_Power	0	3514		false
+V	ESS_15:15_Power	-10000	10000		false
+V	ESS_15:15_Discharge_Power	0	10000		false
+V	ESS_15:15_Charge_Power	0	2858		false
+V	ESS_15:15_Charge_Mode	0	1		true
+V	ESS_15:15_Energy	0	2640000		false
+V	EV_15:15_Charge_Power	0	11000		false
+V	EV_15:15_Charge_Mode	0	1		true
+V	EV_15:15Energy	0	3000000		false
+V	Grid_15:15_Power				false
+V	Grid_15:15_Buy_Power	0	30000		false
+V	Grid_15:15_Sell_Power	0	2858		false
+V	ESS_15:30_Power	-10000	10000		false
+V	ESS_15:30_Discharge_Power	0	10000		false
+V	ESS_15:30_Charge_Power	0	2564		false
+V	ESS_15:30_Charge_Mode	0	1		true
+V	ESS_15:30_Energy	0	2640000		false
+V	EV_15:30_Charge_Power	0	11000		false
+V	EV_15:30_Charge_Mode	0	1		true
+V	EV_15:30Energy	0	3000000		false
+V	Grid_15:30_Power				false
+V	Grid_15:30_Buy_Power	0	30000		false
+V	Grid_15:30_Sell_Power	0	2564		false
+V	ESS_15:45_Power	-10000	10000		false
+V	ESS_15:45_Discharge_Power	0	10000		false
+V	ESS_15:45_Charge_Power	0	1472		false
+V	ESS_15:45_Charge_Mode	0	1		true
+V	ESS_15:45_Energy	0	2640000		false
+V	EV_15:45_Charge_Power	0	11000		false
+V	EV_15:45_Charge_Mode	0	1		true
+V	EV_15:45Energy	0	3000000		false
+V	Grid_15:45_Power				false
+V	Grid_15:45_Buy_Power	0	30000		false
+V	Grid_15:45_Sell_Power	0	1472		false
+V	ESS_16:00_Power	-10000	10000		false
+V	ESS_16:00_Discharge_Power	0	10000		false
+V	ESS_16:00_Charge_Power	0	958		false
+V	ESS_16:00_Charge_Mode	0	1		true
+V	ESS_16:00_Energy	0	2640000		false
+V	EV_16:00_Charge_Power	0	11000		false
+V	EV_16:00_Charge_Mode	0	1		true
+V	EV_16:00Energy	0	3000000		false
+V	Grid_16:00_Power				false
+V	Grid_16:00_Buy_Power	0	30000		false
+V	Grid_16:00_Sell_Power	0	958		false
+V	ESS_16:15_Power	-10000	10000		false
+V	ESS_16:15_Discharge_Power	0	10000		false
+V	ESS_16:15_Charge_Power	0	248		false
+V	ESS_16:15_Energy	0	2640000		false
+V	EV_16:15_Charge_Power	0	11000		false
+V	EV_16:15_Charge_Mode	0	1		true
+V	EV_16:15Energy	0	3000000		false
+V	Grid_16:15_Power				false
+V	Grid_16:15_Buy_Power	0	30000		false
+V	Grid_16:15_Sell_Power	0	248		false
+V	ESS_16:30_Power	-10000	10000		false
+V	ESS_16:30_Discharge_Power	0	10000		false
+V	ESS_16:30_Charge_Power	0	118		false
+V	ESS_16:30_Energy	0	2640000		false
+V	EV_16:30_Charge_Power	0	11000		false
+V	EV_16:30_Charge_Mode	0	1		true
+V	EV_16:30Energy	0	3000000		false
+V	Grid_16:30_Power				false
+V	Grid_16:30_Buy_Power	0	30000		false
+V	Grid_16:30_Sell_Power	0	118		false
+V	ESS_16:45_Power	-10000	10000		false
+V	ESS_16:45_Discharge_Power	0	10000		false
+V	ESS_16:45_Charge_Power	0	123		false
+V	ESS_16:45_Energy	0	2640000		false
+V	EV_16:45_Charge_Power	0	11000		false
+V	EV_16:45_Charge_Mode	0	1		true
+V	EV_16:45Energy	0	3000000		false
+V	Grid_16:45_Power				false
+V	Grid_16:45_Buy_Power	0	30000		false
+V	Grid_16:45_Sell_Power	0	123		false
+V	ESS_17:00_Power	-10000	10000		false
+V	ESS_17:00_Discharge_Power	0	10000		false
+V	ESS_17:00_Charge_Power	0	510		false
+V	ESS_17:00_Energy	0	2640000		false
+V	EV_17:00_Charge_Power	0	11000		false
+V	EV_17:00_Charge_Mode	0	1		true
+V	EV_17:00Energy	0	3000000		false
+V	Grid_17:00_Power				false
+V	Grid_17:00_Buy_Power	0	30000		false
+V	Grid_17:00_Sell_Power	0	510		false
+V	ESS_17:15_Power	-10000	10000		false
+V	ESS_17:15_Discharge_Power	0	10000		false
+V	ESS_17:15_Charge_Power	0	1050		false
+V	ESS_17:15_Charge_Mode	0	1		true
+V	ESS_17:15_Energy	0	2640000		false
+V	EV_17:15_Charge_Power	0	11000		false
+V	EV_17:15_Charge_Mode	0	1		true
+V	EV_17:15Energy	0	3000000		false
+V	Grid_17:15_Power				false
+V	Grid_17:15_Buy_Power	0	30000		false
+V	Grid_17:15_Sell_Power	0	1050		false
+V	ESS_17:30_Power	-10000	10000		false
+V	ESS_17:30_Discharge_Power	0	10000		false
+V	ESS_17:30_Charge_Power	0	718		false
+V	ESS_17:30_Energy	0	2640000		false
+V	EV_17:30_Charge_Power	0	11000		false
+V	EV_17:30_Charge_Mode	0	1		true
+V	EV_17:30Energy	0	3000000		false
+V	Grid_17:30_Power				false
+V	Grid_17:30_Buy_Power	0	30000		false
+V	Grid_17:30_Sell_Power	0	718		false
+V	ESS_17:45_Power	-10000	10000		false
+V	ESS_17:45_Discharge_Power	0	10000		false
+V	ESS_17:45_Charge_Power	0	900		false
+V	ESS_17:45_Charge_Mode	0	1		true
+V	ESS_17:45_Energy	0	2640000		false
+V	EV_17:45_Charge_Power	0	11000		false
+V	EV_17:45_Charge_Mode	0	1		true
+V	EV_17:45Energy	0	3000000		false
+V	Grid_17:45_Power				false
+V	Grid_17:45_Buy_Power	0	30000		false
+V	Grid_17:45_Sell_Power	0	900		false
+V	ESS_18:00_Power	-10000	10000		false
+V	ESS_18:00_Discharge_Power	0	10000		false
+V	ESS_18:00_Charge_Power	0	577		false
+V	ESS_18:00_Energy	0	2640000		false
+V	EV_18:00_Charge_Power	0	11000		false
+V	EV_18:00_Charge_Mode	0	1		true
+V	EV_18:00Energy	0	3000000		false
+V	Grid_18:00_Power				false
+V	Grid_18:00_Buy_Power	0	30000		false
+V	Grid_18:00_Sell_Power	0	577		false
+V	ESS_18:15_Power	-10000	10000		false
+V	ESS_18:15_Discharge_Power	0	10000		false
+V	ESS_18:15_Charge_Power	0	243		false
+V	ESS_18:15_Energy	0	2640000		false
+V	EV_18:15_Charge_Power	0	11000		false
+V	EV_18:15_Charge_Mode	0	1		true
+V	EV_18:15Energy	0	3000000		false
+V	Grid_18:15_Power				false
+V	Grid_18:15_Buy_Power	0	30000		false
+V	Grid_18:15_Sell_Power	0	243		false
+V	ESS_18:30_Power	-10000	10000		false
+V	ESS_18:30_Discharge_Power	0	10000		false
+V	ESS_18:30_Charge_Power	0	124		false
+V	ESS_18:30_Energy	0	2640000		false
+V	EV_18:30_Charge_Power	0	11000		false
+V	EV_18:30_Charge_Mode	0	1		true
+V	EV_18:30Energy	0	3000000		false
+V	Grid_18:30_Power				false
+V	Grid_18:30_Buy_Power	0	30000		false
+V	Grid_18:30_Sell_Power	0	124		false
+V	ESS_18:45_Power	-10000	10000		false
+V	ESS_18:45_Discharge_Power	0	10000		false
+V	ESS_18:45_Charge_Power	0	61		false
+V	ESS_18:45_Energy	0	2640000		false
+V	EV_18:45_Charge_Power	0	11000		false
+V	EV_18:45_Charge_Mode	0	1		true
+V	EV_18:45Energy	0	3000000		false
+V	Grid_18:45_Power				false
+V	Grid_18:45_Buy_Power	0	30000		false
+V	Grid_18:45_Sell_Power	0	61		false
+V	ESS_19:00_Power	-10000	10000		false
+V	ESS_19:00_Discharge_Power	0	10000		false
+V	ESS_19:00_Charge_Power	0	37		false
+V	ESS_19:00_Energy	0	2640000		false
+V	EV_19:00_Charge_Power	0	11000		false
+V	EV_19:00_Charge_Mode	0	1		true
+V	EV_19:00Energy	0	3000000		false
+V	Grid_19:00_Power				false
+V	Grid_19:00_Buy_Power	0	30000		false
+V	Grid_19:00_Sell_Power	0	37		false
+V	ESS_19:15_Power	-10000	10000		false
+V	ESS_19:15_Discharge_Power	0	10000		false
+V	ESS_19:15_Charge_Power	0	13		false
+V	ESS_19:15_Energy	0	2640000		false
+V	EV_19:15_Charge_Power	0	11000		false
+V	EV_19:15_Charge_Mode	0	1		true
+V	EV_19:15Energy	0	3000000		false
+V	Grid_19:15_Power				false
+V	Grid_19:15_Buy_Power	0	30000		false
+V	Grid_19:15_Sell_Power	0	13		false
+V	ESS_19:30_Power	-10000	10000		false
+V	ESS_19:30_Discharge_Power	0	10000		false
+V	ESS_19:30_Charge_Power	0	0		false
+V	ESS_19:30_Energy	0	2640000		false
+V	EV_19:30_Charge_Power	0	11000		false
+V	EV_19:30_Charge_Mode	0	1		true
+V	EV_19:30Energy	0	3000000		false
+V	Grid_19:30_Power				false
+V	Grid_19:30_Buy_Power	0	30000		false
+V	Grid_19:30_Sell_Power	0	0		false
+V	ESS_19:45_Power	-10000	10000		false
+V	ESS_19:45_Discharge_Power	0	10000		false
+V	ESS_19:45_Charge_Power	0	0		false
+V	ESS_19:45_Energy	0	2640000		false
+V	EV_19:45_Charge_Power	0	11000		false
+V	EV_19:45_Charge_Mode	0	1		true
+V	EV_19:45Energy	0	3000000		false
+V	Grid_19:45_Power				false
+V	Grid_19:45_Buy_Power	0	30000		false
+V	Grid_19:45_Sell_Power	0	0		false
+V	ESS_20:00_Power	-10000	10000		false
+V	ESS_20:00_Discharge_Power	0	10000		false
+V	ESS_20:00_Charge_Power	0	0		false
+V	ESS_20:00_Energy	0	2640000		false
+V	EV_20:00_Charge_Power	0	11000		false
+V	EV_20:00_Charge_Mode	0	1		true
+V	EV_20:00Energy	0	3000000		false
+V	Grid_20:00_Power				false
+V	Grid_20:00_Buy_Power	0	30000		false
+V	Grid_20:00_Sell_Power	0	0		false
+V	ESS_20:15_Power	-10000	10000		false
+V	ESS_20:15_Discharge_Power	0	10000		false
+V	ESS_20:15_Charge_Power	0	0		false
+V	ESS_20:15_Energy	0	2640000		false
+V	EV_20:15_Charge_Power	0	11000		false
+V	EV_20:15_Charge_Mode	0	1		true
+V	EV_20:15Energy	0	3000000		false
+V	Grid_20:15_Power				false
+V	Grid_20:15_Buy_Power	0	30000		false
+V	Grid_20:15_Sell_Power	0	0		false
+V	ESS_20:30_Power	-10000	10000		false
+V	ESS_20:30_Discharge_Power	0	10000		false
+V	ESS_20:30_Charge_Power	0	0		false
+V	ESS_20:30_Energy	0	2640000		false
+V	EV_20:30_Charge_Power	0	11000		false
+V	EV_20:30_Charge_Mode	0	1		true
+V	EV_20:30Energy	0	3000000		false
+V	Grid_20:30_Power				false
+V	Grid_20:30_Buy_Power	0	30000		false
+V	Grid_20:30_Sell_Power	0	0		false
+V	ESS_20:45_Power	-10000	10000		false
+V	ESS_20:45_Discharge_Power	0	10000		false
+V	ESS_20:45_Charge_Power	0	0		false
+V	ESS_20:45_Energy	0	2640000		false
+V	EV_20:45_Charge_Power	0	11000		false
+V	EV_20:45_Charge_Mode	0	1		true
+V	EV_20:45Energy	0	3000000		false
+V	Grid_20:45_Power				false
+V	Grid_20:45_Buy_Power	0	30000		false
+V	Grid_20:45_Sell_Power	0	0		false
+V	ESS_21:00_Power	-10000	10000		false
+V	ESS_21:00_Discharge_Power	0	10000		false
+V	ESS_21:00_Charge_Power	0	0		false
+V	ESS_21:00_Energy	0	2640000		false
+V	EV_21:00_Charge_Power	0	11000		false
+V	EV_21:00_Charge_Mode	0	1		true
+V	EV_21:00Energy	0	3000000		false
+V	Grid_21:00_Power				false
+V	Grid_21:00_Buy_Power	0	30000		false
+V	Grid_21:00_Sell_Power	0	0		false
+V	ESS_21:15_Power	-10000	10000		false
+V	ESS_21:15_Discharge_Power	0	10000		false
+V	ESS_21:15_Charge_Power	0	0		false
+V	ESS_21:15_Energy	0	2640000		false
+V	EV_21:15_Charge_Power	0	11000		false
+V	EV_21:15_Charge_Mode	0	1		true
+V	EV_21:15Energy	0	3000000		false
+V	Grid_21:15_Power				false
+V	Grid_21:15_Buy_Power	0	30000		false
+V	Grid_21:15_Sell_Power	0	0		false
+V	ESS_21:30_Power	-10000	10000		false
+V	ESS_21:30_Discharge_Power	0	10000		false
+V	ESS_21:30_Charge_Power	0	0		false
+V	ESS_21:30_Energy	0	2640000		false
+V	EV_21:30_Charge_Power	0	11000		false
+V	EV_21:30_Charge_Mode	0	1		true
+V	EV_21:30Energy	0	3000000		false
+V	Grid_21:30_Power				false
+V	Grid_21:30_Buy_Power	0	30000		false
+V	Grid_21:30_Sell_Power	0	0		false
+V	ESS_21:45_Power	-10000	10000		false
+V	ESS_21:45_Discharge_Power	0	10000		false
+V	ESS_21:45_Charge_Power	0	0		false
+V	ESS_21:45_Energy	0	2640000		false
+V	EV_21:45_Charge_Power	0	11000		false
+V	EV_21:45_Charge_Mode	0	1		true
+V	EV_21:45Energy	0	3000000		false
+V	Grid_21:45_Power				false
+V	Grid_21:45_Buy_Power	0	30000		false
+V	Grid_21:45_Sell_Power	0	0		false
+V	ESS_22:00_Power	-10000	10000		false
+V	ESS_22:00_Discharge_Power	0	10000		false
+V	ESS_22:00_Charge_Power	0	0		false
+V	ESS_22:00_Energy	0	2640000		false
+V	EV_22:00_Charge_Power	0	11000		false
+V	EV_22:00_Charge_Mode	0	1		true
+V	EV_22:00Energy	0	3000000		false
+V	Grid_22:00_Power				false
+V	Grid_22:00_Buy_Power	0	30000		false
+V	Grid_22:00_Sell_Power	0	0		false
+V	ESS_22:15_Power	-10000	10000		false
+V	ESS_22:15_Discharge_Power	0	10000		false
+V	ESS_22:15_Charge_Power	0	0		false
+V	ESS_22:15_Energy	0	2640000		false
+V	EV_22:15_Charge_Power	0	11000		false
+V	EV_22:15_Charge_Mode	0	1		true
+V	EV_22:15Energy	0	3000000		false
+V	Grid_22:15_Power				false
+V	Grid_22:15_Buy_Power	0	30000		false
+V	Grid_22:15_Sell_Power	0	0		false
+V	ESS_22:30_Power	-10000	10000		false
+V	ESS_22:30_Discharge_Power	0	10000		false
+V	ESS_22:30_Charge_Power	0	0		false
+V	ESS_22:30_Energy	0	2640000		false
+V	EV_22:30_Charge_Power	0	11000		false
+V	EV_22:30_Charge_Mode	0	1		true
+V	EV_22:30Energy	0	3000000		false
+V	Grid_22:30_Power				false
+V	Grid_22:30_Buy_Power	0	30000		false
+V	Grid_22:30_Sell_Power	0	0		false
+V	ESS_22:45_Power	-10000	10000		false
+V	ESS_22:45_Discharge_Power	0	10000		false
+V	ESS_22:45_Charge_Power	0	0		false
+V	ESS_22:45_Energy	0	2640000		false
+V	EV_22:45_Charge_Power	0	11000		false
+V	EV_22:45_Charge_Mode	0	1		true
+V	EV_22:45Energy	0	3000000		false
+V	Grid_22:45_Power				false
+V	Grid_22:45_Buy_Power	0	30000		false
+V	Grid_22:45_Sell_Power	0	0		false
+V	ESS_23:00_Power	-10000	10000		false
+V	ESS_23:00_Discharge_Power	0	10000		false
+V	ESS_23:00_Charge_Power	0	0		false
+V	ESS_23:00_Energy	0	2640000		false
+V	EV_23:00_Charge_Power	0	11000		false
+V	EV_23:00_Charge_Mode	0	1		true
+V	EV_23:00Energy	0	3000000		false
+V	Grid_23:00_Power				false
+V	Grid_23:00_Buy_Power	0	30000		false
+V	Grid_23:00_Sell_Power	0	0		false
+V	ESS_23:15_Power	-10000	10000		false
+V	ESS_23:15_Discharge_Power	0	10000		false
+V	ESS_23:15_Charge_Power	0	0		false
+V	ESS_23:15_Energy	0	2640000		false
+V	EV_23:15_Charge_Power	0	11000		false
+V	EV_23:15_Charge_Mode	0	1		true
+V	EV_23:15Energy	0	3000000		false
+V	Grid_23:15_Power				false
+V	Grid_23:15_Buy_Power	0	30000		false
+V	Grid_23:15_Sell_Power	0	0		false
+V	ESS_23:30_Power	-10000	10000		false
+V	ESS_23:30_Discharge_Power	0	10000		false
+V	ESS_23:30_Charge_Power	0	0		false
+V	ESS_23:30_Energy	0	2640000		false
+V	EV_23:30_Charge_Power	0	11000		false
+V	EV_23:30_Charge_Mode	0	1		true
+V	EV_23:30Energy	0	3000000		false
+V	Grid_23:30_Power				false
+V	Grid_23:30_Buy_Power	0	30000		false
+V	Grid_23:30_Sell_Power	0	0		false
+V	ESS_23:45_Power	-10000	10000		false
+V	ESS_23:45_Discharge_Power	0	10000		false
+V	ESS_23:45_Charge_Power	0	0		false
+V	ESS_23:45_Energy	0	2640000		false
+V	EV_23:45_Charge_Power	0	11000		false
+V	EV_23:45_Charge_Mode	0	1		true
+V	EV_23:45Energy	0	3000000		false
+V	Grid_23:45_Power				false
+V	Grid_23:45_Buy_Power	0	30000		false
+V	Grid_23:45_Sell_Power	0	0		false
+V	Grid_Buy_Cost_Sum				false
+V	Grid_Sell_Revenue_Sum				false
+E	EV_22:15_Charge_Power_Expr	4200	11000	
+L	933	1
+L	934	11000
+E	09:15_Power_Balance	-2660	-2660	
+L	384	-1
+L	387	1
+L	379	1
+E	Grid_00:45_BuySellPower_Expr	0	0	
+L	37	1
+L	38	-1
+L	39	1
+E	ESS_01:00_ChargeDischargePower_Expr	0	0	
+L	40	1
+L	41	-1
+L	42	1
+E	ESS_18:00_ChargeDischargePower_Expr	0	0	
+L	759	1
+L	760	-1
+L	761	1
+E	11:45_EV_Energy_Expr	0	0	
+L	496	-1
+L	485	1
+L	494	13
+E	22:30_EV_Energy_Expr	0	0	
+L	945	-1
+L	935	1
+L	943	13
+E	Grid_11:30_BuySellPower_Expr	0	0	
+L	486	1
+L	487	-1
+L	488	1
+E	EV_17:15_Charge_Decision_Expr	1.0		
+L	733	1
+E	22:00_EV_Energy_Expr	0	0	
+L	915	1
+L	923	13
+L	925	-1
+E	ESS_08:00_Charge_Mode2_Expr	0	10000	
+L	326	-1
+L	327	10000
+E	ESS_04:45_Energy_Expr	0	0	
+L	192	14
+L	193	-1
+L	183	1
+L	191	-15
+E	ESS_12:00_Charge_Mode_Expr	0	10000	
+L	501	1
+L	503	10000
+E	13:15_EV_Energy_Expr	0	0	
+L	560	13
+L	562	-1
+L	551	1
+E	13:45_EV_Energy_Expr	0	0	
+L	582	13
+L	584	-1
+L	573	1
+E	20:00_Power_Balance	199	199	
+L	839	1
+L	843	-1
+L	846	1
+E	02:00_ESS_Charge_Constraint_Expr	0.0		
+L	82	1
+E	Grid_03:15_BuySellPower_Expr	0	0	
+L	137	1
+L	138	-1
+L	139	1
+E	11:15_EV_Energy_Expr	0	0	
+L	472	13
+L	474	-1
+L	463	1
+E	EV_03:00_Charge_Decision_Expr	0.0		
+L	125	1
+E	ESS_07:30_Charge_Mode2_Expr	0	10000	
+L	304	-1
+L	305	10000
+E	EV_11:45_Charge_Decision_Expr	1.0		
+L	495	1
+E	EV_20:15_Charge_Power_Expr	4200	11000	
+L	853	1
+L	854	11000
+E	ESS_02:30_Energy_Expr	0	0	
+L	101	-15
+L	102	14
+L	103	-1
+L	93	1
+E	Grid_14:00_BuySellPower_Expr	0	0	
+L	596	1
+L	597	-1
+L	598	1
+E	12:00_ESS_Charge_Constraint_Expr	2039.4		
+L	502	1
+E	00:00_Power_Balance	139	139	
+L	0	1
+L	4	-1
+L	7	1
+E	EV_07:30_Charge_Decision_Expr	1.0		
+L	308	1
+E	20:00_EV_Energy_Expr	0	0	
+L	835	1
+L	843	13
+L	845	-1
+E	Grid_16:00_BuySellPower_Expr	0	0	
+L	684	1
+L	685	-1
+L	686	1
+E	ESS_09:30_Charge_Mode2_Expr	0	10000	
+L	392	-1
+L	393	10000
+E	EV_02:45_Charge_Decision_Expr	0.0		
+L	115	1
+E	20:30_EV_Energy_Expr	0	0	
+L	865	-1
+L	855	1
+L	863	13
+E	EV_09:15_Charge_Decision_Expr	1.0		
+L	385	1
+E	ESS_23:30_ChargeDischargePower_Expr	0	0	
+L	979	1
+L	980	-1
+L	981	1
+E	18:00_Power_Balance	-337	-337	
+L	759	1
+L	763	-1
+L	766	1
+E	Grid_02:45_BuySellPower_Expr	0	0	
+L	117	1
+L	118	-1
+L	119	1
+E	14:15_Power_Balance	-2840	-2840	
+L	599	1
+L	604	-1
+L	607	1
+E	08:15_ESS_Charge_Constraint_Expr	2198.7000000000003		
+L	337	1
+E	ESS_07:15_Charge_Mode_Expr	0	10000	
+L	292	1
+L	294	10000
+E	11:15_Power_Balance	-5133	-5133	
+L	467	1
+L	472	-1
+L	475	1
+E	ESS_08:30_ChargeDischargePower_Expr	0	0	
+L	346	1
+L	347	-1
+L	348	1
+E	21:15_ESS_Charge_Constraint_Expr	0.0		
+L	891	1
+E	ESS_02:15_Energy_Expr	0	0	
+L	83	1
+L	91	-15
+L	92	14
+L	93	-1
+E	05:45_ESS_Charge_Constraint_Expr	57.6		
+L	232	1
+E	16:45_Power_Balance	168	168	
+L	707	1
+L	711	-1
+L	714	1
+E	ESS_08:15_ChargeDischargePower_Expr	0	0	
+L	336	-1
+L	337	1
+L	335	1
+E	ESS_14:30_ChargeDischargePower_Expr	0	0	
+L	610	1
+L	611	-1
+L	612	1
+E	14:30_ESS_Charge_Constraint_Expr	3104.1		
+L	612	1
+E	Grid_01:15_BuySellPower_Expr	0	0	
+L	57	1
+L	58	-1
+L	59	1
+E	Grid_15:30_BuySellPower_Expr	0	0	
+L	662	1
+L	663	-1
+L	664	1
+E	18:15_ESS_Charge_Constraint_Expr	9.9		
+L	771	1
+E	ESS_23:15_ChargeDischargePower_Expr	0	0	
+L	969	1
+L	970	-1
+L	971	1
+E	EV_20:00_Charge_Decision_Expr	0.0		
+L	844	1
+E	03:00_Power_Balance	182	182	
+L	120	1
+L	124	-1
+L	127	1
+E	15:45_EV_Energy_Expr	0	0	
+L	672	-1
+L	661	1
+L	670	13
+E	04:30_ESS_Charge_Constraint_Expr	0.0		
+L	182	1
+E	ESS_14:15_ChargeDischargePower_Expr	0	0	
+L	599	1
+L	600	-1
+L	601	1
+E	ESS_07:00_Charge_Mode_Expr	0	10000	
+L	281	1
+L	283	10000
+E	15:15_EV_Energy_Expr	0	0	
+L	648	13
+L	650	-1
+L	639	1
+E	ESS_00:15_Energy_Expr	0	0	
+L	3	1
+L	11	-15
+L	12	14
+L	13	-1
+E	EV_23:30_Charge_Decision_Expr	0.0		
+L	984	1
+E	01:45_Power_Balance	249	249	
+L	70	1
+L	74	-1
+L	77	1
+E	17:45_EV_Energy_Expr	0	0	
+L	753	13
+L	755	-1
+L	744	1
+E	ESS_05:30_ChargeDischargePower_Expr	0	0	
+L	220	1
+L	221	-1
+L	222	1
+E	17:15_EV_Energy_Expr	0	0	
+L	723	1
+L	732	13
+L	734	-1
+E	11:15_ESS_Charge_Constraint_Expr	4619.7		
+L	469	1
+E	EV_11:00_Charge_Decision_Expr	1.0		
+L	462	1
+E	ESS_11:45_Energy_Expr	0	0	
+L	482	1
+L	490	-15
+L	491	14
+L	493	-1
+E	ESS_02:00_Energy_Expr	0	0	
+L	81	-15
+L	82	14
+L	83	-1
+L	73	1
+E	ESS_05:15_ChargeDischargePower_Expr	0	0	
+L	210	1
+L	211	-1
+L	212	1
+E	23:45_ESS_Charge_Constraint_Expr	0.0		
+L	991	1
+E	EV_08:15_Charge_Decision_Expr	1.0		
+L	341	1
+E	Grid_16:45_BuySellPower_Expr	0	0	
+L	714	1
+L	715	-1
+L	716	1
+E	21:45_Power_Balance	214	214	
+L	913	-1
+L	916	1
+L	909	1
+E	08:45_Power_Balance	-3019	-3019	
+L	357	1
+L	362	-1
+L	365	1
+E	ESS_09:00_ChargeDischargePower_Expr	0	0	
+L	368	1
+L	369	-1
+L	370	1
+E	ESS_18:45_ChargeDischargePower_Expr	0	0	
+L	789	1
+L	790	-1
+L	791	1
+E	13:45_Power_Balance	-3179	-3179	
+L	577	1
+L	582	-1
+L	585	1
+E	ESS_18:15_Energy_Expr	0	0	
+L	770	-15
+L	771	14
+L	772	-1
+L	762	1
+E	EV_07:30_Charge_Power_Expr	4200	11000	
+L	307	1
+L	308	11000
+E	Grid_10:00_BuySellPower_Expr	0	0	
+L	420	1
+L	421	-1
+L	422	1
+E	Grid_17:30_BuySellPower_Expr	0	0	
+L	745	1
+L	746	-1
+L	747	1
+E	Grid_06:45_BuySellPower_Expr	0	0	
+L	277	1
+L	278	-1
+L	279	1
+E	Grid_00:00_BuySellPower_Expr	0	0	
+L	7	1
+L	8	-1
+L	9	1
+E	05:30_Power_Balance	-27	-27	
+L	224	-1
+L	227	1
+L	220	1
+E	Grid_19:30_BuySellPower_Expr	0	0	
+L	826	1
+L	827	-1
+L	828	1
+E	02:30_Power_Balance	235	235	
+L	100	1
+L	104	-1
+L	107	1
+E	ESS_04:45_ChargeDischargePower_Expr	0	0	
+L	192	1
+L	190	1
+L	191	-1
+E	13:45_ESS_Charge_Constraint_Expr	2861.1		
+L	579	1
+E	ESS_00:30_ChargeDischargePower_Expr	0	0	
+L	20	1
+L	21	-1
+L	22	1
+E	10:30_Power_Balance	-3241	-3241	
+L	434	1
+L	439	-1
+L	442	1
+E	ESS_12:15_Charge_Mode_Expr	0	10000	
+L	512	1
+L	514	10000
+E	EV_21:00_Charge_Power_Expr	4200	11000	
+L	883	1
+L	884	11000
+E	EV_16:30_Charge_Decision_Expr	1.0		
+L	702	1
+E	ESS_13:15_Charge_Mode_Expr	0	10000	
+L	556	1
+L	558	10000
+E	Grid_04:45_BuySellPower_Expr	0	0	
+L	197	1
+L	198	-1
+L	199	1
+E	EV_10:45_Charge_Decision_Expr	1.0		
+L	451	1
+E	EV_09:30_Charge_Power_Expr	4200	11000	
+L	395	1
+L	396	11000
+E	Grid_18:45_BuySellPower_Expr	0	0	
+L	796	1
+L	797	-1
+L	798	1
+E	ESS_10:45_ChargeDischargePower_Expr	0	0	
+L	445	1
+L	446	-1
+L	447	1
+E	Grid_12:00_BuySellPower_Expr	0	0	
+L	508	1
+L	509	-1
+L	510	1
+E	ESS_09:45_ChargeDischargePower_Expr	0	0	
+L	401	1
+L	402	-1
+L	403	1
+E	EV_02:00_Charge_Decision_Expr	0.0		
+L	85	1
+E	10:45_Power_Balance	-6062	-6062	
+L	450	-1
+L	453	1
+L	445	1
+E	Grid_10:45_BuySellPower_Expr	0	0	
+L	453	1
+L	454	-1
+L	455	1
+E	19:45_Power_Balance	147	147	
+L	833	-1
+L	836	1
+L	829	1
+E	00:45_ESS_Charge_Constraint_Expr	0.0		
+L	32	1
+E	Grid_04:00_BuySellPower_Expr	0	0	
+L	167	1
+L	168	-1
+L	169	1
+E	ESS_11:30_ChargeDischargePower_Expr	0	0	
+L	480	1
+L	478	1
+L	479	-1
+E	ESS_22:45_ChargeDischargePower_Expr	0	0	
+L	949	1
+L	950	-1
+L	951	1
+E	EV_23:00_Charge_Power_Expr	4200	11000	
+L	963	1
+L	964	11000
+E	06:30_ESS_Charge_Constraint_Expr	405.90000000000003		
+L	262	1
+E	ESS_15:30_Charge_Mode_Expr	0	10000	
+L	657	10000
+L	655	1
+E	ESS_04:00_Energy_Expr	0	0	
+L	161	-15
+L	162	14
+L	163	-1
+L	153	1
+E	ESS_04:00_ChargeDischargePower_Expr	0	0	
+L	160	1
+L	161	-1
+L	162	1
+E	ESS_07:45_ChargeDischargePower_Expr	0	0	
+L	313	1
+L	314	-1
+L	315	1
+E	Grid_03:30_BuySellPower_Expr	0	0	
+L	147	1
+L	148	-1
+L	149	1
+E	EV_06:00_Charge_Power_Expr	4200	11000	
+L	244	1
+L	245	11000
+E	19:30_ESS_Charge_Constraint_Expr	0.0		
+L	821	1
+E	01:15_ESS_Charge_Constraint_Expr	0.0		
+L	52	1
+E	EV_14:30_Charge_Decision_Expr	1.0		
+L	616	1
+E	ESS_04:15_Energy_Expr	0	0	
+L	163	1
+L	171	-15
+L	172	14
+L	173	-1
+E	09:30_ESS_Charge_Constraint_Expr	2080.8		
+L	392	1
+E	17:15_Power_Balance	-905	-905	
+L	727	1
+L	732	-1
+L	735	1
+E	22:30_ESS_Charge_Constraint_Expr	0.0		
+L	941	1
+E	ESS_06:00_ChargeDischargePower_Expr	0	0	
+L	240	1
+L	241	-1
+L	242	1
+E	EV_10:15_Charge_Power_Expr	4200	11000	
+L	428	1
+L	429	11000
+E	ESS_13:00_ChargeDischargePower_Expr	0	0	
+L	544	1
+L	545	-1
+L	546	1
+E	ESS_17:15_ChargeDischargePower_Expr	0	0	
+L	727	1
+L	728	-1
+L	729	1
+E	EV_18:15_Charge_Decision_Expr	1.0		
+L	774	1
+E	Grid_23:30_BuySellPower_Expr	0	0	
+L	986	1
+L	987	-1
+L	988	1
+E	EV_22:30_Charge_Decision_Expr	0.0		
+L	944	1
+E	ESS_00:30_Energy_Expr	0	0	
+L	21	-15
+L	22	14
+L	23	-1
+L	13	1
+E	12:00_EV_Energy_Expr	0	0	
+L	496	1
+L	505	13
+L	507	-1
+E	12:30_EV_Energy_Expr	0	0	
+L	529	-1
+L	518	1
+L	527	13
+E	Grid_09:15_BuySellPower_Expr	0	0	
+L	387	1
+L	388	-1
+L	389	1
+E	ESS_11:15_Energy_Expr	0	0	
+L	468	-15
+L	469	14
+L	471	-1
+L	460	1
+E	05:30_EV_Energy_Expr	0	0	
+L	224	13
+L	226	-1
+L	216	1
+E	05:00_EV_Energy_Expr	0	0	
+L	196	1
+L	204	13
+L	206	-1
+E	10:45_ESS_Charge_Constraint_Expr	5455.8		
+L	447	1
+E	ESS_09:15_Charge_Mode2_Expr	0	10000	
+L	381	-1
+L	382	10000
+E	ESS_08:00_Charge_Mode_Expr	0	10000	
+L	325	1
+L	327	10000
+E	Grid_08:00_BuySellPower_Expr	0	0	
+L	332	1
+L	333	-1
+L	334	1
+E	11:00_Power_Balance	-5782	-5782	
+L	464	1
+L	456	1
+L	461	-1
+E	07:00_EV_Energy_Expr	0	0	
+L	276	1
+L	285	13
+L	287	-1
+E	23:15_Power_Balance	573	573	
+L	976	1
+L	969	1
+L	973	-1
+E	10:00_ESS_Charge_Constraint_Expr	2151.9		
+L	414	1
+E	07:30_EV_Energy_Expr	0	0	
+L	307	13
+L	309	-1
+L	298	1
+E	Grid_22:00_BuySellPower_Expr	0	0	
+L	928	1
+L	926	1
+L	927	-1
+E	EV_19:30_Charge_Power_Expr	4200	11000	
+L	823	1
+L	824	11000
+E	17:00_ESS_Charge_Constraint_Expr	208.8		
+L	719	1
+E	EV_08:30_Charge_Decision_Expr	1.0		
+L	352	1
+E	ESS_08:45_Energy_Expr	0	0	
+L	358	-15
+L	359	14
+L	361	-1
+L	350	1
+E	ESS_16:00_Charge_Mode2_Expr	0	10000	
+L	678	-1
+L	679	10000
+E	EV_05:30_Charge_Power_Expr	4200	11000	
+L	224	1
+L	225	11000
+E	20:00_ESS_Charge_Constraint_Expr	0.0		
+L	841	1
+E	ESS_08:45_Charge_Mode2_Expr	0	10000	
+L	359	-1
+L	360	10000
+E	EV_12:45_Charge_Decision_Expr	1.0		
+L	539	1
+E	Grid_15:15_BuySellPower_Expr	0	0	
+L	651	1
+L	652	-1
+L	653	1
+E	07:00_ESS_Charge_Constraint_Expr	535.5		
+L	282	1
+E	ESS_08:15_Charge_Mode_Expr	0	10000	
+L	336	1
+L	338	10000
+E	ESS_20:15_ChargeDischargePower_Expr	0	0	
+L	849	1
+L	850	-1
+L	851	1
+E	ESS_02:45_Energy_Expr	0	0	
+L	112	14
+L	113	-1
+L	103	1
+L	111	-15
+E	EV_17:30_Charge_Decision_Expr	1.0		
+L	743	1
+E	14:00_ESS_Charge_Constraint_Expr	3297.6		
+L	590	1
+E	Grid_14:45_BuySellPower_Expr	0	0	
+L	629	1
+L	630	-1
+L	631	1
+E	Grid_18:00_BuySellPower_Expr	0	0	
+L	768	1
+L	766	1
+L	767	-1
+E	ESS_15:45_ChargeDischargePower_Expr	0	0	
+L	665	1
+L	666	-1
+L	667	1
+E	23:00_Power_Balance	465	465	
+L	963	-1
+L	966	1
+L	959	1
+E	ESS_03:30_ChargeDischargePower_Expr	0	0	
+L	140	1
+L	141	-1
+L	142	1
+E	ESS_02:30_ChargeDischargePower_Expr	0	0	
+L	100	1
+L	101	-1
+L	102	1
+E	19:15_EV_Energy_Expr	0	0	
+L	805	1
+L	813	13
+L	815	-1
+E	ESS_13:45_ChargeDischargePower_Expr	0	0	
+L	577	1
+L	578	-1
+L	579	1
+E	ESS_10:00_ChargeDischargePower_Expr	0	0	
+L	412	1
+L	413	-1
+L	414	1
+E	ESS_16:30_Energy_Expr	0	0	
+L	690	1
+L	698	-15
+L	699	14
+L	700	-1
+E	19:45_EV_Energy_Expr	0	0	
+L	833	13
+L	835	-1
+L	825	1
+E	07:00_Power_Balance	-595	-595	
+L	288	1
+L	280	1
+L	285	-1
+E	20:45_ESS_Charge_Constraint_Expr	0.0		
+L	871	1
+E	EV_23:45_Charge_Power_Expr	4200	11000	
+L	993	1
+L	994	11000
+E	07:45_ESS_Charge_Constraint_Expr	898.2		
+L	315	1
+E	EV_03:45_Charge_Decision_Expr	0.0		
+L	155	1
+E	EV_21:00_Charge_Decision_Expr	0.0		
+L	884	1
+E	ESS_11:45_Charge_Mode2_Expr	0	10000	
+L	491	-1
+L	492	10000
+E	ESS_23:30_Energy_Expr	0	0	
+L	980	-15
+L	981	14
+L	982	-1
+L	972	1
+E	Grid_19:15_BuySellPower_Expr	0	0	
+L	816	1
+L	817	-1
+L	818	1
+E	Grid_05:15_BuySellPower_Expr	0	0	
+L	217	1
+L	218	-1
+L	219	1
+E	EV_00:15_Charge_Power_Expr	4200	11000	
+L	14	1
+L	15	11000
+E	16:30_ESS_Charge_Constraint_Expr	0.0		
+L	699	1
+E	EV_19:45_Charge_Decision_Expr	0.0		
+L	834	1
+E	Grid_13:30_BuySellPower_Expr	0	0	
+L	576	1
+L	574	1
+L	575	-1
+E	ESS_18:00_Energy_Expr	0	0	
+L	752	1
+L	760	-15
+L	761	14
+L	762	-1
+E	EV_07:15_Charge_Power_Expr	4200	11000	
+L	296	1
+L	297	11000
+E	09:30_Power_Balance	-2312	-2312	
+L	390	1
+L	395	-1
+L	398	1
+E	ESS_08:30_Energy_Expr	0	0	
+L	339	1
+L	347	-15
+L	348	14
+L	350	-1
+E	EV_14:15_Charge_Power_Expr	4200	11000	
+L	604	1
+L	605	11000
+E	05:15_ESS_Charge_Constraint_Expr	0.0		
+L	212	1
+E	ESS_11:00_Energy_Expr	0	0	
+L	449	1
+L	457	-15
+L	458	14
+L	460	-1
+E	EV_01:30_Charge_Power_Expr	4200	11000	
+L	64	1
+L	65	11000
+E	ESS_10:00_Charge_Mode_Expr	0	10000	
+L	413	1
+L	415	10000
+E	22:30_Power_Balance	278	278	
+L	946	1
+L	939	1
+L	943	-1
+E	ESS_12:00_Charge_Mode2_Expr	0	10000	
+L	502	-1
+L	503	10000
+E	22:45_Power_Balance	277	277	
+L	949	1
+L	953	-1
+L	956	1
+E	EV_15:30_Charge_Power_Expr	4200	11000	
+L	659	1
+L	660	11000
+E	EV_12:00_Charge_Decision_Expr	1.0		
+L	506	1
+E	ESS_09:30_Charge_Mode_Expr	0	10000	
+L	391	1
+L	393	10000
+E	04:00_ESS_Charge_Constraint_Expr	0.0		
+L	162	1
+E	EV_22:30_Charge_Power_Expr	4200	11000	
+L	944	11000
+L	943	1
+E	EV_01:45_Charge_Power_Expr	4200	11000	
+L	74	1
+L	75	11000
+E	EV_03:15_Charge_Power_Expr	4200	11000	
+L	134	1
+L	135	11000
+E	ESS_14:45_Charge_Mode2_Expr	0	10000	
+L	624	10000
+L	623	-1
+E	EV_19:00_Charge_Decision_Expr	0.0		
+L	804	1
+E	EV_14:00_Charge_Decision_Expr	1.0		
+L	594	1
+E	ESS_14:30_Charge_Mode_Expr	0	10000	
+L	611	1
+L	613	10000
+E	Grid_21:15_BuySellPower_Expr	0	0	
+L	896	1
+L	897	-1
+L	898	1
+E	16:30_Power_Balance	83	83	
+L	704	1
+L	697	1
+L	701	-1
+E	ESS_20:30_Energy_Expr	0	0	
+L	852	1
+L	860	-15
+L	861	14
+L	862	-1
+E	17:45_ESS_Charge_Constraint_Expr	639.9		
+L	750	1
+E	15:00_ESS_Charge_Constraint_Expr	2946.6		
+L	634	1
+E	15:15_Power_Balance	-2629	-2629	
+L	643	1
+L	648	-1
+L	651	1
+E	Grid_20:15_BuySellPower_Expr	0	0	
+L	856	1
+L	857	-1
+L	858	1
+E	EV_18:45_Charge_Decision_Expr	0.0		
+L	794	1
+E	09:15_EV_Energy_Expr	0	0	
+L	384	13
+L	386	-1
+L	375	1
+E	EV_13:00_Charge_Power_Expr	4200	11000	
+L	549	1
+L	550	11000
+E	EV_02:15_Charge_Power_Expr	4200	11000	
+L	94	1
+L	95	11000
+E	08:15_EV_Energy_Expr	0	0	
+L	340	13
+L	342	-1
+L	331	1
+E	19:30_EV_Energy_Expr	0	0	
+L	823	13
+L	825	-1
+L	815	1
+E	ESS_13:45_Charge_Mode2_Expr	0	10000	
+L	579	-1
+L	580	10000
+E	EV_10:30_Charge_Power_Expr	4200	11000	
+L	439	1
+L	440	11000
+E	ESS_15:30_Energy_Expr	0	0	
+L	656	14
+L	658	-1
+L	647	1
+L	655	-15
+E	Grid_20:45_BuySellPower_Expr	0	0	
+L	876	1
+L	877	-1
+L	878	1
+E	04:00_Power_Balance	269	269	
+L	160	1
+L	164	-1
+L	167	1
+E	ESS_07:15_Energy_Expr	0	0	
+L	292	-15
+L	293	14
+L	295	-1
+L	284	1
+E	EV_12:00_Charge_Power_Expr	4200	11000	
+L	505	1
+L	506	11000
+E	EV_13:30_Charge_Decision_Expr	1.0		
+L	572	1
+E	EV_22:45_Charge_Decision_Expr	0.0		
+L	954	1
+E	ESS_10:00_Charge_Mode2_Expr	0	10000	
+L	414	-1
+L	415	10000
+E	20:15_Power_Balance	283	283	
+L	849	1
+L	853	-1
+L	856	1
+E	07:15_EV_Energy_Expr	0	0	
+L	296	13
+L	298	-1
+L	287	1
+E	ESS_Schedule_Expr	0		
+L	992	1
+E	ESS_14:15_Charge_Mode2_Expr	0	10000	
+L	601	-1
+L	602	10000
+E	EV_11:00_Charge_Power_Expr	4200	11000	
+L	461	1
+L	462	11000
+E	ESS_13:15_Energy_Expr	0	0	
+L	548	1
+L	556	-15
+L	557	14
+L	559	-1
+E	17:30_EV_Energy_Expr	0	0	
+L	742	13
+L	744	-1
+L	734	1
+E	ESS_21:45_ChargeDischargePower_Expr	0	0	
+L	909	1
+L	910	-1
+L	911	1
+E	EV_18:00_Charge_Power_Expr	4200	11000	
+L	763	1
+L	764	11000
+E	ESS_09:15_Energy_Expr	0	0	
+L	372	1
+L	380	-15
+L	381	14
+L	383	-1
+E	EV_11:30_Charge_Power_Expr	4200	11000	
+L	483	1
+L	484	11000
+E	ESS_06:45_ChargeDischargePower_Expr	0	0	
+L	272	1
+L	270	1
+L	271	-1
+E	ESS_03:00_ChargeDischargePower_Expr	0	0	
+L	120	1
+L	121	-1
+L	122	1
+E	ESS_22:00_ChargeDischargePower_Expr	0	0	
+L	919	1
+L	920	-1
+L	921	1
+E	ESS_14:45_Charge_Mode_Expr	0	10000	
+L	624	10000
+L	622	1
+E	Grid_09:30_BuySellPower_Expr	0	0	
+L	400	1
+L	398	1
+L	399	-1
+E	05:45_EV_Energy_Expr	0	0	
+L	226	1
+L	234	13
+L	236	-1
+E	EV_19:00_Charge_Power_Expr	4200	11000	
+L	803	1
+L	804	11000
+E	ESS_15:15_Charge_Mode2_Expr	0	10000	
+L	645	-1
+L	646	10000
+E	Grid_22:15_BuySellPower_Expr	0	0	
+L	936	1
+L	937	-1
+L	938	1
+E	00:15_Power_Balance	263	263	
+L	17	1
+L	10	1
+L	14	-1
+E	EV_18:30_Charge_Decision_Expr	0.0		
+L	784	1
+E	00:00_EV_Energy_Expr	0	0	
+L	4	-13
+L	6	1
+E	01:30_Power_Balance	274	274	
+L	64	-1
+L	67	1
+L	60	1
+E	EV_19:15_Charge_Decision_Expr	0.0		
+L	814	1
+E	ESS_16:45_ChargeDischargePower_Expr	0	0	
+L	707	1
+L	708	-1
+L	709	1
+E	EV_06:45_Charge_Power_Expr	4200	11000	
+L	274	1
+L	275	11000
+E	ESS_06:15_ChargeDischargePower_Expr	0	0	
+L	250	1
+L	251	-1
+L	252	1
+E	14:15_ESS_Charge_Constraint_Expr	2556.0		
+L	601	1
+E	EV_08:15_Charge_Power_Expr	4200	11000	
+L	340	1
+L	341	11000
+E	18:45_ESS_Charge_Constraint_Expr	0.0		
+L	791	1
+E	EV_15:45_Charge_Power_Expr	4200	11000	
+L	670	1
+L	671	11000
+E	04:45_EV_Energy_Expr	0	0	
+L	194	13
+L	196	-1
+L	186	1
+E	EV_17:15_Charge_Power_Expr	4200	11000	
+L	732	1
+L	733	11000
+E	ESS_13:30_Energy_Expr	0	0	
+L	567	-15
+L	568	14
+L	570	-1
+L	559	1
+E	ESS_06:15_Energy_Expr	0	0	
+L	243	1
+L	251	-15
+L	252	14
+L	253	-1
+E	EV_18:30_Charge_Power_Expr	4200	11000	
+L	784	11000
+L	783	1
+E	15:30_EV_Energy_Expr	0	0	
+L	659	13
+L	661	-1
+L	650	1
+E	20:15_EV_Energy_Expr	0	0	
+L	853	13
+L	855	-1
+L	845	1
+E	ESS_22:30_Energy_Expr	0	0	
+L	932	1
+L	940	-15
+L	941	14
+L	942	-1
+E	EV_00:00_Charge_Decision_Expr	0.0		
+L	5	1
+E	14:30_EV_Energy_Expr	0	0	
+L	615	13
+L	617	-1
+L	606	1
+E	ESS_21:15_Energy_Expr	0	0	
+L	882	1
+L	890	-15
+L	891	14
+L	892	-1
+E	21:30_Power_Balance	279	279	
+L	899	1
+L	903	-1
+L	906	1
+E	04:00_EV_Energy_Expr	0	0	
+L	164	13
+L	166	-1
+L	156	1
+E	ESS_11:00_Charge_Mode2_Expr	0	10000	
+L	458	-1
+L	459	10000
+E	12:30_ESS_Charge_Constraint_Expr	4487.400000000001		
+L	524	1
+E	21:15_EV_Energy_Expr	0	0	
+L	885	1
+L	893	13
+L	895	-1
+E	05:45_Power_Balance	-64	-64	
+L	230	1
+L	234	-1
+L	237	1
+E	ESS_08:45_Charge_Mode_Expr	0	10000	
+L	358	1
+L	360	10000
+E	Grid_07:30_BuySellPower_Expr	0	0	
+L	310	1
+L	311	-1
+L	312	1
+E	02:30_ESS_Charge_Constraint_Expr	0.0		
+L	102	1
+E	EV_01:15_Charge_Decision_Expr	0.0		
+L	55	1
+E	ESS_11:45_ChargeDischargePower_Expr	0	0	
+L	489	1
+L	490	-1
+L	491	1
+E	EV_13:45_Charge_Power_Expr	4200	11000	
+L	582	1
+L	583	11000
+E	01:45_EV_Energy_Expr	0	0	
+L	66	1
+L	74	13
+L	76	-1
+E	05:15_Power_Balance	188	188	
+L	210	1
+L	214	-1
+L	217	1
+E	EV_01:15_Charge_Power_Expr	4200	11000	
+L	54	1
+L	55	11000
+E	05:00_ESS_Charge_Constraint_Expr	0.0		
+L	202	1
+E	ESS_14:30_Energy_Expr	0	0	
+L	611	-15
+L	612	14
+L	614	-1
+L	603	1
+E	EV_08:45_Charge_Power_Expr	4200	11000	
+L	362	1
+L	363	11000
+E	EV_15:15_Charge_Power_Expr	4200	11000	
+L	648	1
+L	649	11000
+E	ESS_10:45_Charge_Mode_Expr	0	10000	
+L	448	10000
+L	446	1
+E	ESS_14:15_Energy_Expr	0	0	
+L	592	1
+L	600	-15
+L	601	14
+L	603	-1
+E	ESS_12:45_Charge_Mode2_Expr	0	10000	
+L	535	-1
+L	536	10000
+E	ESS_21:30_Energy_Expr	0	0	
+L	900	-15
+L	901	14
+L	902	-1
+L	892	1
+E	02:00_Power_Balance	148	148	
+L	80	1
+L	84	-1
+L	87	1
+E	ESS_18:45_Energy_Expr	0	0	
+L	790	-15
+L	791	14
+L	792	-1
+L	782	1
+E	08:45_ESS_Charge_Constraint_Expr	2717.1		
+L	359	1
+E	EV_23:30_Charge_Power_Expr	4200	11000	
+L	983	1
+L	984	11000
+E	10:30_ESS_Charge_Constraint_Expr	2916.9		
+L	436	1
+E	19:00_Power_Balance	266	266	
+L	803	-1
+L	806	1
+L	799	1
+E	18:30_EV_Energy_Expr	0	0	
+L	785	-1
+L	775	1
+L	783	13
+E	EV_16:30_Charge_Power_Expr	4200	11000	
+L	701	1
+L	702	11000
+E	EV_04:45_Charge_Decision_Expr	0.0		
+L	195	1
+E	10:15_Power_Balance	-3518	-3518	
+L	423	1
+L	428	-1
+L	431	1
+E	ESS_00:45_Energy_Expr	0	0	
+L	32	14
+L	33	-1
+L	23	1
+L	31	-15
+E	ESS_19:30_ChargeDischargePower_Expr	0	0	
+L	819	1
+L	820	-1
+L	821	1
+E	20:30_ESS_Charge_Constraint_Expr	0.0		
+L	861	1
+E	01:00_EV_Energy_Expr	0	0	
+L	36	1
+L	44	13
+L	46	-1
+E	EV_05:30_Charge_Decision_Expr	0.0		
+L	225	1
+E	11:00_EV_Energy_Expr	0	0	
+L	452	1
+L	461	13
+L	463	-1
+E	EV_06:15_Charge_Decision_Expr	0.0		
+L	255	1
+E	EV_00:30_Charge_Decision_Expr	0.0		
+L	25	1
+E	21:00_Power_Balance	156	156	
+L	883	-1
+L	886	1
+L	879	1
+E	ESS_06:30_ChargeDischargePower_Expr	0	0	
+L	260	1
+L	261	-1
+L	262	1
+E	EV_05:00_Charge_Power_Expr	4200	11000	
+L	204	1
+L	205	11000
+E	ESS_06:30_Energy_Expr	0	0	
+L	261	-15
+L	262	14
+L	263	-1
+L	253	1
+E	10:00_EV_Energy_Expr	0	0	
+L	417	13
+L	419	-1
+L	408	1
+E	22:00_Power_Balance	157	157	
+L	919	1
+L	923	-1
+L	926	1
+E	Grid_21:30_BuySellPower_Expr	0	0	
+L	906	1
+L	907	-1
+L	908	1
+E	ESS_07:15_Charge_Mode2_Expr	0	10000	
+L	293	-1
+L	294	10000
+E	Grid_23:00_BuySellPower_Expr	0	0	
+L	966	1
+L	967	-1
+L	968	1
+E	ESS_15:30_Charge_Mode2_Expr	0	10000	
+L	656	-1
+L	657	10000
+E	EV_02:30_Charge_Power_Expr	4200	11000	
+L	104	1
+L	105	11000
+E	ESS_17:00_ChargeDischargePower_Expr	0	0	
+L	717	1
+L	718	-1
+L	719	1
+E	08:30_Power_Balance	-3826	-3826	
+L	354	1
+L	346	1
+L	351	-1
+E	ESS_19:45_Energy_Expr	0	0	
+L	832	-1
+L	822	1
+L	830	-15
+L	831	14
+E	ESS_13:45_Charge_Mode_Expr	0	10000	
+L	578	1
+L	580	10000
+E	Grid_01:30_BuySellPower_Expr	0	0	
+L	67	1
+L	68	-1
+L	69	1
+E	08:30_EV_Energy_Expr	0	0	
+L	353	-1
+L	342	1
+L	351	13
+E	EV_04:00_Charge_Power_Expr	4200	11000	
+L	164	1
+L	165	11000
+E	Grid_03:00_BuySellPower_Expr	0	0	
+L	128	-1
+L	129	1
+L	127	1
+E	23:15_EV_Energy_Expr	0	0	
+L	965	1
+L	973	13
+L	975	-1
+E	Grid_13:15_BuySellPower_Expr	0	0	
+L	563	1
+L	564	-1
+L	565	1
+E	EV_23:45_Charge_Decision_Expr	0.0		
+L	994	1
+E	EV_13:00_Charge_Decision_Expr	1.0		
+L	550	1
+E	EV_19:30_Charge_Decision_Expr	0.0		
+L	824	1
+E	ESS_11:15_ChargeDischargePower_Expr	0	0	
+L	467	1
+L	468	-1
+L	469	1
+E	ESS_15:00_ChargeDischargePower_Expr	0	0	
+L	632	1
+L	633	-1
+L	634	1
+E	ESS_00:15_ChargeDischargePower_Expr	0	0	
+L	10	1
+L	11	-1
+L	12	1
+E	12:00_Power_Balance	-2266	-2266	
+L	500	1
+L	505	-1
+L	508	1
+E	EV_00:15_Charge_Decision_Expr	0.0		
+L	15	1
+E	04:15_ESS_Charge_Constraint_Expr	0.0		
+L	172	1
+E	09:30_EV_Energy_Expr	0	0	
+L	386	1
+L	395	13
+L	397	-1
+E	ESS_22:15_Energy_Expr	0	0	
+L	930	-15
+L	931	14
+L	932	-1
+L	922	1
+E	ESS_13:30_ChargeDischargePower_Expr	0	0	
+L	566	1
+L	567	-1
+L	568	1
+E	07:15_ESS_Charge_Constraint_Expr	1390.5		
+L	293	1
+E	ESS_13:00_Charge_Mode_Expr	0	10000	
+L	545	1
+L	547	10000
+E	EV_03:30_Charge_Power_Expr	4200	11000	
+L	144	1
+L	145	11000
+E	Grid_00:30_BuySellPower_Expr	0	0	
+L	27	1
+L	28	-1
+L	29	1
+E	ESS_17:15_Energy_Expr	0	0	
+L	720	1
+L	728	-15
+L	729	14
+L	731	-1
+E	ESS_05:30_Energy_Expr	0	0	
+L	213	1
+L	221	-15
+L	222	14
+L	223	-1
+E	20:30_Power_Balance	264	264	
+L	866	1
+L	859	1
+L	863	-1
+E	Grid_14:15_BuySellPower_Expr	0	0	
+L	608	-1
+L	609	1
+L	607	1
+E	06:15_Power_Balance	-222	-222	
+L	257	1
+L	250	1
+L	254	-1
+E	Grid_22:30_BuySellPower_Expr	0	0	
+L	946	1
+L	947	-1
+L	948	1
+E	04:45_Power_Balance	226	226	
+L	194	-1
+L	197	1
+L	190	1
+E	ESS_08:15_Charge_Mode2_Expr	0	10000	
+L	337	-1
+L	338	10000
+E	EV_17:45_Charge_Decision_Expr	1.0		
+L	754	1
+E	ESS_20:30_ChargeDischargePower_Expr	0	0	
+L	859	1
+L	860	-1
+L	861	1
+E	15:45_ESS_Charge_Constraint_Expr	1135.8		
+L	667	1
+E	ESS_19:00_ChargeDischargePower_Expr	0	0	
+L	800	-1
+L	801	1
+L	799	1
+E	ESS_17:30_ChargeDischargePower_Expr	0	0	
+L	738	1
+L	739	-1
+L	740	1
+E	Grid_02:00_BuySellPower_Expr	0	0	
+L	87	1
+L	88	-1
+L	89	1
+E	ESS_11:30_Energy_Expr	0	0	
+L	480	14
+L	482	-1
+L	471	1
+L	479	-15
+E	ESS_08:30_Charge_Mode_Expr	0	10000	
+L	347	1
+L	349	10000
+E	18:30_ESS_Charge_Constraint_Expr	0.0		
+L	781	1
+E	Grid_09:00_BuySellPower_Expr	0	0	
+L	376	1
+L	377	-1
+L	378	1
+E	ESS_17:45_Charge_Mode_Expr	0	10000	
+L	749	1
+L	751	10000
+E	22:00_ESS_Charge_Constraint_Expr	0.0		
+L	921	1
+E	Grid_05:45_BuySellPower_Expr	0	0	
+L	237	1
+L	238	-1
+L	239	1
+E	17:15_ESS_Charge_Constraint_Expr	814.5		
+L	729	1
+E	02:00_EV_Energy_Expr	0	0	
+L	84	13
+L	86	-1
+L	76	1
+E	EV_12:30_Charge_Decision_Expr	1.0		
+L	528	1
+E	Grid_07:15_BuySellPower_Expr	0	0	
+L	299	1
+L	300	-1
+L	301	1
+E	Grid_08:30_BuySellPower_Expr	0	0	
+L	354	1
+L	355	-1
+L	356	1
+E	03:45_EV_Energy_Expr	0	0	
+L	146	1
+L	154	13
+L	156	-1
+E	ESS_04:15_ChargeDischargePower_Expr	0	0	
+L	170	1
+L	171	-1
+L	172	1
+E	ESS_15:15_Energy_Expr	0	0	
+L	644	-15
+L	645	14
+L	647	-1
+L	636	1
+E	EV_06:30_Charge_Decision_Expr	0.0		
+L	265	1
+E	ESS_02:45_ChargeDischargePower_Expr	0	0	
+L	112	1
+L	110	1
+L	111	-1
+E	EV_07:15_Charge_Decision_Expr	1.0		
+L	297	1
+E	ESS_04:30_Energy_Expr	0	0	
+L	181	-15
+L	182	14
+L	183	-1
+L	173	1
+E	EV_13:15_Charge_Decision_Expr	1.0		
+L	561	1
+E	EV_16:15_Charge_Power_Expr	4200	11000	
+L	691	1
+L	692	11000
+E	EV_09:15_Charge_Power_Expr	4200	11000	
+L	384	1
+L	385	11000
+E	02:45_EV_Energy_Expr	0	0	
+L	114	13
+L	116	-1
+L	106	1
+E	09:00_Power_Balance	-2686	-2686	
+L	368	1
+L	373	-1
+L	376	1
+E	ESS_10:30_Charge_Mode_Expr	0	10000	
+L	435	1
+L	437	10000
+E	03:00_EV_Energy_Expr	0	0	
+L	116	1
+L	124	13
+L	126	-1
+E	ESS_00:45_ChargeDischargePower_Expr	0	0	
+L	32	1
+L	30	1
+L	31	-1
+E	EV_17:30_Charge_Power_Expr	4200	11000	
+L	742	1
+L	743	11000
+E	Grid_12:45_BuySellPower_Expr	0	0	
+L	541	1
+L	542	-1
+L	543	1
+E	22:15_EV_Energy_Expr	0	0	
+L	933	13
+L	935	-1
+L	925	1
+E	ESS_23:15_Energy_Expr	0	0	
+L	962	1
+L	970	-15
+L	971	14
+L	972	-1
+E	11:30_Power_Balance	-6263	-6263	
+L	483	-1
+L	486	1
+L	478	1
+E	ESS_02:15_ChargeDischargePower_Expr	0	0	
+L	90	1
+L	91	-1
+L	92	1
+E	ESS_16:15_Energy_Expr	0	0	
+L	688	-15
+L	689	14
+L	690	-1
+L	680	1
+E	EV_01:00_Charge_Decision_Expr	0.0		
+L	45	1
+E	08:30_ESS_Charge_Constraint_Expr	3443.4		
+L	348	1
+E	ESS_15:30_ChargeDischargePower_Expr	0	0	
+L	656	1
+L	654	1
+L	655	-1
+E	EV_05:45_Charge_Decision_Expr	0.0		
+L	235	1
+E	ESS_22:30_ChargeDischargePower_Expr	0	0	
+L	939	1
+L	940	-1
+L	941	1
+E	02:45_ESS_Charge_Constraint_Expr	0.0		
+L	112	1
+E	EV_21:45_Charge_Power_Expr	4200	11000	
+L	913	1
+L	914	11000
+E	16:15_EV_Energy_Expr	0	0	
+L	691	13
+L	693	-1
+L	683	1
+E	EV_00:45_Charge_Power_Expr	4200	11000	
+L	34	1
+L	35	11000
+E	EV_07:45_Charge_Power_Expr	4200	11000	
+L	318	1
+L	319	11000
+E	17:30_Power_Balance	-584	-584	
+L	738	1
+L	742	-1
+L	745	1
+E	EV_14:45_Charge_Power_Expr	4200	11000	
+L	626	1
+L	627	11000
+E	12:45_ESS_Charge_Constraint_Expr	4824.900000000001		
+L	535	1
+E	ESS_12:30_Energy_Expr	0	0	
+L	515	1
+L	523	-15
+L	524	14
+L	526	-1
+E	ESS_08:15_Energy_Expr	0	0	
+L	336	-15
+L	337	14
+L	339	-1
+L	328	1
+E	16:30_EV_Energy_Expr	0	0	
+L	693	1
+L	701	13
+L	703	-1
+E	14:45_Power_Balance	-3409	-3409	
+L	626	-1
+L	629	1
+L	621	1
+E	22:45_ESS_Charge_Constraint_Expr	0.0		
+L	951	1
+E	ESS_12:45_Charge_Mode_Expr	0	10000	
+L	534	1
+L	536	10000
+E	ESS_23:45_ChargeDischargePower_Expr	0	0	
+L	989	1
+L	990	-1
+L	991	1
+E	23:00_EV_Energy_Expr	0	0	
+L	963	13
+L	965	-1
+L	955	1
+E	Grid_Buy_Cost_Sum_Expr	0	0	
+L	258	18.08
+L	8	20.1
+L	520	19.1
+L	777	20.47
+L	268	18.08
+L	18	20.1
+L	531	19.1
+L	787	20.47
+L	278	18.08
+L	28	20.1
+L	797	20.47
+L	542	19.1
+L	289	18.37
+L	38	20.1
+L	807	21.31
+L	553	18.47
+L	300	18.37
+L	48	19.39
+L	817	21.31
+L	564	18.47
+L	311	18.37
+L	58	19.39
+L	827	21.31
+L	575	18.47
+L	322	18.37
+L	68	19.39
+L	837	21.31
+L	586	18.47
+L	333	18.86
+L	78	19.39
+L	847	21.66
+L	597	18.19
+L	88	18.92
+L	344	18.86
+L	857	21.66
+L	608	18.19
+L	98	18.92
+L	355	18.86
+L	867	21.66
+L	619	18.19
+L	108	18.92
+L	877	21.66
+L	366	18.86
+L	118	18.92
+L	630	18.19
+L	887	21.36
+L	377	19.14
+L	128	18.59
+L	641	17.94
+L	897	21.36
+L	388	19.14
+L	138	18.59
+L	907	21.36
+L	652	17.94
+L	399	19.14
+L	148	18.59
+L	917	21.36
+L	663	17.94
+L	410	19.14
+L	158	18.59
+L	927	20.72
+L	674	17.94
+L	421	19.06
+L	168	18.34
+L	937	20.72
+L	685	18.16
+L	432	19.06
+L	178	18.34
+L	947	20.72
+L	695	18.16
+L	443	19.06
+L	188	18.34
+L	957	20.72
+L	705	18.16
+L	198	18.34
+L	454	10.06
+L	967	19.75
+L	715	18.16
+L	208	18.01
+L	465	19.2
+L	977	19.75
+L	725	19.71
+L	218	18.01
+L	987	19.75
+L	476	19.2
+L	736	19.71
+L	228	18.01
+L	997	19.75
+L	999	-1
+L	487	19.2
+L	746	19.71
+L	238	18.01
+L	498	19.2
+L	757	19.71
+L	248	18.08
+L	509	19.1
+L	767	20.47
+E	23:30_EV_Energy_Expr	0	0	
+L	983	13
+L	985	-1
+L	975	1
+E	ESS_19:00_Energy_Expr	0	0	
+L	800	-15
+L	801	14
+L	802	-1
+L	792	1
+E	EV_20:45_Charge_Power_Expr	4200	11000	
+L	873	1
+L	874	11000
+E	ESS_01:15_Energy_Expr	0	0	
+L	51	-15
+L	52	14
+L	53	-1
+L	43	1
+E	Grid_13:00_BuySellPower_Expr	0	0	
+L	552	1
+L	553	-1
+L	554	1
+E	Grid_19:45_BuySellPower_Expr	0	0	
+L	836	1
+L	837	-1
+L	838	1
+E	ESS_10:30_ChargeDischargePower_Expr	0	0	
+L	434	1
+L	435	-1
+L	436	1
+E	ESS_08:45_ChargeDischargePower_Expr	0	0	
+L	357	1
+L	358	-1
+L	359	1
+E	Grid_02:15_BuySellPower_Expr	0	0	
+L	97	1
+L	98	-1
+L	99	1
+E	19:15_Power_Balance	277	277	
+L	816	1
+L	809	1
+L	813	-1
+E	EV_23:15_Charge_Power_Expr	4200	11000	
+L	973	1
+L	974	11000
+E	ESS_03:30_Energy_Expr	0	0	
+L	133	1
+L	141	-15
+L	142	14
+L	143	-1
+E	EV_08:00_Charge_Decision_Expr	1.0		
+L	330	1
+E	Grid_10:30_BuySellPower_Expr	0	0	
+L	442	1
+L	443	-1
+L	444	1
+E	12:45_EV_Energy_Expr	0	0	
+L	529	1
+L	538	13
+L	540	-1
+E	18:00_ESS_Charge_Constraint_Expr	303.3		
+L	761	1
+E	14:45_ESS_Charge_Constraint_Expr	3068.1		
+L	623	1
+E	ESS_03:45_Energy_Expr	0	0	
+L	151	-15
+L	152	14
+L	153	-1
+L	143	1
+E	12:15_EV_Energy_Expr	0	0	
+L	516	13
+L	518	-1
+L	507	1
+E	ESS_07:00_Charge_Mode2_Expr	0	10000	
+L	282	-1
+L	283	10000
+E	04:15_Power_Balance	152	152	
+L	177	1
+L	170	1
+L	174	-1
+E	Grid_14:30_BuySellPower_Expr	0	0	
+L	618	1
+L	619	-1
+L	620	1
+E	Grid_00:15_BuySellPower_Expr	0	0	
+L	17	1
+L	18	-1
+L	19	1
+E	ESS_17:15_Charge_Mode_Expr	0	10000	
+L	728	1
+L	730	10000
+E	08:00_ESS_Charge_Constraint_Expr	1521.0		
+L	326	1
+E	23:45_Power_Balance	713	713	
+L	993	-1
+L	996	1
+L	989	1
+E	EV_04:15_Charge_Decision_Expr	0.0		
+L	175	1
+E	EV_02:30_Charge_Decision_Expr	0.0		
+L	105	1
+E	21:00_ESS_Charge_Constraint_Expr	0.0		
+L	881	1
+E	05:30_ESS_Charge_Constraint_Expr	24.3		
+L	222	1
+E	ESS_10:15_ChargeDischargePower_Expr	0	0	
+L	423	1
+L	424	-1
+L	425	1
+E	12:30_Power_Balance	-4986	-4986	
+L	530	1
+L	522	1
+L	527	-1
+E	10:15_EV_Energy_Expr	0	0	
+L	419	1
+L	428	13
+L	430	-1
+E	ESS_08:30_Charge_Mode2_Expr	0	10000	
+L	348	-1
+L	349	10000
+E	ESS_01:00_Energy_Expr	0	0	
+L	33	1
+L	41	-15
+L	42	14
+L	43	-1
+E	ESS_10:45_Energy_Expr	0	0	
+L	449	-1
+L	438	1
+L	446	-15
+L	447	14
+E	10:45_EV_Energy_Expr	0	0	
+L	450	13
+L	452	-1
+L	441	1
+E	Grid_15:00_BuySellPower_Expr	0	0	
+L	640	1
+L	641	-1
+L	642	1
+E	ESS_12:30_Charge_Mode_Expr	0	10000	
+L	523	1
+L	525	10000
+E	02:15_ESS_Charge_Constraint_Expr	0.0		
+L	92	1
+E	EV_07:45_Charge_Decision_Expr	1.0		
+L	319	1
+E	ESS_09:00_Charge_Mode2_Expr	0	10000	
+L	370	-1
+L	371	10000
+E	ESS_01:30_ChargeDischargePower_Expr	0	0	
+L	60	1
+L	61	-1
+L	62	1
+E	Grid_15:45_BuySellPower_Expr	0	0	
+L	673	1
+L	674	-1
+L	675	1
+E	Grid_01:45_BuySellPower_Expr	0	0	
+L	77	1
+L	78	-1
+L	79	1
+E	ESS_01:15_ChargeDischargePower_Expr	0	0	
+L	50	1
+L	51	-1
+L	52	1
+E	12:15_ESS_Charge_Constraint_Expr	4280.400000000001		
+L	513	1
+E	22:15_ESS_Charge_Constraint_Expr	0.0		
+L	931	1
+E	05:00_Power_Balance	279	279	
+L	200	1
+L	204	-1
+L	207	1
+E	07:30_Power_Balance	-1908	-1908	
+L	307	-1
+L	310	1
+L	302	1
+E	11:00_ESS_Charge_Constraint_Expr	5203.8		
+L	458	1
+E	03:00_ESS_Charge_Constraint_Expr	0.0		
+L	122	1
+E	13:00_Power_Balance	-4732	-4732	
+L	544	1
+L	549	-1
+L	552	1
+E	ESS_10:30_Energy_Expr	0	0	
+L	435	-15
+L	436	14
+L	438	-1
+L	427	1
+E	EV_15:45_Charge_Decision_Expr	1.0		
+L	671	1
+E	ESS_16:00_Charge_Mode_Expr	0	10000	
+L	677	1
+L	679	10000
+E	ESS_03:15_Energy_Expr	0	0	
+L	131	-15
+L	132	14
+L	133	-1
+L	123	1
+E	15:30_ESS_Charge_Constraint_Expr	2043.9		
+L	656	1
+E	15:30_Power_Balance	-2271	-2271	
+L	659	-1
+L	662	1
+L	654	1
+E	09:15_ESS_Charge_Constraint_Expr	2394.0		
+L	381	1
+E	Grid_16:15_BuySellPower_Expr	0	0	
+L	694	1
+L	695	-1
+L	696	1
+E	ESS_07:45_Charge_Mode_Expr	0	10000	
+L	314	1
+L	316	10000
+E	ESS_17:00_Energy_Expr	0	0	
+L	720	-1
+L	710	1
+L	718	-15
+L	719	14
+E	Grid_06:15_BuySellPower_Expr	0	0	
+L	257	1
+L	258	-1
+L	259	1
+E	Grid_17:00_BuySellPower_Expr	0	0	
+L	724	1
+L	725	-1
+L	726	1
+E	Grid_13:45_BuySellPower_Expr	0	0	
+L	585	1
+L	586	-1
+L	587	1
+E	EV_16:00_Charge_Decision_Expr	1.0		
+L	682	1
+E	ESS_18:30_ChargeDischargePower_Expr	0	0	
+L	779	1
+L	780	-1
+L	781	1
+E	ESS_18:15_ChargeDischargePower_Expr	0	0	
+L	769	1
+L	770	-1
+L	771	1
+E	18:45_EV_Energy_Expr	0	0	
+L	785	1
+L	793	13
+L	795	-1
+E	18:15_EV_Energy_Expr	0	0	
+L	773	13
+L	775	-1
+L	765	1
+E	18:45_Power_Balance	152	152	
+L	789	1
+L	793	-1
+L	796	1
+E	21:15_Power_Balance	227	227	
+L	896	1
+L	889	1
+L	893	-1
+E	EV_22:45_Charge_Power_Expr	4200	11000	
+L	953	1
+L	954	11000
+E	14:45_EV_Energy_Expr	0	0	
+L	626	13
+L	628	-1
+L	617	1
+E	EV_21:15_Charge_Decision_Expr	0.0		
+L	894	1
+E	14:15_EV_Energy_Expr	0	0	
+L	595	1
+L	604	13
+L	606	-1
+E	EV_07:00_Charge_Power_Expr	4200	11000	
+L	285	1
+L	286	11000
+E	10:00_Power_Balance	-2391	-2391	
+L	417	-1
+L	420	1
+L	412	1
+E	EV_12:15_Charge_Decision_Expr	1.0		
+L	517	1
+E	13:00_ESS_Charge_Constraint_Expr	4258.8		
+L	546	1
+E	EV_11:30_Charge_Decision_Expr	1.0		
+L	484	1
+E	ESS_08:00_ChargeDischargePower_Expr	0	0	
+L	324	1
+L	325	-1
+L	326	1
+E	EV_09:00_Charge_Power_Expr	4200	11000	
+L	373	1
+L	374	11000
+E	Grid_04:15_BuySellPower_Expr	0	0	
+L	177	1
+L	178	-1
+L	179	1
+E	Grid_11:45_BuySellPower_Expr	0	0	
+L	497	1
+L	498	-1
+L	499	1
+E	16:15_Power_Balance	-86	-86	
+L	691	-1
+L	694	1
+L	687	1
+E	21:00_EV_Energy_Expr	0	0	
+L	883	13
+L	885	-1
+L	875	1
+E	Grid_18:15_BuySellPower_Expr	0	0	
+L	776	1
+L	777	-1
+L	778	1
+E	21:30_EV_Energy_Expr	0	0	
+L	903	13
+L	905	-1
+L	895	1
+E	Grid_12:30_BuySellPower_Expr	0	0	
+L	530	1
+L	531	-1
+L	532	1
+E	EV_07:00_Charge_Decision_Expr	1.0		
+L	286	1
+E	Grid_19:00_BuySellPower_Expr	0	0	
+L	806	1
+L	807	-1
+L	808	1
+E	08:00_Power_Balance	-1690	-1690	
+L	324	1
+L	329	-1
+L	332	1
+E	ESS_14:00_ChargeDischargePower_Expr	0	0	
+L	588	1
+L	589	-1
+L	590	1
+E	ESS_20:00_ChargeDischargePower_Expr	0	0	
+L	839	1
+L	840	-1
+L	841	1
+E	ESS_17:45_ChargeDischargePower_Expr	0	0	
+L	748	1
+L	749	-1
+L	750	1
+E	Grid_02:30_BuySellPower_Expr	0	0	
+L	107	1
+L	108	-1
+L	109	1
+E	EV_05:15_Charge_Decision_Expr	0.0		
+L	215	1
+E	ESS_13:15_ChargeDischargePower_Expr	0	0	
+L	555	1
+L	556	-1
+L	557	1
+E	EV_06:45_Charge_Decision_Expr	1.0		
+L	275	1
+E	EV_11:15_Charge_Decision_Expr	1.0		
+L	473	1
+E	Grid_12:15_BuySellPower_Expr	0	0	
+L	519	1
+L	520	-1
+L	521	1
+E	Grid Exchange Cost Sum			1
+L	999	1
+L	1000	-1
+E	Grid_20:30_BuySellPower_Expr	0	0	
+L	866	1
+L	867	-1
+L	868	1
+E	00:15_EV_Energy_Expr	0	0	
+L	16	-1
+L	6	1
+L	14	13
+E	07:15_Power_Balance	-1545	-1545	
+L	291	1
+L	296	-1
+L	299	1
+E	ESS_15:15_ChargeDischargePower_Expr	0	0	
+L	643	1
+L	644	-1
+L	645	1
+E	ESS_05:15_Energy_Expr	0	0	
+L	211	-15
+L	212	14
+L	213	-1
+L	203	1
+E	03:30_ESS_Charge_Constraint_Expr	0.0		
+L	142	1
+E	00:45_Power_Balance	185	185	
+L	34	-1
+L	37	1
+L	30	1
+E	00:30_ESS_Charge_Constraint_Expr	0.0		
+L	22	1
+E	EV_03:00_Charge_Power_Expr	4200	11000	
+L	124	1
+L	125	11000
+E	Grid_21:00_BuySellPower_Expr	0	0	
+L	886	1
+L	887	-1
+L	888	1
+E	ESS_02:00_ChargeDischargePower_Expr	0	0	
+L	80	1
+L	81	-1
+L	82	1
+E	ESS_03:00_Energy_Expr	0	0	
+L	113	1
+L	121	-15
+L	122	14
+L	123	-1
+E	ESS_14:30_Charge_Mode2_Expr	0	10000	
+L	612	-1
+L	613	10000
+E	18:30_Power_Balance	83	83	
+L	786	1
+L	779	1
+L	783	-1
+E	ESS_05:45_ChargeDischargePower_Expr	0	0	
+L	230	1
+L	231	-1
+L	232	1
+E	ESS_07:45_Charge_Mode2_Expr	0	10000	
+L	315	-1
+L	316	10000
+E	ESS_11:30_Charge_Mode_Expr	0	10000	
+L	481	10000
+L	479	1
+E	ESS_10:00_Energy_Expr	0	0	
+L	416	-1
+L	405	1
+L	413	-15
+L	414	14
+E	EV_15:00_Charge_Decision_Expr	1.0		
+L	638	1
+E	15:45_Power_Balance	-1262	-1262	
+L	673	1
+L	665	1
+L	670	-1
+E	Grid_01:00_BuySellPower_Expr	0	0	
+L	48	-1
+L	49	1
+L	47	1
+E	ESS_01:45_Energy_Expr	0	0	
+L	71	-15
+L	72	14
+L	73	-1
+L	63	1
+E	Grid_07:45_BuySellPower_Expr	0	0	
+L	321	1
+L	322	-1
+L	323	1
+E	EV_12:45_Charge_Power_Expr	4200	11000	
+L	538	1
+L	539	11000
+E	13:30_ESS_Charge_Constraint_Expr	2923.2000000000003		
+L	568	1
+E	ESS_15:00_Charge_Mode2_Expr	0	10000	
+L	634	-1
+L	635	10000
+E	19:15_ESS_Charge_Constraint_Expr	0.0		
+L	811	1
+E	EV_09:00_Charge_Decision_Expr	1.0		
+L	374	1
+E	00:45_EV_Energy_Expr	0	0	
+L	34	13
+L	36	-1
+L	26	1
+E	EV_04:30_Charge_Power_Expr	4200	11000	
+L	184	1
+L	185	11000
+E	20:45_EV_Energy_Expr	0	0	
+L	865	1
+L	873	13
+L	875	-1
+E	ESS_13:30_Charge_Mode_Expr	0	10000	
+L	567	1
+L	569	10000
+E	Grid_08:15_BuySellPower_Expr	0	0	
+L	343	1
+L	344	-1
+L	345	1
+E	19:30_Power_Balance	160	160	
+L	819	1
+L	823	-1
+L	826	1
+E	ESS_07:30_Energy_Expr	0	0	
+L	304	14
+L	306	-1
+L	295	1
+L	303	-15
+E	01:00_ESS_Charge_Constraint_Expr	0.0		
+L	42	1
+E	EV_14:15_Charge_Decision_Expr	1.0		
+L	605	1
+E	EV_11:15_Charge_Power_Expr	4200	11000	
+L	472	1
+L	473	11000
+E	ESS_01:30_Energy_Expr	0	0	
+L	53	1
+L	61	-15
+L	62	14
+L	63	-1
+E	EV_08:30_Charge_Power_Expr	4200	11000	
+L	352	11000
+L	351	1
+E	ESS_04:30_ChargeDischargePower_Expr	0	0	
+L	180	1
+L	181	-1
+L	182	1
+E	Grid_16:30_BuySellPower_Expr	0	0	
+L	704	1
+L	705	-1
+L	706	1
+E	EV_02:15_Charge_Decision_Expr	0.0		
+L	95	1
+E	ESS_10:30_Charge_Mode2_Expr	0	10000	
+L	436	-1
+L	437	10000
+E	ESS_21:15_ChargeDischargePower_Expr	0	0	
+L	889	1
+L	890	-1
+L	891	1
+E	23:30_ESS_Charge_Constraint_Expr	0.0		
+L	981	1
+E	Grid_06:30_BuySellPower_Expr	0	0	
+L	267	1
+L	268	-1
+L	269	1
+E	03:45_Power_Balance	283	283	
+L	150	1
+L	154	-1
+L	157	1
+E	ESS_14:45_ChargeDischargePower_Expr	0	0	
+L	621	1
+L	622	-1
+L	623	1
+E	EV_05:45_Charge_Power_Expr	4200	11000	
+L	234	1
+L	235	11000
+E	ESS_22:15_ChargeDischargePower_Expr	0	0	
+L	929	1
+L	930	-1
+L	931	1
+E	EV_20:00_Charge_Power_Expr	4200	11000	
+L	843	1
+L	844	11000
+E	EV_01:30_Charge_Decision_Expr	0.0		
+L	65	1
+E	ESS_17:45_Energy_Expr	0	0	
+L	752	-1
+L	741	1
+L	749	-15
+L	750	14
+E	04:45_ESS_Charge_Constraint_Expr	0.0		
+L	192	1
+E	01:15_Power_Balance	165	165	
+L	50	1
+L	54	-1
+L	57	1
+E	00:30_Power_Balance	269	269	
+L	20	1
+L	24	-1
+L	27	1
+E	17:00_Power_Balance	-232	-232	
+L	721	-1
+L	724	1
+L	717	1
+E	ESS_13:15_Charge_Mode2_Expr	0	10000	
+L	557	-1
+L	558	10000
+E	ESS_07:30_Charge_Mode_Expr	0	10000	
+L	305	10000
+L	303	1
+E	13:30_EV_Energy_Expr	0	0	
+L	562	1
+L	571	13
+L	573	-1
+E	EV_16:45_Charge_Power_Expr	4200	11000	
+L	711	1
+L	712	11000
+E	Grid_03:45_BuySellPower_Expr	0	0	
+L	157	1
+L	158	-1
+L	159	1
+E	EV_20:15_Charge_Decision_Expr	0.0		
+L	854	1
+E	ESS_00:00_Energy_Expr_1st	0	0	
+L	1	15
+L	2	-14
+L	3	1
+E	EV_16:45_Charge_Decision_Expr	1.0		
+L	712	1
+E	EV_17:00_Charge_Power_Expr	4200	11000	
+L	721	1
+L	722	11000
+E	EV_10:00_Charge_Power_Expr	4200	11000	
+L	417	1
+L	418	11000
+E	06:45_Power_Balance	-355	-355	
+L	274	-1
+L	277	1
+L	270	1
+E	Grid_11:00_BuySellPower_Expr	0	0	
+L	464	1
+L	465	-1
+L	466	1
+E	EV_06:00_Charge_Decision_Expr	0.0		
+L	245	1
+E	13:00_EV_Energy_Expr	0	0	
+L	549	13
+L	551	-1
+L	540	1
+E	EV_09:45_Charge_Power_Expr	4200	11000	
+L	406	1
+L	407	11000
+E	Grid_17:45_BuySellPower_Expr	0	0	
+L	756	1
+L	757	-1
+L	758	1
+E	01:00_Power_Balance	145	145	
+L	40	1
+L	44	-1
+L	47	1
+E	ESS_19:15_Energy_Expr	0	0	
+L	802	1
+L	810	-15
+L	811	14
+L	812	-1
+E	ESS_05:00_ChargeDischargePower_Expr	0	0	
+L	200	1
+L	201	-1
+L	202	1
+E	ESS_20:15_Energy_Expr	0	0	
+L	850	-15
+L	851	14
+L	852	-1
+L	842	1
+E	ESS_20:45_ChargeDischargePower_Expr	0	0	
+L	869	1
+L	870	-1
+L	871	1
+E	06:45_EV_Energy_Expr	0	0	
+L	274	13
+L	276	-1
+L	266	1
+E	ESS_16:15_ChargeDischargePower_Expr	0	0	
+L	688	-1
+L	689	1
+L	687	1
+E	03:30_Power_Balance	171	171	
+L	144	-1
+L	147	1
+L	140	1
+E	ESS_09:15_ChargeDischargePower_Expr	0	0	
+L	379	1
+L	380	-1
+L	381	1
+E	ESS_11:00_ChargeDischargePower_Expr	0	0	
+L	456	1
+L	457	-1
+L	458	1
+E	ESS_09:45_Energy_Expr	0	0	
+L	402	-15
+L	403	14
+L	405	-1
+L	394	1
+E	06:15_EV_Energy_Expr	0	0	
+L	256	-1
+L	246	1
+L	254	13
+E	09:45_Power_Balance	-2491	-2491	
+L	401	1
+L	406	-1
+L	409	1
+E	EV_21:15_Charge_Power_Expr	4200	11000	
+L	893	1
+L	894	11000
+E	ESS_12:15_Energy_Expr	0	0	
+L	512	-15
+L	513	14
+L	515	-1
+L	504	1
+E	EV_10:30_Charge_Decision_Expr	1.0		
+L	440	1
+E	06:30_Power_Balance	-451	-451	
+L	260	1
+L	264	-1
+L	267	1
+E	06:00_EV_Energy_Expr	0	0	
+L	244	13
+L	246	-1
+L	236	1
+E	06:30_EV_Energy_Expr	0	0	
+L	256	1
+L	264	13
+L	266	-1
+E	15:15_ESS_Charge_Constraint_Expr	2366.1		
+L	645	1
+E	ESS_09:15_Charge_Mode_Expr	0	10000	
+L	380	1
+L	382	10000
+E	02:45_Power_Balance	270	270	
+L	114	-1
+L	117	1
+L	110	1
+E	EV_14:00_Charge_Power_Expr	4200	11000	
+L	593	1
+L	594	11000
+E	EV_12:30_Charge_Power_Expr	4200	11000	
+L	528	11000
+L	527	1
+E	14:00_Power_Balance	-3664	-3664	
+L	593	-1
+L	596	1
+L	588	1
+E	ESS_10:15_Charge_Mode_Expr	0	10000	
+L	424	1
+L	426	10000
+E	09:45_EV_Energy_Expr	0	0	
+L	406	13
+L	408	-1
+L	397	1
+E	ESS_16:00_ChargeDischargePower_Expr	0	0	
+L	676	1
+L	677	-1
+L	678	1
+E	EV_00:45_Charge_Decision_Expr	0.0		
+L	35	1
+E	ESS_09:30_Energy_Expr	0	0	
+L	391	-15
+L	392	14
+L	394	-1
+L	383	1
+E	EV_21:30_Charge_Decision_Expr	0.0		
+L	904	1
+E	ESS_21:45_Energy_Expr	0	0	
+L	912	-1
+L	902	1
+L	910	-15
+L	911	14
+E	EV_09:30_Charge_Decision_Expr	1.0		
+L	396	1
+E	ESS_09:00_Charge_Mode_Expr	0	10000	
+L	369	1
+L	371	10000
+E	EV_19:45_Charge_Power_Expr	4200	11000	
+L	833	1
+L	834	11000
+E	EV_02:45_Charge_Power_Expr	4200	11000	
+L	114	1
+L	115	11000
+E	EV_23:15_Charge_Decision_Expr	0.0		
+L	974	1
+E	EV_13:30_Charge_Power_Expr	4200	11000	
+L	571	1
+L	572	11000
+E	EV_13:45_Charge_Decision_Expr	1.0		
+L	583	1
+E	EV_04:30_Charge_Decision_Expr	0.0		
+L	185	1
+E	EV_10:15_Charge_Decision_Expr	1.0		
+L	429	1
+E	11:45_ESS_Charge_Constraint_Expr	3145.5		
+L	491	1
+E	19:00_EV_Energy_Expr	0	0	
+L	803	13
+L	805	-1
+L	795	1
+E	ESS_16:45_Energy_Expr	0	0	
+L	708	-15
+L	709	14
+L	710	-1
+L	700	1
+E	ESS_17:15_Charge_Mode2_Expr	0	10000	
+L	729	-1
+L	730	10000
+E	08:45_EV_Energy_Expr	0	0	
+L	353	1
+L	362	13
+L	364	-1
+E	07:45_EV_Energy_Expr	0	0	
+L	320	-1
+L	309	1
+L	318	13
+E	EV_18:45_Charge_Power_Expr	4200	11000	
+L	793	1
+L	794	11000
+E	ESS_06:00_Energy_Expr	0	0	
+L	241	-15
+L	242	14
+L	243	-1
+L	233	1
+E	Grid_23:15_BuySellPower_Expr	0	0	
+L	976	1
+L	977	-1
+L	978	1
+E	ESS_12:00_ChargeDischargePower_Expr	0	0	
+L	500	1
+L	501	-1
+L	502	1
+E	EV_03:45_Charge_Power_Expr	4200	11000	
+L	154	1
+L	155	11000
+E	ESS_19:45_ChargeDischargePower_Expr	0	0	
+L	829	1
+L	830	-1
+L	831	1
+E	EV_17:45_Charge_Power_Expr	4200	11000	
+L	753	1
+L	754	11000
+E	07:45_Power_Balance	-998	-998	
+L	321	1
+L	313	1
+L	318	-1
+E	ESS_14:00_Charge_Mode_Expr	0	10000	
+L	589	1
+L	591	10000
+E	Grid_21:45_BuySellPower_Expr	0	0	
+L	916	1
+L	917	-1
+L	918	1
+E	EV_05:15_Charge_Power_Expr	4200	11000	
+L	214	1
+L	215	11000
+E	ESS_12:00_Energy_Expr	0	0	
+L	501	-15
+L	502	14
+L	504	-1
+L	493	1
+E	12:45_Power_Balance	-5361	-5361	
+L	533	1
+L	538	-1
+L	541	1
+E	17:00_EV_Energy_Expr	0	0	
+L	721	13
+L	723	-1
+L	713	1
+E	ESS_08:00_Energy_Expr	0	0	
+L	325	-15
+L	326	14
+L	328	-1
+L	317	1
+E	EV_04:45_Charge_Power_Expr	4200	11000	
+L	194	1
+L	195	11000
+E	05:15_EV_Energy_Expr	0	0	
+L	214	13
+L	216	-1
+L	206	1
+E	EV_04:15_Charge_Power_Expr	4200	11000	
+L	174	1
+L	175	11000
+E	Grid_22:45_BuySellPower_Expr	0	0	
+L	956	1
+L	957	-1
+L	958	1
+E	ESS_12:45_ChargeDischargePower_Expr	0	0	
+L	533	1
+L	534	-1
+L	535	1
+E	00:30_EV_Energy_Expr	0	0	
+L	16	1
+L	24	13
+L	26	-1
+E	EV_18:15_Charge_Power_Expr	4200	11000	
+L	773	1
+L	774	11000
+E	ESS_15:45_Charge_Mode2_Expr	0	10000	
+L	667	-1
+L	668	10000
+E	EV_00:00_Charge_Power_Expr	4200	11000	
+L	4	1
+L	5	11000
+E	ESS_13:00_Charge_Mode2_Expr	0	10000	
+L	546	-1
+L	547	10000
+E	23:30_Power_Balance	648	648	
+L	979	1
+L	983	-1
+L	986	1
+E	06:15_ESS_Charge_Constraint_Expr	199.8		
+L	252	1
+E	07:30_ESS_Charge_Constraint_Expr	1717.2		
+L	304	1
+E	ESS_11:30_Charge_Mode2_Expr	0	10000	
+L	480	-1
+L	481	10000
+E	04:15_EV_Energy_Expr	0	0	
+L	176	-1
+L	166	1
+L	174	13
+E	ESS_05:00_Energy_Expr	0	0	
+L	193	1
+L	201	-15
+L	202	14
+L	203	-1
+E	15:00_EV_Energy_Expr	0	0	
+L	628	1
+L	637	13
+L	639	-1
+E	ESS_14:45_Energy_Expr	0	0	
+L	625	-1
+L	614	1
+L	622	-15
+L	623	14
+E	ESS_15:15_Charge_Mode_Expr	0	10000	
+L	644	1
+L	646	10000
+E	EV_05:00_Charge_Decision_Expr	0.0		
+L	205	1
+E	00:00_ESS_Charge_Constraint_Expr	0.0		
+L	2	1
+E	ESS_23:45_Energy_Expr	0	0	
+L	992	-1
+L	982	1
+L	990	-15
+L	991	14
+E	EV_09:45_Charge_Decision_Expr	1.0		
+L	407	1
+E	ESS_17:30_Energy_Expr	0	0	
+L	739	-15
+L	740	14
+L	741	-1
+L	731	1
+E	01:45_ESS_Charge_Constraint_Expr	0.0		
+L	72	1
+E	ESS_10:45_Charge_Mode2_Expr	0	10000	
+L	448	10000
+L	447	-1
+E	Grid_23:45_BuySellPower_Expr	0	0	
+L	996	1
+L	997	-1
+L	998	1
+E	ESS_07:30_ChargeDischargePower_Expr	0	0	
+L	304	1
+L	302	1
+L	303	-1
+E	04:30_EV_Energy_Expr	0	0	
+L	176	1
+L	184	13
+L	186	-1
+E	13:30_Power_Balance	-3248	-3248	
+L	566	1
+L	571	-1
+L	574	1
+E	14:00_EV_Energy_Expr	0	0	
+L	593	13
+L	595	-1
+L	584	1
+E	ESS_07:15_ChargeDischargePower_Expr	0	0	
+L	291	1
+L	292	-1
+L	293	1
+E	ESS_17:45_Charge_Mode2_Expr	0	10000	
+L	750	-1
+L	751	10000
+E	ESS_07:00_ChargeDischargePower_Expr	0	0	
+L	280	1
+L	281	-1
+L	282	1
+E	ESS_21:00_ChargeDischargePower_Expr	0	0	
+L	880	-1
+L	881	1
+L	879	1
+E	EV_06:15_Charge_Power_Expr	4200	11000	
+L	254	1
+L	255	11000
+E	Grid_07:00_BuySellPower_Expr	0	0	
+L	288	1
+L	289	-1
+L	290	1
+E	ESS_10:15_Charge_Mode2_Expr	0	10000	
+L	425	-1
+L	426	10000
+E	EV_21:45_Charge_Decision_Expr	0.0		
+L	914	1
+E	EV_15:15_Charge_Decision_Expr	1.0		
+L	649	1
+E	ESS_20:00_Energy_Expr	0	0	
+L	832	1
+L	840	-15
+L	841	14
+L	842	-1
+E	ESS_14:15_Charge_Mode_Expr	0	10000	
+L	600	1
+L	602	10000
+E	ESS_15:45_Energy_Expr	0	0	
+L	658	1
+L	666	-15
+L	667	14
+L	669	-1
+E	ESS_09:45_Charge_Mode_Expr	0	10000	
+L	402	1
+L	404	10000
+E	13:15_Power_Balance	-3935	-3935	
+L	560	-1
+L	563	1
+L	555	1
+E	21:45_ESS_Charge_Constraint_Expr	0.0		
+L	911	1
+E	01:15_EV_Energy_Expr	0	0	
+L	54	13
+L	56	-1
+L	46	1
+E	EV_00:30_Charge_Power_Expr	4200	11000	
+L	24	1
+L	25	11000
+E	21:45_EV_Energy_Expr	0	0	
+L	913	13
+L	915	-1
+L	905	1
+E	ESS_22:45_Energy_Expr	0	0	
+L	950	-15
+L	951	14
+L	952	-1
+L	942	1
+E	EV_14:30_Charge_Power_Expr	4200	11000	
+L	615	1
+L	616	11000
+E	EV_02:00_Charge_Power_Expr	4200	11000	
+L	84	1
+L	85	11000
+E	16:15_ESS_Charge_Constraint_Expr	77.4		
+L	689	1
+E	EV_18:00_Charge_Decision_Expr	1.0		
+L	764	1
+E	EV_16:00_Charge_Power_Expr	4200	11000	
+L	681	1
+L	682	11000
+E	ESS_13:30_Charge_Mode2_Expr	0	10000	
+L	568	-1
+L	569	10000
+E	18:00_EV_Energy_Expr	0	0	
+L	755	1
+L	763	13
+L	765	-1
+E	01:30_EV_Energy_Expr	0	0	
+L	64	13
+L	66	-1
+L	56	1
+E	ESS_09:00_Energy_Expr	0	0	
+L	369	-15
+L	370	14
+L	372	-1
+L	361	1
+E	23:00_ESS_Charge_Constraint_Expr	0.0		
+L	961	1
+E	EV_20:30_Charge_Decision_Expr	0.0		
+L	864	1
+E	ESS_13:00_Energy_Expr	0	0	
+L	545	-15
+L	546	14
+L	548	-1
+L	537	1
+E	ESS_11:15_Charge_Mode_Expr	0	10000	
+L	468	1
+L	470	10000
+E	Grid_11:15_BuySellPower_Expr	0	0	
+L	475	1
+L	476	-1
+L	477	1
+E	16:00_Power_Balance	-854	-854	
+L	676	1
+L	681	-1
+L	684	1
+E	ESS_12:15_Charge_Mode2_Expr	0	10000	
+L	513	-1
+L	514	10000
+E	11:30_EV_Energy_Expr	0	0	
+L	483	13
+L	485	-1
+L	474	1
+E	08:15_Power_Balance	-2443	-2443	
+L	340	-1
+L	343	1
+L	335	1
+E	03:45_ESS_Charge_Constraint_Expr	0.0		
+L	152	1
+E	Grid_05:00_BuySellPower_Expr	0	0	
+L	208	-1
+L	209	1
+L	207	1
+E	Grid_05:30_BuySellPower_Expr	0	0	
+L	227	1
+L	228	-1
+L	229	1
+E	EV_22:00_Charge_Decision_Expr	0.0		
+L	924	1
+E	ESS_12:15_ChargeDischargePower_Expr	0	0	
+L	512	-1
+L	513	1
+L	511	1
+E	ESS_19:15_ChargeDischargePower_Expr	0	0	
+L	809	1
+L	810	-1
+L	811	1
+E	17:30_ESS_Charge_Constraint_Expr	525.6		
+L	740	1
+E	Grid_Sell_Revenue_Sum_Expr	0	0	
+L	768	10.0
+L	259	10.0
+L	9	10.0
+L	521	10.0
+L	778	10.0
+L	269	10.0
+L	19	10.0
+L	532	10.0
+L	788	10.0
+L	279	10.0
+L	29	10.0
+L	798	10.0
+L	543	10.0
+L	290	10.0
+L	39	10.0
+L	808	10.0
+L	554	10.0
+L	301	10.0
+L	49	10.0
+L	818	10.0
+L	565	10.0
+L	312	10.0
+L	59	10.0
+L	828	10.0
+L	576	10.0
+L	323	10.0
+L	69	10.0
+L	838	10.0
+L	587	10.0
+L	334	10.0
+L	79	10.0
+L	848	10.0
+L	598	10.0
+L	89	10.0
+L	345	10.0
+L	858	10.0
+L	609	10.0
+L	99	10.0
+L	356	10.0
+L	868	10.0
+L	620	10.0
+L	109	10.0
+L	878	10.0
+L	367	10.0
+L	119	10.0
+L	631	10.0
+L	888	10.0
+L	378	10.0
+L	129	10.0
+L	642	10.0
+L	898	10.0
+L	389	10.0
+L	139	10.0
+L	908	10.0
+L	653	10.0
+L	400	10.0
+L	149	10.0
+L	918	10.0
+L	664	10.0
+L	411	10.0
+L	159	10.0
+L	928	10.0
+L	675	10.0
+L	422	10.0
+L	169	10.0
+L	938	10.0
+L	686	10.0
+L	433	10.0
+L	179	10.0
+L	948	10.0
+L	696	10.0
+L	444	10.0
+L	189	10.0
+L	958	10.0
+L	706	10.0
+L	199	10.0
+L	455	10.0
+L	968	10.0
+L	716	10.0
+L	209	10.0
+L	466	10.0
+L	978	10.0
+L	726	10.0
+L	219	10.0
+L	988	10.0
+L	477	10.0
+L	737	10.0
+L	229	10.0
+L	998	10.0
+L	1000	-1
+L	488	10.0
+L	747	10.0
+L	239	10.0
+L	499	10.0
+L	758	10.0
+L	249	10.0
+L	510	10.0
+E	ESS_12:30_ChargeDischargePower_Expr	0	0	
+L	522	1
+L	523	-1
+L	524	1
+E	EV_03:30_Charge_Decision_Expr	0.0		
+L	145	1
+E	ESS_07:45_Energy_Expr	0	0	
+L	306	1
+L	314	-15
+L	315	14
+L	317	-1
+E	ESS_10:15_Energy_Expr	0	0	
+L	416	1
+L	424	-15
+L	425	14
+L	427	-1
+E	ESS_11:00_Charge_Mode_Expr	0	10000	
+L	457	1
+L	459	10000
+E	ESS_18:30_Energy_Expr	0	0	
+L	772	1
+L	780	-15
+L	781	14
+L	782	-1
+E	EV_21:30_Charge_Power_Expr	4200	11000	
+L	903	1
+L	904	11000
+E	ESS_00:00_ChargeDischargePower_Expr	0	0	
+L	0	1
+L	1	-1
+L	2	1
+E	EV_12:15_Charge_Power_Expr	4200	11000	
+L	516	1
+L	517	11000
+E	EV_01:45_Charge_Decision_Expr	0.0		
+L	75	1
+E	08:00_EV_Energy_Expr	0	0	
+L	320	1
+L	329	13
+L	331	-1
+E	EV_10:45_Charge_Power_Expr	4200	11000	
+L	450	1
+L	451	11000
+E	06:00_Power_Balance	-212	-212	
+L	240	1
+L	244	-1
+L	247	1
+E	EV_22:15_Charge_Decision_Expr	0.0		
+L	934	1
+E	23:45_EV_Energy_Expr	0	0	
+L	993	13
+L	995	-1
+L	985	1
+E	02:15_Power_Balance	148	148	
+L	97	1
+L	90	1
+L	94	-1
+E	Grid_09:45_BuySellPower_Expr	0	0	
+L	409	1
+L	410	-1
+L	411	1
+E	10:15_ESS_Charge_Constraint_Expr	3166.2000000000003		
+L	425	1
+E	20:45_Power_Balance	155	155	
+L	869	1
+L	873	-1
+L	876	1
+E	ESS_11:45_Charge_Mode_Expr	0	10000	
+L	490	1
+L	492	10000
+E	EV_20:30_Charge_Power_Expr	4200	11000	
+L	864	11000
+L	863	1
+E	ESS_21:00_Energy_Expr	0	0	
+L	880	-15
+L	881	14
+L	882	-1
+L	872	1
+E	20:15_ESS_Charge_Constraint_Expr	0.0		
+L	851	1
+E	09:00_EV_Energy_Expr	0	0	
+L	373	13
+L	375	-1
+L	364	1
+E	Grid_10:15_BuySellPower_Expr	0	0	
+L	432	-1
+L	433	1
+L	431	1
+E	EV_13:15_Charge_Power_Expr	4200	11000	
+L	560	1
+L	561	11000
+E	23:15_ESS_Charge_Constraint_Expr	0.0		
+L	971	1
+E	22:45_EV_Energy_Expr	0	0	
+L	945	1
+L	953	13
+L	955	-1
+E	ESS_16:00_Energy_Expr	0	0	
+L	677	-15
+L	678	14
+L	680	-1
+L	669	1
+E	16:00_ESS_Charge_Constraint_Expr	768.6		
+L	678	1
+E	16:45_ESS_Charge_Constraint_Expr	0.0		
+L	709	1
+E	12:15_Power_Balance	-4756	-4756	
+L	516	-1
+L	519	1
+L	511	1
+E	EV_06:30_Charge_Power_Expr	4200	11000	
+L	264	1
+L	265	11000
+E	13:15_ESS_Charge_Constraint_Expr	3541.5		
+L	557	1
+E	ESS_03:45_ChargeDischargePower_Expr	0	0	
+L	150	1
+L	151	-1
+L	152	1
+E	ESS_15:45_Charge_Mode_Expr	0	10000	
+L	666	1
+L	668	10000
+E	ESS_06:45_Energy_Expr	0	0	
+L	272	14
+L	273	-1
+L	263	1
+L	271	-15
+E	EV_03:15_Charge_Decision_Expr	0.0		
+L	135	1
+E	ESS_15:00_Charge_Mode_Expr	0	10000	
+L	633	1
+L	635	10000
+E	EV_10:00_Charge_Decision_Expr	1.0		
+L	418	1
+E	EV_04:00_Charge_Decision_Expr	0.0		
+L	165	1
+E	06:45_ESS_Charge_Constraint_Expr	319.5		
+L	272	1
+E	04:30_Power_Balance	150	150	
+L	180	1
+L	184	-1
+L	187	1
+E	03:15_Power_Balance	147	147	
+L	130	1
+L	134	-1
+L	137	1
+E	EV_11:45_Charge_Power_Expr	4200	11000	
+L	494	1
+L	495	11000
+E	EV_Schedule	3000000	3000000	
+L	995	1
+E	ESS_12:45_Energy_Expr	0	0	
+L	534	-15
+L	535	14
+L	537	-1
+L	526	1
+E	10:30_EV_Energy_Expr	0	0	
+L	439	13
+L	441	-1
+L	430	1
+E	Grid_08:45_BuySellPower_Expr	0	0	
+L	365	1
+L	366	-1
+L	367	1
+E	ESS_11:15_Charge_Mode2_Expr	0	10000	
+L	469	-1
+L	470	10000
+E	03:15_ESS_Charge_Constraint_Expr	0.0		
+L	132	1
+E	Grid_17:15_BuySellPower_Expr	0	0	
+L	736	-1
+L	737	1
+L	735	1
+E	ESS_23:00_Energy_Expr	0	0	
+L	960	-15
+L	961	14
+L	962	-1
+L	952	1
+E	16:00_EV_Energy_Expr	0	0	
+L	672	1
+L	681	13
+L	683	-1
+E	18:15_Power_Balance	-11	-11	
+L	769	1
+L	773	-1
+L	776	1
+E	00:15_ESS_Charge_Constraint_Expr	0.0		
+L	12	1
+E	11:45_Power_Balance	-3495	-3495	
+L	497	1
+L	489	1
+L	494	-1
+E	06:00_ESS_Charge_Constraint_Expr	190.8		
+L	242	1
+E	02:30_EV_Energy_Expr	0	0	
+L	96	1
+L	104	13
+L	106	-1
+E	15:00_Power_Balance	-3274	-3274	
+L	640	1
+L	632	1
+L	637	-1
+E	ESS_14:00_Energy_Expr	0	0	
+L	592	-1
+L	581	1
+L	589	-15
+L	590	14
+E	ESS_23:00_ChargeDischargePower_Expr	0	0	
+L	960	-1
+L	961	1
+L	959	1
+E	ESS_09:45_Charge_Mode2_Expr	0	10000	
+L	403	-1
+L	404	10000
+E	03:15_EV_Energy_Expr	0	0	
+L	134	13
+L	136	-1
+L	126	1
+E	EV_08:45_Charge_Decision_Expr	1.0		
+L	363	1
+E	ESS_21:30_ChargeDischargePower_Expr	0	0	
+L	899	1
+L	900	-1
+L	901	1
+E	EV_19:15_Charge_Power_Expr	4200	11000	
+L	813	1
+L	814	11000
+E	EV_23:00_Charge_Decision_Expr	0.0		
+L	964	1
+E	Grid_18:30_BuySellPower_Expr	0	0	
+L	786	1
+L	787	-1
+L	788	1
+E	ESS_05:45_Energy_Expr	0	0	
+L	231	-15
+L	232	14
+L	233	-1
+L	223	1
+E	ESS_20:45_Energy_Expr	0	0	
+L	870	-15
+L	871	14
+L	872	-1
+L	862	1
+E	09:00_ESS_Charge_Constraint_Expr	2417.4		
+L	370	1
+E	22:15_Power_Balance	153	153	
+L	929	1
+L	933	-1
+L	936	1
+E	03:30_EV_Energy_Expr	0	0	
+L	144	13
+L	146	-1
+L	136	1
+E	02:15_EV_Energy_Expr	0	0	
+L	96	-1
+L	86	1
+L	94	13
+E	ESS_14:00_Charge_Mode2_Expr	0	10000	
+L	590	-1
+L	591	10000
+E	ESS_16:30_ChargeDischargePower_Expr	0	0	
+L	697	1
+L	698	-1
+L	699	1
+E	ESS_09:30_ChargeDischargePower_Expr	0	0	
+L	390	1
+L	391	-1
+L	392	1
+E	21:30_ESS_Charge_Constraint_Expr	0.0		
+L	901	1
+E	ESS_19:30_Energy_Expr	0	0	
+L	820	-15
+L	821	14
+L	822	-1
+L	812	1
+E	ESS_15:00_Energy_Expr	0	0	
+L	625	1
+L	633	-15
+L	634	14
+L	636	-1
+E	EV_08:00_Charge_Power_Expr	4200	11000	
+L	329	1
+L	330	11000
+E	Grid_04:30_BuySellPower_Expr	0	0	
+L	187	1
+L	188	-1
+L	189	1
+E	ESS_22:00_Energy_Expr	0	0	
+L	912	1
+L	920	-15
+L	921	14
+L	922	-1
+E	Grid_06:00_BuySellPower_Expr	0	0	
+L	247	1
+L	248	-1
+L	249	1
+E	19:45_ESS_Charge_Constraint_Expr	0.0		
+L	831	1
+E	EV_14:45_Charge_Decision_Expr	1.0		
+L	627	1
+E	19:00_ESS_Charge_Constraint_Expr	0.0		
+L	801	1
+E	Grid_20:00_BuySellPower_Expr	0	0	
+L	848	1
+L	846	1
+L	847	-1
+E	17:45_Power_Balance	-711	-711	
+L	753	-1
+L	756	1
+L	748	1
+E	01:30_ESS_Charge_Constraint_Expr	0.0		
+L	62	1
+E	ESS_03:15_ChargeDischargePower_Expr	0	0	
+L	130	1
+L	131	-1
+L	132	1
+E	09:45_ESS_Charge_Constraint_Expr	2241.9		
+L	403	1
+E	ESS_12:30_Charge_Mode2_Expr	0	10000	
+L	524	-1
+L	525	10000
+E	EV_15:30_Charge_Decision_Expr	1.0		
+L	660	1
+E	16:45_EV_Energy_Expr	0	0	
+L	711	13
+L	713	-1
+L	703	1
+E	ESS_13:45_Energy_Expr	0	0	
+L	578	-15
+L	579	14
+L	581	-1
+L	570	1
+E	EV_17:00_Charge_Decision_Expr	1.0		
+L	722	1
+E	EV_20:45_Charge_Decision_Expr	0.0		
+L	874	1
+E	EV_16:15_Charge_Decision_Expr	1.0		
+L	692	1
+E	ESS_01:45_ChargeDischargePower_Expr	0	0	
+L	70	1
+L	71	-1
+L	72	1
+E	EV_01:00_Charge_Power_Expr	4200	11000	
+L	44	1
+L	45	11000
+E	14:30_Power_Balance	-3449	-3449	
+L	610	1
+L	615	-1
+L	618	1
+E	EV_15:00_Charge_Power_Expr	4200	11000	
+L	637	1
+L	638	11000
+E	EV_22:00_Charge_Power_Expr	4200	11000	
+L	923	1
+L	924	11000
+E	11:30_ESS_Charge_Constraint_Expr	5636.7		
+L	480	1
+E	ESS_07:00_Energy_Expr	0	0	
+L	273	1
+L	281	-15
+L	282	14
+L	284	-1

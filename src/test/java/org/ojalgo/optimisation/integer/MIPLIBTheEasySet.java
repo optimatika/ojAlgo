@@ -23,7 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -40,7 +40,17 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
-        ModelFileTest.makeAndAssert("miplib", modelName, FileFormat.MPS, false, expMinValString, expMaxValString, ACCURACY);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", modelName, false);
+
+        // model.options.debug(Optimisation.Solver.class);
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 
     /**
@@ -56,7 +66,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Test
-    @Tag("slow")
+    @Tag("unstable")
     public void testB_ball() {
         MIPLIBTheEasySet.doTest("b-ball.mps", "-1.5", null);
     }
@@ -115,6 +125,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     /**
      * https://miplib.zib.de/instance_details_neos5.html
      * <p>
+     * 2 or 3 integer solutions, including the optimal solution, is found immediately. Still the branching
+     * goes on "forever", and in addition the generated LP branch-problems get harder and harder to solve for
+     * the LP solver.
+     * <p>
      * Mac Pro (Early 2009)
      * <ul>
      * <li>2019-01-28: 300s suffice with optimal solution
@@ -125,7 +139,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Test
-    @Tag("slow")
+    @Tag("unstable")
     public void testNeos5() {
         MIPLIBTheEasySet.doTest("neos5.mps", "15", null);
     }
@@ -149,10 +163,11 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: Finished with optimal solution in 251s. (optimal solution found after about 150s)
+     * <li>2022-03-17: Finished with optimal solution in 159s.
      * </ul>
      */
     @Test
-    @Tag("slow")
+    @Tag("unstable")
     public void testPk1() {
         MIPLIBTheEasySet.doTest("pk1.mps", "1.10000000e+01", null);
     }
