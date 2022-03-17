@@ -99,7 +99,7 @@ public abstract class AggregatorSet<N extends Comparable<N>> {
 
         default:
 
-            return null;
+            throw new IllegalArgumentException();
         }
     }
 

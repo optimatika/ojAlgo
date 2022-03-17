@@ -38,6 +38,8 @@ import org.ojalgo.random.Uniform;
 
 public class SolverTest extends MatrixTaskTests {
 
+    private static final Random RANDOM = new Random();
+
     @Test
     public void testExampleWikipediA() {
 
@@ -128,11 +130,10 @@ public class SolverTest extends MatrixTaskTests {
 
         Primitive64Store expected = Primitive64Store.FACTORY.make(numVars, 1);
 
-        Random tmpRandom = new Random();
         for (int i = 0; i < numEqs; i++) {
 
-            double pivotE = tmpRandom.nextDouble();
-            double rhsE = tmpRandom.nextDouble();
+            double pivotE = RANDOM.nextDouble();
+            double rhsE = RANDOM.nextDouble();
 
             body.set(i, i, pivotE);
             rhs.set(i, rhsE);

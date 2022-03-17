@@ -23,7 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -43,7 +43,19 @@ import org.ojalgo.type.context.NumberContext;
 public class CuteNetlibCase extends OptimisationLinearTests implements ModelFileTest {
 
     private static void doTest(final String name, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
-        ModelFileTest.makeAndAssert("netlib", name, FileFormat.MPS, false, expMinValString, expMaxValString, accuracy);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("netlib", name, false);
+
+        // model.options.debug(Optimisation.Solver.class);
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.mip_defer = 0.25;
+        // model.options.mip_gap = 1.0E-5;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
     }
 
     /**

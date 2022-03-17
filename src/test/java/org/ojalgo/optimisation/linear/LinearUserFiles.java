@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -41,7 +40,21 @@ public class LinearUserFiles extends OptimisationLinearTests implements ModelFil
 
     private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString,
             final NumberContext accuracy) {
-        return ModelFileTest.makeAndAssert("usersupplied", modelName, FileFormat.EBM, false, expMinValString, expMaxValString, accuracy);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", modelName, false);
+
+        // model.options.debug(Optimisation.Solver.class);
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.mip_defer = 0.25;
+        // model.options.mip_gap = 1.0E-5;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
+
+        return model;
     }
 
     @Test

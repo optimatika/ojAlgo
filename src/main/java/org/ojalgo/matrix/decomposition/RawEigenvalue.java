@@ -163,7 +163,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
-            return this.makeDiagonal(Primitive64Array.wrap(d)).get();
+            return RawDecomposition.makeDiagonal(Primitive64Array.wrap(d)).get();
         }
 
     }
@@ -271,7 +271,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             int dim = d.length;
 
-            RawStore tmpMtrx = new RawStore(dim, dim);
+            RawStore tmpMtrx = this.newRawStore(dim, dim);
 
             double max = ONE;
 
@@ -316,8 +316,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return V
      */
     public MatrixStore<Double> getV() {
-        int n = this.getRowDim();
-        return new RawStore(myTransposedV, n, n).transpose();
+        return this.wrap(myTransposedV).transpose();
     }
 
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
@@ -370,7 +369,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
         int n = this.getRowDim();
-        RawStore fullD = new RawStore(n, n);
+        RawStore fullD = this.newRawStore(n, n);
         double[][] D = fullD.data;
         for (int i = 0; i < n; i++) {
             D[i][i] = d[i];

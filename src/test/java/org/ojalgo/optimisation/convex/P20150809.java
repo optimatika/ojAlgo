@@ -79,13 +79,13 @@ class P20150809 {
         }
 
         final double[] C = new double[] { 0.12, -0.05, 0.08, 0.07 };
-        final RawStore cov = new RawStore(4, 4);
+        final RawStore cov = RawStore.FACTORY.make(4, 4);
         if (identity) {
             for (int i = 0; i < 4; i++) {
                 cov.set(i, i, 1.0);
             }
         }
-        final RawStore linPart = new RawStore(C, 4);
+        final RawStore linPart = RawStore.FACTORY.column(C);
         ConvexSolver.Builder builder = ConvexSolver.newBuilder().objective(cov, linPart);
 
         if (addDummyConstraints) {

@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -79,14 +78,6 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         int[] tmpPivotOrder = decomposition.getPivotOrder();
 
         return Access2D.equals(matrix.rows(tmpPivotOrder), tmpL.multiply(tmpU), context);
-    }
-
-    /**
-     * @deprecated v48 Use {@link #decomposeWithoutPivoting(Access2D.Collectable)} instead.
-     */
-    @Deprecated
-    default boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
-        return this.decomposeWithoutPivoting(matrix) && this.isSolvable();
     }
 
     MatrixStore<N> getL();

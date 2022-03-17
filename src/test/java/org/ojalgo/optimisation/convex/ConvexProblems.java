@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -374,7 +373,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         // System.out.println(result.getValue());
 
         TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertEquals(32.0, result.getValue(), NumberContext.getMath(4));
+        TestUtils.assertEquals(32.0, result.getValue(), NumberContext.of(4));
     }
 
     /**
@@ -947,7 +946,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * numerical difficulties as the previous versions.
      * </p>
      * <p>
-     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 11) till new NumberContext(3, 3) för
+     * 2015-02-28: Var tvungen att ändra från NumberContext.of(7,11) till new NumberContext(3, 3) för
      * lösningen.
      * </p>
      */
@@ -1039,7 +1038,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertBounds(BigMath.ZERO, (Access1D<?>) tmpResult, BigMath.ONE, StandardType.PERCENT);
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, NumberContext.getMath(8), null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, NumberContext.of(8), null);
     }
 
     /**
@@ -1071,7 +1070,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
         Array1D<BigDecimal> tmpSolution = Array1D.BIG.copy(tmpResult);
-        tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
+        tmpSolution.modifyAll(NumberContext.of(7, 6).getFunction(BigFunction.getSet()));
         for (BigDecimal tmpBigDecimal : tmpSolution) {
             if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
@@ -1236,14 +1235,14 @@ public class ConvexProblems extends OptimisationConvexTests {
         Result tmpResult = model.minimise();
         double tmpObjFuncVal = tmpResult.getValue();
 
-        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, new NumberContext(7, 6));
+        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, NumberContext.of(7, 6));
 
         double[] tmpExpected = new double[] { -1.1875, 1.5625, 0.375, 2.5625 };
         for (int i = 0; i < tmpExpected.length; i++) {
-            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), new NumberContext(5, 4));
+            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), NumberContext.of(5, 4));
         }
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model, new NumberContext(7, 6));
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model, NumberContext.of(7, 6));
     }
 
     /**
@@ -1433,7 +1432,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20150720() {
 
-        NumberContext accuracy = NumberContext.getMath(11);
+        NumberContext accuracy = NumberContext.of(11);
 
         ExpressionsBasedModel model1 = P20150720.buildModel1();
         ExpressionsBasedModel model2 = P20150720.buildModel2();
@@ -1510,7 +1509,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20150809() {
 
-        NumberContext precision = new NumberContext(11, 14, RoundingMode.HALF_EVEN);
+        NumberContext precision = NumberContext.of(11, 14);
 
         /*
          * Same as the "c" vector

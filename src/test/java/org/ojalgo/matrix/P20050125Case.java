@@ -51,7 +51,7 @@ public class P20050125Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 6);
+        // ACCURACY = NumberContext.of(7,6);
 
         rAA = P20050125Case.getProblematic();
         rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);

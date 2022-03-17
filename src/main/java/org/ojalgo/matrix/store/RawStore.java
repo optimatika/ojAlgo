@@ -23,13 +23,12 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.io.BufferedReader;
-import java.io.StreamTokenizer;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.ModifyAll;
@@ -66,88 +65,92 @@ public final class RawStore implements PhysicalStore<Double> {
 
         public RawStore columns(final Access1D<?>... source) {
 
-            int tmpRowDim = (int) source[0].count();
-            int tmpColDim = source.length;
+            int nbRows = source[0].size();
+            int nbCols = source.length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
+            double[][] retValData = retVal.data;
 
-            Access1D<?> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = tmpColumn.doubleValue(i);
+            Access1D<?> tmpCol;
+            for (int j = 0; j < nbCols; j++) {
+                tmpCol = source[j];
+                for (int i = 0; i < nbRows; i++) {
+                    retValData[i][j] = tmpCol.doubleValue(i);
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore columns(final Comparable<?>[]... source) {
 
-            int tmpRowDim = source[0].length;
-            int tmpColDim = source.length;
+            int nbRows = source[0].length;
+            int nbCols = source.length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
+            double[][] retValData = retVal.data;
 
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = NumberDefinition.doubleValue(tmpColumn[i]);
+            Comparable<?>[] tmpCol;
+            for (int j = 0; j < nbCols; j++) {
+                tmpCol = source[j];
+                for (int i = 0; i < nbRows; i++) {
+                    retValData[i][j] = NumberDefinition.doubleValue(tmpCol[i]);
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore columns(final double[]... source) {
 
-            int tmpRowDim = source[0].length;
-            int tmpColDim = source.length;
+            int nbRows = source[0].length;
+            int nbCols = source.length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
+            double[][] retValData = retVal.data;
 
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = tmpColumn[i];
+            double[] tmpCol;
+            for (int j = 0; j < nbCols; j++) {
+                tmpCol = source[j];
+                for (int i = 0; i < nbRows; i++) {
+                    retValData[i][j] = tmpCol[i];
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore columns(final List<? extends Comparable<?>>... source) {
 
-            int tmpRowDim = source[0].size();
-            int tmpColDim = source.length;
+            int nbRows = source[0].size();
+            int nbCols = source.length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
+            double[][] retValData = retVal.data;
 
-            List<? extends Comparable<?>> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = NumberDefinition.doubleValue(tmpColumn.get(i));
+            List<? extends Comparable<?>> tmpCol;
+            for (int j = 0; j < nbCols; j++) {
+                tmpCol = source[j];
+                for (int i = 0; i < nbRows; i++) {
+                    retValData[i][j] = NumberDefinition.doubleValue(tmpCol.get(i));
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore copy(final Access2D<?> source) {
 
-            int numbRows = Math.toIntExact(source.countRows());
-            int numbCols = Math.toIntExact(source.countColumns());
+            int nbRows = source.getRowDim();
+            int nbCols = source.getColDim();
 
-            double[][] retVal = new double[numbRows][numbCols];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            for (int i = 0; i < numbRows; i++) {
-                COPY.row(source, i, retVal[i], 0, numbCols);
+            for (int i = 0; i < nbRows; i++) {
+                COPY.row(source, i, retVal.data[i], 0, nbCols);
             }
 
-            return new RawStore(retVal, numbRows, numbCols);
+            return retVal;
         }
 
         public RawStore make(final long rows, final long columns) {
@@ -156,207 +159,102 @@ public final class RawStore implements PhysicalStore<Double> {
 
         public RawStore rows(final Access1D<?>... source) {
 
-            int tmpRowDim = source.length;
-            int tmpColDim = (int) source[0].count();
+            int nbRows = source.length;
+            int nbCols = source[0].size();
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            Access1D<?> tmpSource;
-            double[] tmpDestination;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpSource = source[i];
-                tmpDestination = retVal[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = tmpSource.doubleValue(j);
+            Access1D<?> tmpRow;
+            double[] retValRow;
+            for (int i = 0; i < nbRows; i++) {
+                tmpRow = source[i];
+                retValRow = retVal.data[i];
+                for (int j = 0; j < nbCols; j++) {
+                    retValRow[j] = tmpRow.doubleValue(j);
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore rows(final Comparable<?>[]... source) {
 
-            int tmpRowDim = source.length;
-            int tmpColDim = source[0].length;
+            int nbRows = source.length;
+            int nbCols = source[0].length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            Comparable<?>[] tmpSource;
-            double[] tmpDestination;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpSource = source[i];
-                tmpDestination = retVal[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = NumberDefinition.doubleValue(tmpSource[j]);
+            Comparable<?>[] tmpRow;
+            double[] retValRow;
+            for (int i = 0; i < nbRows; i++) {
+                tmpRow = source[i];
+                retValRow = retVal.data[i];
+                for (int j = 0; j < nbCols; j++) {
+                    retValRow[j] = NumberDefinition.doubleValue(tmpRow[j]);
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore rows(final double[]... source) {
 
-            int tmpRowDim = source.length;
-            int tmpColDim = source[0].length;
+            int nbRows = source.length;
+            int nbCols = source[0].length;
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            double[] tmpSource;
-            double[] tmpDestination;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpSource = source[i];
-                tmpDestination = retVal[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = tmpSource[j];
+            double[] tmpRow;
+            double[] retValRow;
+            for (int i = 0; i < nbRows; i++) {
+                tmpRow = source[i];
+                retValRow = retVal.data[i];
+                for (int j = 0; j < nbCols; j++) {
+                    retValRow[j] = tmpRow[j];
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore rows(final List<? extends Comparable<?>>... source) {
 
-            int tmpRowDim = source.length;
-            int tmpColDim = source[0].size();
+            int nbRows = source.length;
+            int nbCols = source[0].size();
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            List<? extends Comparable<?>> tmpSource;
-            double[] tmpDestination;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpSource = source[i];
-                tmpDestination = retVal[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = NumberDefinition.doubleValue(tmpSource.get(j));
+            List<? extends Comparable<?>> tmpRow;
+            double[] retValRow;
+            for (int i = 0; i < nbRows; i++) {
+                tmpRow = source[i];
+                retValRow = retVal.data[i];
+                for (int j = 0; j < nbCols; j++) {
+                    retValRow[j] = NumberDefinition.doubleValue(tmpRow.get(j));
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
         public RawStore transpose(final Access2D<?> source) {
 
-            int tmpRowDim = (int) source.countColumns();
-            int tmpColDim = (int) source.countRows();
+            int nbRows = source.getColDim();
+            int nbCols = source.getRowDim();
 
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
+            RawStore retVal = new RawStore(nbRows, nbCols);
 
-            for (int i = 0; i < tmpRowDim; i++) {
-                for (int j = 0; j < tmpColDim; j++) {
-                    retVal[i][j] = source.doubleValue(j, i);
+            for (int i = 0; i < nbRows; i++) {
+                double[] retValRow = retVal.data[i];
+                for (int j = 0; j < nbCols; j++) {
+                    retValRow[j] = source.doubleValue(j, i);
                 }
             }
 
-            return new RawStore(retVal);
+            return retVal;
         }
 
     };
-
-    /**
-     * Construct a matrix from a copy of a 2-D array.
-     *
-     * @param A Two-dimensional array of doubles.
-     * @exception IllegalArgumentException All rows must have the same length
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public static RawStore constructWithCopy(final double[][] A) {
-        int m = A.length;
-        int n = A[0].length;
-        RawStore X = new RawStore(m, n);
-        double[][] C = X.data;
-        for (int i = 0; i < m; i++) {
-            if (A[i].length != n) {
-                throw new IllegalArgumentException("All rows must have the same length.");
-            }
-            for (int j = 0; j < n; j++) {
-                C[i][j] = A[i][j];
-            }
-        }
-        return X;
-    }
-
-    /**
-     * Generate matrix with random elements
-     *
-     * @param m Number of rows.
-     * @param n Number of colums.
-     * @return An m-by-n matrix with uniformly distributed random elements.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public static RawStore random(final int m, final int n) {
-        RawStore A = new RawStore(m, n);
-        double[][] X = A.data;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                X[i][j] = Math.random();
-            }
-        }
-        return A;
-    }
-
-    /**
-     * Read a matrix from a stream. The format is the same the print method, so printed matrices can be read
-     * back in (provided they were printed using US Locale). Elements are separated by whitespace, all the
-     * elements for each row appear on a single line, the last row is followed by a blank line.
-     *
-     * @param input the input stream.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public static RawStore read(final BufferedReader input) throws java.io.IOException {
-        StreamTokenizer tokenizer = new StreamTokenizer(input);
-
-        // Although StreamTokenizer will parse numbers, it doesn't recognize
-        // scientific notation (E or D); however, Double.valueOf does.
-        // The strategy here is to disable StreamTokenizer's number parsing.
-        // We'll only get whitespace delimited words, EOL's and EOF's.
-        // These words should all be numbers, for Double.valueOf to parse.
-
-        tokenizer.resetSyntax();
-        tokenizer.wordChars(0, 255);
-        tokenizer.whitespaceChars(0, ' ');
-        tokenizer.eolIsSignificant(true);
-        java.util.Vector<Double> vD = new java.util.Vector<>();
-
-        // Ignore initial empty lines
-        while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
-
-        }
-        if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
-            throw new java.io.IOException("Unexpected EOF on matrix read.");
-        }
-        do {
-            vD.addElement(Double.valueOf(tokenizer.sval)); // Read & store 1st row.
-        } while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-
-        int n = vD.size(); // Now we've got the number of columns!
-        double row[] = new double[n];
-        for (int j = 0; j < n; j++) {
-            row[j] = vD.elementAt(j).doubleValue();
-        }
-        java.util.Vector<double[]> v = new java.util.Vector<>();
-        v.addElement(row); // Start storing rows instead of columns.
-        while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
-            // While non-empty lines
-            v.addElement(row = new double[n]);
-            int j = 0;
-            do {
-                if (j >= n) {
-                    throw new java.io.IOException("Row " + v.size() + " is too long.");
-                }
-                row[j++] = Double.valueOf(tokenizer.sval).doubleValue();
-            } while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-            if (j < n) {
-                throw new java.io.IOException("Row " + v.size() + " is too short.");
-            }
-        }
-        int m = v.size(); // Now we've got the number of rows.
-        double[][] A = new double[m][];
-        v.copyInto(A); // copy the rows out of the vector
-        return RawStore.wrap(A);
-    }
 
     /**
      * Will create a single row matrix with the supplied array as the inner array. You access it using
@@ -372,25 +270,23 @@ public final class RawStore implements PhysicalStore<Double> {
 
     private static RawStore convert(final Access1D<?> elements, final int structure) {
 
-        RawStore retVal = null;
-
         if (elements instanceof RawStore) {
-            retVal = (RawStore) elements;
-        } else {
-            retVal = new RawStore(elements.toRawCopy1D(), structure);
+            return (RawStore) elements;
         }
 
-        return retVal;
-    }
+        int nbCols = structure != 0 ? elements.size() / structure : 0;
 
-    private static RawStore convert(final Access2D<?> elements) {
+        RawStore retVal = new RawStore(structure, nbCols);
 
-        RawStore retVal = null;
+        if (structure * nbCols != elements.size()) {
+            throw new IllegalArgumentException("Array length must be a multiple of structure.");
+        }
 
-        if (elements instanceof RawStore) {
-            retVal = (RawStore) elements;
-        } else {
-            retVal = new RawStore(elements.toRawCopy2D(), (int) elements.countRows(), (int) elements.countColumns());
+        for (int i = 0; i < structure; i++) {
+            double[] row = retVal.data[i];
+            for (int j = 0; j < nbCols; j++) {
+                row[j] = elements.doubleValue(Structure2D.index(structure, i, j));
+            }
         }
 
         return retVal;
@@ -404,7 +300,7 @@ public final class RawStore implements PhysicalStore<Double> {
 
             retVal = ((RawStore) elements).data;
 
-        } else if (elements instanceof Access2D && ((Access2D) elements).getRowDim() == nbRows) {
+        } else if (elements instanceof Access2D && ((Access2D<?>) elements).getRowDim() == nbRows) {
 
             retVal = ((Access2D<?>) elements).toRawCopy2D();
 
@@ -460,133 +356,6 @@ public final class RawStore implements PhysicalStore<Double> {
 
     private final int myNumberOfColumns;
 
-    /**
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final Access2D<?> template) {
-
-        super();
-
-        RawStore tmpConverted = RawStore.convert(template);
-
-        data = tmpConverted.data;
-
-        myNumberOfColumns = Math.toIntExact(template.countColumns());
-    }
-
-    /**
-     * Construct a matrix from a one-dimensional packed array
-     *
-     * @param elements One-dimensional array of doubles, packed by columns (ala Fortran).
-     * @param structure Number of rows.
-     * @exception IllegalArgumentException Array length must be a multiple of m.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final double elements[], final int structure) {
-
-        myNumberOfColumns = structure != 0 ? elements.length / structure : 0;
-
-        if (structure * myNumberOfColumns != elements.length) {
-            throw new IllegalArgumentException("Array length must be a multiple of structure.");
-        }
-
-        data = new double[structure][myNumberOfColumns];
-
-        for (int i = 0; i < structure; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                data[i][j] = elements[Math.toIntExact(Structure2D.index(structure, i, j))];
-            }
-        }
-
-    }
-
-    /**
-     * Construct a matrix from a 2-D array.
-     *
-     * @param A Two-dimensional array of doubles.
-     * @exception IllegalArgumentException All rows must have the same length
-     * @see #constructWithCopy
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final double[][] A) {
-
-        myNumberOfColumns = A[0].length;
-        for (int i = 0; i < A.length; i++) {
-            if (A[i].length != myNumberOfColumns) {
-                throw new IllegalArgumentException("All rows must have the same length.");
-            }
-        }
-        data = A;
-
-    }
-
-    /**
-     * Construct a matrix quickly without checking arguments.
-     *
-     * @param A Two-dimensional array of doubles.
-     * @param m Number of rows.
-     * @param n Number of colums.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final double[][] A, final int m, final int n) {
-
-        data = A;
-
-        myNumberOfColumns = n;
-    }
-
-    /**
-     * Construct an m-by-n matrix of zeros.
-     *
-     * @param m Number of rows.
-     * @param n Number of colums.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final int m, final int n) {
-
-        myNumberOfColumns = n;
-        data = new double[m][n];
-
-    }
-
-    /**
-     * Construct an m-by-n constant matrix.
-     *
-     * @param m Number of rows.
-     * @param n Number of colums.
-     * @param s Fill the matrix with this scalar value.
-     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
-     */
-    @Deprecated
-    public RawStore(final int m, final int n, final double s) {
-
-        myNumberOfColumns = n;
-        data = new double[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                data[i][j] = s;
-            }
-        }
-
-    }
-
-    @SuppressWarnings("unused")
-    private RawStore() {
-
-        super();
-
-        data = new double[0][0];
-
-        myNumberOfColumns = 0;
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     RawStore(final double[][] elements, final int numberOfColumns) {
 
         super();
@@ -594,6 +363,20 @@ public final class RawStore implements PhysicalStore<Double> {
         data = elements;
 
         myNumberOfColumns = numberOfColumns;
+    }
+
+    /**
+     * Construct an m-by-n matrix of zeros.
+     *
+     * @param m Number of rows.
+     * @param n Number of colums.
+     */
+    RawStore(final int m, final int n) {
+
+        super();
+
+        myNumberOfColumns = n;
+        data = new double[m][n];
     }
 
     public void accept(final Access2D<?> supplied) {
@@ -701,7 +484,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillAll(final Double value) {
-        FillMatchingDual.fillAll(data, value);
+        FillMatchingDual.fillAll(data, value.doubleValue());
     }
 
     public void fillAll(final NullaryFunction<?> supplier) {
@@ -722,7 +505,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillColumn(final long row, final long col, final Double value) {
-        FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), value);
+        FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), value.doubleValue());
     }
 
     public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
@@ -730,7 +513,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillDiagonal(final long row, final long col, final Double value) {
-        FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), value);
+        FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), value.doubleValue());
     }
 
     public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
@@ -820,7 +603,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillOne(final long row, final long col, final Double value) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
+        data[Math.toIntExact(row)][Math.toIntExact(col)] = value.doubleValue();
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
@@ -828,7 +611,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillRange(final long first, final long limit, final Double value) {
-        FillMatchingDual.fillRange(data, (int) first, (int) limit, value);
+        FillMatchingDual.fillRange(data, (int) first, (int) limit, value.doubleValue());
     }
 
     public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
@@ -836,7 +619,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void fillRow(final long row, final long col, final Double value) {
-        FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), value);
+        FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), value.doubleValue());
     }
 
     public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
@@ -848,12 +631,20 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public Double get(final long row, final long col) {
-        return data[Math.toIntExact(row)][Math.toIntExact(col)];
+        return Double.valueOf(this.doubleValue(row, col));
+    }
+
+    public int getColDim() {
+        return myNumberOfColumns;
+    }
+
+    public int getRowDim() {
+        return data.length;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         result = prime * result + Arrays.deepHashCode(data);
         result = prime * result + myNumberOfColumns;
@@ -861,119 +652,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public long indexOfLargest() {
-
-        int tmpRowDim = data.length;
-
-        long retVal = 0;
-        double tmpLargest = ZERO;
-        double tmpValue;
-        double[] tmpRow;
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            tmpRow = data[i];
-
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
-                if (tmpValue > tmpLargest) {
-                    tmpLargest = tmpValue;
-                    retVal = Structure2D.index(tmpRowDim, i, j);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInColumn(final long row, final long col) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = Math.toIntExact(row);
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = Math.toIntExact(row); i < tmpRowDim; i++) {
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][Math.toIntExact(col)]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = 0;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int index = 0; index < this.count(); index++) {
-            int i = Structure2D.row(index, tmpRowDim);
-            int j = Structure2D.column(index, tmpRowDim);
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = index;
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-
-        int retVal = Math.toIntExact(col);
-        double tmpLargest = ZERO;
-        double tmpValue;
-        double[] tmpRow = data[Math.toIntExact(row)];
-
-        for (int j = Math.toIntExact(col); j < myNumberOfColumns; j++) {
-            tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = j;
-            }
-        }
-
-        return retVal;
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-
-        int tmpRowDim = data.length;
-
-        int retVal = (int) first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = (int) first, j = (int) first; i < tmpRowDim && j < myNumberOfColumns; i++, j++) {
-            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
-    }
-
-    public boolean isAbsolute(final long index) {
-        int tmpRowDim = data.length;
-        return PrimitiveScalar.isAbsolute(this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
-    }
-
-    public boolean isAbsolute(final long row, final long col) {
-        return PrimitiveScalar.isAbsolute(this.get(Math.toIntExact(row), Math.toIntExact(col)));
-    }
-
-    public boolean isSmall(final long index, final double comparedTo) {
-        int tmpRowDim = data.length;
-        return PrimitiveScalar.isSmall(comparedTo, this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
+        return AMAX.invoke(data);
     }
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {

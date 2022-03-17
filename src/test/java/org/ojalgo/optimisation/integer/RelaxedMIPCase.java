@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
 
@@ -35,7 +35,19 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
     private static void doTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
-        ModelFileTest.makeAndAssert("miplib", name, FileFormat.MPS, true, expMinValString, expMaxValString, ACCURACY);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", name, true);
+
+        // model.options.debug(Optimisation.Solver.class);
+        // model.options.debug(IntegerSolver.class);
+        // model.options.debug(ConvexSolver.class);
+        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
+        // model.options.mip_defer = 0.25;
+        // model.options.mip_gap = 1.0E-5;
+
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 
     /**

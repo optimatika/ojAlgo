@@ -28,7 +28,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -101,7 +100,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     private static ExpressionsBasedModel makeModel(final String modelPath) {
-        return ModelFileTest.makeModel("miplib", modelPath, false, FileFormat.MPS);
+        return ModelFileTest.makeModel("miplib", modelPath, false);
     }
 
     /**

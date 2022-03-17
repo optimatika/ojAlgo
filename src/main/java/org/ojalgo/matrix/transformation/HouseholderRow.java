@@ -1,9 +1,12 @@
 package org.ojalgo.matrix.transformation;
 
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.RowView;
+import org.ojalgo.type.NumberDefinition;
 
 final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implements HouseholderReference<N> {
 
@@ -27,7 +30,8 @@ final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implement
     public double doubleValue(final long index) {
         if (index > myFirst) {
             return myStore.doubleValue(this.row(), index);
-        } else if (index == myFirst) {
+        }
+        if (index == myFirst) {
             return PrimitiveMath.ONE;
         } else {
             return PrimitiveMath.ZERO;
@@ -42,7 +46,8 @@ final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implement
     public N get(final long index) {
         if (index > myFirst) {
             return myStore.get(this.row(), index);
-        } else if (index == myFirst) {
+        }
+        if (index == myFirst) {
             return myStore.physical().scalar().one().get();
         } else {
             return myStore.physical().scalar().zero().get();
@@ -58,7 +63,8 @@ final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implement
     }
 
     public boolean isZero() {
-        return myStore.isRowSmall(this.row(), myFirst + 1L, PrimitiveMath.ONE);
+        double largest = NumberDefinition.doubleValue(myStore.aggregateRow(this.row(), myFirst + 1L, Aggregator.LARGEST));
+        return PrimitiveScalar.isSmall(PrimitiveMath.ONE, largest);
     }
 
     public void point(final long row, final long col) {

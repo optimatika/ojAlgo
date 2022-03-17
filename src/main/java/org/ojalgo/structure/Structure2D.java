@@ -383,10 +383,10 @@ public interface Structure2D extends Structure1D {
         public final C column;
         public final R row;
 
-        public RowColumnKey(final R row, final C col) {
+        public RowColumnKey(final R theRow, final C theCol) {
             super();
-            this.row = row;
-            this.column = col;
+            this.row = theRow;
+            this.column = theCol;
         }
 
         @SuppressWarnings("rawtypes")

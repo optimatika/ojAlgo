@@ -132,11 +132,11 @@ public class KnapsackTest extends OptimisationIntegerTests {
     }
 
     private void assertOne(final Variable v) {
-        TestUtils.assertEquals(BigMath.ONE, v.getValue(), new NumberContext(7, 6));
+        TestUtils.assertEquals(BigMath.ONE, v.getValue(), NumberContext.of(7, 6));
     }
 
     private void assertZero(final Variable v) {
-        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), new NumberContext(7, 6));
+        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), NumberContext.of(7, 6));
     }
 
 }

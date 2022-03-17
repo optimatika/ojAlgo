@@ -152,7 +152,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         Optimisation.Result tmpResult = tmpSolver.solve();
         // PrimitiveMatrix tmpSolution = tmpResult.getSolution();
 
-        TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpX, tmpResult, NumberContext.of(7, 6));
 
         // As (I believe) the user built it
         //
@@ -168,7 +168,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpResult = tmpSolver.solve();
 
         // Should NOT be equal in this case!
-        TestUtils.assertFalse(Access1D.equals(tmpX, tmpResult, new NumberContext(7, 6)));
+        TestUtils.assertFalse(Access1D.equals(tmpX, tmpResult, NumberContext.of(7, 6)));
 
         // No problem with both the lower and upper limits set.
 
@@ -180,7 +180,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 
-        TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpX, tmpResult, NumberContext.of(7, 6));
     }
 
     /**

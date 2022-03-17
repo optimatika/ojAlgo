@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20071019Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = NumberContext.getGeneral(9);
+    private static final NumberContext DEFINITION = NumberContext.ofScale(9);
 
     public static RationalMatrix getFatProblematic() {
         return SimpleLeastSquaresCase.getBody().transpose();

@@ -128,7 +128,7 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
             BasicLogger.debug("Rational D", rationalDecomp.getD());
         }
 
-        final NumberContext precision = new NumberContext(7, 14);
+        final NumberContext precision = NumberContext.of(7, 14);
 
         TestUtils.assertEquals(primitiveA, primitiveDecomp, precision);
         TestUtils.assertEquals(complexA, complexDecomp, precision);
@@ -165,8 +165,8 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
 
         tmpDecomp.decompose(aMtrxA);
 
-        TestUtils.assertEquals(aMtrxD, tmpDecomp.getD(), new NumberContext(7, 6));
+        TestUtils.assertEquals(aMtrxD, tmpDecomp.getD(), NumberContext.of(7, 6));
 
-        TestUtils.assertEquals(aMtrxA, tmpDecomp, new NumberContext(7, 6));
+        TestUtils.assertEquals(aMtrxA, tmpDecomp, NumberContext.of(7, 6));
     }
 }

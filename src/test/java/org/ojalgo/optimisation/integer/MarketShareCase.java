@@ -34,7 +34,6 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -114,7 +113,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         //
         //        return tmpMPS.getExpressionsBasedModel();
 
-        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false, FileFormat.MPS);
+        return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false);
     }
 
     @Test
@@ -407,7 +406,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
         final Result tmpResult = tmpModel.minimise();
 
-        final NumberContext tmpContext = new NumberContext(8, 13);
+        final NumberContext tmpContext = NumberContext.of(8, 13);
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpContext);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {

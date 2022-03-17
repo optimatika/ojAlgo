@@ -116,22 +116,6 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
 
     MatrixStore<N> getLQ();
 
-    /**
-     * @deprecated v48 Use {@link #getLQ()} instead
-     */
-    @Deprecated
-    default MatrixStore<N> getQ1() {
-        return this.getLQ();
-    }
-
-    /**
-     * @deprecated v48 Use {@link #getRQ()} instead
-     */
-    @Deprecated
-    default MatrixStore<N> getQ2() {
-        return this.getRQ();
-    }
-
     MatrixStore<N> getRQ();
 
     boolean isUpper();

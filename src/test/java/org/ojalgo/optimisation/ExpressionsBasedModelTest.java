@@ -34,6 +34,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest extends OptimisationTests {
@@ -63,6 +64,33 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(1.0, result.doubleValue(0) + result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(4.0, result.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
+    }
+
+    @Test
+    public void testExpressionSetAdd() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable var0 = model.addVariable();
+        Variable var1 = model.addVariable();
+        Variable var2 = model.addVariable();
+
+        Expression expr = model.addExpression();
+
+        expr.set(var1, BigMath.ONE);
+        expr.set(var2, BigMath.TWO);
+
+        expr.add(var0, BigMath.TWO);
+        expr.add(1, BigMath.THREE);
+        expr.add(var2, BigMath.FOUR);
+
+        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(IntIndex.of(0), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(IntIndex.of(1), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(IntIndex.of(2), false));
+
+        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(var0.getIndex(), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(var1.getIndex(), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(var2.getIndex(), false));
     }
 
     /**
@@ -262,6 +290,47 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/415
+     */
+    @Test
+    public void testSimpleInfeasibleSimplification() {
+
+        //
+
+        ExpressionsBasedModel original1 = new ExpressionsBasedModel();
+
+        Variable x1 = original1.addVariable("x").weight(1.0);
+
+        Expression c01 = original1.addExpression("c0").upper(1);
+        c01.set(x1, 1);
+
+        Expression c11 = original1.addExpression("c1").lower(2);
+        c11.set(x1, 1);
+
+        ExpressionsBasedModel simplified1 = original1.simplify();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified1.minimise().getState());
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified1.maximise().getState());
+
+        //
+
+        ExpressionsBasedModel original2 = new ExpressionsBasedModel();
+
+        Variable x2 = original2.addVariable("x").weight(1.0);
+
+        Expression c02 = original2.addExpression("c0").level(1);
+        c02.set(x2, 1);
+
+        Expression c12 = original2.addExpression("c1").level(2);
+        c12.set(x2, 1);
+
+        ExpressionsBasedModel simplified2 = original2.simplify();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified2.minimise().getState());
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, simplified2.maximise().getState());
     }
 
     @Test

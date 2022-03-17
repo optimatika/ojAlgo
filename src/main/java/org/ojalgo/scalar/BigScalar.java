@@ -75,7 +75,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     public static final BigScalar TWO = new BigScalar(BigDecimal.ONE.add(BigDecimal.ONE));
     public static final BigScalar ZERO = new BigScalar(BigDecimal.ZERO);
 
-    static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
+    static final NumberContext CONTEXT = NumberContext.ofMath(MathContext.DECIMAL128);
 
     public static boolean isAbsolute(final BigDecimal value) {
         return value.signum() >= 0;

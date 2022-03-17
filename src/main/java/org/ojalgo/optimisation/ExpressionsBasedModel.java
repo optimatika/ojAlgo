@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -104,7 +105,32 @@ import org.ojalgo.type.context.NumberContext;
 public final class ExpressionsBasedModel extends AbstractModel {
 
     public enum FileFormat {
+
         EBM, MPS;
+
+        /**
+         * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
+         * of the various extensions. In particular it is possible to parse QP models using QUADOBJ or QMATRIX
+         * file sections.
+         */
+        public static FileFormat from(final File file) {
+            return FileFormat.from(file.getPath());
+        }
+
+        public static FileFormat from(final String path) {
+
+            String lowerCasePath = path.toLowerCase();
+
+            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
+                return FileFormat.MPS;
+            }
+
+            if (lowerCasePath.endsWith("ebm")) {
+                return FileFormat.EBM;
+            }
+
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -147,8 +173,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 }
 
                 return new Result(solverState.getState(), modelSolution);
-
             }
+
             if (solverState.count() != numbVariables) {
                 throw new IllegalStateException();
             }
@@ -611,23 +637,13 @@ public final class ExpressionsBasedModel extends AbstractModel {
      */
     public static ExpressionsBasedModel parse(final File file) {
 
-        String lowerCasePath = file.getPath().toLowerCase();
+        FileFormat fileFormat = FileFormat.from(file);
 
         try (FileInputStream input = new FileInputStream(file)) {
-
-            if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
-                return ExpressionsBasedModel.parse(input, FileFormat.MPS);
-            }
-
-            if (lowerCasePath.endsWith("ebm")) {
-                return ExpressionsBasedModel.parse(input, FileFormat.EBM);
-            }
-
+            return ExpressionsBasedModel.parse(input, fileFormat);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
-
-        throw new IllegalArgumentException();
     }
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
@@ -715,14 +731,14 @@ public final class ExpressionsBasedModel extends AbstractModel {
         for (Expression tmpExpr : modelToCopy.getExpressions()) {
             if (shallow) {
                 if (prune) {
-                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                    if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
                         myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
                     }
                 } else {
                     myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, false));
                 }
             } else if (prune) {
-                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && !tmpExpr.isRedundant()) {
+                if (tmpExpr.isObjective() || tmpExpr.isConstraint() && (!tmpExpr.isRedundant() || tmpExpr.isInfeasible())) {
                     myExpressions.put(tmpExpr.getName(), tmpExpr.copy(this, true).compensate(fixedVariables));
                 }
             } else {
@@ -901,11 +917,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         myFixedVariables.clear();
 
         myVariablesCategorisation.reset();
-    }
-
-    public Expression generateCut(final Expression constraint, final Optimisation.Result solution) {
-
-        return null;
     }
 
     public Expression getExpression(final String name) {
@@ -1425,6 +1436,52 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
+    private void generateCuts() {
+
+        Map<String, Expression> cuts = new HashMap<>();
+
+        for (Entry<String, Expression> expressionEntry : myExpressions.entrySet()) {
+            String expressionName = expressionEntry.getKey();
+            Expression expression = expressionEntry.getValue();
+
+            if (expression.isEqualityConstraint() && expression.getUpperLimit().signum() != 0 && expression.isLinearAndAllInteger()) {
+
+                BigDecimal level = expression.getUpperLimit();
+                level = level.add(level);
+
+                String cutName = "CUT_" + expressionName;
+                Expression cut = new Expression(cutName, this);
+
+                for (Entry<IntIndex, BigDecimal> linear : expression.getLinearEntrySet()) {
+
+                    BigDecimal lin = BigMath.DIVIDE.invoke(linear.getValue(), level);
+
+                    BigDecimal lowInt = lin.setScale(0, RoundingMode.FLOOR);
+
+                    BigDecimal fract = lin.subtract(lowInt);
+
+                    if (fract.signum() == 1) {
+                        cut.add(linear.getKey(), fract);
+                    }
+
+                }
+
+                if (cut.countLinearFactors() > 0) {
+
+                    cut.lower(BigMath.HALF);
+
+                    cuts.put(cutName, cut);
+                }
+
+            }
+        }
+
+        myExpressions.putAll(cuts);
+        cuts.clear();
+
+        this.identifyRedundantConstraints();
+    }
+
     /**
      * Will indentify constarints with equal variables set, and check if those can be combined or not.
      */
@@ -1501,6 +1558,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
                                 }
 
                                 subExpression.setRedundant();
+
+                                BasicLogger.debug("Redundant: {} <<= {}", subExpression, refExpression);
                             }
                         }
                     }

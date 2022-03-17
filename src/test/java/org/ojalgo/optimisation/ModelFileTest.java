@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
@@ -39,7 +38,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface ModelFileTest {
 
-    static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final NumberContext accuracy) {
+    static void assertValues(final ExpressionsBasedModel model, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
+
+        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
+        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
         TestUtils.assertTrue(model.validate());
 
@@ -47,47 +49,28 @@ public interface ModelFileTest {
 
             Result result = model.minimise();
 
-            TestUtils.assertStateNotLessThanOptimal(result);
-
             TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMinVal, result.getValue(), accuracy);
+
+            TestUtils.assertStateNotLessThanOptimal(result);
         }
 
         if (expMaxVal != null) {
 
             Result result = model.maximise();
 
-            TestUtils.assertStateNotLessThanOptimal(result);
-
             TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMaxVal, result.getValue(), accuracy);
+
+            TestUtils.assertStateNotLessThanOptimal(result);
         }
     }
 
-    static ExpressionsBasedModel makeAndAssert(final String dataset, final String modelName, final FileFormat fileFormat, final boolean relax,
-            final String expMinValString, final String expMaxValString, final NumberContext precision) {
+    static ExpressionsBasedModel makeModel(final String dataset, final String name, final boolean relax) {
 
-        ExpressionsBasedModel model = ModelFileTest.makeModel(dataset, modelName, relax, fileFormat);
-
-        // model.options.debug(Optimisation.Solver.class);
-        // model.options.debug(IntegerSolver.class);
-        // model.options.debug(ConvexSolver.class);
-        // model.options.debug(LinearSolver.class);
-        // model.options.progress(IntegerSolver.class);
-        // model.options.validate = false;
-        // model.options.mip_defer = 0.0;
-
-        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
-        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
-
-        ModelFileTest.assertValues(model, expMinVal, expMaxVal, precision);
-
-        return model;
-    }
-
-    static ExpressionsBasedModel makeModel(final String dataset, final String name, final boolean relax, final FileFormat format) {
+        ExpressionsBasedModel.FileFormat format = ExpressionsBasedModel.FileFormat.from(name);
 
         try (InputStream input = ExpressionsBasedModel.class.getResourceAsStream("/optimisation/" + dataset + "/" + name)) {
 

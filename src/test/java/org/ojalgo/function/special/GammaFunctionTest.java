@@ -104,7 +104,7 @@ public class GammaFunctionTest {
             TestUtils.assertTrue("-" + n, Double.isNaN(GammaFunction.gamma(NEG * n)));
         }
 
-        final NumberContext tmpEval = new NumberContext(10, 10);
+        final NumberContext tmpEval = NumberContext.of(10, 10);
 
         // Positive half integer
         for (int n = 0; n < 10; n++) {

@@ -96,7 +96,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         }
         tmpC3.level(THREE);
 
-        //tmpModel.options.debug(LinearSolver.class);
+        // tmpModel.options.progress(IntegerSolver.class);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
 
@@ -165,7 +165,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         // BasicLogger.debug(tmpResult.toString());
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
+        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.of(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 
@@ -242,7 +242,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         // BasicLogger.debug(tmpResult.toString());
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
+        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.of(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 

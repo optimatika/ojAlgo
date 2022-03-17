@@ -11,6 +11,47 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [51.1.0] – 2022-03-17
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- `Expression` gained `add` methods corresponding to each of the existing `set` methods.
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- The `IntIndex` and `IntRowColumn` variants of the `Expression` `add` and `set` methods are deprecated. You should use the alternatives taking a `Variable` or simply an `int` instead.
+
+#### org.ojalgo.concurrent
+
+- New class `MultiviewSet` that combines a `Set` with multiple `PriorityQueue`:s. This allows to have multiple task queues, with different priorities, all backed by a common set of tasks.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+Big changes for the `IntegerSolver`!
+
+- New way to multi-thread the `IntegerSolver`. It no longer does fork-join, but instead makes use of ojAlgo's `ProcessingService`.
+- The `Optimisation.Options.mip_defer` and `Optimisation.Options.mip_gap` configurations are no longer used. Instead there is a whole new framework for how to control the `IntegerSolver`. This framework will be a work in progress for quite some time. Please use it, and give feedback, but don't expect it to be a stable API.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Calling `model.simplify()` no longer discards constraints flagged both redundant and infeasible – info about the model being infeasible is no longer lost.
+
+### Removed
+
+- A bunch of stuff that's been deprecated for a while is now removed. Only some of which is specifically mentioned below.
+
+#### org.ojalgo.structure
+
+- The interfaces `Access*D.Elements` and `Access*D.IndexOf` have been removed. Some parts of what they defined are still available via other interfaces. Like for instance the `Access1D.Aggregatable` interface took over the `indexOfLargest()` method.
+
 ## [51.0.0] – 2022-02-21
 
 ### Added

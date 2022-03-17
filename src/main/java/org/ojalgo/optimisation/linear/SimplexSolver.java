@@ -579,7 +579,7 @@ public abstract class SimplexSolver extends LinearSolver {
                     myTableau.doubleValue(pivot.row, pivot.col), tmpPivotRHS, myTableau.doubleValue(pivot.row, tmpColRHS));
         }
 
-        if (options.validate) {
+        if (this.isLogDebug() && options.validate) {
 
             // Right-most column of the tableau
             Access1D<Double> colRHS = myTableau.sliceConstraintsRHS();

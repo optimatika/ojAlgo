@@ -24,8 +24,6 @@ ojAlgo is available at [The Central (Maven) Repository](https://search.maven.org
 
 User documentation is available in the form of blog posts at the ojAlgo web site: http://ojalgo.org/
 
-The wiki here at GitHub is in the process of being migrated to the ojAlgo site, but still contains info not available elsewhere: https://github.com/optimatika/ojAlgo/wiki
-
 Programming questions related to ojAlgo are best asked at [stack overflow](https://stackoverflow.com/search?tab=relevance&q=ojalgo). Just remember to actually mention ojAlgo and tag the question using 'ojalgo' and whatever other tags you find suitable.
 
 Bug reports, or any issue with existing code, should be posted at GitHub: https://github.com/optimatika/ojAlgo/issues
