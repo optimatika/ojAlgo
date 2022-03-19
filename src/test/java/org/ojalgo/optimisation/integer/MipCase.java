@@ -140,6 +140,12 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
         MipCase.doTest("gen-ip054.mps", "6840.966", null);
     }
 
+    @Test
+    @Tag("unstable")
+    public void testMad() {
+        MipCase.doTest("mad.mps", "0.0268", null);
+    }
+
     /**
      * https://miplib.zib.de/instance_details_markshare_5_0.html
      * <ul>

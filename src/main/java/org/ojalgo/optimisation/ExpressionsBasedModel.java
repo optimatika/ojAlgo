@@ -649,7 +649,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
         switch (format) {
         case MPS:
-            return MathProgSysModel.parse(input).getExpressionsBasedModel();
+            return FileFormatMPS.read(input);
         case EBM:
             return FileFormatEBM.read(input);
         default:

@@ -147,6 +147,14 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
     }
 
     /**
+     * There are 2 different objective function rows, "N F52" and "N F53". Must pick and use "F52".
+     */
+    @Test
+    public void testMad() {
+        RelaxedMIPCase.doTest("mad.mps", "0", null, null);
+    }
+
+    /**
      * https://miplib.zib.de/instance_details_markshare_4_0.html
      * <ul>
      * Mac Pro (Early 2009)

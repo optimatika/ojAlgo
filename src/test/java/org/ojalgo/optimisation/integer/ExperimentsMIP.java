@@ -57,12 +57,12 @@ public class ExperimentsMIP extends OptimisationIntegerTests implements ModelFil
         MODELS.add("timtab1.mps");
         MODELS.add("vpm2.mps");
 
-        COMPARATORS.put("DISPLACE_DECR", NodeKey.DISPLACEMENT_DECR);
-        COMPARATORS.put("DISPLACE_INCR", NodeKey.DISPLACEMENT_INCR);
-        COMPARATORS.put("OBJECTIV_DECR", NodeKey.OBJECTIVE_DECR);
-        COMPARATORS.put("OBJECTIV_INCR", NodeKey.OBJECTIVE_INCR);
-        COMPARATORS.put("SEQUENCE_DECR", NodeKey.SEQUENCE_DECR);
-        COMPARATORS.put("SEQUENCE_INCR", NodeKey.SEQUENCE_INCR);
+        COMPARATORS.put("DISPLACE_DECR", NodeKey.SMALLEST_DISPLACEMENT);
+        COMPARATORS.put("DISPLACE_INCR", NodeKey.LARGEST_DISPLACEMENT);
+        COMPARATORS.put("OBJECTIV_DECR", NodeKey.MIN_OBJECTIVE);
+        COMPARATORS.put("OBJECTIV_INCR", NodeKey.MAX_OBJECTIVE);
+        COMPARATORS.put("SEQUENCE_DECR", NodeKey.EARLIEST_SEQUENCE);
+        COMPARATORS.put("SEQUENCE_INCR", NodeKey.LATEST_SEQUENCE);
     }
 
     public static void main(final String... args) {
