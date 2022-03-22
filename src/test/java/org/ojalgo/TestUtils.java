@@ -68,7 +68,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class TestUtils extends Assertions {
+public abstract class TestUtils /* extends Assertions */ {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
