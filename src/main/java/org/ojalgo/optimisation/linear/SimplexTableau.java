@@ -23,6 +23,10 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
@@ -30,15 +34,23 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.array.operation.IndexOf;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.ConstraintType;
+import org.ojalgo.optimisation.UpdatableSolver;
+import org.ojalgo.optimisation.linear.SimplexSolver.Primitive1D;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.IndexSelector;
+import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
@@ -47,10 +59,10 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         private final int myColDim;
         private final double[][] myRaw;
 
-        DenseRawTableau(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-                final boolean needDual) {
+        DenseRawTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+                final int nbIdentitySlackVariables, final boolean needDual) {
 
-            super(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
 
             int nbRows = this.countConstraints() + 2;
             int nbCols = this.countVariablesTotally() + 1;
@@ -64,7 +76,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
         DenseRawTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.countConstraints(), toCopy.countProblemVariables(), toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
+            super(toCopy.countConstraints(), toCopy.countProblemVariables(), 0, toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
                     toCopy.countIdentitySlackVariables(), toCopy.isArtificials());
 
             myColDim = toCopy.getColDim();
@@ -320,9 +332,9 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
     static abstract class DenseTableau extends SimplexTableau {
 
-        DenseTableau(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-                final boolean needDual) {
-            super(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+        DenseTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+                final int nbIdentitySlackVariables, final boolean needDual) {
+            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
         }
 
     }
@@ -332,10 +344,10 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         private final int myColDim;
         private final Primitive64Store myTransposed;
 
-        DenseTransposedTableau(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-                final boolean needDual) {
+        DenseTransposedTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+                final int nbIdentitySlackVariables, final boolean needDual) {
 
-            super(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
 
             int nbRows = this.countConstraints() + 2;
             int nbCols = this.countVariablesTotally() + 1;
@@ -346,7 +358,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
         DenseTransposedTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.countConstraints(), toCopy.countProblemVariables(), toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
+            super(toCopy.countConstraints(), toCopy.countProblemVariables(), 0, toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
                     toCopy.countIdentitySlackVariables(), toCopy.isArtificials());
 
             myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
@@ -604,6 +616,70 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
     }
 
+    static final class MetaData implements UpdatableSolver.EntityMap {
+
+        final boolean[] negatedDual;
+        final int[] negativePartVariables;
+        final int[] positivePartVariables;
+        final EntryPair<ModelEntity<?>, ConstraintType>[] slack;
+
+        MetaData(final int nbConstr, final int nbPos, final int nbNeg, final int nbSlack) {
+            positivePartVariables = new int[nbPos];
+            negativePartVariables = new int[nbNeg];
+            slack = (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbSlack];
+            negatedDual = new boolean[nbConstr];
+        }
+
+        public int countSlackVariables() {
+            return slack.length;
+        }
+
+        public int countVariables() {
+            return positivePartVariables.length + negativePartVariables.length;
+        }
+
+        public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
+            return slack[idx];
+        }
+
+        public int indexOf(final int idx) {
+
+            if (idx < 0) {
+                throw new IllegalArgumentException();
+            }
+
+            if (idx < positivePartVariables.length) {
+                return positivePartVariables[idx];
+            }
+
+            int negIdx = idx - positivePartVariables.length;
+
+            if (negIdx < negativePartVariables.length) {
+                return negativePartVariables[negIdx];
+            }
+
+            return -1;
+        }
+
+        public boolean isNegated(final int idx) {
+
+            if (idx < 0) {
+                throw new IllegalArgumentException();
+            }
+
+            if (idx < positivePartVariables.length) {
+                return false;
+            }
+
+            if (idx - positivePartVariables.length < negativePartVariables.length) {
+                return true;
+            }
+
+            return false;
+        }
+
+    }
+
     static final class SparseTableau extends SimplexTableau {
 
         private double myInfeasibility = ZERO;
@@ -614,10 +690,12 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         private final SparseArray.SparseFactory<Double> mySparseFactory;
         private double myValue = ZERO;
 
-        SparseTableau(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-                final boolean needDual) {
+        SparseTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+                final int nbIdentitySlackVariables, final boolean needDual) {
 
-            super(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+
+            int nbProblemVariables = nbPositiveProblemVariables + nbNegativeProblemVariables;
 
             long initial = Math.max(5L, Math.round(Math.sqrt(Math.min(nbConstraints, nbProblemVariables))));
             mySparseFactory = SparseArray.factory(Primitive64Array.FACTORY).initial(initial);
@@ -1004,14 +1082,15 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         return options.sparse != null && options.sparse.booleanValue();
     }
 
-    static SimplexTableau make(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-            final boolean needDual, final Optimisation.Options options) {
+    static SimplexTableau make(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+            final int nbIdentitySlackVariables, final boolean needDual, final Optimisation.Options options) {
 
         if (SimplexTableau.isSparse(options)) {
-            return new SparseTableau(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            return new SparseTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables,
+                    needDual);
         }
 
-        return new DenseRawTableau(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+        return new DenseRawTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
     }
 
     static SimplexTableau make(final LinearSolver.Builder builder, final Optimisation.Options options) {
@@ -1022,14 +1101,14 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         int nbIdentitySlackVariables = 0;
         boolean needDual = true;
 
-        SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
+        SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
         SimplexTableau.copy(builder, tableau);
         return tableau;
     }
 
     static SimplexTableau newDense(final LinearSolver.Builder matrices) {
 
-        SimplexTableau tableau = new DenseTransposedTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, true);
+        SimplexTableau tableau = new DenseTransposedTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
 
         SimplexTableau.copy(matrices, tableau);
 
@@ -1038,7 +1117,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
     static SparseTableau newSparse(final LinearSolver.Builder matrices) {
 
-        SparseTableau tableau = new SparseTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, true);
+        SparseTableau tableau = new SparseTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
 
         SimplexTableau.copy(matrices, tableau);
 
@@ -1065,11 +1144,12 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
     private transient SimplexSolver.Primitive1D myObjective = null;
     private final IndexSelector mySelector;
 
-    final boolean[] negative;
+    final MetaData meta;
 
     /**
      * @param nbConstraints The number of constraints.
-     * @param nbProblemVariables The number of problem variables.
+     * @param nbPositiveProblemVariables The number of positive problem variables.
+     * @param nbNegativeProblemVariables The number of negative problem variables.
      * @param nbSlackVariables The number of slack variables (the number of inequality constraints). The
      *        actual/full set of slack variables is nbSlackVariables + nbIdentitySlackVariables
      * @param nbIdentitySlackVariables The number of slack variables that form an identity matrix and can
@@ -1081,13 +1161,13 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
      *        constructing the tableau. In that case the identity slack variables and the artificial variables
      *        must form an identity matrix in the initial tableau (towards the right hand side).
      */
-    SimplexTableau(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-            final boolean needDual) {
+    SimplexTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
+            final int nbIdentitySlackVariables, final boolean needDual) {
 
         super();
 
         myNumberOfConstraints = nbConstraints;
-        myNumberOfProblemVariables = nbProblemVariables;
+        myNumberOfProblemVariables = nbPositiveProblemVariables + nbNegativeProblemVariables;
         myNumberOfSlackVariables = nbSlackVariables;
         myNumberOfIdentitySlackVariables = nbIdentitySlackVariables;
         myNumberOfArtificialVariables = needDual ? nbConstraints - nbIdentitySlackVariables : 0;
@@ -1095,7 +1175,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         mySelector = new IndexSelector(this.countVariables());
         myBasis = BasicArray.makeIncreasingRange(-nbConstraints, nbConstraints);
 
-        negative = new boolean[nbConstraints];
+        meta = new MetaData(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables + nbIdentitySlackVariables);
     }
 
     /**
@@ -1201,14 +1281,33 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         return retVal;
     }
 
-    boolean fixVariable(final int index, final double value) {
+    abstract boolean fixVariable(final int index, final double value);
 
-        int row = this.getBasisRowIndex(index);
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
-        if (row < 0) {
+        int nbConstraints = this.countConstraints();
+        int nbProblemVariables = this.countProblemVariables();
+
+        Primitive1D constraintsRHS = this.sliceConstraintsRHS();
+
+        List<Equation> retVal = new ArrayList<>();
+
+        for (int i = 0; i < nbConstraints; i++) {
+            int variableIndex = this.getBasisColumnIndex(i);
+
+            double rhs = constraintsRHS.doubleValue(i);
+
+            if (variableIndex >= 0 && variableIndex < nbProblemVariables && integer[variableIndex] && !accuracy.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), variableIndex, rhs, integer, fractionality);
+
+                if (maybe != null) {
+                    retVal.add(maybe);
+                }
+            }
         }
 
-        return false;
+        return retVal;
     }
 
     int[] getBasis() {
@@ -1220,7 +1319,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
     }
 
     int getBasisRowIndex(final int basisColumnIndex) {
-        return org.ojalgo.array.operation.IndexOf.indexOf(myBasis, basisColumnIndex);
+        return IndexOf.indexOf(myBasis, basisColumnIndex);
     }
 
     int getDualIdentityBase() {

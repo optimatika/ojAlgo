@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 public class MissingMathTest {
 
@@ -55,6 +56,23 @@ public class MissingMathTest {
 
         // BasicLogger.DEBUG.println("Max error: {} @ y={}, x={}", max, ye, xe);
         TestUtils.assertTrue(max < 3E-4);
+    }
+
+    @Test
+    public void testGCD() {
+
+        int[] numbers = new int[30];
+
+        for (int i = 0; i < numbers.length; i++) {
+
+            int base = PrimitiveMath.getPrimeNumber(i);
+
+            for (int j = 0; j < numbers.length; j++) {
+                numbers[j] = base * PrimitiveMath.getPrimeNumber(j);
+            }
+
+            TestUtils.assertEquals(base, MissingMath.gcd(base * base, numbers));
+        }
     }
 
     @Test

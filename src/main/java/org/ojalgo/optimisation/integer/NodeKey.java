@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
@@ -263,23 +262,21 @@ public final class NodeKey implements Comparable<NodeKey> {
         int[] tmpLBs = this.copyLowerBounds();
         int[] tmpUBs = this.copyUpperBounds();
 
-        double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
-
-        int tmpFloor = (int) Math.floor(tmpFeasibleValue);
+        int floorValue = (int) Math.floor(this.feasible(branchIntegerIndex, value, false));
 
         int oldVal = tmpUBs[branchIntegerIndex];
 
-        if (tmpFloor >= tmpUBs[branchIntegerIndex] && tmpFloor > tmpLBs[branchIntegerIndex]) {
-            tmpUBs[branchIntegerIndex] = tmpFloor - 1;
+        if (floorValue >= tmpUBs[branchIntegerIndex] && floorValue > tmpLBs[branchIntegerIndex]) {
+            tmpUBs[branchIntegerIndex] = floorValue - 1;
         } else {
-            tmpUBs[branchIntegerIndex] = tmpFloor;
+            tmpUBs[branchIntegerIndex] = floorValue;
         }
 
         int newVal = tmpUBs[branchIntegerIndex];
 
         boolean changed = oldVal > 0 && newVal <= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - floorValue, objVal, changed, myIntArrayPool);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objVal) {
@@ -287,23 +284,21 @@ public final class NodeKey implements Comparable<NodeKey> {
         int[] tmpLBs = this.copyLowerBounds();
         int[] tmpUBs = this.copyUpperBounds();
 
-        double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
-
-        int tmpCeil = (int) Math.ceil(tmpFeasibleValue);
+        int ceilValue = (int) Math.ceil(this.feasible(branchIntegerIndex, value, false));
 
         int oldVal = tmpLBs[branchIntegerIndex];
 
-        if (tmpCeil <= tmpLBs[branchIntegerIndex] && tmpCeil < tmpUBs[branchIntegerIndex]) {
-            tmpLBs[branchIntegerIndex] = tmpCeil + 1;
+        if (ceilValue <= tmpLBs[branchIntegerIndex] && ceilValue < tmpUBs[branchIntegerIndex]) {
+            tmpLBs[branchIntegerIndex] = ceilValue + 1;
         } else {
-            tmpLBs[branchIntegerIndex] = tmpCeil;
+            tmpLBs[branchIntegerIndex] = ceilValue;
         }
 
         int newVal = tmpLBs[branchIntegerIndex];
 
         boolean changed = oldVal < 0 && newVal >= 0;
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objVal, changed, myIntArrayPool);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, ceilValue - value, objVal, changed, myIntArrayPool);
     }
 
     void dispose() {
@@ -327,12 +322,12 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
     }
 
-    void enforceBounds(final Intermediate nodeModel, final ModelStrategy strategy) {
+    void enforceBounds(final NodeSolver nodeSolver, final ModelStrategy strategy) {
 
         BigDecimal lowerBound = this.getLowerBound(index);
         BigDecimal upperBound = this.getUpperBound(index);
 
-        Variable variable = nodeModel.getVariable(strategy.getIndex(index));
+        Variable variable = nodeSolver.getVariable(strategy.getIndex(index));
         variable.lower(lowerBound);
         variable.upper(upperBound);
 
@@ -343,9 +338,9 @@ public final class NodeKey implements Comparable<NodeKey> {
         }
 
         if (this.isSignChanged()) {
-            nodeModel.dispose();
+            nodeSolver.reset();
         } else {
-            nodeModel.update(variable);
+            nodeSolver.update(variable);
         }
     }
 
@@ -356,19 +351,19 @@ public final class NodeKey implements Comparable<NodeKey> {
         return true;
     }
 
-    double getFraction(final int idx, final double value) {
-
-        double feasibleValue = this.feasible(idx, value, true);
-
-        return Math.abs(feasibleValue - Math.rint(feasibleValue));
-    }
-
     BigDecimal getLowerBound(final int idx) {
         int tmpLower = myLowerBounds[idx];
         if (tmpLower != Integer.MIN_VALUE) {
             return new BigDecimal(tmpLower);
         }
         return null;
+    }
+
+    double getMinimumDisplacement(final int idx, final double value) {
+
+        double feasibleValue = this.feasible(idx, value, true);
+
+        return Math.abs(feasibleValue - Math.rint(feasibleValue));
     }
 
     BigDecimal getUpperBound(final int idx) {

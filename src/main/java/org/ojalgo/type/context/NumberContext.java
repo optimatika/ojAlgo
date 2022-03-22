@@ -33,6 +33,7 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.format.NumberStyle;
 
@@ -179,7 +180,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         myMathContext = math;
 
         if (math.getPrecision() > 0) {
-            myEpsilon = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveMath.POW.invoke(PrimitiveMath.TEN, 1 - math.getPrecision()));
+            myEpsilon = Math.max(PrimitiveMath.MACHINE_EPSILON, Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision()));
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -187,8 +188,8 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * PrimitiveMath.POW.invoke(PrimitiveMath.TEN, -scale));
-            myRoundingFactor = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, scale);
+            myZeroError = Math.max(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale));
+            myRoundingFactor = MissingMath.power(PrimitiveMath.TEN, scale);
         } else {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
@@ -222,17 +223,23 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
-     * Does not enforce the precision and does not use the specified rounding mode. The precision is given by
-     * the type double and the rounding mode is always "half even" as given by
-     * {@linkplain StrictMath#rint(double)}.
+     * If precision is specified then this method instantiates a {@link BigDecimal}, enforces that, and then
+     * extracts a double again.
+     * <P>
+     * If only a scale is specified then this enforces without creating any objects. In this case the
+     * precision is given by the type double and the rounding mode is always "half even" as given by
+     * {@linkplain Math#rint(double)} (regardless of what rounding mode is specified).
      */
     public double enforce(final double number) {
-        return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
+        if (myMathContext.getPrecision() > 0) {
+            return this.enforce(BigDecimal.valueOf(number)).doubleValue();
+        }
+        if (myScale > Integer.MIN_VALUE) {
+            return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
+        }
+        return number;
     }
 
-    /**
-     * @return the epsilon
-     */
     public double epsilon() {
         return myEpsilon;
     }
@@ -320,20 +327,51 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
     }
 
+    public boolean isInteger(final double value) {
+        return this.isSmall(PrimitiveMath.ONE, Math.rint(value) - value);
+    }
+
     public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {
         return value.compareTo(reference) < 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
+    }
+
+    /**
+     * The absolute smallest number allowed by this context, but not zero. A single ±1 at the very last
+     * decimal place.
+     * <p>
+     * Say you rounded a number to scale 4 and ended up with a number that is ±1E-4.
+     */
+    public boolean isMinimal(final BigDecimal value) {
+        return value.scale() == myScale && Math.abs(value.unscaledValue().intValue()) == 1;
     }
 
     public boolean isMoreThan(final BigDecimal reference, final BigDecimal value) {
         return value.compareTo(reference) > 0 && this.isDifferent(reference.doubleValue(), value.doubleValue());
     }
 
+    public boolean isSmall(final BigDecimal comparedTo, final BigDecimal value) {
+        if (this.isZero(comparedTo)) {
+            return this.isZero(value);
+        }
+        BigDecimal reference = this.enforce(comparedTo);
+        return this.enforce(reference.add(value)).compareTo(reference) == 0;
+    }
+
     public boolean isSmall(final double comparedTo, final double value) {
-        double norm = Math.abs(comparedTo);
-        if (NumberContext.isZero(norm, myZeroError)) {
+        if (NumberContext.isZero(comparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         }
-        return NumberContext.isZero(value / norm, myEpsilon);
+        double relative = value / comparedTo;
+        return NumberContext.isZero(relative, myEpsilon);
+    }
+
+    public boolean isZero(final BigDecimal value) {
+
+        if (value.signum() == 0) {
+            return true;
+        }
+
+        return this.enforce(value).signum() == 0;
     }
 
     public boolean isZero(final double value) {

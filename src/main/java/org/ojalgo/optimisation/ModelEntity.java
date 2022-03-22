@@ -54,10 +54,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         int doubleRange = 2 * range;
 
         if (expL > doubleRange) {
-
             return 0;
-
         }
+
         double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
 
         double negatedAverage = (expL + expS) / -PrimitiveMath.TWO;
@@ -76,7 +75,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         }
 
         BigDecimal candidate = TypeUtils.toBigDecimal(number);
-        final BigDecimal magnitude = candidate.abs();
+        BigDecimal magnitude = candidate.abs();
         if (magnitude.compareTo(LARGEST) >= 0) {
             candidate = null;
         } else if (magnitude.compareTo(SMALLEST) <= 0) {
@@ -117,6 +116,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         myName = name;
 
         ProgrammingError.throwIfNull(name);
+    }
+
+    public abstract void addTo(Expression target, BigDecimal scale);
+
+    public final BigDecimal adjust(final BigDecimal factor) {
+        return factor.movePointRight(this.getAdjustmentExponent());
     }
 
     /**
@@ -192,6 +197,11 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) == 0;
     }
 
+    /**
+     * Is this entity (all involved variables) integer?
+     */
+    public abstract boolean isInteger();
+
     public final boolean isLowerConstraint() {
         return myLowerLimit != null && !this.isEqualityConstraint();
     }
@@ -258,6 +268,20 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         }
 
         return adjusted;
+    }
+
+    /**
+     * Add this shift to the lower/upper limits, if they exist.
+     */
+    public void shift(final BigDecimal shift) {
+
+        if (this.isLowerLimitSet()) {
+            this.lower(this.getLowerLimit().add(shift));
+        }
+
+        if (this.isUpperLimitSet()) {
+            this.upper(this.getUpperLimit().add(shift));
+        }
     }
 
     /**
@@ -426,8 +450,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         myUpperLimit = null;
     }
 
-    protected abstract void doIntegerRounding();
-
     protected final int getAdjustmentExponent() {
         if (myAdjustmentExponent == Integer.MIN_VALUE) {
             myAdjustmentExponent = this.deriveAdjustmentExponent();
@@ -493,6 +515,15 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     abstract int deriveAdjustmentExponent();
+
+    /**
+     * Should only be called if all variables are integer. Will then verify if all variable factors are
+     * integers or if there exists a simple scalar that will make it so. If so, the lower/upper limits are
+     * adjusted be "integer rounded". The return value indicates if rounding was successful or not. An
+     * {@link Expression} {@link #isInteger()} only if rounding was successful (all variables AND parameters
+     * are integer).
+     */
+    abstract boolean doIntegerRounding();
 
     final int getAdjustmentExponentValue() {
         return myAdjustmentExponent;

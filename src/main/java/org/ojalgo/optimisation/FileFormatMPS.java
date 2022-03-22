@@ -605,9 +605,9 @@ final class FileFormatMPS {
         case OBJSENSE:
 
             if (line.contains(MAX)) {
-                myModel.setMaximisation();
+                myModel.setOptimisationSense(Optimisation.Sense.MAX);
             } else {
-                myModel.setMinimisation();
+                myModel.setOptimisationSense(Optimisation.Sense.MIN);
             }
 
             break;

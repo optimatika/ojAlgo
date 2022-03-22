@@ -79,6 +79,30 @@ public interface Optimisation {
 
     }
 
+    public enum ConstraintType implements Optimisation {
+
+        /**
+         * Corresponds to setting {@link ModelEntity#level(Comparable)} and/or checking
+         * {@link Constraint#isEqualityConstraint()}.
+         */
+        EQUALITY,
+        /**
+         * Corresponds to setting {@link ModelEntity#lower(Comparable)} and/or checking
+         * {@link Constraint#isLowerConstraint()}.
+         */
+        LOWER,
+        /**
+         * Unconstrained
+         */
+        NONE,
+        /**
+         * Corresponds to setting {@link ModelEntity#upper(Comparable)} and/or checking
+         * {@link Constraint#isUpperConstraint()}.
+         */
+        UPPER;
+
+    }
+
     /**
      * An {@link Optimisation.Model} implementation should not depend on any specific
      * {@link Optimisation.Solver}, and {@link Optimisation.Solver} implementations should be usable

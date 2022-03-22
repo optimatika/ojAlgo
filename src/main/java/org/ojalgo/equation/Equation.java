@@ -38,7 +38,7 @@ import org.ojalgo.type.NumberDefinition;
 public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D.Modifiable<Double> {
 
     public static Equation dense(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
-        return new Equation(pivot, factory.make(cols), ZERO);
+        return new Equation(factory.make(cols), pivot, ZERO);
     }
 
     public static List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
@@ -46,18 +46,22 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(i, factory.make(cols), ZERO));
+            system.add(new Equation(factory.make(cols), i, ZERO));
         }
 
         return system;
     }
 
+    public static Equation of(final double rhs, final int pivot, final double... body) {
+        return new Equation(Primitive64Array.wrap(body), pivot, rhs);
+    }
+
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
-        return new Equation(pivot, SparseArray.factory(factory).limit(cols).make(), ZERO);
+        return new Equation(SparseArray.factory(factory).limit(cols).make(), pivot, ZERO);
     }
 
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory, final int numberOfNonzeros) {
-        return new Equation(pivot, SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), ZERO);
+        return new Equation(SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), pivot, ZERO);
     }
 
     public static List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
@@ -65,7 +69,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(i, SparseArray.factory(factory).limit(cols).make(), ZERO));
+            system.add(new Equation(SparseArray.factory(factory).limit(cols).make(), i, ZERO));
         }
 
         return system;
@@ -76,7 +80,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(i, SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), ZERO));
+            system.add(new Equation(SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), i, ZERO));
         }
 
         return system;
@@ -98,7 +102,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     @Deprecated
     public Equation(final int row, final long numberOfColumns, final double rhs) {
-        this(row, SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).make(), rhs);
+        this(SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).make(), row, rhs);
     }
 
     /**
@@ -106,10 +110,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     @Deprecated
     public Equation(final int row, final long numberOfColumns, final double rhs, final int numberOfNonzeros) {
-        this(row, SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).initial(numberOfNonzeros).make(), rhs);
+        this(SparseArray.factory(Primitive64Array.FACTORY).limit(numberOfColumns).initial(numberOfNonzeros).make(), row, rhs);
     }
 
-    Equation(final int pivot, final BasicArray<Double> elements, final double rhs) {
+    Equation(final BasicArray<Double> elements, final int pivot, final double rhs) {
 
         super();
 
@@ -223,7 +227,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
 
     @Override
     public String toString() {
-        return index + ": " + myElements.toString();
+        return index + ": " + myElements.toString() + " = " + myRHS;
     }
 
     private <T extends Access1D<Double> & Mutate1D.Modifiable<Double>> double calculate(final T x, final double rhs, final double relaxation) {

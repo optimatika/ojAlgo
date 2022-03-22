@@ -26,12 +26,13 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
+import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * A user reported that ojAlgo had problems solving this. (results unstable between execution, and
@@ -39,6 +40,7 @@ import org.ojalgo.optimisation.linear.LinearSolver;
  */
 public class P20140819 extends OptimisationIntegerTests {
 
+    private static final NumberContext ACCURACY = NumberContext.of(10, 14);
     /**
      * 20201217: Solution obtained using CPLEX
      */
@@ -54,7 +56,7 @@ public class P20140819 extends OptimisationIntegerTests {
 
         Result result = model.minimise();
 
-        if (OptimisationIntegerTests.DEBUG) {
+        if (DEBUG) {
             BasicLogger.debug(result);
             BasicLogger.debug(model);
         }
@@ -99,7 +101,7 @@ public class P20140819 extends OptimisationIntegerTests {
             BasicLogger.debug(model);
         }
 
-        TestUtils.assertStateAndSolution(CPLEX_RESULTS, result);
+        TestUtils.assertStateAndSolution(CPLEX_RESULTS, result, ACCURACY);
     }
 
     static ExpressionsBasedModel makeModel() {
@@ -166,6 +168,50 @@ public class P20140819 extends OptimisationIntegerTests {
         lower[2] = 1;
         upper[2] = 414;
         P20140819.doTestRelaxedAtSpecificNode(upperModel, lower, upper);
+    }
+
+    @Test
+    public void testCuts() {
+
+        ExpressionsBasedModel integer = P20140819.makeModel();
+
+        ExpressionsBasedModel simplified = integer.simplify();
+
+        ModelStrategy strategy = IntegerStrategy.DEFAULT.newModelStrategy(simplified);
+
+        ExpressionsBasedModel relaxed = simplified.snapshot();
+
+        TestUtils.assertTrue(relaxed.validate(CPLEX_RESULTS));
+
+        Result resLP0 = relaxed.minimise();
+
+        TestUtils.assertTrue(relaxed.validate(resLP0));
+
+        NodeSolver node = relaxed.prepare(NodeSolver::new);
+
+        Result resLP1 = node.solve();
+        TestUtils.assertTrue(relaxed.validate(resLP1));
+
+        if (DEBUG) {
+            BasicLogger.debug(relaxed);
+        }
+
+        node.generateCuts(strategy);
+
+        if (DEBUG) {
+            BasicLogger.debug(relaxed);
+        }
+
+        Result resLP2 = node.solve();
+
+        if (DEBUG) {
+            BasicLogger.debug(relaxed);
+        }
+
+        TestUtils.assertTrue(relaxed.validate(resLP2));
+        // TestUtils.assertFalse(relaxed.validate(resLP1)); // TODO Fix so that there are cuts that cut off the original solution
+        // TestUtils.assertFalse(relaxed.validate(resLP0));
+        TestUtils.assertTrue(relaxed.validate(CPLEX_RESULTS, BasicLogger.DEBUG));
     }
 
     /**
@@ -329,7 +375,7 @@ public class P20140819 extends OptimisationIntegerTests {
         ExpressionsBasedModel model = P20140819.makeModel();
 
         // model.options.mip_defer = 0.0;
-        // model.options.debug(LinearSolver.class);
+        // model.options.progress(IntegerSolver.class);
 
         P20140819.doTestToMatchExpected(model);
     }
@@ -358,8 +404,7 @@ public class P20140819 extends OptimisationIntegerTests {
             actModel.getVariable(v).integer(false).lower(lowerBoundsAct[v]).upper(upperBoundsAct[v]);
         }
 
-        actModel.setMinimisation();
-        Intermediate intermediate = actModel.prepare();
+        IntermediateSolver intermediate = actModel.prepare(NodeSolver::new);
         Result nodeResult = intermediate.solve();
 
         TestUtils.assertStateNotLessThanOptimal(nodeResult);
@@ -404,8 +449,7 @@ public class P20140819 extends OptimisationIntegerTests {
             parentModel.options.debug(LinearSolver.class);
         }
 
-        parentModel.setMinimisation();
-        Intermediate intermediate = parentModel.prepare();
+        IntermediateSolver intermediate = parentModel.prepare(NodeSolver::new);
         Result parentResult = intermediate.solve();
 
         if (DEBUG) {
@@ -451,8 +495,7 @@ public class P20140819 extends OptimisationIntegerTests {
             parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
         }
 
-        parentModel.setMinimisation();
-        Intermediate intermediate = parentModel.prepare();
+        IntermediateSolver intermediate = parentModel.prepare(NodeSolver::new);
         Result parentResult = intermediate.solve();
 
         TestUtils.assertStateNotLessThanOptimal(parentResult);

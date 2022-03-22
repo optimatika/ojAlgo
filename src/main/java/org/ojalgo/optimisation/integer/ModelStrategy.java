@@ -74,7 +74,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
         /**
          * The latest found integer solution.
          */
-        private Access1D<?> myIterationPoint;
+        private Access1D<?> myIterationPoint = null;
         /**
          * Try to keep track of how different values of integer variables relates to the objective function
          * value.
@@ -105,7 +105,8 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
             int nbIntegers = this.countIntegerVariables();
 
-            MatrixStore<Double> gradient = function.getGradient(Access1D.asPrimitive1D(point));
+            Access1D<Double> iterationPoint = Access1D.asPrimitive1D(point);
+            MatrixStore<Double> gradient = function.getGradient(iterationPoint);
             double largest = gradient.aggregateAll(Aggregator.LARGEST).doubleValue();
 
             if (!ROUGHLY.isZero(largest)) {
@@ -118,7 +119,17 @@ public abstract class ModelStrategy implements IntegerStrategy {
                 }
             }
 
+            myIterationPoint = iterationPoint;
+
             return this;
+        }
+
+        @Override
+        protected boolean isCutRatherThanBranch(final double displacement, final boolean found) {
+            if (cutting && found) {
+                return displacement > 0.49;
+            }
+            return false;
         }
 
         @Override
@@ -126,24 +137,22 @@ public abstract class ModelStrategy implements IntegerStrategy {
             return found ? node.displacement <= THIRD : node.displacement <= HALF;
         }
 
-        /**
-         * If not yet found integer solution then compare the remaining/reversed (larger) fraction, otherwise
-         * the fraction scaled by the significance.
-         *
-         * @see org.ojalgo.optimisation.integer.ModelStrategy#toComparable(int, double, boolean)
-         */
         @Override
-        protected double toComparable(final int idx, final double fraction, final boolean found) {
-            return found ? fraction * mySignificances[idx] : ONE - fraction;
+        protected void markInfeasible(final NodeKey key) {
+            int index = key.index;
+            if (index >= 0) {
+                this.addSignificance(index, TENTH);
+            }
         }
 
         /**
          * Update the integer significances, based on new integer solution found.
          */
         @Override
-        protected void update(final Optimisation.Result result) {
+        protected void markInteger(final NodeKey key, final Optimisation.Result result) {
 
             if (myIterationPoint != null) {
+
                 for (int i = 0, limit = this.countIntegerVariables(); i < limit; i++) {
                     int globalIndex = this.getIndex(i);
                     double diff = result.doubleValue(globalIndex) - myIterationPoint.doubleValue(globalIndex);
@@ -156,6 +165,17 @@ public abstract class ModelStrategy implements IntegerStrategy {
             myIterationPoint = result;
         }
 
+        /**
+         * If not yet found integer solution then compare the remaining/reversed (larger) fraction, otherwise
+         * the fraction scaled by the significance.
+         *
+         * @see org.ojalgo.optimisation.integer.ModelStrategy#toComparable(int, double, boolean)
+         */
+        @Override
+        protected double toComparable(final int idx, final double displacement, final boolean found) {
+            return found ? displacement * mySignificances[idx] : ONE - displacement;
+        }
+
     }
 
     /**
@@ -165,11 +185,17 @@ public abstract class ModelStrategy implements IntegerStrategy {
     private final Optimisation.Sense myOptimisationSense;
     private final IntegerStrategy myStrategy;
 
+    /**
+     * Indicates if cut generation is turned on, or not. On by default. Algorithms can turn off when/if no
+     * longer useful.
+     */
+    protected boolean cutting = true;
+
     protected ModelStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
 
         super();
 
-        myOptimisationSense = model.isMinimisation() ? Sense.MIN : Sense.MAX;
+        myOptimisationSense = !(model.getOptimisationSense() == Optimisation.Sense.MAX) ? Sense.MIN : Sense.MAX;
 
         myStrategy = strategy;
 
@@ -186,6 +212,10 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     public NumberContext getGapTolerance() {
         return myStrategy.getGapTolerance();
+    }
+
+    public GMICutConfiguration getGMICutConfiguration() {
+        return myStrategy.getGMICutConfiguration();
     }
 
     public List<Comparator<NodeKey>> getWorkerPriorities() {
@@ -218,6 +248,8 @@ public abstract class ModelStrategy implements IntegerStrategy {
      * Called, once, at the very beginning of the solve process.
      */
     protected abstract ModelStrategy initialise(final MultiaryFunction.TwiceDifferentiable<Double> function, final Access1D<?> point);
+
+    protected abstract boolean isCutRatherThanBranch(double displacement, boolean found);
 
     /**
      * This method will be called twice when branching – once for each of the new nodes created by branching.
@@ -259,6 +291,16 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     /**
+     * Called everytime a node/subproblem is found to be infeasible
+     */
+    protected abstract void markInfeasible(NodeKey key);
+
+    /**
+     * Called everytime a new integer solution is found
+     */
+    protected abstract void markInteger(NodeKey key, Optimisation.Result result);
+
+    /**
      * Convert the fraction to something "comparable" used to determine which variable to branch on. If a
      * variable is at an integer value or not is determined by the {@link Optimisation.Options#feasibility}
      * property. If an integer variable is not at an integer value, then this method is invoked to obtain a
@@ -266,15 +308,11 @@ public abstract class ModelStrategy implements IntegerStrategy {
      * variable with the max "comparable" is picked for branching.
      *
      * @param idx Integer variable index
-     * @param fraction variable's fractional value
+     * @param displacement variable's fractional value
      * @param found Is an integer solution already found?
      * @return Value used to compare variables when determining which to branch on. Larger value means more
      *         likelyn to branch on this.
      */
-    protected abstract double toComparable(int idx, double fraction, boolean found);
+    protected abstract double toComparable(int idx, double displacement, boolean found);
 
-    /**
-     * Called everytime a new integer solution is found
-     */
-    protected abstract void update(Optimisation.Result result);
 }

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,47 +29,237 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
-public class DesignCase {
+public class DesignCase extends OptimisationIntegerTests {
 
     /**
+     * Test based on exaple from IE 511: Integer Programming, Spring 2021 22 Apr, 2021 Lecture 25: Mixed
+     * Integer Cuts Lecturer: Karthik Chandrasekaran Scribe: Karthik
+     * <p>
+     * lecture-25.pdf
+     * <p>
+     * Actually a bad example:
+     * <ol>
+     * <li>There is a mistake in the "Gomory Mixed Integer Cut" defintion (equation 25.2) – missed a minus
+     * sign.
+     * <li>When suggesting a cut the example does not use the cut definition directly, and it seems states an
+     * incorrect final simplex row. Which results in not being able to reproduce the same cut here as in the
+     * example.
+     * <li>Just test that the GomorySolver can solve this.
+     */
+    @Test
+    public void testBadMixedIntegerCutExample() {
+
+        ExpressionsBasedModel mMIP = new ExpressionsBasedModel();
+        Variable x = mMIP.addVariable("x").integer(false).lower(0).weight(1);
+        Variable y = mMIP.addVariable("y").integer(true).lower(0).weight(-4);
+        mMIP.addExpression("C1").upper(14).set(x, -2).set(y, 7);
+        mMIP.addExpression("C2").upper(3).set(x, 1);
+        mMIP.addExpression("C3").upper(3).set(x, -2).set(y, 2);
+
+        ExpressionsBasedModel mLP = mMIP.snapshot();
+        mLP.relax(false);
+        NodeSolver sLP = mLP.prepare(NodeSolver::new);
+
+        Result expRootLP = Result.of(-59.0 / 7.0, State.OPTIMAL, 3.0, 20.0 / 7.0);
+        TestUtils.assertTrue(mLP.validate(expRootLP, BasicLogger.ERROR));
+        Result actRootLP = sLP.solve();
+        TestUtils.assertStateAndSolution(expRootLP, actRootLP);
+
+        Result expMIP = Result.of(-7.5, State.OPTIMAL, 0.5, 2.0);
+        GomorySolver gomorySolver = new GomorySolver(mMIP);
+        Result actMIP = gomorySolver.solve();
+        TestUtils.assertStateAndSolution(expMIP, actMIP);
+    }
+
+    /**
+     * Test based on a simple example in Branch-and-Cut Algorithms for Combinatorial Optimization Problems1
+     * John E. Mitchell2 Mathematical Sciences Rensselaer Polytechnic Institute Troy, NY, USA email:
+     * mitchj@rpi.edu http://www.math.rpi.edu/ ̃mitchj April 19, 1999, revised September 7, 1999.
+     * <p>
+     * bc_hao.pdf
+     */
+    @Test
+    public void testBranchAndCutSimpleExample() {
+
+        // Eg0
+        ExpressionsBasedModel mEg0 = new ExpressionsBasedModel();
+        Variable x1 = mEg0.addVariable("x1").integer(true).lower(0).weight(-6);
+        Variable x2 = mEg0.addVariable("x2").integer(true).lower(0).weight(-5);
+        mEg0.addExpression().upper(11).set(x1, 3).set(x2, 1);
+        mEg0.addExpression().upper(5).set(x1, -1).set(x2, 2);
+
+        Result expEg0 = Result.of(-28, State.OPTIMAL, 3.0, 2.0);
+
+        // First test if the GomorySolver can solve this
+        GomorySolver sEg0 = new GomorySolver(mEg0);
+        if (DEBUG) {
+            sEg0.options.debug(Optimisation.Solver.class);
+        }
+        Result actEg0 = sEg0.solve();
+        TestUtils.assertStateAndSolution(expEg0, actEg0, NumberContext.of(11));
+
+        // In the example the relaxed Eg0 was solved to:
+        Result expEg0LP = Result.of(-232.0 / 7.0, State.OPTIMAL, 17.0 / 7.0, 26.0 / 7.0);
+        ExpressionsBasedModel mEg0LP = mEg0.copy();
+        mEg0LP.relax();
+        Result actEg0LP = mEg0LP.minimise();
+        TestUtils.assertStateAndSolution(expEg0LP, actEg0LP);
+
+        // Branching on x1 to create Eg1 and Eg2
+
+        // Eg1
+        ExpressionsBasedModel mEg1LP = mEg0LP.copy();
+        mEg1LP.getVariable(0).lower(3);
+        Result actEg1LP = mEg1LP.minimise();
+        TestUtils.assertStateAndSolution(expEg0, actEg1LP); // Finds the integer solution
+
+        // Eg2
+        Result expEg2LP = Result.of(-29.5, State.OPTIMAL, 2.0, 3.5);
+        ExpressionsBasedModel mEg2LP = mEg0LP.copy();
+        mEg2LP.getVariable(0).upper(2);
+        Result actEg2LP = mEg2LP.minimise();
+        TestUtils.assertStateAndSolution(expEg2LP, actEg2LP);
+
+        // Add integer constrains again and verify that the GomorySolver can take it from here
+        ExpressionsBasedModel mEg2 = mEg2LP.copy();
+        mEg2.getVariable(0).integer(true);
+        mEg2.getVariable(1).integer(true);
+        GomorySolver sEg2 = new GomorySolver(mEg2);
+        Result actEg2 = sEg2.solve();
+        TestUtils.assertStateNotLessThanOptimal(actEg2); // Found a solution
+        TestUtils.assertTrue(actEg2.getValue() > expEg0.getValue()); // but not as good as the other branch
+    }
+
+    /**
+     * <p>
+     * Example from a presentation by John E. Mitchell titled Gomory Cutting Planes.
+     * <p>
+     * Primarily tests "Expressing the cut in the original variables"
+     */
+    @Test
+    public void testExpressingTheCutInTheOriginalVariables() {
+
+        ExpressionsBasedModel orgModel = new ExpressionsBasedModel();
+        Variable x1 = orgModel.addVariable("x1").lower(0).weight(-1);
+        Variable x2 = orgModel.addVariable("x2").lower(0).weight(-1);
+        Expression c3 = orgModel.addExpression("C3").upper(20).set(x1, 2).set(x2, 5);
+        Expression c4 = orgModel.addExpression("C4").upper(17).set(x1, 4).set(x2, 3);
+
+        ExpressionsBasedModel slackModel = orgModel.copy();
+        Variable x3 = slackModel.addVariable("x3").lower(0);
+        Variable x4 = slackModel.addVariable("x4").lower(0);
+        slackModel.getExpression("C3").lower(20).set(x3, 1);
+        slackModel.getExpression("C4").lower(17).set(x4, 1);
+
+        Result orgResult = orgModel.minimise();
+        Result slackResult = slackModel.minimise();
+
+        TestUtils.assertEquals(orgResult.doubleValue(0), slackResult.doubleValue(0));
+        TestUtils.assertEquals(orgResult.doubleValue(1), slackResult.doubleValue(1));
+
+        slackModel.addExpression("CUT_A").lower(2.0 / 7.0).set(x3, 2.0 / 7.0).set(x4, 6.0 / 7.0);
+        slackModel.addExpression("CUT_B").lower(11.0 / 14.0).set(x3, 11.0 / 14.0).set(x4, 5.0 / 14.0);
+
+        slackResult = slackModel.minimise();
+
+        TestUtils.assertEquals(2.0, slackResult.doubleValue(0));
+        TestUtils.assertEquals(3.0, slackResult.doubleValue(1));
+
+        Expression cutA = orgModel.addExpression("CUT_A").lower(2.0 / 7.0);
+
+        BigDecimal factor = BigDecimal.valueOf(2.0 / 7.0).negate();
+        BigDecimal limit = c3.getUpperLimit();
+        BigDecimal shift = limit.multiply(factor);
+
+        cutA.shift(shift);
+        c3.addTo(cutA, factor);
+
+        BigDecimal factor2 = BigDecimal.valueOf(6.0 / 7.0).negate();
+        BigDecimal limit2 = c4.getUpperLimit();
+        BigDecimal shift2 = limit2.multiply(factor2);
+
+        cutA.shift(shift2);
+        c4.addTo(cutA, factor2);
+
+        // x1 + x2 ≤ 5
+        TestUtils.assertEquals(-20, cutA.getLowerLimit());
+        TestUtils.assertEquals(-4, cutA.get(x1));
+        TestUtils.assertEquals(-4, cutA.get(x2));
+
+        Expression cutB = orgModel.addExpression("CUT_B").lower(11.0 / 14.0);
+
+        BigDecimal factor5 = BigDecimal.valueOf(11.0 / 14.0).negate();
+        BigDecimal limit5 = c3.getUpperLimit();
+        BigDecimal shift5 = limit5.multiply(factor5);
+
+        cutB.shift(shift5);
+        c3.addTo(cutB, factor5);
+
+        BigDecimal factor7 = BigDecimal.valueOf(5.0 / 14.0).negate();
+        BigDecimal limit7 = c4.getUpperLimit();
+        BigDecimal shift7 = limit7.multiply(factor7);
+
+        cutB.shift(shift7);
+        c4.addTo(cutB, factor7);
+
+        // 3x1 + 5x2 ≤ 21
+        TestUtils.assertEquals(-21, cutB.getLowerLimit());
+        TestUtils.assertEquals(-3, cutB.get(x1));
+        TestUtils.assertEquals(-5, cutB.get(x2));
+
+        orgResult = orgModel.minimise();
+
+        TestUtils.assertEquals(2.0, orgResult.doubleValue(0));
+        TestUtils.assertEquals(3.0, orgResult.doubleValue(1));
+    }
+
+    /**
+     * https://people.ohio.edu/melkonia/math3050/slides/IPextendedintro.ppt
+     * <p>
      * http://www.ohio.edu/people/melkonia/math3050/slides/IPextendedintro.ppt Slide 8
      */
     @Test
     public void testFacilityLocation() {
 
-        final ArrayList<Variable> tmpVariables = new ArrayList<>();
-        tmpVariables.add(Variable.makeBinary("Factory in LA").weight(9));
-        tmpVariables.add(Variable.makeBinary("Factory in SF").weight(5));
-        tmpVariables.add(Variable.makeBinary("Warehouse in LA").weight(6));
-        tmpVariables.add(Variable.makeBinary("Warehouse in SF").weight(4));
+        ArrayList<Variable> variables = new ArrayList<>();
+        variables.add(Variable.makeBinary("Factory in LA").weight(9));
+        variables.add(Variable.makeBinary("Factory in SF").weight(5));
+        variables.add(Variable.makeBinary("Warehouse in LA").weight(6));
+        variables.add(Variable.makeBinary("Warehouse in SF").weight(4));
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
-        tmpModel.addVariables(tmpVariables);
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariables(variables);
 
-        final Expression tmpBudgetCost = tmpModel.addExpression("Budget").upper(10);
-        tmpBudgetCost.set(tmpVariables.get(0), 6);
-        tmpBudgetCost.set(tmpVariables.get(1), 3);
-        tmpBudgetCost.set(tmpVariables.get(2), 5);
-        tmpBudgetCost.set(tmpVariables.get(3), 2);
+        Expression budgetCost = model.addExpression("Budget").upper(10);
+        budgetCost.set(variables.get(0), 6);
+        budgetCost.set(variables.get(1), 3);
+        budgetCost.set(variables.get(2), 5);
+        budgetCost.set(variables.get(3), 2);
 
-        //tmpModel.options.debug(GenericSolver.class);
+        if (DEBUG) {
+            BasicLogger.debug(model);
+            model.options.debug(Optimisation.Solver.class);
+        }
 
-        final Result tmpResult = tmpModel.maximise();
+        Result result = model.maximise();
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertStateNotLessThanOptimal(result);
 
-        TestUtils.assertEquals(15.0, tmpResult.getValue());
+        TestUtils.assertEquals(15.0, result.getValue());
 
-        TestUtils.assertEquals(0.0, tmpResult.doubleValue(0));
-        TestUtils.assertEquals(1.0, tmpResult.doubleValue(1));
-        TestUtils.assertEquals(1.0, tmpResult.doubleValue(2));
-        TestUtils.assertEquals(1.0, tmpResult.doubleValue(3));
+        TestUtils.assertEquals(0.0, result.doubleValue(0));
+        TestUtils.assertEquals(1.0, result.doubleValue(1));
+        TestUtils.assertEquals(1.0, result.doubleValue(2));
+        TestUtils.assertEquals(1.0, result.doubleValue(3));
     }
 
     /**
@@ -78,9 +269,9 @@ public class DesignCase {
     @Test
     public void testSimpleTSP() {
 
-        final int n = 6;
+        int n = 6;
 
-        final double[][] c = new double[n][n];
+        double[][] c = new double[n][n];
         c[0][0] = 1.7976931348623157E308;
         c[0][1] = 141.4213562373095;
         c[0][2] = 223.60679774997897;
@@ -118,17 +309,17 @@ public class DesignCase {
         c[5][4] = 297.81988930943544;
         c[5][5] = 1.7976931348623157E308;
 
-        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
         //DECISION VARIABLES
-        final Variable[][] x = new Variable[n][n];
+        Variable[][] x = new Variable[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
                 model.addVariable(x[i][j]);
             }
         }
-        final Variable[] u = new Variable[n];
+        Variable[] u = new Variable[n];
         for (int i = 1; i < n; i++) {
             u[i] = new Variable("u" + i);
             model.addVariable(u[i]);
@@ -139,7 +330,7 @@ public class DesignCase {
         //flow_out:
         //sum(j in cities : i!=j) x[i][j]==1;
         for (int i = 0; i < n; i++) {
-            final Expression constraint_line = model.addExpression("constraint_line" + i).lower(1).upper(1);
+            Expression constraint_line = model.addExpression("constraint_line" + i).lower(1).upper(1);
             for (int j = 0; j < n; j++) {
                 if (i != j) {
                     constraint_line.set(x[i][j], 1);
@@ -151,7 +342,7 @@ public class DesignCase {
         //flow_in:
         //sum(i in cities : i!=j) x[i][j]==1;
         for (int j = 0; j < n; j++) {
-            final Expression constraint_column = model.addExpression("constraint_column" + j).lower(1).upper(1);
+            Expression constraint_column = model.addExpression("constraint_column" + j).lower(1).upper(1);
             for (int i = 0; i < n; i++) {
                 if (i != j) {
                     constraint_column.set(x[i][j], 1);
@@ -165,7 +356,7 @@ public class DesignCase {
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < n; j++) {
                 if (i != j) {
-                    final Expression constraint_subroute = model.addExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
+                    Expression constraint_subroute = model.addExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
                     constraint_subroute.set(u[i], 1);
                     constraint_subroute.set(u[j], -1);
                     constraint_subroute.set(x[i][j], n);
@@ -173,7 +364,7 @@ public class DesignCase {
             }
         }
 
-        final Optimisation.Result result = model.minimise();
+        Optimisation.Result result = model.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertTrue(model.validate(result));
@@ -186,32 +377,32 @@ public class DesignCase {
     @Test
     public void testSOS() {
 
-        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        final List<Variable> starts1 = new ArrayList<>();
-        final List<Variable> works1 = new ArrayList<>();
+        List<Variable> starts1 = new ArrayList<>();
+        List<Variable> works1 = new ArrayList<>();
 
-        final List<Variable> starts2 = new ArrayList<>();
-        final List<Variable> works2 = new ArrayList<>();
+        List<Variable> starts2 = new ArrayList<>();
+        List<Variable> works2 = new ArrayList<>();
 
-        final Set<Variable> orderedSet1 = new HashSet<>();
+        Set<Variable> orderedSet1 = new HashSet<>();
 
-        final Set<Variable> orderedSet2 = new HashSet<>();
+        Set<Variable> orderedSet2 = new HashSet<>();
 
         for (int h = 0; h < 24; h++) {
 
-            final Variable start1 = model.addVariable("Start activity A at " + h).binary();
+            Variable start1 = model.addVariable("Start activity A at " + h).binary();
             starts1.add(start1);
 
-            final Variable start2 = model.addVariable("Start activity B at " + h).binary();
+            Variable start2 = model.addVariable("Start activity B at " + h).binary();
             starts2.add(start2);
 
-            final Variable work1 = model.addVariable("Activity A ongoing at " + h).binary().weight(Math.random());
+            Variable work1 = model.addVariable("Activity A ongoing at " + h).binary().weight(Math.random());
             works1.add(work1);
 
             orderedSet1.add(work1);
 
-            final Variable work2 = model.addVariable("Activity B ongoing at " + h).binary().weight(Math.random());
+            Variable work2 = model.addVariable("Activity B ongoing at " + h).binary().weight(Math.random());
             works2.add(work2);
 
             orderedSet2.add(work2);
@@ -224,7 +415,7 @@ public class DesignCase {
 
         for (int h = 0; h < 21; h++) {
 
-            final Expression expr1 = model.addExpression("Finish A when started at " + h);
+            Expression expr1 = model.addExpression("Finish A when started at " + h);
             expr1.upper(0);
 
             expr1.set(starts1.get(h), 3);
@@ -233,7 +424,7 @@ public class DesignCase {
             expr1.set(works1.get(h + 1), -1);
             expr1.set(works1.get(h + 2), -1);
 
-            final Expression expr2 = model.addExpression("Finish B when started at " + h);
+            Expression expr2 = model.addExpression("Finish B when started at " + h);
             expr2.upper(0);
 
             expr2.set(starts2.get(h), 3);
@@ -251,13 +442,13 @@ public class DesignCase {
         model.addExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
         model.addExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
 
-        final Result resultMin = model.minimise();
+        Result resultMin = model.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(resultMin);
         TestUtils.assertTrue(resultMin.getValue() >= 0.0);
         TestUtils.assertTrue(resultMin.getValue() <= 6.0);
 
-        final Result resultMax = model.maximise();
+        Result resultMax = model.maximise();
 
         TestUtils.assertStateNotLessThanOptimal(resultMax);
         TestUtils.assertTrue(resultMax.getValue() >= 0.0);

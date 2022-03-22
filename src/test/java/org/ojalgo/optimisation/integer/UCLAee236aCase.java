@@ -53,11 +53,10 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeOriginalRootModel() {
 
-        Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(true),
-                new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true) };
+        Variable[] variables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(),
+                new Variable("X2").lower(ZERO).weight(THREE.negate()).integer() };
 
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-        retVal.setMinimisation();
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
 
         Expression exprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {

@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -35,34 +36,6 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class Presolvers {
-
-    public static final ExpressionsBasedModel.Presolver INTEGER_EXPRESSION_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
-                final NumberContext precision) {
-            if (expression.isLinearAndAllInteger()) {
-                expression.doIntegerRounding();
-            }
-            return false;
-        }
-
-    };
-
-    /**
-     * Makes sure integer variables have integer lower/upper bounds (if they exist).
-     */
-    public static final ExpressionsBasedModel.VariableAnalyser INTEGER_VARIABLE_ROUNDING = new ExpressionsBasedModel.VariableAnalyser(4) {
-
-        @Override
-        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
-            if (variable.isInteger()) {
-                variable.doIntegerRounding();
-            }
-            return false;
-        }
-
-    };
 
     /**
      * If the expression is linear and contributes to the objective function, then the contributions are
@@ -210,13 +183,15 @@ public abstract class Presolvers {
                 if (variable.isObjective()) {
                     int weightSignum = variable.getContributionWeight().signum();
 
-                    if (model.isMaximisation() && weightSignum == -1 || model.isMinimisation() && weightSignum == 1) {
+                    if (model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1
+                            || !(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == 1) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
                         } else {
                             variable.setUnbounded(true);
                         }
-                    } else if (model.isMaximisation() && weightSignum == 1 || model.isMinimisation() && weightSignum == -1) {
+                    } else if (model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == 1
+                            || !(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == -1) {
                         if (variable.isUpperLimitSet()) {
                             variable.setFixed(variable.getUpperLimit());
                         } else {
@@ -259,6 +234,7 @@ public abstract class Presolvers {
     };
 
     private static final NumberContext LEVEL = NumberContext.of(12).withMode(RoundingMode.HALF_DOWN);
+    private static final MathContext SIMILARITY = NumberContext.of(12).getMathContext();
 
     static final MathContext LOWER = NumberContext.ofMath(MathContext.DECIMAL128).withMode(RoundingMode.FLOOR).getMathContext();
     static final MathContext UPPER = NumberContext.ofMath(MathContext.DECIMAL128).withMode(RoundingMode.CEILING).getMathContext();
@@ -266,6 +242,98 @@ public abstract class Presolvers {
     public static void checkFeasibility(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
             final NumberContext precision, final boolean relaxed) {
         ZERO_ONE_TWO.simplify(expression, remaining, lower, upper, precision);
+    }
+
+    /**
+     * Checks if the potential {@link Expression} is similar to any in the current collection.
+     *
+     * @return true, if the potential {@link Expression} is found to be similar and marked as redundant by
+     *         this method.
+     */
+    public static boolean checkSimilarity(final Collection<Expression> current, final Expression potential) {
+
+        if (potential.isConstraint() && !potential.isRedundant()) {
+            Set<IntIndex> potentialLinearKeySet = potential.getLinearKeySet();
+
+            for (Expression expression : current) {
+
+                if (expression.isConstraint() && !expression.isRedundant()) {
+                    Set<IntIndex> currentLinearKeySet = expression.getLinearKeySet();
+
+                    if (!expression.getName().equals(potential.getName()) && currentLinearKeySet.equals(potentialLinearKeySet)) {
+
+                        BigDecimal fctVal = null;
+                        BigDecimal tmpVal = null;
+
+                        for (IntIndex index : currentLinearKeySet) {
+
+                            tmpVal = expression.get(index).divide(potential.get(index), SIMILARITY);
+
+                            if (fctVal == null) {
+                                fctVal = tmpVal;
+                            } else if (tmpVal.compareTo(fctVal) != 0) {
+                                fctVal = null;
+                                break;
+                            }
+                        }
+
+                        if (fctVal != null) {
+
+                            // BasicLogger.debug("Match! {}", fctVal);
+                            // BasicLogger.debug("Ref: {}", refExpression);
+                            // BasicLogger.debug("Sub: {}", subExpression);
+
+                            boolean pos = fctVal.signum() == 1;
+
+                            BigDecimal refLo = expression.getLowerLimit();
+                            BigDecimal refUp = expression.getUpperLimit();
+
+                            BigDecimal subLo = pos ? potential.getLowerLimit() : potential.getUpperLimit();
+                            BigDecimal subUp = pos ? potential.getUpperLimit() : potential.getLowerLimit();
+
+                            if (fctVal.compareTo(ONE) != 0) {
+                                if (subLo != null) {
+                                    subLo = subLo.multiply(fctVal);
+                                }
+                                if (subUp != null) {
+                                    subUp = subUp.multiply(fctVal);
+                                }
+                            }
+
+                            if (subLo != null) {
+                                if (refLo != null) {
+                                    expression.lower(subLo.max(refLo));
+                                } else {
+                                    expression.lower(subLo);
+                                }
+                            }
+
+                            if (subUp != null) {
+                                if (refUp != null) {
+                                    expression.upper(subUp.min(refUp));
+                                } else {
+                                    expression.upper(subUp);
+                                }
+                            }
+
+                            // BasicLogger.debug("Redundant: {} <<= {}", subExpression, refExpression);
+                            potential.setRedundant();
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean reduce(final Collection<Expression> expressions) {
+        boolean retVal = false;
+        for (Expression expression : expressions) {
+            retVal |= Presolvers.checkSimilarity(expressions, expression);
+        }
+        return retVal;
     }
 
     /**

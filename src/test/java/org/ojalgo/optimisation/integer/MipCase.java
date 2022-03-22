@@ -50,6 +50,8 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
 
+        // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
+
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 

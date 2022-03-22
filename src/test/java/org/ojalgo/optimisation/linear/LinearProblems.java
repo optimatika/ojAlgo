@@ -197,7 +197,7 @@ public class LinearProblems extends OptimisationLinearTests {
 
         State tmpResultState = tmpModel.maximise().getState();
 
-        TestUtils.assertFalse("Should be INFEASIBLE", tmpResultState == State.FEASIBLE);
+        TestUtils.assertFalse("Should be INFEASIBLE", tmpResultState.isFeasible());
     }
 
     /**
