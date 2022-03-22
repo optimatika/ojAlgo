@@ -60,19 +60,19 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     }
 
+    public static final Comparator<NodeKey> EARLIEST_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed();
+    public static final Comparator<NodeKey> LARGEST_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
+    public static final Comparator<NodeKey> LATEST_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
+    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective);
+    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed();
+    public static final Comparator<NodeKey> SMALLEST_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement).reversed();
+
     /**
      * Used for one thing only - to validate (log problems with) node solver results. Does not effect the
      * algorithm.
      */
     private static final NumberContext FEASIBILITY = NumberContext.of(8, 6);
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
-
-    static final Comparator<NodeKey> DISPLACEMENT_DECR = Comparator.comparingDouble((final NodeKey o1) -> o1.displacement).reversed();
-    static final Comparator<NodeKey> DISPLACEMENT_INCR = Comparator.comparingDouble((final NodeKey o1) -> o1.displacement);
-    static final Comparator<NodeKey> OBJECTIVE_DECR = Comparator.comparingDouble((final NodeKey o1) -> o1.objective).reversed();
-    static final Comparator<NodeKey> OBJECTIVE_INCR = Comparator.comparingDouble((final NodeKey o1) -> o1.objective);
-    static final Comparator<NodeKey> SEQUENCE_DECR = Comparator.comparingLong((final NodeKey o1) -> o1.sequence).reversed();
-    static final Comparator<NodeKey> SEQUENCE_INCR = Comparator.comparingLong((final NodeKey o1) -> o1.sequence);
 
     /**
      * How much the branched on variable must be displaced because of the new constraint introduced with this

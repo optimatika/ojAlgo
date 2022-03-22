@@ -24,8 +24,6 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,17 +33,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
- * Mathematical Programming System (MPS) Model
+ * Mathematical Programming System (MPS) parser
  *
  * @author apete
- * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
  */
-@Deprecated
-public final class MathProgSysModel {
+final class FileFormatMPS {
 
     /**
      * BoundType used with the BOUNDS section.
@@ -83,12 +77,12 @@ public final class MathProgSysModel {
             super();
 
             myVariable = new Variable(name);
-            myDelegate.addVariable(myVariable);
+            myModel.addVariable(myVariable);
 
             this.bound(BoundType.PL, null);
         }
 
-        public Column bound(final BoundType type, final BigDecimal value) {
+        Column bound(final BoundType type, final BigDecimal value) {
 
             switch (type) {
 
@@ -182,17 +176,6 @@ public final class MathProgSysModel {
             return this;
         }
 
-        public Column integer(final boolean flag) {
-            myVariable.setInteger(flag);
-            return this;
-        }
-
-        public void setRowValue(final String rowName, final BigDecimal value) {
-            Row row = myRows.get(rowName);
-            Expression expression = row.getExpression();
-            expression.set(myVariable, value);
-        }
-
         /**
          * @return the variable
          */
@@ -200,16 +183,71 @@ public final class MathProgSysModel {
             return myVariable;
         }
 
+        Column integer(final boolean flag) {
+            myVariable.setInteger(flag);
+            return this;
+        }
+
         boolean isSemicontinuous() {
             return mySemicontinuous;
         }
 
+        void setRowValue(final String rowName, final BigDecimal value) {
+            Row row = myRows.get(rowName);
+            Expression expression = row.getExpression();
+            expression.set(myVariable, value);
+        }
+
     }
+
     /**
      * @author apete
      */
     enum ColumnMarker {
         INTEND, INTORG;
+    }
+
+    interface FieldPredicate {
+
+        FieldPredicate BOUND_TYPE = (line, start, index, field) -> field != null && field.length() == 2;
+        FieldPredicate COLUMN_NAME = (line, start, index, field) -> {
+            if (field == null || Math.max(field.length(), index - start) < 8) {
+                return false;
+            }
+            return true;
+        };
+        FieldPredicate EMPTY = (line, start, index, field) -> {
+            if (field == null || field.length() == 0) {
+                return true;
+            }
+            return false;
+        };
+        FieldPredicate NOT_USED = (line, start, index, field) -> false;
+        FieldPredicate NUMBER = (line, start, index, field) -> field.length() > 0;
+        FieldPredicate ROW_NAME = (line, start, index, field) -> {
+            if (field.length() <= 0) {
+                return false;
+            }
+            for (int i = index + 1; i < line.length(); i++) {
+                if (!ASCII.isSpace(line.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        FieldPredicate ROW_TYPE = (line, start, index, field) -> field != null && field.length() == 1;
+
+        /**
+         * Test if the field is "correct".
+         *
+         * @param line The full line being parsed
+         * @param start The styart index of the current field as specified in the original MPS format
+         * @param index The current index of that full line
+         * @param field The part of the line that being investigated
+         * @return true if the field is correct/complete
+         */
+        boolean test(String line, int start, int index, String field);
+
     }
 
     enum FileSection {
@@ -221,15 +259,15 @@ public final class MathProgSysModel {
         private final Expression myExpression;
         private final RowType myType;
 
-        Row(final String name, final RowType rowType) {
+        Row(final String name, final RowType rowType, final String objName) {
 
             super();
 
-            myExpression = myDelegate.addExpression(name);
+            myExpression = myModel.addExpression(name);
 
             myType = rowType;
 
-            if (myType == RowType.N) {
+            if (myType == RowType.N && name.equals(objName)) {
                 myExpression.weight(ONE);
             } else {
                 myExpression.weight(null);
@@ -238,7 +276,21 @@ public final class MathProgSysModel {
             }
         }
 
-        public Row range(final BigDecimal value) {
+        /**
+         * @return the expression
+         */
+        Expression getExpression() {
+            return myExpression;
+        }
+
+        /**
+         * @return the type
+         */
+        RowType getType() {
+            return myType;
+        }
+
+        Row range(final BigDecimal value) {
 
             switch (myType) {
 
@@ -273,7 +325,7 @@ public final class MathProgSysModel {
             return this;
         }
 
-        public Row rhs(final BigDecimal value) {
+        Row rhs(final BigDecimal value) {
 
             switch (myType) {
 
@@ -309,22 +361,8 @@ public final class MathProgSysModel {
             return this;
         }
 
-        public void setColumnValue(final String columnName, final BigDecimal value) {
+        void setColumnValue(final String columnName, final BigDecimal value) {
             myExpression.set(myColumns.get(columnName).getVariable(), value);
-        }
-
-        /**
-         * @return the expression
-         */
-        Expression getExpression() {
-            return myExpression;
-        }
-
-        /**
-         * @return the type
-         */
-        RowType getType() {
-            return myType;
         }
 
     }
@@ -360,46 +398,23 @@ public final class MathProgSysModel {
      * Seems to be used in problem headers/comment to mark references to authors and such
      */
     private static final String COMMENT_REF = "&";
-    private static final String EMPTY = "";
-    private static final int[] FIELD_FIRSTS = new int[] { 1, 4, 14, 24, 39, 49 };
-    private static final int[] FIELD_LIMITS = new int[] { 4, 14, 24, 39, 49, 64 };
+    private static final int[] FIELD_START = new int[] { 1, 4, 14, 24, 39, 49, 64 };
     private static final String INTEND = "INTEND";
     private static final String INTORG = "INTORG";
     private static final String MARKER = "MARKER";
     private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
-    /**
-     * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
-     */
-    @Deprecated
-    public static MathProgSysModel make(final File file) {
-        try (FileInputStream input = new FileInputStream(file)) {
-            return MathProgSysModel.parse(input);
-        } catch (IOException cause) {
-            throw new RuntimeException(cause);
-        }
-    }
+    static ExpressionsBasedModel read(final InputStream input) {
 
-    /**
-     * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
-     */
-    @Deprecated
-    public static MathProgSysModel parse(final InputStream input) {
-
-        MathProgSysModel retVal = new MathProgSysModel();
+        FileFormatMPS retVal = new FileFormatMPS();
 
         String line;
         FileSection section = null;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
 
-            // Returns the content of a line MINUS the newline.
-            // Returns null only for the END of the stream.
-            // Returns an empty String if two newlines appear in a row.
             while ((line = reader.readLine()) != null) {
-
-                // BasicLogger.debug("Line: {}", line);
 
                 if (line.length() == 0 || line.startsWith(COMMENT) || line.startsWith(COMMENT_REF)) {
                     // Skip this line
@@ -410,141 +425,113 @@ public final class MathProgSysModel {
                 }
             }
 
-        } catch (IOException xcptn) {
-            xcptn.printStackTrace();
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
         }
 
-        return retVal;
+        return retVal.getModel();
     }
 
+    private final Map<String, Row> myRows = new HashMap<>();
     private final Map<String, Column> myColumns = new HashMap<>();
-    private final ExpressionsBasedModel myDelegate;
+    private final FieldPredicate myExistingColumn = (line, start, index, field) -> myColumns.containsKey(field);
+    private final FieldPredicate myExistingRow = (line, start, index, field) -> myRows.containsKey(field);
     private final String[] myFields = new String[6];
     private String myIdBOUNDS = null;
     private String myIdRANGES = null;
     private String myIdRHS = null;
+    private String myIdRowN = null;
     private boolean myIntegerMarker = false;
+    private final FieldPredicate myMatchingBOUNDS = (line, start, index, field) -> {
+
+        if (myIdBOUNDS != null) {
+            if (myIdBOUNDS.equals(field)) {
+                return true;
+            }
+            return false;
+        }
+
+        return this.nameColumns(line, field);
+    };
+    private final FieldPredicate myMatchingRANGES = (line, start, index, field) -> {
+
+        if (myIdRANGES != null) {
+            if (myIdRANGES.equals(field)) {
+                return true;
+            }
+            return false;
+        }
+
+        return this.nameRows(line, field);
+    };
+    private final FieldPredicate myMatchingRHS = (line, start, index, field) -> {
+
+        if (myIdRHS != null) {
+            if (myIdRHS.equals(field)) {
+                return true;
+            }
+            return false;
+        }
+
+        return this.nameRows(line, field);
+    };
+    private final ExpressionsBasedModel myModel;
     private String myName;
     private Expression myQuadObjExpr = null;
-    private final Map<String, Row> myRows = new HashMap<>();
+    private final FieldPredicate[] myVerifierBOUNDS;
+    private final FieldPredicate[] myVerifierCOLUMNS;
+    private final FieldPredicate[] myVerifierQ;
+    private final FieldPredicate[] myVerifierRANGES;
+    private final FieldPredicate[] myVerifierRHS;
+    private final FieldPredicate[] myVerifierROWS;
 
-    MathProgSysModel() {
+    FileFormatMPS() {
 
         super();
 
-        myDelegate = new ExpressionsBasedModel();
-    }
+        myModel = new ExpressionsBasedModel();
 
-    public void dispose() {
-        myDelegate.dispose();
-        myRows.clear();
-        myColumns.clear();
-    }
+        myVerifierROWS = new FieldPredicate[] { FieldPredicate.ROW_TYPE, FieldPredicate.ROW_NAME, FieldPredicate.NOT_USED, FieldPredicate.NOT_USED,
+                FieldPredicate.NOT_USED, FieldPredicate.NOT_USED };
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || !(obj instanceof MathProgSysModel)) {
-            return false;
-        }
-        MathProgSysModel other = (MathProgSysModel) obj;
-        if (myDelegate == null) {
-            if (other.myDelegate != null) {
-                return false;
-            }
-        } else if (!myDelegate.equals(other.myDelegate)) {
-            return false;
-        }
-        return true;
-    }
+        myVerifierCOLUMNS = new FieldPredicate[] { FieldPredicate.EMPTY, FieldPredicate.COLUMN_NAME, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
+                FieldPredicate.NUMBER };
 
-    /**
-     * @return The delegate {@linkplain ExpressionsBasedModel}
-     */
-    public ExpressionsBasedModel getExpressionsBasedModel() {
-        return myDelegate;
-    }
+        myVerifierRHS = new FieldPredicate[] { FieldPredicate.EMPTY, myMatchingRHS, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
+                FieldPredicate.NUMBER };
 
-    public String getName() {
-        return myName;
-    }
+        myVerifierRANGES = new FieldPredicate[] { FieldPredicate.EMPTY, myMatchingRANGES, myExistingRow, FieldPredicate.NUMBER, myExistingRow,
+                FieldPredicate.NUMBER };
 
-    @Override
-    public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
-        return result;
-    }
+        myVerifierBOUNDS = new FieldPredicate[] { FieldPredicate.BOUND_TYPE, myMatchingBOUNDS, myExistingColumn, FieldPredicate.NUMBER, myExistingColumn,
+                FieldPredicate.NUMBER };
 
-    /**
-     * Will disregard the OBJSENSE and maximise.
-     *
-     * @see org.ojalgo.optimisation.Optimisation.Model#maximise()
-     */
-    public Optimisation.Result maximise() {
-        return myDelegate.maximise();
-    }
-
-    /**
-     * Will disregard the OBJSENSE and minimise.
-     *
-     * @see org.ojalgo.optimisation.Optimisation.Model#minimise()
-     */
-    public Optimisation.Result minimise() {
-        return myDelegate.minimise();
-    }
-
-    /**
-     * <p>
-     * If the OBJSENSE was specified in the file it is used otherwise the default is to minimise.
-     * </p>
-     * <p>
-     * The solution (variable values) are in the order the columns were defined in the MPS-file.
-     * </p>
-     */
-    public Optimisation.Result solve() {
-        if (myDelegate.isMinimisation()) {
-            return myDelegate.minimise();
-        }
-        return myDelegate.maximise();
+        myVerifierQ = new FieldPredicate[] { FieldPredicate.EMPTY, myExistingColumn, myExistingColumn, FieldPredicate.NUMBER, FieldPredicate.NOT_USED,
+                FieldPredicate.NOT_USED };
     }
 
     @Override
     public String toString() {
-        return myDelegate.toString();
+        return myModel.toString();
     }
 
-    public boolean validate() {
-        return myDelegate.validate();
-    }
-
-    /**
-     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.structure.Access1D,
-     *      org.ojalgo.type.context.NumberContext)
-     */
-    public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-        return myDelegate.validate(solution, context);
-    }
-
-    private String[] extractFields(final String line, final Map<String, ?> verifier) {
-
-        myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
-        myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
-
-        int first = -1;
-        int limit = -1;
-
-        int field = 2;
+    private void extractFields(final String line, final FieldPredicate[] verifiers) {
 
         char tecken;
-
+        int first = -1;
+        int limit = -1;
         boolean word = false;
 
-        for (int i = FIELD_FIRSTS[field]; i < line.length(); i++) {
+        for (int i = 1, length = line.length(), f = 0; i < length; i++) {
+
             tecken = line.charAt(i);
+
+            if (i == 4) {
+                f = Math.max(f, 1);
+            } else if (!word && i == 14) {
+                f = Math.max(f, 2);
+            }
+
             if (!word && !ASCII.isSpace(tecken)) {
                 word = true;
                 first = i;
@@ -552,26 +539,29 @@ public final class MathProgSysModel {
                 word = false;
                 limit = i;
             }
-            if (word && i + 1 == line.length()) {
+            if (word && i + 1 == length) {
                 word = false;
                 limit = i + 1;
             }
+
             if (limit > first) {
-                String key = line.substring(first, limit);
-                if (field % 2 == 0 && !verifier.containsKey(key)) {
+                String field = line.substring(first, limit);
+                if (!verifiers[f].test(line, FIELD_START[f], i, field)) {
                     word = true;
                 } else {
-                    myFields[field++] = key;
+                    myFields[f++] = field;
                     first = -1;
                 }
                 limit = -1;
             }
         }
-
-        return myFields;
     }
 
-    FileSection identifySection(final String line) {
+    private ExpressionsBasedModel getModel() {
+        return myModel;
+    }
+
+    private FileSection identifySection(final String line) {
 
         int tmpSplit = line.indexOf(SPACE);
         String tmpSection;
@@ -581,10 +571,8 @@ public final class MathProgSysModel {
             tmpArgument = line.substring(tmpSplit).trim();
         } else {
             tmpSection = line.trim();
-            tmpArgument = EMPTY;
+            tmpArgument = "";
         }
-
-        // BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
 
         FileSection retVal = FileSection.valueOf(tmpSection);
 
@@ -604,7 +592,7 @@ public final class MathProgSysModel {
         return retVal;
     }
 
-    void parseSectionLine(final FileSection section, final String line) {
+    private void parseSectionLine(final FileSection section, final String line) {
 
         Arrays.fill(myFields, null);
 
@@ -617,9 +605,9 @@ public final class MathProgSysModel {
         case OBJSENSE:
 
             if (line.contains(MAX)) {
-                myDelegate.setMaximisation();
+                myModel.setMaximisation();
             } else {
-                myDelegate.setMinimisation();
+                myModel.setMinimisation();
             }
 
             break;
@@ -630,11 +618,15 @@ public final class MathProgSysModel {
 
         case ROWS:
 
-            myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
-            myFields[1] = line.substring(FIELD_FIRSTS[1]).trim();
+            this.extractFields(line, myVerifierROWS);
 
-            Row newRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
-            myRows.put(myFields[1], newRow);
+            RowType rowType = RowType.valueOf(myFields[0]);
+            String rowName = myFields[1].trim();
+            if (myIdRowN == null && rowType == RowType.N) {
+                myIdRowN = rowName;
+            }
+
+            myRows.put(myFields[1], new Row(rowName, rowType, myIdRowN));
 
             break;
 
@@ -650,9 +642,9 @@ public final class MathProgSysModel {
 
             } else {
 
-                this.extractFields(line, myRows);
+                this.extractFields(line, myVerifierCOLUMNS);
 
-                Column tmpColumn = myColumns.computeIfAbsent(myFields[1], Column::new);
+                Column tmpColumn = myColumns.computeIfAbsent(myFields[1].trim(), Column::new);
 
                 tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
                 if (myFields[4] != null) {
@@ -668,7 +660,7 @@ public final class MathProgSysModel {
 
         case RHS:
 
-            this.extractFields(line, myRows);
+            this.extractFields(line, myVerifierRHS);
 
             if (myIdRHS == null) {
                 myIdRHS = myFields[1];
@@ -686,7 +678,7 @@ public final class MathProgSysModel {
 
         case RANGES:
 
-            this.extractFields(line, myRows);
+            this.extractFields(line, myVerifierRANGES);
 
             if (myIdRANGES == null) {
                 myIdRANGES = myFields[1];
@@ -704,7 +696,7 @@ public final class MathProgSysModel {
 
         case BOUNDS:
 
-            this.extractFields(line, myColumns);
+            this.extractFields(line, myVerifierBOUNDS);
 
             if (myIdBOUNDS == null) {
                 myIdBOUNDS = myFields[1];
@@ -712,38 +704,44 @@ public final class MathProgSysModel {
                 break;
             }
 
-            myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
+            BoundType boundType = BoundType.valueOf(myFields[0]);
+
+            myColumns.get(myFields[2]).bound(boundType, myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
             break;
 
         case QUADOBJ:
 
-            this.extractFields(line, myColumns);
+            this.extractFields(line, myVerifierQ);
 
             if (myQuadObjExpr == null) {
-                myQuadObjExpr = myDelegate.addExpression(section.name()).weight(HALF);
+                myQuadObjExpr = myModel.addExpression(section.name()).weight(HALF);
             }
 
             Variable var1 = myColumns.get(myFields[1]).getVariable();
             Variable var2 = myColumns.get(myFields[2]).getVariable();
-            BigDecimal param = new BigDecimal(myFields[3]);
+            BigDecimal param3 = new BigDecimal(myFields[3]);
 
-            myQuadObjExpr.set(var1, var2, param);
+            myQuadObjExpr.set(var1, var2, param3);
             if (!var1.equals(var2)) {
-                myQuadObjExpr.set(var2, var1, param);
+                myQuadObjExpr.set(var2, var1, param3);
             }
 
             break;
 
         case QMATRIX:
 
-            this.extractFields(line, myColumns);
+            this.extractFields(line, myVerifierQ);
 
             if (myQuadObjExpr == null) {
-                myQuadObjExpr = myDelegate.addExpression(section.name()).weight(HALF);
+                myQuadObjExpr = myModel.addExpression(section.name()).weight(HALF);
             }
 
-            myQuadObjExpr.set(myColumns.get(myFields[1]).getVariable(), myColumns.get(myFields[2]).getVariable(), new BigDecimal(myFields[3]));
+            Variable varA = myColumns.get(myFields[1]).getVariable();
+            Variable varB = myColumns.get(myFields[2]).getVariable();
+            BigDecimal paramC = new BigDecimal(myFields[3]);
+
+            myQuadObjExpr.set(varA, varB, paramC);
 
             break;
 
@@ -755,8 +753,54 @@ public final class MathProgSysModel {
 
             break;
         }
+    }
 
-        // BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
+    boolean nameColumns(final String line, final String field) {
+
+        String[] parts = line.split("\\s+");
+
+        if (parts.length == 7 && field.equals(parts[parts.length - 5]) && myColumns.containsKey(parts[parts.length - 4])
+                && myColumns.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 5 && field.equals(parts[parts.length - 3]) && myColumns.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 6 && myColumns.containsKey(parts[parts.length - 4]) && myColumns.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 4 && myColumns.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        return line.substring(FIELD_START[1], FIELD_START[2]).trim().equals(field);
+    }
+
+    boolean nameRows(final String line, final String field) {
+
+        String[] parts = line.split("\\s+");
+
+        if (parts.length == 6 && field.equals(parts[parts.length - 5]) && myRows.containsKey(parts[parts.length - 4])
+                && myRows.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 4 && field.equals(parts[parts.length - 3]) && myRows.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 5 && myRows.containsKey(parts[parts.length - 4]) && myRows.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        if (parts.length == 3 && myRows.containsKey(parts[parts.length - 2])) {
+            return true;
+        }
+
+        return line.substring(FIELD_START[1], FIELD_START[2]).trim().equals(field);
     }
 
 }

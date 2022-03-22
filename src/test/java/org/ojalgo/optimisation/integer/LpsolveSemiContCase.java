@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -53,18 +52,17 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     @Disabled("Underscored before JUnit 5")
     public void testSemiContNot() {
 
-        final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+        File file = new File(PATH + "lpsolve_sc_not.mps");
+        ExpressionsBasedModel model = ExpressionsBasedModel.parse(file);
 
-        tmpModel.minimise();
+        model.minimise();
 
-        TestUtils.assertTrue(tmpModel.validate());
+        TestUtils.assertTrue(model.validate());
 
-        final BigDecimal tmpExpVal = new BigDecimal("3.93333");
-        final double tmpActVal = tmpModel.minimise().getValue();
+        BigDecimal tmpExpVal = new BigDecimal("3.93333");
+        double tmpActVal = model.minimise().getValue();
 
-        if (!tmpModel.validate(PRECISION)) {
+        if (!model.validate(PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 
@@ -75,18 +73,17 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     @Disabled("Underscored before JUnit 5")
     public void testSemiContOrg() {
 
-        final File tmpFile = new File(PATH + "lpsolve_sc_org.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+        File file = new File(PATH + "lpsolve_sc_org.mps");
+        ExpressionsBasedModel model = ExpressionsBasedModel.parse(file);
 
-        tmpModel.minimise();
+        model.minimise();
 
-        TestUtils.assertTrue(tmpModel.validate());
+        TestUtils.assertTrue(model.validate());
 
-        final BigDecimal tmpExpVal = new BigDecimal("6.83333");
-        final double tmpActVal = tmpModel.maximise().getValue();
+        BigDecimal tmpExpVal = new BigDecimal("6.83333");
+        double tmpActVal = model.maximise().getValue();
 
-        if (!tmpModel.validate(PRECISION)) {
+        if (!model.validate(PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 

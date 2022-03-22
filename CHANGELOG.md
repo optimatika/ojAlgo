@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- The MPS file parser of `ExpressionsBasedModel` has been refactored and can now handle more format variants. In particular some instances from MIPLIB2017 had problems.
+
 ## [51.1.0] – 2022-03-17
 
 ### Added

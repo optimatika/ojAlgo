@@ -39,6 +39,18 @@ import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest extends OptimisationTests {
 
+    @Test
+    public void testAddingVariableToExpression() {
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x1 = model.addVariable("x1").lower(0).upper(20).weight(1);
+        Expression expr = model.addExpression("10 * x1 = 100").lower(100).upper(100);
+        expr.add(x1, 4); // add term (4 * x1) to expression
+        expr.add(x1, 6); // add term (6 * x1) to expression which now becomes (10 * x1)
+        Optimisation.Result result = model.minimise();
+        BigDecimal x1Result = result.get(model.indexOf(x1));
+        TestUtils.assertEquals(BigDecimal.valueOf(10), x1Result);
+    }
+
     /**
      * https://github.com/optimatika/ojAlgo-extensions/issues/3 <br>
      * "compensating" didn't work because of an incorrectly used stream - did peek(...) instead of map(...).

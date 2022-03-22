@@ -126,8 +126,8 @@ public interface IntegerStrategy {
 
     static ConfigurableStrategy newConfigurable() {
 
-        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.SEQUENCE_DECR, NodeKey.DISPLACEMENT_INCR,
-                NodeKey.DISPLACEMENT_DECR, NodeKey.SEQUENCE_INCR };
+        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
+                NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
 
         return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(6, 8), DefaultStrategy::new);
     }
