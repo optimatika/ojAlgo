@@ -847,7 +847,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * @return A list of the variables that are not fixed at a specific value and whos range include positive
+     *Returns a list of the variables that are not fixed at a specific value and whos range include positive
      *         values and/or zero
      */
     public List<Variable> getPositiveVariables() {
