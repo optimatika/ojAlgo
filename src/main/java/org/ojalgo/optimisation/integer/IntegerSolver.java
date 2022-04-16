@@ -284,7 +284,7 @@ public final class IntegerSolver extends GenericSolver {
         return options.validate || this.isLogProgress() ? new CharacterRing().asPrinter() : null;
     }
 
-    protected boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final PrinterBuffer nodePrinter, final ModelStrategy strategy) {
+    boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final PrinterBuffer nodePrinter, final ModelStrategy strategy) {
 
         if (this.isLogDebug()) {
             nodePrinter.println();
