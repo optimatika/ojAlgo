@@ -191,7 +191,7 @@ public abstract class Presolvers {
                             variable.setUnbounded(true);
                         }
                     } else if (model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == 1
-                            || !(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == -1) {
+                            || (!(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == -1)) {
                         if (variable.isUpperLimitSet()) {
                             variable.setFixed(variable.getUpperLimit());
                         } else {
