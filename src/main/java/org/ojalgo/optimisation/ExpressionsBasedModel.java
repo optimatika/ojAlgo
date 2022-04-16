@@ -738,7 +738,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * @see Presolvers#checkSimilarity(Collection, Expression)
+     *See {@link Presolvers#checkSimilarity(Collection, Expression)}.
      */
     public boolean checkSimilarity(final Expression potential) {
         return Presolvers.checkSimilarity(myExpressions.values(), potential);
