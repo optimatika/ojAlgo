@@ -78,7 +78,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     /**
-     * @see #getLowerLimit()
+     *See {@link #isBinary()}.
      * @see #getUpperLimit()
      * @see #isInteger()
      * @see #isBinary()
