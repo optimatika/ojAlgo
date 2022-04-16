@@ -156,7 +156,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     /**
-     * @see #isInteger()
+     *See {@link #isInteger()}.
      */
     public Variable integer(final boolean integer) {
         this.setInteger(integer);
