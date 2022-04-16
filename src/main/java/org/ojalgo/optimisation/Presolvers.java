@@ -183,7 +183,7 @@ public abstract class Presolvers {
                 if (variable.isObjective()) {
                     int weightSignum = variable.getContributionWeight().signum();
 
-                    if (model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1
+                    if ((model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1)
                             || (!(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == 1)) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
