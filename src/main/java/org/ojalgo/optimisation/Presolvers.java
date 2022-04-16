@@ -184,7 +184,7 @@ public abstract class Presolvers {
                     int weightSignum = variable.getContributionWeight().signum();
 
                     if (model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1
-                            || !(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == 1) {
+                            || (!(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == 1)) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
                         } else {
