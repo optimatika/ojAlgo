@@ -745,7 +745,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * @return A prefiltered stream of expressions that are constraints and have not been markes as redundant
+     *Returns a prefiltered stream of expressions that are constraints and have not been markes as redundant.
      */
     public Stream<Expression> constraints() {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
