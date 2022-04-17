@@ -193,9 +193,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected ModelStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
 
-        super();
-
-        myOptimisationSense = !(model.getOptimisationSense() == Optimisation.Sense.MAX) ? Sense.MIN : Sense.MAX;
+        myOptimisationSense = (model.getOptimisationSense() != Optimisation.Sense.MAX) ? Sense.MIN : Sense.MAX;
 
         myStrategy = strategy;
 
