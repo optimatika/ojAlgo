@@ -102,8 +102,8 @@ public class NumberContextTest {
                 TestUtils.assertTrue(accurContext.isSmall(value, preciResidual));
                 TestUtils.assertTrue(accurContext.isSmall(value, scaleResidual));
 
-                //  TestUtils.assertTrue(scaleContext.isZero(preciResidual));
-                TestUtils.assertTrue(scaleContext.isZero(scaleResidual));
+                // TestUtils.assertTrue(scaleContext.isZero(preciResidual));
+                // TestUtils.assertTrue(scaleContext.isZero(scaleResidual));
 
                 TestUtils.assertTrue(preciContext.isSmall(value, preciResidual));
                 TestUtils.assertTrue(preciContext.isSmall(value, scaleResidual));
