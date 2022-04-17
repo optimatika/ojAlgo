@@ -510,7 +510,7 @@ public final class IntegerSolver extends GenericSolver {
 
             double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
 
-            if (!(myIntegerModel.getOptimisationSense() == Optimisation.Sense.MAX)) {
+            if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
                 BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
                 myIntegerModel.limitObjective(null, upper);
             } else {
