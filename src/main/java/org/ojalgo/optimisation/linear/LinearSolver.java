@@ -340,7 +340,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 return retVal;
             }
 
-            if ((value != null && value.signum() <= 0 || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
+            if (((value != null && value.signum() <= 0) || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
                 retVal += model.getPositiveVariables().size();
                 return retVal;
             }
