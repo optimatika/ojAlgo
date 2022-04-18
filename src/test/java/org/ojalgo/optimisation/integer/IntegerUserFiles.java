@@ -76,10 +76,8 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Test
-    @Tag("slow")
     public void testEnergyApp() {
 
-        // ConfigurableStrategy strategy = IntegerStrategy.DEFAULT;
         ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(4));
 
         IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, strategy);

@@ -138,10 +138,10 @@ public abstract class ModelStrategy implements IntegerStrategy {
         }
 
         @Override
-        protected void markInfeasible(final NodeKey key) {
+        protected void markInfeasible(final NodeKey key, final boolean found) {
             int index = key.index;
             if (index >= 0) {
-                this.addSignificance(index, TENTH);
+                this.addSignificance(index, found ? 0.2 : 0.1);
             }
         }
 
@@ -291,7 +291,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
     /**
      * Called everytime a node/subproblem is found to be infeasible
      */
-    protected abstract void markInfeasible(NodeKey key);
+    protected abstract void markInfeasible(NodeKey key, boolean found);
 
     /**
      * Called everytime a new integer solution is found

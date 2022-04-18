@@ -319,7 +319,7 @@ public final class IntegerSolver extends GenericSolver {
                 return myNodeStatistics.failed();
             }
             // return true;
-            strategy.markInfeasible(nodeKey);
+            strategy.markInfeasible(nodeKey, myBestResultSoFar != null);
             return myNodeStatistics.infeasible();
         }
 

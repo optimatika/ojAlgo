@@ -308,8 +308,8 @@ public interface Optimisation {
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
-            logger_detailed = solver != null == true;
-            validate = solver != null == true;
+            logger_detailed = (solver != null);
+            validate = (solver != null);
         }
 
         public <T> Optional<T> getConfigurator(final Class<T> type) {
@@ -361,6 +361,10 @@ public interface Optimisation {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
             return new Result(state, value, Access1D.wrap(solution));
+        }
+
+        public static Result of(final Optimisation.State state, final double... solution) {
+            return new Result(state, Double.NaN, Access1D.wrap(solution));
         }
 
         private transient Access1D<?> myMultipliers = null;
@@ -456,8 +460,7 @@ public interface Optimisation {
             result = prime * result + (myState == null ? 0 : myState.hashCode());
             long temp;
             temp = Double.doubleToLongBits(myValue);
-            result = prime * result + (int) (temp ^ temp >>> 32);
-            return result;
+            return prime * result + (int) (temp ^ temp >>> 32);
         }
 
         public Result multipliers(final Access1D<?> multipliers) {
