@@ -116,6 +116,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: 11s finsihed with optimal solution
+     * <li>2022-04-18: 22s finsihed with optimal solution
      * </ul>
      */
     @Test

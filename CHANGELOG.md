@@ -28,6 +28,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `IntegerSolver` is no longer a pure branch-and-bound algorithm. It now also generates cuts.
 - A whole lot of refactoring to enable cut generation for the `IntegerSolver`. This touches almost everything in the optimisation package, but the public API:s for normal/recommended usage should be unchanged.
 
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- Deprecated the separation between preferred and fallback solver integrations in `ExpressionsBasedModel`. Instead, if you want add a solver integration, you simply call `addIntegration(Integration<?>)`.
+
 ### Fixed
 
 #### org.ojalgo.optimisation

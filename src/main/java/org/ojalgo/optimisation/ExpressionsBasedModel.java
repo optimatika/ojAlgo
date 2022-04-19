@@ -284,8 +284,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         public final int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (myUUID == null ? 0 : myUUID.hashCode());
-            return result;
+            return prime * result + (myUUID == null ? 0 : myUUID.hashCode());
         }
 
         final int getExecutionOrder() {
@@ -449,11 +448,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    private static final List<ExpressionsBasedModel.Integration<?>> FALLBACK_INTEGRATIONS = new ArrayList<>();
+    private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
-    private static final List<ExpressionsBasedModel.Integration<?>> PREFERRED_INTEGRATIONS = new ArrayList<>();
     private static final String START_END = "############################################\n";
     static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
 
@@ -465,16 +463,29 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     /**
      * Add a solver that will be used for problem types the built-in solvers cannot handle as defined by
      * {@link Integration#isCapable(org.ojalgo.optimisation.Optimisation.Model)}.
+     *
+     * @deprecated v51.2.0 Use {@link #addSolver(Integration<?>)} instead
      */
+    @Deprecated
     public static boolean addFallbackSolver(final Integration<?> integration) {
-        return FALLBACK_INTEGRATIONS.add(integration);
+        return ExpressionsBasedModel.addIntegration(integration);
+    }
+
+    /**
+     * Add an integration for a solver that will be used rather than the built-in solvers
+     */
+    public static boolean addIntegration(final Integration<?> integration) {
+        return INTEGRATIONS.add(integration);
     }
 
     /**
      * Add a solver that will be used rather than the built-in solvers
+     *
+     * @deprecated v51.2.0 Use {@link #addSolver(Integration<?>)} instead
      */
+    @Deprecated
     public static boolean addPreferredSolver(final Integration<?> integration) {
-        return PREFERRED_INTEGRATIONS.add(integration);
+        return ExpressionsBasedModel.addIntegration(integration);
     }
 
     public static boolean addPresolver(final Presolver presolver) {
@@ -482,8 +493,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public static void clearIntegrations() {
-        PREFERRED_INTEGRATIONS.clear();
-        FALLBACK_INTEGRATIONS.clear();
+        INTEGRATIONS.clear();
     }
 
     public static void clearPresolvers() {
@@ -518,7 +528,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public static boolean removeIntegration(final Integration<?> integration) {
-        return PREFERRED_INTEGRATIONS.remove(integration) | FALLBACK_INTEGRATIONS.remove(integration);
+        return INTEGRATIONS.remove(integration);
     }
 
     public static boolean removePresolver(final Presolver presolver) {
@@ -738,14 +748,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     *See {@link Presolvers#checkSimilarity(Collection, Expression)}.
+     * See {@link Presolvers#checkSimilarity(Collection, Expression)}.
      */
     public boolean checkSimilarity(final Expression potential) {
         return Presolvers.checkSimilarity(myExpressions.values(), potential);
     }
 
     /**
-     *Returns a prefiltered stream of expressions that are constraints and have not been markes as redundant.
+     * Returns a prefiltered stream of expressions that are constraints and have not been markes as redundant.
      */
     public Stream<Expression> constraints() {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
@@ -847,8 +857,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     *Returns a list of the variables that are not fixed at a specific value and whos range include positive
-     *         values and/or zero
+     * Returns a list of the variables that are not fixed at a specific value and whos range include positive
+     * values and/or zero
      */
     public List<Variable> getPositiveVariables() {
         return Collections.unmodifiableList(myVariablesCategorisation.getPositiveVariables(myVariables));
@@ -907,7 +917,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         if (allVarsSomeInfo) {
-            if (this.validate(retSolution, validationContext)) {
+            if (this.validate(retSolution, validationContext, BasicLogger.NULL)) {
                 retState = State.FEASIBLE;
                 retValue = this.objective().evaluate(retSolution).doubleValue();
             } else {
@@ -1292,7 +1302,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
-        final NumberContext context = options.feasibility;
+        NumberContext context = options.feasibility;
         return this.validate(solution, context, appender);
     }
 
@@ -1424,7 +1434,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         ExpressionsBasedModel.Integration<?> retVal = null;
 
-        for (final ExpressionsBasedModel.Integration<?> preferred : PREFERRED_INTEGRATIONS) {
+        for (final ExpressionsBasedModel.Integration<?> preferred : INTEGRATIONS) {
             if (preferred.isCapable(this)) {
                 retVal = preferred;
                 break;
@@ -1440,15 +1450,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 retVal = ConvexSolver.INTEGRATION;
             } else if (LinearSolver.INTEGRATION.isCapable(this)) {
                 retVal = LinearSolver.INTEGRATION;
-            }
-        }
-
-        if (retVal == null) {
-            for (final ExpressionsBasedModel.Integration<?> fallback : FALLBACK_INTEGRATIONS) {
-                if (fallback.isCapable(this)) {
-                    retVal = fallback;
-                    break;
-                }
             }
         }
 

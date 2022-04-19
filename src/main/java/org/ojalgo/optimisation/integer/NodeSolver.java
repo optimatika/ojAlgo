@@ -226,6 +226,10 @@ public final class NodeSolver extends IntermediateSolver {
                     if (DEBUG) {
                         BasicLogger.debug("\t{} < {}", cut.getLowerLimit(), cut.getLinearEntrySet());
                     }
+
+                    if (target.options.logger_detailed && target.options.logger_appender != null) {
+                        target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                    }
                 }
             }
         }

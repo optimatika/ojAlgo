@@ -29,12 +29,13 @@ import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.structure.Access1D;
 
 /**
- * An alternative MIP solver using Gomory mixed integer cuts – purely iterative with no branching. This solver
- * is only used for some cut generation tests. The solver to use for you MIP models is {@link IntegerSolver}.
+ * An alternative MIP solver using Gomory Mixed Integer (GMI) cuts – purely iterative with no branching. This
+ * solver is only used for some cut generation tests. The solver to use for your MIP models is
+ * {@link IntegerSolver}.
  *
  * @author apete
  */
-final class GomorySolver extends GenericSolver {
+public final class GomorySolver extends GenericSolver {
 
     static final class ModelIntegration extends ExpressionsBasedModel.Integration<GomorySolver> {
 
@@ -43,7 +44,7 @@ final class GomorySolver extends GenericSolver {
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return !model.isAnyConstraintQuadratic();
+            return model.isAnyVariableInteger() && !model.isAnyConstraintQuadratic();
         }
 
         @Override
@@ -63,6 +64,8 @@ final class GomorySolver extends GenericSolver {
 
     }
 
+    public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();
+
     private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withFractionality(0.01).withViolation(BigMath.HUNDRED);
 
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
@@ -81,16 +84,21 @@ final class GomorySolver extends GenericSolver {
         ModelStrategy strategy = IntegerStrategy.DEFAULT.withGMICutConfiguration(GMI_CUT_CONFIGURATION).newModelStrategy(myIntegerModel);
 
         ExpressionsBasedModel iteratorModel = myIntegerModel.snapshot();
-        iteratorModel.relax(true);
         NodeSolver iterativeSolver = iteratorModel.prepare(NodeSolver::new);
 
         Result retVal = iterativeSolver.solve();
-
+        this.incrementIterationsCount();
+        if (this.isLogProgress()) {
+            this.log("Iteration {}: {}", this.countIterations(), retVal);
+            this.log();
+        }
         while (retVal.getState().isFeasible() && !myIntegerModel.validate(retVal)) {
             iterativeSolver.generateCuts(strategy);
             retVal = iterativeSolver.solve();
-            if (this.isLogDebug()) {
-                this.log("Iteration: {}", retVal);
+            this.incrementIterationsCount();
+            if (this.isLogProgress()) {
+                this.log("Iteration {}: {}", this.countIterations(), retVal);
+                this.log();
             }
         }
 
