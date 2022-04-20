@@ -11,7 +11,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-## [51.1.0] – 2022-04-20
+## [51.2.0] – 2022-04-20
 
 ### Added
 
