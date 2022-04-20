@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelFileTest {
 
-    private static final NumberContext ACCURACY = NumberContext.of(8, 6);
+    private static final NumberContext ACCURACY = NumberContext.of(8);
 
     private static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
 
@@ -49,6 +49,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
         // model.options.debug(LinearSolver.class);
         // model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
+        // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
@@ -115,6 +116,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: 11s finsihed with optimal solution
+     * <li>2022-04-18: 22s finsihed with optimal solution
      * </ul>
      */
     @Test

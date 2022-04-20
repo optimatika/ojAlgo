@@ -24,11 +24,13 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -84,6 +86,27 @@ public abstract class SimplexSolver extends LinearSolver {
     }
 
     static abstract class Primitive1D implements Access1D<Double>, Mutate1D {
+
+        static Primitive1D of(final double... values) {
+            return new Primitive1D() {
+
+                @Override
+                public int size() {
+                    return values.length;
+                }
+
+                @Override
+                double doubleValue(final int index) {
+                    return values[index];
+                }
+
+                @Override
+                void set(final int index, final double value) {
+                    values[index] = value;
+                }
+
+            };
+        }
 
         public final long count() {
             return this.size();
@@ -159,12 +182,13 @@ public abstract class SimplexSolver extends LinearSolver {
     }
 
     private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
+
     private static final NumberContext PHASE1 = ACCURACY.withScale(7);
     private static final NumberContext PIVOT = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
     private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
-
     private LongToNumberMap<Double> myFixedVariables = null;
+
     private final SimplexSolver.IterationPoint myPoint;
     private final SimplexTableau myTableau;
 
@@ -212,6 +236,14 @@ public abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    public Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+        return myTableau.generateCutCandidates(integer, options.feasibility, fractionality);
+    }
+
+    public SimplexTableau.MetaData getEntityMap() {
+        return myTableau.meta;
+    }
+
     public Result solve(final Result kickStarter) {
 
         if (this.isLogDebug() && this.isTableauPrintable()) {
@@ -229,6 +261,10 @@ public abstract class SimplexSolver extends LinearSolver {
             if (this.isLogDebug() && this.isTableauPrintable()) {
                 this.logDebugTableau("Tableau Iteration");
             }
+        }
+
+        if (this.isLogDebug() && this.isTableauPrintable()) {
+            this.logDebugTableau("Final Tableau");
         }
 
         // BasicLogger.debug("Total iters: {}", this.countIterations());
@@ -280,6 +316,10 @@ public abstract class SimplexSolver extends LinearSolver {
         return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
     }
 
+    private double infeasibility() {
+        return -myTableau.value(true);
+    }
+
     private boolean isTableauPrintable() {
         return myTableau.count() <= 512L;
     }
@@ -289,16 +329,12 @@ public abstract class SimplexSolver extends LinearSolver {
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
-    private double infeasibility() {
-        return -myTableau.value(true);
+    private int phase() {
+        return myPoint.isPhase2() ? 2 : 1;
     }
 
     private double value() {
         return -myTableau.value(false);
-    }
-
-    private int phase() {
-        return myPoint.isPhase2() ? 2 : 1;
     }
 
     @Override
@@ -319,7 +355,7 @@ public abstract class SimplexSolver extends LinearSolver {
     protected Access1D<?> extractMultipliers() {
 
         Access1D<Double> duals = myTableau.sliceDualVariables();
-        boolean[] negative = myTableau.negative;
+        boolean[] negative = myTableau.meta.negatedDual;
 
         return new Access1D<Double>() {
 

@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.RowView;
@@ -47,7 +48,8 @@ final class DualSimplex extends SimplexSolver {
         int nbProblemVariables = nbEqus + nbEqus + nbInes;
         int nbConstraints = nbVars;
 
-        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, 0, true, options);
+        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, 0, 0, true, options);
+        MetaData meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -67,7 +69,7 @@ final class DualSimplex extends SimplexSolver {
 
         for (int i = 0; i < nbConstraints; i++) {
             double rhs = checkFeasibility ? i : convexC.doubleValue(i);
-            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
             for (int j = 0; j < nbEqus; j++) {
                 double valE = convexAE.doubleValue(j, i);
                 constraintsBody.set(i, j, neg ? -valE : valE);
@@ -83,7 +85,7 @@ final class DualSimplex extends SimplexSolver {
                 int tabI = Math.toIntExact(element.index());
 
                 double tabVal = element.doubleValue();
-                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, retVal.negative[tabI] ? -tabVal : tabVal);
+                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, meta.negatedDual[tabI] ? -tabVal : tabVal);
             }
         }
 
@@ -106,7 +108,8 @@ final class DualSimplex extends SimplexSolver {
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();
 
-        SimplexTableau retVal = SimplexTableau.make(nbVars, nbEqus + nbEqus + nbInes, 0, 0, true, options);
+        SimplexTableau retVal = SimplexTableau.make(nbVars, nbEqus + nbEqus + nbInes, 0, 0, 0, true, options);
+        MetaData meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -117,7 +120,7 @@ final class DualSimplex extends SimplexSolver {
 
         for (int i = 0; i < nbVars; i++) {
             double rhs = checkFeasibility ? ZERO : convexC.doubleValue(i);
-            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
             for (int j = 0; j < nbEqus; j++) {
                 double valE = convexAE.doubleValue(j, i);
                 constraintsBody.set(i, j, neg ? -valE : valE);
@@ -133,7 +136,7 @@ final class DualSimplex extends SimplexSolver {
                 int tabI = Math.toIntExact(element.index());
 
                 double tabVal = element.doubleValue();
-                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, retVal.negative[tabI] ? -tabVal : tabVal);
+                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, meta.negatedDual[tabI] ? -tabVal : tabVal);
             }
         }
 

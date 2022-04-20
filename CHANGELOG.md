@@ -11,11 +11,38 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.function
+
+- `MissingMath` can now find the greatest common denominator of multiple int:s or long:s.
+
+#### org.ojalgo.optimisation
+
+- There is now a new solver, `GomorySolver`, for (mixed) integer models. It implements Gomory's cutting plane method. This solver is primarily used to test the cut generation feature used in `IntegerSolver`, which is the solver to use for (mixed) integer problems.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The `IntegerSolver` is no longer a pure branch-and-bound algorithm. It now also generates cuts.
+- A whole lot of refactoring to enable cut generation for the `IntegerSolver`. This touches almost everything in the optimisation package, but the public API:s for normal/recommended usage should be unchanged.
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- Deprecated the separation between preferred and fallback solver integrations in `ExpressionsBasedModel`. Instead, if you want add a solver integration, you simply call `addIntegration(Integration<?>)`.
+
 ### Fixed
 
 #### org.ojalgo.optimisation
 
 - The MPS file parser of `ExpressionsBasedModel` has been refactored and can now handle more format variants. In particular some instances from MIPLIB2017 had problems.
+
+### Removed
+
+- The methods `isMinimisation()` and `isMaximisation()` from `ExpressionsBasedModel`. They've been deprecated for a while and are replaced by `getOptimisationSense()`. There is no way to set the optimisation sense – you simply call `minimise()` or `maximise()`;
 
 ## [51.1.0] – 2022-03-17
 

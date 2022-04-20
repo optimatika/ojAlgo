@@ -50,6 +50,10 @@ public final class Variable extends ModelEntity<Variable> {
         return Variable.make(name).binary();
     }
 
+    public static Variable makeInteger(final String name) {
+        return Variable.make(name).integer();
+    }
+
     private IntIndex myIndex = null;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;
@@ -68,8 +72,13 @@ public final class Variable extends ModelEntity<Variable> {
         myValue = variableToCopy.getValue();
     }
 
+    @Override
+    public void addTo(final Expression target, final BigDecimal scale) {
+        target.add(this, scale);
+    }
+
     /**
-     * @see #getLowerLimit()
+     *See {@link #isBinary()}.
      * @see #getUpperLimit()
      * @see #isInteger()
      * @see #isBinary()
@@ -142,8 +151,12 @@ public final class Variable extends ModelEntity<Variable> {
         return myValue;
     }
 
+    public Variable integer() {
+        return this.integer(true);
+    }
+
     /**
-     * @see #isInteger()
+     *See {@link #isInteger()}.
      */
     public Variable integer(final boolean integer) {
         this.setInteger(integer);
@@ -160,6 +173,7 @@ public final class Variable extends ModelEntity<Variable> {
     /**
      * @return true if this is an integer variable, otherwise false
      */
+    @Override
     public boolean isInteger() {
         return myInteger;
     }
@@ -276,17 +290,6 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected void doIntegerRounding() {
-        BigDecimal limit;
-        if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
-            this.upper(limit.setScale(0, RoundingMode.FLOOR));
-        }
-        if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
-            this.lower(limit.setScale(0, RoundingMode.CEILING));
-        }
-    }
-
-    @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
         return this.validate(value, context, appender, false);
     }
@@ -294,7 +297,7 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     int deriveAdjustmentExponent() {
 
-        if (!this.isConstraint()) {
+        if (!this.isConstraint() || this.isInteger()) {
             return 0;
         }
 
@@ -326,6 +329,18 @@ public final class Variable extends ModelEntity<Variable> {
         }
 
         return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
+    }
+
+    @Override
+    boolean doIntegerRounding() {
+        BigDecimal limit;
+        if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
+            this.upper(limit.setScale(0, RoundingMode.FLOOR));
+        }
+        if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
+            this.lower(limit.setScale(0, RoundingMode.CEILING));
+        }
+        return true;
     }
 
     IntIndex getIndex() {

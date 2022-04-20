@@ -1198,7 +1198,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
         Expression tmpObjExpr = model.addExpression("Objective");
-        model.setMinimisation();
 
         tmpObjExpr.set(2, 2, BigMath.HALF);
         tmpObjExpr.set(3, 3, BigMath.TWO);

@@ -27,6 +27,8 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * NumberContextTest
@@ -36,19 +38,157 @@ import org.ojalgo.TestUtils;
 public class NumberContextTest {
 
     @Test
+    public void testComparePrecisionAndScaleBigDecimal() {
+
+        for (int precision = 2; precision < 16; precision++) {
+            int scale = precision - 1;
+
+            NumberContext preciContext = NumberContext.ofPrecision(precision).withoutScale();
+            NumberContext scaleContext = NumberContext.ofScale(scale).withoutPrecision();
+            NumberContext accurContext = NumberContext.of(precision, scale);
+
+            for (int f = 1; f <= 9; f++) {
+                BigDecimal value = BigDecimal.valueOf(f + Math.random());
+                // Guaranteed to be in the range [1.0 , 10)
+
+                BigDecimal preciEnforced = preciContext.enforce(value);
+                BigDecimal scaleEnforced = scaleContext.enforce(value);
+
+                TestUtils.assertEquals(preciEnforced, scaleEnforced);
+
+                BigDecimal preciResidual = value.subtract(preciEnforced);
+                BigDecimal scaleResidual = value.subtract(scaleEnforced);
+
+                TestUtils.assertEquals(preciResidual, scaleResidual);
+
+                TestUtils.assertTrue(accurContext.isSmall(value, preciResidual));
+                TestUtils.assertTrue(accurContext.isSmall(value, scaleResidual));
+
+                TestUtils.assertTrue(scaleContext.isZero(preciResidual));
+                TestUtils.assertTrue(scaleContext.isZero(scaleResidual));
+
+                TestUtils.assertTrue(preciContext.isSmall(value, preciResidual));
+                TestUtils.assertTrue(preciContext.isSmall(value, scaleResidual));
+
+                BigDecimal trigger = BigMath.ONE.movePointLeft(scale).multiply(value);
+
+                TestUtils.assertFalse(preciContext.isSmall(value, trigger));
+            }
+        }
+    }
+
+    @Test
+    public void testComparePrecisionAndScalePrimitive() {
+
+        for (int precision = 2; precision < 16; precision++) {
+            int scale = precision - 1;
+
+            NumberContext preciContext = NumberContext.ofPrecision(precision);
+            NumberContext scaleContext = NumberContext.ofScale(scale);
+            NumberContext accurContext = NumberContext.of(precision, scale);
+
+            for (int f = 1; f <= 9; f++) {
+                double value = f + Math.random();
+                // Guaranteed to be in the range [1.0 , 10)
+
+                double preciEnforced = preciContext.enforce(value);
+                double scaleEnforced = scaleContext.enforce(value);
+
+                TestUtils.assertEquals(preciEnforced, scaleEnforced);
+
+                double preciResidual = value - preciEnforced;
+                double scaleResidual = value - scaleEnforced;
+
+                TestUtils.assertTrue(accurContext.isSmall(value, preciResidual));
+                TestUtils.assertTrue(accurContext.isSmall(value, scaleResidual));
+
+                // TestUtils.assertTrue(scaleContext.isZero(preciResidual));
+                // TestUtils.assertTrue(scaleContext.isZero(scaleResidual));
+
+                TestUtils.assertTrue(preciContext.isSmall(value, preciResidual));
+                TestUtils.assertTrue(preciContext.isSmall(value, scaleResidual));
+
+                double trigger = (BigMath.ONE.movePointLeft(scale).doubleValue() + PrimitiveMath.MACHINE_EPSILON) * value;
+
+                TestUtils.assertFalse(preciContext.isSmall(value, trigger));
+            }
+        }
+    }
+
+    @Test
+    public void testIsSmall() {
+
+        BigDecimal compareTo = BigDecimal.valueOf(2.03007518794);
+        BigDecimal small = BigDecimal.valueOf(1E-12);
+
+        TestUtils.assertTrue(NumberContext.of(12).isSmall(compareTo, small));
+    }
+
+    @Test
     public void testPercentContext() {
 
-        final NumberContext tmpNC = NumberContext.getPercent(Locale.US);
+        NumberContext nc = NumberContext.getPercent(Locale.US);
 
-        TestUtils.assertEquals(7, tmpNC.getPrecision());
-        TestUtils.assertEquals(4, tmpNC.getScale());
-        TestUtils.assertEquals(RoundingMode.HALF_EVEN, tmpNC.getRoundingMode());
+        TestUtils.assertEquals(7, nc.getPrecision());
+        TestUtils.assertEquals(4, nc.getScale());
+        TestUtils.assertEquals(RoundingMode.HALF_EVEN, nc.getRoundingMode());
 
-        final String tmpOriginalString = "123.4567";
-        final BigDecimal tmpBD = new BigDecimal(tmpOriginalString);
+        String tmpOriginalString = "123.4567";
+        BigDecimal tmpBD = new BigDecimal(tmpOriginalString);
         TestUtils.assertEquals(tmpOriginalString, tmpBD.toPlainString());
 
-        TestUtils.assertEquals("12,345.67%", tmpNC.format(tmpBD));
+        TestUtils.assertEquals("12,345.67%", nc.format(tmpBD));
+    }
+
+    @Test
+    public void testPrecision() {
+
+        NumberContext nc = NumberContext.of(3);
+
+        double upper = 0.0004999;
+        double lower = -0.0004999;
+
+        TestUtils.assertTrue(nc.isZero(upper));
+        TestUtils.assertTrue(nc.isZero(lower));
+
+        TestUtils.assertFalse(nc.isDifferent(0.1 + lower, 0.1 + upper));
+        TestUtils.assertFalse(nc.isDifferent(0.1 + upper, 0.1 + lower));
+
+        upper = 0.004999;
+        lower = -0.004999;
+
+        TestUtils.assertFalse(nc.isZero(upper));
+        TestUtils.assertFalse(nc.isZero(lower));
+
+        TestUtils.assertTrue(nc.isDifferent(0.1 + lower, 0.1 + upper));
+        TestUtils.assertTrue(nc.isDifferent(0.1 + upper, 0.1 + lower));
+
+        upper = 0.00004999;
+        lower = -0.00004999;
+
+        TestUtils.assertTrue(nc.isZero(upper));
+        TestUtils.assertTrue(nc.isZero(lower));
+
+        TestUtils.assertFalse(nc.isDifferent(0.1 + lower, 0.1 + upper));
+        TestUtils.assertFalse(nc.isDifferent(0.1 + upper, 0.1 + lower));
+
+        upper = 555 + 0.5;
+        lower = 555 - 0.5;
+
+        TestUtils.assertFalse(nc.isDifferent(lower, upper));
+        TestUtils.assertFalse(nc.isDifferent(upper, lower));
+
+        upper = 100 + 1;
+        lower = 100 - 1;
+
+        TestUtils.assertTrue(nc.isDifferent(lower, upper));
+        TestUtils.assertTrue(nc.isDifferent(upper, lower));
+
+        upper = 999 + 1;
+        lower = 999 - 1;
+
+        TestUtils.assertFalse(nc.isDifferent(lower, upper));
+        TestUtils.assertFalse(nc.isDifferent(upper, lower));
     }
 
     @Test

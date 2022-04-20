@@ -188,7 +188,7 @@ public final class IntegerSolver extends GenericSolver {
         myIntegerModel = model.simplify();
         myFunction = myIntegerModel.limitObjective(null, null).toFunction();
 
-        myMinimisation = myIntegerModel.isMinimisation();
+        myMinimisation = myIntegerModel.getOptimisationSense() == Optimisation.Sense.MIN;
     }
 
     public Result solve(final Result kickStarter) {
@@ -205,14 +205,19 @@ public final class IntegerSolver extends GenericSolver {
 
         this.resetIterationsCount();
 
-        NodeKey root = new NodeKey(myIntegerModel);
-        ExpressionsBasedModel rootModel = this.getNodeModel();
-        root.setNodeState(rootModel, strategy);
+        ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
+        NodeSolver cutSolver = cutModel.prepare(NodeSolver::new);
+        Result cutResult = cutSolver.solve();
+        cutSolver.generateCuts(strategy, myIntegerModel);
+
+        NodeKey rootNode = new NodeKey(myIntegerModel);
+        ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
+        rootNode.setNodeState(rootModel, strategy);
 
         PrinterBuffer rootPrinter = this.newPrinter();
 
-        AtomicBoolean solverNormalExit = new AtomicBoolean(this.compute(root, rootModel.prepare(), rootPrinter, strategy));
-        root.dispose();
+        AtomicBoolean solverNormalExit = new AtomicBoolean(this.compute(rootNode, rootModel.prepare(NodeSolver::new), rootPrinter, strategy));
+        rootNode.dispose();
 
         Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
 
@@ -233,9 +238,10 @@ public final class IntegerSolver extends GenericSolver {
                     } else if (!strategy.isGoodEnough(myBestResultSoFar, node.objective)) {
                         workerNormalExit = myNodeStatistics.abandoned();
                     } else {
-                        ExpressionsBasedModel nodeModel = this.getNodeModel();
+                        ExpressionsBasedModel nodeModel = myIntegerModel.snapshot();
                         node.setNodeState(nodeModel, strategy);
-                        workerNormalExit &= this.compute(node, nodeModel.prepare(), nodePrinter, strategy);
+                        NodeSolver nodeSolver = nodeModel.prepare(NodeSolver::new);
+                        workerNormalExit &= this.compute(node, nodeSolver, nodePrinter, strategy);
                     }
 
                     node.dispose();
@@ -278,8 +284,7 @@ public final class IntegerSolver extends GenericSolver {
         return options.validate || this.isLogProgress() ? new CharacterRing().asPrinter() : null;
     }
 
-    protected boolean compute(final NodeKey nodeKey, final ExpressionsBasedModel.Intermediate nodeModel, final PrinterBuffer nodePrinter,
-            final ModelStrategy strategy) {
+    boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final PrinterBuffer nodePrinter, final ModelStrategy strategy) {
 
         if (this.isLogDebug()) {
             nodePrinter.println();
@@ -289,11 +294,11 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         if (nodeKey.index >= 0) {
-            nodeKey.enforceBounds(nodeModel, strategy);
+            nodeKey.enforceBounds(nodeSolver, strategy);
         }
 
         Optimisation.Result bestEstimate = this.getBestEstimate();
-        Optimisation.Result nodeResult = nodeModel.solve(bestEstimate);
+        Optimisation.Result nodeResult = nodeSolver.solve(bestEstimate);
 
         // Increment when/if an iteration was actually performed
         this.incrementIterationsCount();
@@ -308,12 +313,13 @@ public final class IntegerSolver extends GenericSolver {
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
 
-            nodeModel.dispose();
+            nodeSolver.dispose();
             if (nodeKey.sequence == 0 && (nodeResult.getState().isUnexplored() || !nodeResult.getState().isValid())) {
                 // return false;
                 return myNodeStatistics.failed();
             }
             // return true;
+            strategy.markInfeasible(nodeKey, myBestResultSoFar != null);
             return myNodeStatistics.infeasible();
         }
 
@@ -321,7 +327,7 @@ public final class IntegerSolver extends GenericSolver {
             nodePrinter.println("Node solved to optimality!");
         }
 
-        if (options.validate && !nodeModel.validate(nodeResult, nodePrinter)) {
+        if (options.validate && !nodeSolver.validate(nodeResult, nodePrinter)) {
             // This should not be possible. There is a bug somewhere.
             nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
             nodePrinter.println("Integer indices: {}", strategy);
@@ -354,7 +360,7 @@ public final class IntegerSolver extends GenericSolver {
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
 
-            nodeModel.dispose();
+            nodeSolver.dispose();
             return myNodeStatistics.integer();
 
         }
@@ -370,17 +376,25 @@ public final class IntegerSolver extends GenericSolver {
                 IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
             }
 
-            nodeModel.dispose();
+            nodeSolver.dispose();
             // return true;
             return myNodeStatistics.exhausted();
         }
         if (this.isLogDebug()) {
             nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
-                    nodeModel.getVariable(strategy.getIndex(branchIntegerIndex)));
+                    nodeSolver.getVariable(strategy.getIndex(branchIntegerIndex)));
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
         }
 
-        // this.generateCuts(nodeModel);
+        if (strategy.cutting && nodeKey.sequence % 10L == 0L) {
+            double displacement = nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue);
+            if (strategy.isCutRatherThanBranch(displacement, myBestResultSoFar != null)) {
+                if (nodeSolver.generateCuts(strategy)) {
+                    return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
+                }
+                strategy.cutting = false;
+            }
+        }
 
         NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
         NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
@@ -396,10 +410,10 @@ public final class IntegerSolver extends GenericSolver {
 
         boolean retVal = true;
         if (lowerBranch != null) {
-            retVal = retVal && this.compute(lowerBranch, nodeModel, nodePrinter, strategy);
+            retVal = retVal && this.compute(lowerBranch, nodeSolver, nodePrinter, strategy);
         }
         if (upperBranch != null) {
-            retVal = retVal && this.compute(upperBranch, nodeModel, nodePrinter, strategy);
+            retVal = retVal && this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
         }
         return retVal;
     }
@@ -407,7 +421,7 @@ public final class IntegerSolver extends GenericSolver {
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
         if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
-            return myFunction.invoke(Access1D.asPrimitive1D(solution));
+            return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
         }
         return Double.NaN;
     }
@@ -434,12 +448,6 @@ public final class IntegerSolver extends GenericSolver {
         MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(myIntegerModel.countVariables(), 1);
 
         return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
-    }
-
-    protected ExpressionsBasedModel getNodeModel() {
-        ExpressionsBasedModel shallowCopy = myIntegerModel.snapshot();
-        shallowCopy.relax(true);
-        return shallowCopy;
     }
 
     protected boolean isIterationNecessary() {
@@ -494,7 +502,7 @@ public final class IntegerSolver extends GenericSolver {
             myBestResultSoFar = result;
         }
 
-        strategy.update(result);
+        strategy.markInteger(key, result);
 
         double bestIntegerSolutionValue = myBestResultSoFar.getValue();
 
@@ -502,7 +510,7 @@ public final class IntegerSolver extends GenericSolver {
 
             double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
 
-            if (myIntegerModel.isMinimisation()) {
+            if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
                 BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
                 myIntegerModel.limitObjective(null, upper);
             } else {
@@ -510,7 +518,6 @@ public final class IntegerSolver extends GenericSolver {
                 myIntegerModel.limitObjective(lower, null);
             }
         }
-
     }
 
     /**
@@ -554,25 +561,25 @@ public final class IntegerSolver extends GenericSolver {
 
         int retVal = -1;
 
-        double fraction;
-        double comparableFraction = ZERO;
+        double displacement;
+        double comparableDisplacement = ZERO;
         double maxComparable = ZERO;
 
         for (int i = 0, limit = strategy.countIntegerVariables(); i < limit; i++) {
 
             int globalIndex = strategy.getIndex(i);
 
-            fraction = nodeKey.getFraction(i, nodeResult.doubleValue(globalIndex));
+            displacement = nodeKey.getMinimumDisplacement(i, nodeResult.doubleValue(globalIndex));
             // [0, 0.5]
 
-            if (!options.feasibility.isZero(fraction)) {
+            if (!options.feasibility.isZero(displacement)) {
                 // This variable not integer
 
-                comparableFraction = strategy.toComparable(i, fraction, myBestResultSoFar != null);
+                comparableDisplacement = strategy.toComparable(i, displacement, myBestResultSoFar != null);
 
-                if (comparableFraction > maxComparable) {
+                if (comparableDisplacement > maxComparable) {
                     retVal = i;
-                    maxComparable = comparableFraction;
+                    maxComparable = comparableDisplacement;
                 }
             }
         }

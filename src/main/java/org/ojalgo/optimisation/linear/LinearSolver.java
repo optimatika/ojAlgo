@@ -194,7 +194,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbConstraints = nbEqualites + nbInequalites;
             boolean needDual = true;
 
-            SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
+            SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -336,10 +336,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             BigDecimal value = variable.getValue();
 
-            if (value.signum() >= 0 && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
+            if ((value != null && value.signum() >= 0 || variable.isPositive()) && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
                 return retVal;
             }
-            if (value.signum() <= 0 && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
+
+            if (((value != null && value.signum() <= 0) || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
                 retVal += model.getPositiveVariables().size();
                 return retVal;
             }

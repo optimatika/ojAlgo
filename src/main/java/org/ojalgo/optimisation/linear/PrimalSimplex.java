@@ -36,9 +36,11 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 final class PrimalSimplex extends SimplexSolver {
 
@@ -53,7 +55,8 @@ final class PrimalSimplex extends SimplexSolver {
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();
 
-        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars, nbInes, 0, true, options);
+        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars, 0, nbInes, 0, true, options);
+        MetaData meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -71,7 +74,7 @@ final class PrimalSimplex extends SimplexSolver {
         for (int i = 0; i < nbEqus; i++) {
             double rhs = convexBE.doubleValue(i);
 
-            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
 
             for (int j = 0; j < nbVars; j++) {
                 double valA = convexAE.doubleValue(i, j);
@@ -86,7 +89,7 @@ final class PrimalSimplex extends SimplexSolver {
 
             double rhs = convex.getBI(r);
 
-            boolean neg = retVal.negative[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
 
             rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
             constraintsBody.set(nbEqus + r, nbVars + nbVars + r, neg ? NEG : ONE);
@@ -131,7 +134,7 @@ final class PrimalSimplex extends SimplexSolver {
         int nbIdentitySlackVars = 0;
         boolean needDuals = false;
 
-        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProbVars, nbSlackVars, 0, false, model.options);
+        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProbVars, 0, nbSlackVars, 0, false, model.options);
 
         int tmpPosVarsBaseIndex = 0;
         int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + posVariables.size();
@@ -139,7 +142,8 @@ final class PrimalSimplex extends SimplexSolver {
 
         for (IntIndex tmpKey : objFunc.getLinearKeySet()) {
 
-            double tmpFactor = model.isMaximisation() ? -objFunc.getAdjustedLinearFactor(tmpKey) : objFunc.getAdjustedLinearFactor(tmpKey);
+            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objFunc.getAdjustedLinearFactor(tmpKey)
+                    : objFunc.getAdjustedLinearFactor(tmpKey);
 
             int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
             if (tmpPosInd >= 0) {
@@ -485,7 +489,8 @@ final class PrimalSimplex extends SimplexSolver {
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();
 
-        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars + nbVars, nbInes, 0, true, options);
+        SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars + nbVars, 0, nbInes, 0, true, options);
+        MetaData meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -504,7 +509,7 @@ final class PrimalSimplex extends SimplexSolver {
         for (int i = 0; i < nbEqus; i++) {
             double rhs = convexBE.doubleValue(i);
 
-            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
 
             for (int j = 0; j < nbVars; j++) {
                 double valA = convexAE.doubleValue(i, j);
@@ -520,7 +525,7 @@ final class PrimalSimplex extends SimplexSolver {
 
             double rhs = convex.getBI(r);
 
-            boolean neg = retVal.negative[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+            boolean neg = meta.negatedDual[nbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
 
             rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
             rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
@@ -615,26 +620,37 @@ final class PrimalSimplex extends SimplexSolver {
 
         Expression objective = model.objective().compensate(fixedVariables);
 
-        int nbProbVars = posVariables.size() + negVariables.size();
+        int nbPosProbVars = posVariables.size();
+        int nbNegProbVars = negVariables.size();
         int nbIdentitySlackVars = exprUpPos.size() + exprLoNeg.size() + varsPosUp.size() + varsNegLo.size();
         int nbOtherSlackVars = exprUpNeg.size() + exprLoPos.size() + varsNegUp.size() + varsPosLo.size();
         int nbConstraints = nbIdentitySlackVars + nbOtherSlackVars + exprEqPos.size() + exprEqNeg.size();
         boolean needDuals = false;
 
-        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProbVars, nbOtherSlackVars, nbIdentitySlackVars, needDuals, model.options);
+        SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars, needDuals,
+                model.options);
+        MetaData meta = retVal.meta;
         SimplexSolver.Primitive2D retConstraintsBdy = retVal.constraintsBody();
         SimplexSolver.Primitive1D retConstraintsRHS = retVal.constraintsRHS();
         SimplexSolver.Primitive1D retObjective = retVal.objective();
 
-        int basePosVars = 0;
-        int baseNegVars = basePosVars + posVariables.size();
-        int baseSlackVars = baseNegVars + negVariables.size();
+        int basePosVars = 0; // 0 + 0
+        int baseNegVars = nbPosProbVars; // 0 + nbPosProbVars
+        int baseSlackVars = baseNegVars + nbNegProbVars;
         int baseIdSlackVars = baseSlackVars + nbOtherSlackVars;
         int baseArtificialVars = baseIdSlackVars + nbIdentitySlackVars;
 
+        for (int i = 0; i < posVariables.size(); i++) {
+            meta.positivePartVariables[i] = model.indexOf(posVariables.get(i));
+        }
+        for (int i = 0; i < negVariables.size(); i++) {
+            meta.negativePartVariables[i] = model.indexOf(negVariables.get(i));
+        }
+
         for (IntIndex tmpKey : objective.getLinearKeySet()) {
 
-            double tmpFactor = model.isMaximisation() ? -objective.getAdjustedLinearFactor(tmpKey) : objective.getAdjustedLinearFactor(tmpKey);
+            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.getAdjustedLinearFactor(tmpKey)
+                    : objective.getAdjustedLinearFactor(tmpKey);
 
             int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
             if (tmpPosInd >= 0) {
@@ -664,6 +680,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = expression.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.UPPER);
             indCnstr++;
             indSlack++;
         }
@@ -682,6 +699,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = -expression.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.LOWER);
             indCnstr++;
             indSlack++;
         }
@@ -698,6 +716,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = variable.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.UPPER);
             indCnstr++;
             indSlack++;
         }
@@ -714,6 +733,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = -variable.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.LOWER);
             indCnstr++;
             indSlack++;
         }
@@ -734,6 +754,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = expression.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.LOWER);
             indCnstr++;
             indSlack++;
         }
@@ -752,6 +773,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = -expression.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.UPPER);
             indCnstr++;
             indSlack++;
         }
@@ -768,6 +790,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = variable.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.LOWER);
             indCnstr++;
             indSlack++;
         }
@@ -784,6 +807,7 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = -variable.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
+            meta.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.UPPER);
             indCnstr++;
             indSlack++;
         }

@@ -172,33 +172,33 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         Expression exp1 = ebm.addExpression("Exp1").set(var1, 3).set(var2, 6).upper(13.5);
         exp1.doIntegerRounding();
-        TestUtils.assertEquals(BigMath.ONE, exp1.get(var1));
-        TestUtils.assertEquals(BigMath.TWO, exp1.get(var2));
-        TestUtils.assertEquals(BigMath.FOUR, exp1.getUpperLimit());
+        TestUtils.assertEquals(BigMath.THREE, exp1.get(var1));
+        TestUtils.assertEquals(BigMath.SIX, exp1.get(var2));
+        TestUtils.assertEquals(BigMath.TWELVE, exp1.getUpperLimit());
 
         Expression exp2 = ebm.addExpression("Exp2").set(var1, 30).set(var2, 60).upper(135);
         exp2.doIntegerRounding();
-        TestUtils.assertEquals(BigMath.ONE, exp2.get(var1));
-        TestUtils.assertEquals(BigMath.TWO, exp2.get(var2));
-        TestUtils.assertEquals(BigMath.FOUR, exp2.getUpperLimit());
+        TestUtils.assertEquals(BigMath.THREE.multiply(BigMath.TEN), exp2.get(var1));
+        TestUtils.assertEquals(BigMath.SIX.multiply(BigMath.TEN), exp2.get(var2));
+        TestUtils.assertEquals(BigMath.TWELVE.multiply(BigMath.TEN), exp2.getUpperLimit());
 
         Expression exp3 = ebm.addExpression("Exp3").set(var1, 0.3).set(var2, 0.6).upper(1.35);
         exp3.doIntegerRounding();
-        TestUtils.assertEquals(BigMath.ONE, exp3.get(var1));
-        TestUtils.assertEquals(BigMath.TWO, exp3.get(var2));
-        TestUtils.assertEquals(BigMath.FOUR, exp3.getUpperLimit());
+        TestUtils.assertEquals(BigMath.THREE.divide(BigMath.TEN), exp3.get(var1));
+        TestUtils.assertEquals(BigMath.SIX.divide(BigMath.TEN), exp3.get(var2));
+        TestUtils.assertEquals(BigMath.TWELVE.divide(BigMath.TEN), exp3.getUpperLimit());
 
         Expression exp4 = ebm.addExpression("Exp4").set(var1, 0.3).set(var2, 60).upper(1.35);
         exp4.doIntegerRounding();
-        TestUtils.assertEquals(BigMath.ONE, exp4.get(var1));
-        TestUtils.assertEquals(BigMath.TWO.multiply(BigMath.HUNDRED), exp4.get(var2));
-        TestUtils.assertEquals(BigMath.FOUR, exp4.getUpperLimit());
+        TestUtils.assertEquals(BigMath.THREE.divide(BigMath.TEN), exp4.get(var1));
+        TestUtils.assertEquals(BigMath.SIX.multiply(BigMath.TEN), exp4.get(var2));
+        TestUtils.assertEquals(BigDecimal.valueOf(1.2), exp4.getUpperLimit());
 
         Expression exp5 = ebm.addExpression("Exp5").set(var1, 30).set(var2, 0.6).upper(1.35);
         exp5.doIntegerRounding(); // How to get 50, 1 and 2?
-        TestUtils.assertEquals(BigMath.ONE.multiply(BigMath.HUNDRED), exp5.get(var1)); // 50
-        TestUtils.assertEquals(BigMath.TWO, exp5.get(var2)); // 1
-        TestUtils.assertEquals(BigMath.FOUR, exp5.getUpperLimit()); // 2
+        TestUtils.assertEquals(BigMath.THREE.multiply(BigMath.TEN), exp5.get(var1)); // 50
+        TestUtils.assertEquals(BigMath.SIX.divide(BigMath.TEN), exp5.get(var2)); // 1
+        TestUtils.assertEquals(BigDecimal.valueOf(1.2), exp5.getUpperLimit()); // 2
     }
 
     @Test
