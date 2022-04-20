@@ -240,6 +240,10 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return number;
     }
 
+    /**
+     * epsilon is defined as the difference between 1 and the next larger decimal number with the given number
+     * of digits (precision).
+     */
     public double epsilon() {
         return myEpsilon;
     }
@@ -316,8 +320,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myMathContext == null ? 0 : myMathContext.hashCode());
-        result = prime * result + myScale;
-        return result;
+        return prime * result + myScale;
     }
 
     public boolean isDifferent(final double expected, final double actual) {
