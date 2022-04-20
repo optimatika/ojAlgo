@@ -78,7 +78,8 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     /**
-     *See {@link #isBinary()}.
+     * See {@link #isBinary()}.
+     * 
      * @see #getUpperLimit()
      * @see #isInteger()
      * @see #isBinary()
@@ -156,7 +157,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     /**
-     *See {@link #isInteger()}.
+     * See {@link #isInteger()}.
      */
     public Variable integer(final boolean integer) {
         this.setInteger(integer);
