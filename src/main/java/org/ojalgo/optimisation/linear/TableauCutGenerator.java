@@ -72,7 +72,8 @@ abstract class TableauCutGenerator {
         return Equation.of(ONE, variableIndex, cut);
     }
 
-    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer, final double fractionality) {
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer,
+            final double fractionality) {
 
         int nbVariables = body.size();
 
