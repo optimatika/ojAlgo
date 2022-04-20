@@ -84,7 +84,7 @@ public abstract class TestUtils /* extends Assertions */ {
         BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
         BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
 
-        if (tmpValue.compareTo(tmpLower) == -1 || tmpValue.compareTo(tmpUpper) == 1) {
+        if (tmpValue.compareTo(tmpLower) < 0 || tmpValue.compareTo(tmpUpper) > 0) {
             Assertions.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
         }
     }
@@ -426,8 +426,7 @@ public abstract class TestUtils /* extends Assertions */ {
     public static void assertNotNullOrEmpty(final String actual) {
         if (actual == null) {
             TestUtils.fail("Is null!");
-        }
-        if (actual.length() <= 0) {
+        } else if (actual.length() <= 0) {
             TestUtils.fail("Is empty!");
         }
     }
