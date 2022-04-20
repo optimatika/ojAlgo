@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
@@ -72,8 +74,6 @@ public class KnapsackTest extends OptimisationIntegerTests {
                 tmpTotalWeightExpr.set(i, items.get(i).weight);
             }
             tmpTotalWeightExpr.lower(ZERO).upper(maxWeight);
-
-            retVal.setMaximisation();
 
             return retVal;
         }
@@ -123,7 +123,10 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
 
-        // model.options.debug(IntegerSolver.class);
+        if (DEBUG) {
+            BasicLogger.debug(model);
+            model.options.debug(Optimisation.Solver.class);
+        }
 
         model.maximise();
         //Expected: just second item

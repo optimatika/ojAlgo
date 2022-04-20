@@ -46,8 +46,6 @@ public abstract class OptimisationIntegerData {
         }
         tmpTotalWeightExpr.lower(ZERO).upper(THREE);
 
-        retVal.setMaximisation();
-
         return retVal;
     }
 

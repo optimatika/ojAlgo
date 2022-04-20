@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>51.1.0</version>
+    <version>51.2.0</version>
     <packaging>jar</packaging>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
@@ -51,7 +51,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <version.org.junit.jupiter>5.8.2</version.org.junit.jupiter>
-        <version.org.openjdk.jmh>1.34</version.org.openjdk.jmh>
+        <version.org.openjdk.jmh>1.35</version.org.openjdk.jmh>
         <sonar.organization>optimatika</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>

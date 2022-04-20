@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -109,6 +110,14 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
     public DR makeDense(final long rows, final long columns) {
         return this.dense(myPhysicalFactory.make(rows, columns));
+    }
+
+    public M makeDiagonal(final Access1D<?> diagonal) {
+        return this.instantiate(myPhysicalFactory.makeDiagonal(diagonal).get());
+    }
+
+    public M makeDiagonal(final double... diagonal) {
+        return this.makeDiagonal(Primitive64Array.wrap(diagonal));
     }
 
     public M makeEye(final int rows, final int columns) {

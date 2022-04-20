@@ -78,6 +78,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     private BigDecimal myConstant = null;
     private transient boolean myInfeasible = false;
+    private transient Boolean myInteger = null;
     private final Map<IntIndex, BigDecimal> myLinear;
     private final ExpressionsBasedModel myModel;
     private final Map<IntRowColumn, BigDecimal> myQuadratic;
@@ -310,6 +311,20 @@ public final class Expression extends ModelEntity<Expression> {
      */
     public Expression add(final Variable variable1, final Variable variable2, final long value) {
         return this.add(variable1, variable2, BigDecimal.valueOf(value));
+    }
+
+    @Override
+    public void addTo(final Expression target, final BigDecimal scale) {
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            BigDecimal value = entry.getValue().multiply(scale);
+            target.add(entry.getKey(), value);
+        }
+
+        for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
+            BigDecimal value = entry.getValue().multiply(scale);
+            target.add(entry.getKey(), value);
+        }
     }
 
     public int compareTo(final Expression obj) {
@@ -548,6 +563,14 @@ public final class Expression extends ModelEntity<Expression> {
 
     public boolean isFunctionQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
+    }
+
+    @Override
+    public boolean isInteger() {
+        if (myInteger == null) {
+            myInteger = this.deduceInteger();
+        }
+        return myInteger.booleanValue();
     }
 
     /**
@@ -833,6 +856,15 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    /**
+     * Will attempt to exploit integer property to tighten the lower and/or upper limits (integer rounding).
+     */
+    public void tighten() {
+        if (this.isConstraint()) {
+            this.isInteger();
+        }
+    }
+
     public MultiaryFunction.TwiceDifferentiable<Double> toFunction() {
 
         if (this.isFunctionQuadratic()) {
@@ -868,6 +900,26 @@ public final class Expression extends ModelEntity<Expression> {
 
         }
         return value;
+    }
+
+    private Boolean deduceInteger() {
+
+        if (myLinear.size() == 0 && myQuadratic.size() == 0) {
+            return Boolean.FALSE;
+        }
+
+        for (IntIndex key : myLinear.keySet()) {
+            if (!myModel.getVariable(key).isInteger()) {
+                return Boolean.FALSE;
+            }
+        }
+        for (IntRowColumn key : myQuadratic.keySet()) {
+            if (!myModel.getVariable(key.row).isInteger() || !myModel.getVariable(key.column).isInteger()) {
+                return Boolean.FALSE;
+            }
+        }
+
+        return Boolean.valueOf(this.doIntegerRounding());
     }
 
     private BigDecimal getConstant() {
@@ -958,42 +1010,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    @Override
-    protected void doIntegerRounding() {
-
-        BigInteger gcd = null;
-        int maxScale = Integer.MIN_VALUE;
-        for (BigDecimal coeff : myLinear.values()) {
-            BigDecimal abs = coeff.stripTrailingZeros().abs();
-            maxScale = Math.max(maxScale, abs.scale());
-            if (gcd != null) {
-                gcd = gcd.gcd(abs.unscaledValue());
-            } else {
-                gcd = abs.unscaledValue();
-            }
-            if (gcd.equals(BigInteger.ONE)) {
-                return; // gcd == 1, no point
-            }
-        }
-
-        BigDecimal divisor = new BigDecimal(gcd, maxScale);
-
-        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
-            BigDecimal value = entry.getValue();
-            entry.setValue(value.divide(divisor, 0, RoundingMode.UNNECESSARY));
-        }
-
-        BigDecimal lower = this.getLowerLimit();
-        if (lower != null) {
-            this.lower(lower.divide(divisor, 0, RoundingMode.CEILING));
-        }
-
-        BigDecimal upper = this.getUpperLimit();
-        if (upper != null) {
-            this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
-        }
-    }
-
     void addObjectiveConstant(final BigDecimal value) {
 
         BigDecimal weight = this.getContributionWeight();
@@ -1068,6 +1084,10 @@ public final class Expression extends ModelEntity<Expression> {
     @Override
     int deriveAdjustmentExponent() {
 
+        if (this.isInteger()) {
+            return 0;
+        }
+
         AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
 
         AggregatorFunction<BigDecimal> largest = aggregators.largest();
@@ -1093,6 +1113,46 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
+    }
+
+    /**
+     * Assumes at least 1 variable, and all variables integer!
+     *
+     * @see org.ojalgo.optimisation.ModelEntity#doIntegerRounding()
+     */
+    @Override
+    boolean doIntegerRounding() {
+
+        BigInteger gcd = null;
+        int maxScale = Integer.MIN_VALUE;
+        for (BigDecimal coeff : myLinear.values()) {
+            BigDecimal abs = coeff.stripTrailingZeros().abs();
+            maxScale = Math.max(maxScale, abs.scale());
+            if (gcd != null) {
+                gcd = gcd.gcd(abs.unscaledValue());
+            } else {
+                gcd = abs.unscaledValue();
+            }
+            if (maxScale > 8 || gcd.equals(BigInteger.ONE) && maxScale > 0) {
+                return false;
+            }
+        }
+
+        BigDecimal divisor = new BigDecimal(gcd, maxScale);
+
+        BigDecimal lower = this.getLowerLimit();
+        if (lower != null) {
+            BigDecimal tmpVal = lower.divide(divisor, 0, RoundingMode.CEILING);
+            this.lower(tmpVal.multiply(divisor));
+        }
+
+        BigDecimal upper = this.getUpperLimit();
+        if (upper != null) {
+            BigDecimal tmpVal = upper.divide(divisor, 0, RoundingMode.FLOOR);
+            this.upper(tmpVal.multiply(divisor));
+        }
+
+        return true;
     }
 
     Expression doMixedIntegerRounding() {

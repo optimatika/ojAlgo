@@ -50,6 +50,8 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
 
+        // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
+
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }
 
@@ -138,6 +140,12 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
     @Tag("slow")
     public void testGen_ip054() {
         MipCase.doTest("gen-ip054.mps", "6840.966", null);
+    }
+
+    @Test
+    @Tag("unstable")
+    public void testMad() {
+        MipCase.doTest("mad.mps", "0.0268", null);
     }
 
     /**

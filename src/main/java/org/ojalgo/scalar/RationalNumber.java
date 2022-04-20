@@ -157,7 +157,7 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
                 retDenom = BigInteger.TEN.pow(scale);
 
                 BigInteger gcd = retNumer.gcd(retDenom);
-                if (gcd.compareTo(BigInteger.ONE) == 1) {
+                if (gcd.compareTo(BigInteger.ONE) > 0) {
                     retNumer = retNumer.divide(gcd);
                     retDenom = retDenom.divide(gcd);
                 }

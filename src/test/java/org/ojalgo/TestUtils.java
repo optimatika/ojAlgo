@@ -68,7 +68,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class TestUtils {
+public abstract class TestUtils /* extends Assertions */ {
 
     private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
@@ -516,20 +516,20 @@ public abstract class TestUtils {
         Assertions.assertTrue(condition, message);
     }
 
-    public static void fail() {
-        Assertions.fail("");
+    public static <V> V fail() {
+        return Assertions.fail("");
     }
 
-    public static void fail(final String message) {
-        Assertions.fail(message);
+    public static <V> V fail(final String message) {
+        return Assertions.fail(message);
     }
 
-    public static void fail(final String message, final Throwable cause) {
-        Assertions.fail(message, cause);
+    public static <V> V fail(final String message, final Throwable cause) {
+        return Assertions.fail(message, cause);
     }
 
-    public static void fail(final Throwable cause) {
-        Assertions.fail(cause.getMessage(), cause);
+    public static <V> V fail(final Throwable cause) {
+        return Assertions.fail(cause.getMessage(), cause);
     }
 
     public static InputStream getResource(final Class<?> root, final String name) {

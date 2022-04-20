@@ -197,15 +197,9 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         TestUtils.assertStateAndSolution(primResult, dualResult);
     }
 
-    private static void comparePrimalAndDualSolvers2(final ExpressionsBasedModel model, final boolean minimise) {
+    private static void comparePrimalAndDualSolvers2(final ExpressionsBasedModel model) {
 
         ExpressionsBasedModel simplified = model.simplify();
-
-        if (minimise) {
-            simplified.setMinimisation();
-        } else {
-            simplified.isMaximisation();
-        }
 
         if (DEBUG) {
             model.options.debug(LinearSolver.class);
@@ -394,7 +388,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("QSCAGR7.SIF");
 
-        PrimalDualTest.comparePrimalAndDualSolvers2(model, true);
+        PrimalDualTest.comparePrimalAndDualSolvers2(model);
     }
 
     @Test

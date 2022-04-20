@@ -26,6 +26,11 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+/**
+ * Math utilities missing from {@link Math}.
+ *
+ * @author apete
+ */
 public abstract class MissingMath {
 
     public static double acosh(final double arg) {
@@ -101,15 +106,15 @@ public abstract class MissingMath {
     /**
      * Greatest Common Denominator
      */
-    public static int gcd(int value1, int value2) {
+    public static int gcd(final int val1, final int val2) {
 
         int retVal = 1;
 
-        value1 = Math.abs(value1);
-        value2 = Math.abs(value2);
+        int abs1 = Math.abs(val1);
+        int abs2 = Math.abs(val2);
 
-        int tmpMax = Math.max(value1, value2);
-        int tmpMin = Math.min(value1, value2);
+        int tmpMax = Math.max(abs1, abs2);
+        int tmpMin = Math.min(abs1, abs2);
 
         while (tmpMin != 0) {
             retVal = tmpMin;
@@ -120,18 +125,58 @@ public abstract class MissingMath {
         return retVal;
     }
 
+    public static int gcd(final int val1, final int... vals) {
+
+        int retVal = val1;
+
+        if (retVal == 1) {
+            return 1;
+        }
+
+        for (int i = 0; i < vals.length; i++) {
+            retVal = MissingMath.gcd(retVal, vals[i]);
+            if (retVal == 1) {
+                return 1;
+            }
+        }
+
+        return retVal;
+    }
+
+    public static int gcd(final int[] vals) {
+        return MissingMath.gcd(vals[0], vals);
+    }
+
+    public static long gcd(final long val1, final long... vals) {
+
+        long retVal = val1;
+
+        if (retVal == 1L) {
+            return 1L;
+        }
+
+        for (int i = 0; i < vals.length; i++) {
+            retVal = MissingMath.gcd(retVal, vals[i]);
+            if (retVal == 1L) {
+                return 1L;
+            }
+        }
+
+        return retVal;
+    }
+
     /**
      * Greatest Common Denominator
      */
-    public static long gcd(long value1, long value2) {
+    public static long gcd(final long val1, final long val2) {
 
         long retVal = 1L;
 
-        value1 = Math.abs(value1);
-        value2 = Math.abs(value2);
+        long abs1 = Math.abs(val1);
+        long abs2 = Math.abs(val2);
 
-        long tmpMax = Math.max(value1, value2);
-        long tmpMin = Math.min(value1, value2);
+        long tmpMax = Math.max(abs1, abs2);
+        long tmpMin = Math.min(abs1, abs2);
 
         while (tmpMin != 0L) {
             retVal = tmpMin;
@@ -140,6 +185,10 @@ public abstract class MissingMath {
         }
 
         return retVal;
+    }
+
+    public static long gcd(final long[] vals) {
+        return MissingMath.gcd(vals[0], vals);
     }
 
     public static BigDecimal hypot(final BigDecimal arg1, final BigDecimal arg2) {

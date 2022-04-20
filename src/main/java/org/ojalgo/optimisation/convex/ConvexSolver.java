@@ -92,6 +92,10 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
  */
 public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
 
+    public UpdatableSolver.EntityMap getEntityMap() {
+        return null;
+    }
+
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
         private ConvexObjectiveFunction myObjective = null;
@@ -405,7 +409,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
             mtrxQ = Primitive64Store.FACTORY.make(numbVars, numbVars);
 
-            BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
+            BinaryFunction<Double> tmpBaseFunc = sourceModel.getOptimisationSense() == Optimisation.Sense.MAX ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
             for (IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
                 int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
@@ -420,7 +424,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
             mtrxC = Primitive64Store.FACTORY.make(numbVars, 1);
-            if (sourceModel.isMinimisation()) {
+            if (!(sourceModel.getOptimisationSense() == Optimisation.Sense.MAX)) {
                 for (IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     mtrxC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
@@ -523,7 +527,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         // Q & C
 
         Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
-        boolean maximisation = sourceModel.isMaximisation();
+        boolean maximisation = sourceModel.getOptimisationSense() == Optimisation.Sense.MAX;
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {

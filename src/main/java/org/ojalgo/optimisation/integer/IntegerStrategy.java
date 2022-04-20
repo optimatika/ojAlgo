@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +29,8 @@ import java.util.function.BiFunction;
 import java.util.function.IntSupplier;
 
 import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.integer.ModelStrategy.DefaultStrategy;
 import org.ojalgo.type.context.NumberContext;
@@ -38,12 +41,13 @@ public interface IntegerStrategy {
 
         private final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> myFactory;
         private final NumberContext myGapTolerance;
+        private final GMICutConfiguration myGMICutConfiguration;
         private final IntSupplier myParallelism;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
         private transient List<Comparator<NodeKey>> myWorkerPriorities = null;
 
         ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext gap,
-                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory) {
+                final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
 
             super();
 
@@ -51,29 +55,34 @@ public interface IntegerStrategy {
             myPriorityDefinitions = definitions;
             myGapTolerance = gap;
             myFactory = factory;
+            myGMICutConfiguration = configuration;
         }
 
         /**
          * Retains any existing definitions, but adds these to be used rather than the existing. If there are
          * enough threads both these additional and the previously existing definitions will be used.
          */
-        public ConfigurableStrategy addPriorityDefinitions(final Comparator<NodeKey>... definitions) {
+        public ConfigurableStrategy addPriorityDefinitions(final Comparator<NodeKey>... additionalDefinitions) {
 
-            Comparator<NodeKey>[] totalDefinitions = (Comparator<NodeKey>[]) new Comparator<?>[definitions.length + myPriorityDefinitions.length];
+            Comparator<NodeKey>[] totalDefinitions = (Comparator<NodeKey>[]) new Comparator<?>[additionalDefinitions.length + myPriorityDefinitions.length];
 
-            for (int i = 0; i < definitions.length; i++) {
-                totalDefinitions[i] = definitions[i];
+            for (int i = 0; i < additionalDefinitions.length; i++) {
+                totalDefinitions[i] = additionalDefinitions[i];
             }
 
             for (int i = 0; i < myPriorityDefinitions.length; i++) {
-                totalDefinitions[definitions.length + i] = myPriorityDefinitions[i];
+                totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(myParallelism, totalDefinitions, myGapTolerance, myFactory);
+            return new ConfigurableStrategy(myParallelism, totalDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
         public NumberContext getGapTolerance() {
             return myGapTolerance;
+        }
+
+        public GMICutConfiguration getGMICutConfiguration() {
+            return myGMICutConfiguration;
         }
 
         public List<Comparator<NodeKey>> getWorkerPriorities() {
@@ -94,30 +103,74 @@ public interface IntegerStrategy {
         /**
          * Change the MIP gap
          */
-        public ConfigurableStrategy withGapTolerance(final NumberContext gapTolerance) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, gapTolerance, myFactory);
+        public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, newTolerance, myFactory, myGMICutConfiguration);
         }
 
-        /**
-         * If you created a custom {@link ModelStrategy} implementation you need to provide a factory for it
-         * here.
-         */
-        public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myGapTolerance, factory);
+        public ConfigurableStrategy withGMICutConfiguration(final GMICutConfiguration newConfiguration) {
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myGapTolerance, myFactory, newConfiguration);
+        }
+
+        public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myGapTolerance, newFactory, myGMICutConfiguration);
         }
 
         /**
          * How many threads will be used? Perhaps use {@link Parallelism} to obtain a suitable value.
          */
-        public ConfigurableStrategy withParallelism(final IntSupplier parallelism) {
-            return new ConfigurableStrategy(parallelism, myPriorityDefinitions, myGapTolerance, myFactory);
+        public ConfigurableStrategy withParallelism(final IntSupplier newParallelism) {
+            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
-        public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... definitions) {
-            return new ConfigurableStrategy(myParallelism, definitions, myGapTolerance, myFactory);
+        public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
+            return new ConfigurableStrategy(myParallelism, newDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
+        }
+
+    }
+
+    /**
+     * Gomory Mixed Integer Cut Configuration
+     *
+     * @author apete
+     */
+    public static final class GMICutConfiguration {
+
+        /**
+         * The minimum fractionality of the integer variable used to generate the cut. Less than this, and the
+         * (potential) cut is never generated.
+         */
+        public final double fractionality;
+        /**
+         * After the cut is generated it is transformed to be expresssed in the original model variables. In
+         * this process the RHS of the cut inequality changes. This parameter controls how much the RHS is
+         * allowed to grow in magnitude. If it grows/expands to much the cut is discarded.
+         * <p>
+         * The cut/constraint violation is always exactly 1 (due to how the cut is generated). That means the
+         * magnitude of the RHS becomes a meassure of the relative cut violation. Allowing large RHS values is
+         * equivalent to accepting small relative cut violations. The number you specify here is the inverse
+         * of the relative cut violation (the absolute value of the max RHS allowed).
+         */
+        public final BigDecimal violation;
+
+        public GMICutConfiguration() {
+            this(PrimitiveMath.ELEVENTH, BigMath.TWELVE);
+        }
+
+        private GMICutConfiguration(final double newAway, final BigDecimal newExpansion) {
+            super();
+            fractionality = newAway;
+            violation = newExpansion;
+        }
+
+        public GMICutConfiguration withFractionality(final double newFractionality) {
+            return new GMICutConfiguration(Math.min(Math.abs(newFractionality), 0.5), violation);
+        }
+
+        public GMICutConfiguration withViolation(final BigDecimal newViolation) {
+            return new GMICutConfiguration(fractionality, newViolation.abs());
         }
 
     }
@@ -126,10 +179,10 @@ public interface IntegerStrategy {
 
     static ConfigurableStrategy newConfigurable() {
 
-        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.SEQUENCE_DECR, NodeKey.DISPLACEMENT_INCR,
-                NodeKey.DISPLACEMENT_DECR, NodeKey.SEQUENCE_INCR };
+        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
+                NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
 
-        return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(6, 8), DefaultStrategy::new);
+        return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(6, 8), DefaultStrategy::new, new GMICutConfiguration());
     }
 
     /**
@@ -142,6 +195,8 @@ public interface IntegerStrategy {
      * @return The tolerance context used to determine if the gap is too small or not
      */
     NumberContext getGapTolerance();
+
+    GMICutConfiguration getGMICutConfiguration();
 
     /**
      * There will be 1 worker thread per item in the returned {@link List}. The {@link Comparator} instances
