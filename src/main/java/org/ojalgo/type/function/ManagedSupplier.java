@@ -19,30 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.function.Supplier;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+import org.ojalgo.type.management.Throughput;
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
+final class ManagedSupplier<T> implements AutoSupplier<T> {
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
+    private final Throughput myManager;
+    private final Supplier<T> mySupplier;
 
-    public LineSplittingParser(final String regex, final boolean trim) {
+    ManagedSupplier(final Throughput manager, final Supplier<T> supplier) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+        myManager = manager;
+        mySupplier = supplier;
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public void close() throws Exception {
+        if (mySupplier instanceof AutoCloseable) {
+            ((AutoCloseable) mySupplier).close();
+        }
+    }
+
+    public T read() {
+        T retVal = mySupplier.get();
+        if (retVal != null) {
+            myManager.increment();
+        }
+        return retVal;
     }
 
 }

@@ -21,28 +21,39 @@
  */
 package org.ojalgo.netio;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.io.File;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+abstract class NetioUtils {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+    /**
+     * @param file Path to a file or directory (does not need to be empty) to be deleted
+     */
+    static void delete(final File file) {
+
+        if (file == null || !file.exists()) {
+            return;
+        }
+
+        File[] nested = file.listFiles();
+
+        if (nested != null && nested.length > 0) {
+            for (File subfile : nested) {
+                NetioUtils.delete(subfile);
+            }
+        }
+
+        if (!file.delete()) {
+            throw new RuntimeException("Failed to delete " + file.getAbsolutePath());
+        }
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
-    }
-
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    /**
+     * Make sure this directory exists, create if necessary
+     */
+    static void mkdirs(final File dir) {
+        if (!dir.exists() && (!dir.mkdirs() && !dir.exists())) {
+            throw new RuntimeException("Failed to create " + dir.getAbsolutePath());
+        }
     }
 
 }

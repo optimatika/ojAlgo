@@ -19,30 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.function.UnaryOperator;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+@FunctionalInterface
+public interface OperatorWithException<T> extends UnaryOperator<T> {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+    default T apply(final T type) {
+        try {
+            return this.invoke(type);
+        } catch (Exception cause) {
+            throw new RuntimeException(cause);
+        }
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
-    }
-
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
-    }
+    T invoke(T type) throws Exception;
 
 }

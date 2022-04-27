@@ -24,7 +24,6 @@ package org.ojalgo.data.domain.finance.series;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicParser;
 
@@ -42,15 +41,15 @@ public class YahooParser implements BasicParser<YahooParser.Data> {
         public double open;
         public double volume;
 
-        public Data(LocalDate date) {
+        public Data(final LocalDate date) {
             super(date);
         }
 
-        Data(CharSequence text) {
+        Data(final CharSequence text) {
             super(text);
         }
 
-        Data(CharSequence text, DateTimeFormatter formatter) {
+        Data(final CharSequence text, final DateTimeFormatter formatter) {
             super(text, formatter);
         }
 
@@ -66,7 +65,7 @@ public class YahooParser implements BasicParser<YahooParser.Data> {
     }
 
     @Override
-    public YahooParser.Data parse(final String line) throws RecoverableCondition {
+    public YahooParser.Data parse(final String line) {
 
         // Date,Open,High,Low,Close,Adj Close,Volume
 

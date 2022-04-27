@@ -796,13 +796,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         int result = super.hashCode();
         result = prime * result + myColDim;
         result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        result = prime * result + myRowDim;
-        return result;
-    }
-
-    @Override
-    public long indexOfLargest() {
-        return myUtility.indexOfLargest();
+        return prime * result + myRowDim;
     }
 
     @Override

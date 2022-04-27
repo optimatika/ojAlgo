@@ -19,30 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.management;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.concurrent.atomic.LongAdder;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+public final class Throughput implements ThroughputMBean {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+    private static final double NANOS = 1E9;
+
+    private long myLastTime = System.nanoTime();
+    private double myLastTotal = 0.0;
+    private final LongAdder myTotal = new LongAdder();
+
+    public void add(final long x) {
+        myTotal.add(x);
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
+    public double getRate() {
+
+        long currentTime = System.nanoTime();
+        double currentTotal = myTotal.sum();
+
+        double difference = currentTotal - myLastTotal;
+        double interval = (currentTime - myLastTime) / NANOS;
+
+        double rate = difference / interval;
+
+        myLastTime = currentTime;
+        myLastTotal = currentTotal;
+
+        return rate;
     }
 
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
+    public long getTotal() {
+        return myTotal.sum();
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public void increment() {
+        myTotal.increment();
     }
 
 }

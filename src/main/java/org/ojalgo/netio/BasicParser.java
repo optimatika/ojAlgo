@@ -21,19 +21,20 @@
  */
 package org.ojalgo.netio;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.function.Consumer;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
+import java.util.function.Supplier;
 
-import org.ojalgo.RecoverableCondition;
-
-public interface BasicParser<T> {
+/**
+ * A (CSV) parser interface. Could theoretically parse anything, but is primarily aimed towards parsing
+ * delimited text lines.
+ *
+ * @author apete
+ */
+@FunctionalInterface
+public interface BasicParser<T> extends TextLineReader.Parser<T> {
 
     /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
@@ -44,29 +45,10 @@ public interface BasicParser<T> {
      */
     default void parse(final File file, final boolean skipHeader, final Consumer<T> consumer) {
 
-        if (file.exists() && file.isFile() && file.canRead()) {
-
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-
-                final String path = file.getPath();
-
-                if (path.endsWith(".zip")) {
-                    try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(fileInputStream))) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
-                } else if (path.endsWith(".gz")) {
-                    try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(fileInputStream))) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
-                } else {
-                    try (InputStreamReader reader = new InputStreamReader(fileInputStream)) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
-                }
-
-            } catch (IOException cause) {
-                throw new RuntimeException(cause);
-            }
+        try (TextLineReader supplier = TextLineReader.of(file)) {
+            this.parse(supplier, skipHeader, consumer);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
         }
     }
 
@@ -87,23 +69,10 @@ public interface BasicParser<T> {
      */
     default void parse(final Reader reader, final boolean skipHeader, final Consumer<T> consumer) {
 
-        String tmpLine = null;
-        T tmpItem = null;
-        try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
-            if (skipHeader) {
-                bufferedReader.readLine();
-            }
-            while ((tmpLine = bufferedReader.readLine()) != null) {
-                try {
-                    if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine)) != null)) {
-                        consumer.accept(tmpItem);
-                    }
-                } catch (final RecoverableCondition xcptn) {
-                    // Skip this line and try the next
-                }
-            }
-        } catch (final IOException exception) {
-            exception.printStackTrace();
+        try (TextLineReader supplier = new TextLineReader(reader)) {
+            this.parse(supplier, skipHeader, consumer);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
         }
     }
 
@@ -115,16 +84,33 @@ public interface BasicParser<T> {
         this.parse(reader, false, consumer);
     }
 
-    /**
-     * Parse one line into some custom object.
-     *
-     * @param line The text line to parse
-     * @return An object containing (referencing) the parsed data
-     */
-    T parse(String line) throws RecoverableCondition;
-
     default void parse(final String filePath, final boolean skipHeader, final Consumer<T> consumer) {
         this.parse(new File(filePath), skipHeader, consumer);
+    }
+
+    default void parse(final String filePath, final Consumer<T> consumer) {
+        this.parse(filePath, false, consumer);
+    }
+
+    default void parse(final Supplier<String> lineSupplier, final boolean skipHeader, final Consumer<T> consumer) {
+
+        String line = null;
+        T item = null;
+
+        if (skipHeader) {
+            line = lineSupplier.get();
+            line = null;
+        }
+
+        while ((line = lineSupplier.get()) != null) {
+            if ((line.length() > 0) && !line.startsWith("#") && ((item = this.parse(line)) != null)) {
+                consumer.accept(item);
+            }
+        }
+    }
+
+    default void parse(final Supplier<String> lineSupplier, final Consumer<T> consumer) {
+        this.parse(lineSupplier, false, consumer);
     }
 
 }

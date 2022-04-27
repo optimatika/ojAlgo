@@ -3,7 +3,6 @@ package org.ojalgo.data.domain.finance.series;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicParser;
 
@@ -24,15 +23,15 @@ public class AlphaVantageParser implements BasicParser<AlphaVantageParser.Data> 
         public double open;
         public double volume;
 
-        Data(CharSequence text) {
+        Data(final CharSequence text) {
             super(text);
         }
 
-        Data(CharSequence text, DateTimeFormatter formatter) {
+        Data(final CharSequence text, final DateTimeFormatter formatter) {
             super(text, formatter);
         }
 
-        Data(LocalDate date) {
+        Data(final LocalDate date) {
             super(date);
         }
 
@@ -48,7 +47,7 @@ public class AlphaVantageParser implements BasicParser<AlphaVantageParser.Data> 
     }
 
     @Override
-    public AlphaVantageParser.Data parse(String line) throws RecoverableCondition {
+    public AlphaVantageParser.Data parse(final String line) {
 
         // timestamp,open,high,low,close,adjusted_close,volume,dividend_amount,split_coefficient
         // timestamp,open,high,low,close,adjusted close,volume,dividend amount

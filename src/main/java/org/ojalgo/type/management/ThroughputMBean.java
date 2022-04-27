@@ -19,30 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.management;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+public interface ThroughputMBean {
 
-    private final String myRegExp;
-    private final boolean myTrim;
+    /**
+     * The, current, througput rate (items/second)
+     */
+    double getRate();
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
-
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
-    }
-
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
-    }
+    /**
+     * The total number of items that passed through here.
+     */
+    long getTotal();
 
 }

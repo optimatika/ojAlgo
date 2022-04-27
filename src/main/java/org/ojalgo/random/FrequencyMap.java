@@ -32,19 +32,18 @@ import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Count the occurrence of different keys
- *
- * @author apete
  */
 public final class FrequencyMap<T> {
 
     @FunctionalInterface
     public interface FrequencyPredicate<T> {
 
-        boolean test(T element, SampleSet properties, long frequency);
+        boolean test(T element, SampleSet statistics, long frequency);
 
     }
 
-    private final ConcurrentHashMap<T, LongAdder> myFrequencyMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<T, LongAdder> myMap = new ConcurrentHashMap<>();
+
     private final LongAdder myPopulation = new LongAdder();
 
     public FrequencyMap() {
@@ -77,18 +76,17 @@ public final class FrequencyMap<T> {
         }
     }
 
-    /**
-     * @return The population size
-     */
-    public long count() {
-        return myPopulation.longValue();
+    public void addAll(final Set<? extends T> elements, final long count) {
+        for (T element : elements) {
+            this.add(element, count);
+        }
     }
 
     /**
      * @return All known elements
      */
     public Set<T> elements() {
-        return myFrequencyMap.keySet();
+        return myMap.keySet();
     }
 
     /**
@@ -99,11 +97,12 @@ public final class FrequencyMap<T> {
 
         Set<T> retVal = new HashSet<>();
 
-        SampleSet sample = this.sample();
+        SampleSet statistics = this.sample();
 
-        for (Entry<T, LongAdder> entry : myFrequencyMap.entrySet()) {
-            if (predicate.test(entry.getKey(), sample, entry.getValue().longValue())) {
-                retVal.add(entry.getKey());
+        for (Entry<T, LongAdder> entry : myMap.entrySet()) {
+            T element = entry.getKey();
+            if (predicate.test(element, statistics, entry.getValue().longValue())) {
+                retVal.add(element);
             }
         }
 
@@ -111,7 +110,7 @@ public final class FrequencyMap<T> {
     }
 
     public long getFrequency(final T element) {
-        return myFrequencyMap.getOrDefault(element, new LongAdder()).longValue();
+        return myMap.getOrDefault(element, new LongAdder()).longValue();
     }
 
     public long getMaximumFrequenecy() {
@@ -131,10 +130,14 @@ public final class FrequencyMap<T> {
     }
 
     public double getRelativeFrequency(final T element) {
-        if (myPopulation.sum() == 0L) {
+
+        long populationSize = this.populationSize();
+
+        if (populationSize == 0L) {
             return PrimitiveMath.ZERO;
         }
-        return this.getFrequency(element) / myPopulation.doubleValue();
+
+        return ((double) this.getFrequency(element)) / ((double) populationSize);
     }
 
     public void increment(final T element) {
@@ -148,14 +151,55 @@ public final class FrequencyMap<T> {
         }
     }
 
+    public void merge(final FrequencyMap<T> other) {
+        this.addAll(other.getMap());
+    }
+
+    public void merge(final FrequencyMap<T> other, final FrequencyPredicate<T> predicate) {
+
+        SampleSet statistics = other.sample();
+
+        for (Entry<T, LongAdder> entry : other.getMap().entrySet()) {
+            T element = entry.getKey();
+            long frequency = entry.getValue().longValue();
+            if (predicate.test(element, statistics, frequency)) {
+                this.add(element, frequency);
+            }
+        }
+    }
+
+    public int numberOfKnownKeys() {
+        return myMap.size();
+    }
+
+    public long populationSize() {
+        return myPopulation.longValue();
+    }
+
     public void reset() {
-        myFrequencyMap.clear();
+        myMap.clear();
         myPopulation.reset();
+    }
+
+    /**
+     * Remove entries that do not satisfy the predicate - remove elements that would not be returned by
+     * {@link #elements(FrequencyPredicate)}.
+     */
+    public void retainIf(final FrequencyPredicate<T> predicate) {
+
+        SampleSet statistics = this.sample();
+
+        for (Entry<T, LongAdder> entry : myMap.entrySet()) {
+            T element = entry.getKey();
+            if (!predicate.test(element, statistics, entry.getValue().longValue())) {
+                myMap.remove(element);
+            }
+        }
     }
 
     public SampleSet sample() {
 
-        Set<Entry<T, LongAdder>> entries = myFrequencyMap.entrySet();
+        Set<Entry<T, LongAdder>> entries = myMap.entrySet();
 
         double[] frequencies = new double[entries.size()];
 
@@ -168,7 +212,7 @@ public final class FrequencyMap<T> {
     }
 
     private LongAdder get(final T element) {
-        return myFrequencyMap.computeIfAbsent(element, k -> new LongAdder());
+        return myMap.computeIfAbsent(element, k -> new LongAdder());
     }
 
     private Entry<T, LongAdder> getEntryWithHighestFrequenecy() {
@@ -176,7 +220,7 @@ public final class FrequencyMap<T> {
         Entry<T, LongAdder> retVal = null;
         long maximum = 0L;
 
-        for (Entry<T, LongAdder> entry : myFrequencyMap.entrySet()) {
+        for (Entry<T, LongAdder> entry : myMap.entrySet()) {
             if (entry.getValue().longValue() > maximum) {
                 maximum = entry.getValue().longValue();
                 retVal = entry;
@@ -184,6 +228,10 @@ public final class FrequencyMap<T> {
         }
 
         return retVal;
+    }
+
+    ConcurrentHashMap<T, LongAdder> getMap() {
+        return myMap;
     }
 
 }

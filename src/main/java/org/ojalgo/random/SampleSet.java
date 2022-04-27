@@ -251,6 +251,8 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
+     * https://en.wikipedia.org/wiki/Quartile
+     * <p>
      * Potentially expensive as it requires copying and sorting of the samples.
      */
     public double getQuartile1() {
@@ -263,6 +265,8 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
+     * https://en.wikipedia.org/wiki/Quartile
+     * <p>
      * Potentially expensive as it requires copying and sorting of the samples.
      */
     public double getQuartile2() {
@@ -275,6 +279,8 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
+     * https://en.wikipedia.org/wiki/Quartile
+     * <p>
      * Potentially expensive as it requires copying and sorting of the samples.
      */
     public double getQuartile3() {

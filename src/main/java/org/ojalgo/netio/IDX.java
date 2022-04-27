@@ -21,10 +21,7 @@
  */
 package org.ojalgo.netio;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.ojalgo.array.ArrayAnyD;
@@ -43,49 +40,10 @@ public abstract class IDX {
         return IDX.parse(filePath, Primitive32Array.FACTORY);
     }
 
-    public static ArrayAnyD<Double> parse(final File filePath, final DenseArray.Factory<Double> arrayFactory) {
+    public static ArrayAnyD<Double> parse(final File file, final DenseArray.Factory<Double> factory) {
 
-        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
-
-            input.read();
-            input.read();
-            int type = input.read();
-            int rank = input.read();
-
-            long[] structure = new long[rank];
-            for (int i = 0; i < rank; i++) {
-                structure[rank - 1 - i] = input.readInt();
-            }
-
-            ArrayAnyD<Double> data = ArrayAnyD.factory(arrayFactory).make(structure);
-
-            for (long i = 0, limit = data.count(); i < limit; i++) {
-                switch (type) {
-                case 0x08:
-                    data.set(i, input.readUnsignedByte());
-                    break;
-                case 0x09:
-                    data.set(i, input.readByte());
-                    break;
-                case 0x0B:
-                    data.set(i, input.readShort());
-                    break;
-                case 0x0C8:
-                    data.set(i, input.readInt());
-                    break;
-                case 0x0D:
-                    data.set(i, input.readFloat());
-                    break;
-                case 0x0E:
-                    data.set(i, input.readDouble());
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown element type!");
-                }
-            }
-
-            return data;
-
+        try (DataReader<ArrayAnyD<Double>> reader = DataReader.of(file, DataInterpreter.newIDX(factory))) {
+            return reader.read();
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }

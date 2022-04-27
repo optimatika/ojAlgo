@@ -19,30 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+final class MappedConsumer<IN, OUT> implements AutoConsumer<IN> {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
+    private final Consumer<OUT> myConsumer;
+    private final Function<IN, OUT> myMapper;
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
+    MappedConsumer(final Function<IN, OUT> mapper, final Consumer<OUT> consumer) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+        myMapper = mapper;
+        myConsumer = consumer;
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public void close() throws Exception {
+        if (myConsumer instanceof AutoCloseable) {
+            ((AutoCloseable) myConsumer).close();
+        }
+    }
+
+    public void write(final IN item) {
+        myConsumer.accept(myMapper.apply(item));
     }
 
 }

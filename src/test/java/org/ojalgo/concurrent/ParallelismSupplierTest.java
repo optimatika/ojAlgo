@@ -59,8 +59,8 @@ public class ParallelismSupplierTest {
     @Test
     public void testMinMax() {
 
-        TestUtils.assertEquals(8, INIT9.min(8));
-        TestUtils.assertEquals(10, INIT9.max(10));
+        TestUtils.assertEquals(8, INIT9.limit(8));
+        TestUtils.assertEquals(10, INIT9.require(10));
     }
 
     @Test

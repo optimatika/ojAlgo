@@ -19,30 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+final class ShardedConsumer<T> implements AutoConsumer<T> {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
+    private final Consumer<T>[] myConsumers;
+    private final ToIntFunction<T> myDistributor;
+    private final int myNumberOfShards;
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
+    ShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
 
-    public LineSplittingParser(final String regex, final boolean trim) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+
+        myConsumers = consumers;
+        myNumberOfShards = consumers.length;
+        myDistributor = distributor;
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public void close() throws Exception {
+        for (Consumer<T> consumer : myConsumers) {
+            if (consumer instanceof AutoCloseable) {
+                ((AutoCloseable) consumer).close();
+            }
+        }
+    }
+
+    public void write(final T item) {
+        myConsumers[Math.abs(myDistributor.applyAsInt(item) % myNumberOfShards)].accept(item);
     }
 
 }

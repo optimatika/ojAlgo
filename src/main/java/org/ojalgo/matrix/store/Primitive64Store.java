@@ -817,8 +817,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + myColDim;
-        result = prime * result + myRowDim;
-        return result;
+        return prime * result + myRowDim;
     }
 
     @Override
@@ -1056,11 +1055,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         } else {
             myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
         }
-    }
-
-    @Override
-    public long indexOfLargest() {
-        return myUtility.indexOfLargest();
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {

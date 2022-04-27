@@ -3,7 +3,6 @@ package org.ojalgo.data.domain.finance.series;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicParser;
 
@@ -23,15 +22,15 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
         public double unadjustedVolume;
         public double volume;
 
-        Data(CharSequence text) {
+        Data(final CharSequence text) {
             super(text);
         }
 
-        Data(CharSequence text, DateTimeFormatter formatter) {
+        Data(final CharSequence text, final DateTimeFormatter formatter) {
             super(text, formatter);
         }
 
-        Data(LocalDate date) {
+        Data(final LocalDate date) {
             super(date);
         }
 
@@ -47,7 +46,7 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
     }
 
     @Override
-    public IEXTradingParser.Data parse(String line) throws RecoverableCondition {
+    public IEXTradingParser.Data parse(final String line) {
 
         // date,open,high,low,close,volume,unadjustedVolume,change,changePercent,vwap,label,changeOverTime
 

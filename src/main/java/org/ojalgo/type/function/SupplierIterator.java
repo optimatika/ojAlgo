@@ -19,30 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+final class SupplierIterator<T> implements Iterator<T> {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
+    private transient T myNext;
+    private final AutoSupplier<T> mySupplier;
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
+    SupplierIterator(final AutoSupplier<T> supplier) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+        mySupplier = supplier;
+        myNext = mySupplier.get();
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public boolean hasNext() {
+        return myNext != null;
+    }
+
+    public T next() {
+        if (myNext == null) {
+            throw new NoSuchElementException();
+        }
+        T retVal = myNext;
+        myNext = mySupplier.get();
+        return retVal;
     }
 
 }

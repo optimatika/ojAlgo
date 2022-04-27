@@ -21,28 +21,30 @@
  */
 package org.ojalgo.netio;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+import org.ojalgo.type.function.AutoConsumer;
+import org.ojalgo.type.function.AutoSupplier;
+import org.ojalgo.type.function.OperatorWithException;
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+public interface TextLineInterpreter<T> extends TextLineReader.Parser<T>, TextLineWriter.Formatter<T> {
+
+    default AutoSupplier<T> newReader(final File file) {
+        return TextLineReader.of(file).withParser(this);
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
+    default AutoSupplier<T> newReader(final File file, final OperatorWithException<InputStream> filter) {
+        return TextLineReader.of(file, filter).withParser(this);
     }
 
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
+    default AutoConsumer<T> newWriter(final File file) {
+        return TextLineWriter.of(file).withFormatter(this);
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    default AutoConsumer<T> newWriter(final File file, final OperatorWithException<OutputStream> filter) {
+        return TextLineWriter.of(file, filter).withFormatter(this);
     }
 
 }

@@ -11,6 +11,10 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.structure.Structure1D.IndexMapper;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public final class TableData<R> {
 
     private static final NumberContext GENERAL = NumberContext.ofScale(8);

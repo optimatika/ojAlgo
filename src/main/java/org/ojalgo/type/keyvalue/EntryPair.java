@@ -37,6 +37,55 @@ import org.ojalgo.type.PrimitiveNumber;
  */
 public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
+    final class Dual<T> {
+
+        public final T first;
+        public final T second;
+
+        Dual(final T obj1, final T obj2) {
+
+            super();
+
+            first = obj1;
+            second = obj2;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof Dual)) {
+                return false;
+            }
+            Dual other = (Dual) obj;
+            if (first == null) {
+                if (other.first != null) {
+                    return false;
+                }
+            } else if (!first.equals(other.first)) {
+                return false;
+            }
+            if (second == null) {
+                if (other.second != null) {
+                    return false;
+                }
+            } else if (!second.equals(other.second)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((first == null) ? 0 : first.hashCode());
+            return prime * result + ((second == null) ? 0 : second.hashCode());
+        }
+
+    }
+
     interface KeyedPrimitive<K> extends EntryPair<K, PrimitiveNumber>, PrimitiveNumber {
 
         default Set<Entry<K, PrimitiveNumber>> entrySet() {
@@ -76,7 +125,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.byteValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -124,8 +173,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
-            result = prime * result + myValue;
-            return result;
+            return prime * result + myValue;
         }
 
         public int intValue() {
@@ -166,7 +214,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.doubleValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -216,8 +264,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
             long temp;
             temp = Double.doubleToLongBits(myValue);
-            result = prime * result + (int) (temp ^ temp >>> 32);
-            return result;
+            return prime * result + (int) (temp ^ temp >>> 32);
         }
 
         public Set<K> keySet() {
@@ -250,7 +297,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.floatValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -302,8 +349,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
-            result = prime * result + Float.floatToIntBits(myValue);
-            return result;
+            return prime * result + Float.floatToIntBits(myValue);
         }
 
         public Set<K> keySet() {
@@ -336,7 +382,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.intValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -384,8 +430,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
-            result = prime * result + myValue;
-            return result;
+            return prime * result + myValue;
         }
 
         public int intValue() {
@@ -426,7 +471,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.longValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -474,8 +519,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
-            result = prime * result + (int) (myValue ^ myValue >>> 32);
-            return result;
+            return prime * result + (int) (myValue ^ myValue >>> 32);
         }
 
         public int intValue() {
@@ -546,6 +590,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         public Collection<V> values() {
             return Collections.singleton(myValue);
         }
+
     }
 
     final class ObjectShort<K> implements KeyedPrimitive<K> {
@@ -568,7 +613,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         }
 
         public boolean containsValue(final Object value) {
-            if (value != null && value instanceof Comparable<?>) {
+            if (value instanceof Comparable<?>) {
                 return NumberDefinition.shortValue((Comparable<?>) value) == myValue;
             }
             return false;
@@ -616,8 +661,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             final int prime = 31;
             int result = 1;
             result = prime * result + (myKey == null ? 0 : myKey.hashCode());
-            result = prime * result + myValue;
-            return result;
+            return prime * result + myValue;
         }
 
         public int intValue() {
@@ -659,6 +703,34 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         return new ObjectInt<>(key, value);
     }
 
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final byte value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final double value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final float value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final int value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final long value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final short value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
+    static <K, V> EntryPair<Dual<K>, V> of(final K key1, final K key2, final V value) {
+        return EntryPair.of(new Dual<>(key1, key2), value);
+    }
+
     static <K> KeyedPrimitive<K> of(final K key, final long value) {
         return new ObjectLong<>(key, value);
     }
@@ -667,8 +739,40 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         return new ObjectShort<>(key, value);
     }
 
-    static <K, V> ObjectObject<K, V> of(final K key, final V value) {
+    static <K, V> EntryPair<K, V> of(final K key, final V value) {
         return new ObjectObject<>(key, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final byte value) {
+        return EntryPair.of(this, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final double value) {
+        return EntryPair.of(this, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final float value) {
+        return EntryPair.of(this, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final int value) {
+        return EntryPair.of(this, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final long value) {
+        return EntryPair.of(this, value);
+    }
+
+    default KeyedPrimitive<EntryPair<K, V>> asKeyTo(final short value) {
+        return EntryPair.of(this, value);
+    }
+
+    default <T> EntryPair<EntryPair<K, V>, T> asKeyTo(final T value) {
+        return EntryPair.of(this, value);
+    }
+
+    default <T> EntryPair<T, EntryPair<K, V>> asValueTo(final T key) {
+        return EntryPair.of(key, this);
     }
 
     default void clear() {
