@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEigenvalueCase;
 import org.ojalgo.matrix.SimpleLUCase;
@@ -32,6 +31,7 @@ import org.ojalgo.matrix.SimpleQRCase;
 import org.ojalgo.matrix.SimpleSingularValueCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
 
 public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
@@ -142,10 +142,10 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(JAMA_QR.decompose(tmpMtrxA), PRIMITIVE_QR.decompose(tmpMtrxA));
 
-        final int[] tmpEconSet = BasicArray.makeIncreasingRange(0, tmpMinDim);
+        final int[] tmpEconSet = Structure1D.newIncreasingRange(0, tmpMinDim);
 
-        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().column(tmpEconSet), COMPARE_CONTEXT);
-        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().row(tmpEconSet), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().columns(tmpEconSet), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().rows(tmpEconSet), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_QR.getRank(), PRIMITIVE_QR.getRank());
 
         TestUtils.assertEquals(JAMA_QR.isComputed(), PRIMITIVE_QR.isComputed());

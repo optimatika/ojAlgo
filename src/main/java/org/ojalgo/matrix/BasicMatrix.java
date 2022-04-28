@@ -191,7 +191,19 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.newInstance(this.store().bidiagonal(upper));
     }
 
-    public M columns(final int[] columns) {
+    public M column(final int column) {
+        return this.newInstance(this.store().column(column));
+    }
+
+    public M column(final long column) {
+        return this.newInstance(this.store().column(column));
+    }
+
+    public M columns(final int... columns) {
+        return this.newInstance(this.store().columns(columns));
+    }
+
+    public M columns(final long... columns) {
         return this.newInstance(this.store().columns(columns));
     }
 
@@ -540,7 +552,19 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.newInstance(this.store().right(numberOfColumns));
     }
 
-    public M rows(final int[] rows) {
+    public M row(final int row) {
+        return this.newInstance(this.store().row(row));
+    }
+
+    public M row(final long row) {
+        return this.newInstance(this.store().row(row));
+    }
+
+    public M rows(final int... rows) {
+        return this.newInstance(this.store().rows(rows));
+    }
+
+    public M rows(final long... rows) {
         return this.newInstance(this.store().rows(rows));
     }
 

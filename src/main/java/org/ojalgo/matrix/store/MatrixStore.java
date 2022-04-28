@@ -158,13 +158,25 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LowerTriangularStore<>(new UpperHessenbergStore<>(this), false);
     }
 
+    default MatrixStore<N> column(final int column) {
+        return Structure2D.Logical.super.column(column);
+    }
+
+    default MatrixStore<N> column(final long column) {
+        return Structure2D.Logical.super.column(column);
+    }
+
     /**
      * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
      * once, and any negative column reference/index will translate to a column of zeros. The number of
      * columns in the resulting matrix is the same as the number of elements in the columns index array.
      */
-    default MatrixStore<N> columns(final int[] columns) {
+    default MatrixStore<N> columns(final int... columns) {
         return new ColumnsStore<>(this, columns);
+    }
+
+    default MatrixStore<N> columns(final long... columns) {
+        return Structure2D.Logical.super.columns(columns);
     }
 
     /**
@@ -526,13 +538,25 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LeftRightStore<>(this, right);
     }
 
+    default MatrixStore<N> row(final int row) {
+        return Structure2D.Logical.super.row(row);
+    }
+
+    default MatrixStore<N> row(final long row) {
+        return Structure2D.Logical.super.row(row);
+    }
+
     /**
      * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once, and
      * any negative row reference/index will translate to a row of zeros. The number of rows in the resulting
      * matrix is the same as the number of elements in the rows index array.
      */
-    default MatrixStore<N> rows(final int[] rows) {
+    default MatrixStore<N> rows(final int... rows) {
         return new RowsStore<>(this, rows);
+    }
+
+    default MatrixStore<N> rows(final long... rows) {
+        return Structure2D.Logical.super.rows(rows);
     }
 
     default MatrixStore<N> signum() {

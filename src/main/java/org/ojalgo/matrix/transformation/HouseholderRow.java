@@ -5,7 +5,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.NumberDefinition;
 
 final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implements HouseholderReference<N> {
@@ -68,7 +68,7 @@ final class HouseholderRow<N extends Comparable<N>> extends RowView<N> implement
     }
 
     public void point(final long row, final long col) {
-        this.setRow(row);
+        this.goToRow(row);
         myFirst = (int) col;
     }
 

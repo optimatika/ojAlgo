@@ -143,7 +143,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
-        this.collect(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+        this.collect(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }
@@ -200,7 +200,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
 
-            Primitive64Store.FACTORY.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+            Primitive64Store.FACTORY.makeWrapper(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
 
             return this.doSolve(preallocated);
 

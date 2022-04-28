@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.structure.Structure1D;
 
 final class Pivot {
 
@@ -69,7 +69,7 @@ final class Pivot {
     void reset(final int numberOf) {
 
         if ((myOrder == null) || (myOrder.length != numberOf)) {
-            myOrder = BasicArray.makeIncreasingRange(0, numberOf);
+            myOrder = Structure1D.newIncreasingRange(0, numberOf);
         } else {
             for (int i = 0; i < myOrder.length; i++) {
                 myOrder[i] = i;

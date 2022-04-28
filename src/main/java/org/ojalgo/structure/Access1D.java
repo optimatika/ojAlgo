@@ -72,7 +72,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
-    public static class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
+    public static final class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
 
         private long myCursor;
         private long myLastCursor;
@@ -150,6 +150,44 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             }
 
             return null;
+        }
+
+    }
+
+    public static final class SelectionView<N extends Comparable<N>> implements Access1D<N>, Collectable<N, Mutate1D> {
+
+        private final Access1D<N> myFullData;
+        private final long[] mySelection;
+
+        SelectionView(final Access1D<N> fullData, final long[] selection) {
+
+            super();
+
+            myFullData = fullData;
+            mySelection = selection;
+        }
+
+        public long count() {
+            return mySelection.length;
+        }
+
+        public double doubleValue(final long index) {
+            return myFullData.doubleValue(mySelection[Math.toIntExact(index)]);
+        }
+
+        public N get(final long index) {
+            return myFullData.get(mySelection[Math.toIntExact(index)]);
+        }
+
+        public void supplyTo(final Mutate1D receiver) {
+            for (int i = 0, limit = mySelection.length; i < limit; i++) {
+                receiver.set(i, myFullData.get(mySelection[i]));
+            }
+        }
+
+        @Override
+        public String toString() {
+            return Access1D.toString(this);
         }
 
     }
@@ -409,6 +447,13 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     default ElementView1D<N, ?> nonzeros() {
         return this.elements();
+    }
+
+    /**
+     * Creates a view of the underlying data structure of only the selected elements.
+     */
+    default SelectionView<N> select(final long... selection) {
+        return new Access1D.SelectionView<>(this, selection);
     }
 
     default short shortValue(final long index) {

@@ -28,8 +28,8 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.RowView;
 import org.ojalgo.type.context.NumberContext;
 
 final class DualSimplex extends SimplexSolver {
@@ -161,9 +161,7 @@ final class DualSimplex extends SimplexSolver {
 
         Result result = solver.solve();
 
-        Optimisation.Result retVal = DualSimplex.toConvexState(result, convex);
-
-        return retVal;
+        return DualSimplex.toConvexState(result, convex);
     }
 
     static int size(final ConvexSolver.Builder convex) {

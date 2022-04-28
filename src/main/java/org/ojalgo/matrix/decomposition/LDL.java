@@ -90,6 +90,6 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
         int[] pivotOrder = this.getPivotOrder();
 
-        return mtrxL.multiply(mtrxD).multiply(mtrxR).row(pivotOrder).column(pivotOrder);
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(pivotOrder).columns(pivotOrder);
     }
 }

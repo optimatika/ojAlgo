@@ -11,6 +11,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.structure
+
+- `Access1D`, `Access2D` and `AccessAnyD` each gained additional features to `select` (view) subsets of the elements and/or to iterate over elements/rows/columns/vectors/matruces...
+
+### Changed
+
+#### org.ojalgo.structure
+
+- The various `row`, `rows`, `column` and `columns` methods in `Structure2D.Logical` have been signature-refactored to be more logical. If you used the `row` or `column` alternatives to reference more than 1 row/column you need to change your code to instead use `rows` or `columns`.
+- The previously existing `Access2D.RowView`, `Access2D.ColumnView`, `AccessAnyD.VectorView` and `AccessAnyD.MatrixView` gained support to "goTo" directly to a specified row/column/vector/matrix
+
 ## [51.2.0] – 2022-04-20
 
 ### Added

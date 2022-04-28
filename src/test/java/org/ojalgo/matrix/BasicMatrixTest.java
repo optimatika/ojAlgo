@@ -45,8 +45,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.ColumnView;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.ColumnView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -387,12 +387,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countColumns());
         }
 
-        expected = rAA.column(tmpArr);
+        expected = rAA.columns(tmpArr);
 
-        actual = cAA.column(tmpArr);
+        actual = cAA.columns(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.column(tmpArr);
+        actual = p64AA.columns(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
     }
@@ -528,12 +528,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rAA.countRows());
         }
 
-        expected = rAA.row(tmpArr);
+        expected = rAA.rows(tmpArr);
 
-        actual = cAA.row(tmpArr);
+        actual = cAA.rows(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        actual = p64AA.row(tmpArr);
+        actual = p64AA.rows(tmpArr);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
     }

@@ -56,7 +56,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 
@@ -424,7 +424,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
             mtrxC = Primitive64Store.FACTORY.make(numbVars, 1);
-            if (!(sourceModel.getOptimisationSense() == Optimisation.Sense.MAX)) {
+            if ((sourceModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
                 for (IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     mtrxC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
@@ -825,7 +825,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected MatrixStore<Double> getMatrixBI(final int[] selector) {
-        return myMatrices.getBI().row(selector);
+        return myMatrices.getBI().rows(selector);
     }
 
     protected MatrixStore<Double> getMatrixC() {
@@ -890,18 +890,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         this.setState(State.VALID);
 
         boolean symmetric = true;
-        if (options.validate) {
+        if (options.validate && !matrixQ.isHermitian()) {
 
-            if (!matrixQ.isHermitian()) {
+            symmetric = false;
+            this.setState(State.INVALID);
 
-                symmetric = false;
-                this.setState(State.INVALID);
-
-                if (!this.isLogDebug()) {
-                    throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
-                }
-                this.log(Q_NOT_SYMMETRIC, matrixQ);
+            if (!this.isLogDebug()) {
+                throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
             }
+            this.log(Q_NOT_SYMMETRIC, matrixQ);
         }
 
         myPatchedQ = false;

@@ -19,35 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array;
+package org.ojalgo.structure;
 
-import org.junit.jupiter.api.Test;
+public interface ElementViewAnyD<N extends Comparable<N>, V extends ElementViewAnyD<N, V>> extends ElementView1D<N, V> {
 
-/**
- * AbstractArrayTest
- *
- * @author apete
- */
-public class SegmentedArrayTest extends ArrayTests {
-
-    @Test
-    public void testRandomSetAndGetBackPrimitive64() {
-
-        final long tmpCount = 5000L;
-
-        final SegmentedArray<Double> tmpArray = Primitive64Array.FACTORY.makeSegmented(tmpCount);
-
-        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
-    }
-
-    @Test
-    public void testVeryLargeRandomSetAndGetBackBasic() {
-
-        final long tmpCount = Long.MAX_VALUE;
-
-        final BasicArray<Double> tmpArray = new BasicArray.Factory<>(Primitive64Array.FACTORY).make(tmpCount);
-
-        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
-    }
+    long[] reference();
 
 }

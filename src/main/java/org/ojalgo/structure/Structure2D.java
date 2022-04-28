@@ -95,8 +95,7 @@ public interface Structure2D extends Structure1D {
             final int prime = 31;
             int result = 1;
             result = prime * result + column;
-            result = prime * result + row;
-            return result;
+            return prime * result + row;
         }
 
         public IntIndex row() {
@@ -132,15 +131,15 @@ public interface Structure2D extends Structure1D {
         /**
          * @see #columns(int[])
          */
-        default B column(final int... columns) {
-            return this.columns(columns);
+        default B column(final int column) {
+            return this.columns(column);
         }
 
         /**
          * @see #columns(int[])
          */
-        default B column(final long... columns) {
-            return this.columns(Structure1D.toIntIndexes(columns));
+        default B column(final long column) {
+            return this.columns(column);
         }
 
         /**
@@ -148,12 +147,12 @@ public interface Structure2D extends Structure1D {
          * once, and any negative column reference/index will translate to a column of zeros. The number of
          * columns in the resulting matrix is the same as the number of elements in the columns index array.
          */
-        B columns(int[] columns);
+        B columns(int... columns);
 
         /**
          * @see #columns(int[])
          */
-        default B columns(final long[] columns) {
+        default B columns(final long... columns) {
             return this.columns(Structure1D.toIntIndexes(columns));
         }
 
@@ -208,15 +207,15 @@ public interface Structure2D extends Structure1D {
         /**
          * @see #rows(int[])
          */
-        default B row(final int... rows) {
-            return this.rows(rows);
+        default B row(final int row) {
+            return this.rows(row);
         }
 
         /**
          * @see #rows(int[])
          */
-        default B row(final long... rows) {
-            return this.rows(Structure1D.toIntIndexes(rows));
+        default B row(final long row) {
+            return this.rows(row);
         }
 
         /**
@@ -224,12 +223,12 @@ public interface Structure2D extends Structure1D {
          * and any negative row reference/index will translate to a row of zeros. The number of rows in the
          * resulting matrix is the same as the number of elements in the rows index array.
          */
-        B rows(final int[] rows);
+        B rows(final int... rows);
 
         /**
          * @see #rows(int[])
          */
-        default B rows(final long[] rows) {
+        default B rows(final long... rows) {
             return this.rows(Structure1D.toIntIndexes(rows));
         }
 
@@ -322,8 +321,7 @@ public interface Structure2D extends Structure1D {
             final int prime = 31;
             int result = 1;
             result = prime * result + (int) (column ^ column >>> 32);
-            result = prime * result + (int) (row ^ row >>> 32);
-            return result;
+            return prime * result + (int) (row ^ row >>> 32);
         }
 
         public LongIndex row() {
@@ -421,8 +419,7 @@ public interface Structure2D extends Structure1D {
             final int prime = 31;
             int result = 1;
             result = prime * result + (column == null ? 0 : column.hashCode());
-            result = prime * result + (row == null ? 0 : row.hashCode());
-            return result;
+            return prime * result + (row == null ? 0 : row.hashCode());
         }
 
     }
