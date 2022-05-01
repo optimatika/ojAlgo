@@ -324,7 +324,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             super();
 
             myDelegate2D = access;
-            myLastRow = access.countRows() - 1L;
+            myLastRow = lastRow;
 
             myRow = row;
         }
