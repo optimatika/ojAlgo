@@ -35,7 +35,7 @@ import org.ojalgo.function.special.PowerOf2;
  *
  * @author apete
  */
-public class LongToNumberMapTest {
+public class LongToNumberMapTest extends ArrayTests {
 
     private static final Random RANDOM = new Random();
 

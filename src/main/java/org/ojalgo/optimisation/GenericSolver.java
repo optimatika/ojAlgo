@@ -36,7 +36,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;

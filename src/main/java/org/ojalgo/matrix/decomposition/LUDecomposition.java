@@ -186,7 +186,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
-        preallocated.fillMatching(this.collect(rhs).row(myPivot.getOrder()));
+        preallocated.fillMatching(this.collect(rhs).rows(myPivot.getOrder()));
 
         DecompositionStore<N> body = this.getInPlace();
 

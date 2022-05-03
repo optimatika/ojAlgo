@@ -31,7 +31,7 @@ import org.ojalgo.random.Uniform;
  *
  * @author apete
  */
-public abstract class BasicArrayTest {
+public abstract class BasicArrayTest extends ArrayTests {
 
     static final int COUNT = 100;
     static final long[] INDICES = new long[10];

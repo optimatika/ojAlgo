@@ -29,7 +29,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Normal;
 import org.ojalgo.structure.StructureAnyD;
 
-public class ReductionTest {
+public class ReductionTest extends ArrayTests {
 
     private static final Random RANDOM = new Random();
 
@@ -59,7 +59,7 @@ public class ReductionTest {
     @Test
     public void testAnyTo1D() {
 
-        final long[] structure = new long[] { 5, 3, 4, 2, 1 };
+        final long[] structure = { 5, 3, 4, 2, 1 };
 
         final double total = StructureAnyD.count(structure);
 
@@ -79,7 +79,7 @@ public class ReductionTest {
     @Test
     public void testAnyTo2D() {
 
-        final long[] structure = new long[] { 6, 5, 3, 4, 2, 1 };
+        final long[] structure = { 6, 5, 3, 4, 2, 1 };
 
         final double total = StructureAnyD.count(structure);
 

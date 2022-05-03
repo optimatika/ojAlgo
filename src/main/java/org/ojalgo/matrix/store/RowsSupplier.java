@@ -9,7 +9,6 @@ import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.RowView;
 
 public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N>, Supplier<PhysicalStore<N>> {
 

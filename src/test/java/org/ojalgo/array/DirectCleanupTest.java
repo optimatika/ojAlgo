@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 
-public class DirectCleanupTest {
+public class DirectCleanupTest extends ArrayTests {
 
     static final AtomicInteger COUNTER = new AtomicInteger();
     static final int SIZE = 134_217_728;

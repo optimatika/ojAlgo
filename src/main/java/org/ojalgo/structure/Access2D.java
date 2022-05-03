@@ -21,6 +21,13 @@
  */
 package org.ojalgo.structure;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -87,81 +94,399 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
+    public static class ColumnView<N extends Comparable<N>> implements Access1D<N>, Iterable<ColumnView<N>>, Iterator<ColumnView<N>>,
+            Spliterator<ColumnView<N>>, Comparable<ColumnView<N>>, Access1D.Collectable<N, Mutate1D> {
+
+        static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
+                | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
+
+        private long myColumn = -1L;
+        private final Access2D<N> myDelegate2D;
+        private final long myLastColumn;
+
+        private ColumnView(final Access2D<N> access, final long column, final long lastColumn) {
+
+            super();
+
+            myDelegate2D = access;
+            myLastColumn = lastColumn;
+
+            myColumn = column;
+        }
+
+        protected ColumnView(final Access2D<N> access) {
+            this(access, -1L, access.countColumns() - 1L);
+        }
+
+        ColumnView(final Access2D<N> access, final long column) {
+            this(access, column, access.countColumns() - 1L);
+        }
+
+        public int characteristics() {
+            return CHARACTERISTICS;
+        }
+
+        public long column() {
+            return myColumn;
+        }
+
+        public int compareTo(final ColumnView<N> other) {
+            return Long.compare(myColumn, other.column());
+        }
+
+        public long count() {
+            return myDelegate2D.countRows();
+        }
+
+        public double doubleValue(final long index) {
+            return myDelegate2D.doubleValue(index, myColumn);
+        }
+
+        public long estimateSize() {
+            return myLastColumn - myColumn;
+        }
+
+        public void forEachRemaining(final Consumer<? super ColumnView<N>> action) {
+            Iterator.super.forEachRemaining(action);
+        }
+
+        public N get(final long index) {
+            return myDelegate2D.get(index, myColumn);
+        }
+
+        public void goToColumn(final long column) {
+            myColumn = column;
+        }
+
+        public boolean hasNext() {
+            return myColumn < myLastColumn;
+        }
+
+        public boolean hasPrevious() {
+            return myColumn > 0L;
+        }
+
+        public ColumnView<N> iterator() {
+            return new ColumnView<>(myDelegate2D);
+        }
+
+        public ColumnView<N> next() {
+            myColumn++;
+            return this;
+        }
+
+        public ColumnView<N> previous() {
+            myColumn--;
+            return this;
+        }
+
+        public void remove() {
+            ProgrammingError.throwForUnsupportedOptionalOperation();
+        }
+
+        public Stream<ColumnView<N>> stream() {
+            return StreamSupport.stream(this, false);
+        }
+
+        public void supplyTo(final Mutate1D receiver) {
+            for (long i = 0L, limit = Math.min(myDelegate2D.countRows(), receiver.count()); i < limit; i++) {
+                receiver.set(i, myDelegate2D.get(i, myColumn));
+            }
+        }
+
+        @Override
+        public String toString() {
+            return Access1D.toString(this);
+        }
+
+        public boolean tryAdvance(final Consumer<? super ColumnView<N>> action) {
+            if (this.hasNext()) {
+                action.accept(this.next());
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public Spliterator<ColumnView<N>> trySplit() {
+
+            final long remaining = myLastColumn - myColumn;
+
+            if (remaining > 1L) {
+
+                final long split = myColumn + (remaining / 2L);
+
+                final ColumnView<N> retVal = new ColumnView<>(myDelegate2D, myColumn, split);
+
+                myColumn = split;
+
+                return retVal;
+
+            } else {
+
+                return null;
+            }
+        }
+
+    }
+
     public static class ElementView<N extends Comparable<N>> implements ElementView2D<N, ElementView<N>> {
 
-        private final ElementView1D<N, ?> myDelegate;
+        private final ElementView1D<N, ?> myDelegate1D;
         private final long myStructure;
 
         public ElementView(final ElementView1D<N, ?> delegate, final long structure) {
 
             super();
 
-            myDelegate = delegate;
+            myDelegate1D = delegate;
             myStructure = structure;
         }
 
         public long column() {
-            return Structure2D.column(myDelegate.index(), myStructure);
+            return Structure2D.column(myDelegate1D.index(), myStructure);
         }
 
         public double doubleValue() {
-            return myDelegate.doubleValue();
+            return myDelegate1D.doubleValue();
         }
 
         public long estimateSize() {
-            return myDelegate.estimateSize();
+            return myDelegate1D.estimateSize();
         }
 
         public N get() {
-            return myDelegate.get();
+            return myDelegate1D.get();
         }
 
         public boolean hasNext() {
-            return myDelegate.hasNext();
+            return myDelegate1D.hasNext();
         }
 
         public boolean hasPrevious() {
-            return myDelegate.hasPrevious();
+            return myDelegate1D.hasPrevious();
         }
 
         public long index() {
-            return myDelegate.index();
+            return myDelegate1D.index();
         }
 
         public ElementView<N> iterator() {
-            return new ElementView<>(myDelegate.iterator(), myStructure);
+            return new ElementView<>(myDelegate1D.iterator(), myStructure);
         }
 
         public ElementView<N> next() {
-            myDelegate.next();
+            myDelegate1D.next();
             return this;
         }
 
         public long nextIndex() {
-            return myDelegate.nextIndex();
+            return myDelegate1D.nextIndex();
         }
 
         public ElementView<N> previous() {
-            myDelegate.previous();
+            myDelegate1D.previous();
             return this;
         }
 
         public long previousIndex() {
-            return myDelegate.previousIndex();
+            return myDelegate1D.previousIndex();
         }
 
         public long row() {
-            return Structure2D.row(myDelegate.index(), myStructure);
+            return Structure2D.row(myDelegate1D.index(), myStructure);
         }
 
         public ElementView<N> trySplit() {
 
-            ElementView1D<N, ?> delegateSpliterator = myDelegate.trySplit();
+            ElementView1D<N, ?> delegateSpliterator = myDelegate1D.trySplit();
 
             if (delegateSpliterator != null) {
                 return new ElementView<>(delegateSpliterator, myStructure);
             }
             return null;
+        }
+
+    }
+
+    public static class RowView<N extends Comparable<N>> implements Access1D<N>, Iterable<RowView<N>>, Iterator<RowView<N>>, Spliterator<RowView<N>>,
+            Comparable<RowView<N>>, Access1D.Collectable<N, Mutate1D> {
+
+        static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
+                | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
+
+        private final Access2D<N> myDelegate2D;
+        private final long myLastRow;
+        private long myRow = -1L;
+
+        private RowView(final Access2D<N> access, final long row, final long lastRow) {
+
+            super();
+
+            myDelegate2D = access;
+            myLastRow = lastRow;
+
+            myRow = row;
+        }
+
+        protected RowView(final Access2D<N> access) {
+            this(access, -1L, access.countRows() - 1L);
+        }
+
+        RowView(final Access2D<N> access, final long row) {
+            this(access, row, access.countRows() - 1L);
+        }
+
+        public int characteristics() {
+            return CHARACTERISTICS;
+        }
+
+        public int compareTo(final RowView<N> other) {
+            return Long.compare(myRow, other.row());
+        }
+
+        public long count() {
+            return myDelegate2D.countColumns();
+        }
+
+        public double doubleValue(final long index) {
+            return myDelegate2D.doubleValue(myRow, index);
+        }
+
+        public long estimateSize() {
+            return myLastRow - myRow;
+        }
+
+        public void forEachRemaining(final Consumer<? super RowView<N>> action) {
+            Iterator.super.forEachRemaining(action);
+        }
+
+        public N get(final long index) {
+            return myDelegate2D.get(myRow, index);
+        }
+
+        public void goToRow(final long row) {
+            myRow = row;
+        }
+
+        public boolean hasNext() {
+            return myRow < myLastRow;
+        }
+
+        public boolean hasPrevious() {
+            return myRow > 0L;
+        }
+
+        public RowView<N> iterator() {
+            return new RowView<>(myDelegate2D);
+        }
+
+        public RowView<N> next() {
+            myRow++;
+            return this;
+        }
+
+        public RowView<N> previous() {
+            myRow--;
+            return this;
+        }
+
+        public void remove() {
+            ProgrammingError.throwForUnsupportedOptionalOperation();
+        }
+
+        public long row() {
+            return myRow;
+        }
+
+        public Stream<RowView<N>> stream() {
+            return StreamSupport.stream(this, false);
+        }
+
+        public void supplyTo(final Mutate1D receiver) {
+            for (long j = 0L, limit = Math.min(myDelegate2D.countColumns(), receiver.count()); j < limit; j++) {
+                receiver.set(j, myDelegate2D.get(myRow, j));
+            }
+        }
+
+        @Override
+        public String toString() {
+            return Access1D.toString(this);
+        }
+
+        public boolean tryAdvance(final Consumer<? super RowView<N>> action) {
+            if (this.hasNext()) {
+                action.accept(this.next());
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public Spliterator<RowView<N>> trySplit() {
+
+            final long remaining = myLastRow - myRow;
+
+            if (remaining > 1L) {
+
+                final long split = myRow + (remaining / 2L);
+
+                final RowView<N> retVal = new RowView<>(myDelegate2D, myRow, split);
+
+                myRow = split;
+
+                return retVal;
+
+            } else {
+
+                return null;
+            }
+        }
+
+    }
+
+    public static final class SelectionView<N extends Comparable<N>> implements Access2D<N>, Collectable<N, Mutate2D> {
+
+        private final long[] myColumns;
+        private final Access2D<N> myFullData;
+        private final long[] myRows;
+
+        SelectionView(final Access2D<N> fullData, final long[] rows, final long[] columns) {
+
+            super();
+
+            myFullData = fullData;
+            myRows = Structure1D.replaceNullOrEmptyWithFull(rows, fullData.getRowDim());
+            myColumns = Structure1D.replaceNullOrEmptyWithFull(columns, fullData.getColDim());
+        }
+
+        public long countColumns() {
+            return myColumns.length;
+        }
+
+        public long countRows() {
+            return myRows.length;
+        }
+
+        public double doubleValue(final long row, final long col) {
+            return myFullData.doubleValue(myRows[Math.toIntExact(row)], myColumns[Math.toIntExact(col)]);
+        }
+
+        public N get(final long row, final long col) {
+            return myFullData.get(myRows[Math.toIntExact(row)], myColumns[Math.toIntExact(col)]);
+        }
+
+        public void supplyTo(final Mutate2D receiver) {
+            for (int j = 0; j < myColumns.length; j++) {
+                for (int i = 0; i < myRows.length; i++) {
+                    receiver.set(i, j, myFullData.get(myRows[i], myColumns[j]));
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            return Access2D.toString(this);
         }
 
     }
@@ -493,6 +818,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return new ColumnView<>(this);
     }
 
+    default Access2D<N> columns(final int... columns) {
+        return this.select(null, columns);
+    }
+
+    default Access2D<N> columns(final long... columns) {
+        return this.select(null, columns);
+    }
+
     default double doubleValue(final long index) {
         long structure = this.countRows();
         long row = Structure2D.row(index, structure);
@@ -555,6 +888,26 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return new RowView<>(this);
     }
 
+    default Access2D<N> rows(final int... rows) {
+        return this.select(rows, null);
+    }
+
+    default Access2D<N> rows(final long... rows) {
+        return this.select(rows, null);
+    }
+
+    default SelectionView<N> select(final int[] rows, final int[] columns) {
+        return new Access2D.SelectionView<>(this, Structure1D.toLongIndexes(rows), Structure1D.toLongIndexes(columns));
+    }
+
+    /**
+     * Creates a view of the underlying data structure of only the selected elements. If either the rows or
+     * columns input arguments are null or empty arrays, then that transaltes to all rows and/or columns.
+     */
+    default SelectionView<N> select(final long[] rows, final long[] columns) {
+        return new Access2D.SelectionView<>(this, rows, columns);
+    }
+
     default short shortValue(final long index) {
         long structure = this.countRows();
         return this.shortValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
@@ -581,5 +934,4 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         return retVal;
     }
-
 }

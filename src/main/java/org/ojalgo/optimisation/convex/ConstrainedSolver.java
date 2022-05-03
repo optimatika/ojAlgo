@@ -110,7 +110,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         final int tmpCountE = this.countEqualityConstraints();
 
-        final MatrixStore<Double> tmpLI = mySolutionL.offsets(tmpCountE, 0).row(included);
+        final MatrixStore<Double> tmpLI = mySolutionL.offsets(tmpCountE, 0).rows(included);
 
         return mySolutionL.limits(tmpCountE, 1).below(tmpLI);
     }

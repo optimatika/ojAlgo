@@ -34,6 +34,7 @@ import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.StructureAnyD;
 
 /**
@@ -124,36 +125,36 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     }
 
+    /**
+     * @deprecated Use {@link Structure1D#newDecreasingRange(int,int)} instead
+     */
+    @Deprecated
     public static int[] makeDecreasingRange(final int first, final int count) {
-        final int[] retVal = new int[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first - i;
-        }
-        return retVal;
+        return Structure1D.newDecreasingRange(first, count);
     }
 
+    /**
+     * @deprecated Use {@link Structure1D#newDecreasingRange(long,int)} instead
+     */
+    @Deprecated
     public static long[] makeDecreasingRange(final long first, final int count) {
-        final long[] retVal = new long[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first - i;
-        }
-        return retVal;
+        return Structure1D.newDecreasingRange(first, count);
     }
 
+    /**
+     * @deprecated Use {@link Structure1D#newIncreasingRange(int,int)} instead
+     */
+    @Deprecated
     public static int[] makeIncreasingRange(final int first, final int count) {
-        final int[] retVal = new int[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first + i;
-        }
-        return retVal;
+        return Structure1D.newIncreasingRange(first, count);
     }
 
+    /**
+     * @deprecated Use {@link Structure1D#newIncreasingRange(long,int)} instead
+     */
+    @Deprecated
     public static long[] makeIncreasingRange(final long first, final int count) {
-        final long[] retVal = new long[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first + i;
-        }
-        return retVal;
+        return Structure1D.newIncreasingRange(first, count);
     }
 
     private final ArrayFactory<N, ?> myFactory;
@@ -200,8 +201,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
     public long indexOfLargest() {

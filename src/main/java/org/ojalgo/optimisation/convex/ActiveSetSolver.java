@@ -391,7 +391,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         Primitive64Store soluL = this.getSolutionL();
 
         if (this.isLogDebug() && included.length > 0) {
-            double[] multipliers = soluL.offsets(nbEqus, 0).row(included).toRawCopy1D();
+            double[] multipliers = soluL.offsets(nbEqus, 0).rows(included).toRawCopy1D();
             this.log("Looking for the largest negative lagrange multiplier among these: {}.", multipliers);
         }
 
@@ -570,7 +570,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     MatrixStore<Double> getSlackI(final int[] rows) {
-        return this.getSlackI().row(rows);
+        return this.getSlackI().rows(rows);
     }
 
     void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {

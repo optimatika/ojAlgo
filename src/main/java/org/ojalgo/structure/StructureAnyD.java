@@ -86,8 +86,7 @@ public interface StructureAnyD extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + Arrays.hashCode(reference);
-            return result;
+            return prime * result + Arrays.hashCode(reference);
         }
 
         @Override
@@ -153,8 +152,7 @@ public interface StructureAnyD extends Structure1D {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + Arrays.hashCode(reference);
-            return result;
+            return prime * result + Arrays.hashCode(reference);
         }
 
         @Override
@@ -367,18 +365,30 @@ public interface StructureAnyD extends Structure1D {
 
     static long[] reference(final long index, final long[] structure) {
 
-        final long[] retVal = new long[structure.length];
+        long[] retVal = new long[structure.length];
+
+        StructureAnyD.reference(index, structure, retVal);
+
+        return retVal;
+    }
+
+    /**
+     * Based on the input index and structure/shape the reference array will derived.
+     *
+     * @param index Input index
+     * @param structure Relevant structure/shape
+     * @param reference Will be updated to the correct reference array given the index and structure
+     */
+    static void reference(final long index, final long[] structure, final long[] reference) {
 
         long tmpPrev = 1L;
         long tmpNext = 1L;
 
         for (int s = 0; s < structure.length; s++) {
             tmpNext *= structure[s];
-            retVal[s] = index % tmpNext / tmpPrev;
+            reference[s] = index % tmpNext / tmpPrev;
             tmpPrev = tmpNext;
         }
-
-        return retVal;
     }
 
     static long[] shape(final StructureAnyD structure) {
@@ -553,5 +563,9 @@ public interface StructureAnyD extends Structure1D {
     }
 
     long[] shape();
+
+    default int size(final int dimension) {
+        return Math.toIntExact(this.count(dimension));
+    }
 
 }

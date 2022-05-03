@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
@@ -48,6 +47,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -1173,7 +1173,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         myNumberOfArtificialVariables = needDual ? nbConstraints - nbIdentitySlackVariables : 0;
 
         mySelector = new IndexSelector(this.countVariables());
-        myBasis = BasicArray.makeIncreasingRange(-nbConstraints, nbConstraints);
+        myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
 
         meta = new MetaData(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables + nbIdentitySlackVariables);
     }

@@ -61,7 +61,7 @@ public class CaseLDL extends MatrixDecompositionTests {
         RawStore mtrxL = RawStore.wrap(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
         RawStore mtrxD = RawStore.wrap(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
 
-        MatrixStore<Double> permA = mtrxA.row(3, 2, 1, 0).column(3, 2, 1, 0);
+        MatrixStore<Double> permA = mtrxA.rows(3, 2, 1, 0).columns(3, 2, 1, 0);
 
         this.doTest(permA, mtrxL, mtrxD);
     }
