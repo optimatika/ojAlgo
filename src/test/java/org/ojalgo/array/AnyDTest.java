@@ -27,8 +27,8 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.AccessAnyD.MatrixView;
-import org.ojalgo.structure.AccessAnyD.SelectionView;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
 
@@ -94,7 +94,7 @@ public class AnyDTest extends ArrayTests {
 
         array.fillAll(Uniform.standard());
 
-        SelectionView<Double> selectedAnyD = array.select(new long[] { 2 }, new long[] { 1, 3 }, null, null);
+        AccessAnyD<Double> selectedAnyD = array.select(new long[] { 2 }, new long[] { 1, 3 }, null, null);
         TestUtils.assertEquals(10, selectedAnyD.size());
 
         TestUtils.assertEquals(array.count(2), selectedAnyD.count(2));

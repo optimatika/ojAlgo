@@ -568,6 +568,14 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.newInstance(this.store().rows(rows));
     }
 
+    public M select(final int[] rows, final int[] columns) {
+        return this.newInstance(this.store().select(rows, columns));
+    }
+
+    public M select(final long[] rows, final long[] columns) {
+        return this.newInstance(this.store().select(rows, columns));
+    }
+
     public M signum() {
         return this.newInstance(this.store().signum());
     }

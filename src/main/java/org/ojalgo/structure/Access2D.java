@@ -896,7 +896,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return this.select(rows, null);
     }
 
-    default SelectionView<N> select(final int[] rows, final int[] columns) {
+    default Access2D<N> select(final int[] rows, final int[] columns) {
         return new Access2D.SelectionView<>(this, Structure1D.toLongIndexes(rows), Structure1D.toLongIndexes(columns));
     }
 
@@ -904,7 +904,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
      * Creates a view of the underlying data structure of only the selected elements. If either the rows or
      * columns input arguments are null or empty arrays, then that transaltes to all rows and/or columns.
      */
-    default SelectionView<N> select(final long[] rows, final long[] columns) {
+    default Access2D<N> select(final long[] rows, final long[] columns) {
         return new Access2D.SelectionView<>(this, rows, columns);
     }
 

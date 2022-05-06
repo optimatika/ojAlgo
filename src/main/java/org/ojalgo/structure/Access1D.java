@@ -452,7 +452,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     /**
      * Creates a view of the underlying data structure of only the selected elements.
      */
-    default SelectionView<N> select(final long... selection) {
+    default Access1D<N> select(final long... selection) {
         return new Access1D.SelectionView<>(this, selection);
     }
 

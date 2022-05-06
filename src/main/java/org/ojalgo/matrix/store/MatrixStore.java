@@ -34,6 +34,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Structure2D.Logical;
 import org.ojalgo.type.NumberDefinition;
@@ -557,6 +558,25 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
     default MatrixStore<N> rows(final long... rows) {
         return Structure2D.Logical.super.rows(rows);
+    }
+
+    default MatrixStore<N> select(final int[] rows, final int[] columns) {
+
+        MatrixStore<N> retVal = this;
+
+        if (rows != null && rows.length > 0) {
+            retVal = retVal.rows(rows);
+        }
+
+        if (columns != null && columns.length > 0) {
+            retVal = retVal.columns(columns);
+        }
+
+        return retVal;
+    }
+
+    default MatrixStore<N> select(final long[] rows, final long[] columns) {
+        return this.select(Structure1D.toIntIndexes(rows), Structure1D.toIntIndexes(columns));
     }
 
     default MatrixStore<N> signum() {
