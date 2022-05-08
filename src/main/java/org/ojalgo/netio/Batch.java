@@ -24,6 +24,10 @@ package org.ojalgo.netio;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public class Batch extends ArrayList<Message> {
 
     private static final long serialVersionUID = 1L;

@@ -22,7 +22,6 @@
 package org.ojalgo.netio;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -903,12 +902,12 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR, message, arguments);
     }
 
+    /**
+     * @deprecated v51 Use {@link ToFileWriter#mkdirs(File)} instead
+     */
+    @Deprecated
     public static void mkdirs(final File dir) {
-        if (!dir.exists()) {
-            if (!dir.mkdirs() && !dir.exists()) {
-                throw new RuntimeException(new FileNotFoundException(dir.getAbsolutePath()));
-            }
-        }
+        ToFileWriter.mkdirs(dir);
     }
 
     private static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context, final boolean plain) {

@@ -21,15 +21,15 @@
  */
 package org.ojalgo.netio;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.EnumeratedColumnsParser.LineView;
 import org.ojalgo.type.context.TypeContext;
 
-public class EnumeratedColumnsParser extends AbstractParser<LineView> {
+public final class EnumeratedColumnsParser implements BasicParser<LineView> {
 
     public static class Builder implements Supplier<EnumeratedColumnsParser> {
 
@@ -143,7 +143,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
             }
         }
 
-        abstract boolean index(final String line, BufferedReader reader);
+        abstract boolean index(final String line, Supplier<String> lineSupplier);
 
     }
 
@@ -203,7 +203,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        boolean index(final String line, final BufferedReader reader) {
+        boolean index(final String line, final Supplier<String> lineSupplier) {
 
             int tmpIndex = 0;
             int tmpPosition = -1;
@@ -241,7 +241,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        boolean index(final String line, final BufferedReader reader) {
+        boolean index(final String line, final Supplier<String> lineSupplier) {
 
             int tmpIndex = 0;
             int tmpPosition = -2;
@@ -287,7 +287,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        boolean index(final String line, final BufferedReader reader) {
+        boolean index(final String line, final Supplier<String> lineSupplier) {
 
             myEscaped = false;
 
@@ -317,10 +317,13 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
                             myEscaped = true;
                         }
                     } else if (tmpNextInd == tmpLine.length()) {
-                        try {
-                            tmpLine = tmpLine + '\n' + reader.readLine();
-                        } catch (final IOException exception) {
-                            exception.printStackTrace();
+                        if (lineSupplier == null) {
+                            throw new ProgrammingError("Cant't handle line breaks within quotes when used this way!");
+                        }
+                        String nextPart = lineSupplier.get();
+                        if (nextPart != null) {
+                            tmpLine = tmpLine + '\n' + nextPart;
+                        } else {
                             return false;
                         }
                     }
@@ -385,8 +388,32 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         myLineView = strategy.make(columns, delimiter);
     }
 
-    @Override
-    LineView parse(final String line, final BufferedReader reader) {
+    public LineView parse(final String line) {
+        return this.parseLine(line, null);
+    }
+
+    public void parse(final Supplier<String> reader, final boolean skipHeader, final Consumer<LineView> consumer) {
+
+        // A reimplementation of the default method from the BasicParser interface.
+        // The only difference is that it keeps a reference to the BufferedReader to enable passing it to other methods.
+
+        String line = null;
+        LineView item = null;
+
+        if (skipHeader) {
+            line = reader.get();
+            line = null;
+        }
+
+        while ((line = reader.get()) != null) {
+            if ((line.length() > 0) && !line.startsWith("#") && ((item = this.parseLine(line, reader)) != null)) {
+                consumer.accept(item);
+            }
+        }
+
+    }
+
+    LineView parseLine(final String line, final Supplier<String> reader) {
 
         if (myLineView.index(line, reader)) {
             return myLineView;

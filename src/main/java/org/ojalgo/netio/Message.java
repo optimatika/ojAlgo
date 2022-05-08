@@ -25,6 +25,10 @@ import java.util.List;
 
 import org.ojalgo.array.operation.COPY;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public class Message {
 
     private static String EMPTY = "";
