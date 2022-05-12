@@ -132,10 +132,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         boolean retVal = false;
 
-        if (obj instanceof ModelEntity<?>) {
-            if (myName.equals(((ModelEntity<?>) obj).getName())) {
-                retVal = true;
-            }
+        if ((obj instanceof ModelEntity<?>) && myName.equals(((ModelEntity<?>) obj).getName())) {
+            retVal = true;
         }
 
         return retVal;
@@ -460,17 +458,15 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     /**
      * Validate model parameters, like lower and upper limits. Does not validate the solution/value.
      */
-    protected final boolean validate(final BasicLogger.Printer appender) {
+    protected final boolean validate(final BasicLogger appender) {
 
         boolean retVal = true;
 
-        if (myLowerLimit != null && myUpperLimit != null) {
-            if (myLowerLimit.compareTo(myUpperLimit) == 1 || myUpperLimit.compareTo(myLowerLimit) == -1) {
-                if (appender != null) {
-                    appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
-                }
-                retVal = false;
+        if ((myLowerLimit != null && myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0 || myUpperLimit.compareTo(myLowerLimit) < 0)) {
+            if (appender != null) {
+                appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
             }
+            retVal = false;
         }
 
         if (myContributionWeight != null && myContributionWeight.signum() == 0) {
@@ -483,7 +479,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return retVal;
     }
 
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
 
         boolean retVal = true;
 

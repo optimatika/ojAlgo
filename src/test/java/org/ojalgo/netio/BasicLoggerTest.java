@@ -21,64 +21,22 @@
  */
 package org.ojalgo.netio;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.netio.BasicLogger.AppendablePrinter;
-import org.ojalgo.netio.BasicLogger.PrintStreamPrinter;
-import org.ojalgo.netio.BasicLogger.PrintWriterPrinter;
+import org.ojalgo.netio.CharacterRing.RingLogger;
 
 public class BasicLoggerTest extends NetioTests {
 
     @Test
-    public void testGettingPrinters() {
-
-        Optional<Appendable> appendable = Optional.empty();
-        Optional<PrintStream> printStream = Optional.empty();
-        Optional<PrintWriter> printWriter = Optional.empty();
-
-        BasicLogger.AppendablePrinter appendablePrinter = new AppendablePrinter(new StringBuilder());
-        BasicLogger.PrintStreamPrinter printStreamPrinter = new PrintStreamPrinter(System.out);
-        BasicLogger.PrintWriterPrinter printWriterPrinter = new PrintWriterPrinter(new PrintWriter(System.out));
-
-        appendable = appendablePrinter.getAppendable();
-        printStream = appendablePrinter.getPrintStream();
-        printWriter = appendablePrinter.getPrintWriter();
-
-        TestUtils.assertEquals(true, appendable.isPresent());
-        TestUtils.assertEquals(false, printStream.isPresent());
-        TestUtils.assertEquals(false, printWriter.isPresent());
-
-        appendable = printStreamPrinter.getAppendable();
-        printStream = printStreamPrinter.getPrintStream();
-        printWriter = printStreamPrinter.getPrintWriter();
-
-        TestUtils.assertEquals(false, appendable.isPresent());
-        TestUtils.assertEquals(true, printStream.isPresent());
-        TestUtils.assertEquals(false, printWriter.isPresent());
-
-        appendable = printWriterPrinter.getAppendable();
-        printStream = printWriterPrinter.getPrintStream();
-        printWriter = printWriterPrinter.getPrintWriter();
-
-        TestUtils.assertEquals(false, appendable.isPresent());
-        TestUtils.assertEquals(false, printStream.isPresent());
-        TestUtils.assertEquals(true, printWriter.isPresent());
-    }
-
-    @Test
     public void testColumns() {
 
-        StringBuilder appendable = new StringBuilder();
+        RingLogger logger = CharacterRing.newRingLogger();
 
-        BasicLogger.AppendablePrinter appendablePrinter = new AppendablePrinter(appendable);
+        logger.columns(7, "123", "1234", "12345", "123456", "1234567");
 
-        appendablePrinter.columns(7, "123", "1234", "12345", "123456", "1234567");
-
-        String string = appendable.toString();
+        StringBuilder receiver = new StringBuilder();
+        logger.flush(receiver);
+        String string = receiver.toString();
 
         TestUtils.assertEquals(7 * 5 + 1, string.length()); // +1 for the newline at the end
     }

@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.netio.BasicLogger.Printer;
 
 /**
  * ResourceLocator - it's a URI/URL builder.
@@ -104,10 +103,7 @@ public final class ResourceLocator {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof KeyedValues)) {
+            if ((obj == null) || !(obj instanceof KeyedValues)) {
                 return false;
             }
             KeyedValues other = (KeyedValues) obj;
@@ -228,10 +224,7 @@ public final class ResourceLocator {
             if (this == obj) {
                 return true;
             }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof Request)) {
+            if ((obj == null) || !(obj instanceof Request)) {
                 return false;
             }
             Request other = (Request) obj;
@@ -297,7 +290,7 @@ public final class ResourceLocator {
             return this;
         }
 
-        public void print(final Printer receiver) {
+        public void print(final BasicLogger receiver) {
             mySession.print(receiver);
             receiver.println("Request URL: {}", this.toURL());
             if (myForm.size() > 0) {
@@ -463,7 +456,7 @@ public final class ResourceLocator {
             }
         }
 
-        public void print(final Printer receiver) {
+        public void print(final BasicLogger receiver) {
             receiver.println("Response body: {}", this.toString());
             receiver.println("Response headers: {}", myConnection.getHeaderFields());
             receiver.println("<Recreated>");
@@ -530,7 +523,7 @@ public final class ResourceLocator {
             return this;
         }
 
-        public void print(final BasicLogger.Printer receiver) {
+        public void print(final BasicLogger receiver) {
             receiver.println("Session parameters: {}", myParameters);
             receiver.println("Session cookies: {}", myCookieManager.getCookieStore().getCookies());
         }

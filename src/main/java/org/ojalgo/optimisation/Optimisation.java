@@ -210,9 +210,9 @@ public interface Optimisation {
 
         /**
          * If this is null nothing is printed, if it is not null then progress/debug messages are printed to
-         * that {@linkplain org.ojalgo.netio.BasicLogger.Printer}.
+         * that {@linkplain org.ojalgo.netio.BasicLogger}.
          */
-        public BasicLogger.Printer logger_appender = null;
+        public BasicLogger logger_appender = null;
 
         /**
          * Detailed (debug) logging or not.

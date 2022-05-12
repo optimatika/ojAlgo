@@ -23,7 +23,7 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.netio.BasicLogger.Printer;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.structure.Access1D;
 
@@ -129,7 +129,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
 
     public void update(final Variable variable) {
 
-        if (myInPlaceUpdatesOK && mySolver != null && mySolver instanceof UpdatableSolver && variable.isFixed()) {
+        if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver && variable.isFixed()) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
             int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
@@ -146,7 +146,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         mySolver = null;
     }
 
-    public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+    public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
         return myModel.validate(solution, appender);
     }
 
