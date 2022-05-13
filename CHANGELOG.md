@@ -42,6 +42,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Reimplemented the IDX file parser in terms of `DataInterpreter` and `DataReader`.
 - Refactored the `BasicParser` interface to make use of the new `FromFileReader` and `ToFileWriter`.
+- Refactored `BasicLogger` and everything associated with it. There are API-breaking changes, but with stuff mostly used internally.
 
 #### org.ojalgo.optimisation
 
