@@ -148,7 +148,7 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
 
     }
 
-    public static final int length = Character.MAX_VALUE + 1;
+    public static int length = Character.MAX_VALUE + 1;
 
     public static RingLogger newRingLogger() {
         return new RingLogger();
@@ -202,7 +202,7 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
         if ((obj == null) || !(obj instanceof CharacterRing)) {
             return false;
         }
-        final CharacterRing other = (CharacterRing) obj;
+        CharacterRing other = (CharacterRing) obj;
         if (!Arrays.equals(myCharacters, other.myCharacters) || (myCursor != other.myCursor)) {
             return false;
         }
@@ -212,15 +212,15 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
     public void flush(final Appendable receiver) {
         try {
             synchronized (receiver) {
-                final int tmpCursor = myCursor;
+                int cursor = myCursor;
                 char tmpChar;
-                for (int i = tmpCursor; i < length; i++) {
+                for (int i = cursor; i < length; i++) {
                     tmpChar = myCharacters[i];
                     if (tmpChar != ASCII.NULL) {
                         receiver.append(tmpChar);
                     }
                 }
-                for (int i = 0; i < tmpCursor; i++) {
+                for (int i = 0; i < cursor; i++) {
                     tmpChar = myCharacters[i];
                     if (tmpChar != ASCII.NULL) {
                         receiver.append(tmpChar);
@@ -234,31 +234,28 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
     }
 
     public void flush(final BasicLogger receiver) {
-
         synchronized (receiver) {
-
-            final int tmpCursor = myCursor;
+            int cursor = myCursor;
             char tmpChar;
-            for (int i = tmpCursor; i < length; i++) {
+            for (int i = cursor; i < length; i++) {
                 tmpChar = myCharacters[i];
                 if (tmpChar != ASCII.NULL) {
                     receiver.print(tmpChar);
                 }
             }
-            for (int i = 0; i < tmpCursor; i++) {
+            for (int i = 0; i < cursor; i++) {
                 tmpChar = myCharacters[i];
                 if (tmpChar != ASCII.NULL) {
                     receiver.print(tmpChar);
                 }
             }
-
             this.clear();
         }
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         result = (prime * result) + Arrays.hashCode(myCharacters);
         return (prime * result) + myCursor;
@@ -268,15 +265,15 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
 
         int retVal = -1;
 
-        final char tmpCursor = myCursor;
-        for (int i = tmpCursor; (retVal < 0) && (i < length); i++) {
+        char cursor = myCursor;
+        for (int i = cursor; (retVal < 0) && (i < length); i++) {
             if (myCharacters[i] == c) {
-                retVal = i - tmpCursor;
+                retVal = i - cursor;
             }
         }
-        for (int i = 0; (retVal < 0) && (i < tmpCursor); i++) {
+        for (int i = 0; (retVal < 0) && (i < cursor); i++) {
             if (myCharacters[i] == c) {
-                retVal = i + tmpCursor;
+                retVal = i + cursor;
             }
         }
 
@@ -287,15 +284,15 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
 
         int retVal = -1;
 
-        final char tmpCursor = myCursor;
-        for (int i = tmpCursor - 1; (retVal < 0) && (i >= 0); i--) {
+        char cursor = myCursor;
+        for (int i = cursor - 1; (retVal < 0) && (i >= 0); i--) {
             if (myCharacters[i] == c) {
-                retVal = i + tmpCursor;
+                retVal = i + cursor;
             }
         }
-        for (int i = length - 1; (retVal < 0) && (i >= tmpCursor); i--) {
+        for (int i = length - 1; (retVal < 0) && (i >= cursor); i--) {
             if (myCharacters[i] == c) {
-                retVal = i - tmpCursor;
+                retVal = i - cursor;
             }
         }
 
@@ -315,12 +312,12 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
     @Override
     public String toString() {
 
-        final char tmpCursor = myCursor;
+        char cursor = myCursor;
 
-        final String tmpFirstPart = String.valueOf(myCharacters, tmpCursor, length - tmpCursor);
-        final String tmpSecondPart = String.valueOf(myCharacters, 0, tmpCursor);
+        String firstPart = String.valueOf(myCharacters, cursor, length - cursor);
+        String secondPart = String.valueOf(myCharacters, 0, cursor);
 
-        return tmpFirstPart + tmpSecondPart;
+        return firstPart + secondPart;
     }
 
     char getCursor() {
