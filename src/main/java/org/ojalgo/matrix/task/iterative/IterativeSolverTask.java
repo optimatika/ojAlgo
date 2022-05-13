@@ -74,7 +74,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         /**
          * To get debug print per iteration
          */
-        public Configurator debug(final BasicLogger.Printer printer) {
+        public Configurator debug(final BasicLogger printer) {
             mySolver.setDebugPrinter(printer);
             return this;
         }
@@ -128,7 +128,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
     }
 
     private NumberContext myAccuracyContext = DEFAULT;
-    private BasicLogger.Printer myDebugPrinter = null;
+    private BasicLogger myDebugPrinter = null;
     private int myIterationsLimit = Integer.MAX_VALUE;
 
     IterativeSolverTask() {
@@ -176,7 +176,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         myAccuracyContext = accuracyContext;
     }
 
-    protected void setDebugPrinter(final BasicLogger.Printer debugPrinter) {
+    protected void setDebugPrinter(final BasicLogger debugPrinter) {
         myDebugPrinter = debugPrinter;
     }
 

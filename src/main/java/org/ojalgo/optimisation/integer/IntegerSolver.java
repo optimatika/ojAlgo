@@ -38,7 +38,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.CharacterRing;
-import org.ojalgo.netio.CharacterRing.PrinterBuffer;
+import org.ojalgo.netio.CharacterRing.RingLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -168,7 +168,7 @@ public final class IntegerSolver extends GenericSolver {
         return new IntegerSolver(model);
     }
 
-    static void flush(final PrinterBuffer buffer, final BasicLogger.Printer receiver) {
+    static void flush(final RingLogger buffer, final BasicLogger receiver) {
         if (buffer != null && receiver != null) {
             buffer.flush(receiver);
         }
@@ -214,7 +214,7 @@ public final class IntegerSolver extends GenericSolver {
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
         rootNode.setNodeState(rootModel, strategy);
 
-        PrinterBuffer rootPrinter = this.newPrinter();
+        RingLogger rootPrinter = this.newPrinter();
 
         AtomicBoolean solverNormalExit = new AtomicBoolean(this.compute(rootNode, rootModel.prepare(NodeSolver::new), rootPrinter, strategy));
         rootNode.dispose();
@@ -227,7 +227,7 @@ public final class IntegerSolver extends GenericSolver {
 
             MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerStrategy, myDeferredNodes::newView);
 
-            PrinterBuffer nodePrinter = this.newPrinter();
+            RingLogger nodePrinter = this.newPrinter();
 
             NodeKey node = null;
             while (workerNormalExit && solverNormalExit.get() && !myDeferredNodes.isEmpty()) {
@@ -280,11 +280,11 @@ public final class IntegerSolver extends GenericSolver {
                 this.getBestResultSoFar());
     }
 
-    private PrinterBuffer newPrinter() {
-        return options.validate || this.isLogProgress() ? new CharacterRing().asPrinter() : null;
+    private RingLogger newPrinter() {
+        return options.validate || this.isLogProgress() ? CharacterRing.newRingLogger() : null;
     }
 
-    boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final PrinterBuffer nodePrinter, final ModelStrategy strategy) {
+    boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
 
         if (this.isLogDebug()) {
             nodePrinter.println();

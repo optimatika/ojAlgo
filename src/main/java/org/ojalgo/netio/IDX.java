@@ -57,11 +57,11 @@ public abstract class IDX {
         return IDX.parse(new File(filePath), arrayFactory);
     }
 
-    public static void print(final Access2D<?> image, final BasicLogger.Printer printer) {
+    public static void print(final Access2D<?> image, final BasicLogger printer) {
         IDX.print(image, printer, true);
     }
 
-    public static void print(final Access2D<?> image, final BasicLogger.Printer printer, final boolean transpose) {
+    public static void print(final Access2D<?> image, final BasicLogger printer, final boolean transpose) {
 
         double maxValue = 0D;
         for (int i = 0; i < image.count(); i++) {
@@ -71,7 +71,7 @@ public abstract class IDX {
         IDX.print(image, printer, transpose, maxValue);
     }
 
-    public static void print(final Access2D<?> image, final BasicLogger.Printer printer, final boolean transpose, final double maxExpectedValue) {
+    public static void print(final Access2D<?> image, final BasicLogger printer, final boolean transpose, final double maxExpectedValue) {
 
         double oneThird = maxExpectedValue / 3D;
         double twoThirds = 2D * maxExpectedValue / 3D;
@@ -96,7 +96,7 @@ public abstract class IDX {
         }
     }
 
-    private static void printPixel(final double gray, final BasicLogger.Printer printer, final double oneThird, final double twoThirds) {
+    private static void printPixel(final double gray, final BasicLogger printer, final double oneThird, final double twoThirds) {
         if (gray < oneThird) {
             printer.print(" ");
         } else if (gray < twoThirds) {
