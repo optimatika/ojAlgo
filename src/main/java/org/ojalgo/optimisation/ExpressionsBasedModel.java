@@ -1324,7 +1324,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     *Returns a stream of variables that are not fixed.
+     * Returns a stream of variables that are not fixed.
      */
     public Stream<Variable> variables() {
         return myVariables.stream().filter(v -> !v.isEqualityConstraint());
