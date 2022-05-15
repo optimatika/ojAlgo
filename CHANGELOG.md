@@ -17,7 +17,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.data
 
-- New batch processising tool `BatchNode` to do stream-like processing of huge data sets on a single machine.
+- New batch processising tool `BatchNode` to do processing of huge data sets on a single machine.
 
 #### org.ojalgo.netio
 
