@@ -1489,6 +1489,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return false;
     }
 
+    boolean isInteger(final Set<IntIndex> variables) {
+
+        if (variables.size() <= 0) {
+            return false;
+        }
+
+        for (IntIndex index : variables) {
+            if (!myVariables.get(index.index).isInteger()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     boolean isReferenced(final Variable variable) {
         return myReferences.contains(variable.getIndex());
     }

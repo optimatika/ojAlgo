@@ -1139,7 +1139,7 @@ public final class Expression extends ModelEntity<Expression> {
             return;
         }
 
-        if (remaining.size() == 0 || !this.isInteger(remaining) || myQuadratic.size() > 0) {
+        if (remaining.size() == 0 || !myModel.isInteger(remaining) || myQuadratic.size() > 0) {
             myInteger = Boolean.FALSE;
             return;
         }
@@ -1284,21 +1284,6 @@ public final class Expression extends ModelEntity<Expression> {
     @Override
     boolean isInfeasible() {
         return myInfeasible || super.isInfeasible();
-    }
-
-    boolean isInteger(final Set<IntIndex> variables) {
-
-        if (variables.size() <= 0) {
-            return false;
-        }
-
-        for (IntIndex index : variables) {
-            if (!myModel.getVariable(index).isInteger()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
