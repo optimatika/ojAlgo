@@ -106,7 +106,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     }
 
     @Override
-    protected void setDebugPrinter(final BasicLogger.Printer debugPrinter) {
+    protected void setDebugPrinter(final BasicLogger debugPrinter) {
         super.setDebugPrinter(debugPrinter);
         myDelegate.setDebugPrinter(debugPrinter);
     }

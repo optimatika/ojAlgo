@@ -36,7 +36,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.RowView;
 
 /**
  * Should be able hold data for any problem solvable by ojAlgo's built-in solvers. This class is typically
@@ -316,11 +316,11 @@ final class OptimisationData {
 
         // Reset to trigger input validation
 
-        if (!(myAE == null && myBE == null)) {
+        if (((myAE != null) || (myBE != null))) {
             this.setEqualities(myAE, myBE);
         }
 
-        if (!(myAI == null && myBI == null)) {
+        if (((myAI != null) || (myBI != null))) {
             this.setInequalities(myAI, myBI);
         }
 

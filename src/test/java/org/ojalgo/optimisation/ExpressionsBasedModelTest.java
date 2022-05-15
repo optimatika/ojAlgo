@@ -145,8 +145,8 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Tag("unstable")
     public void testGitHubIssue2() {
 
-        Variable[] objective = new Variable[] { new Variable("X1").weight(0.8), new Variable("X2").weight(0.2), new Variable("X3").weight(0.7),
-                new Variable("X4").weight(0.3), new Variable("X5").weight(0.6), new Variable("X6").weight(0.4) };
+        Variable[] objective = { new Variable("X1").weight(0.8), new Variable("X2").weight(0.2), new Variable("X3").weight(0.7), new Variable("X4").weight(0.3),
+                new Variable("X5").weight(0.6), new Variable("X6").weight(0.4) };
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
 
@@ -167,8 +167,8 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testIntegerRounding() {
 
         ExpressionsBasedModel ebm = new ExpressionsBasedModel();
-        Variable var1 = ebm.addVariable("X1");
-        Variable var2 = ebm.addVariable("X2");
+        Variable var1 = ebm.addVariable("X1").integer();
+        Variable var2 = ebm.addVariable("X2").integer();
 
         Expression exp1 = ebm.addExpression("Exp1").set(var1, 3).set(var2, 6).upper(13.5);
         exp1.doIntegerRounding();
@@ -208,25 +208,25 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        Variable[] tmpVariables = { tmpXONE, tmpYTWO, tmpZTHREE };
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        BigDecimal[] tmpFactorsLIM1 = new BigDecimal[] { ONE, ONE, ZERO };
+        BigDecimal[] tmpFactorsLIM1 = { ONE, ONE, ZERO };
         Expression tmpLIM1 = tmpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, tmpFactorsLIM1[v]);
         }
         tmpLIM1.upper(FIVE.add(TENTH));
 
-        BigDecimal[] tmpFactorsLIM2 = new BigDecimal[] { ONE, ZERO, ONE };
+        BigDecimal[] tmpFactorsLIM2 = { ONE, ZERO, ONE };
         Expression tmpLIM2 = tmpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, tmpFactorsLIM2[v]);
         }
         tmpLIM2.lower(TEN.add(TENTH));
 
-        BigDecimal[] tmpFactorsMYEQN = new BigDecimal[] { ZERO, ONE.negate(), ONE };
+        BigDecimal[] tmpFactorsMYEQN = { ZERO, ONE.negate(), ONE };
         Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, tmpFactorsMYEQN[v]);

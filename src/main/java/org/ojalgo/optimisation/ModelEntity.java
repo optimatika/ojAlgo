@@ -64,6 +64,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return MissingMath.roundToInt(negatedAverage);
     }
 
+    static boolean isInfeasible(final BigDecimal lower, final BigDecimal upper) {
+        return lower != null && upper != null && lower.compareTo(upper) > 0;
+    }
+
     static BigDecimal toBigDecimal(final Comparable<?> number) {
 
         if (number == null) {
@@ -132,10 +136,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         boolean retVal = false;
 
-        if (obj instanceof ModelEntity<?>) {
-            if (myName.equals(((ModelEntity<?>) obj).getName())) {
-                retVal = true;
-            }
+        if ((obj instanceof ModelEntity<?>) && myName.equals(((ModelEntity<?>) obj).getName())) {
+            retVal = true;
         }
 
         return retVal;
@@ -460,17 +462,15 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     /**
      * Validate model parameters, like lower and upper limits. Does not validate the solution/value.
      */
-    protected final boolean validate(final BasicLogger.Printer appender) {
+    protected final boolean validate(final BasicLogger appender) {
 
         boolean retVal = true;
 
-        if (myLowerLimit != null && myUpperLimit != null) {
-            if (myLowerLimit.compareTo(myUpperLimit) == 1 || myUpperLimit.compareTo(myLowerLimit) == -1) {
-                if (appender != null) {
-                    appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
-                }
-                retVal = false;
+        if ((myLowerLimit != null && myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0 || myUpperLimit.compareTo(myLowerLimit) < 0)) {
+            if (appender != null) {
+                appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
             }
+            retVal = false;
         }
 
         if (myContributionWeight != null && myContributionWeight.signum() == 0) {
@@ -483,7 +483,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return retVal;
     }
 
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
 
         boolean retVal = true;
 
@@ -517,13 +517,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     abstract int deriveAdjustmentExponent();
 
     /**
-     * Should only be called if all variables are integer. Will then verify if all variable factors are
-     * integers or if there exists a simple scalar that will make it so. If so, the lower/upper limits are
-     * adjusted be "integer rounded". The return value indicates if rounding was successful or not. An
-     * {@link Expression} {@link #isInteger()} only if rounding was successful (all variables AND parameters
-     * are integer).
+     * If necessary this method should first determine if this {@link ModelEntity} is "integer" or not.
+     * <P>
+     * If it is, then verify if all variable factors are integers or if there exists a simple scalar that will
+     * make it so. If so, the lower/upper limits are "integer rounded".
      */
-    abstract boolean doIntegerRounding();
+    abstract void doIntegerRounding();
 
     final int getAdjustmentExponentValue() {
         return myAdjustmentExponent;
@@ -554,7 +553,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     boolean isInfeasible() {
-        return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) > 0;
+        return ModelEntity.isInfeasible(myLowerLimit, myUpperLimit);
     }
 
 }

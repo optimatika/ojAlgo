@@ -149,14 +149,13 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.row(myPivot.getInverseOrder());
+        return preallocated.rows(myPivot.getInverseOrder());
     }
 
     public MatrixStore<N> getL() {
         DecompositionStore<N> tmpInPlace = this.getInPlace();
         MatrixStore<N> tmpBuilder = tmpInPlace;
-        MatrixStore<N> tmpTriangular = tmpBuilder.triangular(false, true);
-        return tmpTriangular;
+        return tmpBuilder.triangular(false, true);
     }
 
     public int[] getPivotOrder() {
@@ -180,7 +179,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         int[] order = myPivot.getOrder();
 
-        preallocated.fillMatching(this.collect(rhs).row(order));
+        preallocated.fillMatching(this.collect(rhs).rows(order));
 
         DecompositionStore<N> body = this.getInPlace();
 
@@ -193,7 +192,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.row(myPivot.getInverseOrder());
+        return preallocated.rows(myPivot.getInverseOrder());
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

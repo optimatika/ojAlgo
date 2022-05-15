@@ -79,7 +79,7 @@ public final class Variable extends ModelEntity<Variable> {
 
     /**
      * See {@link #isBinary()}.
-     * 
+     *
      * @see #getUpperLimit()
      * @see #isInteger()
      * @see #isBinary()
@@ -291,7 +291,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
         return this.validate(value, context, appender, false);
     }
 
@@ -333,15 +333,16 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    boolean doIntegerRounding() {
-        BigDecimal limit;
-        if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
-            this.upper(limit.setScale(0, RoundingMode.FLOOR));
+    void doIntegerRounding() {
+        if (myInteger) {
+            BigDecimal limit;
+            if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
+                this.upper(limit.setScale(0, RoundingMode.FLOOR));
+            }
+            if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
+                this.lower(limit.setScale(0, RoundingMode.CEILING));
+            }
         }
-        if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
-            this.lower(limit.setScale(0, RoundingMode.CEILING));
-        }
-        return true;
     }
 
     IntIndex getIndex() {
@@ -372,7 +373,7 @@ public final class Variable extends ModelEntity<Variable> {
         myUnbounded = uncorrelated;
     }
 
-    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, final boolean relaxed) {
+    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender, final boolean relaxed) {
 
         boolean retVal = super.validate(value, context, appender);
 

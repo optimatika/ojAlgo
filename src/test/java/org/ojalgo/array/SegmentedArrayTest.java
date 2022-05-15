@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
-public class SegmentedArrayTest {
+public class SegmentedArrayTest extends ArrayTests {
 
     @Test
     public void testRandomSetAndGetBackPrimitive64() {

@@ -19,34 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-class BufferedParsingReader extends Reader {
+final class MappedSupplier<IN, OUT> implements AutoSupplier<OUT> {
 
-    private static int BUFFER_SIZE = 8192;
-    private final char myBuffer[];
-    private final Reader myDelegate;
+    private final Function<IN, OUT> myMapper;
+    private final Supplier<IN> mySupplier;
 
-    public BufferedParsingReader(final Reader delegate) {
-
-        super(delegate);
-
-        myDelegate = delegate;
-        myBuffer = new char[BUFFER_SIZE];
+    MappedSupplier(final Supplier<IN> supplier, final Function<IN, OUT> mapper) {
+        super();
+        myMapper = mapper;
+        mySupplier = supplier;
     }
 
-    @Override
-    public void close() throws IOException {
-        myDelegate.close();
+    public void close() throws Exception {
+        if (mySupplier instanceof AutoCloseable) {
+            ((AutoCloseable) mySupplier).close();
+        }
     }
 
-    @Override
-    public int read(final char[] buffer, final int offset, final int length) throws IOException {
-        // TODO Auto-generated method stub
-        return 0;
+    public OUT read() {
+        IN unmapped = mySupplier.get();
+        if (unmapped != null) {
+            return myMapper.apply(unmapped);
+        } else {
+            return null;
+        }
     }
 
 }

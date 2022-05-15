@@ -27,6 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public class ProcessInputStream extends DataInputStream {
 
     private static String EMPTY = "";

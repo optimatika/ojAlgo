@@ -37,7 +37,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
-import org.ojalgo.structure.RowView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -857,9 +857,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         Result result = solver.solve();
 
-        Optimisation.Result retVal = PrimalSimplex.toConvexState(result, convex);
-
-        return retVal;
+        return PrimalSimplex.toConvexState(result, convex);
     }
 
     static int size(final ConvexSolver.Builder convex) {

@@ -123,6 +123,12 @@ public final class Expression extends ModelEntity<Expression> {
             myLinear = expressionToCopy.getLinear();
             myQuadratic = expressionToCopy.getQuadratic();
         }
+
+        if (expressionToCopy.isInteger()) {
+            myInteger = Boolean.TRUE;
+        } else {
+            myInteger = null;
+        }
     }
 
     Expression(final String name, final ExpressionsBasedModel model) {
@@ -422,6 +428,10 @@ public final class Expression extends ModelEntity<Expression> {
             retVal.upper(this.getUpperLimit().subtract(tmpFixedValue));
         }
 
+        if (this.isInteger()) {
+            retVal.setInteger();
+        }
+
         return retVal;
 
     }
@@ -568,7 +578,7 @@ public final class Expression extends ModelEntity<Expression> {
     @Override
     public boolean isInteger() {
         if (myInteger == null) {
-            myInteger = this.deduceInteger();
+            this.doIntegerRounding();
         }
         return myInteger.booleanValue();
     }
@@ -885,41 +895,19 @@ public final class Expression extends ModelEntity<Expression> {
     private BigDecimal convert(final BigDecimal value, final boolean adjusted) {
 
         if (value == null) {
-
             return BigMath.ZERO;
         }
-        if (!adjusted) {
 
+        if (!adjusted) {
             return value;
         }
+
         int tmpAdjExp = this.getAdjustmentExponent();
-
         if (tmpAdjExp != 0) {
-
             return value.movePointRight(tmpAdjExp);
-
         }
+
         return value;
-    }
-
-    private Boolean deduceInteger() {
-
-        if (myLinear.size() == 0 && myQuadratic.size() == 0) {
-            return Boolean.FALSE;
-        }
-
-        for (IntIndex key : myLinear.keySet()) {
-            if (!myModel.getVariable(key).isInteger()) {
-                return Boolean.FALSE;
-            }
-        }
-        for (IntRowColumn key : myQuadratic.keySet()) {
-            if (!myModel.getVariable(key.row).isInteger() || !myModel.getVariable(key.column).isInteger()) {
-                return Boolean.FALSE;
-            }
-        }
-
-        return Boolean.valueOf(this.doIntegerRounding());
     }
 
     private BigDecimal getConstant() {
@@ -1051,13 +1039,11 @@ public final class Expression extends ModelEntity<Expression> {
             }
 
             for (IntRowColumn quadKey : myQuadratic.keySet()) {
-                if (subset.contains(quadKey.row())) {
-                    if (subset.contains(quadKey.column())) {
-                        BigDecimal coefficient = this.get(quadKey);
-                        BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
-                        BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
-                        retVal = retVal.add(coefficient.multiply(rowValue).multiply(colValue));
-                    }
+                if (subset.contains(quadKey.row()) && subset.contains(quadKey.column())) {
+                    BigDecimal coefficient = this.get(quadKey);
+                    BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
+                    BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
+                    retVal = retVal.add(coefficient.multiply(rowValue).multiply(colValue));
                 }
             }
         }
@@ -1121,11 +1107,25 @@ public final class Expression extends ModelEntity<Expression> {
      * @see org.ojalgo.optimisation.ModelEntity#doIntegerRounding()
      */
     @Override
-    boolean doIntegerRounding() {
+    void doIntegerRounding() {
+        this.doIntegerRounding(this.getLinearKeySet(), this.getLowerLimit(), this.getUpperLimit());
+    }
+
+    void doIntegerRounding(final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper) {
+
+        if (myInteger != null) {
+            return;
+        }
+
+        if (remaining.size() == 0 || !myModel.isInteger(remaining) || myQuadratic.size() > 0) {
+            myInteger = Boolean.FALSE;
+            return;
+        }
 
         BigInteger gcd = null;
         int maxScale = Integer.MIN_VALUE;
-        for (BigDecimal coeff : myLinear.values()) {
+        for (IntIndex index : remaining) {
+            BigDecimal coeff = myLinear.get(index);
             BigDecimal abs = coeff.stripTrailingZeros().abs();
             maxScale = Math.max(maxScale, abs.scale());
             if (gcd != null) {
@@ -1133,26 +1133,39 @@ public final class Expression extends ModelEntity<Expression> {
             } else {
                 gcd = abs.unscaledValue();
             }
-            if (maxScale > 8 || gcd.equals(BigInteger.ONE) && maxScale > 0) {
-                return false;
+            if (maxScale > 8 || (gcd.equals(BigInteger.ONE) && maxScale > 0)) {
+                myInteger = Boolean.FALSE;
+                return;
             }
         }
 
         BigDecimal divisor = new BigDecimal(gcd, maxScale);
 
-        BigDecimal lower = this.getLowerLimit();
+        boolean full = myLinear.size() == remaining.size();
+
+        BigDecimal newLower = null, newUpper = null;
+
         if (lower != null) {
             BigDecimal tmpVal = lower.divide(divisor, 0, RoundingMode.CEILING);
-            this.lower(tmpVal.multiply(divisor));
+            newLower = tmpVal.multiply(divisor);
+            if (full) {
+                this.lower(newLower);
+            }
         }
 
-        BigDecimal upper = this.getUpperLimit();
         if (upper != null) {
             BigDecimal tmpVal = upper.divide(divisor, 0, RoundingMode.FLOOR);
-            this.upper(tmpVal.multiply(divisor));
+            newUpper = tmpVal.multiply(divisor);
+            if (full) {
+                this.upper(newUpper);
+            }
         }
 
-        return true;
+        if (ModelEntity.isInfeasible(newLower, newUpper)) {
+            this.setInfeasible();
+        }
+
+        myInteger = Boolean.TRUE;
     }
 
     Expression doMixedIntegerRounding() {
@@ -1322,6 +1335,10 @@ public final class Expression extends ModelEntity<Expression> {
     void setInfeasible() {
         myInfeasible = true;
         myModel.setInfeasible();
+    }
+
+    void setInteger() {
+        myInteger = Boolean.TRUE;
     }
 
     void setRedundant() {

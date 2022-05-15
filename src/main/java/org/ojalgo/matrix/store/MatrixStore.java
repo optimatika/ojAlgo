@@ -34,6 +34,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Structure2D.Logical;
 import org.ojalgo.type.NumberDefinition;
@@ -158,13 +159,25 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LowerTriangularStore<>(new UpperHessenbergStore<>(this), false);
     }
 
+    default MatrixStore<N> column(final int column) {
+        return Structure2D.Logical.super.column(column);
+    }
+
+    default MatrixStore<N> column(final long column) {
+        return Structure2D.Logical.super.column(column);
+    }
+
     /**
      * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
      * once, and any negative column reference/index will translate to a column of zeros. The number of
      * columns in the resulting matrix is the same as the number of elements in the columns index array.
      */
-    default MatrixStore<N> columns(final int[] columns) {
+    default MatrixStore<N> columns(final int... columns) {
         return new ColumnsStore<>(this, columns);
+    }
+
+    default MatrixStore<N> columns(final long... columns) {
+        return Structure2D.Logical.super.columns(columns);
     }
 
     /**
@@ -526,13 +539,44 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LeftRightStore<>(this, right);
     }
 
+    default MatrixStore<N> row(final int row) {
+        return Structure2D.Logical.super.row(row);
+    }
+
+    default MatrixStore<N> row(final long row) {
+        return Structure2D.Logical.super.row(row);
+    }
+
     /**
      * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once, and
      * any negative row reference/index will translate to a row of zeros. The number of rows in the resulting
      * matrix is the same as the number of elements in the rows index array.
      */
-    default MatrixStore<N> rows(final int[] rows) {
+    default MatrixStore<N> rows(final int... rows) {
         return new RowsStore<>(this, rows);
+    }
+
+    default MatrixStore<N> rows(final long... rows) {
+        return Structure2D.Logical.super.rows(rows);
+    }
+
+    default MatrixStore<N> select(final int[] rows, final int[] columns) {
+
+        MatrixStore<N> retVal = this;
+
+        if (rows != null && rows.length > 0) {
+            retVal = retVal.rows(rows);
+        }
+
+        if (columns != null && columns.length > 0) {
+            retVal = retVal.columns(columns);
+        }
+
+        return retVal;
+    }
+
+    default MatrixStore<N> select(final long[] rows, final long[] columns) {
+        return this.select(Structure1D.toIntIndexes(rows), Structure1D.toIntIndexes(columns));
     }
 
     default MatrixStore<N> signum() {

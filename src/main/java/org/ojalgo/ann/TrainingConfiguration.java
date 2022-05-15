@@ -29,7 +29,7 @@ final class TrainingConfiguration {
 
     boolean dropouts = false;
     ArtificialNeuralNetwork.Error error = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    double learningRate = ONE;
+    double learningRate = HUNDREDTH;
     boolean regularisationL1 = false;
     double regularisationL1Factor = ZERO;
     boolean regularisationL2 = false;
@@ -48,16 +48,8 @@ final class TrainingConfiguration {
             return false;
         }
         TrainingConfiguration other = (TrainingConfiguration) obj;
-        if (dropouts != other.dropouts) {
-            return false;
-        }
-        if (error != other.error) {
-            return false;
-        }
-        if (Double.doubleToLongBits(learningRate) != Double.doubleToLongBits(other.learningRate)) {
-            return false;
-        }
-        if (regularisationL1 != other.regularisationL1) {
+        if ((dropouts != other.dropouts) || (error != other.error) || (Double.doubleToLongBits(learningRate) != Double.doubleToLongBits(other.learningRate))
+                || (regularisationL1 != other.regularisationL1)) {
             return false;
         }
         if (Double.doubleToLongBits(regularisationL1Factor) != Double.doubleToLongBits(other.regularisationL1Factor)) {
@@ -86,8 +78,7 @@ final class TrainingConfiguration {
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         result = (prime * result) + (regularisationL2 ? 1231 : 1237);
         temp = Double.doubleToLongBits(regularisationL2Factor);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
-        return result;
+        return (prime * result) + (int) (temp ^ (temp >>> 32));
     }
 
     private double doL1(final double current) {
@@ -139,12 +130,10 @@ final class TrainingConfiguration {
             } else {
                 return this::doL2;
             }
+        } else if (regularisationL1) {
+            return this::doL1;
         } else {
-            if (regularisationL1) {
-                return this::doL1;
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 

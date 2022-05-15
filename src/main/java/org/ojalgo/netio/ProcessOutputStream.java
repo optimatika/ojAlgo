@@ -28,6 +28,10 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public class ProcessOutputStream extends PrintStream {
 
     private static String EMPTY = "";

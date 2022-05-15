@@ -245,10 +245,58 @@ public interface Structure1D {
         return new BasicMapper<>();
     }
 
+    static int[] newDecreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    static long[] newDecreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    static int[] newIncreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
+    }
+
+    static long[] newIncreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
+    }
+
+    static long[] replaceNullOrEmptyWithFull(final long[] suggested, final int fullSize) {
+        if (suggested != null && suggested.length > 0) {
+            return suggested;
+        } else {
+            return Structure1D.newIncreasingRange(0L, fullSize);
+        }
+    }
+
     static int[] toIntIndexes(final long[] indexes) {
         int[] retVal = new int[indexes.length];
         for (int i = 0; i < indexes.length; i++) {
             retVal[i] = Math.toIntExact(indexes[i]);
+        }
+        return retVal;
+    }
+
+    static long[] toLongIndexes(final int[] indexes) {
+        long[] retVal = new long[indexes.length];
+        for (int i = 0; i < indexes.length; i++) {
+            retVal[i] = indexes[i];
         }
         return retVal;
     }

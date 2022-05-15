@@ -37,6 +37,18 @@ import org.ojalgo.type.context.NumberContext;
 
 public abstract class Presolvers {
 
+    public static final ExpressionsBasedModel.Presolver INTEGER = new ExpressionsBasedModel.Presolver(20) {
+
+        @Override
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
+
+            expression.doIntegerRounding(remaining, lower, upper);
+
+            return false;
+        }
+    };
+
     /**
      * If the expression is linear and contributes to the objective function, then the contributions are
      * transferred to the variables and the weight of the expression set to null.
@@ -78,7 +90,7 @@ public abstract class Presolvers {
      * Calculates the min and max value of this expression based on the variables' individual bounds. Then
      * compares those with the expression's bounds.
      */
-    public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(Integer.MAX_VALUE) {
+    public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(30) {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
@@ -154,7 +166,7 @@ public abstract class Presolvers {
                     lowerRedundant = true;
                 }
 
-                if (lowerRedundant & upperRedundant) {
+                if (lowerRedundant && upperRedundant) {
                     expression.setRedundant();
                 }
             }
@@ -184,14 +196,14 @@ public abstract class Presolvers {
                     int weightSignum = variable.getContributionWeight().signum();
 
                     if ((model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1)
-                            || (!(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == 1)) {
+                            || ((model.getOptimisationSense() != Optimisation.Sense.MAX) && weightSignum == 1)) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
                         } else {
                             variable.setUnbounded(true);
                         }
                     } else if ((model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == 1)
-                            || (!(model.getOptimisationSense() == Optimisation.Sense.MAX) && weightSignum == -1)) {
+                            || ((model.getOptimisationSense() != Optimisation.Sense.MAX) && weightSignum == -1)) {
                         if (variable.isUpperLimitSet()) {
                             variable.setFixed(variable.getUpperLimit());
                         } else {
@@ -408,10 +420,8 @@ public abstract class Presolvers {
             } else {
                 lowerNew = lowerOld;
             }
-        } else if (lowerCand != null) {
-            lowerNew = lowerCand;
         } else {
-            lowerNew = null;
+            lowerNew = lowerCand;
         }
 
         BigDecimal upperNew;
@@ -421,10 +431,8 @@ public abstract class Presolvers {
             } else {
                 upperNew = upperOld;
             }
-        } else if (upperCand != null) {
-            upperNew = upperCand;
         } else {
-            upperNew = null;
+            upperNew = upperCand;
         }
 
         if (lowerNew != null && upperNew != null) {

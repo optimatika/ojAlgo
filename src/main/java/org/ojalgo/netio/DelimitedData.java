@@ -27,8 +27,9 @@ import java.util.List;
 /**
  * http://www.iana.org/assignments/media-types/ http://www.webmaster-toolkit.com/mime-types.shtml
  *
- * @author apete
+ * @deprecated v51
  */
+@Deprecated
 public final class DelimitedData {
 
     public static DelimitedData makeCommaDelimited() {

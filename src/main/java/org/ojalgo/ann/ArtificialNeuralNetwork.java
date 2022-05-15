@@ -114,8 +114,8 @@ public final class ArtificialNeuralNetwork {
     public enum Error implements PrimitiveFunction.Binary {
 
         /**
-         * Currently this can only be used in in combination with {@link Activator#SOFTMAX} in the final
-         * layer. All other usage will give incorrect network training.
+         * Currently this can only be used in combination with {@link Activator#SOFTMAX} in the final layer.
+         * All other usage will give incorrect network training.
          */
         CROSS_ENTROPY((target, current) -> -target * Math.log(current), (target, current) -> (current - target)),
         /**
@@ -321,8 +321,7 @@ public final class ArtificialNeuralNetwork {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(myLayers);
-        return result;
+        return prime * result + Arrays.hashCode(myLayers);
     }
 
     /**

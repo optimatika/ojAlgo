@@ -34,7 +34,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.ColumnView;
+import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;

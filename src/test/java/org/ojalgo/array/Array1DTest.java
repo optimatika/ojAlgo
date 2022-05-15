@@ -27,12 +27,12 @@ import org.ojalgo.TestUtils;
 /**
  * @author apete
  */
-public class Array1DTest {
+public class Array1DTest extends ArrayTests {
 
     @Test
     public void testSortingEvenSizedArrayAscending() {
 
-        final double[][] tmpRows = new double[][] { { 4, 5, 6, 7, 8, 9 }, { 9, 8, 7, 6, 5, 4 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
+        final double[][] tmpRows = { { 4, 5, 6, 7, 8, 9 }, { 9, 8, 7, 6, 5, 4 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
 
         this.doSortTest(tmpRows);
     }
@@ -40,7 +40,7 @@ public class Array1DTest {
     @Test
     public void testSortingEvenSizedArrayDescending() {
 
-        final double[][] tmpRows = new double[][] { { 9, 8, 7, 6, 5, 4 }, { 4, 5, 6, 7, 8, 9 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
+        final double[][] tmpRows = { { 9, 8, 7, 6, 5, 4 }, { 4, 5, 6, 7, 8, 9 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
 
         this.doSortTest(tmpRows);
     }
@@ -48,9 +48,9 @@ public class Array1DTest {
     @Test
     public void testSortingOddSizedArrayAscending() {
 
-        final double[][] tmpRows = new double[][] { { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 },
-                { 6, 7, 8, 1, 2, 3, 4, 5, 9 }, { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 },
-                { 2, 3, 4, 5, 6, 7, 8, 1, 9 }, { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
+        final double[][] tmpRows = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 }, { 6, 7, 8, 1, 2, 3, 4, 5, 9 },
+                { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 }, { 2, 3, 4, 5, 6, 7, 8, 1, 9 },
+                { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
 
         this.doSortTest(tmpRows);
     }
@@ -58,9 +58,9 @@ public class Array1DTest {
     @Test
     public void testSortingOddSizedArrayDescending() {
 
-        final double[][] tmpRows = new double[][] { { 9, 8, 7, 6, 5, 4, 3, 2, 1 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 },
-                { 6, 7, 8, 1, 2, 3, 4, 5, 9 }, { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 },
-                { 2, 3, 4, 5, 6, 7, 8, 1, 9 }, { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
+        final double[][] tmpRows = { { 9, 8, 7, 6, 5, 4, 3, 2, 1 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 }, { 6, 7, 8, 1, 2, 3, 4, 5, 9 },
+                { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 }, { 2, 3, 4, 5, 6, 7, 8, 1, 9 },
+                { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
 
         this.doSortTest(tmpRows);
     }

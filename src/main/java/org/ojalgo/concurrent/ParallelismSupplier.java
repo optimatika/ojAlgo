@@ -52,7 +52,7 @@ public interface ParallelismSupplier extends IntSupplier {
     }
 
     /**
-     * Round up as in: 9 / 2 = 5
+     * Round up as in: 9 / 2 = 5 and 1 / 9 = 1
      */
     default ParallelismSupplier divideBy(final int divisor) {
         if (divisor > 1) {
@@ -69,20 +69,52 @@ public interface ParallelismSupplier extends IntSupplier {
         return () -> Math.max(1, this.getAsInt() + 1);
     }
 
+    default ParallelismSupplier limit(final int notMoreThan) {
+        return () -> Math.min(this.getAsInt(), notMoreThan);
+    }
+
+    default ParallelismSupplier limit(final IntSupplier notMoreThan) {
+        return () -> Math.min(this.getAsInt(), notMoreThan.getAsInt());
+    }
+
+    /**
+     * @deprecated Use {@link #require(int)} instead
+     */
+    @Deprecated
     default ParallelismSupplier max(final int other) {
-        return this.max(() -> other);
+        return this.require(other);
     }
 
+    /**
+     * @deprecated Use {@link #require(IntSupplier)} instead
+     */
+    @Deprecated
     default ParallelismSupplier max(final IntSupplier other) {
-        return () -> Math.max(this.getAsInt(), other.getAsInt());
+        return this.require(other);
     }
 
+    /**
+     * @deprecated Use {@link #limit(int)} instead
+     */
+    @Deprecated
     default ParallelismSupplier min(final int other) {
-        return this.min(() -> other);
+        return this.limit(other);
     }
 
+    /**
+     * @deprecated Use {@link #limit(IntSupplier)} instead
+     */
+    @Deprecated
     default ParallelismSupplier min(final IntSupplier other) {
-        return () -> Math.min(this.getAsInt(), other.getAsInt());
+        return this.limit(other);
+    }
+
+    default ParallelismSupplier require(final int atLeast) {
+        return () -> Math.max(this.getAsInt(), atLeast);
+    }
+
+    default ParallelismSupplier require(final IntSupplier atLeast) {
+        return () -> Math.max(this.getAsInt(), atLeast.getAsInt());
     }
 
     /**

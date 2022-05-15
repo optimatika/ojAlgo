@@ -26,6 +26,10 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 
+/**
+ * @deprecated v51
+ */
+@Deprecated
 public abstract class SystemProcess {
 
     private static String ERROR_TEXT = "System command not working!";

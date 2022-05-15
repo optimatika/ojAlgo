@@ -97,7 +97,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         MatrixStore<N> mtrxL = this.getL();
         MatrixStore<N> mtrxU = this.getU();
         int[] pivotOrder = this.getPivotOrder();
-        return mtrxL.multiply(mtrxU).row(pivotOrder);
+        return mtrxL.multiply(mtrxU).rows(pivotOrder);
     }
 
 }

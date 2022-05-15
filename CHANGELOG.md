@@ -11,7 +11,71 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-## [51.1.0] – 2022-04-20
+## [51.3.0] – 2022-05-15
+
+### Added
+
+#### org.ojalgo.data
+
+- New batch processising tool `BatchNode` to do stream-like processing of huge data sets on a single machine.
+
+#### org.ojalgo.netio
+
+- New interfaces `FromFileReader` and `ToFileWriter` paired with a wide range of implementations, builders, parsers, interpreters... There is also a new class `ShardedFile` that describes a set of shards and allow creations of readers and writers of the total set of files.
+
+#### org.ojalgo.structure
+
+- `Access1D`, `Access2D` and `AccessAnyD` each gained additional features to `select` (view) subsets of the elements and/or to iterate over elements/rows/columns/vectors/matruces...
+
+#### org.ojalgo.type
+
+- New utilities `CloseableList` and `CloseableMap` to simplify handing (closing) multiple readers/writers.
+- Whole new package, `org.ojalgo.type.function`, with lots of utlities for consumers/suppliers (or readers/writers). A lot of the new stuff in `org.ojalgo.netio` build on this.
+- Additions to EntryPair. Primarily to allow creation of key-value "pairs" with dual keys.
+
+### Changed
+
+#### org.ojalgo.concurrent
+
+- The `ParallelismSupplier` interface had the `min` and `max` methods renamed `limit` and `require` to better dscribe what they do.
+- Refactoring and additions to `ProcessingService`.
+
+#### org.ojalgo.netio
+
+- Reimplemented the IDX file parser in terms of `DataInterpreter` and `DataReader`.
+- Refactored the `BasicParser` interface to make use of the new `FromFileReader` and `ToFileWriter`.
+- Refactored `BasicLogger` and everything associated with it. There are API-breaking changes, but with stuff mostly used internally.
+
+#### org.ojalgo.optimisation
+
+- The default value of the (MIP) gap property in `IntegerStrategy` changed from `NumberContext.of(6,8)` to `NumberContext.of(7,8)`. This is to match what the recently deprecated mip_gap option used to be. The default MIP gap used to 1E-6, and that corresponfs to 7 digits precision (not 6).
+
+#### org.ojalgo.random
+
+- Refactoring and additions to `FrequencyMap`.
+
+#### org.ojalgo.structure
+
+- The various `row`, `rows`, `column` and `columns` methods in `Structure2D.Logical` have been signature-refactored to be more logical. If you used the `row` or `column` alternatives to reference more than 1 row/column you need to change your code to instead use `rows` or `columns`.
+- The previously existing `Access2D.RowView`, `Access2D.ColumnView`, `AccessAnyD.VectorView` and `AccessAnyD.MatrixView` gained support to "goTo" directly to a specified row/column/vector/matrix
+
+### Deprecated
+
+#### org.ojalgo.netio
+
+- A bunch of old useless stuff... will be removed eventually.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Calling `indexOfLargest()` on a `Primitive64Store`, `Primitive32Store` or `GenericStore` would result in a StackOverflowError.
+
+#### org.ojalgo.optimisation
+
+- There was a problem with integer rounding of lower/upper bounds of integer expressions - since it was applied too late the presolver would sometimes fail to detect infeasible nodes as such, and instead generate an incorrect problem for the main solver. This was not a very common problem, but did happen sometimes, and the fix made the presolver generally more efficient.
+
+## [51.2.0] – 2022-04-20
 
 ### Added
 

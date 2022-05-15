@@ -50,7 +50,13 @@ import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.structure.*;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
 
 /**
@@ -593,8 +599,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + myColDim;
-        result = prime * result + myRowDim;
-        return result;
+        return prime * result + myRowDim;
     }
 
     public int intValue(final long row, final long col) {
@@ -838,11 +843,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
             SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
         }
-    }
-
-    @Override
-    public long indexOfLargest() {
-        return myUtility.indexOfLargest();
     }
 
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {

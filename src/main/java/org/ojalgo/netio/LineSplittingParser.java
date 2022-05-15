@@ -21,8 +21,6 @@
  */
 package org.ojalgo.netio;
 
-import org.ojalgo.RecoverableCondition;
-
 public final class LineSplittingParser implements BasicParser<String[]> {
 
     private final String myRegExp;
@@ -43,7 +41,7 @@ public final class LineSplittingParser implements BasicParser<String[]> {
     }
 
     @Override
-    public String[] parse(final String line) throws RecoverableCondition {
+    public String[] parse(final String line) {
         return (myTrim ? line.trim() : line).split(myRegExp);
     }
 

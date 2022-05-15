@@ -182,7 +182,7 @@ public interface IntegerStrategy {
         Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
                 NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
 
-        return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(6, 8), DefaultStrategy::new, new GMICutConfiguration());
+        return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(7, 8), DefaultStrategy::new, new GMICutConfiguration());
     }
 
     /**

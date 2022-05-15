@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +15,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+
+import org.ojalgo.type.function.TwoStepMapper;
 
 public final class ProcessingService {
 
@@ -42,27 +44,25 @@ public final class ProcessingService {
 
     }
 
-    static final class CallableFunction<W, R> implements Callable<Map<W, R>> {
+    static final class CallableMapper<W, R> implements Callable<TwoStepMapper<W, R>> {
 
-        private final Function<W, R> myFunction;
-        private final Map<W, R> myResults;
+        private final TwoStepMapper<W, R> myMapper;
         private final Queue<W> myWork;
 
-        CallableFunction(final Queue<W> work, final Function<W, R> function, final Map<W, R> results) {
+        CallableMapper(final Queue<W> work, final TwoStepMapper<W, R> mapper) {
             super();
             myWork = work;
-            myFunction = function;
-            myResults = results;
+            myMapper = mapper;
         }
 
-        public Map<W, R> call() throws Exception {
+        public TwoStepMapper<W, R> call() throws Exception {
 
             W item = null;
             while ((item = myWork.poll()) != null) {
-                myResults.computeIfAbsent(item, k -> myFunction.apply(k));
+                myMapper.consume(item);
             }
 
-            return myResults;
+            return myMapper;
         }
 
     }
@@ -83,59 +83,36 @@ public final class ProcessingService {
     /**
      * Using parallelism {@link Parallelism#CORES}.
      *
-     * @see #compute(Collection, IntSupplier, Function)
+     * @see ProcessingService#compute(Collection, IntSupplier, Function)
      */
-    public <W, R> Map<W, R> compute(final Collection<W> work, final Function<W, R> processor) {
-        return this.compute(work, Parallelism.CORES, processor);
+    public <W, R> Map<W, R> compute(final Collection<W> work, final Function<W, R> computer) {
+        return this.compute(work, Parallelism.CORES, computer);
     }
 
     /**
+     * Compute an output item for each (unique) input item, and return the results as a {@link Map}. If the
+     * input contains duplicates, the output will have fewer items. It is therefore vital that the input type
+     * implements {@link Object#hashCode()} and {@link Object#equals(Object)} properly.
+     * <p>
      * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
-     * with {@code processor} and collectiing the results in a {@link Map}.
+     * with {@code computer} and collectiing the results in a {@link Map}.
      *
      * @param <W> The work item type
      * @param <R> The function return type
      * @param work The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param processor The processing code
+     * @param computer The processing code
      * @return A map of function input to output
      */
-    public <W, R> Map<W, R> compute(final Collection<W> work, final IntSupplier parallelism, final Function<W, R> processor) {
-
-        int load = work.size();
-        int concurrency = Math.min(load, parallelism.getAsInt());
-
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
-        Map<W, R> results = new ConcurrentHashMap<>(load);
-
-        List<CallableFunction<W, R>> tasks = new ArrayList<>(concurrency);
-        for (int i = 0; i < concurrency; i++) {
-            tasks.add(new CallableFunction<>(queue, processor, results));
-        }
-
-        try {
-            for (Future<Map<W, R>> future : myExecutor.invokeAll(tasks)) {
-                future.get();
-            }
-        } catch (InterruptedException | ExecutionException cause) {
-            throw new RuntimeException(cause);
-        }
-
-        return results;
+    public <W, R> Map<W, R> compute(final Collection<W> work, final int parallelism, final Function<W, R> computer) {
+        return this.reduce(work, parallelism, () -> new TwoStepMapper.SimpleCache<>(computer));
     }
 
     /**
-     * @see #compute(Collection, Function)
+     * @see ProcessingService#compute(Collection, int, Function)
      */
-    public <W, R> Map<W, R> computePair(final W work1, final W work2, final Function<W, R> processor) {
-        return this.compute(Arrays.asList(work1, work2), processor);
-    }
-
-    /**
-     * @see #compute(Collection, Function)
-     */
-    public <W, R> Map<W, R> computeTriplet(final W work1, final W work2, final W work3, final Function<W, R> processor) {
-        return this.compute(Arrays.asList(work1, work2, work3), processor);
+    public <W, R> Map<W, R> compute(final Collection<W> work, final IntSupplier parallelism, final Function<W, R> computer) {
+        return this.compute(work, parallelism.getAsInt(), computer);
     }
 
     public DivideAndConquer.Divider divider() {
@@ -152,7 +129,40 @@ public final class ProcessingService {
     /**
      * Using parallelism {@link Parallelism#CORES}.
      *
-     * @see #process(Collection, IntSupplier, Consumer)
+     * @see ProcessingService#map(Collection, IntSupplier, Function)
+     */
+    public <W, R> Collection<R> map(final Collection<W> work, final Function<W, R> mapper) {
+        return this.map(work, Parallelism.CORES, mapper);
+    }
+
+    /**
+     * Simply map each (unique) input item to an output item - a {@link Collection} of input results in a
+     * {@link Collection} of output. If the input contains duplicates, the output will have fewer items. It is
+     * therefore vital that the input type implements {@link Object#hashCode()} and
+     * {@link Object#equals(Object)} properly.
+     *
+     * @param <W> The input item type
+     * @param <R> The output item type
+     * @param work The collection of work items
+     * @param parallelism The maximum number of concurrent workers that will process the work items
+     * @param mapper The mapper functiom
+     * @return The mapped results
+     */
+    public <W, R> Collection<R> map(final Collection<W> work, final int parallelism, final Function<W, R> mapper) {
+        return this.compute(work, parallelism, mapper).values();
+    }
+
+    /**
+     * @see ProcessingService#map(Collection, int, Function)
+     */
+    public <W, R> Collection<R> map(final Collection<W> work, final IntSupplier parallelism, final Function<W, R> mapper) {
+        return this.map(work, parallelism.getAsInt(), mapper);
+    }
+
+    /**
+     * Using parallelism {@link Parallelism#CORES}.
+     *
+     * @see ProcessingService#process(Collection, IntSupplier, Consumer)
      */
     public <W> void process(final Collection<? extends W> work, final Consumer<W> processor) {
         this.process(work, Parallelism.CORES, processor);
@@ -167,10 +177,9 @@ public final class ProcessingService {
      * @param parallelism The maximum number of concurrent workers that will process the work items
      * @param processor The processing code
      */
-    public <W> void process(final Collection<? extends W> work, final IntSupplier parallelism, final Consumer<W> processor) {
+    public <W> void process(final Collection<? extends W> work, final int parallelism, final Consumer<W> processor) {
 
-        int load = work.size();
-        int concurrency = Math.min(load, parallelism.getAsInt());
+        int concurrency = Math.min(work.size(), parallelism);
 
         Queue<W> queue = new LinkedBlockingDeque<>(work);
 
@@ -189,6 +198,15 @@ public final class ProcessingService {
     }
 
     /**
+     * @see ProcessingService#process(Collection, int, Consumer)
+     */
+    public <W> void process(final Collection<? extends W> work, final IntSupplier parallelism, final Consumer<W> processor) {
+        this.process(work, parallelism.getAsInt(), processor);
+    }
+
+    /**
+     * Just 2 work items.
+     *
      * @see #process(Collection, Consumer)
      */
     public <W> void processPair(final W work1, final W work2, final Consumer<W> processor) {
@@ -196,10 +214,63 @@ public final class ProcessingService {
     }
 
     /**
+     * Just 3 work items.
+     *
      * @see #process(Collection, Consumer)
      */
     public <W> void processTriplet(final W work1, final W work2, final W work3, final Consumer<W> processor) {
         this.process(Arrays.asList(work1, work2, work3), processor);
+    }
+
+    /**
+     * Will (map and) reduce the collection of input work items to 1 single, but arbitrarily large/complex,
+     * output instance.
+     *
+     * @param <W> The work item type
+     * @param <R> The output type
+     * @param work The collection of work items
+     * @param parallelism The maximum number of concurrent workers that will process the work items
+     * @param reducer Providing a {@link TwoStepMapper} implementation that does what you want is the key.
+     * @return The results...
+     */
+    public <W, R> R reduce(final Collection<W> work, final int parallelism, final Supplier<TwoStepMapper<W, R>> reducer) {
+
+        int concurrency = Math.min(work.size(), parallelism);
+
+        Queue<W> queue = new LinkedBlockingDeque<>(work);
+
+        List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
+        for (int i = 0; i < concurrency; i++) {
+            tasks.add(new CallableMapper<>(queue, reducer.get()));
+        }
+
+        TwoStepMapper<W, R> totalResults = reducer.get();
+
+        try {
+            for (Future<TwoStepMapper<W, R>> future : myExecutor.invokeAll(tasks)) {
+                TwoStepMapper<W, R> mapper = future.get();
+                totalResults.merge(mapper.getResults());
+                mapper.reset();
+            }
+        } catch (InterruptedException | ExecutionException cause) {
+            throw new RuntimeException(cause);
+        }
+
+        return totalResults.getResults();
+    }
+
+    /**
+     * @see ProcessingService#reduce(Collection, int, Supplier)
+     */
+    public <W, R> R reduce(final Collection<W> work, final IntSupplier parallelism, final Supplier<TwoStepMapper<W, R>> reducer) {
+        return this.reduce(work, parallelism.getAsInt(), reducer);
+    }
+
+    /**
+     * @see ProcessingService#reduce(Collection, int, Supplier)
+     */
+    public <W, R> R reduce(final Collection<W> work, final Supplier<TwoStepMapper<W, R>> reducer) {
+        return this.reduce(work, Parallelism.CORES, reducer);
     }
 
     /**
@@ -208,12 +279,10 @@ public final class ProcessingService {
      * @param parallelism The number of concurrent workers/threads that will run
      * @param processor The processing code
      */
-    public void run(final IntSupplier parallelism, final Runnable processor) {
+    public void run(final int parallelism, final Runnable processor) {
 
-        int concurrency = parallelism.getAsInt();
-
-        List<Callable<Object>> tasks = new ArrayList<>(concurrency);
-        for (int i = 0; i < concurrency; i++) {
+        List<Callable<Object>> tasks = new ArrayList<>(parallelism);
+        for (int i = 0; i < parallelism; i++) {
             tasks.add(Executors.callable(processor));
         }
 
@@ -224,6 +293,13 @@ public final class ProcessingService {
         } catch (InterruptedException | ExecutionException cause) {
             throw new RuntimeException(cause);
         }
+    }
+
+    /**
+     * @see ProcessingService#run(int, Runnable)
+     */
+    public void run(final IntSupplier parallelism, final Runnable processor) {
+        this.run(parallelism.getAsInt(), processor);
     }
 
 }

@@ -35,6 +35,8 @@ import org.ojalgo.random.Uniform;
  */
 public abstract class ArrayTests {
 
+    public static final boolean DEBUG = false;
+
     static void doTestRandomSetAndGetBack(final BasicArray<Double> array, final long expectedCount) {
 
         TestUtils.assertEquals(expectedCount, array.count());

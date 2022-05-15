@@ -35,7 +35,7 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class NumberListTest {
+public class NumberListTest extends ArrayTests {
 
     private static final Random RANDOM = new Random();
 
