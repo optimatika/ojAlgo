@@ -910,28 +910,6 @@ public final class Expression extends ModelEntity<Expression> {
         return value;
     }
 
-    //    private Boolean deduceInteger() {
-    //
-    //        if (myLinear.size() == 0 && myQuadratic.size() == 0) {
-    //            return Boolean.FALSE;
-    //        }
-    //
-    //        for (IntIndex key : myLinear.keySet()) {
-    //            if (!myModel.getVariable(key).isInteger()) {
-    //                return Boolean.FALSE;
-    //            }
-    //        }
-    //        for (IntRowColumn key : myQuadratic.keySet()) {
-    //            if (!myModel.getVariable(key.row).isInteger() || !myModel.getVariable(key.column).isInteger()) {
-    //                return Boolean.FALSE;
-    //            }
-    //        }
-    //
-    //        boolean doIntegerRounding = this.doIntegerRounding();
-    //
-    //        return Boolean.valueOf(doIntegerRounding);
-    //    }
-
     private BigDecimal getConstant() {
         return myConstant != null ? myConstant : BigMath.ZERO;
     }
