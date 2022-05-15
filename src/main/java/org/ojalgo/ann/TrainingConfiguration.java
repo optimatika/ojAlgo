@@ -48,7 +48,8 @@ final class TrainingConfiguration {
             return false;
         }
         TrainingConfiguration other = (TrainingConfiguration) obj;
-        if ((dropouts != other.dropouts) || (error != other.error) || (Double.doubleToLongBits(learningRate) != Double.doubleToLongBits(other.learningRate)) || (regularisationL1 != other.regularisationL1)) {
+        if ((dropouts != other.dropouts) || (error != other.error) || (Double.doubleToLongBits(learningRate) != Double.doubleToLongBits(other.learningRate))
+                || (regularisationL1 != other.regularisationL1)) {
             return false;
         }
         if (Double.doubleToLongBits(regularisationL1Factor) != Double.doubleToLongBits(other.regularisationL1Factor)) {

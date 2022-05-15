@@ -21,7 +21,6 @@
  */
 package org.ojalgo.type.function;
 
-
 interface AutoFunctional {
 
 }
