@@ -1133,7 +1133,7 @@ public final class Expression extends ModelEntity<Expression> {
             } else {
                 gcd = abs.unscaledValue();
             }
-            if (maxScale > 8 || gcd.equals(BigInteger.ONE) && maxScale > 0) {
+            if (maxScale > 8 || (gcd.equals(BigInteger.ONE) && maxScale > 0)) {
                 myInteger = Boolean.FALSE;
                 return;
             }
