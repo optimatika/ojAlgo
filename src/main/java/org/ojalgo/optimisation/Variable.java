@@ -333,15 +333,16 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    boolean doIntegerRounding() {
-        BigDecimal limit;
-        if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
-            this.upper(limit.setScale(0, RoundingMode.FLOOR));
+    void doIntegerRounding() {
+        if (myInteger) {
+            BigDecimal limit;
+            if ((limit = this.getUpperLimit()) != null && limit.scale() > 0) {
+                this.upper(limit.setScale(0, RoundingMode.FLOOR));
+            }
+            if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
+                this.lower(limit.setScale(0, RoundingMode.CEILING));
+            }
         }
-        if ((limit = this.getLowerLimit()) != null && limit.scale() > 0) {
-            this.lower(limit.setScale(0, RoundingMode.CEILING));
-        }
-        return true;
     }
 
     IntIndex getIndex() {

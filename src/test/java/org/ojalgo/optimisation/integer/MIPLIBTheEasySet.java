@@ -73,10 +73,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     }
 
     /**
-     * This test became somewhat unstable when GMI cuts where introduced. It "always" works when running
-     * locally, on my machine, but on GitHub CI it often fails. It seems it finds a solution that is "better
-     * than possible" with some contraints violated.
-     * <p>
      * https://miplib.zib.de/instance_details_flugpl.html
      * <p>
      * Mac Pro (Early 2009)

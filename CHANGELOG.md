@@ -69,6 +69,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Calling `indexOfLargest()` on a `Primitive64Store`, `Primitive32Store` or `GenericStore` would result in a StackOverflowError.
 
+#### org.ojalgo.optimisation
+
+- There was a problem with integer rounding of lower/upper bounds of integer expressions - since it was applied too late the presolver would sometimes fail to detect infeasible nodes as such, and instead generate an incorrect problem for the main solver. This was not a very common problem, but did happen sometimes, and the fix made the presolver generally more efficient.
+
 ## [51.2.0] – 2022-04-20
 
 ### Added

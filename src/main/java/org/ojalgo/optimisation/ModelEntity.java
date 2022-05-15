@@ -64,6 +64,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return MissingMath.roundToInt(negatedAverage);
     }
 
+    static boolean isInfeasible(final BigDecimal lower, final BigDecimal upper) {
+        return lower != null && upper != null && lower.compareTo(upper) > 0;
+    }
+
     static BigDecimal toBigDecimal(final Comparable<?> number) {
 
         if (number == null) {
@@ -513,13 +517,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     abstract int deriveAdjustmentExponent();
 
     /**
-     * Should only be called if all variables are integer. Will then verify if all variable factors are
-     * integers or if there exists a simple scalar that will make it so. If so, the lower/upper limits are
-     * adjusted be "integer rounded". The return value indicates if rounding was successful or not. An
-     * {@link Expression} {@link #isInteger()} only if rounding was successful (all variables AND parameters
-     * are integer).
+     * If necessary this method should first determine if this {@link ModelEntity} is "integer" or not.
+     * <P>
+     * If it is, then verify if all variable factors are integers or if there exists a simple scalar that will
+     * make it so. If so, the lower/upper limits are "integer rounded".
      */
-    abstract boolean doIntegerRounding();
+    abstract void doIntegerRounding();
 
     final int getAdjustmentExponentValue() {
         return myAdjustmentExponent;
@@ -550,7 +553,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     boolean isInfeasible() {
-        return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) > 0;
+        return ModelEntity.isInfeasible(myLowerLimit, myUpperLimit);
     }
 
 }

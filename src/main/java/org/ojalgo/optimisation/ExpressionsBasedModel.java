@@ -456,6 +456,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
+        ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
         ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
     }
 
@@ -1271,6 +1272,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return this.validate(solution, context, appender);
     }
 
+    public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
+        NumberContext context = options.feasibility;
+        return this.validate(solution, context, appender);
+    }
+
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
         BasicLogger appender = options.logger_detailed && options.logger_appender != null ? options.logger_appender : BasicLogger.NULL;
         return this.validate(solution, context, appender);
@@ -1300,8 +1306,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
-    public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
-        NumberContext context = options.feasibility;
+    public boolean validate(final BasicLogger appender) {
+        final NumberContext context = options.feasibility;
+        final Result solution = this.getVariableValues(context);
         return this.validate(solution, context, appender);
     }
 
@@ -1316,14 +1323,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return this.validate(solution, context, appender);
     }
 
-    public boolean validate(final BasicLogger appender) {
-        final NumberContext context = options.feasibility;
-        final Result solution = this.getVariableValues(context);
-        return this.validate(solution, context, appender);
-    }
-
     /**
-     * @return A stream of variables that are not fixed
+     * Returns a stream of variables that are not fixed.
      */
     public Stream<Variable> variables() {
         return myVariables.stream().filter(v -> !v.isEqualityConstraint());
@@ -1486,6 +1487,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             }
         }
         return false;
+    }
+
+    boolean isInteger(final Set<IntIndex> variables) {
+
+        if (variables.size() <= 0) {
+            return false;
+        }
+
+        for (IntIndex index : variables) {
+            if (!myVariables.get(index.index).isInteger()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     boolean isReferenced(final Variable variable) {
