@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.netio
+
+- New methods in `BasicLogger` to handle logging of exceptions with stacktrace.
+
 ## [51.3.0] – 2022-05-15
 
 ### Added

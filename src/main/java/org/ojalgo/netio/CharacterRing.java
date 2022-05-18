@@ -131,6 +131,10 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
             }
         }
 
+        public void print(final Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
         public void printf(final String format, final Object... args) {
             if (myFormatter == null || myFormatter.locale() != Locale.getDefault()) {
                 myFormatter = new Formatter(myRing);

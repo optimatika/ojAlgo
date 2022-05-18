@@ -119,6 +119,10 @@ public interface BasicLogger {
             myPrintWriter.print(value);
         }
 
+        public void print(final Throwable throwable) {
+            throwable.printStackTrace(myPrintWriter);
+        }
+
         public void printf(final String format, final Object... args) {
             myPrintWriter.printf(format, args);
             myPrintWriter.println();
@@ -177,6 +181,12 @@ public interface BasicLogger {
         static void println(final BasicLogger appender, final String messagePattern, final Object... arguments) {
             if (appender != null) {
                 appender.println(messagePattern, arguments);
+            }
+        }
+
+        static void println(final BasicLogger appender, final Throwable throwable, final String messagePattern, final Object... arguments) {
+            if (appender != null) {
+                appender.println(throwable, messagePattern, arguments);
             }
         }
 
@@ -292,6 +302,9 @@ public interface BasicLogger {
         public void print(final short value) {
         }
 
+        public void print(final Throwable throwable) {
+        }
+
         public void printf(final String format, final Object... args) {
         }
 
@@ -324,6 +337,10 @@ public interface BasicLogger {
         NotNull.println(DEBUG, message, arguments);
     }
 
+    static void debug(final Throwable throwable, final String message, final Object... arguments) {
+        NotNull.println(DEBUG, throwable, message, arguments);
+    }
+
     static void error() {
         NotNull.println(ERROR);
     }
@@ -346,6 +363,10 @@ public interface BasicLogger {
 
     static void error(final String message, final Object... arguments) {
         NotNull.println(ERROR, message, arguments);
+    }
+
+    static void error(final Throwable throwable, final String message, final Object... arguments) {
+        NotNull.println(ERROR, throwable, message, arguments);
     }
 
     /**
@@ -403,6 +424,8 @@ public interface BasicLogger {
 
     void print(short value);
 
+    void print(Throwable throwable);
+
     void printf(String format, Object... args);
 
     void println();
@@ -415,6 +438,12 @@ public interface BasicLogger {
     default void println(final String message, final Object... args) {
         this.print(TypeUtils.format(message, args));
         this.println();
+    }
+
+    default void println(final Throwable throwable, final String message, final Object... args) {
+        this.print(TypeUtils.format(message, args));
+        this.println();
+        this.print(throwable);
     }
 
     default void printmtrx(final String message, final Access2D<?> matrix) {
