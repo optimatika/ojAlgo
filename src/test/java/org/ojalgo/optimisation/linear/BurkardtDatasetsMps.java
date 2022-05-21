@@ -36,7 +36,7 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/maros.mps
+ * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/
  *
  * @author apete
  */
@@ -168,7 +168,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
         Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        Variable[] tmpVariables = { tmpXONE, tmpYTWO, tmpZTHREE };
 
         ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 

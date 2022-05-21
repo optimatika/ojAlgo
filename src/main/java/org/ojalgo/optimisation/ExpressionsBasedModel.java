@@ -38,6 +38,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.ToFileWriter;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -1337,6 +1338,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * @param file The path/name of the file to write.
      */
     public void writeTo(final File file) {
+        ToFileWriter.mkdirs(file.getParentFile());
         try (FileOutputStream output = new FileOutputStream(file)) {
             FileFormatEBM.write(this, output);
         } catch (IOException cause) {
