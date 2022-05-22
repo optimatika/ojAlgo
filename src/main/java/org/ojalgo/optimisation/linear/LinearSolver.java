@@ -369,8 +369,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      * <li>All variables have a nonnegativity sign restriction.</li>
      * </ul>
      * <p>
-     * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements
-     * in [BE]). Don't think that's an actual LP standard form requirement, but it is required here.
+     * Further it is required that the constraint right hand sides are nonnegative (nonnegative elements in
+     * [BE]). Don't think that's an actual LP standard form requirement, but it is commonly required, and also
+     * here.
      * </p>
      * <p>
      * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
@@ -448,9 +449,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         int primSize = PrimalSimplex.size(convex);
         boolean dual = dualSize <= primSize;
 
-        Optimisation.Result retVal = dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
-
-        return retVal;
+        return dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
     }
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {
