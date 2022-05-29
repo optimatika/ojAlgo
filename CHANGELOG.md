@@ -13,6 +13,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.function
+
+- `AggregatorFunction` gained a new method `filter(PredicateFunction)` that allows to define a filter for which values will be considered in the aggregation.
+
 #### org.ojalgo.netio
 
 - New methods in `BasicLogger` to handle logging of exceptions with stacktrace.
