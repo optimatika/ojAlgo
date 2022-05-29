@@ -21,11 +21,114 @@
  */
 package org.ojalgo.function.aggregator;
 
+import org.ojalgo.function.PredicateFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.AccessScalar;
 
 public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunction<N>, AccessScalar<N> {
+
+    final class PredicateWrapper<N extends Comparable<N>> implements AggregatorFunction<N> {
+
+        private final AggregatorFunction<N> myAggregator;
+        private final PredicateFunction<N> myPredicate;
+
+        PredicateWrapper(final PredicateFunction<N> predicate, final AggregatorFunction<N> aggregator) {
+            super();
+            myPredicate = predicate;
+            myAggregator = aggregator;
+        }
+
+        public boolean booleanValue() {
+            return myAggregator.booleanValue();
+        }
+
+        public byte byteValue() {
+            return myAggregator.byteValue();
+        }
+
+        public double doubleValue() {
+            return myAggregator.doubleValue();
+        }
+
+        public float floatValue() {
+            return myAggregator.floatValue();
+        }
+
+        public N get() {
+            return myAggregator.get();
+        }
+
+        public int intValue() {
+            return myAggregator.intValue();
+        }
+
+        public void invoke(final byte arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final double arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final float arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final int arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final long arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final N arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public void invoke(final short arg) {
+            if (myPredicate.test(arg)) {
+                myAggregator.invoke(arg);
+            }
+        }
+
+        public long longValue() {
+            return myAggregator.longValue();
+        }
+
+        public AggregatorFunction<N> reset() {
+            return myAggregator.reset();
+        }
+
+        public short shortValue() {
+            return myAggregator.shortValue();
+        }
+
+        public Scalar<N> toScalar() {
+            return myAggregator.toScalar();
+        }
+
+    }
+
+    /**
+     * Only the values that pass the predicate filter will actually be part of the aggregation.
+     */
+    default AggregatorFunction<N> filter(final PredicateFunction<N> predicate) {
+        return new PredicateWrapper<>(predicate, this);
+    }
 
     AggregatorFunction<N> reset();
 
