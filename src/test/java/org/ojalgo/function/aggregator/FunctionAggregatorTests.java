@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.aggregator;
 
-public abstract class AggregatorFunctionTests {
+public abstract class FunctionAggregatorTests {
 
     static final boolean DEBUG = false;
 

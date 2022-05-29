@@ -26,7 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.function.PrimitiveFunction;
 
-public class PredicateTest extends AggregatorFunctionTests {
+public class AggregatorFunctionTest extends FunctionAggregatorTests {
 
     private static final PrimitiveFunction.Predicate FINITE = Double::isFinite;
 

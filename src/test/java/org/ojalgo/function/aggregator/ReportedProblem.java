@@ -31,7 +31,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 
-public class ReportedProblem extends AggregatorFunctionTests {
+public class ReportedProblem extends FunctionAggregatorTests {
 
     @Test
     public void testAggregatorMaximumDoesNotWorkForNegativeNumbers() {
