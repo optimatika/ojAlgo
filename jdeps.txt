@@ -165,10 +165,12 @@ ojalgo-51.3.1-SNAPSHOT-tests.jar -> ./target/ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.structure                               ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.type                                    ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.function.aggregator                     -> java.lang                                          java.base
+   org.ojalgo.function.aggregator                     -> java.lang.invoke                                   java.base
    org.ojalgo.function.aggregator                     -> java.math                                          java.base
    org.ojalgo.function.aggregator                     -> org.junit.jupiter.api                              not found
    org.ojalgo.function.aggregator                     -> org.ojalgo                                         ojalgo-51.3.1-SNAPSHOT-tests.jar
    org.ojalgo.function.aggregator                     -> org.ojalgo.array                                   ojalgo-51.3.1-SNAPSHOT.jar
+   org.ojalgo.function.aggregator                     -> org.ojalgo.function                                ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.function.aggregator                     -> org.ojalgo.scalar                                  ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.function.aggregator                     -> org.ojalgo.structure                               ojalgo-51.3.1-SNAPSHOT.jar
    org.ojalgo.function.constant                       -> java.lang                                          java.base

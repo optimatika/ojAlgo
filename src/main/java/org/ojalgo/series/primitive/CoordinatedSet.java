@@ -54,13 +54,23 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
             return CoordinatedSet.from(uncoordinated);
         }
+
+        public CoordinatedSet<K> build(final UnaryOperator<K> keyMapper) {
+
+            List<BasicSeries<K, ?>> uncoordinated = new ArrayList<>();
+
+            for (Supplier<BasicSeries<K, ?>> supplier : mySuppliers) {
+                uncoordinated.add(supplier.get().resample(keyMapper));
+            }
+
+            return CoordinatedSet.from(uncoordinated);
+        }
     }
 
     public static <K extends Comparable<? super K>> CoordinatedSet.Builder<K> builder() {
         return new CoordinatedSet.Builder<>();
     }
 
-    @SuppressWarnings("unchecked")
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final BasicSeries<K, ?>... uncoordinated) {
         return CoordinatedSet.from(Arrays.asList(uncoordinated));
     }
@@ -143,6 +153,12 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
     public int size() {
         return myCoordinated.length;
+    }
+
+    @Override
+    public String toString() {
+        return "FirstKey=" + this.getFirstKey() + ", LastKey=" + this.getLastKey() + ", NumberOfSeries=" + myCoordinated.length + ", NumberOfSeriesEntries="
+                + myCoordinated[0].size();
     }
 
 }

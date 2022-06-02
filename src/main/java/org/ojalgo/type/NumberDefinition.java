@@ -24,9 +24,7 @@ package org.ojalgo.type;
 import java.util.Objects;
 
 /**
- * An interface that defines what is already in {@link java.lang.Number}. Hopefully Java itself will one day
- * get an interface similar to this. When/if that happens this interface, and possibly some additional usage
- * of <code>extends java.lang.Number</code>, will be replaced by that new interface.
+ * An interface defining a "Number". Had {@link java.lang.Number} been an interface...
  */
 public interface NumberDefinition {
 

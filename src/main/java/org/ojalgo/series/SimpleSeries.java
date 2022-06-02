@@ -21,48 +21,33 @@
  */
 package org.ojalgo.series;
 
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.SortedMap;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.UnaryOperator;
 
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.NumberDefinition;
+public final class SimpleSeries<K extends Comparable<? super K>, V extends Comparable<V>> extends TreeSeries<K, V, SimpleSeries<K, V>> {
 
-public class NumberSeries<N extends Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
+    public static <K extends Comparable<? super K>, V extends Comparable<V>> SimpleSeries<K, V> copy(final Map<? extends K, ? extends V> entries) {
+        SimpleSeries<K, V> retVal = new SimpleSeries<>();
+        retVal.putAll(entries);
+        return retVal;
+    }
 
-    public NumberSeries() {
+    public static <K extends Comparable<? super K>, V extends Comparable<V>> SimpleSeries<K, V> wrap(final NavigableMap<K, V> delegate) {
+        return new SimpleSeries<>(delegate);
+    }
+
+    public SimpleSeries() {
         super(new TreeMap<>());
     }
 
-    public NumberSeries(final Map<? extends N, ? extends N> map) {
-        super(new TreeMap<>(map));
+    SimpleSeries(final NavigableMap<K, V> delegate) {
+        super(delegate);
     }
 
-    public NumberSeries(final SortedMap<N, ? extends N> sortedMap) {
-        super(new TreeMap<>(sortedMap));
-    }
-
-    public Access1D<N> accessKeys() {
-        return Access1D.wrap(new ArrayList<>(this.keySet()));
-    }
-
-    public Access1D<N> accessValues() {
-        return Access1D.wrap(new ArrayList<>(this.values()));
-    }
-
-    public double doubleValue(final N key) {
-        return NumberDefinition.doubleValue(this.get(key));
-    }
-
-    @Override
-    public N get(final N key) {
-        return this.get((Object) key);
-    }
-
-    public BasicSeries<N, N> resample(final UnaryOperator<N> keyTranslator) {
-        NumberSeries<N> retVal = new NumberSeries<>();
+    public BasicSeries<K, V> resample(final UnaryOperator<K> keyTranslator) {
+        BasicSeries<K, V> retVal = new SimpleSeries<>();
         this.resample(keyTranslator, retVal);
         return retVal;
     }
