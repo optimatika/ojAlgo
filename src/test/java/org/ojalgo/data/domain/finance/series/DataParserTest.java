@@ -33,7 +33,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 
 public class DataParserTest {
 
-    static final class ResultsConsumer<DP extends DatePrice> implements Consumer<DP> {
+    static class ResultsConsumer<DP extends DatePrice> implements Consumer<DP> {
 
         List<DP> data = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public class DataParserTest {
         }
 
         LocalDate firstDate() {
-            return data.get(0).key;
+            return data.get(0).date;
         }
 
         double firstPrice() {
@@ -50,7 +50,7 @@ public class DataParserTest {
         }
 
         LocalDate lastDate() {
-            return data.get(data.size() - 1).key;
+            return data.get(data.size() - 1).date;
         }
 
         double lastPrice() {
@@ -216,7 +216,7 @@ public class DataParserTest {
 
         parser.parse(file, true, collector);
 
-        TestUtils.assertEquals(9562, collector.size());
+        TestUtils.assertEquals(9561, collector.size());
 
         TestUtils.assertEquals(LocalDate.of(1980, 12, 12), collector.firstDate());
         TestUtils.assertEquals(0.023106, collector.firstPrice(), PrimitiveMath.MACHINE_EPSILON);

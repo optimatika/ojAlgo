@@ -78,9 +78,7 @@ public abstract class FinanceUtils {
         double tmpDiff = PrimitiveMath.SQRT.invoke(tmpVar / tmpStepSize);
         double tmpDrift = tmpExp / tmpStepSize + tmpDiff * tmpDiff / TWO;
 
-        GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
-
-        return retVal;
+        return new GeometricBrownianMotion(tmpDrift, tmpDiff);
     }
 
     public static CalendarDateSeries<RandomNumber> forecast(final CalendarDateSeries<? extends Comparable<?>> series, final int pointCount,
@@ -104,7 +102,7 @@ public abstract class FinanceUtils {
         tmpProcess.setValue(tmpLastValue);
 
         for (int i = 1; i <= pointCount; i++) {
-            retVal.put(tmpLastKey.millis + i * timeUnit.toDurationInMillis(), tmpProcess.getDistribution(i));
+            retVal.put(tmpLastKey.step(i, timeUnit), tmpProcess.getDistribution(i));
         }
 
         return retVal;

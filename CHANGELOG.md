@@ -13,6 +13,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.data
+
+- New class `org.ojalgo.data.domain.finance.series.FinanceDataReader` that implements both `FinanceData` and `DataFetcher`. Instead of fetching data from some (web) service it reads and and parses files. Already had some parsers, and since it implements both `FinanceData` and `DataFetcher`, it can be used with much of the existing code. In particular `DataSource` has been updated to include this reader option.
+
 #### org.ojalgo.function
 
 - `AggregatorFunction` gained a new method `filter(PredicateFunction)` that allows to define a filter for which values will be considered in the aggregation.
@@ -20,6 +24,26 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.netio
 
 - New methods in `BasicLogger` to handle logging of exceptions with stacktrace.
+
+#### org.ojalgo.series
+
+- New class `SimpleSeries` that is the simplest possible `BasicSeries` implementation.
+
+### Changed
+
+#### org.ojalgo.data
+
+- Refactoring of the `org.ojalgo.data.domain.finance.series` package. This package very much depends on `org.ojalgo.series` which is extensively refactored.
+- `FinanceData` is now generic and the `getHistoricalPrices()` method is now declared to contain a specified subclass of `DatePrice`.
+- `DatePrice` now implements `EntryPair.KeyedPrimitive` rather than the deprecated `KeyValue` interface. The public `key` field has been renamed `date` (the date is the key). All `DatePrice` subclasses are now immutable.
+
+#### org.ojalgo.series
+
+- Extensive refactoring of all `BasicSeries` subinterfaces and implementations, including some breaking name changes. The `BasicSeries.NaturallySequenced` interface still exists, but is not really used for anything. All the useful stuff is in `BasicSeries`. All methods that used `long` keys to interact with entries are removed.
+
+#### org.ojalgo.type
+
+- The interface `CalendarDate.Resolution` now also extends `Structure1D.IndexMapper` and defines a method to `adjustInto` for `CalendarDate`.
 
 ## [51.3.0] – 2022-05-15
 

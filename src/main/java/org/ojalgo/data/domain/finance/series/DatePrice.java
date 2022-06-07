@@ -23,36 +23,67 @@ package org.ojalgo.data.domain.finance.series;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Set;
 
-import org.ojalgo.type.keyvalue.KeyValue;
+import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.keyvalue.EntryPair;
 
-public abstract class DatePrice implements KeyValue<LocalDate, Double> {
+public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
 
-    public final LocalDate key;
+    public final LocalDate date;
 
-    protected DatePrice(CharSequence text) {
-
-        super();
-
-        key = LocalDate.parse(text);
-    }
-
-    protected DatePrice(CharSequence text, DateTimeFormatter formatter) {
+    protected DatePrice(final CharSequence text) {
 
         super();
 
-        key = LocalDate.parse(text, formatter);
+        date = LocalDate.parse(text);
     }
 
-    protected DatePrice(final LocalDate date) {
+    protected DatePrice(final CharSequence text, final DateTimeFormatter formatter) {
 
         super();
 
-        key = date;
+        date = LocalDate.parse(text, formatter);
     }
 
-    public int compareTo(final KeyValue<LocalDate, ?> ref) {
-        return key.compareTo(ref.getKey());
+    protected DatePrice(final LocalDate key) {
+
+        super();
+
+        date = key;
+    }
+
+    public int compareTo(final PrimitiveNumber reference) {
+
+        int retVal = 0;
+
+        if (reference instanceof DatePrice) {
+            retVal = date.compareTo(((DatePrice) reference).date);
+        }
+
+        if (retVal == 0) {
+            retVal = Double.compare(this.getPrice(), reference.doubleValue());
+        }
+
+        return retVal;
+    }
+
+    public boolean containsKey(final Object key) {
+        return date.equals(key);
+    }
+
+    public boolean containsValue(final Object value) {
+        if (value instanceof Comparable<?>) {
+            return NumberDefinition.doubleValue((Comparable<?>) value) == this.getPrice();
+        } else {
+            return false;
+        }
+    }
+
+    public final double doubleValue() {
+        return this.getPrice();
     }
 
     @Override
@@ -60,44 +91,47 @@ public abstract class DatePrice implements KeyValue<LocalDate, Double> {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof DatePrice)) {
             return false;
         }
-        final DatePrice other = (DatePrice) obj;
-        if (key == null) {
-            if (other.key != null) {
+        DatePrice other = (DatePrice) obj;
+        if (date == null) {
+            if (other.date != null) {
                 return false;
             }
-        } else if (!key.equals(other.key)) {
+        } else if (!date.equals(other.date)) {
             return false;
         }
         return true;
     }
 
+    public PrimitiveNumber get(final Object key) {
+        if (date.equals(key)) {
+            return this;
+        } else {
+            return null;
+        }
+    }
+
     public final LocalDate getKey() {
-        return key;
+        return date;
     }
 
     public abstract double getPrice();
-
-    public final Double getValue() {
-        return this.getPrice();
-    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((key == null) ? 0 : key.hashCode());
-        return result;
+        return prime * result + ((date == null) ? 0 : date.hashCode());
+    }
+
+    public Set<LocalDate> keySet() {
+        return Collections.singleton(date);
     }
 
     @Override
     public final String toString() {
-        return key + ": " + this.getPrice();
+        return this.getKey() + ": " + this.getPrice();
     }
-
 }

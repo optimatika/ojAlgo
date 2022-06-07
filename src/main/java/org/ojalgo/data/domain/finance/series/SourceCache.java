@@ -93,7 +93,7 @@ public final class SourceCache {
         }
     }
 
-    public synchronized void register(FinanceData primary, FinanceData secondary) {
+    public synchronized void register(final FinanceData primary, final FinanceData secondary) {
 
         myCache.computeIfAbsent(primary, k -> new SourceCache.Value(k.getSymbol()));
 

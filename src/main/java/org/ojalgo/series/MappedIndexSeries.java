@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
@@ -36,6 +37,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.structure.Structure1D;
+import org.ojalgo.structure.Structure1D.IndexMapper;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
@@ -99,16 +101,12 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
         return null;
     }
 
-    public long count() {
-        return this.size();
+    public void complete() {
+        this.complete(key -> myMapper.next(key));
     }
 
     public double doubleValue(final K key) {
         return myDelegate.doubleValue(myMapper.toIndex(key));
-    }
-
-    public double doubleValue(final long index) {
-        return myDelegate.doubleValue(index);
     }
 
     @Override
@@ -118,7 +116,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
             @Override
             public Iterator<Map.Entry<K, N>> iterator() {
 
-                final Iterator<Map.Entry<Long, N>> tmpDelegateIterator = myDelegate.entrySet().iterator();
+                Iterator<Map.Entry<Long, N>> tmpDelegateIterator = myDelegate.entrySet().iterator();
 
                 return new Iterator<Map.Entry<K, N>>() {
 
@@ -128,7 +126,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
 
                     public Map.Entry<K, N> next() {
 
-                        final Map.Entry<Long, N> tmpDelegateNext = tmpDelegateIterator.next();
+                        Map.Entry<Long, N> tmpDelegateNext = tmpDelegateIterator.next();
 
                         return new Map.Entry<K, N>() {
 
@@ -169,11 +167,6 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
         return myDelegate.get(myMapper.toIndex(key));
     }
 
-    public N get(final long index) {
-        return myDelegate.get(index);
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public N get(final Object key) {
         if (key instanceof Comparable<?>) {
@@ -224,15 +217,17 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
     }
 
     public double put(final K key, final double value) {
-        return this.put(myMapper.toIndex(key), value);
+        long index = myMapper.toIndex(key);
+        if (myAccumulator != null) {
+            return myDelegate.mix(index, myAccumulator, value);
+        } else {
+            return myDelegate.put(index, value);
+        }
     }
 
     @Override
     public N put(final K key, final N value) {
-        return this.put(myMapper.toIndex(key), value);
-    }
-
-    public double put(final long index, final double value) {
+        long index = myMapper.toIndex(key);
         if (myAccumulator != null) {
             return myDelegate.mix(index, myAccumulator, value);
         } else {
@@ -240,12 +235,28 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
         }
     }
 
-    public N put(final long index, final N value) {
-        if (myAccumulator != null) {
-            return myDelegate.mix(index, myAccumulator, value);
-        } else {
-            return myDelegate.put(index, value);
+    public BasicSeries<K, N> resample(final UnaryOperator<K> keyTranslator) {
+
+        MappedIndexSeries<K, N> retVal = new MappedIndexSeries<>(myMapper, this.newDelegateInstance(), this.getAccumulator());
+
+        retVal.setColour(this.getColour());
+        retVal.setName(this.getName());
+
+        for (Map.Entry<K, N> entry : this.entrySet()) {
+            K key = keyTranslator.apply(entry.getKey());
+            N value = entry.getValue();
+            retVal.put(key, value);
         }
+
+        return retVal;
+    }
+
+    public void setColour(final ColourData colour) {
+        myColour = colour;
+    }
+
+    public void setName(final String name) {
+        myName = name;
     }
 
     public K step(final K key) {
@@ -254,9 +265,9 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
 
     @Override
     public MappedIndexSeries<K, N> subMap(final K fromKey, final K toKey) {
-        final long fromIndex = myMapper.toIndex(fromKey);
-        final long toIndex = myMapper.toIndex(toKey);
-        final LongToNumberMap<N> delegateSubMap = myDelegate.subMap(fromIndex, toIndex);
+        long fromIndex = myMapper.toIndex(fromKey);
+        long toIndex = myMapper.toIndex(toKey);
+        LongToNumberMap<N> delegateSubMap = myDelegate.subMap(fromIndex, toIndex);
         return new MappedIndexSeries<>(myMapper, delegateSubMap, myAccumulator);
     }
 
@@ -267,7 +278,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
     @Override
     public String toString() {
 
-        final StringBuilder retVal = new StringBuilder();
+        StringBuilder retVal = new StringBuilder();
 
         if (myName != null) {
             retVal.append(myName);
@@ -299,12 +310,15 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Compara
         return retVal.toString();
     }
 
-    void setColour(final ColourData colour) {
-        myColour = colour;
+    /**
+     * A "hack" that will create a new empty delegate {@link LongToNumberMap} instance.
+     */
+    private LongToNumberMap<N> newDelegateInstance() {
+        return myDelegate.headMap(Long.MIN_VALUE);
     }
 
-    void setName(final String name) {
-        myName = name;
+    BinaryFunction<N> getAccumulator() {
+        return myAccumulator;
     }
 
 }

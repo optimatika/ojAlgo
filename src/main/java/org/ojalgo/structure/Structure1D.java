@@ -93,8 +93,16 @@ public interface Structure1D {
             return this.toKey(this.toIndex(key) - 1L);
         }
 
+        /**
+         * For each key (any instance of that type) there is a corresponding index value – 1 or more key
+         * instances will be mapped to each index value.
+         */
         long toIndex(T key);
 
+        /**
+         * In most cases it should be safe to assume that the input index value is valid (matching what would
+         * be created by {@link #toIndex(Object)}).
+         */
         T toKey(long index);
 
     }

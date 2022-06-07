@@ -21,69 +21,116 @@
  */
 package org.ojalgo.series;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.series.primitive.DataSeries;
-import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 
-abstract class TreeSeries<K extends Comparable<? super K>, N extends Comparable<N>, I extends TreeSeries<K, N, I>> extends TreeMap<K, N>
-        implements BasicSeries<K, N> {
-
-    private static final long serialVersionUID = 1L;
+abstract class TreeSeries<K extends Comparable<? super K>, V extends Comparable<V>, I extends TreeSeries<K, V, I>>
+        implements NavigableMap<K, V>, BasicSeries<K, V> {
 
     private ColourData myColour = null;
+    private final NavigableMap<K, V> myDelegate;
     private String myName = null;
 
-    @SuppressWarnings("unused")
-    private TreeSeries(final Comparator<? super K> comparator) {
-        super(comparator);
-    }
-
-    protected TreeSeries() {
+    protected TreeSeries(final NavigableMap<K, V> delegate) {
         super();
+        myDelegate = delegate;
     }
 
-    protected TreeSeries(final Map<? extends K, ? extends N> map) {
-        super(map);
+    public Entry<K, V> ceilingEntry(final K key) {
+        return myDelegate.ceilingEntry(key);
     }
 
-    protected TreeSeries(final SortedMap<K, ? extends N> sortedMap) {
-        super(sortedMap);
+    public K ceilingKey(final K key) {
+        return myDelegate.ceilingKey(key);
     }
 
-    public PrimitiveSeries asPrimitive() {
-
-        final double[] retVal = new double[this.size()];
-
-        int i = 0;
-        for (final N tmpValue : this.values()) {
-            retVal[i] = NumberDefinition.doubleValue(tmpValue);
-            i++;
-        }
-
-        return DataSeries.wrap(retVal);
+    public void clear() {
+        myDelegate.clear();
     }
 
-    @SuppressWarnings("unchecked")
-    public I colour(final ColourData colour) {
-        myColour = colour;
-        return (I) this;
+    public final I colour(final ColourData colour) {
+        return (I) BasicSeries.super.colour(colour);
     }
 
-    public final double doubleValue(final K key) {
-        return NumberDefinition.doubleValue(this.get(key));
+    public Comparator<? super K> comparator() {
+        return myDelegate.comparator();
     }
 
-    public N firstValue() {
-        return this.get(this.firstKey());
+    public V compute(final K key, final BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        return myDelegate.compute(key, remappingFunction);
+    }
+
+    public V computeIfAbsent(final K key, final Function<? super K, ? extends V> mappingFunction) {
+        return myDelegate.computeIfAbsent(key, mappingFunction);
+    }
+
+    public V computeIfPresent(final K key, final BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        return myDelegate.computeIfPresent(key, remappingFunction);
+    }
+
+    public boolean containsKey(final Object key) {
+        return myDelegate.containsKey(key);
+    }
+
+    public boolean containsValue(final Object value) {
+        return myDelegate.containsValue(value);
+    }
+
+    public NavigableSet<K> descendingKeySet() {
+        return myDelegate.descendingKeySet();
+    }
+
+    public NavigableMap<K, V> descendingMap() {
+        return myDelegate.descendingMap();
+    }
+
+    public Set<Entry<K, V>> entrySet() {
+        return myDelegate.entrySet();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return myDelegate.equals(o);
+    }
+
+    public Entry<K, V> firstEntry() {
+        return myDelegate.firstEntry();
+    }
+
+    public K firstKey() {
+        return myDelegate.firstKey();
+    }
+
+    public Entry<K, V> floorEntry(final K key) {
+        return myDelegate.floorEntry(key);
+    }
+
+    public K floorKey(final K key) {
+        return myDelegate.floorKey(key);
+    }
+
+    public void forEach(final BiConsumer<? super K, ? super V> action) {
+        myDelegate.forEach(action);
+    }
+
+    public V get(final K key) {
+        return myDelegate.get(key);
+    }
+
+    public V get(final Object key) {
+        return myDelegate.get(key);
     }
 
     public ColourData getColour() {
@@ -91,30 +138,150 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Comparable<
     }
 
     public String getName() {
-        if (myName == null) {
-            myName = UUID.randomUUID().toString();
-        }
         return myName;
     }
 
-    public N lastValue() {
-        return this.get(this.lastKey());
+    public V getOrDefault(final Object key, final V defaultValue) {
+        return myDelegate.getOrDefault(key, defaultValue);
     }
 
-    @SuppressWarnings("unchecked")
-    public I name(final String name) {
+    @Override
+    public int hashCode() {
+        return myDelegate.hashCode();
+    }
+
+    public SortedMap<K, V> headMap(final K toKey) {
+        return myDelegate.headMap(toKey);
+    }
+
+    public NavigableMap<K, V> headMap(final K toKey, final boolean inclusive) {
+        return myDelegate.headMap(toKey, inclusive);
+    }
+
+    public Entry<K, V> higherEntry(final K key) {
+        return myDelegate.higherEntry(key);
+    }
+
+    public K higherKey(final K key) {
+        return myDelegate.higherKey(key);
+    }
+
+    public boolean isEmpty() {
+        return myDelegate.isEmpty();
+    }
+
+    public Set<K> keySet() {
+        return myDelegate.keySet();
+    }
+
+    public Entry<K, V> lastEntry() {
+        return myDelegate.lastEntry();
+    }
+
+    public K lastKey() {
+        return myDelegate.lastKey();
+    }
+
+    public Entry<K, V> lowerEntry(final K key) {
+        return myDelegate.lowerEntry(key);
+    }
+
+    public K lowerKey(final K key) {
+        return myDelegate.lowerKey(key);
+    }
+
+    public V merge(final K key, final V value, final BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        return myDelegate.merge(key, value, remappingFunction);
+    }
+
+    public final I name(final String name) {
+        return (I) BasicSeries.super.name(name);
+    }
+
+    public NavigableSet<K> navigableKeySet() {
+        return myDelegate.navigableKeySet();
+    }
+
+    public Entry<K, V> pollFirstEntry() {
+        return myDelegate.pollFirstEntry();
+    }
+
+    public Entry<K, V> pollLastEntry() {
+        return myDelegate.pollLastEntry();
+    }
+
+    public V put(final K key, final V value) {
+        return myDelegate.put(key, value);
+    }
+
+    public void putAll(final Map<? extends K, ? extends V> m) {
+        myDelegate.putAll(m);
+    }
+
+    public V putIfAbsent(final K key, final V value) {
+        return myDelegate.putIfAbsent(key, value);
+    }
+
+    public V remove(final Object key) {
+        return myDelegate.remove(key);
+    }
+
+    public boolean remove(final Object key, final Object value) {
+        return myDelegate.remove(key, value);
+    }
+
+    public V replace(final K key, final V value) {
+        return myDelegate.replace(key, value);
+    }
+
+    public boolean replace(final K key, final V oldValue, final V newValue) {
+        return myDelegate.replace(key, oldValue, newValue);
+    }
+
+    public void replaceAll(final BiFunction<? super K, ? super V, ? extends V> function) {
+        myDelegate.replaceAll(function);
+    }
+
+    public void setColour(final ColourData colour) {
+        myColour = colour;
+    }
+
+    public void setName(final String name) {
         myName = name;
-        return (I) this;
+    }
+
+    public int size() {
+        return myDelegate.size();
+    }
+
+    public NavigableMap<K, V> subMap(final K fromKey, final boolean fromInclusive, final K toKey, final boolean toInclusive) {
+        return myDelegate.subMap(fromKey, fromInclusive, toKey, toInclusive);
+    }
+
+    public SortedMap<K, V> subMap(final K fromKey, final K toKey) {
+        return myDelegate.subMap(fromKey, toKey);
+    }
+
+    public SortedMap<K, V> tailMap(final K fromKey) {
+        return myDelegate.tailMap(fromKey);
+    }
+
+    public NavigableMap<K, V> tailMap(final K fromKey, final boolean inclusive) {
+        return myDelegate.tailMap(fromKey, inclusive);
     }
 
     @Override
     public String toString() {
 
-        final StringBuilder retVal = this.toStringFirstPart();
+        StringBuilder retVal = this.toStringFirstPart();
 
         this.appendLastPartToString(retVal);
 
         return retVal.toString();
+    }
+
+    public Collection<V> values() {
+        return myDelegate.values();
     }
 
     final void appendLastPartToString(final StringBuilder builder) {
@@ -125,28 +292,24 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Comparable<
         }
 
         if (this.size() <= 30) {
-            builder.append(super.toString());
+            builder.append(myDelegate.toString());
         } else {
             builder.append("First:");
-            builder.append(this.firstEntry());
+            builder.append(this.firstKey());
+            builder.append("=");
+            builder.append(this.firstValue());
             builder.append(ASCII.NBSP);
             builder.append("Last:");
-            builder.append(this.lastEntry());
+            builder.append(this.lastKey());
+            builder.append("=");
+            builder.append(this.lastValue());
             builder.append(ASCII.NBSP);
             builder.append("Size:");
             builder.append(this.size());
         }
     }
 
-    void setColour(final ColourData colour) {
-        this.colour(colour);
-    }
-
-    void setName(final String name) {
-        this.name(name);
-    }
-
-    StringBuilder toStringFirstPart() {
+    final StringBuilder toStringFirstPart() {
 
         final StringBuilder retVal = new StringBuilder();
 

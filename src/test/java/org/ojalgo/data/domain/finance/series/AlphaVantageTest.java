@@ -40,7 +40,7 @@ public class AlphaVantageTest extends FinanceDataTests {
     @Test
     public void testAlphaVantageDailyMSFT() {
 
-        final DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
+        DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
 
         FinanceDataTests.assertAtLeastExpectedItems(dataSource, 100);
     }
@@ -48,7 +48,7 @@ public class AlphaVantageTest extends FinanceDataTests {
     @Test
     public void testAlphaVantageMonthlyMSFT() {
 
-        final DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.MONTH, "demo");
+        DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.MONTH, "demo");
 
         FinanceDataTests.assertAtLeastExpectedItems(dataSource, 240);
     }
@@ -56,7 +56,7 @@ public class AlphaVantageTest extends FinanceDataTests {
     @Test
     public void testAlphaVantageWeeklyMSFT() {
 
-        final DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.WEEK, "demo");
+        DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.WEEK, "demo");
 
         FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1044);
     }
@@ -64,7 +64,7 @@ public class AlphaVantageTest extends FinanceDataTests {
     @Test
     public void testDeriveDistributions() {
 
-        final DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
+        DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
 
         FinanceDataTests.doTestDeriveDistribution(dataSource);
     }

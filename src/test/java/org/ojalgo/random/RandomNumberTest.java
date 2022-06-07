@@ -23,8 +23,6 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
@@ -33,6 +31,8 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.CalendarDate;
+import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -43,16 +43,20 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class RandomNumberTest extends RandomTests {
 
-    // A wrapper for two-parameter random numbers to make it easier to generalize tests. Easy to extend to single-parameter random numbers,
-    // or just apply as-is by having one throw-away parameter.
-    private abstract class Dist2 {
+    /**
+     * A wrapper for two-parameter random numbers to make it easier to generalize tests. Easy to extend to
+     * single-parameter random numbers, or just apply as-is by having one throw-away parameter.
+     */
+    abstract static class Dist2 {
 
         public abstract RandomNumber getDist(double p0, double p1);
     }
 
-    // Erlang's first argument is an int. For convenience, this takes the int value of the corresponding double's floor, which
-    // should be the nearest lower int, according to the javadoc.
-    private class Dist2Erlang extends Dist2 {
+    /**
+     * Erlang's first argument is an int. For convenience, this takes the int value of the corresponding
+     * double's floor, which should be the nearest lower int, according to the javadoc.
+     */
+    static class Dist2Erlang extends Dist2 {
 
         @Override
         public RandomNumber getDist(final double p0, final double p1) {
@@ -63,7 +67,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    private class Dist2Gamma extends Dist2 {
+    static class Dist2Gamma extends Dist2 {
 
         @Override
         public RandomNumber getDist(final double p0, final double p1) {
@@ -71,7 +75,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    private class Dist2Norm extends Dist2 {
+    static class Dist2Norm extends Dist2 {
 
         @Override
         public RandomNumber getDist(final double p0, final double p1) {
@@ -79,7 +83,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    private class Dist2Weibull extends Dist2 {
+    static class Dist2Weibull extends Dist2 {
 
         @Override
         public RandomNumber getDist(final double p0, final double p1) {
@@ -88,29 +92,41 @@ public class RandomNumberTest extends RandomTests {
     }
 
     public static void compareDensity(final ContinuousDistribution expected, final ContinuousDistribution actual) {
+        RandomNumberTest.compareDensity(expected, actual, NumberContext.of(6));
+    }
+
+    public static void compareDensity(final ContinuousDistribution expected, final ContinuousDistribution actual, final NumberContext accuracy) {
         for (int d = -20; d < 21; d++) { // -2 .. 2
             double value = d / 10.0;
             double e = expected.getDensity(value);
             double a = actual.getDensity(value);
-            TestUtils.assertEquals(e, a, 0.000001);
+            TestUtils.assertEquals(e, a, accuracy);
         }
     }
 
     public static void compareDistribution(final ContinuousDistribution expected, final ContinuousDistribution actual) {
+        RandomNumberTest.compareDistribution(expected, actual, NumberContext.of(6));
+    }
+
+    public static void compareDistribution(final ContinuousDistribution expected, final ContinuousDistribution actual, final NumberContext accuracy) {
         for (int d = -20; d < 21; d++) { // -2 .. 2
             double value = d / 10.0;
             double e = expected.getDistribution(-value);
             double a = actual.getDistribution(-value);
-            TestUtils.assertEquals(e, a, 0.0001);
+            TestUtils.assertEquals(e, a, accuracy);
         }
     }
 
     public static void compareQuantile(final ContinuousDistribution expected, final ContinuousDistribution actual) {
+        RandomNumberTest.compareQuantile(expected, actual, NumberContext.of(6));
+    }
+
+    public static void compareQuantile(final ContinuousDistribution expected, final ContinuousDistribution actual, final NumberContext accuracy) {
         for (int t = 1; t < 10; t++) { // 0.1 .. 0.9
             double probability = t / 10.0;
             double e = expected.getQuantile(probability);
             double a = actual.getQuantile(probability);
-            TestUtils.assertEquals(e, a, 0.0000001);
+            TestUtils.assertEquals(e, a, accuracy);
         }
     }
 
@@ -166,7 +182,7 @@ public class RandomNumberTest extends RandomTests {
     @Test
     public void testERFandERFI() {
 
-        final double precision = 1E-14;
+        double precision = 1E-14;
         double expected = -1.5;
         double actual;
 
@@ -193,7 +209,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpConfidenceLevel;
         double tmpExpected;
-        final NumberContext tmpNewScale = NumberContext.of(2, 5);
+        NumberContext tmpNewScale = NumberContext.of(2, 5);
 
         tmpConfidenceLevel = 0.80;
         tmpExpected = 1.28155;
@@ -233,8 +249,8 @@ public class RandomNumberTest extends RandomTests {
         // Erlang is a special case of the gamma where the count is an integer -- verify that this is true for current implementation.
         for (double theta = .01; theta <= 10.0; theta = theta * 10.0) {
             for (int i = 1; i < 10; i++) {
-                final Erlang erl = new Erlang(i, theta);
-                final Gamma gam = new Gamma(i, theta);
+                Erlang erl = new Erlang(i, theta);
+                Gamma gam = new Gamma(i, theta);
                 TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getVariance(), gam.getVariance(), MACHINE_SMALLEST);
                 TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getExpected(), gam.getExpected(), MACHINE_SMALLEST);
             }
@@ -244,35 +260,33 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
-    @Tag("unstable")
     public void testGamma() {
         // TODO 15% error seems a little high
         this.testDist2(new Dist2Gamma(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 200000, .15);
     }
 
     @Test
-    @Tag("unstable")
     public void testGeometricMeanAndStandardDeviation() {
 
-        final int tmpSize = 1000;
+        int tmpSize = 1000;
 
-        final double tmpFactoryExpected = 1.05;
-        final double tmpFactoryStdDev = ABS.invoke(new Normal(0.0, tmpFactoryExpected - ONE).doubleValue());
-        final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
+        double tmpFactoryExpected = 1.05;
+        double tmpFactoryStdDev = ABS.invoke(new Normal(0.0, tmpFactoryExpected - ONE).doubleValue());
+        Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / THREE);
 
-        final Primitive64Array tmpRawValues = Primitive64Array.make(tmpSize);
-        final Primitive64Array tmpLogValues = Primitive64Array.make(tmpSize);
+        Primitive64Array tmpRawValues = Primitive64Array.make(tmpSize);
+        Primitive64Array tmpLogValues = Primitive64Array.make(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             tmpRawValues.data[i] = tmpFactoryDistr.doubleValue();
             tmpLogValues.data[i] = LOG.invoke(tmpRawValues.data[i]);
         }
-        final SampleSet tmpLogValuesSet = SampleSet.wrap(tmpLogValues);
-        final LogNormal tmpLogDistribut = new LogNormal(tmpLogValuesSet.getMean(), tmpLogValuesSet.getStandardDeviation());
+        SampleSet tmpLogValuesSet = SampleSet.wrap(tmpLogValues);
+        LogNormal tmpLogDistribut = new LogNormal(tmpLogValuesSet.getMean(), tmpLogValuesSet.getStandardDeviation());
 
-        final double tmpGeometricMean = tmpLogDistribut.getGeometricMean();
-        final double tmpGeometricStandardDeviation = tmpLogDistribut.getGeometricStandardDeviation();
+        double tmpGeometricMean = tmpLogDistribut.getGeometricMean();
+        double tmpGeometricStandardDeviation = tmpLogDistribut.getGeometricStandardDeviation();
 
         double tmpRawProduct = ONE;
         for (int i = 0; i < tmpSize; i++) {
@@ -286,7 +300,7 @@ public class RandomNumberTest extends RandomTests {
         }
         TestUtils.assertEquals(tmpGeometricMean, EXP.invoke(tmpLogSum / tmpSize), 1E-14 / THREE);
 
-        final double tmpLogGeoMean = LOG.invoke(tmpGeometricMean);
+        double tmpLogGeoMean = LOG.invoke(tmpGeometricMean);
 
         double tmpVal;
         double tmpSumSqrDiff = ZERO;
@@ -300,100 +314,99 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testLogNormal() {
 
-        final double tmpAccuracy = TENTH / THREE;
-
-        final RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
+        RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
         double tmpValue = HUNDRED;
-        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
+        CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
         for (int i = 0; i < 1000; i++) {
-            tmpSeries.put(i, tmpValue);
+            // tmpSeries.put(i, tmpValue);
+            tmpSeries.put(CalendarDate.now().step(i, CalendarDateUnit.DAY), tmpValue); // TODO
             tmpValue *= tmpRandomNumber.doubleValue();
         }
-        final double[] someValues1 = tmpSeries.asPrimitive().toRawCopy1D();
-        final int tmpSize1 = someValues1.length - 1;
+        double[] someValues1 = tmpSeries.asPrimitive().toRawCopy1D();
+        int tmpSize1 = someValues1.length - 1;
 
-        final double[] retVal1 = new double[tmpSize1];
+        double[] retVal1 = new double[tmpSize1];
 
         for (int i1 = 0; i1 < tmpSize1; i1++) {
             retVal1[i1] = someValues1[i1 + 1] / someValues1[i1];
         }
 
-        final SampleSet tmpQuotients = SampleSet.wrap(Access1D.wrap(retVal1));
-        final double[] someValues = tmpSeries.asPrimitive().toRawCopy1D();
-        final int tmpSize = someValues.length - 1;
+        SampleSet tmpQuotients = SampleSet.wrap(Access1D.wrap(retVal1));
+        double[] someValues = tmpSeries.asPrimitive().toRawCopy1D();
+        int tmpSize = someValues.length - 1;
 
-        final double[] retVal = new double[tmpSize];
+        double[] retVal = new double[tmpSize];
 
         for (int i = 0; i < tmpSize; i++) {
             retVal[i] = LOG.invoke(someValues[i + 1] / someValues[i]);
         }
-        final SampleSet tmpLogChanges = SampleSet.wrap(Access1D.wrap(retVal));
+        SampleSet tmpLogChanges = SampleSet.wrap(Access1D.wrap(retVal));
 
-        // Quotient distribution parameters within 3% of the generating distribution
-        TestUtils.assertEquals(ONE, tmpQuotients.getMean() / tmpRandomNumber.getExpected(), tmpAccuracy);
-        TestUtils.assertEquals(ONE, tmpQuotients.getStandardDeviation() / tmpRandomNumber.getStandardDeviation(), tmpAccuracy);
+        double accuracy = TENTH / TWO;
 
-        final Normal tmpNormal = new Normal(tmpQuotients.getMean(), tmpQuotients.getStandardDeviation());
-        final LogNormal tmpLogNormal = new LogNormal(tmpLogChanges.getMean(), tmpLogChanges.getStandardDeviation());
+        // Quotient distribution parameters within 5% of the generating distribution
+        TestUtils.assertEquals(ONE, tmpQuotients.getMean() / tmpRandomNumber.getExpected(), accuracy);
+        TestUtils.assertEquals(ONE, tmpQuotients.getStandardDeviation() / tmpRandomNumber.getStandardDeviation(), accuracy);
 
-        // LogNormal (logarithmic changes) parameters within 3% of the Normal (quotients) parameters
-        TestUtils.assertEquals(ONE, tmpLogNormal.getExpected() / tmpNormal.getExpected(), tmpAccuracy);
-        TestUtils.assertEquals(ONE, tmpLogNormal.getStandardDeviation() / tmpNormal.getStandardDeviation(), tmpAccuracy);
+        Normal tmpNormal = new Normal(tmpQuotients.getMean(), tmpQuotients.getStandardDeviation());
+        LogNormal tmpLogNormal = new LogNormal(tmpLogChanges.getMean(), tmpLogChanges.getStandardDeviation());
+
+        // LogNormal (logarithmic changes) parameters within 5% of the Normal (quotients) parameters
+        TestUtils.assertEquals(ONE, tmpLogNormal.getExpected() / tmpNormal.getExpected(), accuracy);
+        TestUtils.assertEquals(ONE, tmpLogNormal.getStandardDeviation() / tmpNormal.getStandardDeviation(), accuracy);
     }
 
-    // Sample means differ from expectation by an amount greater than anticipated given the large samples. May be due to
-    // rounding error. For comparison, matlab's estimates for the mean of the normal for large samples tend to be
-    // within 2 percent of the mean.
     @Test
     public void testNorm2() {
+        // Sample means differ from expectation by an amount greater than anticipated given the large samples. May be due to
+        // rounding error. For comparison, matlab's estimates for the mean of the normal for large samples tend to be
+        // within 2 percent of the mean.
         this.testDist2(new Dist2Norm(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 1500000, .05);
     }
 
     @Test
     public void testNormal() {
 
-        final double[] tmpStdDevCount = new double[] { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX }; // ± this number of std devs
-        final double[] tmpConfidence = new double[] { ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027 };
+        double[] tmpStdDevCount = { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX }; // ± this number of std devs
+        double[] tmpConfidence = { ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027 };
 
-        final Normal tmpDistribution = new Normal(TEN, PI);
+        Normal tmpDistribution = new Normal(TEN, PI);
 
         for (int c = 0; c < 4; c++) { // Can't handle the more extrem values
 
-            final double tmpHalfSideRemainder = (ONE - tmpConfidence[c]) / TWO;
+            double tmpHalfSideRemainder = (ONE - tmpConfidence[c]) / TWO;
 
-            final double tmpUpperBound = tmpDistribution.getQuantile(ONE - tmpHalfSideRemainder);
-            final double tmpLowerBound = tmpDistribution.getQuantile(tmpHalfSideRemainder);
+            double tmpUpperBound = tmpDistribution.getQuantile(ONE - tmpHalfSideRemainder);
+            double tmpLowerBound = tmpDistribution.getQuantile(tmpHalfSideRemainder);
 
-            final double tmpExpected = tmpStdDevCount[c];
-            final double tmpActual = (tmpUpperBound - tmpLowerBound) / TWO_PI; // Std Dev is PI
+            double tmpExpected = tmpStdDevCount[c];
+            double tmpActual = (tmpUpperBound - tmpLowerBound) / TWO_PI; // Std Dev is PI
 
             TestUtils.assertEquals(tmpExpected, tmpActual, 5.0E-3);
         }
     }
 
     @Test
-    @Tag("unstable")
     public void testSampledMean() {
 
-        final RandomNumber[] tmpRndNmbrs = new RandomNumber[] { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),
-                new Geometric(), new Poisson(), new Erlang(), new Gamma(), new Weibull() };
+        RandomNumber[] tmpRndNmbrs = { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(), new Geometric(), new Poisson(),
+                new Erlang(), new Gamma(), new Weibull() };
 
         for (int d = 0; d < tmpRndNmbrs.length; d++) {
 
-            final RandomNumber tmpDistr = tmpRndNmbrs[d];
+            RandomNumber tmpDistr = tmpRndNmbrs[d];
 
-            final SampleSet tmpSamples = SampleSet.make(tmpDistr, 1000);
+            SampleSet tmpSamples = SampleSet.make(tmpDistr, 1000);
 
-            final String tmpDistrName = tmpDistr.getClass().getSimpleName();
-            final double tmpDistrValue = tmpDistr.getExpected();
-            final double tmpSampledValue = tmpSamples.getMean();
-            final double tmpQuotient = tmpSampledValue / tmpDistrValue;
+            String tmpDistrName = tmpDistr.getClass().getSimpleName();
+            double tmpDistrValue = tmpDistr.getExpected();
+            double tmpSampledValue = tmpSamples.getMean();
+            double tmpQuotient = tmpSampledValue / tmpDistrValue;
 
-            final double tmpExpected = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpDistrValue : ONE;
-            final double tmpActual = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpSampledValue : tmpQuotient;
+            double tmpExpected = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpDistrValue : ONE;
+            double tmpActual = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpSampledValue : tmpQuotient;
 
             //            BasicLogger.logDebug("Name={}: Value={} <=> Sampled={} == Quotient={}", tmpDistrName, tmpDistrValue, tmpSampledValue, tmpQuotient);
 
@@ -410,14 +423,14 @@ public class RandomNumberTest extends RandomTests {
         RandomNumberTest.compareDensity(new TDistribution.Degree3(), new TDistribution(THREE));
         RandomNumberTest.compareDensity(new TDistribution.Degree4(), new TDistribution(FOUR));
         RandomNumberTest.compareDensity(new TDistribution.Degree5(), new TDistribution(FIVE));
-        //        RandomNumberTest.compareDensity(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+        RandomNumberTest.compareDensity(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE), NumberContext.of(2));
 
-        //        RandomNumberTest.compareDistribution(new TDistribution.Degree1(), new TDistribution(ONE));
-        //        RandomNumberTest.compareDistribution(new TDistribution.Degree2(), new TDistribution(TWO));
-        //        RandomNumberTest.compareDistribution(new TDistribution.Degree3(), new TDistribution(THREE));
-        //        RandomNumberTest.compareDistribution(new TDistribution.Degree4(), new TDistribution(FOUR));
-        //        RandomNumberTest.compareDistribution(new TDistribution.Degree5(), new TDistribution(FIVE));
-        //        RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+        RandomNumberTest.compareDistribution(new TDistribution.Degree1(), new TDistribution(ONE), NumberContext.of(2));
+        RandomNumberTest.compareDistribution(new TDistribution.Degree2(), new TDistribution(TWO), NumberContext.of(2));
+        RandomNumberTest.compareDistribution(new TDistribution.Degree3(), new TDistribution(THREE), NumberContext.of(2));
+        RandomNumberTest.compareDistribution(new TDistribution.Degree4(), new TDistribution(FOUR), NumberContext.of(2));
+        RandomNumberTest.compareDistribution(new TDistribution.Degree5(), new TDistribution(FIVE), NumberContext.of(2));
+        RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE), NumberContext.of(1));
 
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
@@ -428,13 +441,12 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
-    @Tag("unstable")
     public void testVariance() {
 
-        final double tmpStdDev = TEN;
+        double tmpStdDev = TEN;
         double tmpExpectedVar = tmpStdDev * tmpStdDev;
 
-        final SampleSet tmpSampleSet = SampleSet.make(new Normal(PI, tmpStdDev), 10000);
+        SampleSet tmpSampleSet = SampleSet.make(new Normal(PI, tmpStdDev), 10000);
 
         double tmpActualVar = tmpSampleSet.getVariance();
 
@@ -444,9 +456,9 @@ public class RandomNumberTest extends RandomTests {
 
         TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, 1E-14 / THREE);
 
-        final double[] tmpValues = tmpSampleSet.getValues();
+        double[] tmpValues = tmpSampleSet.getValues();
         double s = ZERO, s2 = ZERO;
-        for (final double tmpVal : tmpValues) {
+        for (double tmpVal : tmpValues) {
             s += tmpVal;
             s2 += tmpVal * tmpVal;
         }
@@ -460,8 +472,8 @@ public class RandomNumberTest extends RandomTests {
     public void testWeibull() {
         for (double i = .01; i <= 10.0; i = i * 10) {
             for (double j = .01; j <= 100.0; j = j * 10) {
-                final Weibull w0 = new Weibull(i, j);
-                final Weibull w1 = new Weibull(i, j);
+                Weibull w0 = new Weibull(i, j);
+                Weibull w1 = new Weibull(i, j);
                 // There are analytic solutions available for mean and variance of Weibull, users will probably assume they're being used.
                 TestUtils.assertEquals("Weibull distribution's mean should be deterministic and precise.", w0.getExpected(), w1.getExpected());
                 TestUtils.assertEquals("Weibull distribution's variance should be deterministic and precise.", w0.getVariance(), w1.getVariance());
@@ -474,11 +486,11 @@ public class RandomNumberTest extends RandomTests {
     public void testWeibullWithShape1() {
 
         // Weibull with shape=1.0 shoud be equivalent to Exponential with the same lambda
-        final double tmpEpsilon = 1E-14 / THREE * THOUSAND * TEN;
+        double tmpEpsilon = 1E-14 / THREE * THOUSAND * TEN;
 
         for (double lambda = HUNDREDTH; lambda <= HUNDRED; lambda *= TEN) {
-            final Exponential tmpExpected = new Exponential(lambda);
-            final Weibull tmpActual = new Weibull(lambda, ONE);
+            Exponential tmpExpected = new Exponential(lambda);
+            Weibull tmpActual = new Weibull(lambda, ONE);
             TestUtils.assertEquals("Expected/Mean, lambda=" + lambda, tmpExpected.getExpected(), tmpActual.getExpected(), tmpEpsilon);
             TestUtils.assertEquals("Variance, lambda=" + lambda, tmpExpected.getVariance(), tmpActual.getVariance(), tmpEpsilon);
         }
@@ -488,10 +500,10 @@ public class RandomNumberTest extends RandomTests {
 
         for (double p0 = min[0]; p0 <= max[0]; p0 *= mult[0]) {
             for (double p1 = min[1]; p1 <= max[1]; p1 *= mult[1]) {
-                final RandomNumber tmpDistribution = dist.getDist(p0, p1);
-                final SampleSet tmpSamples = SampleSet.make(tmpDistribution, samples);
+                RandomNumber tmpDistribution = dist.getDist(p0, p1);
+                SampleSet tmpSamples = SampleSet.make(tmpDistribution, samples);
                 // Used to estimate an upper bound on how much the sample should deviate from the analytic expected value.
-                final double stErr = SQRT.invoke(tmpDistribution.getVariance() / samples);
+                double stErr = SQRT.invoke(tmpDistribution.getVariance() / samples);
 
                 // Within 4 standard errors of the mean. False failures should be rare under this scheme.
                 TestUtils.assertEquals("Sample mean was " + tmpSamples.getMean() + ", distribution mean was " + tmpDistribution.getExpected() + ".",

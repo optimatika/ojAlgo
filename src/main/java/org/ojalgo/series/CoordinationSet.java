@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
@@ -42,7 +41,7 @@ public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, Ca
 
     private static final long serialVersionUID = 1L;
 
-    private CalendarDateUnit myResolution = null;
+    private transient CalendarDateUnit myResolution = null;
 
     public CoordinationSet() {
         super();
@@ -146,25 +145,21 @@ public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, Ca
 
     public CalendarDateUnit getResolution() {
 
-        if (myResolution != null) {
+        if (myResolution == null) {
 
-            return myResolution;
+            CalendarDateUnit tmpRes = null;
 
-        } else {
+            for (CalendarDateSeries<N> series : this.values()) {
 
-            CalendarDateUnit retVal = null, tmpVal = null;
+                tmpRes = series.getResolution();
 
-            for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-
-                tmpVal = tmpSeries.getResolution();
-
-                if ((retVal == null) || (tmpVal.compareTo(retVal) > 0)) {
-                    retVal = tmpVal;
+                if ((myResolution == null) || (tmpRes.compareTo(myResolution) > 0)) {
+                    myResolution = tmpRes;
                 }
             }
-
-            return retVal;
         }
+
+        return myResolution;
     }
 
     public N getValue(final String series, final CalendarDate date) {
@@ -172,58 +167,19 @@ public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, Ca
     }
 
     /**
-     * @return A new CoordinationSet where all series have the same first and last keys.
+     * Returns a new CoordinationSet where all series have the same first and last keys, as well as a common
+     * (the highest common) resolution.
      */
     public CoordinationSet<N> prune() {
-
-        final CoordinationSet<N> retVal = new CoordinationSet<>(this.getResolution());
-
-        final CalendarDate tmpFirstKey = this.getLatestFirstKey();
-        final CalendarDate tmpLastKey = this.getEarliestLastKey();
-
-        if (tmpLastKey.compareTo(tmpFirstKey) != -1) {
-            for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-                final CalendarDateSeries<N> tmpSubMap = tmpSeries.subMap(tmpFirstKey, true, tmpLastKey, true);
-                retVal.put(tmpSubMap);
-            }
-        }
-
-        final CalendarDate tmpEarliestFirstKey = retVal.getEarliestFirstKey();
-        final CalendarDate tmpLatestFirstKey = retVal.getLatestFirstKey();
-        final CalendarDate tmpEarliestLastKey = retVal.getEarliestLastKey();
-        final CalendarDate tmpLatestLastKey = retVal.getLatestLastKey();
-
-        if ((tmpEarliestFirstKey == null) || !tmpEarliestFirstKey.equals(tmpFirstKey)) {
-            throw new ProgrammingError("Something went wrong!");
-        }
-        if ((tmpLatestFirstKey == null) || !tmpLatestFirstKey.equals(tmpFirstKey)) {
-            throw new ProgrammingError("Something went wrong!");
-        }
-        if ((tmpEarliestLastKey == null) || !tmpEarliestLastKey.equals(tmpLastKey)) {
-            throw new ProgrammingError("Something went wrong!");
-        }
-        if ((tmpLatestLastKey == null) || !tmpLatestLastKey.equals(tmpLastKey)) {
-            throw new ProgrammingError("Something went wrong!");
-        }
-
-        return retVal;
+        return this.doPruneAndResample(this.getLatestFirstKey(), this.getEarliestLastKey(), this.getResolution());
     }
 
     /**
-     * Will prune and resample the data
+     * Returns a new CoordinationSet where all series have the same first and last keys, as well as the
+     * specified resolution.
      */
     public CoordinationSet<N> prune(final CalendarDateUnit resolution) {
-
-        final CoordinationSet<N> retVal = new CoordinationSet<>(resolution);
-
-        final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
-        final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
-
-        for (final Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
-            retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
-        }
-
-        return retVal;
+        return this.doPruneAndResample(this.getLatestFirstKey(), this.getEarliestLastKey(), resolution);
     }
 
     /**
@@ -235,18 +191,10 @@ public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, Ca
     }
 
     /**
-     * @param resolution The new resolution
-     * @return A new set of series each resampled to the supplied resolution
+     * Returns a new set of series each resampled to the supplied resolution. No pruning!
      */
     public CoordinationSet<N> resample(final CalendarDateUnit resolution) {
-
-        final CoordinationSet<N> retVal = new CoordinationSet<>(resolution);
-
-        for (final java.util.Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
-            retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(resolution));
-        }
-
-        return retVal;
+        return this.doPruneAndResample(this.getEarliestFirstKey(), this.getLatestLastKey(), resolution);
     }
 
     @Override
@@ -260,6 +208,24 @@ public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, Ca
         }
 
         return retVal.toString();
+    }
+
+    private CoordinationSet<N> doPruneAndResample(final CalendarDate firstKey, final CalendarDate lastKey, final CalendarDateUnit resolution) {
+
+        CoordinationSet<N> retVal = new CoordinationSet<>();
+
+        for (Map.Entry<String, CalendarDateSeries<N>> entry : this.entrySet()) {
+
+            String key = entry.getKey();
+
+            CalendarDateSeries<N> value = entry.getValue();
+            CalendarDateSeries<N> pruned = value.subMap(firstKey, true, lastKey, true);
+            CalendarDateSeries<N> resampled = (CalendarDateSeries<N>) pruned.resample(resolution::adjustInto);
+
+            retVal.put(key, resampled);
+        }
+
+        return retVal;
     }
 
 }

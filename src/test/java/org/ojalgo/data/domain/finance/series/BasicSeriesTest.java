@@ -21,10 +21,10 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -35,8 +35,9 @@ import org.ojalgo.type.CalendarDateUnit;
 /**
  * @author apete
  */
-@Disabled
 public class BasicSeriesTest extends FinanceDataTests {
+
+    private static final File FILE = new File("./src/test/resources/org/ojalgo/data/domain/finance/series/Yahoo-AAPL-daily.csv");
 
     public BasicSeriesTest() {
         super();
@@ -45,11 +46,11 @@ public class BasicSeriesTest extends FinanceDataTests {
     @Test
     public void testDoubleKeys() {
 
-        final int dim = 1000;
-        final Uniform tmpUniform = new Uniform(0, Double.MAX_VALUE);
+        int dim = 1000;
+        Uniform tmpUniform = new Uniform(0, Double.MAX_VALUE);
 
-        final double[] keys = new double[dim];
-        final long[] indices = new long[dim];
+        double[] keys = new double[dim];
+        long[] indices = new long[dim];
 
         for (int i = 0; i < dim; i++) {
             keys[i] = tmpUniform.doubleValue();
@@ -67,18 +68,18 @@ public class BasicSeriesTest extends FinanceDataTests {
     @Test
     public void testResample() {
 
-        final DataSource dataSource = DataSource.newIEXTrading("AAPL");
-        final List<DatePrice> historicalPrices = dataSource.getHistoricalPrices();
-        final double lastPrice = historicalPrices.get(historicalPrices.size() - 1).getPrice();
+        DataSource dataSource = DataSource.newFileReader(FILE, YahooParser.INSTANCE);
+        List<DatePrice> historicalPrices = dataSource.getHistoricalPrices();
+        double lastPrice = historicalPrices.get(historicalPrices.size() - 1).getPrice();
 
-        final CalendarDateSeries<Double> tmpDaySeries = dataSource.getCalendarDateSeries(CalendarDateUnit.DAY).name("Day");
-        final CalendarDateSeries<Double> tmpWeekSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.WEEK).name("Week");
-        final CalendarDateSeries<Double> tmpMonthSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MONTH).name("Month");
-        final CalendarDateSeries<Double> tmpQuarterSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.QUARTER).name("Quarter");
-        final CalendarDateSeries<Double> tmpYearSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.YEAR).name("Year");
-        final CalendarDateSeries<Double> tmpDecadeSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.DECADE).name("Decade");
-        final CalendarDateSeries<Double> tmpCenturySeries = dataSource.getCalendarDateSeries(CalendarDateUnit.CENTURY).name("Century");
-        final CalendarDateSeries<Double> tmpMilleniumSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MILLENIUM).name("MIllenium");
+        CalendarDateSeries<Double> tmpDaySeries = dataSource.getCalendarDateSeries(CalendarDateUnit.DAY).name("Day");
+        CalendarDateSeries<Double> tmpWeekSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.WEEK).name("Week");
+        CalendarDateSeries<Double> tmpMonthSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MONTH).name("Month");
+        CalendarDateSeries<Double> tmpQuarterSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.QUARTER).name("Quarter");
+        CalendarDateSeries<Double> tmpYearSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.YEAR).name("Year");
+        CalendarDateSeries<Double> tmpDecadeSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.DECADE).name("Decade");
+        CalendarDateSeries<Double> tmpCenturySeries = dataSource.getCalendarDateSeries(CalendarDateUnit.CENTURY).name("Century");
+        CalendarDateSeries<Double> tmpMilleniumSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MILLENIUM).name("MIllenium");
 
         tmpDaySeries.complete();
         tmpWeekSeries.complete();
@@ -100,34 +101,34 @@ public class BasicSeriesTest extends FinanceDataTests {
         TestUtils.assertEquals("Century Series Last Value", lastPrice, tmpCenturySeries.lastValue(), delta);
         TestUtils.assertEquals("Millenium Series Last Value", lastPrice, tmpMilleniumSeries.lastValue(), delta);
 
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpCenturySeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpDecadeSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
-        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpCenturySeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpDecadeSeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpYearSeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpQuarterSeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpMonthSeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries, tmpDaySeries.resample(CalendarDateUnit.MILLENIUM));
 
-        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpDecadeSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
-        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
-        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
-        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
-        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
+        TestUtils.assertEquals(tmpCenturySeries, tmpDecadeSeries.resample(CalendarDateUnit.CENTURY));
+        TestUtils.assertEquals(tmpCenturySeries, tmpYearSeries.resample(CalendarDateUnit.CENTURY));
+        TestUtils.assertEquals(tmpCenturySeries, tmpQuarterSeries.resample(CalendarDateUnit.CENTURY));
+        TestUtils.assertEquals(tmpCenturySeries, tmpMonthSeries.resample(CalendarDateUnit.CENTURY));
+        TestUtils.assertEquals(tmpCenturySeries, tmpDaySeries.resample(CalendarDateUnit.CENTURY));
 
-        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
-        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
-        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
-        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.DECADE).asPrimitive());
+        TestUtils.assertEquals(tmpDecadeSeries, tmpYearSeries.resample(CalendarDateUnit.DECADE));
+        TestUtils.assertEquals(tmpDecadeSeries, tmpQuarterSeries.resample(CalendarDateUnit.DECADE));
+        TestUtils.assertEquals(tmpDecadeSeries, tmpMonthSeries.resample(CalendarDateUnit.DECADE));
+        TestUtils.assertEquals(tmpDecadeSeries, tmpDaySeries.resample(CalendarDateUnit.DECADE));
 
-        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.YEAR).asPrimitive());
-        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.YEAR).asPrimitive());
-        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.YEAR).asPrimitive());
+        TestUtils.assertEquals(tmpYearSeries, tmpQuarterSeries.resample(CalendarDateUnit.YEAR));
+        TestUtils.assertEquals(tmpYearSeries, tmpMonthSeries.resample(CalendarDateUnit.YEAR));
+        TestUtils.assertEquals(tmpYearSeries, tmpDaySeries.resample(CalendarDateUnit.YEAR));
 
-        TestUtils.assertEquals(tmpQuarterSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.QUARTER).asPrimitive());
-        TestUtils.assertEquals(tmpQuarterSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.QUARTER).asPrimitive());
+        TestUtils.assertEquals(tmpQuarterSeries, tmpMonthSeries.resample(CalendarDateUnit.QUARTER));
+        TestUtils.assertEquals(tmpQuarterSeries, tmpDaySeries.resample(CalendarDateUnit.QUARTER));
 
-        TestUtils.assertEquals(tmpMonthSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.MONTH).asPrimitive());
+        TestUtils.assertEquals(tmpMonthSeries, tmpDaySeries.resample(CalendarDateUnit.MONTH));
 
-        TestUtils.assertEquals(tmpWeekSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.WEEK).asPrimitive());
+        TestUtils.assertEquals(tmpWeekSeries, tmpDaySeries.resample(CalendarDateUnit.WEEK));
     }
 
 }

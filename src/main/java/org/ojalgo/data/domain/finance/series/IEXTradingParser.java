@@ -1,7 +1,6 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicParser;
@@ -15,23 +14,43 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
 
     public static final class Data extends DatePrice {
 
-        public double close;
-        public double high;
-        public double low;
-        public double open;
-        public double unadjustedVolume;
-        public double volume;
+        public final double close;
+        public final double high;
+        public final double low;
+        public final double open;
+        public final double unadjustedVolume;
+        public final double volume;
 
-        Data(final CharSequence text) {
-            super(text);
-        }
-
-        Data(final CharSequence text, final DateTimeFormatter formatter) {
-            super(text, formatter);
-        }
-
-        Data(final LocalDate date) {
+        public Data(final LocalDate date, final double open, final double high, final double low, final double close, final double volume,
+                final double unadjustedVolume) {
             super(date);
+            this.open = open;
+            this.high = high;
+            this.low = low;
+            this.close = close;
+            this.volume = volume;
+            this.unadjustedVolume = unadjustedVolume;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj) || !(obj instanceof Data)) {
+                return false;
+            }
+            Data other = (Data) obj;
+            if ((Double.doubleToLongBits(close) != Double.doubleToLongBits(other.close))
+                    || (Double.doubleToLongBits(high) != Double.doubleToLongBits(other.high))
+                    || (Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low))
+                    || (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open))) {
+                return false;
+            }
+            if ((Double.doubleToLongBits(unadjustedVolume) != Double.doubleToLongBits(other.unadjustedVolume)) || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -39,7 +58,28 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
             return close;
         }
 
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = super.hashCode();
+            long temp;
+            temp = Double.doubleToLongBits(close);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(high);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(low);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(open);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(unadjustedVolume);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(volume);
+            return prime * result + (int) (temp ^ (temp >>> 32));
+        }
+
     }
+
+    public static final IEXTradingParser INSTANCE = new IEXTradingParser();
 
     public IEXTradingParser() {
         super();
@@ -50,75 +90,87 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
 
         // date,open,high,low,close,volume,unadjustedVolume,change,changePercent,vwap,label,changeOverTime
 
-        IEXTradingParser.Data retVal;
+        LocalDate date = null;
+        double open = Double.NaN;
+        double high = Double.NaN;
+        double low = Double.NaN;
+        double close = Double.NaN;
+        double volume = Double.NaN;
+        double unadjustedVolume = Double.NaN;
 
         try {
 
             int inclBegin = 0;
             int exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             String part = line.substring(inclBegin, exclEnd);
-            retVal = new IEXTradingParser.Data(part);
+            date = LocalDate.parse(part);
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.open = Double.parseDouble(part);
+                open = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                open = Double.NaN;
             }
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.high = Double.parseDouble(part);
+                high = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.high = Double.NaN;
+                high = Double.NaN;
             }
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.low = Double.parseDouble(part);
+                low = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.low = Double.NaN;
+                low = Double.NaN;
             }
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.close = Double.parseDouble(part);
+                close = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.close = Double.NaN;
+                close = Double.NaN;
             }
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.volume = Double.parseDouble(part);
+                volume = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.volume = Double.NaN;
+                volume = Double.NaN;
             }
 
             inclBegin = exclEnd + 1;
             exclEnd = line.indexOf(ASCII.COMMA, inclBegin);
             part = line.substring(inclBegin, exclEnd);
             try {
-                retVal.unadjustedVolume = Double.parseDouble(part);
+                unadjustedVolume = Double.parseDouble(part);
             } catch (final NumberFormatException ex) {
-                retVal.unadjustedVolume = Double.NaN;
+                unadjustedVolume = Double.NaN;
             }
 
-        } catch (final Exception exception) {
+        } catch (Exception cause) {
 
-            retVal = null;
+            date = null;
+            close = Double.NaN;
         }
 
-        return retVal;
+        if (date != null && Double.isFinite(close)) {
+            // date,open,high,low,close,volume,unadjustedVolume,change,changePercent,vwap,label,changeOverTime
+            return new Data(date, open, high, low, close, volume, unadjustedVolume);
+        } else {
+            return null;
+        }
     }
 
 }

@@ -33,31 +33,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.series.primitive.CoordinatedSet;
+import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.ColourData;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TimeIndex;
-import org.ojalgo.type.keyvalue.KeyValue;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 /**
  * A BasicSeries is a {@linkplain SortedMap} with:
  * <ul>
- * <li>Keys restricted to {@linkplain Comparable} (the keys have a natural order)</li>
- * <li>Values restricted to {@linkplain Number} (you can do maths on the values)</li>
- * <li>The option to associate a name and colour with the data</li>
- * <li>The option to define an accumlator function to be used with multilple/subsequent put operations on the
- * same key</li>
- * <li>Some additional methods to work with primitive keys and values more efficiently</li>
- * <li>A few additional methods to help access and modify series entries</li>
+ * <li>Keys restricted to {@linkplain Comparable} (the keys have a natural order)
+ * <li>Values restricted to {@linkplain Comparable} (the values are "numeric" as in extending {@link Number}
+ * or implementing {@link NumberDefinition}.
+ * <li>The option to associate a name and colour with the data.
+ * <li>A few additional methods to help access and modify series entries.
  * </ul>
- * The extension {@link NaturallySequenced} is typically used with time series data.
  *
  * @author apete
  */
@@ -65,49 +65,18 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
     /**
      * A series with naturally sequenced keys - given any key there is a natural "next" key, e.g. with a
-     * series of daily values the natural next key is the next day. Further, natural sequencing implies a
-     * bidirectional mapping between the keys and long indices.
+     * series of daily values the natural next key is the next day.
      *
      * @author apete
      */
-    interface NaturallySequenced<K extends Comparable<? super K>, V extends Comparable<V>> extends BasicSeries<K, V>, Access1D<V> {
-
-        default PrimitiveSeries asPrimitive() {
-            return PrimitiveSeries.wrap(this);
-        }
+    interface NaturallySequenced<K extends Comparable<? super K>, V extends Comparable<V>> extends BasicSeries<K, V> {
 
         /**
-         * Will fill in missing values, inbetween the first and last keys.
+         * Using the natural sequencing as the key incrementor.
+         *
+         * @see BasicSeries#complete(UnaryOperator)
          */
-        default void complete() {
-
-            K tmpKey = this.firstKey();
-            V tmpVal = null;
-
-            V patchVal = this.firstValue();
-
-            final K lastKey = this.lastKey();
-            while (tmpKey.compareTo(lastKey) <= 0) {
-
-                tmpVal = this.get(tmpKey);
-
-                if (tmpVal != null) {
-                    patchVal = tmpVal;
-                } else {
-                    this.put(tmpKey, patchVal);
-                }
-
-                tmpKey = this.step(tmpKey);
-            }
-        }
-
-        /**
-         * A natural sequence implies a bidirectional mapping between the keys and long indices. This
-         * {@link org.ojalgo.structure.Structure1D.IndexMapper} specifies that mapping. Please note that
-         * multiple instaces of the key type could correspnd to the same index, and not all long values are
-         * valid indices. The conversions key -> index -> key may not return the original key.
-         */
-        IndexMapper<K> mapper();
+        void complete();
 
         /**
          * @return The next, after the {@link #lastKey()}, key.
@@ -116,15 +85,10 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
             return this.step(this.lastKey());
         }
 
-        double put(long index, double value);
-
-        V put(long index, V value);
-
-        default int size() {
-            return Access1D.super.size();
-        }
-
-        K step(K key);
+        /**
+         * Will step (increment) the key given to the next in the natural sequence.
+         */
+        K step(final K key);
 
     }
 
@@ -139,13 +103,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
+        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
             ProgrammingError.throwIfNull(denseArrayFactory);
             return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory,
-                final BinaryFunction<N> accumularor) {
+        public <N extends Comparable<N>> BasicSeries<K, N> build(final DenseArray.Factory<N> denseArrayFactory, final BinaryFunction<N> accumularor) {
             ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
             return this.doBuild(denseArrayFactory, accumularor);
         }
@@ -160,20 +123,17 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
             return this;
         }
 
-        private <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory,
-                final BinaryFunction<N> accumularor) {
+        private <N extends Comparable<N>> BasicSeries<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
                 } else {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference), accumularor);
                 }
+            } else if (myResolution != null) {
+                return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(myResolution), accumularor);
             } else {
-                if (myResolution != null) {
-                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(myResolution), accumularor);
-                } else {
-                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(), accumularor);
-                }
+                return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(), accumularor);
             }
         }
 
@@ -197,7 +157,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
         K retVal = null, tmpVal = null;
 
-        for (final BasicSeries<K, ?> individual : collection) {
+        for (BasicSeries<K, ?> individual : collection) {
 
             tmpVal = individual.firstKey();
 
@@ -213,7 +173,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
         K retVal = null, tmpVal = null;
 
-        for (final BasicSeries<K, ?> individual : collection) {
+        for (BasicSeries<K, ?> individual : collection) {
 
             tmpVal = individual.lastKey();
 
@@ -229,7 +189,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
         K retVal = null, tmpVal = null;
 
-        for (final BasicSeries<K, ?> individual : collection) {
+        for (BasicSeries<K, ?> individual : collection) {
 
             tmpVal = individual.firstKey();
 
@@ -245,7 +205,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
 
         K retVal = null, tmpVal = null;
 
-        for (final BasicSeries<K, ?> individual : collection) {
+        for (BasicSeries<K, ?> individual : collection) {
 
             tmpVal = individual.lastKey();
 
@@ -274,43 +234,118 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
         return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
 
-    PrimitiveSeries asPrimitive();
+    default PrimitiveSeries asPrimitive() {
 
-    BasicSeries<K, V> colour(ColourData colour);
+        double[] retVal = new double[this.size()];
 
-    double doubleValue(final K key);
+        int i = 0;
+        for (V tmpValue : this.values()) {
+            retVal[i] = NumberDefinition.doubleValue(tmpValue);
+            i++;
+        }
 
-    V firstValue();
+        return DataSeries.wrap(retVal);
+    }
 
-    V get(final K key);
+    default BasicSeries<K, V> colour(final ColourData colour) {
+        this.setColour(colour);
+        return this;
+    }
+
+    /**
+     * Will fill in missing values, inbetween the first and last keys.
+     */
+    default void complete(final UnaryOperator<K> keyIncrementor) {
+
+        K tmpKey = this.firstKey();
+        V tmpVal = null;
+
+        V patchVal = this.firstValue();
+
+        K lastKey = this.lastKey();
+        while (tmpKey.compareTo(lastKey) <= 0) {
+
+            tmpVal = this.get(tmpKey);
+
+            if (tmpVal != null) {
+                patchVal = tmpVal;
+            } else {
+                this.put(tmpKey, patchVal);
+            }
+
+            tmpKey = keyIncrementor.apply(tmpKey);
+        }
+    }
+
+    default double doubleValue(final K key) {
+        return NumberDefinition.doubleValue(this.get(key));
+    }
+
+    default V firstValue() {
+        return this.get(this.firstKey());
+    }
+
+    V get(K key);
+
+    default V get(final Object key) {
+        return this.get((K) key);
+    }
 
     ColourData getColour();
 
     String getName();
 
-    V lastValue();
+    default V lastValue() {
+        return this.get(this.lastKey());
+    }
 
-    BasicSeries<K, V> name(String name);
+    default BasicSeries<K, V> name(final String name) {
+        this.setName(name);
+        return this;
+    }
+
+    default double put(final EntryPair.KeyedPrimitive<K> entry) {
+        return this.put(entry.getKey(), entry.doubleValue());
+    }
 
     /**
+     * Will only work if values are types as Double.
+     *
      * @see #put(Comparable, Number)
      */
-    double put(final K key, final double value);
-
-    /**
-     * Some implementations may specify an accumulator function to be used with subsequent put operation with
-     * the same key. If such an accumulator is present it should be used here, and in that case the method
-     * returns the new/accumulated/mixed value. With out an accumulator this method should behave exactly as
-     * with any other {@link Map}.
-     *
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
-     */
-    V put(final K key, final V value);
-
-    default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
-        for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {
-            this.put(tmpKeyValue.getKey(), tmpKeyValue.getValue());
+    default double put(final K key, final double value) {
+        Double tmpValue = Double.valueOf(value);
+        V newValue = (V) tmpValue;
+        V oldValue = this.put(key, newValue);
+        if (oldValue != null) {
+            return NumberDefinition.doubleValue(oldValue);
+        } else {
+            return Double.NaN;
         }
     }
+
+    default void putAll(final Collection<? extends EntryPair<? extends K, ? extends V>> data) {
+        for (EntryPair<? extends K, ? extends V> entry : data) {
+            this.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    default <K2 extends Comparable<? super K2>> void resample(final Function<K, K2> keyTranslator, final BasicSeries<K2, V> destination) {
+
+        destination.setColour(this.getColour());
+        destination.setName(this.getName());
+
+        for (Map.Entry<K, V> entry : this.entrySet()) {
+            K2 key = keyTranslator.apply(entry.getKey());
+            V value = entry.getValue();
+            destination.put(key, value);
+        }
+    }
+
+    BasicSeries<K, V> resample(UnaryOperator<K> keyTranslator);
+
+    void setColour(ColourData colour);
+
+    void setName(String name);
 
 }

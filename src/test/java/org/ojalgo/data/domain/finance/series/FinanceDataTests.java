@@ -40,16 +40,16 @@ import org.ojalgo.type.CalendarDateUnit;
  */
 public abstract class FinanceDataTests {
 
-    static final boolean DEBUG = false;
+    static boolean DEBUG = false;
 
     static {
 
         if (DEBUG) {
 
-            final ConsoleHandler handler = new ConsoleHandler();
+            ConsoleHandler handler = new ConsoleHandler();
             handler.setLevel(Level.FINE);
 
-            final Logger logger = Logger.getLogger("");
+            Logger logger = Logger.getLogger("");
             logger.setLevel(Level.FINE);
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -58,7 +58,7 @@ public abstract class FinanceDataTests {
 
     static void assertAtLeastExpectedItems(final FinanceData dataSource, final int expected) {
 
-        final List<DatePrice> rows = dataSource.getHistoricalPrices();
+        List<DatePrice> rows = dataSource.getHistoricalPrices();
 
         if (rows.size() <= 0) {
             TestUtils.fail("No data!");
@@ -69,30 +69,33 @@ public abstract class FinanceDataTests {
 
     static void doTestDeriveDistribution(final DataSource dataSource) {
 
-        final CalendarDateSeries<Double> yearSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.YEAR);
-        final CalendarDateSeries<Double> monthSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MONTH);
+        CalendarDateSeries<Double> weekSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.WEEK);
+        CalendarDateSeries<Double> monthSeries = dataSource.getCalendarDateSeries(CalendarDateUnit.MONTH);
 
-        final PrimitiveSeries dataY = yearSeries.asPrimitive();
-        final PrimitiveSeries dataM = monthSeries.asPrimitive();
+        PrimitiveSeries dataW = weekSeries.asPrimitive();
+        PrimitiveSeries dataM = monthSeries.asPrimitive();
 
-        final SampleSet sampleSetY = SampleSet.wrap(dataY.log().differences());
-        final SampleSet sampleSetM = SampleSet.wrap(dataM.log().differences());
+        SampleSet sampleSetW = SampleSet.wrap(dataW.log().differences());
+        SampleSet sampleSetM = SampleSet.wrap(dataM.log().differences());
 
-        final GeometricBrownianMotion procY = GeometricBrownianMotion.estimate(dataY, 1.0);
-        procY.setValue(1.0);
-        final GeometricBrownianMotion procM = GeometricBrownianMotion.estimate(dataM, 1.0 / 12.0);
+        double weeksPerYear = CalendarDateUnit.WEEK.convert(1.0, CalendarDateUnit.YEAR);
+        double monthsPerYear = CalendarDateUnit.MONTH.convert(1.0, CalendarDateUnit.YEAR);
+
+        GeometricBrownianMotion procW = GeometricBrownianMotion.estimate(dataW, 1. / weeksPerYear);
+        procW.setValue(1.0);
+        GeometricBrownianMotion procM = GeometricBrownianMotion.estimate(dataM, 1.0 / monthsPerYear);
         procM.setValue(1.0);
 
         double delta = 1E-14 / PrimitiveMath.THREE;
 
-        LogNormal expDistr = new LogNormal(sampleSetY.getMean(), sampleSetY.getStandardDeviation());
-        LogNormal actDistr = procY.getDistribution(1.0);
+        LogNormal expDistr = new LogNormal(sampleSetW.getMean() * weeksPerYear, sampleSetW.getStandardDeviation() * PrimitiveMath.SQRT.invoke(weeksPerYear));
+        LogNormal actDistr = procW.getDistribution(1.0);
 
-        TestUtils.assertEquals("Yearly Expected", expDistr.getExpected(), actDistr.getExpected(), delta);
-        TestUtils.assertEquals("Yearly Var", expDistr.getVariance(), actDistr.getVariance(), delta);
-        TestUtils.assertEquals("Yearly StdDev", expDistr.getStandardDeviation(), actDistr.getStandardDeviation(), delta);
+        TestUtils.assertEquals("Weekly Expected", expDistr.getExpected(), actDistr.getExpected(), delta);
+        TestUtils.assertEquals("Weekly Var", expDistr.getVariance(), actDistr.getVariance(), delta);
+        TestUtils.assertEquals("Weekly StdDev", expDistr.getStandardDeviation(), actDistr.getStandardDeviation(), delta);
 
-        expDistr = new LogNormal(sampleSetM.getMean() * 12.0, sampleSetM.getStandardDeviation() * PrimitiveMath.SQRT.invoke(12.0));
+        expDistr = new LogNormal(sampleSetM.getMean() * monthsPerYear, sampleSetM.getStandardDeviation() * PrimitiveMath.SQRT.invoke(monthsPerYear));
         actDistr = procM.getDistribution(1.0);
 
         TestUtils.assertEquals("Monthly Expected", expDistr.getExpected(), actDistr.getExpected(), delta);

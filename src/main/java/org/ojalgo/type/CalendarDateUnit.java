@@ -46,7 +46,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  * @see CalendarDateDuration
  * @author apete
  */
-public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, Comparable<CalendarDateUnit> {
+public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution {
 
     /**
      *
@@ -141,70 +141,73 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         }
     }
 
+    public CalendarDate adjustInto(final CalendarDate temporal) {
+        return new CalendarDate(this.adjustInto(temporal.millis));
+    }
+
     public long adjustInto(final long epochMilli) {
         return ((epochMilli / myDurationInMillis) * myDurationInMillis) + myHalf;
     }
 
-    public Temporal adjustInto(Temporal temporal) {
+    public Temporal adjustInto(final Temporal temporal) {
 
         if (temporal instanceof CalendarDate) {
 
-            long millis = ((CalendarDate) temporal).millis;
-            long adjusted = this.adjustInto(millis);
-            return new CalendarDate(adjusted);
+            return this.adjustInto((CalendarDate) temporal);
 
         } else {
 
+            Temporal retVal = temporal;
+
             if (CalendarDateUnit.MILLIS.toDurationInMillis() < myDurationInMillis) {
 
-                temporal = temporal.with(ChronoField.MILLI_OF_SECOND, 0L);
+                retVal = retVal.with(ChronoField.MILLI_OF_SECOND, 0L);
 
                 if (CalendarDateUnit.SECOND.toDurationInMillis() < myDurationInMillis) {
 
-                    temporal = temporal.with(ChronoField.SECOND_OF_MINUTE, 0L);
+                    retVal = retVal.with(ChronoField.SECOND_OF_MINUTE, 0L);
 
                     if (CalendarDateUnit.MINUTE.toDurationInMillis() < myDurationInMillis) {
 
-                        temporal = temporal.with(ChronoField.MINUTE_OF_HOUR, 0L);
+                        retVal = retVal.with(ChronoField.MINUTE_OF_HOUR, 0L);
 
                         if (CalendarDateUnit.HOUR.toDurationInMillis() < myDurationInMillis) {
 
-                            temporal = temporal.with(ChronoField.HOUR_OF_DAY, 12L);
+                            retVal = retVal.with(ChronoField.HOUR_OF_DAY, 12L);
 
                             if (CalendarDateUnit.DAY.toDurationInMillis() < myDurationInMillis) {
 
                                 if (CalendarDateUnit.WEEK.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+                                    retVal = retVal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
 
                                 } else if (CalendarDateUnit.MONTH.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(TemporalAdjusters.lastDayOfMonth());
+                                    retVal = retVal.with(TemporalAdjusters.lastDayOfMonth());
 
                                 } else if (CalendarDateUnit.QUARTER.toDurationInMillis() == myDurationInMillis) {
 
-                                    int nextMonth = 3 + (3 * (temporal.get(ChronoField.MONTH_OF_YEAR) / 3));
-                                    temporal = temporal.with(ChronoField.MONTH_OF_YEAR, nextMonth).with(ChronoField.DAY_OF_MONTH, 1L).minus(1L,
-                                            ChronoUnit.DAYS);
+                                    int nextMonth = 3 + (3 * (retVal.get(ChronoField.MONTH_OF_YEAR) / 3));
+                                    retVal = retVal.with(ChronoField.MONTH_OF_YEAR, nextMonth).with(ChronoField.DAY_OF_MONTH, 1L).minus(1L, ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.YEAR.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(TemporalAdjusters.lastDayOfYear());
+                                    retVal = retVal.with(TemporalAdjusters.lastDayOfYear());
 
                                 } else if (CalendarDateUnit.DECADE.toDurationInMillis() == myDurationInMillis) {
 
-                                    int nextYear = 10 + (10 * (temporal.get(ChronoField.YEAR) / 10));
-                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 10 + (10 * (retVal.get(ChronoField.YEAR) / 10));
+                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.CENTURY.toDurationInMillis() == myDurationInMillis) {
 
-                                    int nextYear = 100 + (100 * (temporal.get(ChronoField.YEAR) / 100));
-                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 100 + (100 * (retVal.get(ChronoField.YEAR) / 100));
+                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.MILLENIUM.toDurationInMillis() == myDurationInMillis) {
 
-                                    int nextYear = 1000 + (1000 * (temporal.get(ChronoField.YEAR) / 1000));
-                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 1000 + (1000 * (retVal.get(ChronoField.YEAR) / 1000));
+                                    retVal = retVal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
                                 }
                             }
                         }
@@ -212,7 +215,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
                 }
             }
 
-            return temporal;
+            return retVal;
         }
     }
 
@@ -234,18 +237,18 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
 
     public double convert(final double sourceDurationMeasure, final CalendarDateUnit sourceDurationUnit) {
 
-        final double sourceDurationInNanos = sourceDurationUnit.toDurationInNanos();
-        final double destinationDurationInNanos = myDurationInNanos;
+        double sourceDurationInNanos = sourceDurationUnit.toDurationInNanos();
+        double destinationDurationInNanos = myDurationInNanos;
 
         if (sourceDurationInNanos > destinationDurationInNanos) {
 
-            final double scaleUp = sourceDurationInNanos / destinationDurationInNanos;
+            double scaleUp = sourceDurationInNanos / destinationDurationInNanos;
 
             return sourceDurationMeasure * scaleUp;
 
         } else if (sourceDurationInNanos < destinationDurationInNanos) {
 
-            final double scaleDown = destinationDurationInNanos / sourceDurationInNanos;
+            double scaleDown = destinationDurationInNanos / sourceDurationInNanos;
 
             return sourceDurationMeasure / scaleDown;
 
@@ -256,7 +259,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     }
 
     public long convert(final long sourceMeassure, final CalendarDateUnit sourceUnit) {
-        final Optional<TimeUnit> tmpTimeUnit = sourceUnit.getTimeUnit();
+        Optional<TimeUnit> tmpTimeUnit = sourceUnit.getTimeUnit();
         if ((myTimeUnit != null) && (tmpTimeUnit.isPresent())) {
             return myTimeUnit.convert(sourceMeassure, tmpTimeUnit.get());
         } else {
