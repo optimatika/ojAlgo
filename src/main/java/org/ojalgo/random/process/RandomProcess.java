@@ -28,8 +28,9 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
 /**
- * A random/stochastic process is a collection of random variables representing the evolution of some random
- * value over "time".
+ * A random/stochastic process (a series of random variables indexed by time or space) representing the
+ * evolution of some random value. The key thing you can do with a random process is to ask for its
+ * distribution at a given (future) time.
  *
  * @author apete
  */
@@ -38,7 +39,6 @@ public interface RandomProcess<D extends Distribution> {
     public static final class SimulationResults {
 
         private final double myInitialValue;
-
         private final Array2D<Double> myResults;
 
         /**
@@ -53,38 +53,29 @@ public interface RandomProcess<D extends Distribution> {
             myResults = results;
         }
 
-        @SuppressWarnings("unused")
-        private SimulationResults() {
-
-            super();
-
-            myInitialValue = 0.0;
-            myResults = null;
-        }
-
         public int countSampleSets() {
-            return (int) myResults.countColumns();
+            return myResults.getColDim();
         }
 
         public int countScenarios() {
-            return (int) myResults.countRows();
+            return myResults.getRowDim();
         }
 
         public double getInitialValue() {
             return myInitialValue;
         }
 
-        public SampleSet getSampleSet(final int index) {
-            return SampleSet.wrap(myResults.sliceColumn(0, index));
+        public SampleSet getSampleSet(final int sampleSetIndex) {
+            return SampleSet.wrap(myResults.sliceColumn(sampleSetIndex));
         }
 
         /**
          * A series representing one scenario. Each series has length "number of simulation steps" + 1 as the
          * series includes the initial value.
          */
-        public PrimitiveSeries getScenario(final int index) {
+        public PrimitiveSeries getScenario(final int scenarioIndex) {
 
-            final Array1D<Double> slicedRow = myResults.sliceRow(index, 0);
+            Array1D<Double> slicedRow = myResults.sliceRow(scenarioIndex);
 
             return new PrimitiveSeries() {
 
@@ -114,9 +105,9 @@ public interface RandomProcess<D extends Distribution> {
     D getDistribution(double evaluationPoint);
 
     /**
-     * @return An array of sample sets. The array has aNumberOfSteps elements, and each sample set has
-     *         aNumberOfRealisations samples.
+     *Returns an collection of sample sets. The array has numberOfSteps elements, and each sample set has
+     *         numberOfRealisations samples.
      */
-    RandomProcess.SimulationResults simulate(final int numberOfRealisations, final int numberOfSteps, final double stepSize);
+    RandomProcess.SimulationResults simulate(int numberOfRealisations, int numberOfSteps, double stepSize);
 
 }

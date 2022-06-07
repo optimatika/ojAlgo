@@ -86,7 +86,7 @@ public class Normal extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return (this.random().nextGaussian() * myScale) + myLocation;
+        return (RandomNumber.random().nextGaussian() * myScale) + myLocation;
     }
 
 }

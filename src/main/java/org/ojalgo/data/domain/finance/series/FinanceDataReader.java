@@ -29,10 +29,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicParser;
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.PrimitiveNumber;
 
 public final class FinanceDataReader<T extends DatePrice> implements FinanceData<T>, DataFetcher {
 
@@ -64,11 +65,11 @@ public final class FinanceDataReader<T extends DatePrice> implements FinanceData
         return retVal;
     }
 
-    public BasicSeries<LocalDate, Double> getPriceSeries() {
+    public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
-        BasicSeries<LocalDate, Double> series = BasicSeries.LOCAL_DATE.build(Primitive64Array.FACTORY);
+        BasicSeries<LocalDate, PrimitiveNumber> series = new SimpleSeries<>();
 
-        myParser.parse(myFile, dp -> series.put(dp.date, dp.getPrice()));
+        myParser.parse(myFile, dp -> series.put(dp.date, dp));
 
         return series;
     }

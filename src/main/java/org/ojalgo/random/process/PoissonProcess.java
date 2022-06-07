@@ -24,7 +24,6 @@ package org.ojalgo.random.process;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Exponential;
 import org.ojalgo.random.Poisson;
 
@@ -37,7 +36,7 @@ import org.ojalgo.random.Poisson;
  *
  * @author apete
  */
-public final class PoissonProcess extends AbstractProcess<Poisson> {
+public final class PoissonProcess extends SingleValueBasedProcess<Poisson> {
 
     private static final Poisson GENERATOR = new Poisson();
 
@@ -47,7 +46,7 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
 
         super();
 
-        this.setValue(ZERO);
+        this.setCurrentValue(ZERO);
 
         myRate = rate;
     }
@@ -61,14 +60,9 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
     }
 
     @Override
-    protected double getNormalisedRandomIncrement() {
-        return GENERATOR.doubleValue();
-    }
-
-    @Override
-    protected double step(final double currentValue, final double stepSize, final double normalisedRandomIncrement) {
-        final double retVal = currentValue + ((myRate * stepSize) * normalisedRandomIncrement);
-        this.setValue(retVal);
+    double doStep(final double stepSize, final double normalisedRandomIncrement) {
+        double retVal = this.getCurrentValue() + ((myRate * stepSize) * normalisedRandomIncrement);
+        this.setCurrentValue(retVal);
         return retVal;
     }
 
@@ -80,18 +74,23 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
         ProgrammingError.throwForUnsupportedOptionalOperation();
-        return 0;
+        return ZERO;
+    }
+
+    @Override
+    double getNormalisedRandomIncrement() {
+        return GENERATOR.doubleValue();
     }
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return PrimitiveMath.SQRT.invoke(myRate * stepSize);
+        return SQRT.invoke(myRate * stepSize);
     }
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
         ProgrammingError.throwForUnsupportedOptionalOperation();
-        return 0;
+        return ZERO;
     }
 
     @Override

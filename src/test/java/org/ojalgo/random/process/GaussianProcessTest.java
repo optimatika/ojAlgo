@@ -32,7 +32,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.process.GaussianField.Mean;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.ComparableToDouble;
+import org.ojalgo.type.keyvalue.EntryPair;
 
 /**
  * @author apete
@@ -42,9 +42,9 @@ public class GaussianProcessTest {
     @Test
     public void testTutorial() {
 
-        final GaussianField.Covariance<Double> tmpCovar = new GaussianField.Covariance<Double>() {
+        GaussianField.Covariance<Double> tmpCovar = new GaussianField.Covariance<Double>() {
 
-            public void calibrate(final Collection<ComparableToDouble<Double>> observations, final Mean<Double> mean) {
+            public void calibrate(final Collection<EntryPair.KeyedPrimitive<Double>> observations, final Mean<Double> mean) {
             }
 
             public double invoke(final Double anArg1, final Double anArg2) {
@@ -53,10 +53,10 @@ public class GaussianProcessTest {
 
             double invoke(final double anArg1, final double anArg2) {
 
-                final double tmpSF = 1.27;
-                final double tmpSN = 0.3;
+                double tmpSF = 1.27;
+                double tmpSN = 0.3;
 
-                final double tmpL = 1.0;
+                double tmpL = 1.0;
 
                 double retVal = tmpSF * tmpSF * PrimitiveMath.EXP.invoke(-PrimitiveMath.POW.invoke(anArg1 - anArg2, TWO) / (TWO * tmpL * tmpL));
 
@@ -69,7 +69,7 @@ public class GaussianProcessTest {
 
         };
 
-        final GaussianProcess tmpProc = new GaussianProcess(tmpCovar);
+        GaussianProcess tmpProc = new GaussianProcess(tmpCovar);
         tmpProc.addObservation(-1.5, -1.6);
         tmpProc.addObservation(-1.0, -1.1);
         tmpProc.addObservation(-0.75, -0.4);
@@ -77,7 +77,7 @@ public class GaussianProcessTest {
         tmpProc.addObservation(-0.25, 0.5);
         tmpProc.addObservation(0.0, 0.8);
 
-        final Primitive64Store tmpExpected = Primitive64Store.FACTORY
+        Primitive64Store tmpExpected = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.7029, 1.423379254178694, 1.2174807940480699, 0.8807634427271873, 0.7384394292014367, 0.5236319646022823 },
                         { 1.423379254178694, 1.7029, 1.5632762838868954, 1.3472073239852407, 1.2174807940480699, 0.9782733010505065 },
                         { 1.2174807940480699, 1.5632762838868954, 1.7029, 1.5170744874003474, 1.423379254178694, 1.2174807940480699 },
@@ -86,7 +86,7 @@ public class GaussianProcessTest {
                         { 0.5236319646022823, 0.9782733010505065, 1.2174807940480699, 1.4888943550870049, 1.5632762838868954, 1.7029 } });
         TestUtils.assertEquals(tmpExpected, tmpProc.getCovariances(), NumberContext.of(8, 2));
 
-        final Normal tmpDistr = tmpProc.getDistribution(0.2);
+        Normal tmpDistr = tmpProc.getDistribution(0.2);
         TestUtils.assertEquals("Mean", 0.911277527445648, tmpDistr.getExpected(), 0.005);
         TestUtils.assertEquals("Variance", 0.20604504349662636, tmpDistr.getVariance(), 0.005);
     }

@@ -28,16 +28,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.PrimitiveNumber;
 
 public final class SourceCache {
 
     private static final class Value {
 
-        final BasicSeries<LocalDate, Double> series;
+        final BasicSeries<LocalDate, PrimitiveNumber> series;
         CalendarDate updated = new CalendarDate();
         CalendarDate used = null;
 
@@ -45,7 +46,7 @@ public final class SourceCache {
 
             super();
 
-            series = BasicSeries.LOCAL_DATE.build(Primitive64Array.FACTORY);
+            series = new SimpleSeries<>();
             series.name(name);
         }
 
@@ -75,7 +76,7 @@ public final class SourceCache {
 
     }
 
-    public synchronized BasicSeries<LocalDate, Double> get(final FinanceData key) {
+    public synchronized BasicSeries<LocalDate, PrimitiveNumber> get(final FinanceData key) {
 
         final CalendarDate now = new CalendarDate();
 
@@ -117,8 +118,8 @@ public final class SourceCache {
     }
 
     private void update(final Value cacheValue, final FinanceData cacheKey, final CalendarDate now) {
-        BasicSeries<LocalDate, Double> priceSeries = cacheKey.getPriceSeries();
-        for (Entry<LocalDate, Double> entry : priceSeries.entrySet()) {
+        BasicSeries<LocalDate, PrimitiveNumber> priceSeries = cacheKey.getPriceSeries();
+        for (Entry<LocalDate, PrimitiveNumber> entry : priceSeries.entrySet()) {
             cacheValue.series.put(entry.getKey(), entry.getValue());
         }
         cacheValue.updated = now;

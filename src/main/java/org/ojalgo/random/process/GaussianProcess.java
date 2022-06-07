@@ -26,16 +26,15 @@ import org.ojalgo.random.Normal;
 import org.ojalgo.random.Normal1D;
 
 /**
- * A Gaussian process is a stochastic process whose realizations consist of random values associated with
- * every point in a range of times (or of space) such that each such random variable has a normal
- * distribution. Moreover, every finite collection of those random variables has a multivariate normal
- * distribution. Prior to calling {@linkplain #getDistribution(double)} or
- * {@linkplain #simulate(int, int, double)} you must call {@linkplain #addObservation(Double, double)} one or
- * more times.
+ * A Gaussian process is a {@link RandomProcess} where each variable has a normal distribution. In addition,
+ * every finite collection of those variables has a multivariate normal distribution.
+ * <P>
+ * Prior to calling {@linkplain #getDistribution(double)} or {@linkplain #simulate(int, int, double)} you must
+ * call {@linkplain #addObservation(Double, double)} one or more times.
  *
  * @author apete
  */
-public final class GaussianProcess extends AbstractProcess<Normal> {
+public final class GaussianProcess extends MultipleValuesBasedProcess<Normal> implements Process1D.ComponentProcess<Normal> {
 
     private static final Normal GENERATOR = new Normal();
 
@@ -66,10 +65,10 @@ public final class GaussianProcess extends AbstractProcess<Normal> {
 
     public Normal getDistribution(final double evaluationPoint) {
 
-        final Normal1D tmpVal = this.getDistribution(new Double[] { evaluationPoint });
+        Normal1D tmpVal = this.getDistribution(new Double[] { evaluationPoint });
 
-        final double tmpLocation = tmpVal.getExpected().doubleValue(0);
-        final double tmpScale = tmpVal.getStandardDeviation().doubleValue(0);
+        double tmpLocation = tmpVal.getExpected().doubleValue(0);
+        double tmpScale = tmpVal.getStandardDeviation().doubleValue(0);
 
         return new Normal(tmpLocation, tmpScale);
     }
@@ -78,20 +77,26 @@ public final class GaussianProcess extends AbstractProcess<Normal> {
         return myDelegate.getDistribution(false, evaluationPoint);
     }
 
-    @Override
-    protected double getNormalisedRandomIncrement() {
-        return GENERATOR.doubleValue();
+    public double getValue() {
+        return this.getCurrentValue();
+    }
+
+    public void setValue(final double newValue) {
+        this.setCurrentValue(newValue);
     }
 
     @Override
-    protected double step(final double currentValue, final double stepSize, final double normalisedRandomIncrement) {
+    public double step(final double stepSize, final double standardGaussianInnovation) {
+        return this.doStep(stepSize, standardGaussianInnovation);
+    }
 
-        final Normal tmpDistr = this.getDistribution(stepSize);
+    @Override
+    double doStep(final double stepSize, final double normalisedRandomIncrement) {
 
-        final double retVal = (normalisedRandomIncrement * tmpDistr.getStandardDeviation()) + tmpDistr.getExpected();
+        Normal distr = this.getDistribution(stepSize);
 
-        this.addObservation(this.getObservations().last().key + stepSize, retVal);
-
+        double retVal = (normalisedRandomIncrement * distr.getStandardDeviation()) + distr.getExpected();
+        this.addObservation(this.getObservations().last().getKey() + stepSize, retVal);
         return retVal;
     }
 
@@ -107,6 +112,11 @@ public final class GaussianProcess extends AbstractProcess<Normal> {
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
         return this.getDistribution(stepSize).getLowerConfidenceQuantile(confidence);
+    }
+
+    @Override
+    double getNormalisedRandomIncrement() {
+        return GENERATOR.doubleValue();
     }
 
     @Override

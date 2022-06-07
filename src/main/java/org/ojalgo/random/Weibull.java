@@ -63,7 +63,7 @@ public class Weibull extends RandomNumber {
 
     @Override
     protected double generate() {
-        return PrimitiveMath.POW.invoke(-PrimitiveMath.LOG.invoke(this.random().nextDouble()), ONE / myShape) / myRate;
+        return PrimitiveMath.POW.invoke(-PrimitiveMath.LOG.invoke(RandomNumber.random().nextDouble()), ONE / myShape) / myRate;
     }
 
 }

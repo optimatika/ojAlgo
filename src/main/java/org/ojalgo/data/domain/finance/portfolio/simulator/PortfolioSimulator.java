@@ -31,14 +31,14 @@ import org.ojalgo.data.domain.finance.portfolio.SimplePortfolio;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.random.process.GeometricBrownian1D;
 import org.ojalgo.random.process.GeometricBrownianMotion;
+import org.ojalgo.random.process.Process1D;
 import org.ojalgo.random.process.RandomProcess;
 import org.ojalgo.structure.Access2D;
 
 public class PortfolioSimulator {
 
-    private GeometricBrownian1D myProcess;
+    private Process1D<GeometricBrownianMotion> myProcess;
 
     public PortfolioSimulator(final Access2D<?> correlations, final List<GeometricBrownianMotion> assetProcesses) {
 
@@ -49,9 +49,9 @@ public class PortfolioSimulator {
         }
 
         if (correlations != null) {
-            myProcess = new GeometricBrownian1D(correlations, assetProcesses);
+            myProcess = Process1D.of(correlations, assetProcesses);
         } else {
-            myProcess = new GeometricBrownian1D(assetProcesses);
+            myProcess = Process1D.of(assetProcesses);
         }
     }
 
@@ -72,16 +72,16 @@ public class PortfolioSimulator {
     RandomProcess.SimulationResults simulate(final int aNumberOfRealisations, final int aNumberOfSteps, final double aStepSize,
             final Integer rebalancingInterval) {
 
-        final int tmpProcDim = myProcess.size();
+        int tmpProcDim = myProcess.size();
 
-        final Primitive64Array tmpInitialValues = myProcess.getValues();
-        final Comparable<?>[] tmpValues = new Comparable<?>[tmpProcDim];
+        Primitive64Array tmpInitialValues = myProcess.getValues();
+        Comparable<?>[] tmpValues = new Comparable<?>[tmpProcDim];
         for (int p = 0; p < tmpProcDim; p++) {
             tmpValues[p] = tmpInitialValues.get(p);
         }
-        final List<BigDecimal> tmpWeights = new SimplePortfolio(tmpValues).normalise().getWeights();
+        List<BigDecimal> tmpWeights = new SimplePortfolio(tmpValues).normalise().getWeights();
 
-        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.make(aNumberOfRealisations, aNumberOfSteps);
+        Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.make(aNumberOfRealisations, aNumberOfSteps);
 
         for (int r = 0; r < aNumberOfRealisations; r++) {
 
@@ -89,16 +89,16 @@ public class PortfolioSimulator {
 
                 if (rebalancingInterval != null && s != 0 && s % rebalancingInterval == 0) {
 
-                    final double tmpPortfolioValue = tmpRealisationValues.doubleValue(r, s - 1);
+                    double tmpPortfolioValue = tmpRealisationValues.doubleValue(r, s - 1);
 
                     for (int p = 0; p < tmpProcDim; p++) {
                         myProcess.setValue(p, tmpPortfolioValue * tmpWeights.get(p).doubleValue());
                     }
                 }
 
-                final Array1D<Double> tmpRealisation = myProcess.step(aStepSize);
+                Array1D<Double> tmpRealisation = myProcess.step(aStepSize);
 
-                final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
+                AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
                 tmpRealisation.visitAll(tmpAggregator);
                 tmpRealisationValues.set(r, s, tmpAggregator.doubleValue());
             }
@@ -106,7 +106,7 @@ public class PortfolioSimulator {
             myProcess.setValues(tmpInitialValues);
         }
 
-        final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
+        AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
         for (int i = 0; i < tmpInitialValues.count(); i++) {
             tmpAggregator.invoke(tmpInitialValues.doubleValue(i));
         }

@@ -69,7 +69,7 @@ public class Gamma extends RandomNumber {
 
         double tmpIntegralPart = ZERO;
         for (int i = 0; i < tmpInteger; i++) {
-            tmpIntegralPart -= LOG.invoke(this.random().nextDouble());
+            tmpIntegralPart -= LOG.invoke(RandomNumber.random().nextDouble());
         }
 
         double tmpFractionalPart = ZERO;
@@ -83,13 +83,13 @@ public class Gamma extends RandomNumber {
 
             do {
 
-                tmpFractionalPart = -TWO * LOG.invoke(ONE - POW.invoke(this.random().nextDouble(), ONE / tmpFraction));
+                tmpFractionalPart = -TWO * LOG.invoke(ONE - POW.invoke(RandomNumber.random().nextDouble(), ONE / tmpFraction));
                 tmpNegHalfFraction = -tmpFractionalPart / TWO;
 
                 tmpNumer = POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * EXP.invoke(tmpNegHalfFraction);
                 tmpDenom = POW.invoke(TWO, tmpFractionMinusOne) * POW.invoke(-EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
 
-            } while (this.random().nextDouble() > (tmpNumer / tmpDenom));
+            } while (RandomNumber.random().nextDouble() > (tmpNumer / tmpDenom));
         }
 
         return (tmpIntegralPart + tmpFractionalPart) / myRate;

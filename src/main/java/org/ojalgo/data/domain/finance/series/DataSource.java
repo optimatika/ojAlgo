@@ -33,14 +33,15 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicParser;
 import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.CalendarDateSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.PrimitiveNumber;
 
 public final class DataSource implements FinanceData<DatePrice> {
 
@@ -83,6 +84,8 @@ public final class DataSource implements FinanceData<DatePrice> {
 
         public CoordinatedSet<LocalDate> get() {
             switch (myResolution) {
+            case YEAR:
+                return myBuilder.build(LAST_DAY_OF_YEAR);
             case MONTH:
                 return myBuilder.build(LAST_DAY_OF_MONTH);
             case WEEK:
@@ -100,9 +103,10 @@ public final class DataSource implements FinanceData<DatePrice> {
     }
 
     @SuppressWarnings("deprecation")
-    static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(d);
+    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(d);
     @SuppressWarnings("deprecation")
-    static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(d);
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(d);
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_YEAR = d -> LocalDate.of(d.getYear(), 12, 31);
 
     public static Coordinated coordinated() {
         return new DataSource.Coordinated();
@@ -214,24 +218,24 @@ public final class DataSource implements FinanceData<DatePrice> {
         }
     }
 
-    public BasicSeries<LocalDate, Double> getLocalDateSeries() {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries() {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
-    public BasicSeries<LocalDate, Double> getLocalDateSeries(final CalendarDateUnit resolution) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution, Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final CalendarDateUnit resolution) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution);
     }
 
-    public BasicSeries<LocalDate, Double> getLocalDateSeries(final CalendarDateUnit resolution, final DenseArray.Factory<Double> denseArrayFactory) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution, denseArrayFactory);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final CalendarDateUnit resolution, final DenseArray.Factory<Double> denseArrayFactory) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution);
     }
 
-    public BasicSeries<LocalDate, Double> getLocalDateSeries(final DenseArray.Factory<Double> denseArrayFactory) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), denseArrayFactory);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final DenseArray.Factory<Double> denseArrayFactory) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
-    public BasicSeries<LocalDate, Double> getPriceSeries() {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
     public String getSymbol() {
@@ -246,15 +250,17 @@ public final class DataSource implements FinanceData<DatePrice> {
         return prime * result + (myParser == null ? 0 : myParser.hashCode());
     }
 
-    private BasicSeries<LocalDate, Double> getLocalDateSeries(final List<DatePrice> historicalPrices, final CalendarDateUnit resolution,
-            final DenseArray.Factory<Double> denseArrayFactory) {
+    private BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final List<DatePrice> historicalPrices, final CalendarDateUnit resolution) {
 
-        BasicSeries<LocalDate, Double> retVal = BasicSeries.LOCAL_DATE.build(denseArrayFactory);
+        BasicSeries<LocalDate, PrimitiveNumber> retVal = new SimpleSeries<>();
         retVal.name(this.getSymbol());
 
         LocalDate adjusted;
         for (DatePrice datePrice : historicalPrices) {
             switch (resolution) {
+            case YEAR:
+                adjusted = LAST_DAY_OF_YEAR.apply(datePrice.date);
+                break;
             case MONTH:
                 adjusted = LAST_DAY_OF_MONTH.apply(datePrice.date);
                 break;
@@ -265,7 +271,7 @@ public final class DataSource implements FinanceData<DatePrice> {
                 adjusted = datePrice.date;
                 break;
             }
-            retVal.put(adjusted, datePrice.getPrice());
+            retVal.put(adjusted, datePrice);
         }
 
         return retVal;

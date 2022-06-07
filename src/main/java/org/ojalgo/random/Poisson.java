@@ -78,7 +78,7 @@ public class Poisson extends AbstractDiscrete {
 
             retVal++;
 
-            tmpVal -= PrimitiveMath.LOG.invoke(this.random().nextDouble()) / myLambda;
+            tmpVal -= PrimitiveMath.LOG.invoke(RandomNumber.random().nextDouble()) / myLambda;
         }
 
         return retVal;

@@ -19,60 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random;
+package org.ojalgo.random.scedasticity;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+public final class Homoscedastic extends AbstractScedasticity {
 
-/**
- * The number of required trials until an event with probability aProbability occurs has a geometric
- * distribution.
- *
- * @author apete
- */
-public class Geometric extends AbstractDiscrete {
+    private double myMean = ZERO;
+    private double myVariance = AbstractScedasticity.DEFAULT_VARIANCE;
 
-    public static Geometric of(final double probability) {
-        return new Geometric(probability);
+    public double getMean() {
+        return myMean;
     }
 
-    private final double myProbability;
-
-    public Geometric() {
-        this(HALF);
-    }
-
-    public Geometric(final double probability) {
-
-        super();
-
-        myProbability = probability;
-    }
-
-    public double getExpected() {
-        return ONE / myProbability;
-    }
-
-    public double getProbability(final int value) {
-        return myProbability * PrimitiveMath.POW.invoke(ONE - myProbability, value - ONE);
-    }
-
-    @Override
     public double getVariance() {
-        return (ONE - myProbability) / (myProbability * myProbability);
+        return myVariance;
     }
 
-    @Override
-    protected double generate() {
+    public void initialise(final double mean, final double variance) {
+        myMean = mean;
+        myVariance = variance;
+    }
 
-        int retVal = 1;
-
-        while ((RandomNumber.random().nextDouble() + myProbability) <= ONE) {
-            retVal++;
-        }
-
-        return retVal;
+    public void update(final double value) {
+        // Nothing to do for homoscedastic
     }
 
 }

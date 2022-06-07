@@ -33,6 +33,97 @@ import org.ojalgo.type.function.OperatorWithException;
 
 public final class TextLineWriter implements ToFileWriter<CharSequence> {
 
+    /**
+     * A reusable delimited "text line" builder. When writing CSV data this can help create the lines/rows.
+     * It's backed by the {@link TextLineWriter} used to instantiate it. Just specify the delimiter, once, and
+     * start creating lines/rows.
+     */
+    public static final class CSVLineBuilder {
+
+        private final String myDelimiter;
+        private final StringBuilder myTextLine = new StringBuilder();
+        private final TextLineWriter myWriter;
+
+        CSVLineBuilder(final TextLineWriter writer, final char delimiter) {
+            this(writer, Character.toString(delimiter));
+        }
+
+        CSVLineBuilder(final TextLineWriter writer, final String delimiter) {
+            super();
+            myWriter = writer;
+            myDelimiter = delimiter;
+        }
+
+        public CSVLineBuilder append(final boolean colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final byte colVal) {
+            this.delimit();
+            myTextLine.append(Byte.toString(colVal));
+            return this;
+        }
+
+        public CSVLineBuilder append(final char colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final double colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final float colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final int colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final long colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final Object colVal) {
+            this.delimit();
+            myTextLine.append(colVal);
+            return this;
+        }
+
+        public CSVLineBuilder append(final short colVal) {
+            this.delimit();
+            myTextLine.append(Short.toString(colVal));
+            return this;
+        }
+
+        /**
+         * Write the line/row and reset the builder – ready to build the next line.
+         */
+        public void write() {
+            myWriter.write(myTextLine);
+            myTextLine.setLength(0);
+        }
+
+        private void delimit() {
+            if (myTextLine.length() > 0) {
+                myTextLine.append(myDelimiter);
+            }
+        }
+
+    }
+
     @FunctionalInterface
     public interface Formatter<T> {
 
@@ -64,6 +155,20 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
 
     public void close() throws IOException {
         myWriter.close();
+    }
+
+    /**
+     * @see CSVLineBuilder
+     */
+    public CSVLineBuilder newCSVLineBuilder(final char delimiter) {
+        return new CSVLineBuilder(this, delimiter);
+    }
+
+    /**
+     * @see CSVLineBuilder
+     */
+    public CSVLineBuilder newCSVLineBuilder(final String delimiter) {
+        return new CSVLineBuilder(this, delimiter);
     }
 
     public <T> AutoConsumer<T> withFormatter(final Formatter<T> formatter) {

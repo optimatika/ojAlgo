@@ -85,7 +85,7 @@ public class Exponential extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return -PrimitiveMath.LOG.invoke(this.random().nextDouble()) / myRate;
+        return -PrimitiveMath.LOG.invoke(RandomNumber.random().nextDouble()) / myRate;
     }
 
 }
