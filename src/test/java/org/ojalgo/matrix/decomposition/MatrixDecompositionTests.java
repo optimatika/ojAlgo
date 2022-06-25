@@ -34,7 +34,7 @@ import org.ojalgo.TestUtils;
  */
 public abstract class MatrixDecompositionTests {
 
-    static boolean DEBUG = false;
+    static final boolean DEBUG = false;
 
     public static List<MatrixDecomposition<?>> getAnyAll() {
 
@@ -69,9 +69,8 @@ public abstract class MatrixDecompositionTests {
 
     public static List<Eigenvalue<?>> getAnyEigenvalue() {
 
-        List<Eigenvalue<?>> retVal = new ArrayList<>();
+        List<Eigenvalue<?>> retVal = new ArrayList<>(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueHermitian()));
 
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueHermitian()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueGeneral()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueDynamic()));
 
@@ -179,9 +178,8 @@ public abstract class MatrixDecompositionTests {
 
     public static List<Eigenvalue<Double>> getPrimitiveEigenvalue() {
 
-        List<Eigenvalue<Double>> retVal = new ArrayList<>();
+        List<Eigenvalue<Double>> retVal = new ArrayList<>(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()));
 
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()));
         retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueDynamic()));
 

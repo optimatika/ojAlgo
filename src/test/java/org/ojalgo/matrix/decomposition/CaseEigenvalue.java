@@ -41,6 +41,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Generalisation;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
@@ -86,6 +87,50 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
+    }
+
+    /**
+     * Test case based on problem/example from GitHub issue 442
+     *
+     * @see https://github.com/optimatika/ojAlgo/issues/442
+     */
+    @Test
+    public void testComplexEigenpair() {
+
+        GenericStore<ComplexNumber> matrix = GenericStore.COMPLEX.make(2, 2);
+        matrix.set(0, 0, ComplexNumber.of(6.0, 0.0));
+        matrix.set(1, 0, ComplexNumber.of(-2.0, -1.0));
+        matrix.set(0, 1, ComplexNumber.of(-2.0, 1.0));
+        matrix.set(1, 1, ComplexNumber.of(5.0, 0.0));
+
+        Eigenvalue<ComplexNumber> evd = Eigenvalue.COMPLEX.make(matrix, true);
+        evd.decompose(matrix);
+
+        MatrixStore<ComplexNumber> mtrxD = evd.getD();
+        MatrixStore<ComplexNumber> mtrxV = evd.getV();
+
+        List<Eigenpair> eigenpairs = evd.getEigenpairs();
+
+        if (DEBUG) {
+            BasicLogger.debug("D", mtrxD);
+            BasicLogger.debug("V", mtrxV);
+            for (Eigenpair eigenpair : eigenpairs) {
+                BasicLogger.debug("Value: {}", eigenpair.value.toString());
+                BasicLogger.debug("Vector: {}", eigenpair.vector.toString());
+            }
+        }
+
+        Eigenpair pair0 = eigenpairs.get(0);
+        TestUtils.assertEquals(mtrxD.get(0, 0), pair0.value);
+        TestUtils.assertEquals(mtrxV.get(0, 0), pair0.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, 0), pair0.vector.get(1));
+
+        Eigenpair pair1 = eigenpairs.get(1);
+        TestUtils.assertEquals(mtrxD.get(1, 1), pair1.value);
+        TestUtils.assertEquals(mtrxV.get(0, 1), pair1.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, 1), pair1.vector.get(1));
+
+        TestUtils.assertEquals(matrix, evd, NumberContext.of(8));
     }
 
     /**
@@ -169,7 +214,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         ComplexNumber tmp33 = ComplexNumber.ZERO;
         ComplexNumber tmp44 = tmp33;
 
-        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
+        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
         NumberContext accuracyContext = NumberContext.of(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
@@ -206,7 +251,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testPaulsMathNote() {
 
-        double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
+        double[][] tmpData = { { 3, -9 }, { 4, -3 } };
         Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
@@ -265,7 +310,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testPrimitiveAsComplex() {
 
-        double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
+        double[][] tmpData = { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
         Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
 
         int tmpLength = tmpData.length;
@@ -490,7 +535,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 1; dim < 10; dim++) {
 
-            final int dim1 = dim;
+            int dim1 = dim;
             Primitive64Store matrix = Primitive64Store.FACTORY.makeSPD(dim1);
 
             for (Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
