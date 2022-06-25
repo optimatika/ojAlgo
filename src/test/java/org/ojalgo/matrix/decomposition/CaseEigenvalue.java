@@ -134,6 +134,69 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     }
 
     /**
+     * Test case based on problem/example from GitHub issue 443
+     *
+     * @see https://github.com/optimatika/ojAlgo/issues/443
+     */
+    @Test
+    public void testGeneralisedComplexEigenvalue() {
+
+        GenericStore<ComplexNumber> mtrxA = GenericStore.COMPLEX.make(2, 2);
+        mtrxA.set(0, 0, ComplexNumber.of(5.0, 0.0));
+        mtrxA.set(1, 0, ComplexNumber.of(0.0, -3.0));
+        mtrxA.set(0, 1, ComplexNumber.of(0.0, 3.0));
+        mtrxA.set(1, 1, ComplexNumber.of(2.0, 0.0));
+
+        GenericStore<ComplexNumber> mtrxB = GenericStore.COMPLEX.make(2, 2);
+        mtrxB.set(0, 0, ComplexNumber.of(6.0, 0.0));
+        mtrxB.set(1, 0, ComplexNumber.of(-2.0, -1.0));
+        mtrxB.set(0, 1, ComplexNumber.of(-2.0, 1.0));
+        mtrxB.set(1, 1, ComplexNumber.of(5.0, 0.0));
+
+        if (DEBUG) {
+            BasicLogger.debug("A", mtrxA);
+            BasicLogger.debug("B", mtrxB);
+        }
+
+        Eigenvalue.Generalised<ComplexNumber> evd = Eigenvalue.COMPLEX.makeGeneralised(mtrxA, Generalisation.A_B);
+        evd.decompose(mtrxA, mtrxB); // [A][V]=[B][V][D]
+
+        MatrixStore<ComplexNumber> mtrxD = evd.getD();
+        MatrixStore<ComplexNumber> mtrxV = evd.getV();
+
+        List<Eigenpair> eigenpairs = evd.getEigenpairs();
+
+        if (DEBUG) {
+            BasicLogger.debug("D", mtrxD);
+            BasicLogger.debug("V", mtrxV);
+            for (Eigenpair eigenpair : eigenpairs) {
+                BasicLogger.debug("Value: {}", eigenpair.value.toString());
+                BasicLogger.debug("Vector: {}", eigenpair.vector.toString());
+            }
+        }
+
+        Eigenpair pair0 = eigenpairs.get(0);
+        TestUtils.assertEquals(mtrxD.get(0, 0), pair0.value);
+        TestUtils.assertEquals(mtrxV.get(0, 0), pair0.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, 0), pair0.vector.get(1));
+
+        Eigenpair pair1 = eigenpairs.get(1);
+        TestUtils.assertEquals(mtrxD.get(1, 1), pair1.value);
+        TestUtils.assertEquals(mtrxV.get(0, 1), pair1.vector.get(0));
+        TestUtils.assertEquals(mtrxV.get(1, 1), pair1.vector.get(1));
+
+        MatrixStore<ComplexNumber> left = mtrxA.multiply(mtrxV);
+        MatrixStore<ComplexNumber> right = mtrxB.multiply(mtrxV).multiply(mtrxD);
+
+        if (DEBUG) {
+            BasicLogger.debug("left", left);
+            BasicLogger.debug("right", right);
+        }
+
+        TestUtils.assertEquals(left, right);
+    }
+
+    /**
      * org.ojalgo.matrix.decomposition.EvD2D.hqr2 not converging #366. Following the debugger, it is the
      * method hqr2 that get stuck in a loop
      */
