@@ -22,6 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -89,11 +91,13 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
 
     @Override
     protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+
         if (myCholesky.isComputed()) {
             myReduced = this.reduce(matrix);
         } else {
             myReduced = matrix.collect(myFactory);
         }
+
         if (valuesOnly) {
             return myEigenvalue.computeValuesOnly(myReduced);
         } else {
@@ -109,6 +113,14 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
         return myEigenvalue.getEigenvalues();
+    }
+
+    public Eigenpair getEigenpair(final int index) {
+
+        ComplexNumber value = ComplexNumber.FACTORY.cast(this.getD().get(index, index));
+        DenseArray<ComplexNumber> vector = ComplexArray.FACTORY.copy(this.getV().sliceColumn(index));
+
+        return new Eigenpair(value, vector);
     }
 
     @Override
@@ -141,12 +153,10 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
 
             if (reduced instanceof PhysicalStore<?>) {
                 myRecovered = (PhysicalStore<N>) reduced;
+            } else if (myRecovered != null) {
+                reduced.supplyTo(myRecovered);
             } else {
-                if (myRecovered != null) {
-                    reduced.supplyTo(myRecovered);
-                } else {
-                    myRecovered = reduced.collect(myFactory);
-                }
+                myRecovered = reduced.collect(myFactory);
             }
 
             myRecovered.substituteBackwards(mtrxL, false, true, false);
@@ -170,7 +180,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
             }
 
             myRecovered.substituteForwards(mtrxL, false, false, false);
-            myReduced = myRecovered.transpose().copy();
+            myReduced = myRecovered.conjugate().copy();
             myReduced.substituteForwards(mtrxL, false, false, false);
 
             return myReduced;
@@ -188,7 +198,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
             }
 
             myRecovered.fillByMultiplying(myReduced, mtrxL);
-            myReduced.fillByMultiplying(mtrxL.transpose(), myRecovered);
+            myReduced.fillByMultiplying(mtrxL.conjugate(), myRecovered);
 
             return myReduced;
         }

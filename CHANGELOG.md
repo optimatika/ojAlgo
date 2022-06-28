@@ -45,6 +45,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The interface `CalendarDate.Resolution` now also extends `Structure1D.IndexMapper` and defines a method to `adjustInto` for `CalendarDate`.
 
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed problems related to extracting eigenpairs and calculating generalised `Eigenvalue` decompositions for complex matrices (`ComplexNumber` elements).
+
 ## [51.3.0] – 2022-05-15
 
 ### Added
