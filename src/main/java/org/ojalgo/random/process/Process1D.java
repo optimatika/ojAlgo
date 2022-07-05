@@ -21,12 +21,14 @@
  */
 package org.ojalgo.random.process;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.random.Distribution;
 import org.ojalgo.random.Random1D;
-import org.ojalgo.random.process.RandomProcess.SimulationResults;
+import org.ojalgo.random.process.Process1D.ComponentProcess;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
@@ -35,34 +37,52 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-public class Process1D<P extends AbstractProcess<?>> {
+public final class Process1D<P extends ComponentProcess<?>> {
+
+    interface ComponentProcess<D extends Distribution> extends RandomProcess<D> {
+
+        double getValue();
+
+        void setValue(double newValue);
+
+        double step(double stepSize, double standardGaussianInnovation);
+
+    }
 
     /**
      * Correlated processes
      */
-    public static <P extends AbstractProcess<?>> Process1D of(final Access2D<?> correlations, final P... processes) {
+    public static <P extends ComponentProcess<?>> Process1D<P> of(final Access2D<?> correlations, final List<? extends P> processes) {
+        return new Process1D<>(new Random1D(correlations), Process1D.toArray(processes));
+    }
+
+    /**
+     * Correlated processes
+     */
+    public static <P extends ComponentProcess<?>> Process1D<P> of(final Access2D<?> correlations, final P... processes) {
         return new Process1D<>(new Random1D(correlations), processes);
     }
 
     /**
      * Uncorrelated processes
      */
-    public static <P extends AbstractProcess<?>> Process1D of(final P... processes) {
+    public static <P extends ComponentProcess<?>> Process1D<P> of(final List<? extends P> processes) {
+        return new Process1D<>(new Random1D(processes.size()), Process1D.toArray(processes));
+    }
+
+    /**
+     * Uncorrelated processes
+     */
+    public static <P extends ComponentProcess<?>> Process1D<P> of(final P... processes) {
         return new Process1D<>(new Random1D(processes.length), processes);
+    }
+
+    static <P extends ComponentProcess<?>> P[] toArray(final Collection<? extends P> processes) {
+        return (P[]) processes.toArray(new ComponentProcess[processes.size()]);
     }
 
     private final Random1D myGenerator;
     private final P[] myProcesses;
-
-    @SuppressWarnings("unchecked")
-    protected Process1D(final Access2D<?> correlations, final List<? extends P> processes) {
-        this(new Random1D(correlations), (P[]) processes.toArray(new AbstractProcess[processes.size()]));
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Process1D(final List<? extends P> processes) {
-        this(new Random1D(processes.size()), (P[]) processes.toArray(new AbstractProcess[processes.size()]));
-    }
 
     Process1D(final Random1D generator, final P... processes) {
 
@@ -78,10 +98,10 @@ public class Process1D<P extends AbstractProcess<?>> {
 
     public Primitive64Array getValues() {
 
-        final int tmpLength = myProcesses.length;
-        final Primitive64Array retVal = Primitive64Array.make(tmpLength);
+        int length = myProcesses.length;
+        Primitive64Array retVal = Primitive64Array.make(length);
 
-        for (int p = 0; p < tmpLength; p++) {
+        for (int p = 0; p < length; p++) {
             retVal.set(p, myProcesses[p].getValue());
         }
 
@@ -104,45 +124,15 @@ public class Process1D<P extends AbstractProcess<?>> {
 
     public Array1D<Double> step(final double stepSize) {
 
-        final Array1D<Double> retVal = myGenerator.nextGaussian();
+        Array1D<Double> retVal = myGenerator.nextGaussian();
 
         for (int p = 0; p < myProcesses.length; p++) {
-            retVal.set(p, myProcesses[p].step(this.getValue(p), stepSize, retVal.doubleValue(p)));
+            double standardGaussianInnovation = retVal.doubleValue(p);
+            double nextValue = myProcesses[p].step(stepSize, standardGaussianInnovation);
+            retVal.set(p, nextValue);
         }
 
         return retVal;
-    }
-
-    protected P getProcess(final int index) {
-        return myProcesses[index];
-    }
-
-    double getExpected(final int index, final double stepSize) {
-        return myProcesses[index].getExpected(stepSize);
-    }
-
-    double getLowerConfidenceQuantile(final int index, final double stepSize, final double confidence) {
-        return myProcesses[index].getLowerConfidenceQuantile(stepSize, confidence);
-    }
-
-    double getStandardDeviation(final int index, final double stepSize) {
-        return myProcesses[index].getStandardDeviation(stepSize);
-    }
-
-    double getUpperConfidenceQuantile(final int index, final double stepSize, final double confidence) {
-        return myProcesses[index].getUpperConfidenceQuantile(stepSize, confidence);
-    }
-
-    double getVariance(final int index, final double stepSize) {
-        return myProcesses[index].getVariance(stepSize);
-    }
-
-    SimulationResults simulate(final int index, final int numberOfRealisations, final int numberOfSteps, final double stepSize) {
-        return myProcesses[index].simulate(numberOfRealisations, numberOfSteps, stepSize);
-    }
-
-    double step(final int index, final double stepSize) {
-        return myProcesses[index].step(stepSize);
     }
 
 }

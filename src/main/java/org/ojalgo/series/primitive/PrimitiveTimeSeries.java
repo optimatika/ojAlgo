@@ -27,18 +27,18 @@ public abstract class PrimitiveTimeSeries extends PrimitiveSeries {
 
     private final PrimitiveSeries myValueSeries;
 
-    protected PrimitiveTimeSeries(final PrimitiveSeries aValueSeries) {
+    protected PrimitiveTimeSeries(final PrimitiveSeries valueSeries) {
 
         super();
 
-        myValueSeries = aValueSeries;
+        myValueSeries = valueSeries;
     }
 
     public abstract CalendarDate first();
 
     public abstract long getAverageStepSize();
 
-    public final PrimitiveSeries getValueSeries() {
+    public PrimitiveSeries getValueSeries() {
         return myValueSeries;
     }
 
@@ -47,12 +47,12 @@ public abstract class PrimitiveTimeSeries extends PrimitiveSeries {
     public abstract CalendarDate last();
 
     @Override
-    public final int size() {
+    public int size() {
         return myValueSeries.size();
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myValueSeries.value(index);
     }
 

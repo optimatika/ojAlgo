@@ -28,19 +28,29 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.type.PrimitiveNumber;
 
-public interface FinanceData {
+public interface FinanceData<DP extends DatePrice> {
 
     /**
      * Assumes there will be no data for weekends. If there is the implementation nedds to be changed to
      * <code>(temporal) -> TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY).adjustInto(temporal.minus(2, ChronoUnit.DAYS))</code>.
+     *
+     * @deprecated Use {@link TemporalAdjusters#nextOrSame(DayOfWeek)} or {@link DataSource#FRIDAY_OF_WEEK}
+     *             instead.
      */
+    @Deprecated
     TemporalAdjuster FRIDAY_OF_WEEK = TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY);
+    /**
+     * @deprecated Use {@link TemporalAdjusters#lastDayOfMonth()} or {@link DataSource#LAST_DAY_OF_MONTH}
+     *             instead.
+     */
+    @Deprecated
     TemporalAdjuster LAST_DAY_OF_MONTH = TemporalAdjusters.lastDayOfMonth();
 
-    List<DatePrice> getHistoricalPrices();
+    List<DP> getHistoricalPrices();
 
-    BasicSeries<LocalDate, Double> getPriceSeries();
+    BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries();
 
     String getSymbol();
 

@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.series.BasicSeries;
 
-public class CoordinatedSet<K extends Comparable<? super K>> {
+public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
 
     public static final class Builder<K extends Comparable<? super K>> {
 
@@ -54,13 +54,23 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
             return CoordinatedSet.from(uncoordinated);
         }
+
+        public CoordinatedSet<K> build(final UnaryOperator<K> keyMapper) {
+
+            List<BasicSeries<K, ?>> uncoordinated = new ArrayList<>();
+
+            for (Supplier<BasicSeries<K, ?>> supplier : mySuppliers) {
+                uncoordinated.add(supplier.get().resample(keyMapper));
+            }
+
+            return CoordinatedSet.from(uncoordinated);
+        }
     }
 
     public static <K extends Comparable<? super K>> CoordinatedSet.Builder<K> builder() {
         return new CoordinatedSet.Builder<>();
     }
 
-    @SuppressWarnings("unchecked")
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final BasicSeries<K, ?>... uncoordinated) {
         return CoordinatedSet.from(Arrays.asList(uncoordinated));
     }
@@ -110,7 +120,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
     private CoordinatedSet(final PrimitiveSeries[] coordinated, final K first, final K last) {
 
-        super();
+        super(coordinated);
 
         myCoordinated = coordinated;
         myFirstKey = first;
@@ -126,7 +136,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     }
 
     public MatrixStore<Double> getSamples() {
-        return Primitive64Store.FACTORY.columns(myCoordinated);
+        return this.getData(Primitive64Store.FACTORY);
     }
 
     public MatrixStore<Double> getSamples(final UnaryOperator<PrimitiveSeries> operator) {
@@ -143,6 +153,12 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
     public int size() {
         return myCoordinated.length;
+    }
+
+    @Override
+    public String toString() {
+        return "FirstKey=" + this.getFirstKey() + ", LastKey=" + this.getLastKey() + ", NumberOfSeries=" + myCoordinated.length + ", NumberOfSeriesEntries="
+                + myCoordinated[0].size();
     }
 
 }

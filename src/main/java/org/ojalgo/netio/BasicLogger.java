@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.scalar.ComplexNumber;
@@ -71,6 +72,10 @@ public interface BasicLogger {
         public BasicWriter(final Writer out) {
             super();
             myPrintWriter = new PrintWriter(out, true);
+        }
+
+        public Optional<Writer> asWriter() {
+            return Optional.of(this);
         }
 
         @Override
@@ -117,6 +122,10 @@ public interface BasicLogger {
 
         public void print(final short value) {
             myPrintWriter.print(value);
+        }
+
+        public void print(final Throwable throwable) {
+            throwable.printStackTrace(myPrintWriter);
         }
 
         public void printf(final String format, final Object... args) {
@@ -168,6 +177,12 @@ public interface BasicLogger {
             }
         }
 
+        static void println(final BasicLogger appender, final int tabs, final String messagePattern, final Object... arguments) {
+            if (appender != null) {
+                appender.println(tabs, messagePattern, arguments);
+            }
+        }
+
         static void println(final BasicLogger appender, final Object message) {
             if (appender != null) {
                 appender.println(message);
@@ -177,6 +192,12 @@ public interface BasicLogger {
         static void println(final BasicLogger appender, final String messagePattern, final Object... arguments) {
             if (appender != null) {
                 appender.println(messagePattern, arguments);
+            }
+        }
+
+        static void println(final BasicLogger appender, final Throwable throwable, final String messagePattern, final Object... arguments) {
+            if (appender != null) {
+                appender.println(throwable, messagePattern, arguments);
             }
         }
 
@@ -265,6 +286,10 @@ public interface BasicLogger {
 
     BasicLogger NULL = new BasicLogger() {
 
+        public Optional<Writer> asWriter() {
+            return Optional.empty();
+        }
+
         public void print(final boolean value) {
         }
 
@@ -292,6 +317,9 @@ public interface BasicLogger {
         public void print(final short value) {
         }
 
+        public void print(final Throwable throwable) {
+        }
+
         public void printf(final String format, final Object... args) {
         }
 
@@ -306,6 +334,10 @@ public interface BasicLogger {
 
     static void debug(final int width, final Object... columns) {
         NotNull.columns(DEBUG, width, columns);
+    }
+
+    static void debug(final int tabs, final String message, final Object... arguments) {
+        NotNull.println(DEBUG, tabs, message, arguments);
     }
 
     static void debug(final Object message) {
@@ -324,12 +356,20 @@ public interface BasicLogger {
         NotNull.println(DEBUG, message, arguments);
     }
 
+    static void debug(final Throwable throwable, final String message, final Object... arguments) {
+        NotNull.println(DEBUG, throwable, message, arguments);
+    }
+
     static void error() {
         NotNull.println(ERROR);
     }
 
     static void error(final int width, final Object... columns) {
         NotNull.columns(ERROR, width, columns);
+    }
+
+    static void error(final int tabs, final String message, final Object... arguments) {
+        NotNull.println(ERROR, tabs, message, arguments);
     }
 
     static void error(final Object message) {
@@ -348,6 +388,10 @@ public interface BasicLogger {
         NotNull.println(ERROR, message, arguments);
     }
 
+    static void error(final Throwable throwable, final String message, final Object... arguments) {
+        NotNull.println(ERROR, throwable, message, arguments);
+    }
+
     /**
      * @deprecated v51 Use {@link ToFileWriter#mkdirs(File)} instead
      */
@@ -355,6 +399,8 @@ public interface BasicLogger {
     static void mkdirs(final File dir) {
         ToFileWriter.mkdirs(dir);
     }
+
+    Optional<Writer> asWriter();
 
     /**
      * Will print 1 line/row with the objects in fixed width columns
@@ -403,9 +449,19 @@ public interface BasicLogger {
 
     void print(short value);
 
+    void print(Throwable throwable);
+
     void printf(String format, Object... args);
 
     void println();
+
+    default void println(final int tabs, final String message, final Object... args) {
+        for (int i = 0; i < tabs; i++) {
+            this.print(ASCII.HT);
+        }
+        this.print(TypeUtils.format(message, args));
+        this.println();
+    }
 
     default void println(final Object object) {
         this.print(object);
@@ -415,6 +471,12 @@ public interface BasicLogger {
     default void println(final String message, final Object... args) {
         this.print(TypeUtils.format(message, args));
         this.println();
+    }
+
+    default void println(final Throwable throwable, final String message, final Object... args) {
+        this.print(TypeUtils.format(message, args));
+        this.println();
+        this.print(throwable);
     }
 
     default void printmtrx(final String message, final Access2D<?> matrix) {

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -29,18 +30,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicParser;
 import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.CalendarDateSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.PrimitiveNumber;
 
-public final class DataSource implements FinanceData {
+public final class DataSource implements FinanceData<DatePrice> {
 
     public static final class Coordinated implements Supplier<CoordinatedSet<LocalDate>> {
 
@@ -49,12 +52,12 @@ public final class DataSource implements FinanceData {
         private CalendarDateUnit myResolution = CalendarDateUnit.MONTH;
         private final YahooSession myYahooSession = new YahooSession();
 
-        public DataSource.Coordinated add(final FinanceData data) {
+        public <T extends DatePrice> DataSource.Coordinated add(final FinanceData<T> data) {
             myBuilder.add(() -> myCache.get(data));
             return this;
         }
 
-        public DataSource.Coordinated add(final FinanceData primary, final FinanceData secondary) {
+        public <T1 extends DatePrice, T2 extends DatePrice> DataSource.Coordinated add(final FinanceData<T1> primary, final FinanceData<T2> secondary) {
             myCache.register(primary, secondary);
             myBuilder.add(() -> myCache.get(primary));
             return this;
@@ -70,13 +73,26 @@ public final class DataSource implements FinanceData {
             return this;
         }
 
+        public <T extends DatePrice> DataSource.Coordinated addReader(final File file, final BasicParser<T> parser) {
+            return this.add(FinanceDataReader.of(file, parser));
+        }
+
         public DataSource.Coordinated addYahoo(final String symbol) {
             myBuilder.add(() -> myCache.get(DataSource.newYahoo(myYahooSession, symbol, myResolution)));
             return this;
         }
 
         public CoordinatedSet<LocalDate> get() {
-            return myBuilder.build();
+            switch (myResolution) {
+            case YEAR:
+                return myBuilder.build(LAST_DAY_OF_YEAR);
+            case MONTH:
+                return myBuilder.build(LAST_DAY_OF_MONTH);
+            case WEEK:
+                return myBuilder.build(FRIDAY_OF_WEEK);
+            default:
+                return myBuilder.build();
+            }
         }
 
         public DataSource.Coordinated resolution(final CalendarDateUnit resolution) {
@@ -85,6 +101,12 @@ public final class DataSource implements FinanceData {
         }
 
     }
+
+    @SuppressWarnings("deprecation")
+    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(d);
+    @SuppressWarnings("deprecation")
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(d);
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_YEAR = d -> LocalDate.of(d.getYear(), 12, 31);
 
     public static Coordinated coordinated() {
         return new DataSource.Coordinated();
@@ -102,6 +124,14 @@ public final class DataSource implements FinanceData {
         AlphaVantageFetcher fetcher = new AlphaVantageFetcher(symbol, resolution, apiKey, fullOutputSize);
         AlphaVantageParser parser = new AlphaVantageParser();
         return new DataSource(fetcher, parser);
+    }
+
+    public static <T extends DatePrice> DataSource newFileReader(final File file, final BasicParser<T> parser) {
+        return new DataSource(FinanceDataReader.of(file, parser), parser);
+    }
+
+    public static <T extends DatePrice> DataSource newFileReader(final File file, final BasicParser<T> parser, final CalendarDateUnit resolution) {
+        return new DataSource(FinanceDataReader.of(file, parser, resolution), parser);
     }
 
     public static DataSource newIEXTrading(final String symbol) {
@@ -165,7 +195,7 @@ public final class DataSource implements FinanceData {
         CalendarDateSeries<Double> retVal = new CalendarDateSeries<>(resolution);
 
         for (DatePrice datePrice : this.getHistoricalPrices()) {
-            retVal.put(CalendarDate.valueOf(datePrice.key.atTime(time).atZone(zoneId)), datePrice.getPrice());
+            retVal.put(CalendarDate.valueOf(datePrice.getKey().atTime(time).atZone(zoneId)), datePrice.getPrice());
         }
 
         return retVal;
@@ -188,25 +218,24 @@ public final class DataSource implements FinanceData {
         }
     }
 
-    public BasicSeries.NaturallySequenced<LocalDate, Double> getLocalDateSeries() {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries() {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
-    public BasicSeries.NaturallySequenced<LocalDate, Double> getLocalDateSeries(final CalendarDateUnit resolution) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution, Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final CalendarDateUnit resolution) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution);
     }
 
-    public BasicSeries.NaturallySequenced<LocalDate, Double> getLocalDateSeries(final CalendarDateUnit resolution,
-            final DenseArray.Factory<Double> denseArrayFactory) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution, denseArrayFactory);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final CalendarDateUnit resolution, final DenseArray.Factory<Double> denseArrayFactory) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), resolution);
     }
 
-    public BasicSeries.NaturallySequenced<LocalDate, Double> getLocalDateSeries(final DenseArray.Factory<Double> denseArrayFactory) {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), denseArrayFactory);
+    public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final DenseArray.Factory<Double> denseArrayFactory) {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
-    public BasicSeries<LocalDate, Double> getPriceSeries() {
-        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution(), Primitive64Array.FACTORY);
+    public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
+        return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
     public String getSymbol() {
@@ -218,30 +247,31 @@ public final class DataSource implements FinanceData {
         final int prime = 31;
         int result = 1;
         result = prime * result + (myFetcher == null ? 0 : myFetcher.hashCode());
-        result = prime * result + (myParser == null ? 0 : myParser.hashCode());
-        return result;
+        return prime * result + (myParser == null ? 0 : myParser.hashCode());
     }
 
-    private BasicSeries.NaturallySequenced<LocalDate, Double> getLocalDateSeries(final List<DatePrice> historicalPrices, final CalendarDateUnit resolution,
-            final DenseArray.Factory<Double> denseArrayFactory) {
+    private BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries(final List<DatePrice> historicalPrices, final CalendarDateUnit resolution) {
 
-        BasicSeries.NaturallySequenced<LocalDate, Double> retVal = BasicSeries.LOCAL_DATE.build(denseArrayFactory);
+        BasicSeries<LocalDate, PrimitiveNumber> retVal = new SimpleSeries<>();
         retVal.name(this.getSymbol());
 
         LocalDate adjusted;
         for (DatePrice datePrice : historicalPrices) {
             switch (resolution) {
+            case YEAR:
+                adjusted = LAST_DAY_OF_YEAR.apply(datePrice.date);
+                break;
             case MONTH:
-                adjusted = (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(datePrice.key);
+                adjusted = LAST_DAY_OF_MONTH.apply(datePrice.date);
                 break;
             case WEEK:
-                adjusted = (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(datePrice.key);
+                adjusted = FRIDAY_OF_WEEK.apply(datePrice.date);
                 break;
             default:
-                adjusted = datePrice.key;
+                adjusted = datePrice.date;
                 break;
             }
-            retVal.put(adjusted, datePrice.getPrice());
+            retVal.put(adjusted, datePrice);
         }
 
         return retVal;

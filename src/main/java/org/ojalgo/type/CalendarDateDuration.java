@@ -87,13 +87,13 @@ public final class CalendarDateDuration implements TemporalAmount, CalendarDate.
     }
 
     public int compareTo(final CalendarDateDuration reference) {
-        final long tmpVal = this.toDurationInNanos();
-        final long refVal = reference.toDurationInNanos();
+        long tmpVal = this.toDurationInNanos();
+        long refVal = reference.toDurationInNanos();
         return Long.signum(tmpVal - refVal);
     }
 
     public CalendarDateDuration convertTo(final CalendarDateUnit newUnit) {
-        final double newMeasure = newUnit.convert(measure, unit);
+        double newMeasure = newUnit.convert(measure, unit);
         return new CalendarDateDuration(newMeasure, newUnit);
     }
 
@@ -107,17 +107,11 @@ public final class CalendarDateDuration implements TemporalAmount, CalendarDate.
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if ((obj == null) || !(obj instanceof CalendarDateDuration)) {
             return false;
         }
-        if (!(obj instanceof CalendarDateDuration)) {
-            return false;
-        }
-        final CalendarDateDuration other = (CalendarDateDuration) obj;
-        if (Double.doubleToLongBits(measure) != Double.doubleToLongBits(other.measure)) {
-            return false;
-        }
-        if (unit != other.unit) {
+        CalendarDateDuration other = (CalendarDateDuration) obj;
+        if ((Double.doubleToLongBits(measure) != Double.doubleToLongBits(other.measure)) || (unit != other.unit)) {
             return false;
         }
         return true;
@@ -142,13 +136,12 @@ public final class CalendarDateDuration implements TemporalAmount, CalendarDate.
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(measure);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
-        result = (prime * result) + ((unit == null) ? 0 : unit.hashCode());
-        return result;
+        return (prime * result) + ((unit == null) ? 0 : unit.hashCode());
     }
 
     @Override

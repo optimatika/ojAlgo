@@ -122,6 +122,6 @@ public class Uniform extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return myLower + (myRange * this.random().nextDouble());
+        return myLower + (myRange * RandomNumber.random().nextDouble());
     }
 }

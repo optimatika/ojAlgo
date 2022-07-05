@@ -19,10 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.aggregator;
+package org.ojalgo.random.process;
 
-public abstract class AggregatorFunctionTests {
+/**
+ * A random field is a generalization of a stochastic process such that the underlying parameter need no
+ * longer be a simple real or integer valued "time", but can instead take values that are multidimensional
+ * vectors, or points on some manifold.
+ *
+ * @author apete
+ */
+abstract class RandomField<T> {
 
-    static final boolean DEBUG = false;
+    RandomField() {
+        super();
+    }
 
 }

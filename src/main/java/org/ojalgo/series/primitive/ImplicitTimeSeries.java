@@ -32,28 +32,28 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     private final CalendarDateUnit myResolution;
     private final CalendarDate myFirst;
 
-    public ImplicitTimeSeries(final Calendar aFirst, final CalendarDateUnit aResolution, final PrimitiveSeries aValueSeries) {
+    public ImplicitTimeSeries(final Calendar first, final CalendarDateUnit resolution, final PrimitiveSeries valueSeries) {
 
-        super(aValueSeries);
+        super(valueSeries);
 
-        myFirst = CalendarDate.make(aFirst, aResolution);
-        myResolution = aResolution;
+        myFirst = CalendarDate.make(first, resolution);
+        myResolution = resolution;
     }
 
-    public ImplicitTimeSeries(final CalendarDate aFirst, final CalendarDateUnit aResolution, final PrimitiveSeries aValueSeries) {
+    public ImplicitTimeSeries(final CalendarDate first, final CalendarDateUnit resolution, final PrimitiveSeries valueSeries) {
 
-        super(aValueSeries);
+        super(valueSeries);
 
-        myFirst = aFirst.filter(aResolution);
-        myResolution = aResolution;
+        myFirst = first.filter(resolution);
+        myResolution = resolution;
     }
 
-    public ImplicitTimeSeries(final Date aFirst, final CalendarDateUnit aResolution, final PrimitiveSeries aValueSeries) {
+    public ImplicitTimeSeries(final Date first, final CalendarDateUnit resolution, final PrimitiveSeries valueSeries) {
 
-        super(aValueSeries);
+        super(valueSeries);
 
-        myFirst = CalendarDate.make(aFirst, aResolution);
-        myResolution = aResolution;
+        myFirst = CalendarDate.make(first, resolution);
+        myResolution = resolution;
     }
 
     @Override

@@ -68,7 +68,7 @@ public class Geometric extends AbstractDiscrete {
 
         int retVal = 1;
 
-        while ((this.random().nextDouble() + myProbability) <= ONE) {
+        while ((RandomNumber.random().nextDouble() + myProbability) <= ONE) {
             retVal++;
         }
 

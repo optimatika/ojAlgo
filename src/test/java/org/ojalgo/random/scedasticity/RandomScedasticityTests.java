@@ -19,24 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random.process;
+package org.ojalgo.random.scedasticity;
 
-import java.util.List;
+public abstract class RandomScedasticityTests {
 
-import org.ojalgo.structure.Access2D;
-
-/**
- * @deprecated v49 Use the superclass {@link Process1D} instead.
- */
-@Deprecated
-public class Wiener1D extends Process1D<WienerProcess> {
-
-    public Wiener1D(final Access2D<?> correlations, final List<? extends WienerProcess> processes) {
-        super(correlations, processes);
-    }
-
-    public Wiener1D(final List<? extends WienerProcess> processes) {
-        super(processes);
-    }
+    public static final boolean DEBUG = false;
 
 }

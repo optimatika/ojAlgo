@@ -27,9 +27,9 @@ public final class ExplicitTimeSeries extends PrimitiveTimeSeries {
 
     private final long[] myTimes;
 
-    public ExplicitTimeSeries(final long[] someTimes, final PrimitiveSeries aValueSeries) {
+    public ExplicitTimeSeries(final long[] someTimes, final PrimitiveSeries valueSeries) {
 
-        super(aValueSeries);
+        super(valueSeries);
 
         myTimes = someTimes;
     }

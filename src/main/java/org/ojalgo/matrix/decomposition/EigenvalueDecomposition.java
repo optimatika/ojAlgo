@@ -92,6 +92,10 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
             myD = this.makeD();
         }
 
+        if (myD == null) {
+            throw new IllegalStateException();
+        }
+
         return myD;
     }
 
@@ -125,6 +129,10 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
             myV = this.makeV();
         }
 
+        if (myV == null) {
+            throw new IllegalStateException();
+        }
+
         return myV;
     }
 
@@ -148,7 +156,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
 
         myValuesOnly = valuesOnly;
 
-        boolean retVal = false;
+        boolean retVal;
 
         long countRows = matrix.countRows();
         if (matrix.countColumns() != countRows) {
