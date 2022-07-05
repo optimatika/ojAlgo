@@ -49,7 +49,8 @@ public class AlphaVantageParser implements BasicParser<AlphaVantageParser.Data> 
                     || (Double.doubleToLongBits(high) != Double.doubleToLongBits(other.high))) {
                 return false;
             }
-            if ((Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low)) || (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open)) || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
+            if ((Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low)) || (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open))
+                    || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
                 return false;
             }
             return true;

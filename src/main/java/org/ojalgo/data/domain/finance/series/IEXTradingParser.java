@@ -47,7 +47,8 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
                     || (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open))) {
                 return false;
             }
-            if ((Double.doubleToLongBits(unadjustedVolume) != Double.doubleToLongBits(other.unadjustedVolume)) || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
+            if ((Double.doubleToLongBits(unadjustedVolume) != Double.doubleToLongBits(other.unadjustedVolume))
+                    || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
                 return false;
             }
             return true;

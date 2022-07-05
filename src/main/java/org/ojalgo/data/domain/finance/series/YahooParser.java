@@ -62,7 +62,10 @@ public class YahooParser implements BasicParser<YahooParser.Data> {
                 return false;
             }
             Data other = (Data) obj;
-            if ((Double.doubleToLongBits(adjustedClose) != Double.doubleToLongBits(other.adjustedClose)) || (Double.doubleToLongBits(close) != Double.doubleToLongBits(other.close)) || (Double.doubleToLongBits(high) != Double.doubleToLongBits(other.high)) || (Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low))) {
+            if ((Double.doubleToLongBits(adjustedClose) != Double.doubleToLongBits(other.adjustedClose))
+                    || (Double.doubleToLongBits(close) != Double.doubleToLongBits(other.close))
+                    || (Double.doubleToLongBits(high) != Double.doubleToLongBits(other.high))
+                    || (Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low))) {
                 return false;
             }
             if (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open)) {

@@ -105,8 +105,8 @@ public interface RandomProcess<D extends Distribution> {
     D getDistribution(double evaluationPoint);
 
     /**
-     *Returns an collection of sample sets. The array has numberOfSteps elements, and each sample set has
-     *         numberOfRealisations samples.
+     * Returns an collection of sample sets. The array has numberOfSteps elements, and each sample set has
+     * numberOfRealisations samples.
      */
     RandomProcess.SimulationResults simulate(int numberOfRealisations, int numberOfSteps, double stepSize);
 
