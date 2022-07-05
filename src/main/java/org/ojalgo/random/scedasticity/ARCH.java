@@ -26,15 +26,52 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.random.SampleSet;
-import org.ojalgo.series.primitive.PrimitiveSeries;
+import org.ojalgo.structure.Access1D;
 
 public final class ARCH extends AbstractScedasticity {
+
+    /**
+     * Parameter estimation using heuristics (not max likelihood).
+     *
+     * @param series Series to adapt to
+     * @param q Number of lagged squared error terms
+     * @return Ready to use ARCH model
+     */
+    public static ARCH estimate(final Access1D<?> series, final int q) {
+
+        SampleSet ss = SampleSet.wrap(series);
+        double mean = ss.getMean();
+        double variance = ss.getVariance();
+
+        ARCH model = ARCH.newInstance(q);
+
+        Access1D<?> parameters = AbstractScedasticity.parameters(series, mean, q);
+
+        double base = variance / TWELVE;
+
+        double[] errorWeights = new double[q];
+        for (int i = 0; i < q; i++) {
+            double weight = ELEVEN_TWELFTHS * parameters.doubleValue(i);
+            if (weight < ZERO) {
+                base += weight * variance;
+            } else {
+                errorWeights[i] = weight;
+            }
+        }
+
+        model.base(base);
+        model.errorWeights(errorWeights);
+
+        model.initialise(mean, variance);
+
+        return model;
+    }
 
     /**
      * @see #newInstance(int, double, double)
      */
     public static ARCH newInstance(final int q) {
-        return ARCH.newInstance(q, ZERO, AbstractScedasticity.DEFAULT_VARIANCE);
+        return ARCH.newInstance(q, ZERO, DEFAULT_VARIANCE);
     }
 
     /**
@@ -49,25 +86,12 @@ public final class ARCH extends AbstractScedasticity {
         retVal.base(variance / TWELVE);
 
         double[] errorWeights = new double[q];
-        AbstractScedasticity.average(errorWeights, ELEVEN / TWELVE);
+        AbstractScedasticity.average(errorWeights, ELEVEN_TWELFTHS);
         retVal.errorWeights(errorWeights);
 
         retVal.initialise(mean, variance);
 
         return retVal;
-    }
-
-    /**
-     * @see #newInstance(int, double, double)
-     */
-    public static ARCH newInstance(final int q, final PrimitiveSeries values) {
-
-        SampleSet statistics = SampleSet.wrap(values);
-
-        double mean = statistics.getMean();
-        double variance = statistics.getVariance();
-
-        return ARCH.newInstance(q, mean, variance);
     }
 
     private double myBase = ZERO;

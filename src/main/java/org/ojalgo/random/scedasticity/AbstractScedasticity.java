@@ -25,9 +25,14 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.structure.Access1D;
+
 abstract class AbstractScedasticity implements ScedasticityModel {
 
     static final double DEFAULT_VARIANCE = HUNDREDTH * HUNDREDTH;
+    static final double ELEVEN_TWELFTHS = ELEVEN / TWELVE;
 
     /**
      * Will set the array of weights to equal weights (average values)
@@ -46,10 +51,10 @@ abstract class AbstractScedasticity implements ScedasticityModel {
      * @param total The total the weights should sum up to
      */
     static void decreasing(final double[] weights, final double total) {
-    
+
         int length = weights.length;
         double weight = total;
-    
+
         if (length == 1) {
             weights[0] = weight;
         } else if (length != 0) {
@@ -59,6 +64,36 @@ abstract class AbstractScedasticity implements ScedasticityModel {
             }
             weights[length - 1] = weights[length - 2];
         }
+    }
+
+    static Access1D<?> parameters(final Access1D<?> series, final double mean, final int q) {
+
+        int nbVars = q;
+        int nbEquations = series.size();
+
+        if (q + nbVars > nbEquations) {
+            throw new IllegalArgumentException();
+        }
+
+        Primitive64Store body = Primitive64Store.FACTORY.make(nbEquations, nbVars);
+        Primitive64Store rhs = Primitive64Store.FACTORY.make(nbEquations, 1);
+
+        for (int i = 0; i < nbEquations; i++) {
+
+            double value = series.doubleValue(i);
+            double error = value - mean;
+            double squared = error * error;
+
+            rhs.set(i, squared);
+
+            body.fillDiagonal(i + 1, 0, squared);
+        }
+
+        QR<Double> qr = QR.PRIMITIVE.make(nbEquations, nbVars);
+
+        qr.compute(body.offsets(q, -1));
+
+        return qr.getSolution(rhs.offsets(q, -1));
     }
 
     AbstractScedasticity() {

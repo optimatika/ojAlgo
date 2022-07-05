@@ -25,8 +25,24 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 public final class Homoscedastic extends AbstractScedasticity {
 
+    /**
+     * @see #newInstance(double, double)
+     */
+    public static Homoscedastic newInstance() {
+        return Homoscedastic.newInstance(ZERO, DEFAULT_VARIANCE);
+    }
+
+    public static Homoscedastic newInstance(final double mean, final double variance) {
+
+        Homoscedastic retVal = new Homoscedastic();
+
+        retVal.initialise(mean, variance);
+
+        return retVal;
+    }
+
     private double myMean = ZERO;
-    private double myVariance = AbstractScedasticity.DEFAULT_VARIANCE;
+    private double myVariance = DEFAULT_VARIANCE;
 
     public double getMean() {
         return myMean;

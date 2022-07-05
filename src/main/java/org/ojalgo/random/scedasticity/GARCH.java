@@ -26,15 +26,58 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.random.SampleSet;
-import org.ojalgo.series.primitive.PrimitiveSeries;
+import org.ojalgo.structure.Access1D;
 
 public final class GARCH extends AbstractScedasticity {
+
+    /**
+     * Parameter estimation using heuristics (not max likelihood).
+     *
+     * @param series Series to adapt to
+     * @param p Number of lagged variance values
+     * @param q Number of lagged squared error terms
+     * @return Ready to use GARCH model
+     */
+    public static GARCH estimate(final Access1D<?> series, final int p, final int q) {
+
+        SampleSet ss = SampleSet.wrap(series);
+        double mean = ss.getMean();
+        double variance = ss.getVariance();
+
+        GARCH model = GARCH.newInstance(p, q);
+
+        int dim = 10 * Math.max(p, q);
+
+        Access1D<?> parameters = AbstractScedasticity.parameters(series, mean, dim);
+
+        double base = variance / TWELVE;
+
+        double[] varianceWeights = new double[p];
+        double[] errorWeights = new double[q];
+        double totalErrorWeights = ZERO;
+
+        for (int i = 0; i < q; i++) {
+            double weight = ELEVEN_TWELFTHS * parameters.doubleValue(i);
+            if (weight >= ZERO) {
+                totalErrorWeights += errorWeights[i] = weight;
+            }
+        }
+        AbstractScedasticity.decreasing(varianceWeights, ELEVEN_TWELFTHS - totalErrorWeights);
+
+        model.base(base);
+        model.errorWeights(errorWeights);
+        model.varianceWeights(varianceWeights);
+
+        model.initialise(mean, variance);
+
+        return model;
+    }
 
     /**
      * @see #newInstance(int, int, double, double)
      */
     public static GARCH newInstance(final int p, final int q) {
-        return GARCH.newInstance(p, q, ZERO, AbstractScedasticity.DEFAULT_VARIANCE);
+        return GARCH.newInstance(p, q, ZERO, DEFAULT_VARIANCE);
     }
 
     /**
@@ -59,19 +102,6 @@ public final class GARCH extends AbstractScedasticity {
         retVal.initialise(mean, variance);
 
         return retVal;
-    }
-
-    /**
-     * @see #newInstance(int, int, double, double)
-     */
-    public static GARCH newInstance(final int p, final int q, final PrimitiveSeries values) {
-
-        SampleSet statistics = SampleSet.wrap(values);
-
-        double mean = statistics.getMean();
-        double variance = statistics.getVariance();
-
-        return GARCH.newInstance(p, q, mean, variance);
     }
 
     private final ARCH myARCH;

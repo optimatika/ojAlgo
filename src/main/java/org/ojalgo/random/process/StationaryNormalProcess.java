@@ -27,7 +27,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.random.Normal;
+import org.ojalgo.random.scedasticity.ARCH;
+import org.ojalgo.random.scedasticity.GARCH;
 import org.ojalgo.random.scedasticity.ScedasticityModel;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Process with fixed mean and (possibly) fluctuating variance given by a {@link ScedasticityModel}.
@@ -35,6 +38,14 @@ import org.ojalgo.random.scedasticity.ScedasticityModel;
  * @author apete
  */
 public final class StationaryNormalProcess extends SingleValueBasedProcess<Normal> implements Process1D.ComponentProcess<Normal> {
+
+    public static StationaryNormalProcess estimateARCH(final Access1D<?> series, final int q) {
+        return new StationaryNormalProcess(ARCH.estimate(series, q));
+    }
+
+    public static StationaryNormalProcess estimateGARCH(final Access1D<?> series, final int p, final int q) {
+        return new StationaryNormalProcess(GARCH.estimate(series, p, q));
+    }
 
     public static StationaryNormalProcess of(final ScedasticityModel scedasticityModel) {
         return new StationaryNormalProcess(scedasticityModel);
