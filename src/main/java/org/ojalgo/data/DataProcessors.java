@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.SampleSet;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Factory2D;
@@ -74,17 +75,85 @@ public class DataProcessors {
             .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
 
     /**
-     * Variables in columns and samples in rows
+     * Calculate the correlation matrix from a set of variables' samples. Each {@link Access1D} instance
+     * represents one variable, and contains an ordered sequence of samples.
      */
-    public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
+    public static <M extends Mutate2D> M correlations(final Factory2D<M> factory, final Access1D<?>... data) {
 
-        long numberOfVariables = data.countColumns();
-        M retVal = factory.make(numberOfVariables, numberOfVariables);
+        int nbVariables = data.length;
+        M retVal = factory.make(nbVariables, nbVariables);
 
         SampleSet rowSet = SampleSet.make();
         SampleSet colSet = SampleSet.make();
 
-        for (int j = 0; j < numberOfVariables; j++) {
+        double[] stdDev = new double[nbVariables];
+        double stdDevJ = ZERO;
+
+        for (int j = 0; j < nbVariables; j++) {
+            colSet.swap(data[j]);
+
+            stdDevJ = stdDev[j] = colSet.getStandardDeviation();
+
+            for (int i = 0; i < j; i++) {
+                rowSet.swap(data[i]);
+
+                double correlation = rowSet.getCovariance(colSet);
+                correlation /= stdDev[i];
+                correlation /= stdDevJ;
+
+                retVal.set(i, j, correlation);
+                retVal.set(j, i, correlation);
+            }
+
+            retVal.set(j, j, ONE);
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Calculate the covariance matrix from a set of variables' samples. Each {@link Access1D} instance
+     * represents one variable, and contains an ordered sequence of samples.
+     */
+    public static <M extends Mutate2D> M covariances(final Factory2D<M> factory, final Access1D<?>... data) {
+
+        int nbVariables = data.length;
+        M retVal = factory.make(nbVariables, nbVariables);
+
+        SampleSet rowSet = SampleSet.make();
+        SampleSet colSet = SampleSet.make();
+
+        for (int j = 0; j < nbVariables; j++) {
+            colSet.swap(data[j]);
+
+            retVal.set(j, j, colSet.getVariance());
+
+            for (int i = 0; i < j; i++) {
+                rowSet.swap(data[i]);
+
+                double covariance = rowSet.getCovariance(colSet);
+                retVal.set(i, j, covariance);
+                retVal.set(j, i, covariance);
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Variables in columns and matching samples in rows.
+     *
+     * @see #covariances(Factory2D, Access1D...)
+     */
+    public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
+
+        int nbVariables = data.getColDim();
+        M retVal = factory.make(nbVariables, nbVariables);
+
+        SampleSet rowSet = SampleSet.make();
+        SampleSet colSet = SampleSet.make();
+
+        for (int j = 0; j < nbVariables; j++) {
             colSet.swap(data.sliceColumn(j));
 
             retVal.set(j, j, colSet.getVariance());
@@ -102,7 +171,7 @@ public class DataProcessors {
     }
 
     /**
-     * @param data Each of the arrays represent a variable - it contains the samples for that variable
+     * @see #covariances(Factory2D, Access1D...)
      */
     public static <M extends Mutate2D> M covariances(final Factory2D<M> factory, final double[]... data) {
         return DataProcessors.covariances(factory, RawStore.wrap(data).transpose());

@@ -19,41 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.series.primitive;
+package org.ojalgo.random.scedasticity;
 
-import org.ojalgo.type.CalendarDate;
+public abstract class RandomScedasticityTests {
 
-public abstract class PrimitiveTimeSeries extends PrimitiveSeries {
-
-    private final PrimitiveSeries myValueSeries;
-
-    protected PrimitiveTimeSeries(final PrimitiveSeries valueSeries) {
-
-        super();
-
-        myValueSeries = valueSeries;
-    }
-
-    public abstract CalendarDate first();
-
-    public abstract long getAverageStepSize();
-
-    public PrimitiveSeries getValueSeries() {
-        return myValueSeries;
-    }
-
-    public abstract long[] keys();
-
-    public abstract CalendarDate last();
-
-    @Override
-    public int size() {
-        return myValueSeries.size();
-    }
-
-    @Override
-    public double value(final int index) {
-        return myValueSeries.value(index);
-    }
+    public static final boolean DEBUG = false;
 
 }

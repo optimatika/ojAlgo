@@ -19,60 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random;
+package org.ojalgo.random.scedasticity;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.random.SampleSet;
+import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 
-/**
- * The number of required trials until an event with probability aProbability occurs has a geometric
- * distribution.
- *
- * @author apete
- */
-public class Geometric extends AbstractDiscrete {
+public interface ScedasticityModel {
 
-    public static Geometric of(final double probability) {
-        return new Geometric(probability);
+    double getMean();
+
+    default double getStandardDeviation() {
+        return SQRT.invoke(this.getVariance());
     }
 
-    private final double myProbability;
+    double getVariance();
 
-    public Geometric() {
-        this(HALF);
-    }
+    void initialise(double mean, double variance);
 
-    public Geometric(final double probability) {
+    void update(double value);
 
-        super();
+    /**
+     * Takes a series of realised values and outputs a series of (locally fluctuating) variances.
+     */
+    default PrimitiveSeries variances(final PrimitiveSeries values) {
 
-        myProbability = probability;
-    }
+        SampleSet statistics = SampleSet.wrap(values);
 
-    public double getExpected() {
-        return ONE / myProbability;
-    }
+        double mean = statistics.getMean();
+        double variance = statistics.getVariance();
 
-    public double getProbability(final int value) {
-        return myProbability * PrimitiveMath.POW.invoke(ONE - myProbability, value - ONE);
-    }
+        this.initialise(mean, variance);
 
-    @Override
-    public double getVariance() {
-        return (ONE - myProbability) / (myProbability * myProbability);
-    }
+        double[] data = new double[values.size()];
 
-    @Override
-    protected double generate() {
-
-        int retVal = 1;
-
-        while ((RandomNumber.random().nextDouble() + myProbability) <= ONE) {
-            retVal++;
+        for (int i = 0; i < values.size(); i++) {
+            data[i] = this.getVariance();
+            this.update(values.value(i));
         }
 
-        return retVal;
+        return DataSeries.wrap(data);
     }
 
 }

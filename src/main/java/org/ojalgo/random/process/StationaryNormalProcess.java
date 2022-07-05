@@ -23,30 +23,43 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.random.Normal;
+import org.ojalgo.random.scedasticity.ARCH;
+import org.ojalgo.random.scedasticity.GARCH;
+import org.ojalgo.random.scedasticity.ScedasticityModel;
+import org.ojalgo.structure.Access1D;
 
-public final class WienerProcess extends SingleValueBasedProcess<Normal> implements Process1D.ComponentProcess<Normal> {
+/**
+ * Process with fixed mean and (possibly) fluctuating variance given by a {@link ScedasticityModel}.
+ *
+ * @author apete
+ */
+public final class StationaryNormalProcess extends SingleValueBasedProcess<Normal> implements Process1D.ComponentProcess<Normal> {
 
-    private static final Normal GENERATOR = new Normal();
-
-    public WienerProcess() {
-
-        super();
-
-        this.setCurrentValue(ZERO);
+    public static StationaryNormalProcess estimateARCH(final Access1D<?> series, final int q) {
+        return new StationaryNormalProcess(ARCH.estimate(series, q));
     }
 
-    @SuppressWarnings("unused")
-    private WienerProcess(final double initialValue) {
+    public static StationaryNormalProcess estimateGARCH(final Access1D<?> series, final int p, final int q) {
+        return new StationaryNormalProcess(GARCH.estimate(series, p, q));
+    }
 
+    public static StationaryNormalProcess of(final ScedasticityModel scedasticityModel) {
+        return new StationaryNormalProcess(scedasticityModel);
+    }
+
+    private final ScedasticityModel myScedasticityModel;
+
+    StationaryNormalProcess(final ScedasticityModel scedasticityModel) {
         super();
-
-        this.setCurrentValue(initialValue);
+        myScedasticityModel = scedasticityModel;
     }
 
     public Normal getDistribution(final double evaluationPoint) {
-        return new Normal(this.getCurrentValue(), SQRT.invoke(evaluationPoint));
+        return Normal.of(this.getExpected(evaluationPoint), this.getStandardDeviation(evaluationPoint));
     }
 
     public double getValue() {
@@ -55,48 +68,59 @@ public final class WienerProcess extends SingleValueBasedProcess<Normal> impleme
 
     public void setValue(final double newValue) {
         this.setCurrentValue(newValue);
+        myScedasticityModel.update(newValue);
     }
 
-    @Override
+    public double step() {
+        return this.step(ONE);
+    }
+
     public double step(final double stepSize, final double standardGaussianInnovation) {
         return this.doStep(stepSize, standardGaussianInnovation);
     }
 
     @Override
     double doStep(final double stepSize, final double normalisedRandomIncrement) {
-        double retVal = this.getCurrentValue() + (SQRT.invoke(stepSize) * normalisedRandomIncrement);
-        this.setCurrentValue(retVal);
+
+        double stdDev = this.getStandardDeviation(stepSize);
+
+        double error = stdDev * normalisedRandomIncrement;
+
+        double retVal = this.getExpected(stepSize) + error;
+
+        this.setValue(retVal);
+
         return retVal;
     }
 
     @Override
     double getExpected(final double stepSize) {
-        return this.getCurrentValue();
+        return myScedasticityModel.getMean();
     }
 
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getCurrentValue() - (SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
+        return this.getExpected(stepSize) - (this.getStandardDeviation(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override
     double getNormalisedRandomIncrement() {
-        return GENERATOR.doubleValue();
+        return ThreadLocalRandom.current().nextGaussian();
     }
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return SQRT.invoke(stepSize);
+        return SQRT.invoke(this.getVariance(stepSize));
     }
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getCurrentValue() + (SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
+        return this.getExpected(stepSize) + (this.getStandardDeviation(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override
     double getVariance(final double stepSize) {
-        return stepSize;
+        return stepSize * myScedasticityModel.getVariance();
     }
 
 }

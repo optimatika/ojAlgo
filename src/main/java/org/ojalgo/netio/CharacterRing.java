@@ -22,10 +22,12 @@
 package org.ojalgo.netio;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly
@@ -45,6 +47,10 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
             super();
 
             myRing = new CharacterRing();
+        }
+
+        public Optional<Writer> asWriter() {
+            return Optional.empty();
         }
 
         public void clear() {

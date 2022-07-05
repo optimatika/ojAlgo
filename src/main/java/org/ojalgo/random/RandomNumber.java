@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -35,8 +36,6 @@ import org.ojalgo.type.ComparableNumber;
  * @author apete
  */
 public abstract class RandomNumber implements Distribution, NullaryFunction<Double>, ComparableNumber<RandomNumber> {
-
-    private final Random myRandom = new Random();
 
     protected RandomNumber() {
         super();
@@ -96,7 +95,7 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
     }
 
     public void setSeed(final long seed) {
-        myRandom.setSeed(seed);
+        RandomNumber.random().setSeed(seed);
     }
 
     @Override
@@ -112,7 +111,7 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
 
     protected abstract double generate();
 
-    protected final Random random() {
-        return myRandom;
+    protected final static Random random() {
+        return ThreadLocalRandom.current();
     }
 }

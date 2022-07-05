@@ -62,7 +62,7 @@ public class Erlang extends RandomNumber {
         double tmpVal = ZERO;
 
         for (int i = 0; i < myCount; i++) {
-            tmpVal -= PrimitiveMath.LOG.invoke(this.random().nextDouble());
+            tmpVal -= PrimitiveMath.LOG.invoke(RandomNumber.random().nextDouble());
         }
 
         return tmpVal / myRate;

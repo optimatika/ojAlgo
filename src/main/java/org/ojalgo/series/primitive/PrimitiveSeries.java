@@ -23,6 +23,7 @@ package org.ojalgo.series.primitive;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.random.scedasticity.ScedasticityModel;
 import org.ojalgo.structure.Access1D;
 
 public abstract class PrimitiveSeries implements Access1D<Double> {
@@ -74,7 +75,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return new BinaryFunctionSeries(this, PrimitiveMath.DIVIDE, divisor);
     }
 
-    public final double doubleValue(final long index) {
+    public double doubleValue(final long index) {
         return this.value((int) index);
     }
 
@@ -82,11 +83,11 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return new UnaryFunctionSeries(this, PrimitiveMath.EXP);
     }
 
-    public final Double get(final int index) {
+    public Double get(final int index) {
         return this.value(index);
     }
 
-    public final Double get(final long index) {
+    public Double get(final long index) {
         return this.value((int) index);
     }
 
@@ -123,9 +124,9 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
 
     public PrimitiveSeries runningProduct(final double initialValue) {
 
-        final int tmpNewSize = this.size() + 1;
+        int tmpNewSize = this.size() + 1;
 
-        final double[] tmpValues = new double[tmpNewSize];
+        double[] tmpValues = new double[tmpNewSize];
 
         double tmpAggrVal = tmpValues[0] = initialValue;
         for (int i = 1; i < tmpNewSize; i++) {
@@ -137,9 +138,9 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
 
     public PrimitiveSeries runningSum(final double initialValue) {
 
-        final int tmpNewSize = this.size() + 1;
+        int tmpNewSize = this.size() + 1;
 
-        final double[] tmpValues = new double[tmpNewSize];
+        double[] tmpValues = new double[tmpNewSize];
 
         double tmpAggrVal = tmpValues[0] = initialValue;
         for (int i = 1; i < tmpNewSize; i++) {
@@ -159,27 +160,37 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return new BinaryFunctionSeries(this, PrimitiveMath.SUBTRACT, subtrahend);
     }
 
-    public final DataSeries toDataSeries() {
+    public DataSeries toDataSeries() {
         return DataSeries.wrap(this.values());
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return Access1D.toString(this);
     }
 
-    public abstract double value(final int index);
+    public abstract double value(int index);
 
-    public final double[] values() {
+    public double[] values() {
 
-        final int tmpSize = this.size();
-        final double[] retVal = new double[tmpSize];
+        int tmpSize = this.size();
+        double[] retVal = new double[tmpSize];
 
         for (int i = 0; i < tmpSize; i++) {
             retVal[i] = this.value(i);
         }
 
         return retVal;
+    }
+
+    /**
+     * Creates a series of variances from this series of values. Assumes there is a stationary mean, and then
+     * calculates the (possibly fluctuating) variance from that mean.
+     *
+     * @see ScedasticityModel#variances(PrimitiveSeries)
+     */
+    public PrimitiveSeries variances(final ScedasticityModel model) {
+        return model.variances(this);
     }
 
 }

@@ -278,7 +278,18 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Comparab
     }
 
     default double doubleValue(final K key) {
-        return NumberDefinition.doubleValue(this.get(key));
+
+        if (key == null) {
+            return Double.NaN;
+        }
+
+        V value = this.get(key);
+
+        if (value == null) {
+            return Double.NaN;
+        }
+
+        return NumberDefinition.doubleValue(value);
     }
 
     default V firstValue() {

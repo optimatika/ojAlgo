@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.series.BasicSeries;
 
-public class CoordinatedSet<K extends Comparable<? super K>> {
+public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
 
     public static final class Builder<K extends Comparable<? super K>> {
 
@@ -120,7 +120,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
     private CoordinatedSet(final PrimitiveSeries[] coordinated, final K first, final K last) {
 
-        super();
+        super(coordinated);
 
         myCoordinated = coordinated;
         myFirstKey = first;
@@ -136,7 +136,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     }
 
     public MatrixStore<Double> getSamples() {
-        return Primitive64Store.FACTORY.columns(myCoordinated);
+        return this.getData(Primitive64Store.FACTORY);
     }
 
     public MatrixStore<Double> getSamples(final UnaryOperator<PrimitiveSeries> operator) {

@@ -48,30 +48,30 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
         for (int c = 1; c < 20; c++) {
 
-            final double tmpConfidence = ONE - c / (TEN + TEN);
+            double tmpConfidence = ONE - c / (TEN + TEN);
 
             for (int m = 0; m <= 2; m++) {
 
-                final double tmpExpected = PrimitiveMath.POW.invoke(TEN, m);
+                double tmpExpected = PrimitiveMath.POW.invoke(TEN, m);
 
                 for (int s = -2; s <= 2; s++) {
 
-                    final double tmpVariance = PrimitiveMath.POW.invoke(TEN, s);
+                    double tmpVariance = PrimitiveMath.POW.invoke(TEN, s);
 
-                    final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.make(tmpExpected, tmpVariance);
+                    GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.make(tmpExpected, tmpVariance);
 
                     for (int t = 1; t < 10; t++) {
 
-                        final ContinuousDistribution tmpDistribution = tmpProcess.getDistribution(t);
-                        final double tmpOneSideRemainder = (ONE - tmpConfidence) / TWO;
+                        ContinuousDistribution tmpDistribution = tmpProcess.getDistribution(t);
+                        double tmpOneSideRemainder = (ONE - tmpConfidence) / TWO;
 
-                        final double tmpDistrUpper = tmpDistribution.getQuantile(ONE - tmpOneSideRemainder);
-                        final double tmpDistrLower = tmpDistribution.getQuantile(tmpOneSideRemainder);
+                        double tmpDistrUpper = tmpDistribution.getQuantile(ONE - tmpOneSideRemainder);
+                        double tmpDistrLower = tmpDistribution.getQuantile(tmpOneSideRemainder);
 
-                        final double tmpProcUpper = tmpProcess.getUpperConfidenceQuantile(t, tmpConfidence);
-                        final double tmpProcLower = tmpProcess.getLowerConfidenceQuantile(t, tmpConfidence);
+                        double tmpProcUpper = tmpProcess.getUpperConfidenceQuantile(t, tmpConfidence);
+                        double tmpProcLower = tmpProcess.getLowerConfidenceQuantile(t, tmpConfidence);
 
-                        //final double tmpIsZero = PrimitiveMath.IS_ZERO * 100000;
+                        // double tmpIsZero = PrimitiveMath.IS_ZERO * 100000;
                         TestUtils.assertEquals(tmpDistrUpper, tmpProcUpper);
                         TestUtils.assertEquals(tmpDistrLower, tmpProcLower);
 
@@ -89,7 +89,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
     @Test
     public void testDistributionConsistency() {
 
-        final double tmpError = NumberContext.of(7, 9).epsilon();
+        double tmpError = NumberContext.of(7, 9).epsilon();
 
         GeometricBrownianMotion tmpProcess;
         LogNormal tmpDistribution;
@@ -134,34 +134,34 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
     @Tag("unstable")
     public void testLogNormal() {
 
-        final int tmpPeriods = 10000;
+        int tmpPeriods = 10000;
 
-        final double tmpFactoryExpected = 1.05;
-        final double tmpFactoryStdDev = PrimitiveMath.ABS.invoke(new Normal(0.0, tmpFactoryExpected - ONE).doubleValue());
-        final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
+        double tmpFactoryExpected = 1.05;
+        double tmpFactoryStdDev = PrimitiveMath.ABS.invoke(new Normal(0.0, tmpFactoryExpected - ONE).doubleValue());
+        Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
-        final Primitive64Array tmpRawValues = Primitive64Array.make(tmpPeriods + 1);
+        Primitive64Array tmpRawValues = Primitive64Array.make(tmpPeriods + 1);
         tmpRawValues.data[0] = ONE;
         for (int t = 1; t < tmpRawValues.count(); t++) {
             tmpRawValues.data[t] = tmpRawValues.data[t - 1] * tmpFactoryDistr.doubleValue();
         }
 
-        final Primitive64Array tmpQuotient = Primitive64Array.make(tmpPeriods);
-        final Primitive64Array tmpLogDiffs = Primitive64Array.make(tmpPeriods);
+        Primitive64Array tmpQuotient = Primitive64Array.make(tmpPeriods);
+        Primitive64Array tmpLogDiffs = Primitive64Array.make(tmpPeriods);
         for (int t = 0; t < tmpPeriods; t++) {
             tmpQuotient.data[t] = tmpRawValues.data[t + 1] / tmpRawValues.data[t];
             tmpLogDiffs.data[t] = PrimitiveMath.LOG.invoke(tmpRawValues.data[t + 1]) - PrimitiveMath.LOG.invoke(tmpRawValues.data[t]);
         }
-        final SampleSet tmpQuotientSet = SampleSet.wrap(tmpQuotient);
-        final SampleSet tmpLogDiffsSet = SampleSet.wrap(tmpLogDiffs);
+        SampleSet tmpQuotientSet = SampleSet.wrap(tmpQuotient);
+        SampleSet tmpLogDiffsSet = SampleSet.wrap(tmpLogDiffs);
 
-        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(tmpRawValues, ONE);
+        GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(tmpRawValues, ONE);
 
-        final Normal tmpQuotienDistr = new Normal(tmpQuotientSet.getMean(), tmpQuotientSet.getStandardDeviation());
-        final LogNormal tmpLogDiffDistr = new LogNormal(tmpLogDiffsSet.getMean(), tmpLogDiffsSet.getStandardDeviation());
-        final LogNormal tmpProcessDistr = tmpProcess.getDistribution(ONE);
+        Normal tmpQuotienDistr = new Normal(tmpQuotientSet.getMean(), tmpQuotientSet.getStandardDeviation());
+        LogNormal tmpLogDiffDistr = new LogNormal(tmpLogDiffsSet.getMean(), tmpLogDiffsSet.getStandardDeviation());
+        LogNormal tmpProcessDistr = tmpProcess.getDistribution(ONE);
 
         TestUtils.assertEquals("Expected", tmpLogDiffDistr.getExpected(), tmpProcessDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Geometric Mean", tmpLogDiffDistr.getGeometricMean(), tmpProcessDistr.getGeometricMean(), 1E-14 / PrimitiveMath.THREE);
@@ -179,7 +179,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Expected", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaExpected = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        double tmpDeltaExpected = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaExpected);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaExpected);
         TestUtils.assertEquals(true, tmpGeometrVal <= tmpProcessVal);
@@ -192,7 +192,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Std Dev", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaStdDev = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
+        double tmpDeltaStdDev = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaStdDev);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaStdDev);
 
@@ -204,7 +204,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Var", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaVar = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        double tmpDeltaVar = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaVar);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaVar);
 
@@ -216,7 +216,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Final Value", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaFinal = 1E-14 / THREE * THOUSAND;
+        double tmpDeltaFinal = 1E-14 / THREE * THOUSAND;
         TestUtils.assertEquals(ONE, tmpGeometrVal / tmpFactoryVal, tmpDeltaFinal);
     }
 
@@ -224,22 +224,22 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
     public void testWikipediaCases() {
 
         new GeometricBrownianMotion(1.0, 0.2);
-        final GeometricBrownianMotion tmpGreenProc = new GeometricBrownianMotion(0.5, 0.5);
+        GeometricBrownianMotion tmpGreenProc = new GeometricBrownianMotion(0.5, 0.5);
 
-        final GeometricBrownianMotion tmpProc = tmpGreenProc;
+        GeometricBrownianMotion tmpProc = tmpGreenProc;
 
         for (int t = 1; t <= 100; t++) {
 
-            final double tmpStep = t / HUNDRED;
+            double tmpStep = t / HUNDRED;
 
-            final LogNormal tmpDist = tmpProc.getDistribution(tmpStep);
+            LogNormal tmpDist = tmpProc.getDistribution(tmpStep);
 
             ErrorFunction.erfi(0.95);
 
-            final double tmpProcUpper = tmpProc.getUpperConfidenceQuantile(tmpStep, 0.95);
-            final double tmpProcFact = PrimitiveMath.SQRT.invoke(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));
-            final double tmpDistUpper = tmpDist.getQuantile(0.975);
-            final double tmpDistFact = PrimitiveMath.SQRT.invoke(tmpDistUpper / tmpDist.getQuantile(0.025));
+            double tmpProcUpper = tmpProc.getUpperConfidenceQuantile(tmpStep, 0.95);
+            double tmpProcFact = PrimitiveMath.SQRT.invoke(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));
+            double tmpDistUpper = tmpDist.getQuantile(0.975);
+            double tmpDistFact = PrimitiveMath.SQRT.invoke(tmpDistUpper / tmpDist.getQuantile(0.025));
 
             if (RandomProcessTests.DEBUG) {
                 BasicLogger.debug("Step={} ProcFact={} DistFact={} ProcMedian={} DistMedian={} expected={} median={}", tmpStep, tmpProcFact, tmpDistFact,

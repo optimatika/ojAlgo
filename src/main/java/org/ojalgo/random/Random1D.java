@@ -22,6 +22,7 @@
 package org.ojalgo.random;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -29,22 +30,29 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 
-public class Random1D {
+public final class Random1D {
+
+    public static void setSeed(final long seed) {
+        Random1D.random().setSeed(seed);
+    }
+
+    private static Random random() {
+        return ThreadLocalRandom.current();
+    }
 
     public final int length;
 
     private final MatrixStore<Double> myCholeskiedCorrelations;
-    private final Random myRandom = new Random();
 
     public Random1D(final Access2D<?> correlations) {
 
         super();
 
-        final Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
-        tmpCholesky.decompose(Primitive64Store.FACTORY.makeWrapper(correlations));
-        myCholeskiedCorrelations = tmpCholesky.getL();
+        Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make();
+        cholesky.decompose(Primitive64Store.FACTORY.makeWrapper(correlations));
+        myCholeskiedCorrelations = cholesky.getL();
 
-        tmpCholesky.reset();
+        cholesky.reset();
 
         length = (int) myCholeskiedCorrelations.countRows();
     }
@@ -71,16 +79,16 @@ public class Random1D {
      */
     public Array1D<Double> nextDouble() {
 
-        final Primitive64Store tmpUncorrelated = Primitive64Store.FACTORY.make(length, 1);
+        Primitive64Store uncorrelated = Primitive64Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
-            tmpUncorrelated.set(i, 0, this.random().nextDouble());
+            uncorrelated.set(i, 0, Random1D.random().nextDouble());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((Primitive64Store) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
+            return ((Primitive64Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
         } else {
-            return tmpUncorrelated.asList();
+            return uncorrelated.asList();
         }
     }
 
@@ -89,29 +97,21 @@ public class Random1D {
      */
     public Array1D<Double> nextGaussian() {
 
-        final Primitive64Store tmpUncorrelated = Primitive64Store.FACTORY.make(length, 1);
+        Primitive64Store uncorrelated = Primitive64Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
-            tmpUncorrelated.set(i, 0, this.random().nextGaussian());
+            uncorrelated.set(i, 0, Random1D.random().nextGaussian());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((Primitive64Store) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
+            return ((Primitive64Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
         } else {
-            return tmpUncorrelated.asList();
+            return uncorrelated.asList();
         }
-    }
-
-    public void setSeed(final long seed) {
-        myRandom.setSeed(seed);
     }
 
     public int size() {
         return length;
-    }
-
-    protected Random random() {
-        return myRandom;
     }
 
 }

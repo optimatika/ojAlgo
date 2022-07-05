@@ -19,24 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random.process;
+package org.ojalgo.random.scedasticity;
 
-import java.util.List;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.structure.Access2D;
+public final class Homoscedastic extends AbstractScedasticity {
 
-/**
- * @deprecated v49 Use the superclass {@link Process1D} instead.
- */
-@Deprecated
-public class GeometricBrownian1D extends Process1D<GeometricBrownianMotion> {
-
-    public GeometricBrownian1D(final Access2D<?> correlations, final List<? extends GeometricBrownianMotion> processes) {
-        super(correlations, processes);
+    /**
+     * @see #newInstance(double, double)
+     */
+    public static Homoscedastic newInstance() {
+        return Homoscedastic.newInstance(ZERO, DEFAULT_VARIANCE);
     }
 
-    public GeometricBrownian1D(final List<? extends GeometricBrownianMotion> processes) {
-        super(processes);
+    public static Homoscedastic newInstance(final double mean, final double variance) {
+
+        Homoscedastic retVal = new Homoscedastic();
+
+        retVal.initialise(mean, variance);
+
+        return retVal;
+    }
+
+    private double myMean = ZERO;
+    private double myVariance = DEFAULT_VARIANCE;
+
+    public double getMean() {
+        return myMean;
+    }
+
+    public double getVariance() {
+        return myVariance;
+    }
+
+    public void initialise(final double mean, final double variance) {
+        myMean = mean;
+        myVariance = variance;
+    }
+
+    public void update(final double value) {
+        // Nothing to do for homoscedastic
     }
 
 }

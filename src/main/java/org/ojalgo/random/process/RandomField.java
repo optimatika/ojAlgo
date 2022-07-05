@@ -21,22 +21,17 @@
  */
 package org.ojalgo.random.process;
 
-import java.util.List;
-
-import org.ojalgo.structure.Access2D;
-
 /**
- * @deprecated v49 Use the superclass {@link Process1D} instead.
+ * A random field is a generalization of a stochastic process such that the underlying parameter need no
+ * longer be a simple real or integer valued "time", but can instead take values that are multidimensional
+ * vectors, or points on some manifold.
+ *
+ * @author apete
  */
-@Deprecated
-public class Wiener1D extends Process1D<WienerProcess> {
+abstract class RandomField<T> {
 
-    public Wiener1D(final Access2D<?> correlations, final List<? extends WienerProcess> processes) {
-        super(correlations, processes);
-    }
-
-    public Wiener1D(final List<? extends WienerProcess> processes) {
-        super(processes);
+    RandomField() {
+        super();
     }
 
 }

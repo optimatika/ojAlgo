@@ -29,7 +29,7 @@ abstract class AbstractContinuous extends RandomNumber implements ContinuousDist
 
     @Override
     protected double generate() {
-        return this.getQuantile(this.random().nextDouble());
+        return this.getQuantile(RandomNumber.random().nextDouble());
     }
 
 }
