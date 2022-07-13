@@ -25,6 +25,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ## [51.4.0] – 2022-07-05
 
+Last version to target Java 8!
+
 ### Added
 
 #### org.ojalgo.data

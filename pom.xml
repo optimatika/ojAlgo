@@ -1,13 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>51.4.1</version>
-    <packaging>jar</packaging>
+    <version>52.0.0-SNAPSHOT</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
+    <packaging>jar</packaging>
     <url>http://ojalgo.org</url>
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/optimatika/ojAlgo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
     <organization>
         <name>Optimatika</name>
         <url>http://optimatika.se</url>
@@ -21,21 +26,15 @@
             <organizationUrl>http://optimatika.se</organizationUrl>
         </developer>
     </developers>
-    <licenses>
-        <license>
-            <name>MIT</name>
-            <url>https://github.com/optimatika/ojAlgo/blob/master/LICENSE</url>
-        </license>
-    </licenses>
-    <issueManagement>
-        <url>https://github.com/optimatika/ojAlgo/issues</url>
-        <system>GitHub</system>
-    </issueManagement>
     <scm>
         <url>https://github.com/optimatika/ojAlgo</url>
         <connection>https://github.com/optimatika/ojAlgo.git</connection>
         <developerConnection>git@github.com:optimatika/ojAlgo.git</developerConnection>
     </scm>
+    <issueManagement>
+        <url>https://github.com/optimatika/ojAlgo/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -48,12 +47,9 @@
     </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <version.java>11</version.java>
         <version.org.junit.jupiter>5.8.2</version.org.junit.jupiter>
         <version.org.openjdk.jmh>1.35</version.org.openjdk.jmh>
-        <sonar.organization>optimatika</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <dependencies>
         <dependency>
@@ -89,6 +85,28 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${version.java}</source>
+                    <target>${version.java}</target>
+                    <release>${version.java}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <excludedGroups>slow,unstable</excludedGroups>
+                </configuration>
+                <dependencies />
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -141,18 +159,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                    <excludedGroups>slow,unstable</excludedGroups>
-                </configuration>
-                <dependencies />
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
