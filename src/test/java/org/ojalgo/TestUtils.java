@@ -28,7 +28,7 @@ import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.IntSupplier;
-
+ 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.ojalgo.array.Array1D;
