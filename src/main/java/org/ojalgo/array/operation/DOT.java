@@ -21,56 +21,56 @@
  */
 package org.ojalgo.array.operation;
 
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
+import jdk.incubator.vector.DoubleVector;
+import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
+
 /**
  * The ?dot routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of vectors x and y.
- * <p>
- * {@link #invoke(double[], int, double[], int, int, int)} and
- * {@link #invoke(int, double[], int, int, double[], int, int)} may call native code, see
- * {@link NativeLibrary}. That pays off for a single large call. Code that calls them repeatedly, such as the
- * inner loops of a decomposition, is usually better off with the pure Java implementation,
- * {@link JVM#invoke(int, double[], int, int, double[], int, int)}: each native call has a fixed cost, and
- * some libraries add much more.
  *
  * @author apete
  */
-public abstract class DOT implements BLAS1 {
+public abstract class DOT implements ArrayOperation {
 
     /**
-     * The pure Java implementation. Everything it calls is pure Java as well – the {@code JVM}
-     * implementations of other operations, never their dispatching {@code invoke} methods (that may call
-     * native code).
+     * The Vector API kernel: 4 independent accumulators of 128-bit vectors. The vector width is fixed, rather
+     * than the hardware's preferred width, so the summation order, and the result, is the same on all
+     * platforms. Only loaded when used, so that DOT works without the {@code jdk.incubator.vector} module.
      */
-    public static final class JVM {
+    private static final class Vectorised {
 
-        /**
-         * The pure Java implementation of {@link DOT#invoke(int, double[], int, int, double[], int, int)},
-         * for {@code n >= 0}.
-         */
-        public static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
+        private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_128;
 
-            if (incX == 1 && incY == 1) {
-                return DOT.unrolled04(x, offsetX, y, offsetY, 0, n);
+        static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+
+            DoubleVector sum0 = DoubleVector.zero(SPECIES);
+            DoubleVector sum1 = sum0;
+            DoubleVector sum2 = sum0;
+            DoubleVector sum3 = sum0;
+
+            int i = first;
+            for (int lim = limit - 7; i < lim; i += 8) {
+                sum0 = DoubleVector.fromArray(SPECIES, array1, offset1 + i).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i), sum0);
+                sum1 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 2).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 2), sum1);
+                sum2 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 4).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 4), sum2);
+                sum3 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 6).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 6), sum3);
+            }
+            for (int lim = limit - 1; i < lim; i += 2) {
+                sum0 = DoubleVector.fromArray(SPECIES, array1, offset1 + i).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i), sum0);
             }
 
-            double retVal = PrimitiveMath.ZERO;
-            int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
-            int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
-            for (int i = 0; i < n; i++, ix += incX, iy += incY) {
-                retVal += x[ix] * y[iy];
+            double retVal = sum0.add(sum1).add(sum2.add(sum3)).reduceLanes(VectorOperators.ADD);
+            for (; i < limit; i++) {
+                retVal = Math.fma(array1[offset1 + i], array2[offset2 + i], retVal);
             }
             return retVal;
         }
@@ -78,32 +78,15 @@ public abstract class DOT implements BLAS1 {
     }
 
     /**
-     * Native {@code cblas_ddot}, initialised only when {@link NativeLibrary#isAvailable()}.
+     * Opt in to using the (incubating) Vector API for dot products of {@code double[]} segments with at least 32
+     * elements. In steady state that is 1.5-2 times faster, but loading the Vector API and getting the kernel
+     * compiled costs each JVM about 25ms. Has no effect unless the {@code jdk.incubator.vector} module is
+     * resolved (on the module path, or added with {@code --add-modules jdk.incubator.vector}).
      */
-    static final class Native {
+    public static boolean VECTORISE = false;
 
-        static final MethodHandle DDOT = NativeLibrary.downcall("cblas_ddot", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT), true);
-
-        static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
-            MemorySegment segmentX = NativeLibrary.ofVector(x, offsetX, n, incX);
-            MemorySegment segmentY = NativeLibrary.ofVector(y, offsetY, n, incY);
-            try {
-                return (double) DDOT.invokeExact(n, segmentX, incX, segmentY, incY);
-            } catch (Throwable cause) {
-                throw new ProgrammingError(cause);
-            }
-        }
-
-    }
-
-    /**
-     * The native implementation is used, if there is one, when the vector length (the number of operations)
-     * is larger than this. See {@link NativeLibrary}.
-     */
-    private static final double NATIVE_THRESHOLD = 72;
-
-    static final boolean NATIVE = NativeLibrary.isAvailable() && Native.DDOT != null;
+    private static final boolean VECTOR_API = ModuleLayer.boot().findModule("jdk.incubator.vector").isPresent();
+    private static final int VECTOR_THRESHOLD = 32;
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -166,8 +149,8 @@ public abstract class DOT implements BLAS1 {
     }
 
     public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
-        if (DOT.isNative(limit - first)) {
-            return Native.invoke(limit - first, array1, offset1 + first, 1, array2, offset2 + first, 1);
+        if (VECTOR_API && VECTORISE && limit - first >= VECTOR_THRESHOLD) {
+            return Vectorised.invoke(array1, offset1, array2, offset2, first, limit);
         }
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
@@ -182,46 +165,6 @@ public abstract class DOT implements BLAS1 {
 
     public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
-    }
-
-    /**
-     * BLAS {@code ddot}: the sum of x<sub>i</sub>*y<sub>i</sub> over the {@code n} elements of x and y,
-     * stored from {@code offsetX} and {@code offsetY} with increments {@code incX} and {@code incY}. As in
-     * BLAS, a negative increment walks the vector backwards, and the offset is still the lowest index
-     * accessed.
-     */
-    public static double invoke(final int n, final double[] x, final int offsetX, final int incX, final double[] y, final int offsetY, final int incY) {
-        if (n <= 0) {
-            return PrimitiveMath.ZERO;
-        }
-        if (DOT.isNative(n)) {
-            return Native.invoke(n, x, offsetX, incX, y, offsetY, incY);
-        }
-        return JVM.invoke(n, x, offsetX, incX, y, offsetY, incY);
-    }
-
-    /**
-     * BLAS {@code sdot}.
-     *
-     * @see #invoke(int, double[], int, int, double[], int, int)
-     */
-    public static float invoke(final int n, final float[] x, final int offsetX, final int incX, final float[] y, final int offsetY, final int incY) {
-
-        if (n <= 0) {
-            return 0F;
-        }
-
-        if (incX == 1 && incY == 1) {
-            return DOT.unrolled04(x, offsetX, y, offsetY, 0, n);
-        }
-
-        float retVal = 0F;
-        int ix = incX < 0 ? offsetX - (n - 1) * incX : offsetX;
-        int iy = incY < 0 ? offsetY - (n - 1) * incY : offsetY;
-        for (int i = 0; i < n; i++, ix += incX, iy += incY) {
-            retVal += x[ix] * y[iy];
-        }
-        return retVal;
     }
 
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final Access1D<N> array2, final int offset2, final int first,
@@ -260,11 +203,29 @@ public abstract class DOT implements BLAS1 {
     }
 
     /**
-     * Whether to use the native implementation: there is one, and the vector length is larger than
-     * {@link #NATIVE_THRESHOLD}.
+     * Strided dot product matching the BLAS ddot convention. Computes
+     * {@code sum(array1[base1 + i*inc1] * array2[base2 + i*inc2])} for {@code i = 0..count-1}.
      */
-    static boolean isNative(final double n) {
-        return NATIVE && n > NATIVE_THRESHOLD;
+    public static double invoke(final double[] array1, final int base1, final int inc1, final double[] array2, final int base2, final int inc2,
+            final int count) {
+        double retVal = 0D;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
+    }
+
+    /**
+     * Strided dot product matching the BLAS sdot convention.
+     *
+     * @see #invoke(double[], int, int, double[], int, int, int)
+     */
+    public static float invoke(final float[] array1, final int base1, final int inc1, final float[] array2, final int base2, final int inc2, final int count) {
+        float retVal = 0F;
+        for (int i = 0, ix = base1, iy = base2; i < count; i++, ix += inc1, iy += inc2) {
+            retVal += array1[ix] * array2[iy];
+        }
+        return retVal;
     }
 
     static double plain(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
