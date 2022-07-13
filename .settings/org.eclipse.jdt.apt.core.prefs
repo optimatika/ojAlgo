@@ -1,4 +1,2 @@
 eclipse.preferences.version=1
-org.eclipse.jdt.apt.aptEnabled=false
-org.eclipse.jdt.apt.genSrcDir=.apt_generated
-org.eclipse.jdt.apt.reconcileEnabled=true
+org.eclipse.jdt.apt.genTestSrcDir=.apt_generated_tests
