@@ -29,6 +29,10 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
+import jdk.incubator.vector.DoubleVector;
+import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
+
 /**
  * The ?dot routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of vectors x and y.
@@ -36,6 +40,53 @@ import org.ojalgo.structure.Access1D;
  * @author apete
  */
 public abstract class DOT implements ArrayOperation {
+
+    /**
+     * The Vector API kernel: 4 independent accumulators of 128-bit vectors. The vector width is fixed, rather
+     * than the hardware's preferred width, so the summation order, and the result, is the same on all
+     * platforms. Only loaded when used, so that DOT works without the {@code jdk.incubator.vector} module.
+     */
+    private static final class Vectorised {
+
+        private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_128;
+
+        static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+
+            DoubleVector sum0 = DoubleVector.zero(SPECIES);
+            DoubleVector sum1 = sum0;
+            DoubleVector sum2 = sum0;
+            DoubleVector sum3 = sum0;
+
+            int i = first;
+            for (int lim = limit - 7; i < lim; i += 8) {
+                sum0 = DoubleVector.fromArray(SPECIES, array1, offset1 + i).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i), sum0);
+                sum1 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 2).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 2), sum1);
+                sum2 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 4).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 4), sum2);
+                sum3 = DoubleVector.fromArray(SPECIES, array1, offset1 + i + 6).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i + 6), sum3);
+            }
+            for (int lim = limit - 1; i < lim; i += 2) {
+                sum0 = DoubleVector.fromArray(SPECIES, array1, offset1 + i).fma(DoubleVector.fromArray(SPECIES, array2, offset2 + i), sum0);
+            }
+
+            double retVal = sum0.add(sum1).add(sum2.add(sum3)).reduceLanes(VectorOperators.ADD);
+            for (; i < limit; i++) {
+                retVal = Math.fma(array1[offset1 + i], array2[offset2 + i], retVal);
+            }
+            return retVal;
+        }
+
+    }
+
+    /**
+     * Opt in to using the (incubating) Vector API for dot products of {@code double[]} segments with at least 32
+     * elements. In steady state that is 1.5-2 times faster, but loading the Vector API and getting the kernel
+     * compiled costs each JVM about 25ms. Has no effect unless the {@code jdk.incubator.vector} module is
+     * resolved (on the module path, or added with {@code --add-modules jdk.incubator.vector}).
+     */
+    public static boolean VECTORISE = false;
+
+    private static final boolean VECTOR_API = ModuleLayer.boot().findModule("jdk.incubator.vector").isPresent();
+    private static final int VECTOR_THRESHOLD = 32;
 
     public static double invoke(final Access1D<?> array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
         double retVal = PrimitiveMath.ZERO;
@@ -98,6 +149,9 @@ public abstract class DOT implements ArrayOperation {
     }
 
     public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+        if (VECTOR_API && VECTORISE && limit - first >= VECTOR_THRESHOLD) {
+            return Vectorised.invoke(array1, offset1, array2, offset2, first, limit);
+        }
         return DOT.unrolled04(array1, offset1, array2, offset2, first, limit);
     }
 
