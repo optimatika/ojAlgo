@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>56.1.0-SNAPSHOT</version>
+    <version>99.9.9-SNAPSHOT</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to
         do with mathematics, linear algebra and optimisation.</description>
@@ -51,7 +51,7 @@
     </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.java>11</version.java>
+        <version.java>25</version.java>
         <version.org.junit.jupiter>5.14.0</version.org.junit.jupiter>
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
     </properties>
@@ -104,6 +104,10 @@
                             <version>${version.org.openjdk.jmh}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                        <arg>--add-modules=jdk.incubator.vector,jdk.incubator.concurrent</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -164,12 +168,27 @@
                             <quiet>true</quiet>
                             <serialwarn>false</serialwarn>
                             <doclint>none</doclint>
+                            <release>${version.java}</release>
+                            <additionalOptions>--enable-preview --add-modules=jdk.incubator.vector</additionalOptions>
                         </configuration>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <excludedGroups>slow,unstable</excludedGroups>
+                    <argLine>--enable-preview --add-modules=jdk.incubator.vector,jdk.incubator.concurrent</argLine>
+                </configuration>
+                <dependencies />
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
