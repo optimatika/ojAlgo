@@ -48,8 +48,12 @@ final class QueuedConsumer<T> implements AutoConsumer<T> {
 
             while (myParent.drainTo(batchContainer) != 0 || myParent.isMoreToCome()) {
                 if (batchContainer.size() != 0) {
-                    for (T item : batchContainer) {
-                        myConsumer.accept(item);
+                    if (myConsumer instanceof AutoConsumer<?>) {
+                        ((AutoConsumer<T>) myConsumer).writeBatch(batchContainer);
+                    } else {
+                        for (T item : batchContainer) {
+                            myConsumer.accept(item);
+                        }
                     }
                     batchContainer.clear();
                 } else {
