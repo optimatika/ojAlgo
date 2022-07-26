@@ -24,19 +24,71 @@ package org.ojalgo.type.function;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
-final class ShardedConsumer<T> implements AutoConsumer<T> {
+import org.ojalgo.function.special.PowerOf2;
+
+abstract class ShardedConsumer<T> implements AutoConsumer<T> {
+
+    static final class GeneralShardedConsumer<T> extends ShardedConsumer<T> {
+
+        private final Consumer<T>[] myConsumers;
+        private final ToIntFunction<T> myDistributor;
+        private final int myNumberOfShards;
+
+        GeneralShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+
+            super(consumers);
+
+            myConsumers = consumers;
+            myDistributor = distributor;
+            myNumberOfShards = consumers.length;
+        }
+
+        public void write(final T item) {
+            myConsumers[Math.abs(myDistributor.applyAsInt(item) % myNumberOfShards)].accept(item);
+        }
+
+    }
+
+    static final class PowerOf2ShardedConsumer<T> extends ShardedConsumer<T> {
+
+        private final Consumer<T>[] myConsumers;
+        private final ToIntFunction<T> myDistributor;
+        private final int myIndexMask;
+
+        PowerOf2ShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+
+            super(consumers);
+
+            if (!PowerOf2.isPowerOf2(consumers.length)) {
+                throw new IllegalArgumentException("The number of consumers must be a power of 2!");
+            }
+
+            myConsumers = consumers;
+            myDistributor = distributor;
+            myIndexMask = consumers.length - 1;
+        }
+
+        public void write(final T item) {
+            myConsumers[myDistributor.applyAsInt(item) & myIndexMask].accept(item);
+        }
+
+    }
+
+    static <T> ShardedConsumer<T> of(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+        if (PowerOf2.isPowerOf2(consumers.length)) {
+            return new PowerOf2ShardedConsumer<>(distributor, consumers);
+        } else {
+            return new GeneralShardedConsumer<>(distributor, consumers);
+        }
+    }
 
     private final Consumer<T>[] myConsumers;
-    private final ToIntFunction<T> myDistributor;
-    private final int myNumberOfShards;
 
-    ShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+    ShardedConsumer(final Consumer<T>[] consumers) {
 
         super();
 
         myConsumers = consumers;
-        myNumberOfShards = consumers.length;
-        myDistributor = distributor;
     }
 
     public void close() throws Exception {
@@ -45,10 +97,6 @@ final class ShardedConsumer<T> implements AutoConsumer<T> {
                 ((AutoCloseable) consumer).close();
             }
         }
-    }
-
-    public void write(final T item) {
-        myConsumers[Math.abs(myDistributor.applyAsInt(item) % myNumberOfShards)].accept(item);
     }
 
 }
