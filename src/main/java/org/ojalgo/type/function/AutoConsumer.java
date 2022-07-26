@@ -80,7 +80,7 @@ public interface AutoConsumer<T> extends AutoCloseable, Consumer<T>, AutoFunctio
      * Distribute to 1 of the consumers
      */
     static <T> AutoConsumer<T> sharded(final ToIntFunction<T> distributor, final Consumer<T>... consumers) {
-        return new ShardedConsumer<>(distributor, consumers);
+        return ShardedConsumer.of(distributor, consumers);
     }
 
     default void accept(final T item) {
