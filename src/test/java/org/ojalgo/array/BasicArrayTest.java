@@ -55,6 +55,16 @@ public abstract class BasicArrayTest extends ArrayTests {
     }
 
     @Test
+    public void testNative32() {
+        this.doTest(OffHeapArray.makeNative32(COUNT));
+    }
+
+    @Test
+    public void testNative64() {
+        this.doTest(OffHeapArray.makeNative64(COUNT));
+    }
+
+    @Test
     public void testPrimitive32() {
         this.doTest(Primitive32Array.make(COUNT));
     }
