@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.array
+
+- Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this has been supported via an extension artifact, ojAlgo-unsafe.
+
 ### Changed
 
 #### org.ojalgo.type
