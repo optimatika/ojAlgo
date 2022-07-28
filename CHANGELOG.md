@@ -23,6 +23,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed a problem with the `IntegerSolver` where you could get an `ArrayIndexOutOfBoundsException` when concurrently solving multiple problem instances sharing the same `IntegerStrategy`.
+
 ## [51.4.0] – 2022-07-05
 
 Last version to target Java 8!
