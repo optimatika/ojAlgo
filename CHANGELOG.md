@@ -23,6 +23,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Fixed a regression with `RandomNumber` where it was no longer possible to set a seed for the underlying `java.util.Random` instance.
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed a problem with the `IntegerSolver` where you could get an `ArrayIndexOutOfBoundsException` when concurrently solving multiple problem instances sharing the same `IntegerStrategy`.
+
 ## [51.4.0] – 2022-07-05
 
 Last version to target Java 8!
