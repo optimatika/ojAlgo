@@ -184,6 +184,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
     private final int[] myIndices;
     private final Optimisation.Sense myOptimisationSense;
     private final IntegerStrategy myStrategy;
+    private final List<Comparator<NodeKey>> myWorkerPriorities;
 
     /**
      * Indicates if cut generation is turned on, or not. On by default. Algorithms can turn off when/if no
@@ -206,6 +207,8 @@ public abstract class ModelStrategy implements IntegerStrategy {
             int globalIndex = model.indexOf(integerVariables.get(i));
             myIndices[i] = globalIndex;
         }
+
+        myWorkerPriorities = strategy.getWorkerPriorities();
     }
 
     public NumberContext getGapTolerance() {
@@ -217,7 +220,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
     }
 
     public List<Comparator<NodeKey>> getWorkerPriorities() {
-        return myStrategy.getWorkerPriorities();
+        return myWorkerPriorities;
     }
 
     public ModelStrategy newModelStrategy(final ExpressionsBasedModel model) {
