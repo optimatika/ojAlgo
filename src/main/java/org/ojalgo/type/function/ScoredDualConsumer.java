@@ -22,13 +22,14 @@
 package org.ojalgo.type.function;
 
 import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.Dual;
+import org.ojalgo.type.keyvalue.KeyValue;
+import org.ojalgo.type.keyvalue.KeyValue.Dual;
 
 @FunctionalInterface
-public interface ScoredDualConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<Dual<T>>> {
+public interface ScoredDualConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {
 
-    default void write(final EntryPair.KeyedPrimitive<Dual<T>> item) {
-        Dual<T> key = item.getKey();
+    default void write(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> item) {
+        KeyValue.Dual<T> key = item.getKey();
         this.write(key.first, key.second, item.floatValue());
     }
 

@@ -32,7 +32,8 @@ import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.type.function.OperatorWithException;
 import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.Dual;
+import org.ojalgo.type.keyvalue.KeyValue;
+import org.ojalgo.type.keyvalue.KeyValue.Dual;
 
 public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWriter.Serializer<T> {
 
@@ -118,16 +119,16 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
         };
     }
 
-    static <T> DataInterpreter<EntryPair.KeyedPrimitive<Dual<T>>> newScoredDual(final DataInterpreter<T> keyInterpreter) {
+    static <T> DataInterpreter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> newScoredDual(final DataInterpreter<T> keyInterpreter) {
 
-        return new DataInterpreter<EntryPair.KeyedPrimitive<Dual<T>>>() {
+        return new DataInterpreter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>>() {
 
-            public EntryPair.KeyedPrimitive<Dual<T>> deserialize(final DataInput input) throws IOException {
+            public EntryPair.KeyedPrimitive<KeyValue.Dual<T>> deserialize(final DataInput input) throws IOException {
                 return EntryPair.of(keyInterpreter.deserialize(input), keyInterpreter.deserialize(input), input.readFloat());
             }
 
-            public void serialize(final EntryPair.KeyedPrimitive<Dual<T>> data, final DataOutput output) throws IOException {
-                Dual<T> key = data.getKey();
+            public void serialize(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> data, final DataOutput output) throws IOException {
+                KeyValue.Dual<T> key = data.getKey();
                 keyInterpreter.serialize(key.first, output);
                 keyInterpreter.serialize(key.second, output);
                 output.writeFloat(data.floatValue());
