@@ -22,12 +22,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.type
 
 - If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
+- The `KeyValue` interface was deprecated, but is no longer. Instead `EntryPair` now extends `KeyValue`, and `KeyValue` gained a collection of factory mehods to create pairs. Further the definition of `Dual` moved from `EntryPair` to `KeyValue`.
 
 ### Fixed
 
 #### org.ojalgo.optimisation
 
 - Fixed a problem with the `IntegerSolver` where you could get an `ArrayIndexOutOfBoundsException` when concurrently solving multiple problem instances sharing the same `IntegerStrategy`.
+
+### Removed
+
+- A bunch of stuff in `org.ojalgo.type.keyvalue` that has been deprecated for a while is now actually removed.
+
+#### org.ojalgo.type
 
 ## [51.4.0] – 2022-07-05
 
