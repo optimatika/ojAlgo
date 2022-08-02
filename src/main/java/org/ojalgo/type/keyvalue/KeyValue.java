@@ -26,12 +26,17 @@ import java.util.Map;
 import org.ojalgo.type.PrimitiveNumber;
 
 /**
- * Like {@link Map.Entry}, but without {@link Map.Entry#setValue(Object)}.
+ * A pair, like {@link Map.Entry} without {@link Map.Entry#setValue(Object)}.
  *
  * @author apete
  */
 public interface KeyValue<K, V> {
 
+    /**
+     * A pair of the same type.
+     *
+     * @author apete
+     */
     final class Dual<T> implements KeyValue<T, T> {
 
         public final T first;

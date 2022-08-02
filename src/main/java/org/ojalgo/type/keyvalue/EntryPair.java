@@ -39,10 +39,6 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
 
     interface KeyedPrimitive<K> extends EntryPair<K, PrimitiveNumber>, PrimitiveNumber {
 
-        default Set<Entry<K, PrimitiveNumber>> entrySet() {
-            return Collections.singleton(this);
-        }
-
         default PrimitiveNumber getValue() {
             return this;
         }
@@ -510,10 +506,6 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return myValue.equals(value);
         }
 
-        public Set<Entry<K, V>> entrySet() {
-            return Collections.singleton(this);
-        }
-
         @Override
         public boolean equals(final Object obj) {
             if (this == obj) {
@@ -762,6 +754,10 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
 
     default void clear() {
         throw new UnsupportedOperationException();
+    }
+
+    default Set<Entry<K, V>> entrySet() {
+        return Collections.singleton(this);
     }
 
     default boolean isEmpty() {
