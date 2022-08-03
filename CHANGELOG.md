@@ -33,6 +33,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 ### Removed
 
 - A bunch of stuff in `org.ojalgo.type.keyvalue` that has been deprecated for a while is now actually removed.
+- Some old code in `org.ojalgo.netio` that was deprecated is now removed.
 
 #### org.ojalgo.type
 
