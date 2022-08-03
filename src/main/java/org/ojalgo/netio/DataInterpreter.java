@@ -33,11 +33,10 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.type.function.OperatorWithException;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.KeyValue;
-import org.ojalgo.type.keyvalue.KeyValue.Dual;
 
 public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWriter.Serializer<T> {
 
-    DataInterpreter<String> STRING = new DataInterpreter<String>() {
+    DataInterpreter<String> STRING = new DataInterpreter<>() {
 
         public String deserialize(final DataInput input) throws IOException {
             return input.readUTF();
@@ -53,7 +52,7 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
 
         ArrayAnyD.Factory<N> factory = ArrayAnyD.factory(denseArray);
 
-        return new DataInterpreter<ArrayAnyD<N>>() {
+        return new DataInterpreter<>() {
 
             public ArrayAnyD<N> deserialize(final DataInput input) throws IOException {
 
@@ -121,7 +120,7 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
 
     static <T> DataInterpreter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> newScoredDual(final DataInterpreter<T> keyInterpreter) {
 
-        return new DataInterpreter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>>() {
+        return new DataInterpreter<>() {
 
             public EntryPair.KeyedPrimitive<KeyValue.Dual<T>> deserialize(final DataInput input) throws IOException {
                 return EntryPair.of(keyInterpreter.deserialize(input), keyInterpreter.deserialize(input), input.readFloat());
