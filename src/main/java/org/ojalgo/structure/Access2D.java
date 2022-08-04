@@ -550,7 +550,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
-        return new Access2D<Double>() {
+        return new Access2D<>() {
 
             public long count() {
                 return access.count();
@@ -645,7 +645,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<Double, R>() {
+        return new Access2D.Collectable<>() {
 
             public long countColumns() {
                 return 1L;
@@ -664,7 +664,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveRowCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<Double, R>() {
+        return new Access2D.Collectable<>() {
 
             public long countColumns() {
                 return anything1D.count();
@@ -722,7 +722,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static Access2D<Double> wrap(final double[][] target) {
-        return new Access2D<Double>() {
+        return new Access2D<>() {
 
             public long count() {
                 return Structure2D.count(target.length, target[0].length);
@@ -753,7 +753,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static <N extends Comparable<N>> Access2D<N> wrap(final N[][] target) {
-        return new Access2D<N>() {
+        return new Access2D<>() {
 
             public long count() {
                 return Structure2D.count(target.length, target[0].length);
@@ -788,7 +788,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
-        return new Collectable<NN, R>() {
+        return new Collectable<>() {
 
             public long countColumns() {
                 return Access2D.this.countColumns();

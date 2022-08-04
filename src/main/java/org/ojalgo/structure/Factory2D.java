@@ -94,7 +94,7 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
     }
 
     default Factory1D<I> asFactory1D() {
-        return new Factory1D<I>() {
+        return new Factory1D<>() {
 
             public FunctionSet<?> function() {
                 return Factory2D.this.function();

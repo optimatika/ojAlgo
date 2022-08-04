@@ -73,9 +73,7 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
-
-        return retVal;
+        return Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
     }
 
     /**

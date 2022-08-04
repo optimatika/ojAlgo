@@ -18,11 +18,11 @@ import org.ojalgo.type.CalendarDate.Resolution;
 
 public abstract class TimeIndex<T extends Comparable<? super T>> {
 
-    public static final TimeIndex<Calendar> CALENDAR = new TimeIndex<Calendar>() {
+    public static final TimeIndex<Calendar> CALENDAR = new TimeIndex<>() {
 
         @Override
         public IndexMapper<Calendar> from(final Calendar reference) {
-            return new IndexMapper<Calendar>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Calendar key) {
                     return key.getTimeInMillis() - reference.getTimeInMillis();
@@ -40,7 +40,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Calendar> from(final Calendar reference, final Resolution resolution) {
-            return new IndexMapper<Calendar>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Calendar key) {
                     return (key.getTimeInMillis() - reference.getTimeInMillis()) / resolution.toDurationInMillis();
@@ -58,7 +58,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Calendar> plain() {
-            return new IndexMapper<Calendar>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Calendar key) {
                     return key.getTimeInMillis();
@@ -75,7 +75,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Calendar> plain(final Resolution resolution) {
-            return new IndexMapper<Calendar>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Calendar key) {
                     return key.getTimeInMillis() / resolution.toDurationInMillis();
@@ -93,11 +93,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<CalendarDate> CALENDAR_DATE = new TimeIndex<CalendarDate>() {
+    public static final TimeIndex<CalendarDate> CALENDAR_DATE = new TimeIndex<>() {
 
         @Override
         public IndexMapper<CalendarDate> from(final CalendarDate reference) {
-            return new IndexMapper<CalendarDate>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final CalendarDate key) {
                     return key.millis - reference.millis;
@@ -112,7 +112,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<CalendarDate> from(final CalendarDate reference, final Resolution resolution) {
-            return new IndexMapper<CalendarDate>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final CalendarDate key) {
                     return (key.millis - reference.millis) / resolution.toDurationInMillis();
@@ -127,7 +127,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<CalendarDate> plain() {
-            return new IndexMapper<CalendarDate>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final CalendarDate key) {
                     return key.millis;
@@ -142,7 +142,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<CalendarDate> plain(final Resolution resolution) {
-            return new IndexMapper<CalendarDate>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final CalendarDate key) {
                     return key.millis / resolution.toDurationInMillis();
@@ -157,11 +157,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<Date> DATE = new TimeIndex<Date>() {
+    public static final TimeIndex<Date> DATE = new TimeIndex<>() {
 
         @Override
         public IndexMapper<Date> from(final Date reference) {
-            return new IndexMapper<Date>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Date key) {
                     return key.getTime() - reference.getTime();
@@ -176,7 +176,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Date> from(final Date reference, final Resolution resolution) {
-            return new IndexMapper<Date>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Date key) {
                     return (key.getTime() - reference.getTime()) / resolution.toDurationInMillis();
@@ -191,7 +191,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Date> plain() {
-            return new IndexMapper<Date>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Date key) {
                     return key.getTime();
@@ -206,7 +206,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Date> plain(final Resolution resolution) {
-            return new IndexMapper<Date>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Date key) {
                     return key.getTime() / resolution.toDurationInMillis();
@@ -221,11 +221,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<Instant> INSTANT = new TimeIndex<Instant>() {
+    public static final TimeIndex<Instant> INSTANT = new TimeIndex<>() {
 
         @Override
         public IndexMapper<Instant> from(final Instant reference) {
-            return new IndexMapper<Instant>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Instant key) {
                     return reference.until(key, ChronoUnit.NANOS);
@@ -240,7 +240,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Instant> from(final Instant reference, final Resolution resolution) {
-            return new IndexMapper<Instant>() {
+            return new IndexMapper<>() {
 
                 private final long myResolution = resolution.toDurationInNanos();
 
@@ -257,7 +257,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Instant> plain() {
-            return new IndexMapper<Instant>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final Instant key) {
                     return key.toEpochMilli();
@@ -272,7 +272,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<Instant> plain(final Resolution resolution) {
-            return new IndexMapper<Instant>() {
+            return new IndexMapper<>() {
 
                 private final long myResolution = resolution.toDurationInMillis();
 
@@ -289,11 +289,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<LocalDate> LOCAL_DATE = new TimeIndex<LocalDate>() {
+    public static final TimeIndex<LocalDate> LOCAL_DATE = new TimeIndex<>() {
 
         @Override
         public IndexMapper<LocalDate> from(final LocalDate reference) {
-            return new IndexMapper<LocalDate>() {
+            return new IndexMapper<>() {
 
                 private final long myReference = reference.toEpochDay();
 
@@ -310,7 +310,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDate> from(final LocalDate reference, final Resolution resolution) {
-            return new IndexMapper<LocalDate>() {
+            return new IndexMapper<>() {
 
                 private final long myReference = reference.toEpochDay() * DAY_SIZE;
                 private final long myResolution = resolution.toDurationInMillis();
@@ -328,7 +328,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDate> plain() {
-            return new IndexMapper<LocalDate>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final LocalDate key) {
                     return key.toEpochDay();
@@ -343,7 +343,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDate> plain(final Resolution resolution) {
-            return new IndexMapper<LocalDate>() {
+            return new IndexMapper<>() {
 
                 private final long myResolution = resolution.toDurationInMillis();
 
@@ -360,11 +360,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<LocalDateTime> LOCAL_DATE_TIME = new TimeIndex<LocalDateTime>() {
+    public static final TimeIndex<LocalDateTime> LOCAL_DATE_TIME = new TimeIndex<>() {
 
         @Override
         public IndexMapper<LocalDateTime> from(final LocalDateTime reference) {
-            return new IndexMapper<LocalDateTime>() {
+            return new IndexMapper<>() {
 
                 private final long myReference = reference.toInstant(ZoneOffset.UTC).toEpochMilli();
 
@@ -381,7 +381,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDateTime> from(final LocalDateTime reference, final Resolution resolution) {
-            return new IndexMapper<LocalDateTime>() {
+            return new IndexMapper<>() {
 
                 private final long myReference = reference.toEpochSecond(ZoneOffset.UTC);
                 private final long myResolution = resolution.toDurationInMillis();
@@ -399,7 +399,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDateTime> plain() {
-            return new IndexMapper<LocalDateTime>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final LocalDateTime key) {
                     return key.toInstant(ZoneOffset.UTC).toEpochMilli();
@@ -414,7 +414,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalDateTime> plain(final Resolution resolution) {
-            return new IndexMapper<LocalDateTime>() {
+            return new IndexMapper<>() {
 
                 private final long myResolution = resolution.toDurationInMillis();
 
@@ -431,11 +431,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<LocalTime> LOCAL_TIME = new TimeIndex<LocalTime>() {
+    public static final TimeIndex<LocalTime> LOCAL_TIME = new TimeIndex<>() {
 
         @Override
         public IndexMapper<LocalTime> from(final LocalTime reference) {
-            return new IndexMapper<LocalTime>() {
+            return new IndexMapper<>() {
 
                 final long myReference = reference.toNanoOfDay();
 
@@ -452,7 +452,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalTime> from(final LocalTime reference, final Resolution resolution) {
-            return new IndexMapper<LocalTime>() {
+            return new IndexMapper<>() {
 
                 final long myReference = reference.toNanoOfDay();
                 final long myResolution = resolution.toDurationInNanos();
@@ -470,7 +470,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalTime> plain() {
-            return new IndexMapper<LocalTime>() {
+            return new IndexMapper<>() {
 
                 public long toIndex(final LocalTime key) {
                     return key.toNanoOfDay();
@@ -485,7 +485,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<LocalTime> plain(final Resolution resolution) {
-            return new IndexMapper<LocalTime>() {
+            return new IndexMapper<>() {
 
                 final long myResolution = resolution.toDurationInNanos();
 
@@ -502,11 +502,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<OffsetDateTime> OFFSET_DATE_TIME = new TimeIndex<OffsetDateTime>() {
+    public static final TimeIndex<OffsetDateTime> OFFSET_DATE_TIME = new TimeIndex<>() {
 
         @Override
         public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference) {
-            return new IndexMapper<OffsetDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant());
                 private final ZoneOffset myOffset = reference.getOffset();
@@ -528,7 +528,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference, final Resolution resolution) {
-            return new IndexMapper<OffsetDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant(), resolution);
                 private final ZoneOffset myOffset = reference.getOffset();
@@ -550,7 +550,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<OffsetDateTime> plain() {
-            return new IndexMapper<OffsetDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.plain();
                 private transient ZoneOffset myOffset = null;
@@ -573,7 +573,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<OffsetDateTime> plain(final Resolution resolution) {
-            return new IndexMapper<OffsetDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.plain(resolution);
 
@@ -592,11 +592,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<ZonedDateTime> ZONED_DATE_TIME = new TimeIndex<ZonedDateTime>() {
+    public static final TimeIndex<ZonedDateTime> ZONED_DATE_TIME = new TimeIndex<>() {
 
         @Override
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference) {
-            return new IndexMapper<ZonedDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant());
                 private final ZoneId myZone = reference.getZone();
@@ -618,7 +618,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference, final Resolution resolution) {
-            return new IndexMapper<ZonedDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant(), resolution);
                 private final ZoneId myZone = reference.getZone();
@@ -640,7 +640,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<ZonedDateTime> plain() {
-            return new IndexMapper<ZonedDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.plain();
                 private transient ZoneId myZone = null;
@@ -663,7 +663,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
         @Override
         public IndexMapper<ZonedDateTime> plain(final Resolution resolution) {
-            return new IndexMapper<ZonedDateTime>() {
+            return new IndexMapper<>() {
 
                 private final IndexMapper<Instant> myDelegate = INSTANT.plain(resolution);
 
