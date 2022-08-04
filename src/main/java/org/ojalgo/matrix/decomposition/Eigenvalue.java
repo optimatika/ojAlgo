@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -113,8 +114,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             final int prime = 31;
             int result = 1;
             result = prime * result + (value == null ? 0 : value.hashCode());
-            result = prime * result + (vector == null ? 0 : vector.hashCode());
-            return result;
+            return prime * result + (vector == null ? 0 : vector.hashCode());
         }
 
     }
@@ -218,7 +218,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<>() {
 
         @Override
         public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
@@ -249,7 +249,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         return retVal;
     };
 
-    Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<>() {
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
@@ -285,7 +285,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<>() {
 
         @Override
         public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
@@ -304,7 +304,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<>() {
 
         @Override
         public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
@@ -335,12 +335,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
-    /**
-     * @deprecated With Java 9 this will be made private. Use {@link #getEigenvectors()} or
-     *             {@link #getEigenpair(int)} instead.
-     */
-    @Deprecated
-    default void copyEigenvector(final int index, final Array1D<ComplexNumber> destination) {
+    private void copyEigenvector(final int index, final Array1D<ComplexNumber> destination) {
 
         final MatrixStore<N> tmpV = this.getV();
         final MatrixStore<N> tmpD = this.getD();
@@ -405,7 +400,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             retVal.add(this.getEigenpair(i));
         }
 
-        retVal.sort(null);
+        Collections.sort(retVal);
 
         return retVal;
     }

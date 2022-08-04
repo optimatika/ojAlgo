@@ -493,7 +493,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
     }
 
     static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<Double>() {
+        return new AccessAnyD<>() {
 
             public long count() {
                 return access.count();
@@ -546,7 +546,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
     }
 
     default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
-        return new Collectable<NN, R>() {
+        return new Collectable<>() {
 
             public long count(final int dimension) {
                 return AccessAnyD.this.count(dimension);

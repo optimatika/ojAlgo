@@ -213,7 +213,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
-        return new Access1D<Double>() {
+        return new Access1D<>() {
 
             public long count() {
                 return access.count();
@@ -307,7 +307,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     static Access1D<Double> wrap(final double... target) {
-        return new Access1D<Double>() {
+        return new Access1D<>() {
 
             public long count() {
                 return target.length;
@@ -330,7 +330,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     static <N extends Comparable<N>> Access1D<N> wrap(final List<? extends N> target) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return target.size();
@@ -353,7 +353,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     static <N extends Comparable<N>> Access1D<N> wrap(final N[] target) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return target.length;
@@ -380,7 +380,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * type.
      */
     default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
-        return new Collectable<NN, R>() {
+        return new Collectable<>() {
 
             public long count() {
                 return Access1D.this.count();
