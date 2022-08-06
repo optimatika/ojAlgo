@@ -77,38 +77,6 @@ public interface ParallelismSupplier extends IntSupplier {
         return () -> Math.min(this.getAsInt(), notMoreThan.getAsInt());
     }
 
-    /**
-     * @deprecated Use {@link #require(int)} instead
-     */
-    @Deprecated
-    default ParallelismSupplier max(final int other) {
-        return this.require(other);
-    }
-
-    /**
-     * @deprecated Use {@link #require(IntSupplier)} instead
-     */
-    @Deprecated
-    default ParallelismSupplier max(final IntSupplier other) {
-        return this.require(other);
-    }
-
-    /**
-     * @deprecated Use {@link #limit(int)} instead
-     */
-    @Deprecated
-    default ParallelismSupplier min(final int other) {
-        return this.limit(other);
-    }
-
-    /**
-     * @deprecated Use {@link #limit(IntSupplier)} instead
-     */
-    @Deprecated
-    default ParallelismSupplier min(final IntSupplier other) {
-        return this.limit(other);
-    }
-
     default ParallelismSupplier require(final int atLeast) {
         return () -> Math.max(this.getAsInt(), atLeast);
     }
