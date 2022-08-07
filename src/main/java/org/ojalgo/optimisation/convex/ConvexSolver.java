@@ -646,22 +646,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    /**
-     * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
-     */
-    @Deprecated
-    public static Builder getBuilder() {
-        return ConvexSolver.newBuilder();
-    }
-
-    /**
-     * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
-     */
-    @Deprecated
-    public static Builder getBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-        return ConvexSolver.newBuilder().objective(Q, C);
-    }
-
     public static Builder newBuilder() {
         return new Builder();
     }

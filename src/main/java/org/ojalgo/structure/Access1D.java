@@ -273,19 +273,6 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         return true;
     }
 
-    /**
-     * @deprecated v49 Implement your own
-     */
-    @Deprecated
-    static int hashCode(final Access1D<?> access) {
-        int limit = access.size();
-        int retVal = limit + 31;
-        for (int ij = 0; ij < limit; ij++) {
-            retVal *= access.intValue(ij);
-        }
-        return retVal;
-    }
-
     static String toString(final Access1D<?> access) {
         int size = access.size();
         switch (size) {

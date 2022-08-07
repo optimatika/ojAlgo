@@ -462,31 +462,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
-     * Add a solver that will be used for problem types the built-in solvers cannot handle as defined by
-     * {@link Integration#isCapable(org.ojalgo.optimisation.Optimisation.Model)}.
-     *
-     * @deprecated v51.2.0 Use {@link #addSolver(Integration<?>)} instead
-     */
-    @Deprecated
-    public static boolean addFallbackSolver(final Integration<?> integration) {
-        return ExpressionsBasedModel.addIntegration(integration);
-    }
-
-    /**
      * Add an integration for a solver that will be used rather than the built-in solvers
      */
     public static boolean addIntegration(final Integration<?> integration) {
         return INTEGRATIONS.add(integration);
-    }
-
-    /**
-     * Add a solver that will be used rather than the built-in solvers
-     *
-     * @deprecated v51.2.0 Use {@link #addSolver(Integration<?>)} instead
-     */
-    @Deprecated
-    public static boolean addPreferredSolver(final Integration<?> integration) {
-        return ExpressionsBasedModel.addIntegration(integration);
     }
 
     public static boolean addPresolver(final Presolver presolver) {

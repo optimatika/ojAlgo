@@ -45,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class ComplexNumber
         implements SelfDeclaringScalar<ComplexNumber>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D> {
 
-    public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
+    public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<>() {
 
         @Override
         public ComplexNumber cast(final Comparable<?> number) {
@@ -497,8 +497,7 @@ public final class ComplexNumber
         temp = Double.doubleToLongBits(i);
         result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myRealValue);
-        result = prime * result + (int) (temp ^ temp >>> 32);
-        return result;
+        return prime * result + (int) (temp ^ temp >>> 32);
     }
 
     @Override

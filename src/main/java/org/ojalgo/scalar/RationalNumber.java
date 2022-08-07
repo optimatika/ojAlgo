@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class RationalNumber implements SelfDeclaringScalar<RationalNumber> {
 
-    public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
+    public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<>() {
 
         @Override
         public RationalNumber cast(final Comparable<?> number) {
@@ -525,10 +525,7 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
             return false;
         }
         RationalNumber other = (RationalNumber) obj;
-        if (myDenominator != other.myDenominator) {
-            return false;
-        }
-        if (myNumerator != other.myNumerator) {
+        if ((myDenominator != other.myDenominator) || (myNumerator != other.myNumerator)) {
             return false;
         }
         return true;
@@ -549,8 +546,7 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         final int prime = 31;
         int result = 1;
         result = (prime * result) + (int) (myDenominator ^ (myDenominator >>> 32));
-        result = (prime * result) + (int) (myNumerator ^ (myNumerator >>> 32));
-        return result;
+        return (prime * result) + (int) (myNumerator ^ (myNumerator >>> 32));
     }
 
     @Override

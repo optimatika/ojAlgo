@@ -392,14 +392,6 @@ public interface BasicLogger {
         NotNull.println(ERROR, throwable, message, arguments);
     }
 
-    /**
-     * @deprecated v51 Use {@link ToFileWriter#mkdirs(File)} instead
-     */
-    @Deprecated
-    static void mkdirs(final File dir) {
-        ToFileWriter.mkdirs(dir);
-    }
-
     Optional<Writer> asWriter();
 
     /**

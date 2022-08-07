@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
 
 public final class PrimitiveScalar implements Scalar<Double>, Enforceable<PrimitiveScalar> {
 
-    public static final Scalar.Factory<Double> FACTORY = new Scalar.Factory<Double>() {
+    public static final Scalar.Factory<Double> FACTORY = new Scalar.Factory<>() {
 
         @Override
         public Double cast(final Comparable<?> number) {
@@ -200,8 +200,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(myValue);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
-        return result;
+        return (prime * result) + (int) (temp ^ (temp >>> 32));
     }
 
     @Override

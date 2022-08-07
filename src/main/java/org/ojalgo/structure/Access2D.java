@@ -592,58 +592,6 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return accessA.countRows() == accessB.countRows() && accessA.countColumns() == accessB.countColumns() && Access1D.equals(accessA, accessB, accuracy);
     }
 
-    /**
-     * @deprecated v47 Use {@link MatrixStore#isHermitian()} instead
-     */
-    @Deprecated
-    static boolean isHermitian(final Access2D<?> matrix) {
-
-        long rows = matrix.countRows();
-        long cols = matrix.countColumns();
-
-        Comparable<?> anyElement = matrix.get(0L);
-
-        boolean retVal = rows == cols;
-
-        if (anyElement instanceof ComplexNumber) {
-
-            for (int j = 0; retVal && j < cols; j++) {
-
-                double imagDiag = ComplexNumber.valueOf(matrix.get(j, j)).i;
-
-                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, imagDiag);
-
-                for (int i = j + 1; retVal && i < rows; i++) {
-
-                    ComplexNumber lowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
-                    ComplexNumber upperRight = ComplexNumber.valueOf(matrix.get(j, i));
-
-                    double diff = lowerLeft.subtract(upperRight).norm();
-                    double sum = lowerLeft.add(upperRight).norm();
-
-                    retVal &= PrimitiveScalar.isSmall(sum, diff);
-                }
-            }
-
-        } else {
-
-            for (int j = 0; retVal && j < cols; j++) {
-                for (int i = j + 1; retVal && i < rows; i++) {
-
-                    double lowerLeft = matrix.doubleValue(i, j);
-                    double upperRight = matrix.doubleValue(j, i);
-
-                    double diff = lowerLeft - upperRight;
-                    double sum = lowerLeft + upperRight;
-
-                    retVal &= PrimitiveScalar.isSmall(sum, diff);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
         return new Access2D.Collectable<>() {
 
