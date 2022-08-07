@@ -22,6 +22,7 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
+import java.io.Reader;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,6 +45,7 @@ import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 public final class DataSource implements FinanceData<DatePrice> {
 
@@ -214,17 +216,26 @@ public final class DataSource implements FinanceData<DatePrice> {
         return this.getCalendarDateSeries(myFetcher.getResolution(), time, zoneId);
     }
 
-    public List<DatePrice> getHistoricalPrices() {
-        try {
-            final ArrayList<DatePrice> retVal = new ArrayList<>();
-            myParser.parse(myFetcher.getStreamOfCSV(), row -> retVal.add(row));
-            Collections.sort(retVal);
-            return retVal;
+    public KeyValue<String, List<DatePrice>> getHistoricalData() {
+
+        String key = myFetcher.getSymbol();
+
+        List<DatePrice> value = new ArrayList<>();
+
+        try (Reader streamOfCSV = myFetcher.getStreamOfCSV()) {
+            myParser.parse(streamOfCSV, row -> value.add(row));
         } catch (final Exception cause) {
-            BasicLogger.error("Fetch problem for {}!", myFetcher.getClass().getSimpleName());
+            BasicLogger.error(cause, "Fetch problem for {}!", myFetcher.getClass().getSimpleName());
             BasicLogger.error("Symbol & Resolution: {} & {}", myFetcher.getSymbol(), myFetcher.getResolution());
-            return Collections.emptyList();
         }
+
+        Collections.sort(value);
+
+        return KeyValue.of(key, value);
+    }
+
+    public List<DatePrice> getHistoricalPrices() {
+        return this.getHistoricalData().getValue();
     }
 
     public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries() {
