@@ -32,7 +32,7 @@ public final class Money extends ExactDecimal<Money> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(4);
 
-    public static final Scalar.Factory<Money> FACTORY = new ExactDecimal.Factory<Money>() {
+    public static final Scalar.Factory<Money> FACTORY = new ExactDecimal.Factory<>() {
 
         @Override
         public Money cast(final Comparable<?> number) {

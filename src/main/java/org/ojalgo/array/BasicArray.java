@@ -125,38 +125,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     }
 
-    /**
-     * @deprecated Use {@link Structure1D#newDecreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeDecreasingRange(final int first, final int count) {
-        return Structure1D.newDecreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newDecreasingRange(long,int)} instead
-     */
-    @Deprecated
-    public static long[] makeDecreasingRange(final long first, final int count) {
-        return Structure1D.newDecreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newIncreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeIncreasingRange(final int first, final int count) {
-        return Structure1D.newIncreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newIncreasingRange(long,int)} instead
-     */
-    @Deprecated
-    public static long[] makeIncreasingRange(final long first, final int count) {
-        return Structure1D.newIncreasingRange(first, count);
-    }
-
     private final ArrayFactory<N, ?> myFactory;
 
     @SuppressWarnings("unused")

@@ -22,10 +22,12 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,10 +104,17 @@ public final class DataSource implements FinanceData<DatePrice> {
 
     }
 
-    @SuppressWarnings("deprecation")
-    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(d);
-    @SuppressWarnings("deprecation")
-    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to a Friday.
+     */
+    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY).adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to the last day of the month.
+     */
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) TemporalAdjusters.lastDayOfMonth().adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to the last day of the year.
+     */
     public static final UnaryOperator<LocalDate> LAST_DAY_OF_YEAR = d -> LocalDate.of(d.getYear(), 12, 31);
 
     public static Coordinated coordinated() {

@@ -30,7 +30,7 @@ public final class Amount extends ExactDecimal<Amount> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(2);
 
-    public static final Scalar.Factory<Amount> FACTORY = new ExactDecimal.Factory<Amount>() {
+    public static final Scalar.Factory<Amount> FACTORY = new ExactDecimal.Factory<>() {
 
         public Amount cast(final double value) {
             return Amount.valueOf(value);

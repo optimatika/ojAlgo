@@ -66,7 +66,7 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
     }
 
     default Factory1D<I> asFactory1D() {
-        return new Factory1D<I>() {
+        return new Factory1D<>() {
 
             public FunctionSet<?> function() {
                 return FactoryAnyD.this.function();
