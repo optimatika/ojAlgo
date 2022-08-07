@@ -64,13 +64,13 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
         public InverterTask<N> make(final MatrixStore<N> template) {
-            return this.make(template, Access2D.isHermitian(template), false);
+            return this.make(template, template.isHermitian(), false);
         }
 
         public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<>() {
 
         @Override
         public InverterTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -88,7 +88,7 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<>() {
 
         @Override
         public InverterTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -139,7 +139,7 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<>() {
 
         @Override
         public InverterTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -157,7 +157,7 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<>() {
 
         @Override
         public InverterTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {

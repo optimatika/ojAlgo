@@ -31,12 +31,13 @@ import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
 /**
- * @deprecated v44 In the future there will only be primitives based implementations of the Scalar interface
+ * A {@link BigDecimal} based implementation of the {@link Scalar} interface. Most/all other implementations
+ * are based on primitive components. This implementation exists for historical reasons, and is now primarily
+ * used for tests.
  */
-@Deprecated
 public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScalar> {
 
-    public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<BigDecimal>() {
+    public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<>() {
 
         @Override
         public BigDecimal cast(final Comparable<?> number) {
@@ -211,8 +212,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myNumber == null) ? 0 : myNumber.hashCode());
-        return result;
+        return (prime * result) + ((myNumber == null) ? 0 : myNumber.hashCode());
     }
 
     @Override

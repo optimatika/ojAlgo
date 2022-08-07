@@ -54,10 +54,8 @@ public abstract class ObjectPool<T> {
             } catch (InterruptedException exception) {
                 throw new RuntimeException(exception);
             }
-        } else {
-            if ((retVal = myObjects.poll()) == null) {
-                retVal = this.newObject();
-            }
+        } else if ((retVal = myObjects.poll()) == null) {
+            retVal = this.newObject();
         }
         return retVal;
     }

@@ -57,12 +57,10 @@ public class ScheduleBuilder {
             } else {
                 aTimer.schedule(myTask, myStartDate);
             }
+        } else if (myRepetitionUnit != null) {
+            aTimer.scheduleAtFixedRate(myTask, new Date(), myRepetitionMeassure * myRepetitionUnit.toDurationInMillis());
         } else {
-            if (myRepetitionUnit != null) {
-                aTimer.scheduleAtFixedRate(myTask, new Date(), myRepetitionMeassure * myRepetitionUnit.toDurationInMillis());
-            } else {
-                aTimer.schedule(myTask, new Date());
-            }
+            aTimer.schedule(myTask, new Date());
         }
     }
 

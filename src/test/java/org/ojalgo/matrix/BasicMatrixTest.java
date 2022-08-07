@@ -403,7 +403,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetCondition() {
 
-        if (rAA.isFullRank()) {
+        if (rAA.getRank() == rAA.getMinDim()) {
 
             // Difficult to test numerically
             // Will only check that they are the same order of magnitude
@@ -665,16 +665,16 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsFullRank() {
 
-        boolean expected = rAA.isFullRank();
+        boolean expected = rAA.getRank() == rAA.getMinDim();
         boolean actual;
 
-        actual = cAA.isFullRank();
+        actual = cAA.getRank() == cAA.getMinDim();
         TestUtils.assertEquals(expected, actual);
 
-        actual = p64AA.isFullRank();
+        actual = p64AA.getRank() == p64AA.getMinDim();
         TestUtils.assertEquals(expected, actual);
 
-        actual = p32AA.isFullRank();
+        actual = p32AA.getRank() == p32AA.getMinDim();
         TestUtils.assertEquals(expected, actual);
     }
 

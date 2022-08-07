@@ -266,7 +266,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
         // Check if hermitian, maybe
         if (tmpPositiveDefinite && checkHermitian) {
-            tmpPositiveDefinite &= Access2D.isHermitian(tmpInPlace);
+            tmpPositiveDefinite &= tmpInPlace.isHermitian();
         }
 
         UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();

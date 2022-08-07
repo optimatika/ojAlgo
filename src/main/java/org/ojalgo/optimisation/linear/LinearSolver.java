@@ -410,24 +410,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
-    /**
-     * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
-     *             {@link LinearSolver#newGeneralBuilder()} instead.
-     */
-    @Deprecated
-    public static LinearSolver.StandardBuilder getBuilder() {
-        return LinearSolver.newStandardBuilder();
-    }
-
-    /**
-     * @deprecated v50 Use {@link LinearSolver#newStandardBuilder()} or
-     *             {@link LinearSolver#newGeneralBuilder()} instead.
-     */
-    @Deprecated
-    public static LinearSolver.StandardBuilder getBuilder(final MatrixStore<Double> C) {
-        return LinearSolver.newStandardBuilder().objective(C);
-    }
-
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
     }
