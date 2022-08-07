@@ -25,19 +25,52 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.PrimitiveNumber;
-import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.KeyValue;
 
+/**
+ * A source of (historical) financial time series data.
+ */
+@FunctionalInterface
 public interface FinanceData<DP extends DatePrice> {
 
-    default EntryPair<String, List<DP>> asEntryPair() {
-        return EntryPair.of(this.getSymbol(), this.getHistoricalPrices());
+    KeyValue<String, List<DP>> getHistoricalData();
+
+    /**
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
+     */
+    @Deprecated
+    default List<DP> getHistoricalPrices() {
+        return this.getHistoricalData().getValue();
     }
 
-    List<DP> getHistoricalPrices();
+    /**
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
+     */
+    @Deprecated
+    default BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
-    BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries();
+        KeyValue<String, List<DP>> data = this.getHistoricalData();
 
-    String getSymbol();
+        BasicSeries<LocalDate, PrimitiveNumber> series = new SimpleSeries<>();
+
+        series.setName(data.getKey());
+
+        for (DP item : data.getValue()) {
+            series.put(item.getKey(), item.getValue());
+        }
+
+        return series;
+    }
+
+    /**
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
+     */
+    @Deprecated
+    default String getSymbol() {
+        return this.getHistoricalData().getKey();
+
+    }
 
 }
