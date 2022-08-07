@@ -34,6 +34,7 @@ import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 public final class FinanceDataReader<T extends DatePrice> implements FinanceData<T>, DataFetcher {
 
@@ -54,6 +55,10 @@ public final class FinanceDataReader<T extends DatePrice> implements FinanceData
         myFile = file;
         myParser = parser;
         myResolution = resolution;
+    }
+
+    public KeyValue<String, List<T>> getHistoricalData() {
+        return KeyValue.of(this.getSymbol(), this.getHistoricalPrices());
     }
 
     public List<T> getHistoricalPrices() {
