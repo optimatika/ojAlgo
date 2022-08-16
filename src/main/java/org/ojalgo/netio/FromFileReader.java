@@ -184,23 +184,6 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
         return () -> AutoSupplier.sequenced(work, factory);
     }
 
-    /**
-     * Read the properties file and copy the entries to the supplied destination {@link Properties} instance.
-     *
-     * @param sourceFile Source properties file
-     * @param destinationMap Destination properties map
-     */
-    static void read(final File sourceFile, final Properties destinationMap) {
-
-        BasicLogger.debug("Path to properties file: {}", sourceFile);
-
-        try (FileInputStream stream = new java.io.FileInputStream(sourceFile)) {
-            destinationMap.load(stream);
-        } catch (IOException cause) {
-            BasicLogger.error(cause, "Failed to load properties file!");
-        }
-    }
-
     default void close() throws IOException {
         try {
             AutoSupplier.super.close();
