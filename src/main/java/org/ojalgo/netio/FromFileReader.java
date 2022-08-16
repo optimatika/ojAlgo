@@ -30,6 +30,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.Function;
@@ -80,6 +81,23 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
             }
         }
 
+    }
+
+    /**
+     * Read the properties file and copy the entries to the supplied destination {@link Properties} instance.
+     *
+     * @param sourceFile Source properties file
+     * @param destinationMap Destination properties map
+     */
+    static void copy(final File sourceFile, final Properties destinationMap) {
+
+        BasicLogger.debug("Path to properties file: {}", sourceFile);
+
+        try (FileInputStream stream = new java.io.FileInputStream(sourceFile)) {
+            destinationMap.load(stream);
+        } catch (IOException cause) {
+            BasicLogger.error(cause, "Failed to load properties file!");
+        }
     }
 
     /**
