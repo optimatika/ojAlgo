@@ -19,36 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type;
+package org.ojalgo.data.domain.finance.series;
+
+import org.ojalgo.netio.DetectingParser;
+import org.ojalgo.netio.LineSplittingParser;
+import org.ojalgo.netio.TextLineReader;
 
 /**
- * Alternator
+ * Will switch between any/all known parsers producing {@link DatePrice} subclasses. There is also a default
+ * parser that assumes just 2 columns, no header, separated by whitespace.
  *
  * @author apete
  */
-public class Alternator<T> {
+public final class DatePriceParser extends DetectingParser<DatePrice> {
 
-    private final T myAlternativeA;
-    private final T myAlternativeB;
-    private boolean mySwitch;
+    static final class DefaultParser implements TextLineReader.Parser<DatePrice> {
 
-    public Alternator(final T alternativeA, final T alternativeB) {
+        private final LineSplittingParser myDelegate = new LineSplittingParser();
 
-        super();
+        public DatePrice parse(final String line) {
+            String[] parsed = myDelegate.parse(line);
+            return DatePrice.of(parsed[0], parsed[1]);
+        }
 
-        mySwitch = false;
-
-        myAlternativeA = alternativeA;
-        myAlternativeB = alternativeB;
     }
 
-    @SuppressWarnings("unused")
-    private Alternator() {
-        this(null, null);
-    }
+    public DatePriceParser() {
 
-    public T get() {
-        return (mySwitch = !mySwitch) ? myAlternativeA : myAlternativeB;
+        super(new DefaultParser());
+
+        this.addPotentialParser(YahooParser::testHeader, new YahooParser());
+
+        this.addPotentialParser(AlphaVantageParser::testHeader, new AlphaVantageParser());
+
+        this.addPotentialParser(IEXTradingParser::testHeader, new IEXTradingParser());
     }
 
 }

@@ -103,7 +103,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
         }
 
         while ((line = lineSupplier.get()) != null) {
-            if ((line.length() > 0) && !line.startsWith("#") && ((item = this.parse(line)) != null)) {
+            if (TextLineReader.isLineOK(line) && ((item = this.parse(line)) != null)) {
                 consumer.accept(item);
             }
         }

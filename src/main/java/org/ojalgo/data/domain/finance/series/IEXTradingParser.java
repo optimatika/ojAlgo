@@ -82,6 +82,31 @@ public class IEXTradingParser implements BasicParser<IEXTradingParser.Data> {
 
     public static final IEXTradingParser INSTANCE = new IEXTradingParser();
 
+    /**
+     * Checks if the header matches what this parser can handle.
+     */
+    public static boolean testHeader(final String header) {
+
+        String[] columns = header.split("" + ASCII.COMMA);
+
+        int length = columns.length;
+        if (length != 12) {
+            return false;
+        }
+
+        String date = columns[0].trim();
+        if (!"date".equalsIgnoreCase(date)) {
+            return false;
+        }
+
+        String price = columns[4].trim();
+        if (!"close".equalsIgnoreCase(price)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public IEXTradingParser() {
         super();
     }
