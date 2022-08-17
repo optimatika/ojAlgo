@@ -17,6 +17,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this has been supported via an extension artifact, ojAlgo-unsafe.
 
+#### org.ojalgo.data
+
+- New `DatePriceParser` parser that will analyse the contents (first header line) to determine the file format, and then choose an appropriate parser to use.
+
+#### org.ojalgo.netio
+
+- New class `InMemoryFile` to be used when writing to files that are never actually written to disk – for dynamically creating files for downloading. The `TextLineWriter`, in particular, gained support for this.
+- The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
+- New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
+
+#### org.ojalgo.type
+
+- The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
+
 ### Changed
 
 #### org.ojalgo.type
@@ -32,10 +46,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Removed
 
+#### org.ojalgo.type
+
 - A bunch of stuff in `org.ojalgo.type.keyvalue` that has been deprecated for a while is now actually removed.
 - Some old code in `org.ojalgo.netio` that was deprecated is now removed.
-
-#### org.ojalgo.type
 
 ## [51.4.0] – 2022-07-05
 

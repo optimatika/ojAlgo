@@ -19,36 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type;
+package org.ojalgo.netio;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.OutputStream;
 
 /**
- * Alternator
+ * An in-memory "file". Can be used with some {@link ToFileWriter} implementations to dynamically create file
+ * contents that only exist in memory (for download).
+ * <p>
+ * Feed an instance of {@link InMemoryFile} rather than {@link File} to a {@link ToFileWriter} that support
+ * doing so (like the {@link TextLineWriter}), and keep a reference to the {@link InMemoryFile} instance. When
+ * done writing you get the (file) contents from that instance.
  *
  * @author apete
  */
-public class Alternator<T> {
+public class InMemoryFile {
 
-    private final T myAlternativeA;
-    private final T myAlternativeB;
-    private boolean mySwitch;
+    private final ByteArrayOutputStream myOutputStream = new ByteArrayOutputStream();
 
-    public Alternator(final T alternativeA, final T alternativeB) {
-
-        super();
-
-        mySwitch = false;
-
-        myAlternativeA = alternativeA;
-        myAlternativeB = alternativeB;
+    public byte[] getContentsAsByteArray() {
+        return myOutputStream.toByteArray();
     }
 
-    @SuppressWarnings("unused")
-    private Alternator() {
-        this(null, null);
+    public String getContentsAsString() {
+        return myOutputStream.toString();
     }
 
-    public T get() {
-        return (mySwitch = !mySwitch) ? myAlternativeA : myAlternativeB;
+    public OutputStream getOutputStream() {
+        return myOutputStream;
     }
 
 }

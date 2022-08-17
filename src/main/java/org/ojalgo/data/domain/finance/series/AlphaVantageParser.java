@@ -86,6 +86,31 @@ public class AlphaVantageParser implements BasicParser<AlphaVantageParser.Data> 
 
     public static final AlphaVantageParser INSTANCE = new AlphaVantageParser();
 
+    /**
+     * Checks if the header matches what this parser can handle.
+     */
+    public static boolean testHeader(final String header) {
+
+        String[] columns = header.split("" + ASCII.COMMA);
+
+        int length = columns.length;
+        if (((length != 8) && (length != 9))) {
+            return false;
+        }
+
+        String date = columns[0].trim();
+        if (!"timestamp".equalsIgnoreCase(date)) {
+            return false;
+        }
+
+        String price = columns[5].trim();
+        if ((!"adjusted_close".equalsIgnoreCase(price) && !"adjusted close".equalsIgnoreCase(price))) {
+            return false;
+        }
+
+        return true;
+    }
+
     public AlphaVantageParser() {
         super();
     }
@@ -193,5 +218,4 @@ public class AlphaVantageParser implements BasicParser<AlphaVantageParser.Data> 
             return null;
         }
     }
-
 }

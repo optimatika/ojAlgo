@@ -30,6 +30,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.netio.TextLineReader;
+import org.ojalgo.type.function.AutoSupplier;
 
 public class DataParserTest {
 
@@ -65,6 +67,31 @@ public class DataParserTest {
 
     private static final String PATH = "./src/test/resources/org/ojalgo/data/domain/finance/series/";
 
+    static void compareWithDetectingParser(final File file, final ResultsConsumer<?> results) {
+
+        DatePriceParser parser = new DatePriceParser();
+
+        // try (TextLineReader reader = TextLineReader.of(file); AutoSupplier<DatePrice> supplier = reader.withFilteredParser(BasicParser::isLineOK, parser)) {
+        try (TextLineReader reader = TextLineReader.of(file); AutoSupplier<DatePrice> supplier = reader.withParser(parser)) {
+
+            ResultsConsumer<DatePrice> collector = new ResultsConsumer<>();
+
+            for (DatePrice datePrice : supplier) {
+                collector.accept(datePrice);
+            }
+
+            TestUtils.assertEquals(results.size(), collector.size());
+            TestUtils.assertEquals(results.firstDate(), collector.firstDate());
+            TestUtils.assertEquals(results.lastDate(), collector.lastDate());
+            TestUtils.assertEquals(results.firstPrice(), collector.firstPrice());
+            TestUtils.assertEquals(results.lastPrice(), collector.lastPrice());
+
+        } catch (Exception cause) {
+            TestUtils.fail(cause);
+        }
+
+    }
+
     @Test
     public void testAlphaVantageDailyAAPL() {
 
@@ -83,6 +110,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(1998, 1, 2), collector.lastDate());
         TestUtils.assertEquals(0.5125, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -103,6 +132,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(2018, 6, 22), collector.lastDate());
         TestUtils.assertEquals(100.0198, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -123,6 +154,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(1998, 2, 27), collector.lastDate());
         TestUtils.assertEquals(0.7450, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -143,6 +176,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(1998, 2, 27), collector.lastDate());
         TestUtils.assertEquals(13.9246, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -163,6 +198,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(1998, 1, 9), collector.lastDate());
         TestUtils.assertEquals(0.5737, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -183,6 +220,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(1998, 1, 9), collector.lastDate());
         TestUtils.assertEquals(10.4332, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -203,6 +242,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(2018, 11, 12), collector.lastDate());
         TestUtils.assertEquals(194.17, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -223,6 +264,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(2018, 11, 9), collector.lastDate());
         TestUtils.assertEquals(204.470001, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -243,6 +286,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(2018, 11, 9), collector.lastDate());
         TestUtils.assertEquals(204.470001, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
     @Test
@@ -263,6 +308,8 @@ public class DataParserTest {
 
         TestUtils.assertEquals(LocalDate.of(2018, 11, 9), collector.lastDate());
         TestUtils.assertEquals(204.470001, collector.lastPrice(), PrimitiveMath.MACHINE_EPSILON);
+
+        DataParserTest.compareWithDetectingParser(file, collector);
     }
 
 }
