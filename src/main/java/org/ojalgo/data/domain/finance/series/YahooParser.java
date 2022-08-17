@@ -68,10 +68,8 @@ public class YahooParser implements BasicParser<YahooParser.Data> {
                     || (Double.doubleToLongBits(low) != Double.doubleToLongBits(other.low))) {
                 return false;
             }
-            if (Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open)) {
-                return false;
-            }
-            if (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume)) {
+            if ((Double.doubleToLongBits(open) != Double.doubleToLongBits(other.open))
+                    || (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume))) {
                 return false;
             }
             return true;
@@ -104,6 +102,31 @@ public class YahooParser implements BasicParser<YahooParser.Data> {
     }
 
     public static final YahooParser INSTANCE = new YahooParser();
+
+    /**
+     * Checks if the header matches what this parser can handle.
+     */
+    public static boolean testHeader(final String header) {
+
+        String[] columns = header.split("" + ASCII.COMMA);
+
+        int length = columns.length;
+        if (length != 7) {
+            return false;
+        }
+
+        String date = columns[0].trim();
+        if (!"Date".equalsIgnoreCase(date)) {
+            return false;
+        }
+
+        String price = columns[5].trim();
+        if (!"Adj Close".equalsIgnoreCase(price)) {
+            return false;
+        }
+
+        return true;
+    }
 
     public YahooParser() {
         super();

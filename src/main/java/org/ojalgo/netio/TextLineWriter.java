@@ -142,6 +142,14 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
         return new TextLineWriter(filter.apply(ToFileWriter.output(file)));
     }
 
+    public static TextLineWriter of(final InMemoryFile file) {
+        return new TextLineWriter(file.getOutputStream());
+    }
+
+    public static TextLineWriter of(final InMemoryFile file, final OperatorWithException<OutputStream> filter) {
+        return new TextLineWriter(filter.apply(file.getOutputStream()));
+    }
+
     private final BufferedWriter myWriter;
 
     TextLineWriter(final OutputStream outputStream) {
