@@ -23,7 +23,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.netio
 
-- New class `InMemoryFile` to be used when writing to files that are never actually written to disk – for dynamically creating files for downloading. The `TextLineWriter`, in particular, gained support for this.
+- New class `InMemoryFile` to be used when writing to and/or reading from "files" that never actually exist on disk – for dynamically creating files for downloading or parsing uploaded "files". The `TextLineWriter` and `TextLineReader`, in particular, gained support for this.
 - The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
 - New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
 

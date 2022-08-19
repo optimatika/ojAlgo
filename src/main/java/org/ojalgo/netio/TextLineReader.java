@@ -63,6 +63,14 @@ public final class TextLineReader implements FromFileReader<String> {
         return new TextLineReader(filter.apply(FromFileReader.input(file)));
     }
 
+    public static TextLineReader of(final InMemoryFile file) {
+        return new TextLineReader(file.newInputStream());
+    }
+
+    public static TextLineReader of(final InMemoryFile file, final OperatorWithException<InputStream> filter) {
+        return new TextLineReader(filter.apply(file.newInputStream()));
+    }
+
     private final BufferedReader myReader;
 
     TextLineReader(final InputStream inputStream) {
