@@ -36,7 +36,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
  * @see DatePriceParser
  * @author apete
  */
-public abstract class DetectingParser<T> implements TextLineReader.Parser<T> {
+public abstract class DetectingParser<T> implements BasicParser<T> {
 
     private final List<KeyValue<Predicate<String>, TextLineReader.Parser<? extends T>>> myPotentialParsers = new ArrayList<>();
     private Parser<? extends T> mySelectedParser = null;
