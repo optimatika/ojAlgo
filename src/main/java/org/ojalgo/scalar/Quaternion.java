@@ -219,16 +219,14 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         }
 
         if (number instanceof Quaternion) {
-
             return (Quaternion) number;
-
         }
-        if (number instanceof ComplexNumber) {
 
+        if (number instanceof ComplexNumber) {
             ComplexNumber tmpComplex = (ComplexNumber) number;
             return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
-
         }
+
         return new Quaternion(NumberDefinition.doubleValue(number));
     }
 
