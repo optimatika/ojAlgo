@@ -44,6 +44,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Fixed a problem with the `IntegerSolver` where you could get an `ArrayIndexOutOfBoundsException` when concurrently solving multiple problem instances sharing the same `IntegerStrategy`.
 
+#### org.ojalgo.random
+
+- Fixed a regression with `RandomNumber` where it was no longer possible to set a seed for the underlying `java.util.Random` instance.
+
 ### Removed
 
 #### org.ojalgo.type

@@ -416,6 +416,16 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    public void testSettingSeed() {
+        // Given
+        Normal normal = new Normal();
+        // When... failed
+        normal.setSeed(1L);
+        // Should not throw an exception, and the value should not change
+        TestUtils.assertEquals(1.561581040188955, normal.doubleValue());
+    }
+
+    @Test
     public void testTDistributionFreedomCases() {
 
         RandomNumberTest.compareDensity(new TDistribution.Degree1(), new TDistribution(ONE));

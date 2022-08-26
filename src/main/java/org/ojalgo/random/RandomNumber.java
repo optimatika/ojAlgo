@@ -37,6 +37,8 @@ import org.ojalgo.type.ComparableNumber;
  */
 public abstract class RandomNumber implements Distribution, NullaryFunction<Double>, ComparableNumber<RandomNumber> {
 
+    private Random myRandom = null;
+
     protected RandomNumber() {
         super();
     }
@@ -94,8 +96,21 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
         return SampleSet.make(this, numberOfSamples);
     }
 
+    /**
+     * Lets you choose between different {@link Random} implementations:
+     * <ul>
+     * <li>{@link java.util.Random}
+     * <li>{@link java.util.concurrent.ThreadLocalRandom}
+     * <li>{@link java.security.SecureRandom}
+     * <li>...
+     * </ul>
+     */
+    public void setRandom(final Random random) {
+        myRandom = random;
+    }
+
     public void setSeed(final long seed) {
-        RandomNumber.random().setSeed(seed);
+        this.setRandom(new Random(seed));
     }
 
     @Override
@@ -111,7 +126,10 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
 
     protected abstract double generate();
 
-    protected final static Random random() {
+    protected final Random random() {
+        if (myRandom != null) {
+            return myRandom;
+        }
         return ThreadLocalRandom.current();
     }
 }
