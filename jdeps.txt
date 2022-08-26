@@ -168,6 +168,7 @@ ojalgo-52.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.series.primitive                        ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.structure                               ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.type                                    ojalgo-52.0.0-SNAPSHOT.jar
+   org.ojalgo.data.domain.finance.series              -> org.ojalgo.type.function                           ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.function.aggregator                     -> java.lang                                          java.base
    org.ojalgo.function.aggregator                     -> java.lang.invoke                                   java.base
    org.ojalgo.function.aggregator                     -> java.math                                          java.base
@@ -719,6 +720,7 @@ ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.series                                  ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.series.primitive                        ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.type                                    ojalgo-52.0.0-SNAPSHOT.jar
+   org.ojalgo.data.domain.finance.series              -> org.ojalgo.type.function                           ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.data.domain.finance.series              -> org.ojalgo.type.keyvalue                           ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.equation                                -> java.lang                                          java.base
    org.ojalgo.equation                                -> java.util                                          java.base
