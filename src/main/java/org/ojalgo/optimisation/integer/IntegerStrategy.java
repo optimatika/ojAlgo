@@ -44,7 +44,6 @@ public interface IntegerStrategy {
         private final GMICutConfiguration myGMICutConfiguration;
         private final IntSupplier myParallelism;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
-        private transient List<Comparator<NodeKey>> myWorkerPriorities = null;
 
         ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext gap,
                 final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
@@ -86,14 +85,12 @@ public interface IntegerStrategy {
         }
 
         public List<Comparator<NodeKey>> getWorkerPriorities() {
-            if (myWorkerPriorities == null || myWorkerPriorities.size() <= 0) {
-                int parallelism = myParallelism.getAsInt();
-                myWorkerPriorities = new ArrayList<>(parallelism);
-                for (int i = 0; i < parallelism; i++) {
-                    myWorkerPriorities.add(myPriorityDefinitions[i % myPriorityDefinitions.length]);
-                }
+            int parallelism = myParallelism.getAsInt();
+            List<Comparator<NodeKey>> retVal = new ArrayList<>(parallelism);
+            for (int i = 0; i < parallelism; i++) {
+                retVal.add(myPriorityDefinitions[i % myPriorityDefinitions.length]);
             }
-            return myWorkerPriorities;
+            return retVal;
         }
 
         public ModelStrategy newModelStrategy(final ExpressionsBasedModel model) {
@@ -182,7 +179,7 @@ public interface IntegerStrategy {
         Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
                 NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
 
-        return new ConfigurableStrategy(Parallelism.CORES, definitions, NumberContext.of(7, 8), DefaultStrategy::new, new GMICutConfiguration());
+        return new ConfigurableStrategy(Parallelism.CORES.require(4), definitions, NumberContext.of(7, 8), DefaultStrategy::new, new GMICutConfiguration());
     }
 
     /**
