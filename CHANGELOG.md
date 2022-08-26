@@ -11,6 +11,40 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.array
+
+- Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this has been supported via an extension artifact, ojAlgo-unsafe.
+
+#### org.ojalgo.data
+
+- New `DatePriceParser` parser that will analyse the contents (first header line) to determine the file format, and then choose an appropriate parser to use.
+
+#### org.ojalgo.netio
+
+- New class `InMemoryFile` to be used when writing to and/or reading from "files" that never actually exist on disk – for dynamically creating files for downloading or parsing uploaded "files". The `TextLineWriter` and `TextLineReader`, in particular, gained support for this.
+- The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
+- New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
+
+#### org.ojalgo.type
+
+- The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
+
+### Changed
+
+#### org.ojalgo.type
+
+- If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
+- The `KeyValue` interface was deprecated, but is no longer. Instead `EntryPair` now extends `KeyValue`, and `KeyValue` gained a collection of factory mehods to create pairs. Further the definition of `Dual` moved from `EntryPair` to `KeyValue`.
+
+### Removed
+
+#### org.ojalgo.type
+
+- A bunch of stuff in `org.ojalgo.type.keyvalue` that has been deprecated for a while is now actually removed.
+- Some old code in `org.ojalgo.netio` that was deprecated is now removed.
+
 ## [51.4.1] – 2022-08-26
 
 ### Fixed
@@ -22,12 +56,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.random
 
 - Fixed a regression with `RandomNumber` where it was no longer possible to set a seed for the underlying `java.util.Random` instance.
-
-### Fixed
-
-#### org.ojalgo.optimisation
-
-- Fixed a problem with the `IntegerSolver` where you could get an `ArrayIndexOutOfBoundsException` when concurrently solving multiple problem instances sharing the same `IntegerStrategy`.
 
 ## [51.4.0] – 2022-07-05
 
