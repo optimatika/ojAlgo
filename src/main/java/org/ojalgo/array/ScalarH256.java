@@ -34,7 +34,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class QuaternionArray extends ScalarArray<Quaternion> {
+public class ScalarH256 extends ScalarArray<Quaternion> {
 
     public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<Quaternion>() {
 
@@ -60,26 +60,26 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
 
         @Override
         PlainArray<Quaternion> makeDenseArray(final long size) {
-            return QuaternionArray.make((int) size);
+            return ScalarH256.make((int) size);
         }
 
     };
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
 
-    public static final QuaternionArray make(final int size) {
-        return new QuaternionArray(size);
+    public static final ScalarH256 make(final int size) {
+        return new ScalarH256(size);
     }
 
-    public static final QuaternionArray wrap(final Quaternion... data) {
-        return new QuaternionArray(data);
+    public static final ScalarH256 wrap(final Quaternion... data) {
+        return new ScalarH256(data);
     }
 
-    protected QuaternionArray(final int size) {
+    protected ScalarH256(final int size) {
         super(FACTORY, size);
     }
 
-    protected QuaternionArray(final Quaternion[] data) {
+    protected ScalarH256(final Quaternion[] data) {
         super(FACTORY, data);
     }
 

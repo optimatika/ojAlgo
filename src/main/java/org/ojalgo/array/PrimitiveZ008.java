@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public class ArrayZ064 extends PrimitiveArray {
+public class PrimitiveZ008 extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
@@ -66,38 +66,50 @@ public class ArrayZ064 extends PrimitiveArray {
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return ArrayZ064.make((int) size);
+            return PrimitiveZ008.make((int) size);
         }
 
     };
 
     static final long ELEMENT_SIZE = JavaType.LONG.memory();
 
-    public static ArrayZ064 make(final int size) {
-        return new ArrayZ064(size);
+    public static PrimitiveZ008 make(final int size) {
+        return new PrimitiveZ008(size);
     }
 
-    public static ArrayZ064 wrap(final long... data) {
-        return new ArrayZ064(data);
+    public static PrimitiveZ008 wrap(final byte... data) {
+        return new PrimitiveZ008(data);
     }
 
-    public final long[] data;
+    public final byte[] data;
 
     /**
      * Array not copied! No checking!
      */
-    protected ArrayZ064(final long[] data) {
+    protected PrimitiveZ008(final byte[] data) {
 
         super(FACTORY, data.length);
 
         this.data = data;
     }
 
-    protected ArrayZ064(final int size) {
+    protected PrimitiveZ008(final int size) {
 
         super(FACTORY, size);
 
-        data = new long[size];
+        data = new byte[size];
+    }
+
+    @Override
+    public void sortAscending() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sortDescending() {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -116,6 +128,11 @@ public class ArrayZ064 extends PrimitiveArray {
     protected void add(final int index, final float addend) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    protected byte byteValue(final int index) {
+        return data[index];
     }
 
     @Override
@@ -143,6 +160,12 @@ public class ArrayZ064 extends PrimitiveArray {
     }
 
     @Override
+    protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
         // TODO Auto-generated method stub
 
@@ -150,12 +173,6 @@ public class ArrayZ064 extends PrimitiveArray {
 
     @Override
     protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         // TODO Auto-generated method stub
 
     }
@@ -300,18 +317,6 @@ public class ArrayZ064 extends PrimitiveArray {
 
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sortAscending() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sortDescending() {
         // TODO Auto-generated method stub
 
     }

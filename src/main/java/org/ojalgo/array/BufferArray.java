@@ -49,7 +49,6 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
 
@@ -61,99 +60,9 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public abstract class BufferArray extends PlainArray<Double> {
+public abstract class BufferArray extends PlainArray<Double> implements AutoCloseable {
 
-    static final class DoubleBufferArray extends BufferArray {
-
-        private final DoubleBuffer myDoubleBuffer;
-
-        DoubleBufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
-
-            super(DIRECT64, buffer, file);
-
-            myDoubleBuffer = buffer;
-        }
-
-        @Override
-        public void supplyTo(final Mutate1D receiver) {
-            int limit = Math.min(this.size(), receiver.size());
-            for (int i = 0; i < limit; i++) {
-                receiver.set(i, this.doubleValue(i));
-            }
-        }
-
-        @Override
-        protected double doubleValue(final int index) {
-            return myDoubleBuffer.get(index);
-        }
-
-        @Override
-        protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-            myDoubleBuffer.put(index, supplier.doubleValue());
-        }
-
-        @Override
-        protected float floatValue(final int index) {
-            return (float) myDoubleBuffer.get(index);
-        }
-
-        @Override
-        protected void set(final int index, final double value) {
-            myDoubleBuffer.put(index, value);
-        }
-
-        @Override
-        protected void set(final int index, final float value) {
-            myDoubleBuffer.put(index, value);
-        }
-    }
-
-    static final class FloatBufferArray extends BufferArray {
-
-        private final FloatBuffer myFloatBuffer;
-
-        FloatBufferArray(final FloatBuffer buffer, final RandomAccessFile file) {
-
-            super(DIRECT32, buffer, file);
-
-            myFloatBuffer = buffer;
-        }
-
-        @Override
-        public void supplyTo(final Mutate1D receiver) {
-            int limit = Math.min(this.size(), receiver.size());
-            for (int i = 0; i < limit; i++) {
-                receiver.set(i, this.doubleValue(i));
-            }
-        }
-
-        @Override
-        protected double doubleValue(final int index) {
-            return myFloatBuffer.get(index);
-        }
-
-        @Override
-        protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-            myFloatBuffer.put(index, supplier.floatValue());
-        }
-
-        @Override
-        protected float floatValue(final int index) {
-            return myFloatBuffer.get(index);
-        }
-
-        @Override
-        protected void set(final int index, final double value) {
-            myFloatBuffer.put(index, (float) value);
-        }
-
-        @Override
-        protected void set(final int index, final float value) {
-            myFloatBuffer.put(index, value);
-        }
-    }
-
-    public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<Double>() {
+    public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -184,12 +93,12 @@ public abstract class BufferArray extends PlainArray<Double> {
         DenseArray<Double> makeDenseArray(final long size) {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 4);
-            return new FloatBufferArray(tmpAllocateDirect.asFloatBuffer(), null);
+            return new BufferR032(tmpAllocateDirect.asFloatBuffer(), null);
         }
 
     };
 
-    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
+    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -220,7 +129,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         DenseArray<Double> makeDenseArray(final long size) {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
-            return new DoubleBufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
+            return new BufferR064(tmpAllocateDirect.asDoubleBuffer(), null);
         }
 
     };
@@ -241,15 +150,15 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     public static BufferArray make(final int capacity) {
-        return new DoubleBufferArray(DoubleBuffer.allocate(capacity), null);
+        return new BufferR064(DoubleBuffer.allocate(capacity), null);
     }
 
     public static BufferArray wrap(final DoubleBuffer data) {
-        return new DoubleBufferArray(data, null);
+        return new BufferR064(data, null);
     }
 
     public static BufferArray wrap(final FloatBuffer data) {
-        return new FloatBufferArray(data, null);
+        return new BufferR032(data, null);
     }
 
     private static BasicArray<Double> create(final File file, final long... structure) {
@@ -273,9 +182,9 @@ public abstract class BufferArray extends PlainArray<Double> {
 
                 tmpDoubleBuffer = tmpMappedByteBuffer.asDoubleBuffer();
 
-                return new DoubleBufferArray(tmpDoubleBuffer, tmpRandomAccessFile);
+                return new BufferR064(tmpDoubleBuffer, tmpRandomAccessFile);
             }
-            final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<Double>() {
+            final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<>() {
 
                 long offset = 0L;
 
@@ -307,7 +216,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
                         final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
                         tmpMap.order(ByteOrder.nativeOrder());
-                        return new DoubleBufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
+                        return new BufferR064(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
                     } catch (final IOException exception) {
                         throw new RuntimeException(exception);
                     } finally {
@@ -385,23 +294,22 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     private final Buffer myBuffer;
-    private final RandomAccessFile myFile;
+    private final AutoCloseable myFile;
 
-    BufferArray(final DenseArray.Factory<Double> factory, final Buffer buffer, final RandomAccessFile file) {
+    BufferArray(final DenseArray.Factory<Double> factory, final Buffer buffer, final AutoCloseable file) {
 
         super(factory, buffer.capacity());
 
         myBuffer = buffer;
         myFile = file;
-
     }
 
     public void close() {
         if (myFile != null) {
             try {
                 myFile.close();
-            } catch (final IOException exception) {
-                exception.printStackTrace();
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
             }
         }
     }

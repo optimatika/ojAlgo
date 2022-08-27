@@ -52,9 +52,9 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public class Primitive64Array extends PrimitiveArray {
+public class PrimitiveR064 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
+    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -78,19 +78,19 @@ public class Primitive64Array extends PrimitiveArray {
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return Primitive64Array.make((int) size);
+            return PrimitiveR064.make((int) size);
         }
 
     };
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    public static Primitive64Array make(final int size) {
-        return new Primitive64Array(size);
+    public static PrimitiveR064 make(final int size) {
+        return new PrimitiveR064(size);
     }
 
-    public static Primitive64Array wrap(final double... data) {
-        return new Primitive64Array(data);
+    public static PrimitiveR064 wrap(final double... data) {
+        return new PrimitiveR064(data);
     }
 
     public final double[] data;
@@ -98,14 +98,14 @@ public class Primitive64Array extends PrimitiveArray {
     /**
      * Array not copied! No checking!
      */
-    protected Primitive64Array(final double[] data) {
+    protected PrimitiveR064(final double[] data) {
 
         super(FACTORY, data.length);
 
         this.data = data;
     }
 
-    protected Primitive64Array(final int size) {
+    protected PrimitiveR064(final int size) {
 
         super(FACTORY, size);
 
@@ -134,10 +134,10 @@ public class Primitive64Array extends PrimitiveArray {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Primitive64Array)) {
+        if (!(obj instanceof PrimitiveR064)) {
             return false;
         }
-        Primitive64Array other = (Primitive64Array) obj;
+        PrimitiveR064 other = (PrimitiveR064) obj;
         if (!Arrays.equals(data, other.data)) {
             return false;
         }
@@ -146,8 +146,8 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        if (values instanceof Primitive64Array) {
-            FillMatchingSingle.fill(data, ((Primitive64Array) values).data);
+        if (values instanceof PrimitiveR064) {
+            FillMatchingSingle.fill(data, ((PrimitiveR064) values).data);
         } else {
             FillMatchingSingle.fill(data, values);
         }
@@ -169,8 +169,7 @@ public class Primitive64Array extends PrimitiveArray {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(data);
-        return result;
+        return prime * result + Arrays.hashCode(data);
     }
 
     @Override
@@ -219,6 +218,11 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected void add(final int index, final float addend) {
         data[index] += addend;
+    }
+
+    @Override
+    protected byte byteValue(final int index) {
+        return (byte) Math.round(data[index]);
     }
 
     protected final double[] copyOfData() {
@@ -292,6 +296,11 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
+    protected int intValue(final int index) {
+        return (int) Math.round(data[index]);
+    }
+
+    @Override
     protected boolean isAbsolute(final int index) {
         return PrimitiveScalar.isAbsolute(data[index]);
     }
@@ -299,6 +308,11 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, data[index]);
+    }
+
+    @Override
+    protected long longValue(final int index) {
+        return Math.round(data[index]);
     }
 
     @Override
@@ -354,6 +368,11 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected final void set(final int index, final float value) {
         data[index] = value;
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return (short) Math.round(data[index]);
     }
 
     @Override

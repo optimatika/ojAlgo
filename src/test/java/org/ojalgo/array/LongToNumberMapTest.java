@@ -50,7 +50,7 @@ public class LongToNumberMapTest extends ArrayTests {
     @Test
     public void testCompareWithTreeMap() {
 
-        final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
+        final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(PrimitiveR064.FACTORY).make();
         final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.DIRECT64).make();
 
         final SortedMap<Long, Double> expectedMap = new TreeMap<>();
@@ -105,7 +105,7 @@ public class LongToNumberMapTest extends ArrayTests {
     @Test
     public void testSubmap() {
 
-        final LongToNumberMap<Double> tmpMap = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
+        final LongToNumberMap<Double> tmpMap = LongToNumberMap.factory(PrimitiveR064.FACTORY).make();
 
         tmpMap.put(10, 1);
         tmpMap.put(20, 2);

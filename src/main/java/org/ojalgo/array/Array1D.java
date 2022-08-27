@@ -244,14 +244,14 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<>(BigArray.FACTORY);
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<>(ComplexArray.FACTORY);
+    public static final Factory<BigDecimal> BIG = new Factory<>(ReferenceTypeR128.FACTORY);
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<>(ScalarC128.FACTORY);
     public static final Factory<Double> DIRECT32 = new Factory<>(BufferArray.DIRECT32);
     public static final Factory<Double> DIRECT64 = new Factory<>(BufferArray.DIRECT64);
-    public static final Factory<Double> PRIMITIVE32 = new Factory<>(Primitive32Array.FACTORY);
-    public static final Factory<Double> PRIMITIVE64 = new Factory<>(Primitive64Array.FACTORY);
-    public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
-    public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
+    public static final Factory<Double> PRIMITIVE32 = new Factory<>(PrimitiveR032.FACTORY);
+    public static final Factory<Double> PRIMITIVE64 = new Factory<>(PrimitiveR064.FACTORY);
+    public static final Factory<Quaternion> QUATERNION = new Factory<>(ScalarH256.FACTORY);
+    public static final Factory<RationalNumber> RATIONAL = new Factory<>(ScalarQ128.FACTORY);
 
     public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new Array1D.Factory<>(denseFactory);

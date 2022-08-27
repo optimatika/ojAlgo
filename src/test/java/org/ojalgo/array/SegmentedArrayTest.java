@@ -35,7 +35,7 @@ public class SegmentedArrayTest extends ArrayTests {
 
         final long tmpCount = 5000L;
 
-        final SegmentedArray<Double> tmpArray = Primitive64Array.FACTORY.makeSegmented(tmpCount);
+        final SegmentedArray<Double> tmpArray = PrimitiveR064.FACTORY.makeSegmented(tmpCount);
 
         ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }
@@ -45,7 +45,7 @@ public class SegmentedArrayTest extends ArrayTests {
 
         final long tmpCount = Long.MAX_VALUE;
 
-        final BasicArray<Double> tmpArray = new BasicArray.Factory<>(Primitive64Array.FACTORY).make(tmpCount);
+        final BasicArray<Double> tmpArray = new BasicArray.Factory<>(PrimitiveR064.FACTORY).make(tmpCount);
 
         ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }

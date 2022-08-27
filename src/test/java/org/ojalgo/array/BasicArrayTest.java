@@ -51,7 +51,7 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     @Test
     public void testHugeSparse() {
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
+        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
     }
 
     @Test
@@ -66,30 +66,30 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     @Test
     public void testPrimitive32() {
-        this.doTest(Primitive32Array.make(COUNT));
+        this.doTest(PrimitiveR032.make(COUNT));
     }
 
     @Test
     public void testPrimitive64() {
-        this.doTest(Primitive64Array.make(COUNT));
+        this.doTest(PrimitiveR064.make(COUNT));
     }
 
     @Test
     public void testSegmentedPrimitive() {
         //this.doTest(SegmentedArray.make(PrimitiveArray.FACTORY, COUNT));
-        this.doTest(Primitive64Array.FACTORY.makeSegmented((long) COUNT));
+        this.doTest(PrimitiveR064.FACTORY.makeSegmented((long) COUNT));
     }
 
     @Test
     public void testSegmentedSparse() {
         //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
-        this.doTest(new BasicArray.Factory<>(Primitive64Array.FACTORY).makeSegmented(COUNT));
+        this.doTest(new BasicArray.Factory<>(PrimitiveR064.FACTORY).makeSegmented(COUNT));
     }
 
     @Test
     public void testSparse() {
         final long count = COUNT;
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(count).initial(DenseCapacityStrategy.capacity(count)).make());
+        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(count).initial(DenseCapacityStrategy.capacity(count)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);

@@ -21,46 +21,50 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.random.Uniform;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.RunnerException;
+import java.nio.ShortBuffer;
 
-@State(Scope.Benchmark)
-public class SparsePerformance {
+import org.ojalgo.function.NullaryFunction;
 
-    public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(SparsePerformance.class);
+final class BufferZ016 extends BufferArray {
+
+    private final ShortBuffer myBuffer;
+
+    public BufferZ016(final Factory<Double> factory, final ShortBuffer buffer, final AutoCloseable file) {
+        super(factory, buffer, file);
+        myBuffer = buffer;
     }
 
-    long DIM = 10_000L;
-
-    SparseArray<Double> array;
-
-    @Benchmark
-    public double doTest() {
-
-        double retVal = 0D;
-
-        for (long i = 0L, limit = array.count(); i < limit; i++) {
-            retVal += array.doubleValue(i);
-        }
-
-        return retVal;
+    @Override
+    protected byte byteValue(final int index) {
+        return (byte) myBuffer.get(index);
     }
 
-    @Setup
-    public void setup() {
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        // TODO Auto-generated method stub
 
-        array = SparseArray.factory(PrimitiveR064.FACTORY).limit(DIM * DIM).make();
+    }
 
-        for (long i = 0L; i < DIM; i++) {
-            array.set(Uniform.randomInteger(DIM * DIM), 1.0);
-        }
+    @Override
+    protected float floatValue(final int index) {
+        return myBuffer.get(index);
+    }
 
+    @Override
+    protected void set(final int index, final double value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void set(final int index, final float value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return myBuffer.get(index);
     }
 
 }

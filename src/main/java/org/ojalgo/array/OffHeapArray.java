@@ -67,12 +67,12 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
         @Override
         long getElementSize() {
-            return Native32Array.ELEMENT_SIZE;
+            return OffHeapR032.ELEMENT_SIZE;
         }
 
         @Override
         public DenseArray<Double> makeDenseArray(final long size) {
-            return new Native32Array(size);
+            return new OffHeapR032(size);
         }
 
     };
@@ -101,22 +101,22 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
         @Override
         long getElementSize() {
-            return Native64Array.ELEMENT_SIZE;
+            return OffHeapR064.ELEMENT_SIZE;
         }
 
         @Override
         public DenseArray<Double> makeDenseArray(final long size) {
-            return new Native64Array(size);
+            return new OffHeapR064(size);
         }
 
     };
 
     public static OffHeapArray makeNative32(final long count) {
-        return new Native32Array(count);
+        return new OffHeapR032(count);
     }
 
     public static OffHeapArray makeNative64(final long count) {
-        return new Native64Array(count);
+        return new OffHeapR064(count);
     }
 
     private final long myCount;

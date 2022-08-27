@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -40,7 +40,7 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
     }
 
     public DenseArray.Factory<Double> array() {
-        return Primitive64Array.FACTORY;
+        return PrimitiveR064.FACTORY;
     }
 
     public final I conjugate(final Access2D<?> source) {

@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
@@ -414,7 +414,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        return this.makeDiagonal(Primitive64Array.wrap(d)).get();
+        return this.makeDiagonal(PrimitiveR064.wrap(d)).get();
     }
 
     @Override

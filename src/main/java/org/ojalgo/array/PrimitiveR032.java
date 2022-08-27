@@ -48,9 +48,9 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public class Primitive32Array extends PrimitiveArray {
+public class PrimitiveR032 extends PrimitiveArray {
 
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
+    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -74,19 +74,19 @@ public class Primitive32Array extends PrimitiveArray {
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return Primitive32Array.make((int) size);
+            return PrimitiveR032.make((int) size);
         }
 
     };
 
     static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
 
-    public static Primitive32Array make(final int size) {
-        return new Primitive32Array(size);
+    public static PrimitiveR032 make(final int size) {
+        return new PrimitiveR032(size);
     }
 
-    public static Primitive32Array wrap(final float... data) {
-        return new Primitive32Array(data);
+    public static PrimitiveR032 wrap(final float... data) {
+        return new PrimitiveR032(data);
     }
 
     public final float[] data;
@@ -94,14 +94,14 @@ public class Primitive32Array extends PrimitiveArray {
     /**
      * Array not copied! No checking!
      */
-    protected Primitive32Array(final float[] data) {
+    protected PrimitiveR032(final float[] data) {
 
         super(FACTORY, data.length);
 
         this.data = data;
     }
 
-    protected Primitive32Array(final int size) {
+    protected PrimitiveR032(final int size) {
 
         super(FACTORY, size);
 
@@ -130,10 +130,10 @@ public class Primitive32Array extends PrimitiveArray {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof Primitive32Array)) {
+        if (!super.equals(obj) || !(obj instanceof PrimitiveR032)) {
             return false;
         }
-        Primitive32Array other = (Primitive32Array) obj;
+        PrimitiveR032 other = (PrimitiveR032) obj;
         if (!Arrays.equals(data, other.data)) {
             return false;
         }
@@ -142,8 +142,8 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        if (values instanceof Primitive32Array) {
-            FillMatchingSingle.fill(data, ((Primitive32Array) values).data);
+        if (values instanceof PrimitiveR032) {
+            FillMatchingSingle.fill(data, ((PrimitiveR032) values).data);
         } else {
             FillMatchingSingle.fill(data, values);
         }
@@ -165,8 +165,7 @@ public class Primitive32Array extends PrimitiveArray {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(data);
-        return result;
+        return prime * result + Arrays.hashCode(data);
     }
 
     @Override
@@ -207,6 +206,11 @@ public class Primitive32Array extends PrimitiveArray {
     @Override
     protected void add(final int index, final float addend) {
         data[index] += addend;
+    }
+
+    @Override
+    protected byte byteValue(final int index) {
+        return (byte) Math.round(data[index]);
     }
 
     protected final float[] copyOfData() {
@@ -280,6 +284,11 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
+    protected int intValue(final int index) {
+        return Math.round(data[index]);
+    }
+
+    @Override
     protected boolean isAbsolute(final int index) {
         return PrimitiveScalar.isAbsolute(data[index]);
     }
@@ -342,6 +351,11 @@ public class Primitive32Array extends PrimitiveArray {
     @Override
     protected final void set(final int index, final float value) {
         data[index] = value;
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return (short) Math.round(data[index]);
     }
 
     @Override

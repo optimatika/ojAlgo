@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -280,7 +280,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            final Primitive64Array tmpModelSolution = Primitive64Array.make(model.countVariables());
+            final PrimitiveR064 tmpModelSolution = PrimitiveR064.make(model.countVariables());
 
             for (final IntIndex tmpFixed : model.getFixedVariables()) {
                 tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
@@ -312,7 +312,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             final int tmpCountPositives = tmpPositives.size();
             final int tmpCountNegatives = tmpNegatives.size();
 
-            final Primitive64Array tmpSolverSolution = Primitive64Array.make(tmpCountPositives + tmpCountNegatives);
+            final PrimitiveR064 tmpSolverSolution = PrimitiveR064.make(tmpCountPositives + tmpCountNegatives);
 
             for (int p = 0; p < tmpCountPositives; p++) {
                 final Variable tmpVariable = tmpPositives.get(p);

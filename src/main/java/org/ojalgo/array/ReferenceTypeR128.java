@@ -42,9 +42,9 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public class BigArray extends ReferenceTypeArray<BigDecimal> {
+public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
 
-    public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<BigDecimal>() {
+    public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<BigDecimal> aggregator() {
@@ -68,36 +68,36 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
         @Override
         PlainArray<BigDecimal> makeDenseArray(final long size) {
-            return BigArray.make((int) size);
+            return ReferenceTypeR128.make((int) size);
         }
 
     };
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
 
-    public static final BigArray make(final int size) {
-        return new BigArray(size);
+    public static ReferenceTypeR128 make(final int size) {
+        return new ReferenceTypeR128(size);
     }
 
-    public static final BigArray wrap(final BigDecimal... data) {
-        return new BigArray(data);
+    public static final ReferenceTypeR128 wrap(final BigDecimal... data) {
+        return new ReferenceTypeR128(data);
     }
 
-    protected BigArray(final BigDecimal[] data) {
+    protected ReferenceTypeR128(final BigDecimal[] data) {
         super(FACTORY, data);
     }
 
-    protected BigArray(final int size) {
+    protected ReferenceTypeR128(final int size) {
         super(FACTORY, size);
     }
 
     @Override
-    public final void axpy(final double a, final Mutate1D.Modifiable<?> y) {
+    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
 
     @Override
-    public final void sortAscending() {
+    public void sortAscending() {
         Arrays.parallelSort(data);
     }
 
@@ -107,38 +107,48 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected final void add(final int index, final Comparable<?> addend) {
+    protected void add(final int index, final Comparable<?> addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 
     @Override
-    protected final void add(final int index, final double addend) {
+    protected void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 
     @Override
-    protected final void add(final int index, final float addend) {
+    protected void add(final int index, final float addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 
     @Override
-    protected final double doubleValue(final int index) {
+    protected byte byteValue(final int index) {
+        return this.get(index).byteValue();
+    }
+
+    @Override
+    protected double doubleValue(final int index) {
         return data[index].doubleValue();
     }
 
     @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
-    protected final float floatValue(final int index) {
+    protected float floatValue(final int index) {
         return data[index].floatValue();
     }
 
     @Override
-    protected final int indexOfLargest(final int first, final int limit, final int step) {
+    protected int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
+    }
+
+    @Override
+    protected int intValue(final int index) {
+        return this.get(index).intValue();
     }
 
     @Override
@@ -149,6 +159,16 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
+    }
+
+    @Override
+    protected long longValue(final int index) {
+        return this.get(index).longValue();
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return this.get(index).shortValue();
     }
 
 }

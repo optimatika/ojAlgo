@@ -21,39 +21,45 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.machine.JavaType;
-import org.ojalgo.type.NativeMemory;
+import java.nio.ByteBuffer;
 
-final class Native64Array extends OffHeapArray {
+import org.ojalgo.function.NullaryFunction;
 
-    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
+final class BufferZ008 extends BufferArray {
 
-    private final long myPointer;
+    private final ByteBuffer myBuffer;
 
-    Native64Array(final long count) {
-
-        super(OffHeapArray.NATIVE64, count);
-
-        myPointer = NativeMemory.allocateDoubleArray(this, count);
-
-        this.fillAll(PrimitiveMath.ZERO);
+    public BufferZ008(final Factory<Double> factory, final ByteBuffer buffer, final AutoCloseable file) {
+        super(factory, buffer, file);
+        myBuffer = buffer;
     }
 
-    public double doubleValue(final long index) {
-        return NativeMemory.getDouble(myPointer, index);
+    @Override
+    protected byte byteValue(final int index) {
+        return myBuffer.get(index);
     }
 
-    public float floatValue(final long index) {
-        return (float) NativeMemory.getDouble(myPointer, index);
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        // TODO Auto-generated method stub
+
     }
 
-    public void set(final long index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
+    @Override
+    protected float floatValue(final int index) {
+        return myBuffer.get(index);
     }
 
-    public void set(final long index, final float value) {
-        NativeMemory.setDouble(myPointer, index, value);
+    @Override
+    protected void set(final int index, final double value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void set(final int index, final float value) {
+        // TODO Auto-generated method stub
+
     }
 
 }

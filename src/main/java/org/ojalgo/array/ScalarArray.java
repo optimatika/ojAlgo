@@ -76,6 +76,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
+    protected byte byteValue(final int index) {
+        return this.get(index).byteValue();
+    }
+
+    @Override
     protected final double doubleValue(final int index) {
         return data[index].doubleValue();
     }
@@ -96,6 +101,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
+    protected int intValue(final int index) {
+        return this.get(index).intValue();
+    }
+
+    @Override
     protected final boolean isAbsolute(final int index) {
         return data[index].isAbsolute();
     }
@@ -103,6 +113,16 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     @Override
     protected final boolean isSmall(final int index, final double comparedTo) {
         return data[index].isSmall(comparedTo);
+    }
+
+    @Override
+    protected long longValue(final int index) {
+        return this.get(index).longValue();
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return this.get(index).shortValue();
     }
 
 }

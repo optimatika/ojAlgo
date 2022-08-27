@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.ScalarC128;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -118,7 +118,7 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
     public Eigenpair getEigenpair(final int index) {
 
         ComplexNumber value = ComplexNumber.FACTORY.cast(this.getD().get(index, index));
-        DenseArray<ComplexNumber> vector = ComplexArray.FACTORY.copy(this.getV().sliceColumn(index));
+        DenseArray<ComplexNumber> vector = ScalarC128.FACTORY.copy(this.getV().sliceColumn(index));
 
         return new Eigenpair(value, vector);
     }

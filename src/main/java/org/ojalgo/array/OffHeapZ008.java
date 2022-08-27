@@ -21,46 +21,39 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.random.Uniform;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.RunnerException;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.machine.JavaType;
+import org.ojalgo.type.NativeMemory;
 
-@State(Scope.Benchmark)
-public class SparsePerformance {
+final class OffHeapZ008 extends OffHeapArray {
 
-    public static void main(final String[] args) throws RunnerException {
-        BenchmarkUtils.run(SparsePerformance.class);
+    static final long ELEMENT_SIZE = JavaType.BYTE.memory();
+
+    private final long myPointer;
+
+    OffHeapZ008(final long count) {
+
+        super(OffHeapArray.NATIVE32, count);
+
+        myPointer = NativeMemory.allocateByteArray(this, count);
+
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
-    long DIM = 10_000L;
-
-    SparseArray<Double> array;
-
-    @Benchmark
-    public double doTest() {
-
-        double retVal = 0D;
-
-        for (long i = 0L, limit = array.count(); i < limit; i++) {
-            retVal += array.doubleValue(i);
-        }
-
-        return retVal;
+    public double doubleValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
     }
 
-    @Setup
-    public void setup() {
+    public byte byteValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
 
-        array = SparseArray.factory(PrimitiveR064.FACTORY).limit(DIM * DIM).make();
+    public void set(final long index, final double value) {
+        NativeMemory.setByte(myPointer, index, (byte) value);
+    }
 
-        for (long i = 0L; i < DIM; i++) {
-            array.set(Uniform.randomInteger(DIM * DIM), 1.0);
-        }
-
+    public void set(final long index, final byte value) {
+        NativeMemory.setByte(myPointer, index, value);
     }
 
 }

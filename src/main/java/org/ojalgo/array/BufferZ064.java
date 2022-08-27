@@ -21,35 +21,60 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.structure.Mutate1D;
+import java.nio.LongBuffer;
 
-public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
+import org.ojalgo.function.NullaryFunction;
 
-    public static PrimitiveArray make(final int size) {
-        return PrimitiveR064.make(size);
-    }
+final class BufferZ064 extends BufferArray {
 
-    public static PrimitiveArray wrap(final double... data) {
-        return PrimitiveR064.wrap(data);
-    }
+    private final LongBuffer myBuffer;
 
-    public static PrimitiveArray wrap(final float... data) {
-        return PrimitiveR032.wrap(data);
-    }
-
-    PrimitiveArray(final DenseArray.Factory<Double> factory, final int size) {
-        super(factory, size);
+    public BufferZ064(final Factory<Double> factory, final LongBuffer buffer, final AutoCloseable file) {
+        super(factory, buffer, file);
+        myBuffer = buffer;
     }
 
     @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
+    protected byte byteValue(final int index) {
+        return (byte) myBuffer.get(index);
     }
 
     @Override
-    final boolean isPrimitive() {
-        return true;
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected float floatValue(final int index) {
+        return myBuffer.get(index);
+    }
+
+    @Override
+    protected int intValue(final int index) {
+        return (int) myBuffer.get(index);
+    }
+
+    @Override
+    protected long longValue(final int index) {
+        return myBuffer.get(index);
+    }
+
+    @Override
+    protected void set(final int index, final double value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void set(final int index, final float value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected short shortValue(final int index) {
+        return (short) myBuffer.get(index);
     }
 
 }

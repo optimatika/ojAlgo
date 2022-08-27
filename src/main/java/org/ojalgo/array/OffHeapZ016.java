@@ -25,17 +25,17 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.type.NativeMemory;
 
-final class Native32Array extends OffHeapArray {
+final class OffHeapZ016 extends OffHeapArray {
 
-    static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
+    static final long ELEMENT_SIZE = JavaType.SHORT.memory();
 
     private final long myPointer;
 
-    Native32Array(final long count) {
+    OffHeapZ016(final long count) {
 
         super(OffHeapArray.NATIVE32, count);
 
-        myPointer = NativeMemory.allocateFloatArray(this, count);
+        myPointer = NativeMemory.allocateShortArray(this, count);
 
         this.fillAll(PrimitiveMath.ZERO);
     }

@@ -42,7 +42,7 @@ public class NumberListTest extends ArrayTests {
     @Test
     public void testCompareWithArrayList() {
 
-        final NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
+        final NumberList<Double> primit64List = NumberList.factory(PrimitiveR064.FACTORY).make();
         final NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
 
         final List<Double> expectedList = new ArrayList<>();
@@ -113,11 +113,11 @@ public class NumberListTest extends ArrayTests {
     @Test
     public void testGrowCapacity() {
 
-        final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(Primitive64Array.FACTORY);
+        final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(PrimitiveR064.FACTORY);
         final long initial = tmpStrategy.initial();
         final long chunk = tmpStrategy.chunk();
 
-        final NumberList<Double> tmNumberList = NumberList.factory(Primitive64Array.FACTORY).make();
+        final NumberList<Double> tmNumberList = NumberList.factory(PrimitiveR064.FACTORY).make();
         TestUtils.assertEquals(0L, tmNumberList.count());
 
         for (long i = 0L; i <= initial; i++) {

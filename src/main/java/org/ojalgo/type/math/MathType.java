@@ -37,51 +37,51 @@ public enum MathType {
     /**
      * Complex Number: 2 * double
      */
-    C128(NumberSet.C, JavaType.DOUBLE, 2),
+    C128(NumberSet.C, 2, JavaType.DOUBLE),
     /**
      * Quaternion: 4 * double
      */
-    H256(NumberSet.H, JavaType.DOUBLE, 4),
+    H256(NumberSet.H, 4, JavaType.DOUBLE),
     /**
      * Rational Number: 2 * long
      */
-    Q128(NumberSet.Q, JavaType.LONG, 2),
+    Q128(NumberSet.Q, 2, JavaType.LONG),
     /**
      * Real Number: float
      */
-    R032(NumberSet.R, JavaType.FLOAT, 1),
+    R032(NumberSet.R, 1, JavaType.FLOAT),
     /**
      * Real Number: double
      */
-    R064(NumberSet.R, JavaType.DOUBLE, 1),
+    R064(NumberSet.R, 1, JavaType.DOUBLE),
     /**
      * Real Number: {@link BigDecimal}
      * <p>
      * Refer to it as "128" since the {@link MathContext#DECIMAL128} is used by default (when necessary).
      */
-    R128(NumberSet.R, JavaType.REFERENCE, 1),
+    R128(NumberSet.R, 1, JavaType.REFERENCE),
     /**
      * Integer: byte
      */
-    Z008(NumberSet.Z, JavaType.BYTE, 1),
+    Z008(NumberSet.Z, 1, JavaType.BYTE),
     /**
      * Integer: short
      */
-    Z016(NumberSet.Z, JavaType.SHORT, 1),
+    Z016(NumberSet.Z, 1, JavaType.SHORT),
     /**
      * Integer: int
      */
-    Z032(NumberSet.Z, JavaType.INT, 1),
+    Z032(NumberSet.Z, 1, JavaType.INT),
     /**
      * Integer: long
      */
-    Z064(NumberSet.Z, JavaType.LONG, 1);
+    Z064(NumberSet.Z, 1, JavaType.LONG);
 
     private int myComponents;
     private JavaType myJavaType;
     private NumberSet myNumberSet;
 
-    MathType(final NumberSet numberSet, final JavaType javaType, final int components) {
+    MathType(final NumberSet numberSet, final int components, final JavaType javaType) {
         myNumberSet = numberSet;
         myJavaType = javaType;
         myComponents = components;

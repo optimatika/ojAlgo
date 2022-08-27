@@ -28,7 +28,7 @@ import java.util.Collection;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.LongToNumberMap;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -227,7 +227,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (retVal) {
             if (myFixedVariables == null) {
-                myFixedVariables = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
+                myFixedVariables = LongToNumberMap.factory(PrimitiveR064.FACTORY).make();
             }
             myFixedVariables.put(index, value);
             myPoint.returnToPhase1();

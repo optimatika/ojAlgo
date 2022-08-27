@@ -21,8 +21,8 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.array.Primitive32Array;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR032;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
@@ -36,8 +36,8 @@ public final class OperationUnary implements ArrayOperation {
 
     public static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof Primitive64Array) {
-            OperationUnary.invoke(data, first, limit, step, ((Primitive64Array) values).data, function);
+        if (values instanceof PrimitiveR064) {
+            OperationUnary.invoke(data, first, limit, step, ((PrimitiveR064) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.doubleValue(i));
@@ -47,8 +47,8 @@ public final class OperationUnary implements ArrayOperation {
 
     public static void invoke(final float[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof Primitive32Array) {
-            OperationUnary.invoke(data, first, limit, step, ((Primitive32Array) values).data, function);
+        if (values instanceof PrimitiveR032) {
+            OperationUnary.invoke(data, first, limit, step, ((PrimitiveR032) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.floatValue(i));

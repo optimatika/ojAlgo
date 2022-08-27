@@ -32,7 +32,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.BigArray;
+import org.ojalgo.array.ReferenceTypeR128;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -337,7 +337,7 @@ public class CuteMarosMeszarosCase extends OptimisationConvexTests implements Mo
 
         ExpressionsBasedModel model = CuteMarosMeszarosCase.makeModel("HS268.SIF");
 
-        Result proposed = new Result(Optimisation.State.OPTIMAL, BigArray.wrap(BigMath.ONE, BigMath.TWO, BigMath.NEG, BigMath.THREE, BigMath.FOUR.negate()));
+        Result proposed = new Result(Optimisation.State.OPTIMAL, ReferenceTypeR128.wrap(BigMath.ONE, BigMath.TWO, BigMath.NEG, BigMath.THREE, BigMath.FOUR.negate()));
         Result cplex = Result.of(Double.NaN, Optimisation.State.OPTIMAL, 0.995735, 1.995283, -0.999028, 2.989736, -3.982628);
 
         Expression obj = model.objective();

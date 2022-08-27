@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.random.Random1D;
 import org.ojalgo.random.process.Process1D.ComponentProcess;
@@ -96,10 +96,10 @@ public final class Process1D<P extends ComponentProcess<?>> {
         return myProcesses[index].getValue();
     }
 
-    public Primitive64Array getValues() {
+    public PrimitiveR064 getValues() {
 
         int length = myProcesses.length;
-        Primitive64Array retVal = Primitive64Array.make(length);
+        PrimitiveR064 retVal = PrimitiveR064.make(length);
 
         for (int p = 0; p < length; p++) {
             retVal.set(p, myProcesses[p].getValue());
