@@ -36,7 +36,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class ScalarC128 extends ScalarArray<ComplexNumber> {
 
-    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<ComplexNumber>() {
+    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<ComplexNumber> aggregator() {
@@ -67,11 +67,11 @@ public class ScalarC128 extends ScalarArray<ComplexNumber> {
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
 
-    public static final ScalarC128 make(final int size) {
+    public static ScalarC128 make(final int size) {
         return new ScalarC128(size);
     }
 
-    public static final ScalarC128 wrap(final ComplexNumber... data) {
+    public static ScalarC128 wrap(final ComplexNumber... data) {
         return new ScalarC128(data);
     }
 

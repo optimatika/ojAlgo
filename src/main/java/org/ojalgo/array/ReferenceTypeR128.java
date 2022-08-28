@@ -79,7 +79,7 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
         return new ReferenceTypeR128(size);
     }
 
-    public static final ReferenceTypeR128 wrap(final BigDecimal... data) {
+    public static ReferenceTypeR128 wrap(final BigDecimal... data) {
         return new ReferenceTypeR128(data);
     }
 

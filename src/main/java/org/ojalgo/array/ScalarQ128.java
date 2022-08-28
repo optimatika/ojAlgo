@@ -36,7 +36,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class ScalarQ128 extends ScalarArray<RationalNumber> {
 
-    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<RationalNumber>() {
+    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<>() {
 
         @Override
         public AggregatorSet<RationalNumber> aggregator() {
@@ -67,11 +67,11 @@ public class ScalarQ128 extends ScalarArray<RationalNumber> {
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
 
-    public static final ScalarQ128 make(final int size) {
+    public static ScalarQ128 make(final int size) {
         return new ScalarQ128(size);
     }
 
-    public static final ScalarQ128 wrap(final RationalNumber... data) {
+    public static ScalarQ128 wrap(final RationalNumber... data) {
         return new ScalarQ128(data);
     }
 
