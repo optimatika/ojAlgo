@@ -77,14 +77,26 @@ public enum MathType {
      */
     Z064(NumberSet.Z, 1, JavaType.LONG);
 
-    private int myComponents;
-    private JavaType myJavaType;
-    private NumberSet myNumberSet;
+    private final int myComponents;
+    private final JavaType myJavaType;
+    private final NumberSet myNumberSet;
 
     MathType(final NumberSet numberSet, final int components, final JavaType javaType) {
         myNumberSet = numberSet;
         myJavaType = javaType;
         myComponents = components;
+    }
+
+    public JavaType getJavaType() {
+        return myJavaType;
+    }
+
+    public NumberSet getNumberSet() {
+        return myNumberSet;
+    }
+
+    public int getComponents() {
+        return myComponents;
     }
 
 }

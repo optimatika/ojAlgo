@@ -26,12 +26,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
@@ -45,12 +41,13 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
@@ -62,16 +59,24 @@ import org.ojalgo.type.NumberDefinition;
  */
 public abstract class BufferArray extends PlainArray<Double> implements AutoCloseable {
 
-    public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<>() {
+    public static final class Factory extends DenseArray.Factory<Double> {
 
-        @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        private final BufferConstructor myConstructor;
+        private final MathType myMathType;
+
+        Factory(final MathType mathType, final BufferConstructor constructor) {
+            super();
+            myMathType = mathType;
+            myConstructor = constructor;
         }
 
         @Override
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
+        }
+
+        public MappedFileFactory newMapped(final File file) {
+            return new MappedFileFactory(this, file);
         }
 
         @Override
@@ -80,157 +85,166 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        long getCapacityLimit() {
-            return MAX_ARRAY_SIZE / FLOAT_ELEMENT_SIZE;
-        }
-
-        @Override
-        long getElementSize() {
-            return FLOAT_ELEMENT_SIZE;
-        }
-
-        @Override
-        DenseArray<Double> makeDenseArray(final long size) {
-            final int tmpSize = (int) size;
-            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 4);
-            return new BufferR032(tmpAllocateDirect.asFloatBuffer(), null);
-        }
-
-    };
-
-    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<>() {
-
-        @Override
-        public AggregatorSet<Double> aggregator() {
+        AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
         }
 
         @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE / DOUBLE_ELEMENT_SIZE;
+            return MAX_ARRAY_SIZE / this.getElementSize();
         }
 
         @Override
         long getElementSize() {
-            return DOUBLE_ELEMENT_SIZE;
+            return myMathType.getJavaType().memory();
         }
 
         @Override
-        DenseArray<Double> makeDenseArray(final long size) {
-            final int tmpSize = (int) size;
-            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
-            return new BufferR064(tmpAllocateDirect.asDoubleBuffer(), null);
+        BufferArray makeDenseArray(final long size) {
+            int capacity = Math.toIntExact(size * this.getElementSize());
+            ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
+            return myConstructor.newInstance(this, buffer, null);
         }
 
-    };
+        /**
+         * Signature matching {@link BufferConstructor}.
+         */
+        BufferArray newInstance(final Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
+            return myConstructor.newInstance(factory, buffer, closeable);
+        }
 
-    static final long DOUBLE_ELEMENT_SIZE = JavaType.DOUBLE.memory();
-    static final long FLOAT_ELEMENT_SIZE = JavaType.FLOAT.memory();
-
-    public static Array1D<Double> make(final File file, final long count) {
-        return BufferArray.create(file, count).wrapInArray1D();
     }
 
-    public static ArrayAnyD<Double> make(final File file, final long... structure) {
-        return BufferArray.create(file, structure).wrapInArrayAnyD(structure);
-    }
+    public static final class MappedFileFactory extends DenseArray.Factory<Double> {
 
-    public static Array2D<Double> make(final File file, final long rows, final long columns) {
-        return BufferArray.create(file, rows, columns).wrapInArray2D(rows);
-    }
+        private final File myFile;
+        private final Factory myTypeFactory;
 
-    public static BufferArray make(final int capacity) {
-        return new BufferR064(DoubleBuffer.allocate(capacity), null);
-    }
+        MappedFileFactory(final Factory typeFactory, final File file) {
+            super();
+            myTypeFactory = typeFactory;
+            myFile = file;
+        }
 
-    public static BufferArray wrap(final DoubleBuffer data) {
-        return new BufferR064(data, null);
-    }
+        @Override
+        public FunctionSet<Double> function() {
+            return myTypeFactory.function();
+        }
 
-    public static BufferArray wrap(final FloatBuffer data) {
-        return new BufferR032(data, null);
-    }
+        public BufferArray make(final int count) {
+            return (BufferArray) super.make(count);
+        }
 
-    private static BasicArray<Double> create(final File file, final long... structure) {
+        public BufferArray make(final Structure1D shape) {
+            return (BufferArray) super.make(shape);
+        }
 
-        final long tmpCount = StructureAnyD.count(structure);
+        @Override
+        public BufferArray makeFilled(final long count, final NullaryFunction<?> supplier) {
+            return (BufferArray) super.makeFilled(count, supplier);
+        }
 
-        DoubleBuffer tmpDoubleBuffer = null;
+        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+            return (BufferArray) super.makeFilled(shape, supplier);
+        }
 
-        try {
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return myTypeFactory.scalar();
+        }
 
-            final RandomAccessFile tmpRandomAccessFile = new RandomAccessFile(file, "rw");
+        @Override
+        AggregatorSet<Double> aggregator() {
+            return myTypeFactory.aggregator();
+        }
 
-            final FileChannel tmpFileChannel = tmpRandomAccessFile.getChannel();
+        @Override
+        long getElementSize() {
+            return myTypeFactory.getElementSize();
+        }
 
-            final long tmpSize = DOUBLE_ELEMENT_SIZE * tmpCount;
+        @Override
+        BufferArray makeDenseArray(final long size) {
 
-            if (tmpCount <= 1L << 8) {
+            long count = myTypeFactory.getElementSize() * size;
 
-                final MappedByteBuffer tmpMappedByteBuffer = tmpFileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, tmpSize);
-                tmpMappedByteBuffer.order(ByteOrder.nativeOrder());
-
-                tmpDoubleBuffer = tmpMappedByteBuffer.asDoubleBuffer();
-
-                return new BufferR064(tmpDoubleBuffer, tmpRandomAccessFile);
+            FileChannel fileChannel;
+            MappedByteBuffer buffer;
+            try {
+                fileChannel = new RandomAccessFile(myFile, "rw").getChannel();
+                buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, count);
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
             }
-            final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<>() {
 
-                long offset = 0L;
-
-                @Override
-                public AggregatorSet<Double> aggregator() {
-                    return PrimitiveAggregator.getSet();
-                }
-
-                @Override
-                public FunctionSet<Double> function() {
-                    return PrimitiveFunction.getSet();
-                }
-
-                @Override
-                public Scalar.Factory<Double> scalar() {
-                    return PrimitiveScalar.FACTORY;
-                }
-
-                @Override
-                long getElementSize() {
-                    return DOUBLE_ELEMENT_SIZE;
-                }
-
-                @Override
-                PlainArray<Double> makeDenseArray(final long size) {
-
-                    final long tmpSize2 = size * DOUBLE_ELEMENT_SIZE;
-                    try {
-
-                        final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
-                        tmpMap.order(ByteOrder.nativeOrder());
-                        return new BufferR064(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
-                    } catch (final IOException exception) {
-                        throw new RuntimeException(exception);
-                    } finally {
-                        offset += tmpSize2;
-                    }
-                }
-
-            };
-
-            return tmpFactory.makeSegmented(structure);
-
-        } catch (final IOException exception) {
-            throw new RuntimeException(exception);
+            return myTypeFactory.newInstance(myTypeFactory, buffer, fileChannel);
         }
+
+    }
+
+    @FunctionalInterface
+    interface BufferConstructor {
+
+        BufferArray newInstance(BufferArray.Factory factory, ByteBuffer buffer, AutoCloseable closeable);
+
+    }
+
+    public static final Factory R032 = new Factory(MathType.R032, BufferR032::new);
+    public static final Factory R064 = new Factory(MathType.R064, BufferR064::new);
+    public static final Factory Z008 = new Factory(MathType.Z008, BufferZ008::new);
+    public static final Factory Z016 = new Factory(MathType.Z016, BufferZ016::new);
+    public static final Factory Z032 = new Factory(MathType.Z032, BufferZ032::new);
+    public static final Factory Z064 = new Factory(MathType.Z064, BufferZ064::new);
+
+    /**
+     * @deprecated Use {@link #R032} instead
+     */
+    @Deprecated
+    public static final Factory DIRECT32 = R032;
+    /**
+     * @deprecated Use {@link #R064} instead
+     */
+    @Deprecated
+    public static final Factory DIRECT64 = R064;
+
+    /**
+     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
+     */
+    @Deprecated
+    public static Array1D<Double> make(final File file, final long count) {
+        return R064.newMapped(file).make(count).wrapInArray1D();
+    }
+
+    /**
+     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
+     */
+    @Deprecated
+    public static ArrayAnyD<Double> make(final File file, final long... structure) {
+        return R064.newMapped(file).make(StructureAnyD.count(structure)).wrapInArrayAnyD(structure);
+    }
+
+    /**
+     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
+     */
+    @Deprecated
+    public static Array2D<Double> make(final File file, final long rows, final long columns) {
+        return R064.newMapped(file).make(rows * columns).wrapInArray2D(rows);
+    }
+
+    /**
+     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
+     */
+    @Deprecated
+    public static DenseArray<Double> make(final int capacity) {
+        return R064.make(capacity);
+    }
+
+    /**
+     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
+     */
+    @Deprecated
+    public static BufferArray wrap(final ByteBuffer data) {
+        return new BufferR064(BufferArray.R064, data, null);
     }
 
     protected static void fill(final BufferArray data, final Access1D<?> value) {
@@ -296,7 +310,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     private final Buffer myBuffer;
     private final AutoCloseable myFile;
 
-    BufferArray(final DenseArray.Factory<Double> factory, final Buffer buffer, final AutoCloseable file) {
+    BufferArray(final Factory factory, final Buffer buffer, final AutoCloseable file) {
 
         super(factory, buffer.capacity());
 

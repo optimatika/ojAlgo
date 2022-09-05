@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.ojalgo.function.NullaryFunction;
@@ -29,8 +30,12 @@ final class BufferZ032 extends BufferArray {
 
     private final IntBuffer myBuffer;
 
-    public BufferZ032(final Factory<Double> factory, final IntBuffer buffer, final AutoCloseable file) {
-        super(factory, buffer, file);
+    BufferZ032(final BufferArray.Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
+        this(factory, buffer.asIntBuffer(), closeable);
+    }
+
+    BufferZ032(final BufferArray.Factory factory, final IntBuffer buffer, final AutoCloseable closeable) {
+        super(factory, buffer, closeable);
         myBuffer = buffer;
     }
 

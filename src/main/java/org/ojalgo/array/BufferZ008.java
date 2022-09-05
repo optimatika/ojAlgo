@@ -29,8 +29,8 @@ final class BufferZ008 extends BufferArray {
 
     private final ByteBuffer myBuffer;
 
-    public BufferZ008(final Factory<Double> factory, final ByteBuffer buffer, final AutoCloseable file) {
-        super(factory, buffer, file);
+    BufferZ008(final BufferArray.Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
+        super(factory, buffer, closeable);
         myBuffer = buffer;
     }
 
