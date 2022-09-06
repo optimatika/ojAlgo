@@ -28,6 +28,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
@@ -131,6 +132,41 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             return myTypeFactory.function();
         }
 
+        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+            return (BufferArray) super.makeFilled(shape, supplier);
+        }
+
+        @Override
+        public BufferArray copy(final Access1D<?> source) {
+            return (BufferArray) super.copy(source);
+        }
+
+        @Override
+        public BufferArray copy(final Comparable<?>... source) {
+            return (BufferArray) super.copy(source);
+        }
+
+        @Override
+        public BufferArray copy(final double... source) {
+            return (BufferArray) super.copy(source);
+        }
+
+        @Override
+        public BufferArray copy(final List<? extends Comparable<?>> source) {
+            return (BufferArray) super.copy(source);
+        }
+
+        @Override
+        public BufferArray make(final long count) {
+            return (BufferArray) super.make(count);
+        }
+
+        @Override
+        SegmentedArray<Double> makeSegmented(final long... structure) {
+
+            return super.makeSegmented(structure);
+        }
+
         public BufferArray make(final int count) {
             return (BufferArray) super.make(count);
         }
@@ -142,10 +178,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         @Override
         public BufferArray makeFilled(final long count, final NullaryFunction<?> supplier) {
             return (BufferArray) super.makeFilled(count, supplier);
-        }
-
-        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-            return (BufferArray) super.makeFilled(shape, supplier);
         }
 
         @Override

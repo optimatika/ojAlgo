@@ -46,8 +46,7 @@ final class BufferZ032 extends BufferArray {
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        // TODO Auto-generated method stub
-
+        myBuffer.put(index, supplier.intValue());
     }
 
     @Override
@@ -62,14 +61,12 @@ final class BufferZ032 extends BufferArray {
 
     @Override
     protected void set(final int index, final double value) {
-        // TODO Auto-generated method stub
-
+        myBuffer.put(index, (int) Math.round(value));
     }
 
     @Override
     protected void set(final int index, final float value) {
-        // TODO Auto-generated method stub
-
+        myBuffer.put(index, Math.round(value));
     }
 
     @Override

@@ -34,7 +34,6 @@ import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.StructureAnyD;
 
 /**
@@ -87,9 +86,9 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         BasicArray<N> makeStructuredZero(final long... structure) {
 
-            final long total = StructureAnyD.count(structure);
+            long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> strategy = this.strategy();
+            DenseCapacityStrategy<N> strategy = this.strategy();
 
             if (total > SPARSE_SEGMENTATION_LIMIT) {
 
@@ -107,9 +106,9 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         BasicArray<N> makeToBeFilled(final long... structure) {
 
-            final long total = StructureAnyD.count(structure);
+            long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> strategy = this.strategy();
+            DenseCapacityStrategy<N> strategy = this.strategy();
 
             if (strategy.isSegmented(total)) {
 
@@ -167,7 +166,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
@@ -264,29 +263,8 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     }
 
     /**
-     * Safe to cast as DenseArray.
-     */
-    final boolean isDense() {
-        return this instanceof PlainArray;
-    }
-
-    /**
      * Primitive (double) elements
      */
     abstract boolean isPrimitive();
-
-    /**
-     * Safe to cast as SegmentedArray.
-     */
-    final boolean isSegmented() {
-        return this instanceof SegmentedArray;
-    }
-
-    /**
-     * Safe to cast as SparseArray.
-     */
-    final boolean isSparse() {
-        return this instanceof SparseArray;
-    }
 
 }
