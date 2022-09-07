@@ -37,6 +37,12 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         CorePrimitiveOperation.multiply(data, first, limit, 1, data, right);
     }
 
+    public static void negate(final byte[] data, final int first, final int limit, final int step, final byte[] values) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = (byte) -values[i];
+        }
+    }
+
     public static void negate(final double[] data, final int first, final int limit, final int step, final double[] values) {
         for (int i = first; i < limit; i += step) {
             data[i] = -values[i];
@@ -46,6 +52,24 @@ public final class CorePrimitiveOperation implements ArrayOperation {
     public static void negate(final float[] data, final int first, final int limit, final int step, final float[] values) {
         for (int i = first; i < limit; i += step) {
             data[i] = -values[i];
+        }
+    }
+
+    public static void negate(final int[] data, final int first, final int limit, final int step, final int[] values) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = -values[i];
+        }
+    }
+
+    public static void negate(final long[] data, final int first, final int limit, final int step, final long[] values) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = -values[i];
+        }
+    }
+
+    public static void negate(final short[] data, final int first, final int limit, final int step, final short[] values) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = (short) -values[i];
         }
     }
 

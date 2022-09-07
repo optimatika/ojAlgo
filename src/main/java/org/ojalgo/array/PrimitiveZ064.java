@@ -21,6 +21,9 @@
  */
 package org.ojalgo.array;
 
+import java.util.Arrays;
+
+import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -102,14 +105,14 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     public void sortAscending() {
-        // TODO Auto-generated method stub
-
+        Arrays.parallelSort(data);
     }
 
     @Override
     public void sortDescending() {
-        // TODO Auto-generated method stub
-
+        CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
+        Arrays.parallelSort(data);
+        CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
     }
 
     @Override
