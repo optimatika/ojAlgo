@@ -32,6 +32,14 @@ import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * For solving [A][x]=[b] where [A] has non-zero elements on the diagonal.
+ * <p>
+ * It's most likely better to instead use {@link GaussSeidelSolver} or {@link ConjugateGradientSolver}.
+ *
+ * @author apete
+ * @see https://en.wikipedia.org/wiki/Jacobi_method
+ */
 public final class JacobiSolver extends StationaryIterativeSolver {
 
     public JacobiSolver() {
