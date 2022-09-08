@@ -32,6 +32,15 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * For solving [A][x]=[b] where [A] has non-zero elements on the diagonal.
+ * <p>
+ * To guarantee convergence [A] needs to be either strictly diagonally dominant, or symmetric and positive
+ * definite.
+ *
+ * @author apete
+ * @see https://en.wikipedia.org/wiki/Gauss–Seidel_method
+ */
 public final class GaussSeidelSolver extends StationaryIterativeSolver implements IterativeSolverTask.SparseDelegate {
 
     public GaussSeidelSolver() {
