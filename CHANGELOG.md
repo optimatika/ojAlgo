@@ -21,6 +21,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New `DatePriceParser` parser that will analyse the contents (first header line) to determine the file format, and then choose an appropriate parser to use.
 
+#### org.ojalgo.matrix
+
+- Experimental `ParallelGaussSeidelSolver`. The name says what it is. Seems to work and improve performance.
+
 #### org.ojalgo.netio
 
 - New class `InMemoryFile` to be used when writing to and/or reading from "files" that never actually exist on disk – for dynamically creating files for downloading or parsing uploaded "files". The `TextLineWriter` and `TextLineReader`, in particular, gained support for this.
@@ -32,6 +36,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
 
 ### Changed
+
+#### org.ojalgo.equation
+
+- The RHS property of `Equation` is now mutable – there is both get- and a set-method.
+- Bunch of new factory methods for `Equation` (variants of the previously existing ones with the array factory set to `Primitive64Array.FACTORY`).
+
+#### org.ojalgo.matrix
+
+- New method in `IterativeSolverTask.SparseDelegate` that lets you (re)solve with a supplied RHS.
+- Slight modification to how the preconditioning in `ConjugateGradientSolver` works.
 
 #### org.ojalgo.type
 

@@ -24,11 +24,8 @@ package org.ojalgo.matrix.task.iterative;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 /**
- * StationaryIterativeSolver
- *
- * @see <a href="https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods">Iterative_method
- *      </a>
- * @see <a href="https://mathworld.wolfram.com/StationaryIterativeMethod.html">StationaryIterativeMethod</a>
+ * @see https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods
+ * @see https://mathworld.wolfram.com/StationaryIterativeMethod.html
  * @author apete
  */
 public abstract class StationaryIterativeSolver extends IterativeSolverTask {

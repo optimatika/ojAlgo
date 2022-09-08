@@ -43,6 +43,11 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * For solving very large sparse equation systems – [A][x]=[b].
+ *
+ * @author apete
+ */
 public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     public static final class Configurator {
@@ -91,7 +96,22 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     public interface SparseDelegate {
 
-        double resolve(List<Equation> equations, final PhysicalStore<Double> solution);
+        double resolve(List<Equation> equations, PhysicalStore<Double> solution);
+
+        default double resolve(final List<Equation> equations, final PhysicalStore<Double> solution, final Access1D<?> rhs) {
+
+            int nbEquations = equations.size();
+
+            if (rhs.size() != nbEquations) {
+                throw new IllegalArgumentException();
+            }
+
+            for (int i = 0; i < nbEquations; i++) {
+                equations.get(i).setRHS(rhs.doubleValue(i));
+            }
+
+            return this.resolve(equations, solution);
+        }
 
     }
 
@@ -114,9 +134,9 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         } else {
 
             for (int i = 0; i < numbEquations; i++) {
-                final Equation row = retVal.get(i);
+                Equation row = retVal.get(i);
                 for (int j = 0; j < numbVariables; j++) {
-                    final double tmpVal = body.doubleValue(i, j);
+                    double tmpVal = body.doubleValue(i, j);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
                         row.set(j, tmpVal);
                     }
@@ -149,7 +169,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {
         try {
             return Optional.of(this.solve(body, rhs, this.preallocate(body, rhs)));
-        } catch (final RecoverableCondition xcptn) {
+        } catch (RecoverableCondition xcptn) {
             return Optional.empty();
         }
     }

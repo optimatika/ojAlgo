@@ -37,8 +37,16 @@ import org.ojalgo.type.NumberDefinition;
 
 public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D.Modifiable<Double> {
 
+    public static Equation dense(final int pivot, final int cols) {
+        return Equation.dense(pivot, cols, Primitive64Array.FACTORY);
+    }
+
     public static Equation dense(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
         return new Equation(factory.make(cols), pivot, ZERO);
+    }
+
+    public static List<Equation> denseSystem(final int rows, final int cols) {
+        return Equation.denseSystem(rows, cols, Primitive64Array.FACTORY);
     }
 
     public static List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
@@ -56,12 +64,24 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return new Equation(Primitive64Array.wrap(body), pivot, rhs);
     }
 
+    public static Equation sparse(final int pivot, final int cols) {
+        return Equation.sparse(pivot, cols, Primitive64Array.FACTORY);
+    }
+
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
         return new Equation(SparseArray.factory(factory).limit(cols).make(), pivot, ZERO);
     }
 
     public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory, final int numberOfNonzeros) {
         return new Equation(SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), pivot, ZERO);
+    }
+
+    public static Equation sparse(final int pivot, final int cols, final int numberOfNonzeros) {
+        return Equation.sparse(pivot, cols, Primitive64Array.FACTORY, numberOfNonzeros);
+    }
+
+    public static List<Equation> sparseSystem(final int rows, final int cols) {
+        return Equation.sparseSystem(rows, cols, Primitive64Array.FACTORY);
     }
 
     public static List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
@@ -86,6 +106,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return system;
     }
 
+    public static List<Equation> sparseSystem(final int rows, final int cols, final int numberOfNonzeros) {
+        return Equation.sparseSystem(rows, cols, Primitive64Array.FACTORY, numberOfNonzeros);
+    }
+
     /**
      * The row index of the original body matrix, [A].
      */
@@ -95,7 +119,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     private final BasicArray<Double> myElements;
     private double myPivot = ZERO;
-    private final double myRHS;
+    private double myRHS;
 
     /**
      * @deprecated v49 Use one of the factory methods instead
@@ -199,8 +223,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + index;
-        return result;
+        return prime * result + index;
     }
 
     public <T extends Access1D<Double> & Mutate1D.Modifiable<Double>> void initialise(final T x) {
@@ -223,6 +246,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         if (ind == index) {
             myPivot = value;
         }
+    }
+
+    public void setRHS(final double rhs) {
+        myRHS = rhs;
     }
 
     @Override
