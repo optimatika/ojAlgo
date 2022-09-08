@@ -30,10 +30,13 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
+ * Maintains a list of {@link Equation}:s and delegates to a {@link SparseDelegate}.
+ *
  * @author apete
  */
 public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSolverTask.SparseDelegate> extends IterativeSolverTask {
@@ -84,6 +87,10 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
      */
     public final double resolve(final PhysicalStore<Double> solution) {
         return myDelegate.resolve(myRows, solution);
+    }
+
+    public final double resolve(final PhysicalStore<Double> solution, final Access1D<?> rhs) {
+        return myDelegate.resolve(myRows, solution, rhs);
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
