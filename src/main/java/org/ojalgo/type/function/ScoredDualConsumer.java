@@ -23,7 +23,6 @@ package org.ojalgo.type.function;
 
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.KeyValue;
-import org.ojalgo.type.keyvalue.KeyValue.Dual;
 
 @FunctionalInterface
 public interface ScoredDualConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {

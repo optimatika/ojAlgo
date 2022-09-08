@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.UnaryFunction;
