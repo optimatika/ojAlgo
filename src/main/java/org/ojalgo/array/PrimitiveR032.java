@@ -340,7 +340,7 @@ public class PrimitiveR032 extends PrimitiveArray {
 
     @Override
     protected final void set(final int index, final Comparable<?> value) {
-        data[index] = NumberDefinition.floatValue(value);
+        data[index] = Scalar.floatValue(value);
     }
 
     @Override

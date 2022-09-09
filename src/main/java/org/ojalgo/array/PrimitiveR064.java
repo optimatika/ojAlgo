@@ -357,7 +357,7 @@ public class PrimitiveR064 extends PrimitiveArray {
 
     @Override
     protected final void set(final int index, final Comparable<?> value) {
-        data[index] = NumberDefinition.doubleValue(value);
+        data[index] = Scalar.doubleValue(value);
     }
 
     @Override

@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.util.Arrays;
 
 import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -272,56 +273,47 @@ public class PrimitiveZ008 extends PrimitiveArray {
 
     @Override
     protected int searchAscending(final Double number) {
-        // TODO Auto-generated method stub
-        return 0;
+        return Arrays.binarySearch(data, number.byteValue());
     }
 
     @Override
     protected void set(final int index, final Comparable<?> number) {
-        // TODO Auto-generated method stub
-
+        data[index] = Scalar.byteValue(number);
     }
 
     @Override
     protected void set(final int index, final double value) {
-        // TODO Auto-generated method stub
-
+        data[index] = (byte) Math.round(value);
     }
 
     @Override
     protected void set(final int index, final float value) {
-        // TODO Auto-generated method stub
-
+        data[index] = (byte) Math.round(value);
     }
 
     @Override
     protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        // TODO Auto-generated method stub
-
+        OperationVoid.invoke(data, first, limit, step, visitor);
     }
 
     @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
-        // TODO Auto-generated method stub
-
+        visitor.invoke(data[index]);
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        data[intIndex] = function.invoke(left.byteValue(extIndex), data[intIndex]);
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        data[intIndex] = function.invoke(data[intIndex], right.byteValue(extIndex));
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        data[intIndex] = function.invoke(data[intIndex]);
     }
 
 }

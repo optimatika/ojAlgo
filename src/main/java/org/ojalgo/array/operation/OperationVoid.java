@@ -27,6 +27,12 @@ public final class OperationVoid implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
+    public static void invoke(final byte[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
+        for (int i = first; i < limit; i += step) {
+            visitor.invoke(data[i]);
+        }
+    }
+
     public static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {
             visitor.invoke(data[i]);
@@ -39,7 +45,25 @@ public final class OperationVoid implements ArrayOperation {
         }
     }
 
+    public static void invoke(final int[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
+        for (int i = first; i < limit; i += step) {
+            visitor.invoke(data[i]);
+        }
+    }
+
+    public static void invoke(final long[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
+        for (int i = first; i < limit; i += step) {
+            visitor.invoke(data[i]);
+        }
+    }
+
     public static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> visitor) {
+        for (int i = first; i < limit; i += step) {
+            visitor.invoke(data[i]);
+        }
+    }
+
+    public static void invoke(final short[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {
             visitor.invoke(data[i]);
         }
