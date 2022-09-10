@@ -27,6 +27,13 @@ public final class OperationParameter implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
+    public static void invoke(final byte[] data, final int first, final int limit, final int step, final byte[] values,
+            final ParameterFunction<Double> function, final int param) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(values[i], param);
+        }
+    }
+
     public static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values,
             final ParameterFunction<Double> function, final int param) {
         for (int i = first; i < limit; i += step) {
@@ -41,8 +48,29 @@ public final class OperationParameter implements ArrayOperation {
         }
     }
 
+    public static void invoke(final int[] data, final int first, final int limit, final int step, final int[] values, final ParameterFunction<Double> function,
+            final int param) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(values[i], param);
+        }
+    }
+
+    public static void invoke(final long[] data, final int first, final int limit, final int step, final long[] values,
+            final ParameterFunction<Double> function, final int param) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(values[i], param);
+        }
+    }
+
     public static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final N[] values,
             final ParameterFunction<N> function, final int param) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(values[i], param);
+        }
+    }
+
+    public static void invoke(final short[] data, final int first, final int limit, final int step, final short[] values,
+            final ParameterFunction<Double> function, final int param) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(values[i], param);
         }

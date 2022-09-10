@@ -327,12 +327,12 @@ public class PrimitiveR064 extends PrimitiveArray {
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, step, data, function, right);
+        OperationBinary.invoke(data, first, limit, step, data, function, right.doubleValue());
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        OperationBinary.invoke(data, first, limit, step, left, function, data);
+        OperationBinary.invoke(data, first, limit, step, left.doubleValue(), function, data);
     }
 
     @Override

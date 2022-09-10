@@ -24,6 +24,9 @@ package org.ojalgo.array;
 import java.util.Arrays;
 
 import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationParameter;
+import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -225,50 +228,42 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
-        // TODO Auto-generated method stub
-        return false;
+        return PrimitiveScalar.isSmall(comparedTo, data[index]);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, step, data, function, right.shortValue());
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, step, left.shortValue(), function, data);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        // TODO Auto-generated method stub
-
+        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        OperationUnary.invoke(data, first, limit, step, this, function);
     }
 
     @Override
     protected void modifyOne(final int index, final UnaryFunction<Double> modifier) {
-        // TODO Auto-generated method stub
-
+        data[index] = modifier.invoke(data[index]);
     }
 
     @Override

@@ -34,7 +34,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
      *
      * @author apete
      */
-    public static final class FixedFirst<N extends Comparable<N>> implements UnaryFunction<N> {
+    public static final class FixedFirst<N extends Comparable<N>> implements UnaryFunction<N>, NumberDefinition {
 
         private final double myDoubleValue;
         private final float myFloatValue;
@@ -98,7 +98,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
      *
      * @author apete
      */
-    public static final class FixedSecond<N extends Comparable<N>> implements UnaryFunction<N> {
+    public static final class FixedSecond<N extends Comparable<N>> implements UnaryFunction<N>, NumberDefinition {
 
         private final double myDoubleValue;
         private final float myFloatValue;
@@ -159,7 +159,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
 
     default BinaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);
-        return new BinaryFunction<N>() {
+        return new BinaryFunction<>() {
 
             public double invoke(final double arg1, final double arg2) {
                 return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
