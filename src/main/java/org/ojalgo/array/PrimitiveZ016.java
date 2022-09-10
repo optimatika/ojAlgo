@@ -23,7 +23,9 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
@@ -41,6 +43,7 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -121,20 +124,17 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        // TODO Auto-generated method stub
-
+        data[index] += NumberDefinition.shortValue(addend);
     }
 
     @Override
     protected void add(final int index, final double addend) {
-        // TODO Auto-generated method stub
-
+        data[index] += addend;
     }
 
     @Override
     protected void add(final int index, final float addend) {
-        // TODO Auto-generated method stub
-
+        data[index] += addend;
     }
 
     @Override
@@ -144,14 +144,12 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected double doubleValue(final int index) {
-        // TODO Auto-generated method stub
-        return 0;
+        return data[index];
     }
 
     @Override
     protected void exchange(final int firstA, final int firstB, final int step, final int count) {
-        // TODO Auto-generated method stub
-
+        Exchange.exchange(data, firstA, firstB, step, count);
     }
 
     @Override
@@ -186,44 +184,37 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        // TODO Auto-generated method stub
-
+        data[index] = values.shortValue(valueIndex);
     }
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        // TODO Auto-generated method stub
-
+        data[index] = value.shortValue();
     }
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        // TODO Auto-generated method stub
-
+        data[index] = supplier.shortValue();
     }
 
     @Override
     protected float floatValue(final int index) {
-        // TODO Auto-generated method stub
-        return 0;
+        return data[index];
     }
 
     @Override
-    protected Double get(final int index) {
-        // TODO Auto-generated method stub
-        return null;
+    protected final Double get(final int index) {
+        return Double.valueOf(data[index]);
     }
 
     @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
-        // TODO Auto-generated method stub
-        return 0;
+        return AMAX.invoke(data, first, limit, step);
     }
 
     @Override
     protected boolean isAbsolute(final int index) {
-        // TODO Auto-generated method stub
-        return false;
+        return PrimitiveScalar.isAbsolute(data[index]);
     }
 
     @Override

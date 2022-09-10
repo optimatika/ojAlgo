@@ -77,6 +77,23 @@ public final class AMAX implements ArrayOperation {
         return retVal;
     }
 
+    public static int invoke(final byte[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        byte largest = 0;
+        byte candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = (byte) Math.abs(data[i]);
+            if (candidate > largest) {
+                largest = candidate;
+                retVal = i;
+            }
+        }
+
+        return retVal;
+    }
+
     public static int invoke(final double[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
@@ -137,6 +154,40 @@ public final class AMAX implements ArrayOperation {
         return retVal;
     }
 
+    public static int invoke(final int[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        int largest = 0;
+        int candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = Math.abs(data[i]);
+            if (candidate > largest) {
+                largest = candidate;
+                retVal = i;
+            }
+        }
+
+        return retVal;
+    }
+
+    public static int invoke(final long[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        long largest = 0L;
+        long candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = Math.abs(data[i]);
+            if (candidate > largest) {
+                largest = candidate;
+                retVal = i;
+            }
+        }
+
+        return retVal;
+    }
+
     public static <N extends Scalar<N>> int invoke(final N[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
@@ -162,6 +213,23 @@ public final class AMAX implements ArrayOperation {
 
         for (int i = first; i < limit; i += step) {
             candidate = Math.abs(data.doubleValue(i));
+            if (candidate > largest) {
+                largest = candidate;
+                retVal = i;
+            }
+        }
+
+        return retVal;
+    }
+
+    public static int invoke(final short[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        short largest = 0;
+        short candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = (short) Math.abs(data[i]);
             if (candidate > largest) {
                 largest = candidate;
                 retVal = i;

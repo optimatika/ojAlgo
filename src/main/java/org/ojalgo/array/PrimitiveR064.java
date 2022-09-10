@@ -247,17 +247,17 @@ public class PrimitiveR064 extends PrimitiveArray {
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right.doubleValue());
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left.doubleValue(), function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final Double value) {
-        FillAll.fill(data, first, limit, step, value);
+        FillAll.fill(data, first, limit, step, value.doubleValue());
     }
 
     @Override
@@ -272,7 +272,7 @@ public class PrimitiveR064 extends PrimitiveArray {
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        data[index] = value;
+        data[index] = value.doubleValue();
     }
 
     @Override
@@ -287,7 +287,7 @@ public class PrimitiveR064 extends PrimitiveArray {
 
     @Override
     protected final Double get(final int index) {
-        return data[index];
+        return Double.valueOf(data[index]);
     }
 
     @Override
