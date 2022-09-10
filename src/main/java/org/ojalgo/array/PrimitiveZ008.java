@@ -26,6 +26,7 @@ import java.util.Arrays;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.array.operation.Exchange;
+import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.array.operation.OperationBinary;
 import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
@@ -154,32 +155,27 @@ public class PrimitiveZ008 extends PrimitiveArray {
 
     @Override
     protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, 1, left, function, right.byteValue());
     }
 
     @Override
     protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        OperationBinary.invoke(data, first, limit, 1, left.byteValue(), function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        // TODO Auto-generated method stub
-
+        FillAll.fill(data, first, limit, step, value.byteValue());
     }
 
     @Override
     protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        // TODO Auto-generated method stub
-
+        FillAll.fill(data, first, limit, step, supplier);
     }
 
     @Override

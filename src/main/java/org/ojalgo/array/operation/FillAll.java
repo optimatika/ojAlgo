@@ -28,6 +28,18 @@ public final class FillAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
+    public static void fill(final byte[] data, final int first, final int limit, final int step, final byte value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static void fill(final byte[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.byteValue();
+        }
+    }
+
     public static void fill(final double[] data, final int first, final int limit, final int step, final double value) {
         for (int i = first; i < limit; i += step) {
             data[i] = value;
@@ -52,6 +64,30 @@ public final class FillAll implements ArrayOperation {
         }
     }
 
+    public static void fill(final int[] data, final int first, final int limit, final int step, final int value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static void fill(final int[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.intValue();
+        }
+    }
+
+    public static void fill(final long[] data, final int first, final int limit, final int step, final long value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static void fill(final long[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.longValue();
+        }
+    }
+
     public static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final N value) {
         for (int i = first; i < limit; i += step) {
             data[i] = value;
@@ -62,6 +98,18 @@ public final class FillAll implements ArrayOperation {
             final Scalar.Factory<N> scalar) {
         for (int i = first; i < limit; i += step) {
             data[i] = scalar.cast(supplier.invoke());
+        }
+    }
+
+    public static void fill(final short[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.shortValue();
+        }
+    }
+
+    public static void fill(final short[] data, final int first, final int limit, final int step, final short value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
         }
     }
 
