@@ -38,7 +38,7 @@ public class SparseTest extends ArrayTests {
 
         SparseArray<Double> plain = SparseArray.factory(PrimitiveR064.FACTORY).limit(count).make();
         Array1D<Double> array1D = Array1D.R064.make(dim2);
-        Array2D<Double> array2D = Array2D.PRIMITIVE64.make(dim, dim);
+        Array2D<Double> array2D = Array2D.R064.make(dim, dim);
 
         for (int i = 0; i < 100; i++) {
             long index = Uniform.randomInteger(dim2);

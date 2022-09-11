@@ -71,7 +71,7 @@ public class Array1DTest extends ArrayTests {
 
         final boolean tmpAscending = tmpExpexted.doubleValue(tmpExpexted.count() - 1L) > tmpExpexted.doubleValue(0L);
 
-        final Array2D<Double> tmpAll = Array2D.PRIMITIVE64.rows(rows);
+        final Array2D<Double> tmpAll = Array2D.R064.rows(rows);
 
         for (int i = 0; i < tmpAll.countRows(); i++) {
 

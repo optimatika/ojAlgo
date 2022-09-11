@@ -35,7 +35,7 @@ public final class Normal1D extends AbstractDistribution1D {
 
         final int tmpDim = (int) covariances.countRows();
 
-        final Array2D<Double> retVal = Array2D.PRIMITIVE64.make(tmpDim, tmpDim);
+        final Array2D<Double> retVal = Array2D.R064.make(tmpDim, tmpDim);
         final Array1D<Double> tmpStdDev = Array1D.R064.make(tmpDim);
 
         for (int ij = 0; ij < tmpDim; ij++) {

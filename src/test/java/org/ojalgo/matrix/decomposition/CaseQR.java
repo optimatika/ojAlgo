@@ -93,7 +93,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
         QR<Double> tmpDecomp = QR.PRIMITIVE.make();
 
-        Array2D<Double> a2d = Array2D.PRIMITIVE64.makeFilled(3, 3, Normal.standard());
+        Array2D<Double> a2d = Array2D.R064.makeFilled(3, 3, Normal.standard());
 
         tmpDecomp.decompose(a2d);
 

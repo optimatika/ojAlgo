@@ -322,7 +322,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 
-        Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.make(2, 2);
+        Array2D<ComplexNumber> tmpExpVecs = Array2D.C128.make(2, 2);
         tmpExpVecs.set(0, 0, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));

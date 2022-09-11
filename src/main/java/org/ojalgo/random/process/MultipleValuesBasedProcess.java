@@ -56,7 +56,7 @@ abstract class MultipleValuesBasedProcess<D extends Distribution> extends Abstra
         List<KeyedPrimitive<Double>> initialState = new ArrayList<>(myObservations);
         double initialValue = this.getCurrentValue();
 
-        Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.make(numberOfRealisations, numberOfSteps);
+        Array2D<Double> tmpRealisationValues = Array2D.R064.make(numberOfRealisations, numberOfSteps);
 
         for (int r = 0; r < numberOfRealisations; r++) {
             double tmpCurrentValue = initialValue;
