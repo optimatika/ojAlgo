@@ -400,8 +400,4 @@ public class PrimitiveR064 extends PrimitiveArray {
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
-    OfDouble split() {
-        return Spliterators.spliterator(data, 0);
-    }
-
 }
