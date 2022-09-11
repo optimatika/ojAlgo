@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access1D;
 public final class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
 
     public RationalPolynomial(final int degree) {
-        super(Array1D.RATIONAL.make(degree + 1));
+        super(Array1D.Q128.make(degree + 1));
     }
 
     RationalPolynomial(final Array1D<RationalNumber> coefficients) {
@@ -87,7 +87,7 @@ public final class RationalPolynomial extends AbstractPolynomial<RationalNumber>
 
     @Override
     protected AbstractPolynomial<RationalNumber> makeInstance(final int size) {
-        return new RationalPolynomial(Array1D.RATIONAL.make(size));
+        return new RationalPolynomial(Array1D.Q128.make(size));
     }
 
 }

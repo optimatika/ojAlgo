@@ -119,7 +119,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };

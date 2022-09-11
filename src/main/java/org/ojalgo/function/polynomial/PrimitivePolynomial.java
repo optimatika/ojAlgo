@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access1D;
 public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
 
     public PrimitivePolynomial(final int degree) {
-        super(Array1D.PRIMITIVE64.make(degree + 1));
+        super(Array1D.R064.make(degree + 1));
     }
 
     PrimitivePolynomial(final Array1D<Double> coefficients) {
@@ -78,7 +78,7 @@ public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
 
     @Override
     protected AbstractPolynomial<Double> makeInstance(final int size) {
-        return new PrimitivePolynomial(Array1D.PRIMITIVE64.make(size));
+        return new PrimitivePolynomial(Array1D.R064.make(size));
     }
 
 }

@@ -238,7 +238,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         double[] tmpRe = this.getRealParts();
         double[] tmpIm = this.getImaginaryParts();
 
-        Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(tmpRe.length);
+        Array1D<ComplexNumber> retVal = Array1D.C128.make(tmpRe.length);
 
         for (int i = 0; i < retVal.size(); i++) {
             retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));

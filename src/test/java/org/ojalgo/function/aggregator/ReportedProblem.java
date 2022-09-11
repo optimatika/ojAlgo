@@ -36,14 +36,14 @@ public class ReportedProblem extends FunctionAggregatorTests {
     @Test
     public void testAggregatorMaximumDoesNotWorkForNegativeNumbers() {
 
-        Array1D<Double> prim64Arr = Array1D.PRIMITIVE64.make(9);
+        Array1D<Double> prim64Arr = Array1D.R064.make(9);
         for (int i = 0; i < prim64Arr.size(); i++) {
             prim64Arr.set(i, i - 100.0);
         }
 
-        Array1D<BigDecimal> bigArr = Array1D.BIG.copy((Access1D<?>) prim64Arr);
-        Array1D<RationalNumber> rtnlArray = Array1D.RATIONAL.copy((Access1D<?>) prim64Arr);
-        Array1D<Double> prim32Arr = Array1D.PRIMITIVE32.copy((Access1D<?>) prim64Arr);
+        Array1D<BigDecimal> bigArr = Array1D.R128.copy((Access1D<?>) prim64Arr);
+        Array1D<RationalNumber> rtnlArray = Array1D.Q128.copy((Access1D<?>) prim64Arr);
+        Array1D<Double> prim32Arr = Array1D.R032.copy((Access1D<?>) prim64Arr);
 
         TestUtils.assertEquals(-92.0, prim64Arr.aggregateAll(Aggregator.MAXIMUM).doubleValue());
         TestUtils.assertEquals(-92.0, bigArr.aggregateAll(Aggregator.MAXIMUM).doubleValue());
@@ -55,8 +55,8 @@ public class ReportedProblem extends FunctionAggregatorTests {
         TestUtils.assertEquals(-100.0, rtnlArray.aggregateAll(Aggregator.MINIMUM).doubleValue());
         TestUtils.assertEquals(-100.0, prim32Arr.aggregateAll(Aggregator.MINIMUM).doubleValue());
 
-        Array1D<ComplexNumber> cmplxArr = Array1D.COMPLEX.copy((Access1D<?>) prim64Arr);
-        Array1D<Quaternion> quatArr = Array1D.QUATERNION.copy((Access1D<?>) prim64Arr);
+        Array1D<ComplexNumber> cmplxArr = Array1D.C128.copy((Access1D<?>) prim64Arr);
+        Array1D<Quaternion> quatArr = Array1D.H256.copy((Access1D<?>) prim64Arr);
 
         TestUtils.assertEquals(100.0, prim64Arr.aggregateAll(Aggregator.LARGEST).doubleValue());
         TestUtils.assertEquals(100.0, bigArr.aggregateAll(Aggregator.LARGEST).doubleValue());

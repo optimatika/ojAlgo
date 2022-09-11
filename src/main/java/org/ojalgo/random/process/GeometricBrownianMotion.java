@@ -53,7 +53,7 @@ public final class GeometricBrownianMotion extends SingleValueBasedProcess<LogNo
     public static GeometricBrownianMotion estimate(final Access1D<?> seriesOfSamples, final double samplePeriod) {
 
         int sizeMinusOne = seriesOfSamples.size() - 1;
-        Array1D<Double> logDiffSeries = Array1D.PRIMITIVE64.make(sizeMinusOne);
+        Array1D<Double> logDiffSeries = Array1D.R064.make(sizeMinusOne);
         for (int i = 0; i < sizeMinusOne; i++) {
             logDiffSeries.set(i, LOG.invoke(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
         }

@@ -67,7 +67,7 @@ public class Array1DTest extends ArrayTests {
 
     private void doSortTest(final double[][] rows) {
 
-        final Array1D<Double> tmpExpexted = Array1D.PRIMITIVE64.copy(rows[0]);
+        final Array1D<Double> tmpExpexted = Array1D.R064.copy(rows[0]);
 
         final boolean tmpAscending = tmpExpexted.doubleValue(tmpExpexted.count() - 1L) > tmpExpexted.doubleValue(0L);
 
@@ -76,7 +76,7 @@ public class Array1DTest extends ArrayTests {
         for (int i = 0; i < tmpAll.countRows(); i++) {
 
             final Array1D<Double> tmpSlice = tmpAll.sliceRow(i, 0);
-            final Array1D<Double> tmpCopy = tmpSlice.collect(Array1D.PRIMITIVE64); // Will result in a different (Java's built-in) sorting algorthm
+            final Array1D<Double> tmpCopy = tmpSlice.collect(Array1D.R064); // Will result in a different (Java's built-in) sorting algorthm
 
             if (tmpAscending) {
                 tmpSlice.sortAscending();

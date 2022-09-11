@@ -53,7 +53,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 25.4624074360364, 1.29066167576123, 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 25.4624074360364, 1.29066167576123, 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -67,7 +67,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY.rows(new double[][] { { 4.0, 0.0 }, { 3.0, -5.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -81,7 +81,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }

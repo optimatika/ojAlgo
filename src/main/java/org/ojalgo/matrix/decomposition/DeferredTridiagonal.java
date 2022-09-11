@@ -50,7 +50,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         @Override
         Array1D<ComplexNumber> makeReal(final BasicArray<ComplexNumber> offDiagonal) {
 
-            Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(offDiagonal.count());
+            Array1D<ComplexNumber> retVal = Array1D.C128.make(offDiagonal.count());
             retVal.fillAll(ComplexNumber.ONE);
 
             BasicArray<ComplexNumber> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
@@ -99,7 +99,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         @Override
         Array1D<Quaternion> makeReal(final BasicArray<Quaternion> offDiagonal) {
 
-            Array1D<Quaternion> retVal = Array1D.QUATERNION.make(offDiagonal.count());
+            Array1D<Quaternion> retVal = Array1D.H256.make(offDiagonal.count());
             retVal.fillAll(Quaternion.ONE);
 
             BasicArray<Quaternion> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value

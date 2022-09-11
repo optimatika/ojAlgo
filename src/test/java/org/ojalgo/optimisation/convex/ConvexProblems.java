@@ -1069,7 +1069,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        Array1D<BigDecimal> tmpSolution = Array1D.BIG.copy(tmpResult);
+        Array1D<BigDecimal> tmpSolution = Array1D.R128.copy(tmpResult);
         tmpSolution.modifyAll(NumberContext.of(7, 6).getFunction(BigFunction.getSet()));
         for (BigDecimal tmpBigDecimal : tmpSolution) {
             if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {

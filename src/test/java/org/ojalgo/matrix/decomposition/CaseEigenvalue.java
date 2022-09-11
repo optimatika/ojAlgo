@@ -277,7 +277,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         ComplexNumber tmp33 = ComplexNumber.ZERO;
         ComplexNumber tmp44 = tmp33;
 
-        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
+        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.C128.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
         NumberContext accuracyContext = NumberContext.of(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
@@ -318,7 +318,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
-        Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.make(2);
+        Array1D<ComplexNumber> tmpExpVals = Array1D.C128.make(2);
         tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 

@@ -719,7 +719,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     protected Array1D<Double> makeSingularValues() {
-        return Array1D.PRIMITIVE64.wrap(PrimitiveR064.wrap(s));
+        return Array1D.R064.wrap(PrimitiveR064.wrap(s));
     }
 
     void setD(final MatrixStore<N> someD) {

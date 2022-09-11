@@ -274,7 +274,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
-        Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);

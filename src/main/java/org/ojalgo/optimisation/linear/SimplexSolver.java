@@ -550,7 +550,7 @@ public abstract class SimplexSolver extends LinearSolver {
             if (options.validate) {
                 Access1D<Double> numerators = myTableau.sliceBodyColumn(numerCol);
                 Access1D<Double> denominators = myTableau.sliceBodyColumn(denomCol);
-                Array1D<Double> ratios = Array1D.PRIMITIVE64.copy(numerators);
+                Array1D<Double> ratios = Array1D.R064.copy(numerators);
                 ratios.modifyMatching(DIVIDE, denominators);
                 this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", numerators, denominators,
                         ratios);

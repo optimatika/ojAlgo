@@ -377,7 +377,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         final long dim = this.getV().countColumns();
 
-        final Array1D<ComplexNumber> vector = Array1D.COMPLEX.make(dim);
+        final Array1D<ComplexNumber> vector = Array1D.C128.make(dim);
         this.copyEigenvector(index, vector);
 
         final Array1D<ComplexNumber> values = this.getEigenvalues();

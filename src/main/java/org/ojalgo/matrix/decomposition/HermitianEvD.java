@@ -422,7 +422,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         int length = d.length;
 
-        Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(length);
+        Array1D<ComplexNumber> retVal = Array1D.C128.make(length);
 
         for (int ij = 0; ij < length; ij++) {
             retVal.set(ij, ComplexNumber.valueOf(d[ij]));

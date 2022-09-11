@@ -546,7 +546,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
             tmpRaw[i] = ComplexNumber.of(aRawReal[i], aRawImag[i]);
         }
 
-        return Array1D.COMPLEX.wrap(retVal);
+        return Array1D.C128.wrap(retVal);
     }
 
     public MatrixStore<Double> conjugate() {

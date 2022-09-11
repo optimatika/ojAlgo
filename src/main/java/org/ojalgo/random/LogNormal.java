@@ -40,7 +40,7 @@ public class LogNormal extends AbstractContinuous {
 
         final int size = rawSamples.size();
 
-        final Array1D<Double> logSamples = Array1D.PRIMITIVE64.make(size);
+        final Array1D<Double> logSamples = Array1D.R064.make(size);
 
         for (int i = 0; i < size; i++) {
             logSamples.set(i, LOG.invoke(rawSamples.doubleValue(i)));

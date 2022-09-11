@@ -32,15 +32,15 @@ import org.ojalgo.structure.Access1D;
 public final class DataSeries extends PrimitiveSeries {
 
     public static DataSeries copy(final Access1D<?> template) {
-        return new DataSeries(Array1D.PRIMITIVE64.copy(template));
+        return new DataSeries(Array1D.R064.copy(template));
     }
 
     public static DataSeries copy(final double[] template) {
-        return new DataSeries(Array1D.PRIMITIVE64.copy(template));
+        return new DataSeries(Array1D.R064.copy(template));
     }
 
     public static DataSeries wrap(final double[] raw) {
-        return new DataSeries(Array1D.PRIMITIVE64.wrap(PrimitiveR064.wrap(raw)));
+        return new DataSeries(Array1D.R064.wrap(PrimitiveR064.wrap(raw)));
     }
 
     private final Array1D<Double> myValues;

@@ -37,7 +37,7 @@ public class SparseTest extends ArrayTests {
         final long count = dim2;
 
         SparseArray<Double> plain = SparseArray.factory(PrimitiveR064.FACTORY).limit(count).make();
-        Array1D<Double> array1D = Array1D.PRIMITIVE64.make(dim2);
+        Array1D<Double> array1D = Array1D.R064.make(dim2);
         Array2D<Double> array2D = Array2D.PRIMITIVE64.make(dim, dim);
 
         for (int i = 0; i < 100; i++) {

@@ -244,14 +244,58 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<>(ReferenceTypeR128.FACTORY);
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<>(ScalarC128.FACTORY);
-    public static final Factory<Double> DIRECT32 = new Factory<>(BufferArray.DIRECT32);
-    public static final Factory<Double> DIRECT64 = new Factory<>(BufferArray.DIRECT64);
-    public static final Factory<Double> PRIMITIVE32 = new Factory<>(PrimitiveR032.FACTORY);
-    public static final Factory<Double> PRIMITIVE64 = new Factory<>(PrimitiveR064.FACTORY);
-    public static final Factory<Quaternion> QUATERNION = new Factory<>(ScalarH256.FACTORY);
-    public static final Factory<RationalNumber> RATIONAL = new Factory<>(ScalarQ128.FACTORY);
+    public static final Factory<ComplexNumber> C128 = Array1D.factory(ScalarC128.FACTORY);
+    public static final Factory<Quaternion> H256 = Array1D.factory(ScalarH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = Array1D.factory(ScalarQ128.FACTORY);
+    public static final Factory<Double> R032 = Array1D.factory(PrimitiveR032.FACTORY);
+    public static final Factory<Double> R064 = Array1D.factory(PrimitiveR064.FACTORY);
+    public static final Factory<BigDecimal> R128 = Array1D.factory(ReferenceTypeR128.FACTORY);
+    public static final Factory<Double> Z008 = Array1D.factory(PrimitiveZ008.FACTORY);
+    public static final Factory<Double> Z016 = Array1D.factory(PrimitiveZ016.FACTORY);
+    public static final Factory<Double> Z032 = Array1D.factory(PrimitiveZ032.FACTORY);
+    public static final Factory<Double> Z064 = Array1D.factory(PrimitiveZ064.FACTORY);
+
+    /**
+     * @deprecated v52 Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final Factory<RationalNumber> RATIONAL = Q128;
+
+    /**
+     * @deprecated v52 Use {@link #R128} instead
+     */
+    @Deprecated
+    public static final Factory<BigDecimal> BIG = R128;
+    /**
+     * @deprecated v52 Use {@link #C128} instead
+     */
+    @Deprecated
+    public static final Factory<ComplexNumber> COMPLEX = C128;
+    /**
+     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
+     */
+    @Deprecated
+    public static final Factory<Double> DIRECT32 = Array1D.factory(BufferArray.DIRECT32);
+    /**
+     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
+     */
+    @Deprecated
+    public static final Factory<Double> DIRECT64 = Array1D.factory(BufferArray.DIRECT64);
+    /**
+     * @deprecated v52 Use {@link #R032} instead
+     */
+    @Deprecated
+    public static final Factory<Double> PRIMITIVE32 = R032;
+    /**
+     * @deprecated v52 Use {@link #R064} instead
+     */
+    @Deprecated
+    public static final Factory<Double> PRIMITIVE64 = R064;
+    /**
+     * @deprecated v52 Use {@link #H256} instead
+     */
+    @Deprecated
+    public static final Factory<Quaternion> QUATERNION = H256;
 
     public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new Array1D.Factory<>(denseFactory);
@@ -398,8 +442,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
         result = prime * result + (int) (myFirst ^ myFirst >>> 32);
         result = prime * result + (int) (myLimit ^ myLimit >>> 32);
-        result = prime * result + (int) (myStep ^ myStep >>> 32);
-        return result;
+        return prime * result + (int) (myStep ^ myStep >>> 32);
     }
 
     @Override
