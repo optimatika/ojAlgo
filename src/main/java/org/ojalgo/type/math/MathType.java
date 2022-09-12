@@ -87,6 +87,10 @@ public enum MathType {
         myComponents = components;
     }
 
+    public int getComponents() {
+        return myComponents;
+    }
+
     public JavaType getJavaType() {
         return myJavaType;
     }
@@ -95,8 +99,8 @@ public enum MathType {
         return myNumberSet;
     }
 
-    public int getComponents() {
-        return myComponents;
+    public long getTotalMemory() {
+        return myComponents * myJavaType.memory();
     }
 
 }
