@@ -21,7 +21,10 @@
  */
 package org.ojalgo.array;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
@@ -32,30 +35,49 @@ import org.ojalgo.random.Uniform;
  */
 public class BufferArrayTest extends ArrayTests {
 
-    @Test
-    public void testRandomGetSet() {
+    private static void doTest(final BasicArray<Double> array, final int size) {
 
-        final int tmpCount = 5000;
+        TestUtils.assertEquals(size, array.count());
 
-        final BasicArray<Double> tmpArray = BufferArray.make(tmpCount);
-
-        TestUtils.assertEquals(tmpCount, tmpArray.count());
-
-        final Uniform tmpUniform = new Uniform();
+        Uniform random = new Uniform();
 
         for (int i = 0; i < 100; i++) {
 
-            final long tmpIndex = Uniform.randomInteger(tmpCount);
+            long index = Uniform.randomInteger(size);
 
-            final double tmpExpected = tmpUniform.doubleValue();
+            double expected = random.doubleValue();
 
-            tmpArray.set(tmpIndex, tmpExpected);
+            array.set(index, expected);
 
-            final double tmpActual = tmpArray.doubleValue(tmpIndex);
-
-            TestUtils.assertEquals(tmpExpected, tmpActual);
+            TestUtils.assertEquals(expected, array.doubleValue(index));
         }
+    }
 
+    @TempDir
+    public File tempDir;
+
+    @Test
+    public void testRandomGetSet() {
+
+        int size = 5000;
+        final int capacity = size;
+
+        DenseArray<Double> array = BufferArray.R064.make(capacity);
+
+        BufferArrayTest.doTest(array, size);
+    }
+
+    @Test
+    public void testRandomGetSetOnMappedFile() {
+
+        File file = new File(tempDir, "MMF");
+
+        int size = 5000;
+        final int capacity = size;
+
+        try (BufferArray array = BufferArray.R064.newMapped(file).make(capacity)) {
+            BufferArrayTest.doTest(array, size);
+        }
     }
 
 }

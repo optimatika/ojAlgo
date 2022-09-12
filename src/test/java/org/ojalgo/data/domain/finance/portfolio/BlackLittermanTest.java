@@ -333,7 +333,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
         for (int i = 0; i < tmpViewPortfolios.countRows(); i++) {
             final int row = i;
-            tmpBLM.addViewWithBalancedConfidence(Array1D.BIG.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
+            tmpBLM.addViewWithBalancedConfidence(Array1D.R128.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
                     TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)));
         }
 
@@ -359,7 +359,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
             final int row = i;
             final int row1 = i;
             final int col = i;
-            tmpBLM.addViewWithStandardDeviation(Array1D.BIG.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
+            tmpBLM.addViewWithStandardDeviation(Array1D.R128.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
                     TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)),
                     BigMath.SQRT.invoke(TypeUtils.toBigDecimal(tmpConfidenceMatrix.get(row1, col))));
         }

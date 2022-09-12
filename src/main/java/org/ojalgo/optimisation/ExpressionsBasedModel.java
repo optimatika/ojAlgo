@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ToFileWriter;
@@ -160,7 +160,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                     throw new IllegalStateException();
                 }
 
-                final Primitive64Array modelSolution = Primitive64Array.make(numbVariables);
+                final PrimitiveR064 modelSolution = PrimitiveR064.make(numbVariables);
 
                 for (final IntIndex fixedIndex : fixedVariables) {
                     modelSolution.set(fixedIndex.index, model.getVariable(fixedIndex.index).getValue());
@@ -190,7 +190,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             final List<Variable> tmpFreeVariables = model.getFreeVariables();
             final int numbFreeVars = tmpFreeVariables.size();
 
-            final Primitive64Array solverSolution = Primitive64Array.make(numbFreeVars);
+            final PrimitiveR064 solverSolution = PrimitiveR064.make(numbFreeVars);
 
             for (int i = 0; i < numbFreeVars; i++) {
                 final Variable variable = tmpFreeVariables.get(i);
@@ -871,7 +871,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         State retState = State.UNEXPLORED;
         double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.BIG.make(numberOfVariables);
+        final Array1D<BigDecimal> retSolution = Array1D.R128.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
 

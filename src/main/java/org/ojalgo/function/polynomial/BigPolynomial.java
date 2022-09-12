@@ -36,7 +36,7 @@ import org.ojalgo.type.TypeUtils;
 public final class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     public BigPolynomial(final int degree) {
-        super(Array1D.BIG.make(degree + 1));
+        super(Array1D.R128.make(degree + 1));
     }
 
     BigPolynomial(final Array1D<BigDecimal> coefficients) {
@@ -98,7 +98,7 @@ public final class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
     @Override
     protected AbstractPolynomial<BigDecimal> makeInstance(final int size) {
-        return new BigPolynomial(Array1D.BIG.make(size));
+        return new BigPolynomial(Array1D.R128.make(size));
     }
 
 }

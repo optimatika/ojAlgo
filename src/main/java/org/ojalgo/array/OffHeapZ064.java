@@ -22,20 +22,21 @@
 package org.ojalgo.array;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.machine.JavaType;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
+import org.ojalgo.type.math.MathType;
 
-final class Native32Array extends OffHeapArray {
+final class OffHeapZ064 extends OffHeapArray {
 
-    static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
+    static final MathType TYPE = MathType.Z064;
 
     private final long myPointer;
 
-    Native32Array(final long count) {
+    OffHeapZ064(final long count) {
 
-        super(OffHeapArray.NATIVE32, count);
+        super(OffHeapArray.Z064, count);
 
-        myPointer = NativeMemory.allocateFloatArray(this, count);
+        myPointer = NativeMemory.allocateLongArray(this, count);
 
         this.fillAll(PrimitiveMath.ZERO);
     }
@@ -54,6 +55,14 @@ final class Native32Array extends OffHeapArray {
 
     public void set(final long index, final float value) {
         NativeMemory.setFloat(myPointer, index, value);
+    }
+
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.longValue(addend));
+    }
+
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.longValue(value));
     }
 
 }

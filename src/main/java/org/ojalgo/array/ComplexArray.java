@@ -21,66 +21,29 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
- *
+ * @deprecated v52
  * @author apete
  */
-public class ComplexArray extends ScalarArray<ComplexNumber> {
+@Deprecated
+public class ComplexArray extends ScalarC128 {
 
-    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<ComplexNumber>() {
-
-        @Override
-        public AggregatorSet<ComplexNumber> aggregator() {
-            return ComplexAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<ComplexNumber> function() {
-            return ComplexFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<ComplexNumber> scalar() {
-            return ComplexNumber.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<ComplexNumber> makeDenseArray(final long size) {
-            return ComplexArray.make((int) size);
-        }
-
-    };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
-
-    public static final ComplexArray make(final int size) {
+    public static ComplexArray make(final int size) {
         return new ComplexArray(size);
     }
 
-    public static final ComplexArray wrap(final ComplexNumber... data) {
+    public static ComplexArray wrap(final ComplexNumber... data) {
         return new ComplexArray(data);
     }
 
-    protected ComplexArray(final ComplexNumber[] data) {
-        super(FACTORY, data);
+    ComplexArray(final ComplexNumber[] data) {
+        super(data);
     }
 
-    protected ComplexArray(final int size) {
-        super(FACTORY, size);
+    ComplexArray(final int size) {
+        super(size);
     }
 
 }

@@ -30,8 +30,8 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ScalarC128;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -65,7 +65,7 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public final class Primitive64Store extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
+public final class Primitive64Store extends PrimitiveR064 implements PhysicalStore<Double>, DecompositionStore<Double> {
 
     public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PrimitiveFactory<Primitive64Store>() {
 
@@ -442,7 +442,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;
-        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
+        final double[] tmpColumn = ((PrimitiveR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
 
@@ -464,7 +464,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] column = ((Primitive64Array) multipliers).data;
+        final double[] column = ((PrimitiveR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
 
@@ -486,7 +486,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] column = ((Primitive64Array) multipliers).data;
+        final double[] column = ((PrimitiveR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
 
@@ -539,14 +539,14 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final double[] aRawImag = tmpDiags[1];
         final int tmpLength = Math.min(aRawReal.length, aRawImag.length);
 
-        final ComplexArray retVal = ComplexArray.make(tmpLength);
+        final ScalarC128 retVal = ScalarC128.make(tmpLength);
         final ComplexNumber[] tmpRaw = retVal.data;
 
         for (int i = 0; i < tmpLength; i++) {
             tmpRaw[i] = ComplexNumber.of(aRawReal[i], aRawImag[i]);
         }
 
-        return Array1D.COMPLEX.wrap(retVal);
+        return Array1D.C128.wrap(retVal);
     }
 
     public MatrixStore<Double> conjugate() {
@@ -570,7 +570,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         final double[] tmpData = data;
         final int tmpRowDim = myRowDim;
 
-        final double[] tmpDestination = ((Primitive64Array) destination).data;
+        final double[] tmpDestination = ((PrimitiveR064) destination).data;
 
         int tmpIndex = row + column * tmpRowDim;
         final double tmpDenominator = tmpData[tmpIndex];
@@ -1062,7 +1062,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {
-        HouseholderHermitian.tred2j(data, ((Primitive64Array) mainDiagonal).data, ((Primitive64Array) offDiagonal).data, yesvecs);
+        HouseholderHermitian.tred2j(data, ((PrimitiveR064) mainDiagonal).data, ((PrimitiveR064) offDiagonal).data, yesvecs);
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {

@@ -26,19 +26,19 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
-public class AggregatorSum extends BasicArrayTest {
+public class AggregatorSum extends PrimitiveBasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        BasicArrayTest.setMultiple(array, INDICES);
+        PrimitiveBasicArrayTest.setMultiple(array, INDICES);
 
-        final AggregatorFunction<Double> tmpVisitor = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
+        AggregatorFunction<Double> visitor = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
 
-        array.visitAll(tmpVisitor);
+        array.visitAll(visitor);
 
-        TestUtils.assertTrue(1 <= tmpVisitor.intValue());
-        TestUtils.assertTrue(INDICES.length >= tmpVisitor.intValue());
+        TestUtils.assertTrue(1 <= visitor.intValue());
+        TestUtils.assertTrue(INDICES.length >= visitor.intValue());
     }
 
 }

@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -276,8 +276,8 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / THREE);
 
-        Primitive64Array tmpRawValues = Primitive64Array.make(tmpSize);
-        Primitive64Array tmpLogValues = Primitive64Array.make(tmpSize);
+        PrimitiveR064 tmpRawValues = PrimitiveR064.make(tmpSize);
+        PrimitiveR064 tmpLogValues = PrimitiveR064.make(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             tmpRawValues.data[i] = tmpFactoryDistr.doubleValue();
             tmpLogValues.data[i] = LOG.invoke(tmpRawValues.data[i]);

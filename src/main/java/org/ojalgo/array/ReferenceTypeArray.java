@@ -73,10 +73,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof ReferenceTypeArray)) {
+        if (!super.equals(obj) || !(obj instanceof ReferenceTypeArray)) {
             return false;
         }
         ReferenceTypeArray other = (ReferenceTypeArray) obj;
@@ -111,18 +108,12 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + Arrays.hashCode(data);
-        return result;
+        return (prime * result) + Arrays.hashCode(data);
     }
 
     @Override
     public final void reset() {
         Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
-    }
-
-    @Override
-    public final int size() {
-        return data.length;
     }
 
     public final Spliterator<N> spliterator() {

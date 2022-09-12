@@ -23,7 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.Primitive32Array;
+import org.ojalgo.array.PrimitiveR032;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -62,15 +62,15 @@ public class TuneUnrolledDOT {
     @Setup
     public void setup() {
 
-        Primitive32Array l = Primitive32Array.make(1 * _1_000);
+        PrimitiveR032 l = PrimitiveR032.make(1 * _1_000);
         l.fillAll(Uniform.standard());
         left = l.data;
 
-        Primitive32Array r = Primitive32Array.make(_1_000 * _100);
+        PrimitiveR032 r = PrimitiveR032.make(_1_000 * _100);
         r.fillAll(Uniform.standard());
         right = r.data;
 
-        Primitive32Array p = Primitive32Array.make(1 * _100);
+        PrimitiveR032 p = PrimitiveR032.make(1 * _100);
         p.fillAll(Uniform.standard());
         product = p.data;
 

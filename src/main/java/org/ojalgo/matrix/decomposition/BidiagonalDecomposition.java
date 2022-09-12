@@ -53,10 +53,10 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
             DiagonalStore<ComplexNumber, Array1D<ComplexNumber>> tmpDiagonalAccessD = this.doGetDiagonal();
 
-            Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.make(tmpDiagonalAccessD.getDimension());
+            Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.C128.make(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
 
-            Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.COMPLEX.make(tmpDiagonalAccessD.getDimension());
+            Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.C128.make(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ2.fillAll(ComplexNumber.ONE);
 
             boolean tmpUpper = this.isUpper();

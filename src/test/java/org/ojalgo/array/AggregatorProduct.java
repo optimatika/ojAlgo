@@ -26,18 +26,18 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
-public class AggregatorProduct extends BasicArrayTest {
+public class AggregatorProduct extends PrimitiveBasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        BasicArrayTest.setMultiple(array, INDICES);
+        PrimitiveBasicArrayTest.setMultiple(array, INDICES);
 
-        final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
+        AggregatorFunction<Double> visitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
 
-        array.visitAll(tmpVisitor);
+        array.visitAll(visitor);
 
-        TestUtils.assertEquals(0.0, tmpVisitor.intValue());
+        TestUtils.assertEquals(0.0, visitor.intValue());
     }
 
 }

@@ -18,7 +18,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
     /**
      * 512
      */
-    static long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / Primitive64Array.ELEMENT_SIZE;
+    static long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / PrimitiveR064.ELEMENT_SIZE;
     static long INITIAL = 4L;
     static long LIMIT = Long.MAX_VALUE;
     static long SEGMENT = 32_768L;

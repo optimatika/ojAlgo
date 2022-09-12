@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.FillMatchingSingle;
@@ -163,7 +163,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
-            return RawDecomposition.makeDiagonal(Primitive64Array.wrap(d)).get();
+            return RawDecomposition.makeDiagonal(PrimitiveR064.wrap(d)).get();
         }
 
     }
@@ -238,7 +238,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         double[] tmpRe = this.getRealParts();
         double[] tmpIm = this.getImaginaryParts();
 
-        Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(tmpRe.length);
+        Array1D<ComplexNumber> retVal = Array1D.C128.make(tmpRe.length);
 
         for (int i = 0; i < retVal.size(); i++) {
             retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));

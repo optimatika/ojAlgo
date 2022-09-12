@@ -135,7 +135,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
         if (tmpAssetWeights != null) {
 
-            return Array1D.BIG.copy(tmpAssetWeights);
+            return Array1D.R128.copy(tmpAssetWeights);
 
         } else {
 

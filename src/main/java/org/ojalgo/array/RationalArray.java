@@ -21,66 +21,29 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.RationalFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.RationalAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
- *
+ * @deprecated v52
  * @author apete
  */
-public class RationalArray extends ScalarArray<RationalNumber> {
+@Deprecated
+public class RationalArray extends ScalarQ128 {
 
-    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<RationalNumber>() {
-
-        @Override
-        public AggregatorSet<RationalNumber> aggregator() {
-            return RationalAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<RationalNumber> function() {
-            return RationalFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<RationalNumber> scalar() {
-            return RationalNumber.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<RationalNumber> makeDenseArray(final long size) {
-            return RationalArray.make((int) size);
-        }
-
-    };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
-
-    public static final RationalArray make(final int size) {
+    public static RationalArray make(final int size) {
         return new RationalArray(size);
     }
 
-    public static final RationalArray wrap(final RationalNumber... data) {
+    public static RationalArray wrap(final RationalNumber... data) {
         return new RationalArray(data);
     }
 
-    protected RationalArray(final int size) {
-        super(FACTORY, size);
+    RationalArray(final RationalNumber[] data) {
+        super(data);
     }
 
-    protected RationalArray(final RationalNumber[] data) {
-        super(FACTORY, data);
+    RationalArray(final int size) {
+        super(size);
     }
 
 }

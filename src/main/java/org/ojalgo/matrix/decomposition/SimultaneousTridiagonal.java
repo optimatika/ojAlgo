@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -49,8 +49,8 @@ class SimultaneousTridiagonal extends TridiagonalDecomposition<Double> {
         final int size = this.getMinDim();
 
         if ((myDiagD == null) || (myDiagD.count() == size)) {
-            myDiagD = Primitive64Array.make(size);
-            myDiagE = Primitive64Array.make(size);
+            myDiagD = PrimitiveR064.make(size);
+            myDiagE = PrimitiveR064.make(size);
         }
 
         this.getInPlace().tred2(myDiagD, myDiagE, true);

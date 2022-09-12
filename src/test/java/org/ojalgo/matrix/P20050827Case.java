@@ -52,7 +52,7 @@ public class P20050827Case extends BasicMatrixTest {
         final int tmpRowDim = 3;
         final int tmpColDim = 5;
 
-        final Array2D<ComplexNumber> tmpArray = Array2D.COMPLEX.make(tmpRowDim, tmpColDim);
+        final Array2D<ComplexNumber> tmpArray = Array2D.C128.make(tmpRowDim, tmpColDim);
 
         for (int i = 0; i < tmpRowDim; i++) {
             for (int j = 0; j < tmpColDim; j++) {

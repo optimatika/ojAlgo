@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.NumberList;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -280,7 +280,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          * @see #toLinearApproximation(Access1D)
          */
         public LinearSolver.GeneralBuilder toLinearApproximation() {
-            return this.toLinearApproximation(Primitive64Array.make(this.countVariables()));
+            return this.toLinearApproximation(PrimitiveR064.make(this.countVariables()));
         }
 
         /**
@@ -581,7 +581,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         // AI & BI
 
         RowsSupplier<Double> body = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
-        NumberList<Double> rhs = NumberList.factory(Primitive64Array.FACTORY).make();
+        NumberList<Double> rhs = NumberList.factory(PrimitiveR064.FACTORY).make();
         AtomicInteger rowIndex = new AtomicInteger(0);
 
         sourceModel.variables().forEach(variable -> {

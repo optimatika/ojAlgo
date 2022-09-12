@@ -31,7 +31,7 @@ import org.ojalgo.random.Uniform;
  *
  * @author apete
  */
-public abstract class BasicArrayTest extends ArrayTests {
+public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     static final int COUNT = 100;
     static final long[] INDICES = new long[10];
@@ -51,45 +51,62 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     @Test
     public void testHugeSparse() {
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
+        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
     }
 
     @Test
-    public void testNative32() {
-        this.doTest(OffHeapArray.makeNative32(COUNT));
+    public void testOffHeapR032() {
+        this.doTest(OffHeapArray.R032.make(COUNT));
     }
 
     @Test
-    public void testNative64() {
-        this.doTest(OffHeapArray.makeNative64(COUNT));
+    public void testOffHeapR064() {
+        this.doTest(OffHeapArray.R064.make(COUNT));
     }
 
     @Test
-    public void testPrimitive32() {
-        this.doTest(Primitive32Array.make(COUNT));
+    public void testPrimitiveR032() {
+        this.doTest(PrimitiveR032.make(COUNT));
     }
 
     @Test
-    public void testPrimitive64() {
-        this.doTest(Primitive64Array.make(COUNT));
+    public void testPrimitiveR064() {
+        this.doTest(PrimitiveR064.make(COUNT));
+    }
+
+    @Test
+    public void testPrimitiveZ008() {
+        this.doTest(PrimitiveZ008.make(COUNT));
+    }
+
+    @Test
+    public void testPrimitiveZ016() {
+        this.doTest(PrimitiveZ016.make(COUNT));
+    }
+
+    @Test
+    public void testPrimitiveZ032() {
+        this.doTest(PrimitiveZ032.make(COUNT));
+    }
+
+    @Test
+    public void testPrimitiveZ064() {
+        this.doTest(PrimitiveZ064.make(COUNT));
     }
 
     @Test
     public void testSegmentedPrimitive() {
-        //this.doTest(SegmentedArray.make(PrimitiveArray.FACTORY, COUNT));
-        this.doTest(Primitive64Array.FACTORY.makeSegmented((long) COUNT));
+        this.doTest(PrimitiveR064.FACTORY.makeSegmented(COUNT));
     }
 
     @Test
     public void testSegmentedSparse() {
-        //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
-        this.doTest(new BasicArray.Factory<>(Primitive64Array.FACTORY).makeSegmented(COUNT));
+        this.doTest(new BasicArray.Factory<>(PrimitiveR064.FACTORY).makeSegmented(COUNT));
     }
 
     @Test
     public void testSparse() {
-        final long count = COUNT;
-        this.doTest(SparseArray.factory(Primitive64Array.FACTORY).limit(count).initial(DenseCapacityStrategy.capacity(count)).make());
+        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(COUNT).initial(DenseCapacityStrategy.capacity(COUNT)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);

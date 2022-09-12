@@ -22,38 +22,47 @@
 package org.ojalgo.array;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.machine.JavaType;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
+import org.ojalgo.type.math.MathType;
 
-final class Native64Array extends OffHeapArray {
+final class OffHeapZ032 extends OffHeapArray {
 
-    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
+    static final MathType TYPE = MathType.Z032;
 
     private final long myPointer;
 
-    Native64Array(final long count) {
+    OffHeapZ032(final long count) {
 
-        super(OffHeapArray.NATIVE64, count);
+        super(OffHeapArray.Z032, count);
 
-        myPointer = NativeMemory.allocateDoubleArray(this, count);
+        myPointer = NativeMemory.allocateIntArray(this, count);
 
         this.fillAll(PrimitiveMath.ZERO);
     }
 
     public double doubleValue(final long index) {
-        return NativeMemory.getDouble(myPointer, index);
+        return NativeMemory.getFloat(myPointer, index);
     }
 
     public float floatValue(final long index) {
-        return (float) NativeMemory.getDouble(myPointer, index);
+        return NativeMemory.getFloat(myPointer, index);
     }
 
     public void set(final long index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        NativeMemory.setFloat(myPointer, index, (float) value);
     }
 
     public void set(final long index, final float value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        NativeMemory.setFloat(myPointer, index, value);
+    }
+
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.intValue(addend));
+    }
+
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.intValue(value));
     }
 
 }

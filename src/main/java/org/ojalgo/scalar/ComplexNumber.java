@@ -229,10 +229,9 @@ public final class ComplexNumber
         }
 
         if (number instanceof ComplexNumber) {
-
             return (ComplexNumber) number;
-
         }
+
         return new ComplexNumber(NumberDefinition.doubleValue(number));
     }
 

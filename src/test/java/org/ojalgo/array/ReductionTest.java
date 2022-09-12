@@ -40,7 +40,7 @@ public class ReductionTest extends ArrayTests {
     @Test
     public void test2To1D() {
 
-        final Array2D<Double> array = Array2D.PRIMITIVE64.make(5, 3);
+        final Array2D<Double> array = Array2D.R064.make(5, 3);
         array.fillAll(1.0);
 
         final Array1D<Double> reducedRows = array.reduceRows(Aggregator.SUM);
@@ -63,7 +63,7 @@ public class ReductionTest extends ArrayTests {
 
         final double total = StructureAnyD.count(structure);
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.R064.make(structure);
         array.fillAll(1.0);
 
         for (int d = 0; d < structure.length; d++) {
@@ -83,7 +83,7 @@ public class ReductionTest extends ArrayTests {
 
         final double total = StructureAnyD.count(structure);
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.R064.make(structure);
         array.fillAll(1.0);
 
         for (int rd = 0; rd < structure.length; rd++) {
@@ -112,7 +112,7 @@ public class ReductionTest extends ArrayTests {
             structure[d] = 1 + RANDOM.nextInt(9);
         }
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.R064.make(structure);
         array.fillAll(new Normal());
 
         for (int rd = 0; rd < structure.length; rd++) {

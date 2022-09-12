@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array;
 
+import java.util.function.LongFunction;
+
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -33,6 +35,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
@@ -43,7 +46,16 @@ import org.ojalgo.structure.Access1D;
  */
 public abstract class OffHeapArray extends DenseArray<Double> {
 
-    public static final Factory<Double> NATIVE32 = new Factory<>() {
+    static final class Factory extends DenseArray.Factory<Double> {
+
+        private final LongFunction<OffHeapArray> myConstructor;
+        private final MathType myMathType;
+
+        Factory(final MathType mathType, final LongFunction<OffHeapArray> constructor) {
+            super();
+            myMathType = mathType;
+            myConstructor = constructor;
+        }
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -53,6 +65,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         @Override
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public DenseArray<Double> makeDenseArray(final long size) {
+            return myConstructor.apply(size);
         }
 
         @Override
@@ -67,56 +84,43 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
         @Override
         long getElementSize() {
-            return Native32Array.ELEMENT_SIZE;
+            return myMathType.getJavaType().memory();
         }
 
-        @Override
-        public DenseArray<Double> makeDenseArray(final long size) {
-            return new Native32Array(size);
-        }
-
-    };
-
-    public static final Factory<Double> NATIVE64 = new Factory<>() {
-
-        @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        long getCapacityLimit() {
-            return MAX_ARRAY_SIZE;
-        }
-
-        @Override
-        long getElementSize() {
-            return Native64Array.ELEMENT_SIZE;
-        }
-
-        @Override
-        public DenseArray<Double> makeDenseArray(final long size) {
-            return new Native64Array(size);
-        }
-
-    };
-
-    public static OffHeapArray makeNative32(final long count) {
-        return new Native32Array(count);
     }
 
+    public static final DenseArray.Factory<Double> R032 = new Factory(MathType.R032, OffHeapR032::new);
+    public static final DenseArray.Factory<Double> R064 = new Factory(MathType.R064, OffHeapR064::new);
+    public static final DenseArray.Factory<Double> Z008 = new Factory(MathType.Z008, OffHeapZ008::new);
+    public static final DenseArray.Factory<Double> Z016 = new Factory(MathType.Z016, OffHeapZ016::new);
+    public static final DenseArray.Factory<Double> Z032 = new Factory(MathType.Z032, OffHeapZ032::new);
+    public static final DenseArray.Factory<Double> Z064 = new Factory(MathType.Z064, OffHeapZ064::new);
+
+    /**
+     * @deprecated Use {@link #R032} instead
+     */
+    @Deprecated
+    public static final DenseArray.Factory<Double> NATIVE32 = R032;
+    /**
+     * @deprecated Use {@link #R064} instead
+     */
+    @Deprecated
+    public static final DenseArray.Factory<Double> NATIVE64 = R064;
+
+    /**
+     * @deprecated Use {@link #R032} instead
+     */
+    @Deprecated
+    public static OffHeapArray makeNative32(final long count) {
+        return new OffHeapR032(count);
+    }
+
+    /**
+     * @deprecated Use {@link #R064} instead
+     */
+    @Deprecated
     public static OffHeapArray makeNative64(final long count) {
-        return new Native64Array(count);
+        return new OffHeapR064(count);
     }
 
     private final long myCount;
@@ -130,10 +134,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
     public void add(final long index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
-    }
-
-    public void add(final long index, final Comparable<?> addend) {
-        this.add(index, Scalar.doubleValue(addend));
     }
 
     public long count() {
@@ -175,10 +175,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     @Override
     public final void reset() {
         this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    public void set(final long index, final Comparable<?> value) {
-        this.set(index, Scalar.doubleValue(value));
     }
 
     public void visitOne(final long index, final VoidFunction<Double> visitor) {

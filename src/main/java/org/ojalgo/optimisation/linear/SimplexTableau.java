@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
@@ -136,10 +136,10 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             // Diff begin
 
             // Array1D<Double> currentRow = myTransposed.sliceColumn(row);
-            Primitive64Array currentRow = Primitive64Array.wrap(myRaw[row]);
+            PrimitiveR064 currentRow = PrimitiveR064.wrap(myRaw[row]);
             double currentRHS = currentRow.doubleValue(myColDim - 1);
 
-            final Primitive64Array auxiliaryRow = Primitive64Array.make(myColDim);
+            final PrimitiveR064 auxiliaryRow = PrimitiveR064.make(myColDim);
             if (currentRHS > value) {
                 currentRow.axpy(NEG, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
@@ -421,7 +421,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             Array1D<Double> currentRow = myTransposed.sliceColumn(row);
             double currentRHS = currentRow.doubleValue(myColDim - 1);
 
-            final Primitive64Array auxiliaryRow = Primitive64Array.make(myColDim);
+            final PrimitiveR064 auxiliaryRow = PrimitiveR064.make(myColDim);
             if (currentRHS > value) {
                 currentRow.axpy(NEG, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
@@ -698,7 +698,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int nbProblemVariables = nbPositiveProblemVariables + nbNegativeProblemVariables;
 
             long initial = Math.max(5L, Math.round(Math.sqrt(Math.min(nbConstraints, nbProblemVariables))));
-            mySparseFactory = SparseArray.factory(Primitive64Array.FACTORY).initial(initial);
+            mySparseFactory = SparseArray.factory(PrimitiveR064.FACTORY).initial(initial);
 
             // Including artificial variables
             final int totNumbVars = this.countVariablesTotally();
@@ -1048,8 +1048,8 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
 
     }
 
-    static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(Primitive64Array.FACTORY);
-    static final DenseArray.Factory<Double> DENSE_FACTORY = Primitive64Array.FACTORY;
+    static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(PrimitiveR064.FACTORY);
+    static final DenseArray.Factory<Double> DENSE_FACTORY = PrimitiveR064.FACTORY;
 
     static void copy(final LinearSolver.Builder builder, final SimplexTableau tableau) {
 
