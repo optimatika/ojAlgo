@@ -39,7 +39,7 @@ public class AnyDTest extends ArrayTests {
 
         long[] shape = { 4, 9, 5 };
 
-        ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeFilled(shape, Uniform.standard());
+        ArrayAnyD<Double> array = ArrayAnyD.R064.makeFilled(shape, Uniform.standard());
 
         Eigenvalue<Double> evd = Eigenvalue.PRIMITIVE.make(false);
 
@@ -55,7 +55,7 @@ public class AnyDTest extends ArrayTests {
 
         long[] shape = { 4, 9, 5 };
 
-        ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(shape);
+        ArrayAnyD<Double> array = ArrayAnyD.R064.make(shape);
 
         Array1D<Double> sliced = array.sliceSet(new long[] { 2, 3, 0 }, 2);
         sliced.fillAll(2.0);
@@ -113,7 +113,7 @@ public class AnyDTest extends ArrayTests {
 
         long[] shape = { 5, 9, 7 };
 
-        ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE32.make(shape);
+        ArrayAnyD<Double> array = ArrayAnyD.R032.make(shape);
 
         array.sliceSet(new long[] { 0, 0, 0 }, 0).size();
 

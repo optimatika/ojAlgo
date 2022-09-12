@@ -296,7 +296,7 @@ public class TensorTest {
         VectorTensor<RationalNumber> v = FACTORY_1.values(1, -2);
         VectorTensor<RationalNumber> w = FACTORY_1.values(-1, 3);
 
-        ArrayAnyD<RationalNumber> expected = ArrayAnyD.RATIONAL.make(2, 2, 2);
+        ArrayAnyD<RationalNumber> expected = ArrayAnyD.Q128.make(2, 2, 2);
         expected.set(new long[] { 0, 0, 0 }, -1);
         expected.set(new long[] { 0, 0, 1 }, 3);
         expected.set(new long[] { 0, 1, 0 }, 2);
