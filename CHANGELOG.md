@@ -13,9 +13,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.algebra
+
+- New enum `NumberSet` outlining the number sets used within ojAlgo.
+
 #### org.ojalgo.array
 
-- Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this has been supported via an extension artifact, ojAlgo-unsafe.
+- Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this was supported via an extension artifact, ojAlgo-unsafe.That artifact is now deprecated and will not be updated further.
+- New primitives based array classes for `long`, `int`, `short` and `byte` elements. This includes native off-heap and buffer based variants - even the memory mapped file-backed variants.
+- New naming scheme for the various "array" classes and the factories. Most (if not all) the old/previous classes, factories and factory methods sill exist but are deprecated. The new names are based on the members of the `org.ojalgo.type.math.MathType` enum.
 
 #### org.ojalgo.data
 
@@ -34,8 +40,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.type
 
 - The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
+- New enum `MathType` outlining the types used in ojAlgo. It's the mathematical number set paired with info about how it is implemented (ComplexNumber = 2 * double)
 
 ### Changed
+
+#### org.ojalgo.array
+
+- New generalised way to create memory-mapped file-based array classes
 
 #### org.ojalgo.equation
 

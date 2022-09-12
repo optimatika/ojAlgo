@@ -26,9 +26,17 @@ import java.math.MathContext;
 
 import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.machine.JavaType;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * The number sets supported by ojAlgo, paired with a declaration of how they are implemented/approximated.
+ * The naming scheme is the {@link NumberSet} symbol paired with the total number of bits used to represent
+ * the components.
+ * <p>
+ * For instance: C128 referns to C = {@link ComplexNumber} which is implemeted as two double:s each of 64
+ * bits. If there would be a float based complex number implementation it would be named C064.
+ * <p>
+ * R032 is a Real number implemented/approximated using a single 32 bit float.
  *
  * @author apete
  */

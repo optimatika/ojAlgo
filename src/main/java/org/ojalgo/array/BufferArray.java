@@ -163,7 +163,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
         @Override
         SegmentedArray<Double> makeSegmented(final long... structure) {
-
             return super.makeSegmented(structure);
         }
 
