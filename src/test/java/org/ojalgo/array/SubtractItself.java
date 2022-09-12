@@ -25,20 +25,27 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 
-public class AggregatorSum extends PrimitiveBasicArrayTest {
+public class SubtractItself extends PrimitiveBasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
         PrimitiveBasicArrayTest.setMultiple(array, INDICES);
 
-        AggregatorFunction<Double> visitor = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
+        AggregatorFunction<Double> visitor = Aggregator.CARDINALITY.getFunction(PrimitiveAggregator.getSet());
 
         array.visitAll(visitor);
 
         TestUtils.assertTrue(1 <= visitor.intValue());
         TestUtils.assertTrue(INDICES.length >= visitor.intValue());
+
+        array.modifyMatching(PrimitiveMath.SUBTRACT, array);
+
+        visitor.reset();
+        array.visitAll(visitor);
+        TestUtils.assertEquals(0, visitor.intValue());
     }
 
 }

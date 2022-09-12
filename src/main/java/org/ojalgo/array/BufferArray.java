@@ -367,11 +367,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    public int size() {
-        return myBuffer.capacity();
-    }
-
-    @Override
     protected void add(final int index, final Comparable<?> addend) {
         this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
     }

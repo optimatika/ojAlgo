@@ -30,9 +30,7 @@ import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
 /**
- * <p>
  * Each and every element occupies memory and holds a value.
- * </p>
  *
  * @author apete
  */

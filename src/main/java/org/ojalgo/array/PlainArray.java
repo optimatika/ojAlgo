@@ -36,13 +36,15 @@ import org.ojalgo.structure.Access1D;
  * Array class limited by integer (int, not long) indices. Typically this will be a plain java array as in
  * <code>double[]</code>. This class terminates/implements all methods with long arguments, casts the long
  * arguments to int and delegates to new protected abstract methods with the int arguments. No new public
- * methods are declared here, and this class is package private.
+ * methods are declared here.
  *
  * @author apete
  */
 public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
+
+    private final int mySize;
 
     PlainArray(final DenseArray.Factory<N> factory, final int size) {
 
@@ -51,6 +53,12 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         if (size > MAX_ARRAY_SIZE) {
             throw new IllegalArgumentException("Array too large!");
         }
+
+        mySize = size;
+    }
+
+    public final int size() {
+        return mySize;
     }
 
     @Override

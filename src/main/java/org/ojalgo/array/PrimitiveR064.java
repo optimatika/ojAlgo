@@ -173,11 +173,6 @@ public class PrimitiveR064 extends PrimitiveArray {
     }
 
     @Override
-    public int size() {
-        return data.length;
-    }
-
-    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }

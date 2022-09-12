@@ -26,20 +26,20 @@ import java.util.Arrays;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 
-public class SetGetTest extends BasicArrayTest {
+public class SetGetTest extends PrimitiveBasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        BasicArrayTest.setMultiple(array, INDICES);
+        PrimitiveBasicArrayTest.setMultiple(array, INDICES);
 
         for (long i = 0L; i < COUNT; i++) {
 
-            final int tmpIndex = Arrays.binarySearch(INDICES, i);
+            int index = Arrays.binarySearch(INDICES, i);
 
-            if (tmpIndex >= 0) {
+            if (index >= 0) {
 
-                TestUtils.assertEquals(i, INDICES[tmpIndex]);
+                TestUtils.assertEquals(i, INDICES[index]);
 
                 TestUtils.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
 

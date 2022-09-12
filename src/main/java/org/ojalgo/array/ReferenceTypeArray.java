@@ -116,11 +116,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 
-    @Override
-    public final int size() {
-        return data.length;
-    }
-
     public final Spliterator<N> spliterator() {
         return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
