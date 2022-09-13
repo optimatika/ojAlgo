@@ -75,9 +75,9 @@ public class CaseQR extends MatrixDecompositionTests {
         tmpDecomp.decompose(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("This is A", tmpOriginalMatrix);
-            BasicLogger.debug("Should be I", tmpDecomp.getQ());
-            BasicLogger.debug("Should be A", tmpDecomp.getR());
+            BasicLogger.debugMatrix("This is A", tmpOriginalMatrix);
+            BasicLogger.debugMatrix("Should be I", tmpDecomp.getQ());
+            BasicLogger.debugMatrix("Should be A", tmpDecomp.getR());
         }
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, ACCURACY);
@@ -118,7 +118,7 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpOriginal = CaseQR.makeHermitianMatrix();
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Original", tmpOriginal);
+            BasicLogger.debugMatrix("Original", tmpOriginal);
         }
 
         final QR<ComplexNumber> tmpDecomposition = QR.COMPLEX.make();
@@ -168,14 +168,14 @@ public class CaseQR extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Decomp Q", tmpDecompQ);
-            BasicLogger.debug("Now Q", tmpNowQ);
-            BasicLogger.debug("Forward Q", tmpForwardQ);
-            BasicLogger.debug("Reverse Q", tmpReverseQ);
+            BasicLogger.debugMatrix("Decomp Q", tmpDecompQ);
+            BasicLogger.debugMatrix("Now Q", tmpNowQ);
+            BasicLogger.debugMatrix("Forward Q", tmpForwardQ);
+            BasicLogger.debugMatrix("Reverse Q", tmpReverseQ);
             BasicLogger.debug();
-            BasicLogger.debug("Decomp R", tmpDecompR);
-            BasicLogger.debug("Now R", tmpNowR);
-            BasicLogger.debug("Forward R", tmpForwardR);
+            BasicLogger.debugMatrix("Decomp R", tmpDecompR);
+            BasicLogger.debugMatrix("Now R", tmpNowR);
+            BasicLogger.debugMatrix("Forward R", tmpForwardR);
         }
 
         TestUtils.assertEquals(tmpOriginal, tmpDecomposition, ACCURACY);
@@ -238,9 +238,9 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<Double> tmpPrimitiveQ = tmpPrimitiveDecomp.getQ();
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big Q", tmpBigQ);
-            BasicLogger.debug("Complex Q", tmpComplexQ);
-            BasicLogger.debug("Primitive Q", tmpPrimitiveQ);
+            BasicLogger.debugMatrix("Big Q", tmpBigQ);
+            BasicLogger.debugMatrix("Complex Q", tmpComplexQ);
+            BasicLogger.debugMatrix("Primitive Q", tmpPrimitiveQ);
         }
 
         final MatrixStore<RationalNumber> tmpBigR = tmpBigDecomp.getR();
@@ -248,9 +248,9 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<Double> tmpPrimitiveR = tmpPrimitiveDecomp.getR();
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big R", tmpBigR);
-            BasicLogger.debug("Complex R", tmpComplexR);
-            BasicLogger.debug("Primitive R", tmpPrimitiveR);
+            BasicLogger.debugMatrix("Big R", tmpBigR);
+            BasicLogger.debugMatrix("Complex R", tmpComplexR);
+            BasicLogger.debugMatrix("Primitive R", tmpPrimitiveR);
         }
 
         TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));

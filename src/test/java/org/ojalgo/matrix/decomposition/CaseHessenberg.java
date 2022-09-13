@@ -61,11 +61,11 @@ public class CaseHessenberg extends MatrixDecompositionTests {
     private void doPrint(final HessenbergDecomposition<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
         BasicLogger.debug();
         BasicLogger.debug();
-        BasicLogger.debug("Original: ", aMatrix);
-        BasicLogger.debug("Q get: ", aDecomposition.getQ());
-        BasicLogger.debug("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
-        BasicLogger.debug("H: ", aDecomposition.getH());
-        BasicLogger.debug("Reconstructed: ", aDecomposition.reconstruct());
+        BasicLogger.debugMatrix("Original: ", aMatrix);
+        BasicLogger.debugMatrix("Q get: ", aDecomposition.getQ());
+        BasicLogger.debugMatrix("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
+        BasicLogger.debugMatrix("H: ", aDecomposition.getH());
+        BasicLogger.debugMatrix("Reconstructed: ", aDecomposition.reconstruct());
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {

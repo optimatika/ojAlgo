@@ -331,8 +331,12 @@ public interface BasicLogger {
         NotNull.println(DEBUG);
     }
 
+    /**
+     * @deprecated Use {@link #debugColumns(int,Object...)} instead
+     */
+    @Deprecated
     static void debug(final int width, final Object... columns) {
-        NotNull.columns(DEBUG, width, columns);
+        BasicLogger.debugColumns(width, columns);
     }
 
     static void debug(final int tabs, final String message, final Object... arguments) {
@@ -343,12 +347,20 @@ public interface BasicLogger {
         NotNull.println(DEBUG, message);
     }
 
+    /**
+     * @deprecated Use {@link #debugMatrix(String,Access2D<?>)} instead
+     */
+    @Deprecated
     static void debug(final String message, final Access2D<?> matrix) {
-        NotNull.printmtrx(DEBUG, message, matrix, PrivateDetails.MATRIX_ELEMENT_CONTEXT);
+        BasicLogger.debugMatrix(message, matrix);
     }
 
+    /**
+     * @deprecated Use {@link #debugMatrix(String,Access2D<?>,NumberContext)} instead
+     */
+    @Deprecated
     static void debug(final String message, final Access2D<?> matrix, final NumberContext context) {
-        NotNull.printmtrx(DEBUG, message, matrix, context);
+        BasicLogger.debugMatrix(message, matrix, context);
     }
 
     static void debug(final String message, final Object... arguments) {
@@ -359,12 +371,28 @@ public interface BasicLogger {
         NotNull.println(DEBUG, throwable, message, arguments);
     }
 
+    static void debugColumns(final int width, final Object... columns) {
+        NotNull.columns(DEBUG, width, columns);
+    }
+
+    static void debugMatrix(final String message, final Access2D<?> matrix) {
+        NotNull.printmtrx(DEBUG, message, matrix, PrivateDetails.MATRIX_ELEMENT_CONTEXT);
+    }
+
+    static void debugMatrix(final String message, final Access2D<?> matrix, final NumberContext context) {
+        NotNull.printmtrx(DEBUG, message, matrix, context);
+    }
+
     static void error() {
         NotNull.println(ERROR);
     }
 
+    /**
+     * @deprecated Use {@link #errorColumns(int,Object...)} instead
+     */
+    @Deprecated
     static void error(final int width, final Object... columns) {
-        NotNull.columns(ERROR, width, columns);
+        BasicLogger.errorColumns(width, columns);
     }
 
     static void error(final int tabs, final String message, final Object... arguments) {
@@ -375,12 +403,20 @@ public interface BasicLogger {
         NotNull.println(ERROR, message);
     }
 
+    /**
+     * @deprecated Use {@link #errorMatrix(String,Access2D<?>)} instead
+     */
+    @Deprecated
     static void error(final String message, final Access2D<?> matrix) {
-        NotNull.printmtrx(ERROR, message, matrix, PrivateDetails.MATRIX_ELEMENT_CONTEXT);
+        BasicLogger.errorMatrix(message, matrix);
     }
 
+    /**
+     * @deprecated Use {@link #errorMatrix(String,Access2D<?>,NumberContext)} instead
+     */
+    @Deprecated
     static void error(final String message, final Access2D<?> matrix, final NumberContext context) {
-        NotNull.printmtrx(ERROR, message, matrix, context);
+        BasicLogger.errorMatrix(message, matrix, context);
     }
 
     static void error(final String message, final Object... arguments) {
@@ -389,6 +425,18 @@ public interface BasicLogger {
 
     static void error(final Throwable throwable, final String message, final Object... arguments) {
         NotNull.println(ERROR, throwable, message, arguments);
+    }
+
+    static void errorColumns(final int width, final Object... columns) {
+        NotNull.columns(ERROR, width, columns);
+    }
+
+    static void errorMatrix(final String message, final Access2D<?> matrix) {
+        NotNull.printmtrx(ERROR, message, matrix, PrivateDetails.MATRIX_ELEMENT_CONTEXT);
+    }
+
+    static void errorMatrix(final String message, final Access2D<?> matrix, final NumberContext context) {
+        NotNull.printmtrx(ERROR, message, matrix, context);
     }
 
     Optional<Writer> asWriter();

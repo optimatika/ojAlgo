@@ -64,17 +64,17 @@ public class CaseLU extends MatrixDecompositionTests {
         final NumberContext tmpPrintContext = NumberContext.ofScale(20);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big L", tmpBig.getL(), tmpPrintContext);
-            BasicLogger.debug("Complex L", tmpComplex.getL(), tmpPrintContext);
-            BasicLogger.debug("Primitive L", tmpPrimitive.getL(), tmpPrintContext);
-            BasicLogger.debug("Jama L", tmpJama.getL(), tmpPrintContext);
+            BasicLogger.debugMatrix("Big L", tmpBig.getL(), tmpPrintContext);
+            BasicLogger.debugMatrix("Complex L", tmpComplex.getL(), tmpPrintContext);
+            BasicLogger.debugMatrix("Primitive L", tmpPrimitive.getL(), tmpPrintContext);
+            BasicLogger.debugMatrix("Jama L", tmpJama.getL(), tmpPrintContext);
         }
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big U", tmpBig.getU(), tmpPrintContext);
-            BasicLogger.debug("Complex U", tmpComplex.getU(), tmpPrintContext);
-            BasicLogger.debug("Primitive U", tmpPrimitive.getU(), tmpPrintContext);
-            BasicLogger.debug("Jama U", tmpJama.getU(), tmpPrintContext);
+            BasicLogger.debugMatrix("Big U", tmpBig.getU(), tmpPrintContext);
+            BasicLogger.debugMatrix("Complex U", tmpComplex.getU(), tmpPrintContext);
+            BasicLogger.debugMatrix("Primitive U", tmpPrimitive.getU(), tmpPrintContext);
+            BasicLogger.debugMatrix("Jama U", tmpJama.getU(), tmpPrintContext);
         }
 
         final SingularValue<Double> tmpSVD = new RawSingularValue();

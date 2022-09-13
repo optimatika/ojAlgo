@@ -61,15 +61,15 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug(tmpDecomposition.toString());
-            BasicLogger.debug("Original", tmpOriginal);
-            BasicLogger.debug("Q1", tmpQ1);
-            BasicLogger.debug("D", tmpD);
-            BasicLogger.debug("Q2", tmpQ2);
-            BasicLogger.debug("Reconstructed", tmpReconstructed);
-            BasicLogger.debug("Q1 orthogonal (left)", tmpQ1.conjugate().multiply(tmpQ1));
-            BasicLogger.debug("Q1 orthogonal (right)", tmpQ1.multiply(tmpQ1.conjugate()));
-            BasicLogger.debug("Q2 orthogonal (left)", tmpQ2.conjugate().multiply(tmpQ2));
-            BasicLogger.debug("Q2 orthogonal (right)", tmpQ2.multiply(tmpQ2.conjugate()));
+            BasicLogger.debugMatrix("Original", tmpOriginal);
+            BasicLogger.debugMatrix("Q1", tmpQ1);
+            BasicLogger.debugMatrix("D", tmpD);
+            BasicLogger.debugMatrix("Q2", tmpQ2);
+            BasicLogger.debugMatrix("Reconstructed", tmpReconstructed);
+            BasicLogger.debugMatrix("Q1 orthogonal (left)", tmpQ1.conjugate().multiply(tmpQ1));
+            BasicLogger.debugMatrix("Q1 orthogonal (right)", tmpQ1.multiply(tmpQ1.conjugate()));
+            BasicLogger.debugMatrix("Q2 orthogonal (left)", tmpQ2.conjugate().multiply(tmpQ2));
+            BasicLogger.debugMatrix("Q2 orthogonal (right)", tmpQ2.multiply(tmpQ2.conjugate()));
         }
 
         TestUtils.assertEquals(tmpOriginal, tmpDecomposition, NumberContext.of(7, 4));
@@ -136,11 +136,11 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     private void doPrint(final BidiagonalDecomposition<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
         BasicLogger.debug();
         BasicLogger.debug();
-        BasicLogger.debug("Original: ", aMatrix);
-        BasicLogger.debug("Q1 get: ", aDecomposition.getLQ());
-        BasicLogger.debug("D: ", aDecomposition.getD());
-        BasicLogger.debug("Q2 get: ", aDecomposition.getRQ());
-        BasicLogger.debug("Reconstructed: ", aDecomposition.reconstruct());
+        BasicLogger.debugMatrix("Original: ", aMatrix);
+        BasicLogger.debugMatrix("Q1 get: ", aDecomposition.getLQ());
+        BasicLogger.debugMatrix("D: ", aDecomposition.getD());
+        BasicLogger.debugMatrix("Q2 get: ", aDecomposition.getRQ());
+        BasicLogger.debugMatrix("Reconstructed: ", aDecomposition.reconstruct());
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {

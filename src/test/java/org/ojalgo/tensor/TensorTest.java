@@ -94,9 +94,9 @@ public class TensorTest {
         MatrixTensor<RationalNumber> conjugated = original.conjugate();
 
         if (DEBUG) {
-            BasicLogger.debug("original", original);
-            BasicLogger.debug("reversed", reversed);
-            BasicLogger.debug("conjugated", conjugated);
+            BasicLogger.debugMatrix("original", original);
+            BasicLogger.debugMatrix("reversed", reversed);
+            BasicLogger.debugMatrix("conjugated", conjugated);
         }
 
         TestUtils.assertEquals(reversed, conjugated);
@@ -190,10 +190,10 @@ public class TensorTest {
         MatrixTensor<RationalNumber> blocks = FACTORY_2.blocks(matrixB, matrixB, matrixB);
 
         if (DEBUG) {
-            BasicLogger.debug("left", left);
-            BasicLogger.debug("right", right);
-            BasicLogger.debug("both", both);
-            BasicLogger.debug("blocks", blocks);
+            BasicLogger.debugMatrix("left", left);
+            BasicLogger.debugMatrix("right", right);
+            BasicLogger.debugMatrix("both", both);
+            BasicLogger.debugMatrix("blocks", blocks);
         }
 
         TestUtils.assertEquals(3 * DIM, right.dimensions());
