@@ -39,8 +39,10 @@ import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
- * Off heap memory array. Currently supports float and double elements
- * </p>
+ * Off heap memory array.
+ * <p>
+ * When just instantiated these array classes contain uninitialized memory – memory is allocated but not
+ * initialized.
  *
  * @author apete
  */
@@ -79,7 +81,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
         @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE;
+            return Long.MAX_VALUE;
         }
 
         @Override
@@ -136,7 +138,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         this.set(index, this.doubleValue(index) + addend);
     }
 
-    public long count() {
+    public final long count() {
         return myCount;
     }
 

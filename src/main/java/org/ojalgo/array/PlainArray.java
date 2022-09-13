@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import java.util.ArrayList;
 import java.util.RandomAccess;
 import java.util.Spliterator;
 
@@ -46,11 +47,17 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     private final int mySize;
 
+    /**
+     * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
+     * Integer.MAX_VALUE - 2, but other JVM:s may have different limits.
+     */
+    public static final int MAX_SIZE = Integer.MAX_VALUE - 8;
+
     PlainArray(final DenseArray.Factory<N> factory, final int size) {
 
         super(factory);
 
-        if (size > MAX_ARRAY_SIZE) {
+        if (size > PlainArray.MAX_SIZE) {
             throw new IllegalArgumentException("Array too large!");
         }
 

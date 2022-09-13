@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -61,7 +61,7 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     Factory<Double> PRIMITIVE = typical -> {
 
-        if (512L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+        if (512L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new LUDecomposition.Primitive();
         }
         return new RawLU();

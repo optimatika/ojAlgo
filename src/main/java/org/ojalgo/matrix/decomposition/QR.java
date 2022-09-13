@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -71,7 +71,7 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
     Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
 
     Factory<Double> PRIMITIVE = (typical, fullSize) -> {
-        if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+        if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new QRDecomposition.Primitive(fullSize);
         }
         return new RawQR();

@@ -92,7 +92,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
         @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE / this.getElementSize();
+            return PlainArray.MAX_SIZE / this.getElementSize();
         }
 
         @Override

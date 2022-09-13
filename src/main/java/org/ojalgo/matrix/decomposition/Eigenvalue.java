@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -253,7 +253,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
-            if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
                 return new DynamicEvD.Primitive();
             }
             return new RawEigenvalue.Dynamic();
@@ -262,12 +262,12 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
-                if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
                     return new HermitianEvD.Primitive();
                 }
                 return new RawEigenvalue.Symmetric();
             }
-            if (8192L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
                 return new GeneralEvD.Primitive();
             }
             return new RawEigenvalue.General();

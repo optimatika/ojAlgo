@@ -30,7 +30,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
 
         double tmpInitialCapacity = count;
 
-        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
+        while (tmpInitialCapacity > PlainArray.MAX_SIZE) {
             tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
         }
 

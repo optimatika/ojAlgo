@@ -40,6 +40,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -56,9 +57,12 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
 
         super(factory, length);
 
-        data = factory.scalar().newArrayInstance(length);
+        Scalar.Factory<N> scalarFactory = factory.scalar();
 
-        this.fill(0, length, 1, this.factory().scalar().zero().get());
+        data = scalarFactory.newArrayInstance(length);
+
+        N zero = scalarFactory.zero().get();
+        Arrays.fill(data, zero);
     }
 
     ReferenceTypeArray(final DenseArray.Factory<N> factory, final N[] data) {
@@ -76,7 +80,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         if (!super.equals(obj) || !(obj instanceof ReferenceTypeArray)) {
             return false;
         }
-        ReferenceTypeArray other = (ReferenceTypeArray) obj;
+        ReferenceTypeArray<?> other = (ReferenceTypeArray<?>) obj;
         if (!Arrays.equals(data, other.data)) {
             return false;
         }

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
 import org.ojalgo.type.math.MathType;
@@ -37,8 +36,6 @@ final class OffHeapR032 extends OffHeapArray {
         super(OffHeapArray.R032, count);
 
         myPointer = NativeMemory.allocateFloatArray(this, count);
-
-        this.fillAll(PrimitiveMath.ZERO);
     }
 
     public double doubleValue(final long index) {

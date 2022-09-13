@@ -100,7 +100,7 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         long totalCount = StructureAnyD.count(structure);
 
         int max = PowerOf2.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
-        int min = PowerOf2.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
+        int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
 
         if (min > max) {
             throw new IllegalArgumentException();
