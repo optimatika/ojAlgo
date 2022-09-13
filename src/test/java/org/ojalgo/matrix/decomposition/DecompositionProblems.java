@@ -165,7 +165,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         Primitive64Store m = storeFactory.rows(data);
 
         if (DEBUG) {
-            BasicLogger.debug("Original", m);
+            BasicLogger.debugMatrix("Original", m);
         }
 
         QR<Double> qr1 = new QRDecomposition.Primitive(false);
@@ -173,8 +173,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         if (DEBUG) {
             BasicLogger.debug("new QRDecomposition.Primitive(false)");
-            BasicLogger.debug("Q", qr1.getQ());
-            BasicLogger.debug("R", qr1.getR());
+            BasicLogger.debugMatrix("Q", qr1.getQ());
+            BasicLogger.debugMatrix("R", qr1.getR());
         }
 
         QR<Double> qr2 = new RawQR(); // This was the implementation with the issue
@@ -182,8 +182,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         if (DEBUG) {
             BasicLogger.debug("new RawQR()");
-            BasicLogger.debug("Q", qr2.getQ());
-            BasicLogger.debug("R", qr2.getR());
+            BasicLogger.debugMatrix("Q", qr2.getQ());
+            BasicLogger.debugMatrix("R", qr2.getR());
         }
 
         TestUtils.assertEquals(m, qr1, NumberContext.of(8));
@@ -226,9 +226,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("D", tmpSVD.getD(), NumberContext.of(7, 6));
-            BasicLogger.debug("Q1", tmpSVD.getU(), NumberContext.of(7, 6));
-            BasicLogger.debug("Q2", tmpSVD.getV(), NumberContext.of(7, 6));
+            BasicLogger.debugMatrix("D", tmpSVD.getD(), NumberContext.of(7, 6));
+            BasicLogger.debugMatrix("Q1", tmpSVD.getU(), NumberContext.of(7, 6));
+            BasicLogger.debugMatrix("Q2", tmpSVD.getV(), NumberContext.of(7, 6));
         }
 
         TestUtils.assertEquals(tmpA, tmpSVD, NumberContext.of(7, 6));
@@ -364,14 +364,14 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             tmpDecomposition.decompose(tmpHermitian);
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(tmpDecomposition.toString());
-                BasicLogger.debug("Original", tmpHermitian);
-                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
+                BasicLogger.debugMatrix("Original", tmpHermitian);
+                BasicLogger.debugMatrix("Recretaed", tmpDecomposition.reconstruct());
             }
             TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), NumberContext.of(8, 5));
             if (tmpDecomposition instanceof MatrixDecomposition.Solver<?> && ((Solver) tmpDecomposition).isSolvable()) {
                 tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
-                    BasicLogger.debug("Actual", tmpActual);
+                    BasicLogger.debugMatrix("Actual", tmpActual);
                 }
                 TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, NumberContext.of(7, 6));
             }
@@ -400,8 +400,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(decomp.toString());
-                BasicLogger.debug("Original", original);
-                BasicLogger.debug("Recretaed", decomp.reconstruct());
+                BasicLogger.debugMatrix("Original", original);
+                BasicLogger.debugMatrix("Recretaed", decomp.reconstruct());
             }
             TestUtils.assertEquals(decomp.toString(), original, decomp.reconstruct(), NumberContext.of(7, 5));
 
@@ -409,7 +409,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
                 solution = ((Solver<ComplexNumber>) decomp).getSolution(original);
                 if (MatrixDecompositionTests.DEBUG) {
-                    BasicLogger.debug("Actual", solution);
+                    BasicLogger.debugMatrix("Actual", solution);
                 }
                 TestUtils.assertEquals(decomp.toString(), identity, solution, NumberContext.of(7, 6));
             }
@@ -546,8 +546,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             TestUtils.assertEquals(matrix, evd, precision);
 
             if (DEBUG) {
-                BasicLogger.debug("D", evd.getD());
-                BasicLogger.debug("V", evd.getV());
+                BasicLogger.debugMatrix("D", evd.getD());
+                BasicLogger.debugMatrix("V", evd.getV());
             }
 
             MatrixStore<Double> d = evd.getD();

@@ -422,10 +422,10 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Jama.compute()", tmpRaw.decompose(tmpProblematic));
 
         if (DEBUG) {
-            BasicLogger.debug("Rational.L", tmpRational.getL());
-            BasicLogger.debug("Complex.L", tmpComplex.getL());
-            BasicLogger.debug("Primitive.L", tmpPrimitive.getL());
-            BasicLogger.debug("Jama.L", tmpRaw.getL());
+            BasicLogger.debugMatrix("Rational.L", tmpRational.getL());
+            BasicLogger.debugMatrix("Complex.L", tmpComplex.getL());
+            BasicLogger.debugMatrix("Primitive.L", tmpPrimitive.getL());
+            BasicLogger.debugMatrix("Jama.L", tmpRaw.getL());
         }
 
         TestUtils.assertEquals("L Rational vs Complex", tmpRational.getL(), tmpComplex.getL(), ACCURACY);
@@ -481,10 +481,10 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Rational Q", tmpBig.getQ());
-            BasicLogger.debug("Complex Q", tmpComplex.getQ());
-            BasicLogger.debug("Primitive Q", tmpPrimitive.getQ());
-            BasicLogger.debug("Jama Q", tmpJama.getQ());
+            BasicLogger.debugMatrix("Rational Q", tmpBig.getQ());
+            BasicLogger.debugMatrix("Complex Q", tmpComplex.getQ());
+            BasicLogger.debugMatrix("Primitive Q", tmpPrimitive.getQ());
+            BasicLogger.debugMatrix("Jama Q", tmpJama.getQ());
         }
 
         TestUtils.assertEquals("QR.reconstruct() Rational", tmpProblematic, tmpBig.reconstruct(), ACCURACY);

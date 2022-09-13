@@ -103,16 +103,16 @@ public class CaseLDL extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
 
-            BasicLogger.debug("Expected L", mtrxL);
-            BasicLogger.debug("Expected D", mtrxD);
+            BasicLogger.debugMatrix("Expected L", mtrxL);
+            BasicLogger.debugMatrix("Expected D", mtrxD);
 
             BasicLogger.debug("RAW P: {}", Arrays.toString(rawLDL.getPivotOrder()));
-            BasicLogger.debug("RAW L", rawLDL.getL());
-            BasicLogger.debug("RAW D", rawLDL.getD());
+            BasicLogger.debugMatrix("RAW L", rawLDL.getL());
+            BasicLogger.debugMatrix("RAW D", rawLDL.getD());
 
             BasicLogger.debug("PRIM P: {}", Arrays.toString(primLDL.getPivotOrder()));
-            BasicLogger.debug("PRIM L", primLDL.getL());
-            BasicLogger.debug("PRIM D", primLDL.getD());
+            BasicLogger.debugMatrix("PRIM L", primLDL.getL());
+            BasicLogger.debugMatrix("PRIM D", primLDL.getD());
         }
 
         if (!rawLDL.isPivoted()) {

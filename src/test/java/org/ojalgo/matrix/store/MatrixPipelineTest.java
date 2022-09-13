@@ -31,8 +31,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actD = placeholderD.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expD", expD);
-            BasicLogger.debug("actD", actD);
+            BasicLogger.debugMatrix("expD", expD);
+            BasicLogger.debugMatrix("actD", actD);
         }
         TestUtils.assertEquals(expD, actD);
         placeholderD.supplyTo(actD);
@@ -46,8 +46,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actE = placeholderE.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expE", expE);
-            BasicLogger.debug("actE", actE);
+            BasicLogger.debugMatrix("expE", expE);
+            BasicLogger.debugMatrix("actE", actE);
         }
         TestUtils.assertEquals(expE, actE);
         placeholderE.supplyTo(actE);
@@ -60,8 +60,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actF = placeholderF.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expF", expF);
-            BasicLogger.debug("actF", actF);
+            BasicLogger.debugMatrix("expF", expF);
+            BasicLogger.debugMatrix("actF", actF);
         }
         TestUtils.assertEquals(expF, actF);
         placeholderF.supplyTo(actF);
@@ -82,8 +82,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -102,8 +102,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -124,8 +124,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -146,8 +146,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -168,8 +168,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -190,8 +190,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);
@@ -209,8 +209,8 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
 
         if (DEBUG) {
-            BasicLogger.debug("expected", expected);
-            BasicLogger.debug("actual", actual);
+            BasicLogger.debugMatrix("expected", expected);
+            BasicLogger.debugMatrix("actual", actual);
         }
         TestUtils.assertEquals(expected, actual);
         nextPlaceholder.supplyTo(actual);

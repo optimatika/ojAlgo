@@ -98,8 +98,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final MatrixStore<Double> leftD = decompEvD.getD();
         final MatrixStore<Double> leftV = decompEvD.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Left D", leftD, CONTEXT);
-            BasicLogger.debug("Left V", leftV, CONTEXT);
+            BasicLogger.debugMatrix("Left D", leftD, CONTEXT);
+            BasicLogger.debugMatrix("Left V", leftV, CONTEXT);
         }
         // Check that the eigenvalue decomposition of the "left" matrix is correct
         TestUtils.assertEquals(leftA, decompEvD, CONTEXT);
@@ -108,8 +108,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final MatrixStore<Double> rightD = decompEvD.getD();
         final MatrixStore<Double> rightV = decompEvD.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Right D", rightD, CONTEXT);
-            BasicLogger.debug("Right V", rightV, CONTEXT);
+            BasicLogger.debugMatrix("Right D", rightD, CONTEXT);
+            BasicLogger.debugMatrix("Right V", rightV, CONTEXT);
         }
         // Check that the eigenvalue decomposition of the "right" matrix is correct
         TestUtils.assertEquals(rightA, decompEvD, CONTEXT);
@@ -131,9 +131,9 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug("Experimental  S: {}.", tmpExperimental.getSingularValues());
-            BasicLogger.debug("D", tmpExperimental.getD(), CONTEXT);
-            BasicLogger.debug("Q1", tmpExperimental.getU(), CONTEXT);
-            BasicLogger.debug("Q2", tmpExperimental.getV(), CONTEXT);
+            BasicLogger.debugMatrix("D", tmpExperimental.getD(), CONTEXT);
+            BasicLogger.debugMatrix("Q1", tmpExperimental.getU(), CONTEXT);
+            BasicLogger.debugMatrix("Q2", tmpExperimental.getV(), CONTEXT);
         }
 
         TestUtils.assertEquals(matrixA, tmpExperimental, CONTEXT);
