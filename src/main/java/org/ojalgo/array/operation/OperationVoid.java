@@ -21,11 +21,19 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.VoidFunction;
 
 public final class OperationVoid implements ArrayOperation {
 
     public static int THRESHOLD = 256;
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step,
+            final VoidFunction<N> visitor) {
+        for (long i = first; i < limit; i += step) {
+            visitor.invoke(data.get(i));
+        }
+    }
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {

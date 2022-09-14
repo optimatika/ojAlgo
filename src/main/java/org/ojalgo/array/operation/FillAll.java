@@ -21,12 +21,26 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.scalar.Scalar;
 
 public final class FillAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
+
+    public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final long first, final long limit, final long step, final N value) {
+        for (long i = first; i < limit; i += step) {
+            data.set(i, value);
+        }
+    }
+
+    public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final long first, final long limit, final long step,
+            final NullaryFunction<?> supplier) {
+        for (long i = first; i < limit; i += step) {
+            data.set(i, supplier.get());
+        }
+    }
 
     public static void fill(final byte[] data, final int first, final int limit, final int step, final byte value) {
         for (int i = first; i < limit; i += step) {

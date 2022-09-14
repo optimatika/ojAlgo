@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveR032;
 import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.PrimitiveZ008;
@@ -34,6 +35,20 @@ import org.ojalgo.structure.Access1D;
 public final class OperationBinary implements ArrayOperation {
 
     public static int THRESHOLD = 256;
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final BinaryFunction<N> function) {
+        for (long i = first; i < limit; i += step) {
+            data.set(i, function.invoke(left.get(i), data.get(i)));
+        }
+    }
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step,
+            final BinaryFunction<N> function, final Access1D<N> right) {
+        for (long i = first; i < limit; i += step) {
+            data.set(i, function.invoke(data.get(i), right.get(i)));
+        }
+    }
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
@@ -98,6 +113,23 @@ public final class OperationBinary implements ArrayOperation {
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left[i], right);
+            }
+        }
+    }
+
+    public static void invoke(final byte[] data, final int first, final int limit, final int step, final byte[] left, final BinaryFunction<Double> function,
+            final byte[] right) {
+        if (function == PrimitiveMath.ADD) {
+            CorePrimitiveOperation.add(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.DIVIDE) {
+            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MULTIPLY) {
+            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.SUBTRACT) {
+            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(left[i], right[i]);
             }
         }
     }
@@ -169,6 +201,23 @@ public final class OperationBinary implements ArrayOperation {
         }
     }
 
+    public static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
+            final double[] right) {
+        if (function == PrimitiveMath.ADD) {
+            CorePrimitiveOperation.add(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.DIVIDE) {
+            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MULTIPLY) {
+            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.SUBTRACT) {
+            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(left[i], right[i]);
+            }
+        }
+    }
+
     public static void invoke(final float[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
         if (left instanceof PrimitiveR032 && right instanceof PrimitiveR032) {
@@ -232,6 +281,23 @@ public final class OperationBinary implements ArrayOperation {
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left[i], right);
+            }
+        }
+    }
+
+    public static void invoke(final float[] data, final int first, final int limit, final int step, final float[] left, final BinaryFunction<Double> function,
+            final float[] right) {
+        if (function == PrimitiveMath.ADD) {
+            CorePrimitiveOperation.add(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.DIVIDE) {
+            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MULTIPLY) {
+            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.SUBTRACT) {
+            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(left[i], right[i]);
             }
         }
     }
@@ -303,6 +369,23 @@ public final class OperationBinary implements ArrayOperation {
         }
     }
 
+    public static void invoke(final int[] data, final int first, final int limit, final int step, final int[] left, final BinaryFunction<Double> function,
+            final int[] right) {
+        if (function == PrimitiveMath.ADD) {
+            CorePrimitiveOperation.add(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.DIVIDE) {
+            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MULTIPLY) {
+            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.SUBTRACT) {
+            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(left[i], right[i]);
+            }
+        }
+    }
+
     public static void invoke(final long[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
         if (left instanceof PrimitiveZ064 && right instanceof PrimitiveZ064) {
@@ -366,6 +449,23 @@ public final class OperationBinary implements ArrayOperation {
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left[i], right);
+            }
+        }
+    }
+
+    public static void invoke(final long[] data, final int first, final int limit, final int step, final long[] left, final BinaryFunction<Double> function,
+            final long[] right) {
+        if (function == PrimitiveMath.ADD) {
+            CorePrimitiveOperation.add(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.DIVIDE) {
+            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.MULTIPLY) {
+            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+        } else if (function == PrimitiveMath.SUBTRACT) {
+            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+        } else {
+            for (int i = first; i < limit; i += step) {
+                data[i] = function.invoke(left[i], right[i]);
             }
         }
     }
@@ -458,92 +558,7 @@ public final class OperationBinary implements ArrayOperation {
         }
     }
 
-    static void invoke(final byte[] data, final int first, final int limit, final int step, final byte[] left, final BinaryFunction<Double> function,
-            final byte[] right) {
-        if (function == PrimitiveMath.ADD) {
-            CorePrimitiveOperation.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
-            final double[] right) {
-        if (function == PrimitiveMath.ADD) {
-            CorePrimitiveOperation.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final float[] data, final int first, final int limit, final int step, final float[] left, final BinaryFunction<Double> function,
-            final float[] right) {
-        if (function == PrimitiveMath.ADD) {
-            CorePrimitiveOperation.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final int[] data, final int first, final int limit, final int step, final int[] left, final BinaryFunction<Double> function,
-            final int[] right) {
-        if (function == PrimitiveMath.ADD) {
-            CorePrimitiveOperation.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final long[] data, final int first, final int limit, final int step, final long[] left, final BinaryFunction<Double> function,
-            final long[] right) {
-        if (function == PrimitiveMath.ADD) {
-            CorePrimitiveOperation.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            CorePrimitiveOperation.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final short[] data, final int first, final int limit, final int step, final short[] left, final BinaryFunction<Double> function,
+    public static void invoke(final short[] data, final int first, final int limit, final int step, final short[] left, final BinaryFunction<Double> function,
             final short[] right) {
         if (function == PrimitiveMath.ADD) {
             CorePrimitiveOperation.add(data, first, limit, step, left, right);
