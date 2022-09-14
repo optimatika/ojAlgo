@@ -40,6 +40,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
@@ -84,6 +85,11 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         long getCapacityLimit() {
             return Long.MAX_VALUE;
+        }
+
+        @Override
+        MathType getMathType() {
+            return myDenseFactory.getMathType();
         }
 
         @Override
@@ -279,9 +285,12 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return myFactory;
     }
 
-    /**
-     * Primitive (double) elements
-     */
-    abstract boolean isPrimitive();
+    final MathType getMathType() {
+        return myFactory.getMathType();
+    }
+
+    final boolean isPrimitive() {
+        return myFactory.getMathType().isPrimitive();
+    }
 
 }

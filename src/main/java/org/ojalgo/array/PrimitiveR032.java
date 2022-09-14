@@ -36,12 +36,12 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -68,8 +68,8 @@ public class PrimitiveR032 extends PrimitiveArray {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.R032;
         }
 
         @Override
@@ -78,8 +78,6 @@ public class PrimitiveR032 extends PrimitiveArray {
         }
 
     };
-
-    static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
 
     public static PrimitiveR032 make(final int size) {
         return new PrimitiveR032(size);

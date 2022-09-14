@@ -96,11 +96,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        long getElementSize() {
-            return myMathType.getJavaType().memory();
-        }
-
-        @Override
         BufferArray makeDenseArray(final long size) {
             int capacity = Math.toIntExact(size * this.getElementSize());
             ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
@@ -112,6 +107,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
          */
         BufferArray newInstance(final Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
             return myConstructor.newInstance(factory, buffer, closeable);
+        }
+
+        @Override
+        MathType getMathType() {
+            return myMathType;
         }
 
     }
@@ -190,11 +190,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        long getElementSize() {
-            return myTypeFactory.getElementSize();
-        }
-
-        @Override
         BufferArray makeDenseArray(final long size) {
 
             long count = myTypeFactory.getElementSize() * size;
@@ -209,6 +204,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             }
 
             return myTypeFactory.newInstance(myTypeFactory, buffer, fileChannel);
+        }
+
+        @Override
+        MathType getMathType() {
+            return myTypeFactory.getMathType();
         }
 
     }
@@ -518,11 +518,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(this.doubleValue(index));
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return true;
     }
 
     @Override

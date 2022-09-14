@@ -729,13 +729,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if (tmpIndex >= first && tmpIndex < limit) {
-                if ((tmpIndex - first) % step == 0L) {
-                    tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
-                    if (tmpValue > tmpLargest) {
-                        tmpLargest = tmpValue;
-                        retVal = i;
-                    }
+            if ((tmpIndex >= first && tmpIndex < limit) && ((tmpIndex - first) % step == 0L)) {
+                tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
+                if (tmpValue > tmpLargest) {
+                    tmpLargest = tmpValue;
+                    retVal = i;
                 }
             }
         }
@@ -754,10 +752,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if (tmpIndex >= first && tmpIndex < limit) {
-                if ((tmpIndex - first) % step == 0L) {
-                    myValues.modify(tmpIndex, i, left, function);
-                }
+            if ((tmpIndex >= first && tmpIndex < limit) && ((tmpIndex - first) % step == 0L)) {
+                myValues.modify(tmpIndex, i, left, function);
             }
         }
     }
@@ -865,7 +861,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
         final int limit = intTo;
 
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             @Override
             public long count() {
@@ -891,11 +887,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     LongStream indices() {
         return Arrays.stream(myIndices, 0, myActualLength);
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return myValues.isPrimitive();
     }
 
     long lastIndex() {

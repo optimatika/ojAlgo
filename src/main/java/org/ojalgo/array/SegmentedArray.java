@@ -465,9 +465,4 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         }
     }
 
-    @Override
-    boolean isPrimitive() {
-        return mySegments[0].isPrimitive();
-    }
-
 }

@@ -47,9 +47,4 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
         this.fillAll(PrimitiveMath.ZERO);
     }
 
-    @Override
-    final boolean isPrimitive() {
-        return true;
-    }
-
 }

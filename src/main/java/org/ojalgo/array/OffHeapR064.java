@@ -23,11 +23,8 @@ package org.ojalgo.array;
 
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
-import org.ojalgo.type.math.MathType;
 
 final class OffHeapR064 extends OffHeapArray {
-
-    static final MathType TYPE = MathType.R064;
 
     private final long myPointer;
 

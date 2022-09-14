@@ -31,11 +31,11 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
@@ -62,8 +62,8 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.R128;
         }
 
         @Override
@@ -72,8 +72,6 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
         }
 
     };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
 
     public static ReferenceTypeR128 make(final int size) {
         return new ReferenceTypeR128(size);

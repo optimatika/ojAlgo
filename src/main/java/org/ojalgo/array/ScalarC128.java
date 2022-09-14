@@ -25,9 +25,9 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
@@ -54,8 +54,8 @@ public class ScalarC128 extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.C128;
         }
 
         @Override
@@ -64,8 +64,6 @@ public class ScalarC128 extends ScalarArray<ComplexNumber> {
         }
 
     };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
 
     public static ScalarC128 make(final int size) {
         return new ScalarC128(size);

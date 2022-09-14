@@ -85,8 +85,8 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         }
 
         @Override
-        long getElementSize() {
-            return myMathType.getJavaType().memory();
+        MathType getMathType() {
+            return myMathType;
         }
 
     }
@@ -243,11 +243,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         for (long i = first; i < limit; i += step) {
             visitor.invoke(this.doubleValue(i));
         }
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return true;
     }
 
     @Override

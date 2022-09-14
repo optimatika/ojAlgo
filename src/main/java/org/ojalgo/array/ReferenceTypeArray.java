@@ -240,11 +240,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    final boolean isPrimitive() {
-        return false;
-    }
-
-    @Override
     final void modify(final long extIndex, final int intIndex, final Access1D<N> left, final BinaryFunction<N> function) {
         data[intIndex] = function.invoke(left.get(extIndex), data[intIndex]);
     }

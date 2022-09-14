@@ -40,11 +40,11 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -71,8 +71,8 @@ public class PrimitiveZ064 extends PrimitiveArray {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.Z064;
         }
 
         @Override
@@ -81,8 +81,6 @@ public class PrimitiveZ064 extends PrimitiveArray {
         }
 
     };
-
-    static final long ELEMENT_SIZE = JavaType.LONG.memory();
 
     public static PrimitiveZ064 make(final int size) {
         return new PrimitiveZ064(size);

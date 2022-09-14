@@ -87,4 +87,5 @@ final class BufferR064 extends BufferArray {
     protected void set(final int index, final float value) {
         myBuffer.put(index, value);
     }
+
 }
