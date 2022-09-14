@@ -56,12 +56,16 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testOffHeapR032() {
-        this.doTest(OffHeapArray.R032.make(COUNT));
+        DenseArray<Double> array = OffHeapArray.R032.make(COUNT);
+        array.fillAll(0.0);
+        this.doTest(array);
     }
 
     @Test
     public void testOffHeapR064() {
-        this.doTest(OffHeapArray.R064.make(COUNT));
+        DenseArray<Double> array = OffHeapArray.R064.make(COUNT);
+        array.fillAll(0.0);
+        this.doTest(array);
     }
 
     @Test
