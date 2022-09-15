@@ -21,9 +21,43 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.structure.Access1D;
+
 public final class CorePrimitiveOperation implements ArrayOperation {
 
     public static int THRESHOLD = 256;
+
+    public static <N extends Comparable<N>> void add(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) + right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) + right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) + right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) + right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
 
     public static void add(final byte[] data, final int first, final int limit, final int step, final byte left, final byte[] right) {
         for (int i = first; i < limit; i += step) {
@@ -41,10 +75,6 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left[i] + right[i]);
         }
-    }
-
-    public static void add(final double[] data, final int first, final int limit, final double right) {
-        CorePrimitiveOperation.add(data, first, limit, 1, data, right);
     }
 
     public static void add(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
@@ -137,6 +167,37 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         }
     }
 
+    public static <N extends Comparable<N>> void divide(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) / right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) / right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) / right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) / right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static void divide(final byte[] data, final int first, final int limit, final int step, final byte left, final byte[] right) {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left / right[i]);
@@ -153,10 +214,6 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left[i] / right[i]);
         }
-    }
-
-    public static void divide(final double[] data, final int first, final int limit, final double right) {
-        CorePrimitiveOperation.divide(data, first, limit, 1, data, right);
     }
 
     public static void divide(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
@@ -249,6 +306,37 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         }
     }
 
+    public static <N extends Comparable<N>> void multiply(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) * right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) * right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) * right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) * right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static void multiply(final byte[] data, final int first, final int limit, final int step, final byte left, final byte[] right) {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left * right[i]);
@@ -265,10 +353,6 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left[i] * right[i]);
         }
-    }
-
-    public static void multiply(final double[] data, final int first, final int limit, final double right) {
-        CorePrimitiveOperation.multiply(data, first, limit, 1, data, right);
     }
 
     public static void multiply(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
@@ -397,6 +481,37 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         }
     }
 
+    public static <N extends Comparable<N>> void subtract(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) - right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) - right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) - right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) - right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static void subtract(final byte[] data, final int first, final int limit, final int step, final byte left, final byte[] right) {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left - right[i]);
@@ -413,10 +528,6 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left[i] - right[i]);
         }
-    }
-
-    public static void subtract(final double[] data, final int first, final int limit, final double right) {
-        CorePrimitiveOperation.subtract(data, first, limit, 1, data, right);
     }
 
     public static void subtract(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {

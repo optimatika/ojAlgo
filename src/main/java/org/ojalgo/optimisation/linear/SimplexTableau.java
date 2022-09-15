@@ -120,7 +120,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         private void scale(final double[] pivotRow, final int col) {
             double pivotElement = pivotRow[col];
             if (pivotElement != ONE) {
-                CorePrimitiveOperation.divide(pivotRow, 0, myColDim, pivotElement);
+                CorePrimitiveOperation.divide(pivotRow, 0, myColDim, 1, pivotRow, pivotElement);
             }
         }
 
@@ -403,7 +403,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         private void scale(final double[] pivotRowData, final int pivotRowIndexBase, final int col) {
             double pivotElement = pivotRowData[pivotRowIndexBase + col];
             if (pivotElement != ONE) {
-                CorePrimitiveOperation.divide(pivotRowData, pivotRowIndexBase, pivotRowIndexBase + myColDim, pivotElement);
+                CorePrimitiveOperation.divide(pivotRowData, pivotRowIndexBase, pivotRowIndexBase + myColDim, 1, pivotRowData, pivotElement);
             }
         }
 
