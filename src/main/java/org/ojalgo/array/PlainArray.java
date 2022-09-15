@@ -223,15 +223,9 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         this.exchange(Math.toIntExact(firstA), Math.toIntExact(firstB), Math.toIntExact(step), Math.toIntExact(count));
     }
 
-    protected abstract void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right);
-
-    protected abstract void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final N right);
-
     protected abstract void fill(int first, int limit, int step, N value);
 
     protected abstract void fill(int first, int limit, int step, NullaryFunction<?> supplier);
-
-    protected abstract void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right);
 
     @Override
     protected final void fill(final long first, final long limit, final long step, final N value) {

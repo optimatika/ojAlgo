@@ -134,16 +134,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final N right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
     protected final void fill(final int first, final int limit, final int step, final N value) {
         FillAll.fill(data, first, limit, step, value);
     }
@@ -151,11 +141,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         FillAll.fill(data, first, limit, step, supplier, this.factory().scalar());
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override

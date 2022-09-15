@@ -152,21 +152,6 @@ public class PrimitiveZ064 extends PrimitiveArray {
     }
 
     @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right.longValue());
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left.longValue(), function, right);
-    }
-
-    @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
         FillAll.fill(data, first, limit, step, value.longValue());
     }
