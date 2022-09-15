@@ -65,8 +65,7 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         public int hashCode() {
             final int prime = 31;
             int result = super.hashCode();
-            result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-            return result;
+            return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
         public MatrixTensor<N> make(final long rows, final long columns) {
@@ -100,6 +99,10 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         this.add(retVal.getArray(), myArray, addend);
 
         return retVal;
+    }
+
+    public byte byteValue(final long row, final long col) {
+        return myArray.byteValue(row, col);
     }
 
     public MatrixTensor<N> conjugate() {
@@ -170,6 +173,10 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         myArray.fillOne(row, col, supplier);
     }
 
+    public float floatValue(final long row, final long col) {
+        return myArray.floatValue(row, col);
+    }
+
     public N get(final long row, final long col) {
         return myArray.get(row, col);
     }
@@ -179,8 +186,15 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myArray == null ? 0 : myArray.hashCode());
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
+    }
+
+    public int intValue(final long row, final long col) {
+        return myArray.intValue(row, col);
+    }
+
+    public long longValue(final long row, final long col) {
+        return myArray.longValue(row, col);
     }
 
     public MatrixTensor<N> multiply(final double scalarMultiplicand) {
@@ -214,12 +228,36 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return this.norm(myArray);
     }
 
+    public void set(final long row, final long col, final byte value) {
+        myArray.set(row, col, value);
+    }
+
     public void set(final long row, final long col, final Comparable<?> value) {
         myArray.set(row, col, value);
     }
 
     public void set(final long row, final long col, final double value) {
         myArray.set(row, col, value);
+    }
+
+    public void set(final long row, final long col, final float value) {
+        myArray.set(row, col, value);
+    }
+
+    public void set(final long row, final long col, final int value) {
+        myArray.set(row, col, value);
+    }
+
+    public void set(final long row, final long col, final long value) {
+        myArray.set(row, col, value);
+    }
+
+    public void set(final long row, final long col, final short value) {
+        myArray.set(row, col, value);
+    }
+
+    public short shortValue(final long row, final long col) {
+        return myArray.shortValue(row, col);
     }
 
     @Override

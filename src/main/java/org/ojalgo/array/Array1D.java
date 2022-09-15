@@ -368,6 +368,31 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(this.convert(index));
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(this.convert(index));
+    }
+
+    @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(this.convert(index));
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(this.convert(index));
+    }
+
+    @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(this.convert(index));
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;

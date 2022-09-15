@@ -64,8 +64,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         public int hashCode() {
             final int prime = 31;
             int result = super.hashCode();
-            result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-            return result;
+            return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
         public VectorTensor<N> make(final long count) {
@@ -96,6 +95,10 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         this.add(retVal.getArray(), myArray, addend);
 
         return retVal;
+    }
+
+    public byte byteValue(final long index) {
+        return myArray.byteValue(index);
     }
 
     public VectorTensor<N> conjugate() {
@@ -148,6 +151,10 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         myArray.fillOne(index, supplier);
     }
 
+    public float floatValue(final long index) {
+        return myArray.floatValue(index);
+    }
+
     public N get(final long index) {
         return myArray.get(index);
     }
@@ -157,8 +164,15 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myArray == null ? 0 : myArray.hashCode());
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
+    }
+
+    public int intValue(final long index) {
+        return myArray.intValue(index);
+    }
+
+    public long longValue(final long index) {
+        return myArray.longValue(index);
     }
 
     public VectorTensor<N> multiply(final double scalarMultiplicand) {
@@ -192,12 +206,36 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return this.norm(myArray);
     }
 
+    public void set(final long index, final byte value) {
+        myArray.set(index, value);
+    }
+
     public void set(final long index, final Comparable<?> value) {
         myArray.set(index, value);
     }
 
     public void set(final long index, final double value) {
         myArray.set(index, value);
+    }
+
+    public void set(final long index, final float value) {
+        myArray.set(index, value);
+    }
+
+    public void set(final long index, final int value) {
+        myArray.set(index, value);
+    }
+
+    public void set(final long index, final long value) {
+        myArray.set(index, value);
+    }
+
+    public void set(final long index, final short value) {
+        myArray.set(index, value);
+    }
+
+    public short shortValue(final long index) {
+        return myArray.shortValue(index);
     }
 
     @Override

@@ -422,6 +422,56 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(index);
+    }
+
+    @Override
+    public float floatValue(final long row, final long col) {
+        return myDelegate.floatValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(index);
+    }
+
+    @Override
+    public long longValue(final long row, final long col) {
+        return myDelegate.longValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
+    public int intValue(final long row, final long col) {
+        return myDelegate.intValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
+    public short shortValue(final long row, final long col) {
+        return myDelegate.shortValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
+    public byte byteValue(final long row, final long col) {
+        return myDelegate.byteValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
