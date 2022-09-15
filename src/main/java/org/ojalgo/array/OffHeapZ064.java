@@ -40,11 +40,15 @@ final class OffHeapZ064 extends OffHeapArray {
     }
 
     public double doubleValue(final long index) {
-        return NativeMemory.getFloat(myPointer, index);
+        return NativeMemory.getLong(myPointer, index);
     }
 
     public float floatValue(final long index) {
-        return NativeMemory.getFloat(myPointer, index);
+        return NativeMemory.getLong(myPointer, index);
+    }
+
+    public long longValue(final long index) {
+        return NativeMemory.getLong(myPointer, index);
     }
 
     @Override
@@ -57,11 +61,15 @@ final class OffHeapZ064 extends OffHeapArray {
     }
 
     public void set(final long index, final double value) {
-        NativeMemory.setFloat(myPointer, index, (float) value);
+        NativeMemory.setLong(myPointer, index, Math.round(value));
     }
 
     public void set(final long index, final float value) {
-        NativeMemory.setFloat(myPointer, index, value);
+        NativeMemory.setLong(myPointer, index, Math.round(value));
+    }
+
+    public void set(final long index, final long value) {
+        NativeMemory.setLong(myPointer, index, value);
     }
 
 }

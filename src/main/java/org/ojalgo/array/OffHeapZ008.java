@@ -61,7 +61,11 @@ final class OffHeapZ008 extends OffHeapArray {
     }
 
     public void set(final long index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) value);
+        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
+    }
+
+    public void set(final long index, final float value) {
+        NativeMemory.setByte(myPointer, index, (byte) Math.round(value));
     }
 
 }

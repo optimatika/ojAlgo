@@ -22,6 +22,7 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 public final class CorePrimitiveOperation implements ArrayOperation {
@@ -52,6 +53,68 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         case Z008:
             for (long i = first; i < limit; i += step) {
                 data.set(i, left.intValue(i) + right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void add(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Comparable<?> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) + Scalar.doubleValue(right));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) + Scalar.floatValue(right));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) + Scalar.longValue(right));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) + Scalar.intValue(right));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void add(final BasicArray<N> data, final long first, final long limit, final long step, final Comparable<?> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.doubleValue(left) + right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.floatValue(left) + right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.longValue(left) + right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.intValue(left) + right.intValue(i));
             }
             break;
         default:
@@ -198,6 +261,68 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         }
     }
 
+    public static <N extends Comparable<N>> void divide(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Comparable<?> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) / Scalar.doubleValue(right));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) / Scalar.floatValue(right));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) / Scalar.longValue(right));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) / Scalar.intValue(right));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void divide(final BasicArray<N> data, final long first, final long limit, final long step, final Comparable<?> left,
+            final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.doubleValue(left) / right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.floatValue(left) / right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.longValue(left) / right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.intValue(left) / right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static void divide(final byte[] data, final int first, final int limit, final int step, final byte left, final byte[] right) {
         for (int i = first; i < limit; i += step) {
             data[i] = (byte) (left / right[i]);
@@ -330,6 +455,68 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         case Z008:
             for (long i = first; i < limit; i += step) {
                 data.set(i, left.intValue(i) * right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void multiply(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Comparable<?> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) * Scalar.doubleValue(right));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) * Scalar.floatValue(right));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) * Scalar.longValue(right));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) * Scalar.intValue(right));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void multiply(final BasicArray<N> data, final long first, final long limit, final long step,
+            final Comparable<?> left, final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.doubleValue(left) * right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.floatValue(left) * right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.longValue(left) * right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.intValue(left) * right.intValue(i));
             }
             break;
         default:
@@ -505,6 +692,68 @@ public final class CorePrimitiveOperation implements ArrayOperation {
         case Z008:
             for (long i = first; i < limit; i += step) {
                 data.set(i, left.intValue(i) - right.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void subtract(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
+            final Comparable<?> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.doubleValue(i) - Scalar.doubleValue(right));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.floatValue(i) - Scalar.floatValue(right));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.longValue(i) - Scalar.longValue(right));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, left.intValue(i) - Scalar.intValue(right));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static <N extends Comparable<N>> void subtract(final BasicArray<N> data, final long first, final long limit, final long step,
+            final Comparable<?> left, final Access1D<N> right) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.doubleValue(left) - right.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.floatValue(left) - right.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.longValue(left) - right.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, Scalar.intValue(left) - right.intValue(i));
             }
             break;
         default:

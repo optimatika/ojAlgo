@@ -188,6 +188,10 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return this.indexOfLargest(0L, this.count(), 1L);
     }
 
+    public final boolean isPrimitive() {
+        return myFactory.getMathType().isPrimitive();
+    }
+
     public void modifyAll(final UnaryFunction<N> modifier) {
         this.modify(0L, this.count(), 1L, modifier);
     }
@@ -287,10 +291,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     final ArrayFactory<N, ?> factory() {
         return myFactory;
-    }
-
-    final boolean isPrimitive() {
-        return myFactory.getMathType().isPrimitive();
     }
 
 }
