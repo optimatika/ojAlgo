@@ -182,6 +182,30 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
+    public final void set(final long index, final long value) {
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
+    }
+
+    @Override
+    public final void set(final long index, final int value) {
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
+    }
+
+    @Override
+    public final void set(final long index, final short value) {
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
+    }
+
+    @Override
+    public final void set(final long index, final byte value) {
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
+    }
+
+    @Override
     public final short shortValue(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.shortValue((int) index);
@@ -300,7 +324,23 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract void set(final int index, final double value);
 
-    protected abstract void set(final int index, final float value);
+    protected void set(final int index, final float value) {
+        this.set(index, (double) value);
+    }
+
+    protected abstract void set(final int index, final long value);
+
+    protected void set(final int index, final int value) {
+        this.set(index, (long) value);
+    }
+
+    protected void set(final int index, final short value) {
+        this.set(index, (int) value);
+    }
+
+    protected void set(final int index, final byte value) {
+        this.set(index, (short) value);
+    }
 
     protected short shortValue(final int index) {
         return this.byteValue(index);

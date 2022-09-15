@@ -240,6 +240,11 @@ public class PrimitiveZ008 extends PrimitiveArray {
     }
 
     @Override
+    protected void set(final int index, final byte value) {
+        data[index] = value;
+    }
+
+    @Override
     protected void set(final int index, final float value) {
         data[index] = (byte) Math.round(value);
     }
@@ -267,6 +272,11 @@ public class PrimitiveZ008 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = (byte) value;
     }
 
 }

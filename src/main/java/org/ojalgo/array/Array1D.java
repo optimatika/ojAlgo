@@ -575,6 +575,26 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
     public int size() {
         return Math.toIntExact(length);
     }

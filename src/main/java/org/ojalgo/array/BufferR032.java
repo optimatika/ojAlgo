@@ -83,4 +83,9 @@ final class BufferR032 extends BufferArray {
         myBuffer.put(index, value);
     }
 
+    @Override
+    protected void set(final int index, final long value) {
+        myBuffer.put(index, value);
+    }
+
 }

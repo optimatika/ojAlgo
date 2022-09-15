@@ -140,6 +140,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     }
 
     @Override
+    default void set(final long index, final byte value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
+
+    @Override
     default void set(final long index, final Comparable<?> value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
@@ -154,12 +159,43 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
+    @Override
+    default void set(final long index, final int value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
+
+    @Override
+    default void set(final long index, final long value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
+
+    @Override
+    default void set(final long index, final short value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
+
+    default void set(final long[] reference, final byte value) {
+        this.set(reference, (short) value);
+    }
+
     void set(long[] reference, Comparable<?> value);
 
     void set(long[] reference, double value);
 
     default void set(final long[] reference, final float value) {
         this.set(reference, (double) value);
+    }
+
+    default void set(final long[] reference, final int value) {
+        this.set(reference, (long) value);
+    }
+
+    default void set(final long[] reference, final long value) {
+        this.set(reference, (double) value);
+    }
+
+    default void set(final long[] reference, final short value) {
+        this.set(reference, (int) value);
     }
 
 }

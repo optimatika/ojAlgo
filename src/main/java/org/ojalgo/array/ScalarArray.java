@@ -125,4 +125,9 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
         return this.get(index).shortValue();
     }
 
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = this.valueOf(value);
+    }
+
 }

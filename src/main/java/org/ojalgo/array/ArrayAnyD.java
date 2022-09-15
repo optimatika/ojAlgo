@@ -521,6 +521,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long[] reference, final Comparable<?> value) {
         myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
@@ -532,6 +552,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public void set(final long[] reference, final float value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final long value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final int value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final short value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final byte value) {
         myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 

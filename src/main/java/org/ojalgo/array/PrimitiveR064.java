@@ -332,11 +332,6 @@ public class PrimitiveR064 extends PrimitiveArray {
     }
 
     @Override
-    protected final void set(final int index, final float value) {
-        data[index] = value;
-    }
-
-    @Override
     protected short shortValue(final int index) {
         return (short) Math.round(data[index]);
     }
@@ -364,6 +359,11 @@ public class PrimitiveR064 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = value;
     }
 
 }

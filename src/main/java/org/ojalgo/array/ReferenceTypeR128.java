@@ -169,4 +169,9 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
         return this.get(index).shortValue();
     }
 
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = new BigDecimal(value);
+    }
+
 }

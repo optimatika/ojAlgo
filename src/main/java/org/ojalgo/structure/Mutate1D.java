@@ -231,12 +231,28 @@ public interface Mutate1D extends Structure1D {
         this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));
     }
 
+    default void set(final long index, final byte value) {
+        this.set(index, (short) value);
+    }
+
     void set(long index, Comparable<?> value);
 
     void set(long index, double value);
 
     default void set(final long index, final float value) {
         this.set(index, (double) value);
+    }
+
+    default void set(final long index, final int value) {
+        this.set(index, (long) value);
+    }
+
+    default void set(final long index, final long value) {
+        this.set(index, (double) value);
+    }
+
+    default void set(final long index, final short value) {
+        this.set(index, (int) value);
     }
 
 }

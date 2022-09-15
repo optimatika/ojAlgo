@@ -717,6 +717,26 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
@@ -728,6 +748,26 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
 
     @Override
     public void set(final long row, final long col, final float value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final long row, final long col, final long value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final long row, final long col, final int value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final long row, final long col, final short value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final long row, final long col, final byte value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 

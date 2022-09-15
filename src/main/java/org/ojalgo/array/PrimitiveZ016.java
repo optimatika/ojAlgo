@@ -245,6 +245,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
+    protected void set(final int index, final short value) {
+        data[index] = value;
+    }
+
+    @Override
     protected short shortValue(final int index) {
         return data[index];
     }
@@ -272,6 +277,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = (short) value;
     }
 
 }

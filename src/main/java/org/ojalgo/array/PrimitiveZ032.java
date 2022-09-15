@@ -279,4 +279,14 @@ public class PrimitiveZ032 extends PrimitiveArray {
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = (int) value;
+    }
+
+    @Override
+    protected void set(final int index, final int value) {
+        data[index] = value;
+    }
+
 }

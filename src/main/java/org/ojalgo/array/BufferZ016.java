@@ -60,13 +60,18 @@ final class BufferZ016 extends BufferArray {
     }
 
     @Override
-    protected void set(final int index, final float value) {
-        myBuffer.put(index, (short) Math.round(value));
+    protected short shortValue(final int index) {
+        return myBuffer.get(index);
     }
 
     @Override
-    protected short shortValue(final int index) {
-        return myBuffer.get(index);
+    protected void set(final int index, final long value) {
+        myBuffer.put(index, (short) value);
+    }
+
+    @Override
+    protected void set(final int index, final short value) {
+        myBuffer.put(index, value);
     }
 
 }

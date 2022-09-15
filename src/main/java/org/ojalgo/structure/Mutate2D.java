@@ -276,6 +276,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     @Override
+    default void set(final long index, final byte addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    @Override
     default void set(final long index, final Comparable<?> addend) {
         long structure = this.countRows();
         this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
@@ -293,12 +299,46 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
     }
 
+    @Override
+    default void set(final long index, final int addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    @Override
+    default void set(final long index, final long addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    default void set(final long row, final long col, final byte value) {
+        this.set(row, col, (short) value);
+    }
+
     void set(long row, long col, Comparable<?> value);
 
     void set(long row, long col, double value);
 
     default void set(final long row, final long col, final float value) {
         this.set(row, col, (double) value);
+    }
+
+    default void set(final long row, final long col, final int value) {
+        this.set(row, col, (long) value);
+    }
+
+    default void set(final long row, final long col, final long value) {
+        this.set(row, col, (double) value);
+    }
+
+    default void set(final long row, final long col, final short value) {
+        this.set(row, col, (int) value);
+    }
+
+    @Override
+    default void set(final long index, final short addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
     }
 
 }
