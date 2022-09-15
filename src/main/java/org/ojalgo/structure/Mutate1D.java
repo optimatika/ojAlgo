@@ -114,6 +114,22 @@ public interface Mutate1D extends Structure1D {
             this.add(index, (double) addend);
         }
 
+        default void add(final long index, final long addend) {
+            this.add(index, (double) addend);
+        }
+
+        default void add(final long index, final int addend) {
+            this.add(index, (long) addend);
+        }
+
+        default void add(final long index, final short addend) {
+            this.add(index, (int) addend);
+        }
+
+        default void add(final long index, final byte addend) {
+            this.add(index, (short) addend);
+        }
+
         default void modifyAll(final UnaryFunction<N> modifier) {
             this.modifyRange(0L, this.count(), modifier);
         }

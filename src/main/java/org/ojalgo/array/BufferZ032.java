@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.type.NumberDefinition;
 
 final class BufferZ032 extends BufferArray {
 
@@ -79,4 +80,8 @@ final class BufferZ032 extends BufferArray {
         myBuffer.put(index, (int) value);
     }
 
+    @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.intValue(index) + NumberDefinition.intValue(addend));
+    }
 }

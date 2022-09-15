@@ -341,6 +341,26 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
     public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);

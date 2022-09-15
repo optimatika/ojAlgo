@@ -187,12 +187,52 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
         }
 
+        @Override
+        default void add(final long index, final long addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final int addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final short addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final byte addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
         void add(long row, long col, Comparable<?> addend);
 
         void add(long row, long col, double addend);
 
         default void add(final long row, final long col, final float addend) {
             this.add(row, col, (double) addend);
+        }
+
+        default void add(final long row, final long col, final long addend) {
+            this.add(row, col, (double) addend);
+        }
+
+        default void add(final long row, final long col, final int addend) {
+            this.add(row, col, (long) addend);
+        }
+
+        default void add(final long row, final long col, final short addend) {
+            this.add(row, col, (int) addend);
+        }
+
+        default void add(final long row, final long col, final byte addend) {
+            this.add(row, col, (short) addend);
         }
 
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {

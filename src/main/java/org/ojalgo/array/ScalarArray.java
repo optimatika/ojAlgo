@@ -71,11 +71,6 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected final void add(final int index, final float addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
-    }
-
-    @Override
     protected byte byteValue(final int index) {
         return this.get(index).byteValue();
     }

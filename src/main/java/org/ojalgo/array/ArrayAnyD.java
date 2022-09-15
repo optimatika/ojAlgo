@@ -194,6 +194,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long[] reference, final Comparable<?> addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
@@ -205,6 +225,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public void add(final long[] reference, final float addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final long addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final int addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final short addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final byte addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 

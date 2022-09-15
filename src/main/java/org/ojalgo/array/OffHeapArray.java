@@ -134,8 +134,28 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         myCount = count;
     }
 
-    public void add(final long index, final double addend) {
+    public final void add(final long index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
+    }
+
+    public final void add(final long index, final float addend) {
+        this.set(index, this.floatValue(index) + addend);
+    }
+
+    public final void add(final long index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
+    }
+
+    public final void add(final long index, final int addend) {
+        this.set(index, this.intValue(index) + addend);
+    }
+
+    public final void add(final long index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
+    }
+
+    public final void add(final long index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
     }
 
     public final long count() {

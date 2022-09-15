@@ -309,18 +309,33 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
+    protected final void add(final int index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
 
     @Override
-    protected void add(final int index, final float addend) {
+    protected final void add(final int index, final float addend) {
         this.set(index, this.floatValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final int addend) {
+        this.set(index, this.intValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
     }
 
     @Override

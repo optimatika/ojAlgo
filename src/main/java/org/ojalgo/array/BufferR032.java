@@ -26,6 +26,7 @@ import java.nio.FloatBuffer;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 
 final class BufferR032 extends BufferArray {
 
@@ -88,4 +89,8 @@ final class BufferR032 extends BufferArray {
         myBuffer.put(index, value);
     }
 
+    @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.floatValue(index) + NumberDefinition.floatValue(addend));
+    }
 }

@@ -354,6 +354,26 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
@@ -365,6 +385,26 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
 
     @Override
     public void add(final long row, final long col, final float addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final long addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final int addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final short addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final byte addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 

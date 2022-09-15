@@ -42,15 +42,15 @@ import org.ojalgo.structure.Access1D;
  */
 public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
-    static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
-
-    private final int mySize;
-
     /**
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
      * Integer.MAX_VALUE - 2, but other JVM:s may have different limits.
      */
     public static final int MAX_SIZE = Integer.MAX_VALUE - 8;
+
+    static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
+
+    private final int mySize;
 
     PlainArray(final DenseArray.Factory<N> factory, final int size) {
 
@@ -63,23 +63,39 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         mySize = size;
     }
 
-    public final int size() {
-        return mySize;
+    @Override
+    public final void add(final long index, final byte addend) {
+        this.add((int) index, addend);
     }
 
     @Override
     public final void add(final long index, final Comparable<?> addend) {
-        this.add(Math.toIntExact(index), addend);
+        this.add((int) index, addend);
     }
 
     @Override
     public final void add(final long index, final double addend) {
-        this.add(Math.toIntExact(index), addend);
+        this.add((int) index, addend);
     }
 
     @Override
     public final void add(final long index, final float addend) {
-        this.add(Math.toIntExact(index), addend);
+        this.add((int) index, addend);
+    }
+
+    @Override
+    public final void add(final long index, final int addend) {
+        this.add((int) index, addend);
+    }
+
+    @Override
+    public final void add(final long index, final long addend) {
+        this.add((int) index, addend);
+    }
+
+    @Override
+    public final void add(final long index, final short addend) {
+        this.add((int) index, addend);
     }
 
     @Override
@@ -164,6 +180,12 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
+    public final void set(final long index, final byte value) {
+        // No Math.toIntExact() here, be as direct as possible
+        this.set((int) index, value);
+    }
+
+    @Override
     public final void set(final long index, final Comparable<?> number) {
         // No Math.toIntExact() here, be as direct as possible
         this.set((int) index, number);
@@ -182,13 +204,13 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
-    public final void set(final long index, final long value) {
+    public final void set(final long index, final int value) {
         // No Math.toIntExact() here, be as direct as possible
         this.set((int) index, value);
     }
 
     @Override
-    public final void set(final long index, final int value) {
+    public final void set(final long index, final long value) {
         // No Math.toIntExact() here, be as direct as possible
         this.set((int) index, value);
     }
@@ -200,15 +222,13 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
-    public final void set(final long index, final byte value) {
-        // No Math.toIntExact() here, be as direct as possible
-        this.set((int) index, value);
-    }
-
-    @Override
     public final short shortValue(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.shortValue((int) index);
+    }
+
+    public final int size() {
+        return mySize;
     }
 
     @Override
@@ -227,11 +247,29 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         return retVal;
     }
 
+    protected void add(final int index, final byte addend) {
+        this.add(index, (short) addend);
+    }
+
     protected abstract void add(int index, Comparable<?> addend);
 
     protected abstract void add(int index, double addend);
 
-    protected abstract void add(int index, float addend);
+    protected void add(final int index, final float addend) {
+        this.add(index, (double) addend);
+    }
+
+    protected void add(final int index, final int addend) {
+        this.add(index, (long) addend);
+    }
+
+    protected void add(final int index, final long addend) {
+        this.add(index, (double) addend);
+    }
+
+    protected void add(final int index, final short addend) {
+        this.add(index, (int) addend);
+    }
 
     protected abstract byte byteValue(int index);
 
@@ -320,6 +358,10 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract int searchAscending(final N number);
 
+    protected void set(final int index, final byte value) {
+        this.set(index, (short) value);
+    }
+
     protected abstract void set(final int index, final Comparable<?> number);
 
     protected abstract void set(final int index, final double value);
@@ -328,18 +370,14 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         this.set(index, (double) value);
     }
 
-    protected abstract void set(final int index, final long value);
-
     protected void set(final int index, final int value) {
         this.set(index, (long) value);
     }
 
+    protected abstract void set(final int index, final long value);
+
     protected void set(final int index, final short value) {
         this.set(index, (int) value);
-    }
-
-    protected void set(final int index, final byte value) {
-        this.set(index, (short) value);
     }
 
     protected short shortValue(final int index) {

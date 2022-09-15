@@ -26,6 +26,7 @@ import java.nio.DoubleBuffer;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 
 final class BufferR064 extends BufferArray {
 
@@ -88,4 +89,8 @@ final class BufferR064 extends BufferArray {
         myBuffer.put(index, value);
     }
 
+    @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
+    }
 }

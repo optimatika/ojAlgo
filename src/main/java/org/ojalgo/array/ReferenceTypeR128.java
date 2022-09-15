@@ -115,11 +115,6 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected void add(final int index, final float addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
     protected byte byteValue(final int index) {
         return this.get(index).byteValue();
     }

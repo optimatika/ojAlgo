@@ -213,11 +213,6 @@ public class PrimitiveR064 extends PrimitiveArray {
     }
 
     @Override
-    protected void add(final int index, final float addend) {
-        data[index] += addend;
-    }
-
-    @Override
     protected byte byteValue(final int index) {
         return (byte) Math.round(data[index]);
     }

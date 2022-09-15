@@ -135,8 +135,8 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
-    protected void add(final int index, final float addend) {
-        data[index] += (short) Math.round(addend);
+    protected void add(final int index, final short addend) {
+        data[index] += addend;
     }
 
     @Override
