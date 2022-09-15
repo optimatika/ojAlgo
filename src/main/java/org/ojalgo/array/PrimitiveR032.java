@@ -29,7 +29,6 @@ import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -283,21 +282,6 @@ public class PrimitiveR032 extends PrimitiveArray {
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
         OperationBinary.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, step, data, function, right.floatValue());
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        OperationBinary.invoke(data, first, limit, step, left.floatValue(), function, data);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override

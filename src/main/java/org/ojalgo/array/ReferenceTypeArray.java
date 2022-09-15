@@ -30,12 +30,10 @@ import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.OperationBinary;
-import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -167,21 +165,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final Access1D<N> right) {
         OperationBinary.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final N right) {
-        OperationBinary.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final N left, final BinaryFunction<N> function) {
-        OperationBinary.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<N> function, final int parameter) {
-        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override

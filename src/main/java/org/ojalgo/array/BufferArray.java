@@ -34,13 +34,11 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.array.operation.OperationBinary;
-import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -392,21 +390,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
         OperationBinary.invoke(this, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(this, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        OperationBinary.invoke(this, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        OperationParameter.invoke(this, first, limit, step, this, function, parameter);
     }
 
     @Override

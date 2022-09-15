@@ -27,7 +27,6 @@ import java.util.Spliterator;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
@@ -275,12 +274,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
 
     protected abstract void modify(int first, int limit, int step, BinaryFunction<N> function, Access1D<N> right);
-
-    protected abstract void modify(int first, int limit, int step, BinaryFunction<N> function, N right);
-
-    protected abstract void modify(int first, int limit, int step, N left, BinaryFunction<N> function);
-
-    protected abstract void modify(int first, int limit, int step, ParameterFunction<N> function, int parameter);
 
     protected abstract void modify(int first, int limit, int step, UnaryFunction<N> function);
 
