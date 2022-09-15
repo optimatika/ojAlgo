@@ -173,6 +173,10 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return true;
     }
 
+    public final MathType getMathType() {
+        return myFactory.getMathType();
+    }
+
     @Override
     public int hashCode() {
         int prime = 31;
@@ -283,10 +287,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     final ArrayFactory<N, ?> factory() {
         return myFactory;
-    }
-
-    final MathType getMathType() {
-        return myFactory.getMathType();
     }
 
     final boolean isPrimitive() {

@@ -36,17 +36,92 @@ public final class OperationBinary implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final Access1D<N> left,
+            final BinaryFunction<N> function, final Access1D<N> right) {
+        for (int i = first; i < limit; i += step) {
+            data.set(i, function.invoke(left.doubleValue(i), right.doubleValue(i)));
+        }
+    }
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final Access1D<N> left,
+            final BinaryFunction<N> function, final double right) {
+        for (int i = first; i < limit; i += step) {
+            data.set(i, function.invoke(left.doubleValue(i), right));
+        }
+    }
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final double left,
+            final BinaryFunction<N> function, final Access1D<N> right) {
+        for (int i = first; i < limit; i += step) {
+            data.set(i, function.invoke(left, right.doubleValue(i)));
+        }
+    }
+
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
             final BinaryFunction<N> function) {
-        for (long i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left.get(i), data.get(i)));
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.doubleValue(i), data.doubleValue(i)));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.floatValue(i), data.floatValue(i)));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.longValue(i), data.longValue(i)));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.intValue(i), data.intValue(i)));
+            }
+            break;
+        default:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.get(i), data.get(i)));
+            }
+            break;
         }
     }
 
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step,
             final BinaryFunction<N> function, final Access1D<N> right) {
-        for (long i = first; i < limit; i += step) {
-            data.set(i, function.invoke(data.get(i), right.get(i)));
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(data.doubleValue(i), right.doubleValue(i)));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(data.floatValue(i), right.floatValue(i)));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(data.longValue(i), right.longValue(i)));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(data.intValue(i), right.intValue(i)));
+            }
+            break;
+        default:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(data.get(i), right.get(i)));
+            }
+            break;
         }
     }
 

@@ -203,49 +203,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    protected void fill(final long first, final long limit, final long step, final Double value) {
-        final double tmpValue = value.doubleValue();
-        for (long i = first; i < limit; i += step) {
-            this.set(i, tmpValue);
-        }
-    }
-
-    @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, supplier.doubleValue());
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final UnaryFunction<Double> function) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void visit(final long first, final long limit, final long step, final VoidFunction<Double> visitor) {
-        for (long i = first; i < limit; i += step) {
-            visitor.invoke(this.doubleValue(i));
-        }
-    }
-
-    @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
         this.set(intIndex, function.invoke(left.doubleValue(extIndex), this.doubleValue(intIndex)));
     }

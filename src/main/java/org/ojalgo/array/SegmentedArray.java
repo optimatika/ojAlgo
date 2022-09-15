@@ -197,42 +197,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].get(index & myIndexMask);
     }
 
-    /**
-     * Will either grow the last segment to be the same size as all the others, or add another segment (with
-     * the same size). The returned (could be the same) instance is guaranteed to have a last segement of the
-     * same size as the others and at least one more "space" in that segment.
-     */
-    public SegmentedArray<N> grow() {
-
-        BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
-        BasicArray<N> tmpNewSegment = mySegmentFactory.make(mySegmentSize);
-
-        long tmpLastSegmentSize = tmpLastSegment.count();
-
-        if (tmpLastSegmentSize < mySegmentSize) {
-
-            mySegments[mySegments.length - 1] = tmpNewSegment;
-
-            tmpNewSegment.fillMatching(tmpLastSegment);
-
-            return this;
-
-        }
-        if (tmpLastSegmentSize != mySegmentSize) {
-
-            throw new IllegalStateException();
-        }
-        @SuppressWarnings("unchecked")
-        BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
-
-        for (int i = 0; i < mySegments.length; i++) {
-            tmpSegments[i] = mySegments[i];
-        }
-        tmpSegments[mySegments.length] = tmpNewSegment;
-
-        return new SegmentedArray<>(tmpSegments, mySegmentFactory);
-    }
-
     @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
@@ -463,6 +427,42 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
                 visitor.invoke(this.get(i));
             }
         }
+    }
+
+    /**
+     * Will either grow the last segment to be the same size as all the others, or add another segment (with
+     * the same size). The returned (could be the same) instance is guaranteed to have a last segement of the
+     * same size as the others and at least one more "space" in that segment.
+     */
+    SegmentedArray<N> grow() {
+
+        BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
+        BasicArray<N> tmpNewSegment = mySegmentFactory.make(mySegmentSize);
+
+        long tmpLastSegmentSize = tmpLastSegment.count();
+
+        if (tmpLastSegmentSize < mySegmentSize) {
+
+            mySegments[mySegments.length - 1] = tmpNewSegment;
+
+            tmpNewSegment.fillMatching(tmpLastSegment);
+
+            return this;
+
+        }
+        if (tmpLastSegmentSize != mySegmentSize) {
+
+            throw new IllegalStateException();
+        }
+        @SuppressWarnings("unchecked")
+        BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+
+        for (int i = 0; i < mySegments.length; i++) {
+            tmpSegments[i] = mySegments[i];
+        }
+        tmpSegments[mySegments.length] = tmpNewSegment;
+
+        return new SegmentedArray<>(tmpSegments, mySegmentFactory);
     }
 
 }
