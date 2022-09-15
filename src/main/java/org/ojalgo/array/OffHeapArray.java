@@ -31,7 +31,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -42,7 +41,8 @@ import org.ojalgo.type.math.MathType;
  * Off heap memory array.
  * <p>
  * When just instantiated these array classes contain uninitialized memory – memory is allocated but not
- * initialized.
+ * initialized. To initialize call {@link #reset()}. Explicit initialization is only necessary if your code
+ * depends on having zeros as the default/initial value.
  *
  * @author apete
  */
@@ -159,24 +159,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     public Double get(final long index) {
-        return this.doubleValue(index);
-    }
-
-    public boolean isAbsolute(final long index) {
-        return PrimitiveScalar.isAbsolute(this.doubleValue(index));
-    }
-
-    public boolean isSmall(final long index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(this.doubleValue(index), comparedTo);
+        return Double.valueOf(this.doubleValue(index));
     }
 
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.set(index, modifier.invoke(this.doubleValue(index)));
-    }
-
-    @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
     }
 
     public void visitOne(final long index, final VoidFunction<Double> visitor) {

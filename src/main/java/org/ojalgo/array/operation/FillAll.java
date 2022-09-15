@@ -43,6 +43,12 @@ public final class FillAll implements ArrayOperation {
         }
     }
 
+    public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final long first, final long limit, final long step, final double value) {
+        for (long i = first; i < limit; i += step) {
+            data.set(i, value);
+        }
+    }
+
     public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final long first, final long limit, final long step, final N value) {
 
         switch (data.getMathType()) {

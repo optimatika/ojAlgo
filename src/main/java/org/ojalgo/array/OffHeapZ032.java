@@ -35,6 +35,10 @@ final class OffHeapZ032 extends OffHeapArray {
         myPointer = NativeMemory.allocateIntArray(this, count);
     }
 
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.intValue(addend));
+    }
+
     public double doubleValue(final long index) {
         return NativeMemory.getFloat(myPointer, index);
     }
@@ -43,20 +47,21 @@ final class OffHeapZ032 extends OffHeapArray {
         return NativeMemory.getFloat(myPointer, index);
     }
 
+    @Override
+    public void reset() {
+        NativeMemory.initialiseIntArray(myPointer, this.count());
+    }
+
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.intValue(value));
+    }
+
     public void set(final long index, final double value) {
         NativeMemory.setFloat(myPointer, index, (float) value);
     }
 
     public void set(final long index, final float value) {
         NativeMemory.setFloat(myPointer, index, value);
-    }
-
-    public void add(final long index, final Comparable<?> addend) {
-        this.add(index, Scalar.intValue(addend));
-    }
-
-    public void set(final long index, final Comparable<?> value) {
-        this.set(index, Scalar.intValue(value));
     }
 
 }

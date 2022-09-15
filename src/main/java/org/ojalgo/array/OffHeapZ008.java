@@ -35,28 +35,33 @@ final class OffHeapZ008 extends OffHeapArray {
         myPointer = NativeMemory.allocateByteArray(this, count);
     }
 
-    public double doubleValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.byteValue(addend));
     }
 
     public byte byteValue(final long index) {
         return NativeMemory.getByte(myPointer, index);
     }
 
-    public void set(final long index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) value);
+    public double doubleValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
+    public void reset() {
+        NativeMemory.initialiseByteArray(myPointer, this.count());
     }
 
     public void set(final long index, final byte value) {
         NativeMemory.setByte(myPointer, index, value);
     }
 
-    public void add(final long index, final Comparable<?> addend) {
-        this.add(index, Scalar.byteValue(addend));
-    }
-
     public void set(final long index, final Comparable<?> value) {
         this.set(index, Scalar.byteValue(value));
+    }
+
+    public void set(final long index, final double value) {
+        NativeMemory.setByte(myPointer, index, (byte) value);
     }
 
 }

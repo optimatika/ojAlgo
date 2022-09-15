@@ -166,6 +166,11 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
+    public void reset() {
+        Arrays.fill(data, 0.0F);
+    }
+
+    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }

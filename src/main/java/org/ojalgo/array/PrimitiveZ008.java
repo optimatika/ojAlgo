@@ -108,6 +108,11 @@ public class PrimitiveZ008 extends PrimitiveArray {
     }
 
     @Override
+    public void reset() {
+        Arrays.fill(data, (byte) 0);
+    }
+
+    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }
