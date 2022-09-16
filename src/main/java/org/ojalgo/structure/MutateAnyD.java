@@ -38,6 +38,18 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Fillable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Fillable<N> {
 
+        default void fillOne(final long index, final N value) {
+            this.fillOne(StructureAnyD.reference(index, this.shape()), value);
+        }
+
+        default void fillOne(final long index, final NullaryFunction<?> supplier) {
+            this.fillOne(StructureAnyD.reference(index, this.shape()), supplier);
+        }
+
+        default void fillOne(final long[] reference, final Access1D<?> values, final long valueIndex) {
+            this.fillOne(reference, (N) values.get(valueIndex));
+        }
+
         void fillOne(long[] reference, N value);
 
         void fillOne(long[] reference, NullaryFunction<?> supplier);

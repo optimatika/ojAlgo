@@ -139,10 +139,6 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return true;
     }
 
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myArray.fillOne(index, values, valueIndex);
-    }
-
     public void fillOne(final long index, final N value) {
         myArray.fillOne(index, value);
     }

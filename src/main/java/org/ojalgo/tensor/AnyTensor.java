@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
@@ -170,18 +169,6 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             return false;
         }
         return true;
-    }
-
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myArray.fillOne(index, values, valueIndex);
-    }
-
-    public void fillOne(final long index, final N value) {
-        myArray.fillOne(index, value);
-    }
-
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myArray.fillOne(index, supplier);
     }
 
     public void fillOne(final long[] reference, final N value) {

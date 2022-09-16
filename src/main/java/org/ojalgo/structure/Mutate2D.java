@@ -104,7 +104,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), values, valueIndex);
         }
 
-        void fillOne(long row, long col, Access1D<?> values, long valueIndex);
+        default void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            this.fillOne(row, col, (N) values.get(valueIndex));
+        }
 
         void fillOne(long row, long col, N value);
 
