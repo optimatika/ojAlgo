@@ -339,6 +339,11 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(index, addend);
     }
@@ -354,23 +359,18 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void add(final long index, final long addend) {
-        myDelegate.add(index, addend);
-    }
-
-    @Override
     public void add(final long index, final int addend) {
         myDelegate.add(index, addend);
     }
 
     @Override
-    public void add(final long index, final short addend) {
+    public void add(final long index, final long addend) {
         myDelegate.add(index, addend);
     }
 
     @Override
-    public void add(final long index, final byte addend) {
-        myDelegate.add(index, addend);
+    public void add(final long row, final long col, final byte addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
     @Override
@@ -389,12 +389,12 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void add(final long row, final long col, final long addend) {
+    public void add(final long row, final long col, final int addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
     @Override
-    public void add(final long row, final long col, final int addend) {
+    public void add(final long row, final long col, final long addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
@@ -404,8 +404,8 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void add(final long row, final long col, final byte addend) {
-        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    public void add(final long index, final short addend) {
+        myDelegate.add(index, addend);
     }
 
     @Override
@@ -437,6 +437,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
+    public byte byteValue(final long row, final long col) {
+        return myDelegate.byteValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public long count() {
         return myDelegate.count();
     }
@@ -459,56 +469,6 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     @Override
     public double doubleValue(final long row, final long col) {
         return myDelegate.doubleValue(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public float floatValue(final long index) {
-        return myDelegate.floatValue(index);
-    }
-
-    @Override
-    public float floatValue(final long row, final long col) {
-        return myDelegate.floatValue(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public long longValue(final long index) {
-        return myDelegate.longValue(index);
-    }
-
-    @Override
-    public long longValue(final long row, final long col) {
-        return myDelegate.longValue(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public int intValue(final long index) {
-        return myDelegate.intValue(index);
-    }
-
-    @Override
-    public int intValue(final long row, final long col) {
-        return myDelegate.intValue(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public short shortValue(final long index) {
-        return myDelegate.shortValue(index);
-    }
-
-    @Override
-    public short shortValue(final long row, final long col) {
-        return myDelegate.shortValue(Structure2D.index(myRowsCount, row, col));
-    }
-
-    @Override
-    public byte byteValue(final long index) {
-        return myDelegate.byteValue(index);
-    }
-
-    @Override
-    public byte byteValue(final long row, final long col) {
-        return myDelegate.byteValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override
@@ -670,6 +630,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(index);
+    }
+
+    @Override
+    public float floatValue(final long row, final long col) {
+        return myDelegate.floatValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public N get(final long index) {
         return myDelegate.get(index);
     }
@@ -691,6 +661,26 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     @Override
     public long indexOfLargest() {
         return myDelegate.indexOfLargest();
+    }
+
+    @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
+    public int intValue(final long row, final long col) {
+        return myDelegate.intValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(index);
+    }
+
+    @Override
+    public long longValue(final long row, final long col) {
+        return myDelegate.longValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override
@@ -792,6 +782,11 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         myDelegate.set(index, value);
     }
@@ -807,23 +802,18 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void set(final long index, final long value) {
-        myDelegate.set(index, value);
-    }
-
-    @Override
     public void set(final long index, final int value) {
         myDelegate.set(index, value);
     }
 
     @Override
-    public void set(final long index, final short value) {
+    public void set(final long index, final long value) {
         myDelegate.set(index, value);
     }
 
     @Override
-    public void set(final long index, final byte value) {
-        myDelegate.set(index, value);
+    public void set(final long row, final long col, final byte value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
     @Override
@@ -842,12 +832,12 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void set(final long row, final long col, final long value) {
+    public void set(final long row, final long col, final int value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
     @Override
-    public void set(final long row, final long col, final int value) {
+    public void set(final long row, final long col, final long value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
@@ -857,8 +847,18 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
-    public void set(final long row, final long col, final byte value) {
-        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    public void set(final long index, final short value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
+    public short shortValue(final long row, final long col) {
+        return myDelegate.shortValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override

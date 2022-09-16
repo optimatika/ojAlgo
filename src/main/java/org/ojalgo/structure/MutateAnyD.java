@@ -73,6 +73,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     interface Modifiable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
         @Override
+        default void add(final long index, final byte addend) {
+            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        }
+
+        @Override
         default void add(final long index, final Comparable<?> addend) {
             this.add(StructureAnyD.reference(index, this.shape()), addend);
         }
@@ -88,12 +93,12 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         }
 
         @Override
-        default void add(final long index, final long addend) {
+        default void add(final long index, final int addend) {
             this.add(StructureAnyD.reference(index, this.shape()), addend);
         }
 
         @Override
-        default void add(final long index, final int addend) {
+        default void add(final long index, final long addend) {
             this.add(StructureAnyD.reference(index, this.shape()), addend);
         }
 
@@ -102,9 +107,8 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
             this.add(StructureAnyD.reference(index, this.shape()), addend);
         }
 
-        @Override
-        default void add(final long index, final byte addend) {
-            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        default void add(final long[] reference, final byte addend) {
+            this.add(reference, (short) addend);
         }
 
         void add(long[] reference, Comparable<?> addend);
@@ -115,20 +119,16 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
             this.add(reference, (double) addend);
         }
 
-        default void add(final long[] reference, final long addend) {
-            this.add(reference, (double) addend);
-        }
-
         default void add(final long[] reference, final int addend) {
             this.add(reference, (long) addend);
         }
 
-        default void add(final long[] reference, final short addend) {
-            this.add(reference, (int) addend);
+        default void add(final long[] reference, final long addend) {
+            this.add(reference, (double) addend);
         }
 
-        default void add(final long[] reference, final byte addend) {
-            this.add(reference, (short) addend);
+        default void add(final long[] reference, final short addend) {
+            this.add(reference, (int) addend);
         }
 
         void modifyOne(long[] reference, UnaryFunction<N> modifier);
