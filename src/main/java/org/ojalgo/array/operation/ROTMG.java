@@ -27,7 +27,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class ROTMG implements ArrayOperation {
+public abstract class ROTMG implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

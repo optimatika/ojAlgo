@@ -23,7 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.scalar.Scalar;
 
-public final class RotateRight implements ArrayOperation {
+public abstract class RotateRight implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

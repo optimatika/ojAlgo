@@ -26,15 +26,15 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation {
+public abstract class GenerateApplyAndCopyHouseholderRow implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
     public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive64 destination) {
 
-        final int tmpColDim = data.length / structure;
+        int tmpColDim = data.length / structure;
 
-        final double[] tmpVector = destination.vector;
+        double[] tmpVector = destination.vector;
         destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
@@ -51,7 +51,7 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            final double value = tmpNorm2;
+            double value = tmpNorm2;
             retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
@@ -83,9 +83,9 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
 
     public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive32 destination) {
 
-        final int tmpColDim = data.length / structure;
+        int tmpColDim = data.length / structure;
 
-        final float[] tmpVector = destination.vector;
+        float[] tmpVector = destination.vector;
         destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
@@ -102,7 +102,7 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            final double value = tmpNorm2;
+            double value = tmpNorm2;
             retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
@@ -135,9 +135,9 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
     public static <N extends Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 
-        final int tmpColDim = data.length / structure;
+        int tmpColDim = data.length / structure;
 
-        final N[] tmpVector = destination.vector;
+        N[] tmpVector = destination.vector;
         destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO;
@@ -155,7 +155,7 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[j] = tmpVal;
             }
-            final double value = tmpNorm2;
+            double value = tmpNorm2;
             retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 

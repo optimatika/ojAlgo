@@ -25,7 +25,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public final class CorePrimitiveOperation implements ArrayOperation {
+public abstract class CorePrimitiveOperation implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
@@ -629,6 +629,37 @@ public final class CorePrimitiveOperation implements ArrayOperation {
     public static void multiply(final short[] data, final int first, final int limit, final int step, final short[] left, final short[] right) {
         for (int i = first; i < limit; i += step) {
             data[i] = (short) (left[i] * right[i]);
+        }
+    }
+
+    public static <N extends Comparable<N>> void negate(final BasicArray<N> data, final long first, final long limit, final long step,
+            final Access1D<N> values) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, -values.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, -values.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, -values.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                data.set(i, -values.intValue(i));
+            }
+            break;
+        default:
+            throw new IllegalArgumentException();
         }
     }
 

@@ -31,14 +31,14 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class MultiplyHermitianAndVector implements ArrayOperation {
+public abstract class MultiplyHermitianAndVector implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
     public static void invoke(final double[] productMatrix, final int firstRow, final int rowLimit, final double[] hermitianMatrix, final double[] rightVector,
             final int firstColumn) {
 
-        final int structure = rightVector.length;
+        int structure = rightVector.length;
 
         double tmpVal;
         for (int i = firstRow; i < rowLimit; i++) {
@@ -56,7 +56,7 @@ public final class MultiplyHermitianAndVector implements ArrayOperation {
     public static <N extends Scalar<N>> void invoke(final N[] productMatrix, final int firstRow, final int rowLimit, final N[] hermitianMatrix,
             final N[] rightVector, final int firstColumn, final Scalar.Factory<N> scalar) {
 
-        final int structure = rightVector.length;
+        int structure = rightVector.length;
 
         Scalar<N> tmpVal;
         for (int i = firstRow; i < rowLimit; i++) {

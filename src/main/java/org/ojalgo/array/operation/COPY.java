@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-public final class COPY implements ArrayOperation {
+public abstract class COPY implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -41,37 +41,37 @@ public final class COPY implements ArrayOperation {
     }
 
     public static double[] copyOf(final double[] original) {
-        final int tmpLength = original.length;
-        final double[] retVal = new double[tmpLength];
+        int tmpLength = original.length;
+        double[] retVal = new double[tmpLength];
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
     }
 
     public static float[] copyOf(final float[] original) {
-        final int tmpLength = original.length;
-        final float[] retVal = new float[tmpLength];
+        int tmpLength = original.length;
+        float[] retVal = new float[tmpLength];
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
     }
 
     public static int[] copyOf(final int[] original) {
-        final int tmpLength = original.length;
-        final int[] retVal = new int[tmpLength];
+        int tmpLength = original.length;
+        int[] retVal = new int[tmpLength];
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
     }
 
     public static long[] copyOf(final long[] original) {
-        final int tmpLength = original.length;
-        final long[] retVal = new long[tmpLength];
+        int tmpLength = original.length;
+        long[] retVal = new long[tmpLength];
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T[] copyOf(final T[] original) {
-        final int tmpLength = original.length;
-        final T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
+        int tmpLength = original.length;
+        T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
         System.arraycopy(original, 0, retVal, 0, tmpLength);
         return retVal;
     }

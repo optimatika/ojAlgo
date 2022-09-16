@@ -25,7 +25,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.structure.Access1D;
 
-public final class OperationParameter implements ArrayOperation {
+public abstract class OperationParameter implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

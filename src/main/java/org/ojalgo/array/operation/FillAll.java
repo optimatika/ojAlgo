@@ -26,7 +26,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public final class FillAll implements ArrayOperation {
+public abstract class FillAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -206,7 +206,7 @@ public final class FillAll implements ArrayOperation {
     }
 
     protected static void fill(final BasicArray<?> data, final Access1D<?> value) {
-        final int tmpLimit = (int) Math.min(data.count(), value.count());
+        int tmpLimit = (int) Math.min(data.count(), value.count());
         for (int i = 0; i < tmpLimit; i++) {
             data.set(i, value.doubleValue(i));
         }

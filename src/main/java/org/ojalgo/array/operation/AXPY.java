@@ -33,7 +33,7 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public final class AXPY implements ArrayOperation {
+public abstract class AXPY implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -57,7 +57,7 @@ public final class AXPY implements ArrayOperation {
     }
 
     public static void invoke(final Mutate1D.Modifiable<?> y, final double a, final BigDecimal[] x) {
-        final BigDecimal tmpA = new BigDecimal(a);
+        BigDecimal tmpA = new BigDecimal(a);
         for (int i = 0; i < x.length; i++) {
             y.add(i, x[i].multiply(tmpA));
         }

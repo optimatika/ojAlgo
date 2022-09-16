@@ -23,7 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.array.BasicArray;
 
-public final class Exchange implements ArrayOperation {
+public abstract class Exchange implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

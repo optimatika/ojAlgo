@@ -29,7 +29,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  *
  * @author apete
  */
-public final class NRM2 implements ArrayOperation {
+public abstract class NRM2 implements ArrayOperation {
 
     public static double invoke(final double[] data, final double scale, final int first, final int limit) {
         double tmpVal;

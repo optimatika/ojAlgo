@@ -32,7 +32,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 
-public final class OperationBinary implements ArrayOperation {
+public abstract class OperationBinary implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

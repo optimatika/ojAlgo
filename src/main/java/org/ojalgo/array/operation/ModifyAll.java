@@ -23,7 +23,7 @@ package org.ojalgo.array.operation;
 
 import java.util.function.DoubleUnaryOperator;
 
-public final class ModifyAll implements ArrayOperation {
+public abstract class ModifyAll implements ArrayOperation {
 
     public static int THRESHOLD = 64;
 

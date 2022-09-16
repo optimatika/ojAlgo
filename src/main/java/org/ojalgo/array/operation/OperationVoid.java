@@ -24,7 +24,7 @@ package org.ojalgo.array.operation;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.VoidFunction;
 
-public final class OperationVoid implements ArrayOperation {
+public abstract class OperationVoid implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
