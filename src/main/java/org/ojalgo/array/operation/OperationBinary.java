@@ -30,119 +30,152 @@ import org.ojalgo.array.PrimitiveZ032;
 import org.ojalgo.array.PrimitiveZ064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 public abstract class OperationBinary implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
-    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final Access1D<N> left,
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
             final BinaryFunction<N> function, final Access1D<N> right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left.doubleValue(i), right.doubleValue(i)));
-        }
-    }
 
-    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final Access1D<N> left,
-            final BinaryFunction<N> function, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left.doubleValue(i), right));
-        }
-    }
-
-    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step, final double left,
-            final BinaryFunction<N> function, final Access1D<N> right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left, right.doubleValue(i)));
+        if (data.isPrimitive()) {
+            if (function == PrimitiveMath.ADD) {
+                CorePrimitiveOperation.add(data, first, limit, step, left, right);
+            } else if (function == PrimitiveMath.DIVIDE) {
+                CorePrimitiveOperation.divide(data, first, limit, step, left, right);
+            } else if (function == PrimitiveMath.MULTIPLY) {
+                CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
+            } else if (function == PrimitiveMath.SUBTRACT) {
+                CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
+            } else {
+                switch (data.getMathType()) {
+                case R032:
+                    for (long i = first; i < limit; i += step) {
+                        data.set(i, function.invoke(left.floatValue(i), right.floatValue(i)));
+                    }
+                    break;
+                case Z064:
+                    for (long i = first; i < limit; i += step) {
+                        data.set(i, function.invoke(left.longValue(i), right.longValue(i)));
+                    }
+                    break;
+                case Z032:
+                case Z016:
+                case Z008:
+                    for (long i = first; i < limit; i += step) {
+                        data.set(i, function.invoke(left.intValue(i), right.intValue(i)));
+                    }
+                    break;
+                default:
+                    for (long i = first; i < limit; i += step) {
+                        data.set(i, function.invoke(left.doubleValue(i), right.doubleValue(i)));
+                    }
+                    break;
+                }
+            }
+        } else {
+            for (long i = first; i < limit; i += step) {
+                data.set(i, function.invoke(left.get(i), right.get(i)));
+            }
         }
     }
 
     public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final Access1D<N> left,
-            final BinaryFunction<N> function) {
+            final BinaryFunction<N> function, final N right) {
 
         if (data.isPrimitive()) {
             if (function == PrimitiveMath.ADD) {
-                CorePrimitiveOperation.add(data, first, limit, step, left, data);
+                CorePrimitiveOperation.add(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.DIVIDE) {
-                CorePrimitiveOperation.divide(data, first, limit, step, left, data);
+                CorePrimitiveOperation.divide(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.MULTIPLY) {
-                CorePrimitiveOperation.multiply(data, first, limit, step, left, data);
+                CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.SUBTRACT) {
-                CorePrimitiveOperation.subtract(data, first, limit, step, left, data);
+                CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
             } else {
                 switch (data.getMathType()) {
                 case R032:
+                    float floatValue = Scalar.floatValue(right);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.floatValue(i), data.floatValue(i)));
+                        data.set(i, function.invoke(left.floatValue(i), floatValue));
                     }
                     break;
                 case Z064:
+                    long longValue = Scalar.longValue(right);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.longValue(i), data.longValue(i)));
+                        data.set(i, function.invoke(left.longValue(i), longValue));
                     }
                     break;
                 case Z032:
                 case Z016:
                 case Z008:
+                    int intValue = Scalar.intValue(right);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.intValue(i), data.intValue(i)));
+                        data.set(i, function.invoke(left.intValue(i), intValue));
                     }
                     break;
                 default:
+                    double doubleValue = Scalar.doubleValue(right);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.doubleValue(i), data.doubleValue(i)));
+                        data.set(i, function.invoke(left.doubleValue(i), doubleValue));
                     }
                     break;
                 }
             }
         } else {
             for (long i = first; i < limit; i += step) {
-                data.set(i, function.invoke(left.get(i), data.get(i)));
+                data.set(i, function.invoke(left.get(i), right));
             }
         }
     }
 
-    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step,
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step, final N left,
             final BinaryFunction<N> function, final Access1D<N> right) {
 
         if (data.isPrimitive()) {
             if (function == PrimitiveMath.ADD) {
-                CorePrimitiveOperation.add(data, first, limit, step, data, right);
+                CorePrimitiveOperation.add(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.DIVIDE) {
-                CorePrimitiveOperation.divide(data, first, limit, step, data, right);
+                CorePrimitiveOperation.divide(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.MULTIPLY) {
-                CorePrimitiveOperation.multiply(data, first, limit, step, data, right);
+                CorePrimitiveOperation.multiply(data, first, limit, step, left, right);
             } else if (function == PrimitiveMath.SUBTRACT) {
-                CorePrimitiveOperation.subtract(data, first, limit, step, data, right);
+                CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
             } else {
                 switch (data.getMathType()) {
                 case R032:
+                    float floatValue = Scalar.floatValue(left);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(data.floatValue(i), right.floatValue(i)));
+                        data.set(i, function.invoke(floatValue, right.floatValue(i)));
                     }
                     break;
                 case Z064:
+                    long longValue = Scalar.longValue(left);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(data.longValue(i), right.longValue(i)));
+                        data.set(i, function.invoke(longValue, right.longValue(i)));
                     }
                     break;
                 case Z032:
                 case Z016:
                 case Z008:
+                    int intValue = Scalar.intValue(left);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(data.intValue(i), right.intValue(i)));
+                        data.set(i, function.invoke(intValue, right.intValue(i)));
                     }
                     break;
                 default:
+                    double doubleValue = Scalar.doubleValue(left);
                     for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(data.doubleValue(i), right.doubleValue(i)));
+                        data.set(i, function.invoke(doubleValue, right.doubleValue(i)));
                     }
                     break;
                 }
             }
         } else {
             for (long i = first; i < limit; i += step) {
-                data.set(i, function.invoke(data.get(i), right.get(i)));
+                data.set(i, function.invoke(left, right.get(i)));
             }
         }
     }
