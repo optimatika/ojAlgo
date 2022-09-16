@@ -25,9 +25,9 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.RationalAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
@@ -54,8 +54,8 @@ public class ScalarQ128 extends ScalarArray<RationalNumber> {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.Q128;
         }
 
         @Override
@@ -64,8 +64,6 @@ public class ScalarQ128 extends ScalarArray<RationalNumber> {
         }
 
     };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
 
     public static ScalarQ128 make(final int size) {
         return new ScalarQ128(size);

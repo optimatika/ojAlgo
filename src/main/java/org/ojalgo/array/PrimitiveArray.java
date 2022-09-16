@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Mutate1D;
 
 public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
@@ -40,16 +39,6 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
 
     PrimitiveArray(final DenseArray.Factory<Double> factory, final int size) {
         super(factory, size);
-    }
-
-    @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    @Override
-    final boolean isPrimitive() {
-        return true;
     }
 
 }

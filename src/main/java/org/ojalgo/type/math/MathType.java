@@ -111,4 +111,8 @@ public enum MathType {
         return myComponents * myJavaType.memory();
     }
 
+    public boolean isPrimitive() {
+        return myComponents == 1 && myJavaType != JavaType.REFERENCE;
+    }
+
 }

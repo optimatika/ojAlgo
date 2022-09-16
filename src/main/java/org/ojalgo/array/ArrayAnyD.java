@@ -179,6 +179,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(index, addend);
     }
@@ -194,6 +199,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final byte addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
     public void add(final long[] reference, final Comparable<?> addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
@@ -205,6 +230,21 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public void add(final long[] reference, final float addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final int addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final long addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final short addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
@@ -230,6 +270,16 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
+    public byte byteValue(final long... ref) {
+        return myDelegate.byteValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
     public long count() {
         return myDelegate.count();
     }
@@ -245,7 +295,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public double doubleValue(final long[] ref) {
+    public double doubleValue(final long... ref) {
         return myDelegate.doubleValue(StructureAnyD.index(myStructure, ref));
     }
 
@@ -359,12 +409,22 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(index);
+    }
+
+    @Override
+    public float floatValue(final long... ref) {
+        return myDelegate.floatValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
     public N get(final long index) {
         return myDelegate.get(index);
     }
 
     @Override
-    public N get(final long[] ref) {
+    public N get(final long... ref) {
         return myDelegate.get(StructureAnyD.index(myStructure, ref));
     }
 
@@ -379,6 +439,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public long indexOfLargest() {
         return myDelegate.indexOfLargest();
+    }
+
+    @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
+    public int intValue(final long... ref) {
+        return myDelegate.intValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(index);
+    }
+
+    @Override
+    public long longValue(final long... ref) {
+        return myDelegate.longValue(StructureAnyD.index(myStructure, ref));
     }
 
     @Override
@@ -506,6 +586,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         myDelegate.set(index, value);
     }
@@ -518,6 +603,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public void set(final long index, final float value) {
         myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long[] reference, final byte value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
     @Override
@@ -536,8 +641,33 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void set(final long[] reference, final int value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final long value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final short value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
     public long[] shape() {
         return myStructure;
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
+    public short shortValue(final long... ref) {
+        return myDelegate.shortValue(StructureAnyD.index(myStructure, ref));
     }
 
     @Override

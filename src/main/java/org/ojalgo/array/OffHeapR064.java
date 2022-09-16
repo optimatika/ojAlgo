@@ -21,14 +21,10 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
-import org.ojalgo.type.math.MathType;
 
 final class OffHeapR064 extends OffHeapArray {
-
-    static final MathType TYPE = MathType.R064;
 
     private final long myPointer;
 
@@ -37,8 +33,10 @@ final class OffHeapR064 extends OffHeapArray {
         super(OffHeapArray.R064, count);
 
         myPointer = NativeMemory.allocateDoubleArray(this, count);
+    }
 
-        this.fillAll(PrimitiveMath.ZERO);
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.doubleValue(addend));
     }
 
     public double doubleValue(final long index) {
@@ -49,20 +47,21 @@ final class OffHeapR064 extends OffHeapArray {
         return (float) NativeMemory.getDouble(myPointer, index);
     }
 
+    @Override
+    public void reset() {
+        NativeMemory.initialiseDoubleArray(myPointer, this.count());
+    }
+
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.doubleValue(value));
+    }
+
     public void set(final long index, final double value) {
         NativeMemory.setDouble(myPointer, index, value);
     }
 
     public void set(final long index, final float value) {
         NativeMemory.setDouble(myPointer, index, value);
-    }
-
-    public void add(final long index, final Comparable<?> addend) {
-        this.add(index, Scalar.doubleValue(addend));
-    }
-
-    public void set(final long index, final Comparable<?> value) {
-        this.set(index, Scalar.doubleValue(value));
     }
 
 }

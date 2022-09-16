@@ -31,7 +31,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -39,8 +38,11 @@ import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
- * Off heap memory array. Currently supports float and double elements
- * </p>
+ * Off heap memory array.
+ * <p>
+ * When just instantiated these array classes contain uninitialized memory – memory is allocated but not
+ * initialized. To initialize call {@link #reset()}. Explicit initialization is only necessary if your code
+ * depends on having zeros as the default/initial value.
  *
  * @author apete
  */
@@ -79,12 +81,12 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
         @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE;
+            return Long.MAX_VALUE;
         }
 
         @Override
-        long getElementSize() {
-            return myMathType.getJavaType().memory();
+        MathType getMathType() {
+            return myMathType;
         }
 
     }
@@ -132,11 +134,31 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         myCount = count;
     }
 
-    public void add(final long index, final double addend) {
+    public final void add(final long index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
 
-    public long count() {
+    public final void add(final long index, final float addend) {
+        this.set(index, this.floatValue(index) + addend);
+    }
+
+    public final void add(final long index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
+    }
+
+    public final void add(final long index, final int addend) {
+        this.set(index, this.intValue(index) + addend);
+    }
+
+    public final void add(final long index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
+    }
+
+    public final void add(final long index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
+    }
+
+    public final long count() {
         return myCount;
     }
 
@@ -157,24 +179,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     public Double get(final long index) {
-        return this.doubleValue(index);
-    }
-
-    public boolean isAbsolute(final long index) {
-        return PrimitiveScalar.isAbsolute(this.doubleValue(index));
-    }
-
-    public boolean isSmall(final long index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(this.doubleValue(index), comparedTo);
+        return Double.valueOf(this.doubleValue(index));
     }
 
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.set(index, modifier.invoke(this.doubleValue(index)));
-    }
-
-    @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
     }
 
     public void visitOne(final long index, final VoidFunction<Double> visitor) {
@@ -198,54 +207,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
             tmpIndexA += step;
             tmpIndexB += step;
         }
-    }
-
-    @Override
-    protected void fill(final long first, final long limit, final long step, final Double value) {
-        final double tmpValue = value.doubleValue();
-        for (long i = first; i < limit; i += step) {
-            this.set(i, tmpValue);
-        }
-    }
-
-    @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, supplier.doubleValue());
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void modify(final long first, final long limit, final long step, final UnaryFunction<Double> function) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i)));
-        }
-    }
-
-    @Override
-    protected void visit(final long first, final long limit, final long step, final VoidFunction<Double> visitor) {
-        for (long i = first; i < limit; i += step) {
-            visitor.invoke(this.doubleValue(i));
-        }
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return true;
     }
 
     @Override

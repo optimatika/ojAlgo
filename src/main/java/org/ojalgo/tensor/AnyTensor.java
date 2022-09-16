@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
@@ -67,8 +66,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-            return result;
+            return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
         public AnyTensor<N> make(final long... structure) {
@@ -117,6 +115,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    public byte byteValue(final long... ref) {
+        return myArray.byteValue(ref);
+    }
+
     public AnyTensor<N> conjugate() {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -139,7 +141,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return myArray.count(dimension);
     }
 
-    public double doubleValue(final long[] ref) {
+    public double doubleValue(final long... ref) {
         return myArray.doubleValue(ref);
     }
 
@@ -169,26 +171,6 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return true;
     }
 
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myArray.fillOne(index, values, valueIndex);
-    }
-
-    public void fillOne(final long index, final N value) {
-        myArray.fillOne(index, value);
-    }
-
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myArray.fillOne(index, supplier);
-    }
-
-    public void fillOne(final long[] reference, final N value) {
-        myArray.fillOne(reference, value);
-    }
-
-    public void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
-        myArray.fillOne(reference, supplier);
-    }
-
     public void fillSet(final int dimension, final long dimensionalIndex, final N value) {
         myArray.fillSet(dimension, dimensionalIndex, value);
     }
@@ -205,7 +187,11 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         myArray.fillSet(initial, dimension, supplier);
     }
 
-    public N get(final long[] ref) {
+    public float floatValue(final long... ref) {
+        return myArray.floatValue(ref);
+    }
+
+    public N get(final long... ref) {
         return myArray.get(ref);
     }
 
@@ -214,8 +200,15 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (myArray == null ? 0 : myArray.hashCode());
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
+    }
+
+    public int intValue(final long... ref) {
+        return myArray.intValue(ref);
+    }
+
+    public long longValue(final long... ref) {
+        return myArray.longValue(ref);
     }
 
     public AnyTensor<N> multiply(final double scalarMultiplicand) {
@@ -249,6 +242,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return this.norm(myArray);
     }
 
+    public void set(final long[] reference, final byte value) {
+        myArray.set(reference, value);
+    }
+
     public void set(final long[] reference, final Comparable<?> value) {
         myArray.set(reference, value);
     }
@@ -257,8 +254,28 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         myArray.set(reference, value);
     }
 
+    public void set(final long[] reference, final float value) {
+        myArray.set(reference, value);
+    }
+
+    public void set(final long[] reference, final int value) {
+        myArray.set(reference, value);
+    }
+
+    public void set(final long[] reference, final long value) {
+        myArray.set(reference, value);
+    }
+
+    public void set(final long[] reference, final short value) {
+        myArray.set(reference, value);
+    }
+
     public long[] shape() {
         return myArray.shape();
+    }
+
+    public short shortValue(final long... ref) {
+        return myArray.shortValue(ref);
     }
 
     @Override

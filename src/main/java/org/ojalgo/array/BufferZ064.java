@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.type.NumberDefinition;
 
 final class BufferZ064 extends BufferArray {
 
@@ -70,13 +71,17 @@ final class BufferZ064 extends BufferArray {
     }
 
     @Override
-    protected void set(final int index, final float value) {
-        myBuffer.put(index, Math.round(value));
-    }
-
-    @Override
     protected short shortValue(final int index) {
         return (short) myBuffer.get(index);
     }
 
+    @Override
+    protected void set(final int index, final long value) {
+        myBuffer.put(index, value);
+    }
+
+    @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.longValue(index) + NumberDefinition.longValue(addend));
+    }
 }

@@ -28,7 +28,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class CABS1 implements ArrayOperation {
+public abstract class CABS1 implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

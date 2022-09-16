@@ -21,14 +21,10 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
-import org.ojalgo.type.math.MathType;
 
 final class OffHeapZ032 extends OffHeapArray {
-
-    static final MathType TYPE = MathType.Z032;
 
     private final long myPointer;
 
@@ -37,32 +33,43 @@ final class OffHeapZ032 extends OffHeapArray {
         super(OffHeapArray.Z032, count);
 
         myPointer = NativeMemory.allocateIntArray(this, count);
-
-        this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    public double doubleValue(final long index) {
-        return NativeMemory.getFloat(myPointer, index);
-    }
-
-    public float floatValue(final long index) {
-        return NativeMemory.getFloat(myPointer, index);
-    }
-
-    public void set(final long index, final double value) {
-        NativeMemory.setFloat(myPointer, index, (float) value);
-    }
-
-    public void set(final long index, final float value) {
-        NativeMemory.setFloat(myPointer, index, value);
     }
 
     public void add(final long index, final Comparable<?> addend) {
         this.add(index, Scalar.intValue(addend));
     }
 
+    public double doubleValue(final long index) {
+        return NativeMemory.getInt(myPointer, index);
+    }
+
+    public float floatValue(final long index) {
+        return NativeMemory.getInt(myPointer, index);
+    }
+
+    public int intValue(final long index) {
+        return NativeMemory.getInt(myPointer, index);
+    }
+
+    @Override
+    public void reset() {
+        NativeMemory.initialiseIntArray(myPointer, this.count());
+    }
+
     public void set(final long index, final Comparable<?> value) {
         this.set(index, Scalar.intValue(value));
+    }
+
+    public void set(final long index, final double value) {
+        NativeMemory.setInt(myPointer, index, Math.toIntExact(Math.round(value)));
+    }
+
+    public void set(final long index, final float value) {
+        NativeMemory.setInt(myPointer, index, Math.round(value));
+    }
+
+    public void set(final long index, final int value) {
+        NativeMemory.setInt(myPointer, index, value);
     }
 
 }

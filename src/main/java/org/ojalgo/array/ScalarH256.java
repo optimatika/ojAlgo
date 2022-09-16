@@ -25,9 +25,9 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.QuaternionAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.Quaternion}.
@@ -54,8 +54,8 @@ public class ScalarH256 extends ScalarArray<Quaternion> {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.H256;
         }
 
         @Override
@@ -64,8 +64,6 @@ public class ScalarH256 extends ScalarArray<Quaternion> {
         }
 
     };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
 
     public static ScalarH256 make(final int size) {
         return new ScalarH256(size);

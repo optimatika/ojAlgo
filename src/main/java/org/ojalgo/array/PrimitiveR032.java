@@ -29,19 +29,18 @@ import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -68,8 +67,8 @@ public class PrimitiveR032 extends PrimitiveArray {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.R032;
         }
 
         @Override
@@ -78,8 +77,6 @@ public class PrimitiveR032 extends PrimitiveArray {
         }
 
     };
-
-    static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
 
     public static PrimitiveR032 make(final int size) {
         return new PrimitiveR032(size);
@@ -169,6 +166,11 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
+    public void reset() {
+        Arrays.fill(data, 0.0F);
+    }
+
+    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -220,22 +222,6 @@ public class PrimitiveR032 extends PrimitiveArray {
     @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
         Exchange.exchange(data, firstA, firstB, step, count);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function,
-            final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right.floatValue());
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left.floatValue(), function, right);
     }
 
     @Override
@@ -304,21 +290,6 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, step, data, function, right.floatValue());
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        OperationBinary.invoke(data, first, limit, step, left.floatValue(), function, data);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
-    }
-
-    @Override
     protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
         OperationUnary.invoke(data, first, limit, step, this, function);
     }
@@ -376,6 +347,11 @@ public class PrimitiveR032 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = value;
     }
 
 }

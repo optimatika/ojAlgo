@@ -26,7 +26,7 @@ import java.util.function.DoubleSupplier;
 
 import org.ojalgo.structure.Structure2D;
 
-public final class FillMatchingDual implements ArrayOperation {
+public abstract class FillMatchingDual implements ArrayOperation {
 
     /**
      * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix

@@ -21,11 +21,53 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.VoidFunction;
 
-public final class OperationVoid implements ArrayOperation {
+public abstract class OperationVoid implements ArrayOperation {
 
     public static int THRESHOLD = 256;
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final int first, final int limit, final int step,
+            final VoidFunction<N> visitor) {
+        for (int i = first; i < limit; i += step) {
+            visitor.invoke(data.doubleValue(i));
+        }
+    }
+
+    public static <N extends Comparable<N>> void invoke(final BasicArray<N> data, final long first, final long limit, final long step,
+            final VoidFunction<N> visitor) {
+
+        switch (data.getMathType()) {
+        case R064:
+            for (long i = first; i < limit; i += step) {
+                visitor.invoke(data.doubleValue(i));
+            }
+            break;
+        case R032:
+            for (long i = first; i < limit; i += step) {
+                visitor.invoke(data.floatValue(i));
+            }
+            break;
+        case Z064:
+            for (long i = first; i < limit; i += step) {
+                visitor.invoke(data.longValue(i));
+            }
+            break;
+        case Z032:
+        case Z016:
+        case Z008:
+            for (long i = first; i < limit; i += step) {
+                visitor.invoke(data.intValue(i));
+            }
+            break;
+        default:
+            for (long i = first; i < limit; i += step) {
+                visitor.invoke(data.get(i));
+            }
+            break;
+        }
+    }
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {

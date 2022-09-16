@@ -29,7 +29,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class SDOT implements ArrayOperation {
+public abstract class SDOT implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

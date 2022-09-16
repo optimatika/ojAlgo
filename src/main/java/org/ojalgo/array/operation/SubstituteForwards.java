@@ -26,7 +26,7 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
-public final class SubstituteForwards implements ArrayOperation {
+public abstract class SubstituteForwards implements ArrayOperation {
 
     public static int THRESHOLD = 64;
 

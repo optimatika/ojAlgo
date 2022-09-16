@@ -30,16 +30,15 @@ import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.OperationBinary;
-import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -56,9 +55,12 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
 
         super(factory, length);
 
-        data = factory.scalar().newArrayInstance(length);
+        Scalar.Factory<N> scalarFactory = factory.scalar();
 
-        this.fill(0, length, 1, this.factory().scalar().zero().get());
+        data = scalarFactory.newArrayInstance(length);
+
+        N zero = scalarFactory.zero().get();
+        Arrays.fill(data, zero);
     }
 
     ReferenceTypeArray(final DenseArray.Factory<N> factory, final N[] data) {
@@ -76,7 +78,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         if (!super.equals(obj) || !(obj instanceof ReferenceTypeArray)) {
             return false;
         }
-        ReferenceTypeArray other = (ReferenceTypeArray) obj;
+        ReferenceTypeArray<?> other = (ReferenceTypeArray<?>) obj;
         if (!Arrays.equals(data, other.data)) {
             return false;
         }
@@ -130,16 +132,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final N right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
     protected final void fill(final int first, final int limit, final int step, final N value) {
         FillAll.fill(data, first, limit, step, value);
     }
@@ -147,11 +139,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         FillAll.fill(data, first, limit, step, supplier, this.factory().scalar());
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
@@ -178,21 +165,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final Access1D<N> right) {
         OperationBinary.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final N right) {
-        OperationBinary.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final N left, final BinaryFunction<N> function) {
-        OperationBinary.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<N> function, final int parameter) {
-        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override
@@ -233,11 +205,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     protected void visitOne(final int index, final VoidFunction<N> visitor) {
         visitor.invoke(data[index]);
-    }
-
-    @Override
-    final boolean isPrimitive() {
-        return false;
     }
 
     @Override

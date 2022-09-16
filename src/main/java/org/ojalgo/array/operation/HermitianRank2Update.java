@@ -30,14 +30,14 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class HermitianRank2Update implements ArrayOperation {
+public abstract class HermitianRank2Update implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 
-    //    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
-    //            final ComplexNumber[] vector2) {
+    //    public static void invoke( ComplexNumber[] data,  int firstColumn,  int columnLimit,  ComplexNumber[] vector1,
+    //             ComplexNumber[] vector2) {
     //
-    //        final int structure = vector1.length;
+    //         int structure = vector1.length;
     //
     //        ComplexNumber tmpVal1j;
     //        ComplexNumber tmpVal2j;
@@ -58,7 +58,7 @@ public final class HermitianRank2Update implements ArrayOperation {
 
     public static void invoke(final double[] data, final int firstColumn, final int columnLimit, final double[] vector1, final double[] vector2) {
 
-        final int structure = vector1.length;
+        int structure = vector1.length;
 
         double tmpVal1j;
         double tmpVal2j;
@@ -78,7 +78,7 @@ public final class HermitianRank2Update implements ArrayOperation {
 
     public static <N extends Scalar<N>> void invoke(final N[] data, final int firstColumn, final int columnLimit, final N[] vector1, final N[] vector2) {
 
-        final int structure = vector1.length;
+        int structure = vector1.length;
 
         Scalar<N> tmpVal1j;
         Scalar<N> tmpVal2j;

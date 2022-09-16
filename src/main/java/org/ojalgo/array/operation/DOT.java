@@ -35,7 +35,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class DOT implements ArrayOperation {
+public abstract class DOT implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

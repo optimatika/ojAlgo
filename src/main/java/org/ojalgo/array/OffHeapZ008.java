@@ -21,14 +21,10 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
-import org.ojalgo.type.math.MathType;
 
 final class OffHeapZ008 extends OffHeapArray {
-
-    static final MathType TYPE = MathType.Z008;
 
     private final long myPointer;
 
@@ -37,32 +33,39 @@ final class OffHeapZ008 extends OffHeapArray {
         super(OffHeapArray.Z008, count);
 
         myPointer = NativeMemory.allocateByteArray(this, count);
-
-        this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    public double doubleValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
-    }
-
-    public byte byteValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
-    }
-
-    public void set(final long index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) value);
-    }
-
-    public void set(final long index, final byte value) {
-        NativeMemory.setByte(myPointer, index, value);
     }
 
     public void add(final long index, final Comparable<?> addend) {
         this.add(index, Scalar.byteValue(addend));
     }
 
+    public byte byteValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    public double doubleValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
+    public void reset() {
+        NativeMemory.initialiseByteArray(myPointer, this.count());
+    }
+
+    public void set(final long index, final byte value) {
+        NativeMemory.setByte(myPointer, index, value);
+    }
+
     public void set(final long index, final Comparable<?> value) {
         this.set(index, Scalar.byteValue(value));
+    }
+
+    public void set(final long index, final double value) {
+        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
+    }
+
+    public void set(final long index, final float value) {
+        NativeMemory.setByte(myPointer, index, (byte) Math.round(value));
     }
 
 }

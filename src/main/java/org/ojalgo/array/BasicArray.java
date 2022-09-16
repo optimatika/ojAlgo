@@ -22,6 +22,11 @@
 package org.ojalgo.array;
 
 import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.Exchange;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -35,6 +40,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
@@ -79,6 +85,11 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         long getCapacityLimit() {
             return Long.MAX_VALUE;
+        }
+
+        @Override
+        MathType getMathType() {
+            return myDenseFactory.getMathType();
         }
 
         @Override
@@ -151,7 +162,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         if (!(obj instanceof BasicArray)) {
             return false;
         }
-        BasicArray other = (BasicArray) obj;
+        BasicArray<?> other = (BasicArray<?>) obj;
         if (myFactory == null) {
             if (other.myFactory != null) {
                 return false;
@@ -160,6 +171,10 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             return false;
         }
         return true;
+    }
+
+    public final MathType getMathType() {
+        return myFactory.getMathType();
     }
 
     @Override
@@ -171,6 +186,10 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
+    }
+
+    public final boolean isPrimitive() {
+        return myFactory.getMathType().isPrimitive();
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
@@ -211,23 +230,37 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         this.visit(first, limit, 1L, visitor);
     }
 
-    protected abstract void exchange(long firstA, long firstB, long step, long count);
+    protected void exchange(final long firstA, final long firstB, final long step, final long count) {
+        Exchange.exchange(this, firstA, firstB, step, count);
+    }
 
-    protected abstract void fill(long first, long limit, long step, N value);
+    protected void fill(final long first, final long limit, final long step, final N value) {
+        FillAll.fill(this, first, limit, step, value);
+    }
 
-    protected abstract void fill(long first, long limit, long step, NullaryFunction<?> supplier);
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
+        FillAll.fill(this, first, limit, step, supplier);
+    }
 
     protected long indexOfLargest(final long first, final long limit, final long step) {
         return AMAX.invoke(this, first, limit, step);
     }
 
-    protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
+    protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
+        OperationBinary.invoke(this, first, limit, step, left, function, this);
+    }
 
-    protected abstract void modify(long first, long limit, long step, BinaryFunction<N> function, Access1D<N> right);
+    protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
+        OperationBinary.invoke(this, first, limit, step, this, function, right);
+    }
 
-    protected abstract void modify(long first, long limit, long step, UnaryFunction<N> function);
+    protected void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
+        OperationUnary.invoke(this, first, limit, step, this, function);
+    }
 
-    protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
+    protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
+        OperationVoid.invoke(this, first, limit, step, visitor);
+    }
 
     /**
      * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
@@ -259,10 +292,5 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     final ArrayFactory<N, ?> factory() {
         return myFactory;
     }
-
-    /**
-     * Primitive (double) elements
-     */
-    abstract boolean isPrimitive();
 
 }

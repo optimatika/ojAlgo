@@ -28,23 +28,21 @@ import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.array.operation.Exchange;
 import org.ojalgo.array.operation.FillAll;
 import org.ojalgo.array.operation.OperationBinary;
-import org.ojalgo.array.operation.OperationParameter;
 import org.ojalgo.array.operation.OperationUnary;
 import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -71,8 +69,8 @@ public class PrimitiveZ016 extends PrimitiveArray {
         }
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
+        MathType getMathType() {
+            return MathType.Z016;
         }
 
         @Override
@@ -81,8 +79,6 @@ public class PrimitiveZ016 extends PrimitiveArray {
         }
 
     };
-
-    static final long ELEMENT_SIZE = JavaType.LONG.memory();
 
     public static PrimitiveZ016 make(final int size) {
         return new PrimitiveZ016(size);
@@ -112,6 +108,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
+    public void reset() {
+        Arrays.fill(data, (short) 0);
+    }
+
+    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -134,8 +135,8 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
-    protected void add(final int index, final float addend) {
-        data[index] += (short) Math.round(addend);
+    protected void add(final int index, final short addend) {
+        data[index] += addend;
     }
 
     @Override
@@ -151,21 +152,6 @@ public class PrimitiveZ016 extends PrimitiveArray {
     @Override
     protected void exchange(final int firstA, final int firstB, final int step, final int count) {
         Exchange.exchange(data, firstA, firstB, step, count);
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, 1, left, function, right.shortValue());
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        OperationBinary.invoke(data, first, limit, 1, left.shortValue(), function, right);
     }
 
     @Override
@@ -229,21 +215,6 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
-    protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        OperationBinary.invoke(data, first, limit, step, data, function, right.shortValue());
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        OperationBinary.invoke(data, first, limit, step, left.shortValue(), function, data);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
-    }
-
-    @Override
     protected void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
         OperationUnary.invoke(data, first, limit, step, this, function);
     }
@@ -274,6 +245,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     }
 
     @Override
+    protected void set(final int index, final short value) {
+        data[index] = value;
+    }
+
+    @Override
     protected short shortValue(final int index) {
         return data[index];
     }
@@ -301,6 +277,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    protected void set(final int index, final long value) {
+        data[index] = (short) value;
     }
 
 }

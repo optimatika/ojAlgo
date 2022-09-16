@@ -32,6 +32,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D.Dense<I> {
 
@@ -95,12 +96,14 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
 
     abstract long getCapacityLimit();
 
+    abstract MathType getMathType();
+
     SegmentedArray<N> makeSegmented(final long... structure) {
 
         long totalCount = StructureAnyD.count(structure);
 
         int max = PowerOf2.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
-        int min = PowerOf2.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
+        int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
 
         if (min > max) {
             throw new IllegalArgumentException();

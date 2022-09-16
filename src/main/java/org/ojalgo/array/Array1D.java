@@ -260,7 +260,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
      */
     @Deprecated
     public static final Factory<RationalNumber> RATIONAL = Q128;
-
     /**
      * @deprecated v52 Use {@link #R128} instead
      */
@@ -326,6 +325,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(this.convert(index), addend);
     }
@@ -341,10 +345,30 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(this.convert(index), addend);
+    }
+
+    @Override
     public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
+    }
+
+    @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(this.convert(index));
     }
 
     @Override
@@ -425,6 +449,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(this.convert(index));
+    }
+
+    @Override
     public N get(final int index) {
         return myDelegate.get(this.convert(index));
     }
@@ -473,8 +502,18 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(this.convert(index));
+    }
+
+    @Override
     public boolean isEmpty() {
         return length == 0;
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(this.convert(index));
     }
 
     @Override
@@ -560,6 +599,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         myDelegate.set(this.convert(index), value);
     }
@@ -572,6 +616,26 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Override
     public void set(final long index, final float value) {
         myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(this.convert(index));
     }
 
     @Override

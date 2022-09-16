@@ -39,7 +39,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class AMAX implements ArrayOperation {
+public abstract class AMAX implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

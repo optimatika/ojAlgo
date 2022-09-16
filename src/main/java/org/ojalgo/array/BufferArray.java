@@ -32,10 +32,13 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -92,12 +95,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
         @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE / this.getElementSize();
-        }
-
-        @Override
-        long getElementSize() {
-            return myMathType.getJavaType().memory();
+            return PlainArray.MAX_SIZE / this.getElementSize();
         }
 
         @Override
@@ -112,6 +110,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
          */
         BufferArray newInstance(final Factory factory, final ByteBuffer buffer, final AutoCloseable closeable) {
             return myConstructor.newInstance(factory, buffer, closeable);
+        }
+
+        @Override
+        MathType getMathType() {
+            return myMathType;
         }
 
     }
@@ -190,11 +193,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        long getElementSize() {
-            return myTypeFactory.getElementSize();
-        }
-
-        @Override
         BufferArray makeDenseArray(final long size) {
 
             long count = myTypeFactory.getElementSize() * size;
@@ -209,6 +207,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             }
 
             return myTypeFactory.newInstance(myTypeFactory, buffer, fileChannel);
+        }
+
+        @Override
+        MathType getMathType() {
+            return myTypeFactory.getMathType();
         }
 
     }
@@ -278,66 +281,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         return new BufferR064(BufferArray.R064, data, null);
     }
 
-    protected static void fill(final BufferArray data, final Access1D<?> value) {
-        final int tmpLimit = (int) Math.min(data.count(), value.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data.set(i, value.doubleValue(i));
-        }
-    }
-
-    protected static void fill(final BufferArray data, final int first, final int limit, final int step, final double value) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, value);
-        }
-    }
-
-    protected static void fill(final BufferArray data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, supplier.doubleValue());
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> left,
-            final BinaryFunction<Double> function, final Access1D<Double> right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left.get(i), right.get(i)));
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> left,
-            final BinaryFunction<Double> function, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left.doubleValue(i), right));
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> value,
-            final ParameterFunction<Double> function, final int aParam) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(value.doubleValue(i), aParam));
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> value,
-            final UnaryFunction<Double> function) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(value.doubleValue(i)));
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final double left,
-            final BinaryFunction<Double> function, final Access1D<Double> right) {
-        for (int i = first; i < limit; i += step) {
-            data.set(i, function.invoke(left, right.doubleValue(i)));
-        }
-    }
-
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data.get(i));
-        }
-    }
-
     private final Buffer myBuffer;
     private final AutoCloseable myFile;
 
@@ -366,18 +309,33 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
+    protected final void add(final int index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
 
     @Override
-    protected void add(final int index, final float addend) {
+    protected final void add(final int index, final float addend) {
         this.set(index, this.floatValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final int addend) {
+        this.set(index, this.intValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
+    }
+
+    @Override
+    protected final void add(final int index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
     }
 
     @Override
@@ -400,28 +358,13 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(this, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        BufferArray.invoke(this, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(this, first, limit, 1, left, function, right);
-    }
-
-    @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        BufferArray.fill(this, first, limit, step, value);
+        FillAll.fill(this, first, limit, step, value);
     }
 
     @Override
     protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        BufferArray.fill(this, first, limit, step, supplier);
+        FillAll.fill(this, first, limit, step, supplier);
     }
 
     @Override
@@ -456,32 +399,17 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
     @Override
     protected void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        BufferArray.invoke(this, first, limit, step, left, function, this);
+        OperationBinary.invoke(this, first, limit, step, left, function, this);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(this, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        BufferArray.invoke(this, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        BufferArray.invoke(this, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        BufferArray.invoke(this, first, limit, step, this, function, parameter);
+        OperationBinary.invoke(this, first, limit, step, this, function, right);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        BufferArray.invoke(this, first, limit, step, this, function);
+        OperationUnary.invoke(this, first, limit, step, this, function);
     }
 
     @Override
@@ -512,17 +440,12 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
 
     @Override
     protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        BufferArray.invoke(this, first, limit, step, visitor);
+        OperationVoid.invoke(this, first, limit, step, visitor);
     }
 
     @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(this.doubleValue(index));
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return true;
     }
 
     @Override

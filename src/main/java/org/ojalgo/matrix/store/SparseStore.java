@@ -42,6 +42,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -284,8 +285,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         int result = super.hashCode();
         result = prime * result + (myElements == null ? 0 : myElements.hashCode());
         result = prime * result + Arrays.hashCode(myFirsts);
-        result = prime * result + Arrays.hashCode(myLimits);
-        return result;
+        return prime * result + Arrays.hashCode(myLimits);
     }
 
     @Override
@@ -540,9 +540,9 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
-                this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.column(), element.doubleValue()));
+                this.nonzeros().forEach(element -> ((Mutate2D.Modifiable<?>) receiver).add(element.column(), element.doubleValue()));
             } else {
-                this.nonzeros().forEach(element -> ((Modifiable<N>) receiver).add(element.column(), element.get()));
+                this.nonzeros().forEach(element -> ((Mutate2D.Modifiable<?>) receiver).add(element.column(), element.get()));
             }
         } else {
             super.reduceColumns(aggregator, receiver);
@@ -553,9 +553,9 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
-                this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.row(), element.doubleValue()));
+                this.nonzeros().forEach(element -> ((Mutate2D.Modifiable<?>) receiver).add(element.row(), element.doubleValue()));
             } else {
-                this.nonzeros().forEach(element -> ((Modifiable<N>) receiver).add(element.row(), element.get()));
+                this.nonzeros().forEach(element -> ((Mutate2D.Modifiable<?>) receiver).add(element.row(), element.get()));
             }
         } else {
             super.reduceColumns(aggregator, receiver);

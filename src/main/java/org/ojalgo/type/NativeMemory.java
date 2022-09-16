@@ -36,6 +36,12 @@ public abstract class NativeMemory {
     static final long SIZE_LONG = Unsafe.ARRAY_LONG_INDEX_SCALE;
     static final long SIZE_SHORT = Unsafe.ARRAY_SHORT_INDEX_SCALE;
     static final Unsafe UNSAFE;
+    static final byte ZERO_BYTE = (byte) 0;
+    static final double ZERO_DOUBLE = 0.0;
+    static final float ZERO_FLOAT = 0F;
+    static final int ZERO_INT = 0;
+    static final long ZERO_LONG = 0L;
+    static final short ZERO_SHORT = (short) 0;
 
     static {
 
@@ -76,6 +82,42 @@ public abstract class NativeMemory {
         return NativeMemory.allocate(owner, count * SIZE_SHORT);
     }
 
+    public static void fillByteArray(final long basePointer, final long count, final byte value) {
+        for (long i = basePointer, limit = basePointer + SIZE_BYTE * count; i < limit; i += SIZE_BYTE) {
+            UNSAFE.putByte(i, value);
+        }
+    }
+
+    public static void fillDoubleArray(final long basePointer, final long count, final double value) {
+        for (long i = basePointer, limit = basePointer + SIZE_DOUBLE * count; i < limit; i += SIZE_DOUBLE) {
+            UNSAFE.putDouble(i, value);
+        }
+    }
+
+    public static void fillFloatArray(final long basePointer, final long count, final float value) {
+        for (long i = basePointer, limit = basePointer + SIZE_FLOAT * count; i < limit; i += SIZE_FLOAT) {
+            UNSAFE.putFloat(i, value);
+        }
+    }
+
+    public static void fillIntArray(final long basePointer, final long count, final int value) {
+        for (long i = basePointer, limit = basePointer + SIZE_INT * count; i < limit; i += SIZE_INT) {
+            UNSAFE.putInt(i, value);
+        }
+    }
+
+    public static void fillLongArray(final long basePointer, final long count, final long value) {
+        for (long i = basePointer, limit = basePointer + SIZE_LONG * count; i < limit; i += SIZE_LONG) {
+            UNSAFE.putLong(i, value);
+        }
+    }
+
+    public static void fillShortArray(final long basePointer, final long count, final short value) {
+        for (long i = basePointer, limit = basePointer + SIZE_SHORT * count; i < limit; i += SIZE_SHORT) {
+            UNSAFE.putShort(i, value);
+        }
+    }
+
     public static byte getByte(final long basePointer, final long index) {
         return UNSAFE.getByte(basePointer + SIZE_BYTE * index);
     }
@@ -98,6 +140,30 @@ public abstract class NativeMemory {
 
     public static short getShort(final long basePointer, final long index) {
         return UNSAFE.getShort(basePointer + SIZE_SHORT * index);
+    }
+
+    public static void initialiseByteArray(final long basePointer, final long count) {
+        NativeMemory.fillByteArray(basePointer, count, ZERO_BYTE);
+    }
+
+    public static void initialiseDoubleArray(final long basePointer, final long count) {
+        NativeMemory.fillDoubleArray(basePointer, count, ZERO_DOUBLE);
+    }
+
+    public static void initialiseFloatArray(final long basePointer, final long count) {
+        NativeMemory.fillFloatArray(basePointer, count, ZERO_FLOAT);
+    }
+
+    public static void initialiseIntArray(final long basePointer, final long count) {
+        NativeMemory.fillIntArray(basePointer, count, ZERO_INT);
+    }
+
+    public static void initialiseLongArray(final long basePointer, final long count) {
+        NativeMemory.fillLongArray(basePointer, count, ZERO_LONG);
+    }
+
+    public static void initialiseShortArray(final long basePointer, final long count) {
+        NativeMemory.fillShortArray(basePointer, count, ZERO_SHORT);
     }
 
     public static void setByte(final long basePointer, final long index, final byte value) {
