@@ -23,7 +23,6 @@ package org.ojalgo.tensor;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
@@ -137,14 +136,6 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
             return false;
         }
         return true;
-    }
-
-    public void fillOne(final long index, final N value) {
-        myArray.fillOne(index, value);
-    }
-
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myArray.fillOne(index, supplier);
     }
 
     public float floatValue(final long index) {

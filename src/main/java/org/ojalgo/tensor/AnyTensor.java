@@ -171,14 +171,6 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return true;
     }
 
-    public void fillOne(final long[] reference, final N value) {
-        myArray.fillOne(reference, value);
-    }
-
-    public void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
-        myArray.fillOne(reference, supplier);
-    }
-
     public void fillSet(final int dimension, final long dimensionalIndex, final N value) {
         myArray.fillSet(dimension, dimensionalIndex, value);
     }

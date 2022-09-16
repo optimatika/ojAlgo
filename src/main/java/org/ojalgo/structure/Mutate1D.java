@@ -42,7 +42,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface Fillable<N extends Comparable<N>> extends Structure1D {
+    interface Fillable<N extends Comparable<N>> extends Mutate1D {
 
         default void fillAll(final N value) {
             this.fillRange(0L, this.count(), value);
@@ -71,13 +71,29 @@ public interface Mutate1D extends Structure1D {
             Structure1D.loopMatching(this, arguments, i -> this.fillOne(i, function.invoke(arguments.get(i))));
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-            this.fillOne(index, (N) values.get(valueIndex));
+            this.set(index, values.get(valueIndex));
         }
 
-        void fillOne(long index, N value);
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long index, final N value) {
+            this.set(index, value);
+        }
 
-        void fillOne(long index, NullaryFunction<?> supplier);
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long index, final NullaryFunction<?> supplier) {
+            this.set(index, supplier.get());
+        }
 
         default void fillRange(final long first, final long limit, final N value) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));

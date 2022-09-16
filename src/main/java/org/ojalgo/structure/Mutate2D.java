@@ -48,7 +48,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Fillable<N extends Comparable<N>> extends Structure2D, Mutate1D.Fillable<N> {
+    interface Fillable<N extends Comparable<N>> extends Mutate2D, Mutate1D.Fillable<N> {
 
         default void fillColumn(final long col, final Access1D<N> values) {
             this.fillColumn(0L, col, values);
@@ -98,26 +98,54 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillDiagonal(0L, 0L, supplier);
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
             long structure = this.countRows();
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), values, valueIndex);
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
         default void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
             this.fillOne(row, col, (N) values.get(valueIndex));
         }
 
-        void fillOne(long row, long col, N value);
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long row, final long col, final N value) {
+            this.set(row, col, value);
+        }
 
-        void fillOne(long row, long col, NullaryFunction<?> supplier);
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
+            this.set(row, col, supplier.get());
+        }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final N value) {
             long structure = this.countRows();
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final NullaryFunction<?> supplier) {
             long structure = this.countRows();

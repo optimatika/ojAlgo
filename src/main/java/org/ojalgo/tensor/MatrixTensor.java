@@ -23,7 +23,6 @@ package org.ojalgo.tensor;
 
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
@@ -158,14 +157,6 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
             return false;
         }
         return true;
-    }
-
-    public void fillOne(final long row, final long col, final N value) {
-        myArray.fillOne(row, col, value);
-    }
-
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myArray.fillOne(row, col, supplier);
     }
 
     public float floatValue(final long row, final long col) {
