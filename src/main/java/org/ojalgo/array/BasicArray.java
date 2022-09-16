@@ -247,11 +247,11 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
     }
 
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
-        OperationBinary.invoke(this, first, limit, step, left, function);
+        OperationBinary.invoke(this, first, limit, step, left, function, this);
     }
 
     protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
-        OperationBinary.invoke(this, first, limit, step, function, right);
+        OperationBinary.invoke(this, first, limit, step, this, function, right);
     }
 
     protected void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
