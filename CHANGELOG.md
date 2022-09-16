@@ -37,16 +37,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
 - New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
 
+#### org.ojalgo.structure
+
+- Support for getting/setting elements of all (numeric) primitive types.
+
 #### org.ojalgo.type
 
 - The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
 - New enum `MathType` outlining the types used in ojAlgo. It's the mathematical number set paired with info about how it is implemented (ComplexNumber = 2 * double)
+- `NativeMemory` now support initialising and filling off-heap arrays.
 
 ### Changed
 
 #### org.ojalgo.array
 
 - New generalised way to create memory-mapped file-based array classes
+- Quite a bit of refactory to support everything that's new - better support for any/all primitive type, off-heap arrays and more.
 
 #### org.ojalgo.equation
 
@@ -58,10 +64,20 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New method in `IterativeSolverTask.SparseDelegate` that lets you (re)solve with a supplied RHS.
 - Slight modification to how the preconditioning in `ConjugateGradientSolver` works.
 
+#### org.ojalgo.structure
+
+- The `Mutate*D.Fillable` interfaces now extend their respective `Mutate*D` interface.
+
 #### org.ojalgo.type
 
 - If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
 - The `KeyValue` interface was deprecated, but is no longer. Instead `EntryPair` now extends `KeyValue`, and `KeyValue` gained a collection of factory mehods to create pairs. Further the definition of `Dual` moved from `EntryPair` to `KeyValue`.
+
+### Changed
+
+#### org.ojalgo.structure
+
+- All the various `fillOne(...)` methods in the `Mutate*D.Fillable` interfaces are deprecated. Just use `set(...)` instead,
 
 ### Removed
 
