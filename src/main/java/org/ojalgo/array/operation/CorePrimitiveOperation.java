@@ -65,25 +65,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) + Scalar.doubleValue(right));
+                data.set(i, left.doubleValue(i) + doubleValue);
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) + Scalar.floatValue(right));
+                data.set(i, left.floatValue(i) + floatValue);
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) + Scalar.longValue(right));
+                data.set(i, left.longValue(i) + longValue);
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) + Scalar.intValue(right));
+                data.set(i, left.intValue(i) + intValue);
             }
             break;
         default:
@@ -96,25 +100,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.doubleValue(left) + right.doubleValue(i));
+                data.set(i, doubleValue + right.doubleValue(i));
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.floatValue(left) + right.floatValue(i));
+                data.set(i, floatValue + right.floatValue(i));
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.longValue(left) + right.longValue(i));
+                data.set(i, longValue + right.longValue(i));
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.intValue(left) + right.intValue(i));
+                data.set(i, intValue + right.intValue(i));
             }
             break;
         default:
@@ -266,25 +274,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) / Scalar.doubleValue(right));
+                data.set(i, left.doubleValue(i) / doubleValue);
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) / Scalar.floatValue(right));
+                data.set(i, left.floatValue(i) / floatValue);
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) / Scalar.longValue(right));
+                data.set(i, left.longValue(i) / longValue);
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) / Scalar.intValue(right));
+                data.set(i, left.intValue(i) / intValue);
             }
             break;
         default:
@@ -297,25 +309,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.doubleValue(left) / right.doubleValue(i));
+                data.set(i, doubleValue / right.doubleValue(i));
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.floatValue(left) / right.floatValue(i));
+                data.set(i, floatValue / right.floatValue(i));
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.longValue(left) / right.longValue(i));
+                data.set(i, longValue / right.longValue(i));
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.intValue(left) / right.intValue(i));
+                data.set(i, intValue / right.intValue(i));
             }
             break;
         default:
@@ -467,25 +483,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) * Scalar.doubleValue(right));
+                data.set(i, left.doubleValue(i) * doubleValue);
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) * Scalar.floatValue(right));
+                data.set(i, left.floatValue(i) * floatValue);
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) * Scalar.longValue(right));
+                data.set(i, left.longValue(i) * longValue);
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) * Scalar.intValue(right));
+                data.set(i, left.intValue(i) * intValue);
             }
             break;
         default:
@@ -498,25 +518,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.doubleValue(left) * right.doubleValue(i));
+                data.set(i, doubleValue * right.doubleValue(i));
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.floatValue(left) * right.floatValue(i));
+                data.set(i, floatValue * right.floatValue(i));
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.longValue(left) * right.longValue(i));
+                data.set(i, longValue * right.longValue(i));
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.intValue(left) * right.intValue(i));
+                data.set(i, intValue * right.intValue(i));
             }
             break;
         default:
@@ -735,25 +759,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) - Scalar.doubleValue(right));
+                data.set(i, left.doubleValue(i) - doubleValue);
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) - Scalar.floatValue(right));
+                data.set(i, left.floatValue(i) - floatValue);
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) - Scalar.longValue(right));
+                data.set(i, left.longValue(i) - longValue);
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(right);
             for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) - Scalar.intValue(right));
+                data.set(i, left.intValue(i) - intValue);
             }
             break;
         default:
@@ -766,25 +794,29 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
 
         switch (data.getMathType()) {
         case R064:
+            double doubleValue = Scalar.doubleValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.doubleValue(left) - right.doubleValue(i));
+                data.set(i, doubleValue - right.doubleValue(i));
             }
             break;
         case R032:
+            float floatValue = Scalar.floatValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.floatValue(left) - right.floatValue(i));
+                data.set(i, floatValue - right.floatValue(i));
             }
             break;
         case Z064:
+            long longValue = Scalar.longValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.longValue(left) - right.longValue(i));
+                data.set(i, longValue - right.longValue(i));
             }
             break;
         case Z032:
         case Z016:
         case Z008:
+            int intValue = Scalar.intValue(left);
             for (long i = first; i < limit; i += step) {
-                data.set(i, Scalar.intValue(left) - right.intValue(i));
+                data.set(i, intValue - right.intValue(i));
             }
             break;
         default:
