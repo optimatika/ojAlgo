@@ -63,10 +63,19 @@ public final class DataReader<T> implements FromFileReader<T> {
         return new DataReader<>(filter.apply(FromFileReader.input(file)), deserializer);
     }
 
+    public static <T> DataReader<T> of(final InMemoryFile file, final DataReader.Deserializer<T> deserializer) {
+        return new DataReader<>(file.newInputStream(), deserializer);
+    }
+
+    public static <T> DataReader<T> of(final InMemoryFile file, final DataReader.Deserializer<T> deserializer,
+            final OperatorWithException<InputStream> filter) {
+        return new DataReader<>(filter.apply(file.newInputStream()), deserializer);
+    }
+
     private final Deserializer<T> myDeserializer;
     private final DataInputStream myInput;
 
-    DataReader(final InputStream inputStream, final DataReader.Deserializer<T> deserializer) {
+    public DataReader(final InputStream inputStream, final DataReader.Deserializer<T> deserializer) {
 
         super();
 

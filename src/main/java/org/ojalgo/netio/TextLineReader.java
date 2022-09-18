@@ -73,7 +73,7 @@ public final class TextLineReader implements FromFileReader<String> {
 
     private final BufferedReader myReader;
 
-    TextLineReader(final InputStream inputStream) {
+    public TextLineReader(final InputStream inputStream) {
         super();
         try {
             myReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));

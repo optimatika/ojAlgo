@@ -108,18 +108,18 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
             return this;
         }
 
+        private void delimit() {
+            if (myTextLine.length() > 0) {
+                myTextLine.append(myDelimiter);
+            }
+        }
+
         /**
          * Write the line/row and reset the builder – ready to build the next line.
          */
         public void write() {
             myWriter.write(myTextLine);
             myTextLine.setLength(0);
-        }
-
-        private void delimit() {
-            if (myTextLine.length() > 0) {
-                myTextLine.append(myDelimiter);
-            }
         }
 
     }
@@ -152,7 +152,7 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
 
     private final BufferedWriter myWriter;
 
-    TextLineWriter(final OutputStream outputStream) {
+    public TextLineWriter(final OutputStream outputStream) {
         super();
         try {
             myWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
