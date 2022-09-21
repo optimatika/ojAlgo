@@ -21,7 +21,6 @@
  */
 package org.ojalgo.netio;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.CookieManager;
@@ -43,6 +42,8 @@ import java.time.Duration;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLContext;
@@ -346,17 +347,27 @@ public final class ServiceClient {
 
     }
 
+    /**
+     * This is actually a wrapper of a future response. The only things you can do without waiting/blocking
+     * for the actual response is {@link Response#isDone()} and {@link Response#cancel()}.
+     *
+     * @author apete
+     */
     public static final class Response<T> implements BasicLogger.Printable {
 
-        private final HttpResponse<T> myResponse;
+        private final CompletableFuture<HttpResponse<T>> myFutureResponse;
         private final ServiceClient.Session mySession;
 
-        Response(final ServiceClient.Request request, final HttpResponse<T> response) {
+        Response(final ServiceClient.Request request, final CompletableFuture<HttpResponse<T>> response) {
 
             super();
 
             mySession = request.getSession();
-            myResponse = response;
+            myFutureResponse = response;
+        }
+
+        public boolean cancel() {
+            return myFutureResponse.cancel(true);
         }
 
         @Override
@@ -368,11 +379,7 @@ public final class ServiceClient {
                 return false;
             }
             Response other = (Response) obj;
-            if (myResponse == null) {
-                if (other.myResponse != null) {
-                    return false;
-                }
-            } else if (!myResponse.equals(other.myResponse)) {
+            if (!myFutureResponse.equals(other.myFutureResponse)) {
                 return false;
             }
             if (mySession == null) {
@@ -386,15 +393,15 @@ public final class ServiceClient {
         }
 
         public T getBody() {
-            return myResponse.body();
+            return this.getResponse().body();
         }
 
         public HttpHeaders getHeaders() {
-            return myResponse.headers();
+            return this.getResponse().headers();
         }
 
         public Optional<HttpResponse<T>> getPreviousResponse() {
-            return myResponse.previousResponse();
+            return this.getResponse().previousResponse();
         }
 
         /**
@@ -402,7 +409,7 @@ public final class ServiceClient {
          * redirects, then this is NOT the same as the original request.
          */
         public HttpRequest getRequest() {
-            return myResponse.request();
+            return this.getResponse().request();
         }
 
         /**
@@ -410,19 +417,23 @@ public final class ServiceClient {
          *         discerned from the response
          */
         public int getStatusCode() {
-            return myResponse.statusCode();
+            return this.getResponse().statusCode();
         }
 
         public URI getURI() {
-            return myResponse.uri();
+            return this.getResponse().uri();
         }
 
         @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((myResponse == null) ? 0 : myResponse.hashCode());
+            result = prime * result + ((myFutureResponse == null) ? 0 : myFutureResponse.hashCode());
             return prime * result + ((mySession == null) ? 0 : mySession.hashCode());
+        }
+
+        public boolean isDone() {
+            return myFutureResponse.isDone();
         }
 
         /**
@@ -439,7 +450,7 @@ public final class ServiceClient {
 
         public void print(final BasicLogger receiver) {
             receiver.println("Response body: {}", this.toString());
-            receiver.println("Response headers: {}", myResponse.headers().map());
+            receiver.println("Response headers: {}", this.getResponse().headers().map());
             receiver.println("<Recreated>");
             // TODO  this.getRequest().print(receiver);
             receiver.println("</Recreated>");
@@ -448,7 +459,15 @@ public final class ServiceClient {
 
         @Override
         public String toString() {
-            return myResponse.toString();
+            return myFutureResponse.toString();
+        }
+
+        HttpResponse<T> getResponse() {
+            try {
+                return myFutureResponse.get();
+            } catch (InterruptedException | ExecutionException cause) {
+                throw new RuntimeException(cause);
+            }
         }
 
     }
@@ -520,13 +539,8 @@ public final class ServiceClient {
 
         <T> Response<T> send(final Request request, final BodyHandler<T> responseBodyHandler) {
             HttpClient client = this.getClient();
-            try {
-                return new Response<>(request, client.send(request.getRequest(), responseBodyHandler));
-            } catch (IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
+            CompletableFuture<HttpResponse<T>> futureResponse = client.sendAsync(request.getRequest(), responseBodyHandler);
+            return new Response<>(request, futureResponse);
         }
 
     }
@@ -559,7 +573,10 @@ public final class ServiceClient {
     private final HttpClient.Builder myBuilder = HttpClient.newBuilder();
 
     public ServiceClient() {
+
         super();
+
+        myBuilder.executor(ReaderWriterBuilder.executor());
     }
 
     public ServiceClient authenticator(final Authenticator authenticator) {
