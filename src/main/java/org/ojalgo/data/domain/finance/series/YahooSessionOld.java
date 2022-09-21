@@ -21,7 +21,7 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
-import java.io.Reader;
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -61,11 +61,7 @@ final class YahooSessionOld {
 
         }
 
-        public CalendarDateUnit getResolution() {
-            return myResolution;
-        }
-
-        public Reader getStreamOfCSV() {
+        public InputStream getInputStream() {
 
             if (debug) {
                 BasicLogger.debug();
@@ -120,7 +116,11 @@ final class YahooSessionOld {
             ResourceLocator.Request request = YahooSessionOld.buildDataRequest(mySession, mySymbol, myResolution);
             ResourceLocator.Response response = request.response();
 
-            return response.getStreamReader();
+            return response.getInputStream();
+        }
+
+        public CalendarDateUnit getResolution() {
+            return myResolution;
         }
 
         public String getSymbol() {

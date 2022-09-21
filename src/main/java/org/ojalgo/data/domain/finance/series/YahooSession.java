@@ -21,13 +21,13 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import org.ojalgo.netio.ServiceClient;
+import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 
@@ -44,14 +44,9 @@ public final class YahooSession {
             mySession = session;
             mySymbol = symbol;
             myResolution = resolution;
-
         }
 
-        public CalendarDateUnit getResolution() {
-            return myResolution;
-        }
-
-        public Reader getStreamOfCSV() {
+        public InputStream getInputStream() {
 
             // https://query1.finance.yahoo.com/v7/finance/download/AAPL?period1=345427200&period2=1663718400&interval=1d&events=history&includeAdjustedClose=true
 
@@ -78,9 +73,17 @@ public final class YahooSession {
             request.query("events", "history");
             request.query("includeAdjustedClose", "true");
 
-            ServiceClient.Response<String> response = request.send(BodyHandlers.ofString());
+            Response<InputStream> response = request.send(BodyHandlers.ofInputStream());
 
-            return new StringReader(response.getBody());
+            if (response.isResponseOK()) {
+                return response.getBody();
+            } else {
+                return InputStream.nullInputStream();
+            }
+        }
+
+        public CalendarDateUnit getResolution() {
+            return myResolution;
         }
 
         public String getSymbol() {

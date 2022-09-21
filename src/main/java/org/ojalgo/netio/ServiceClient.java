@@ -26,8 +26,6 @@ import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -263,7 +261,7 @@ public final class ServiceClient {
         /**
          * https or http ?
          */
-        public ServiceClient.Request Secure(final boolean secure) {
+        public ServiceClient.Request secure(final boolean secure) {
             if (secure) {
                 myResourceSpecification.setScheme("https");
             } else {
@@ -310,14 +308,6 @@ public final class ServiceClient {
                 }
             } else {
                 return BodyPublishers.noBody();
-            }
-        }
-
-        void configure(final HttpURLConnection connection) {
-            try {
-                connection.setRequestMethod(myMethod.name());
-            } catch (ProtocolException exception) {
-                throw new ProgrammingError(exception);
             }
         }
 
@@ -458,13 +448,9 @@ public final class ServiceClient {
             receiver.println("Response body: {}", this.toString());
             receiver.println("Response headers: {}", myResponse.headers().map());
             receiver.println("<Recreated>");
-            // TODO this.getRequest().print(receiver);
+            // TODO  this.getRequest().print(receiver);
             receiver.println("</Recreated>");
             mySession.print(receiver);
-        }
-
-        public HttpRequest request() {
-            return myResponse.request();
         }
 
         @Override

@@ -502,7 +502,7 @@ public final class ResourceLocator {
         /**
          * Open a connection and get the input stream.
          */
-        InputStream getInputStream() {
+        public InputStream getInputStream() {
             InputStream retVal = null;
             try {
                 retVal = myConnection.getInputStream();
@@ -653,6 +653,10 @@ public final class ResourceLocator {
      */
     public Reader getStreamReader() {
         return this.response().getStreamReader();
+    }
+
+    public InputStream getInputStream() {
+        return this.response().getInputStream();
     }
 
     public ResourceLocator host(final String host) {
