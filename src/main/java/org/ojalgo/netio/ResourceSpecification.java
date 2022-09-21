@@ -78,14 +78,7 @@ final class ResourceSpecification {
         } else if (!myPath.equals(other.myPath)) {
             return false;
         }
-        if (myPort != other.myPort) {
-            return false;
-        }
-        if (myQuery == null) {
-            if (other.myQuery != null) {
-                return false;
-            }
-        } else if (!myQuery.equals(other.myQuery)) {
+        if ((myPort != other.myPort) || !myQuery.equals(other.myQuery)) {
             return false;
         }
         if (myScheme == null) {
@@ -106,7 +99,7 @@ final class ResourceSpecification {
         result = prime * result + ((myHost == null) ? 0 : myHost.hashCode());
         result = prime * result + ((myPath == null) ? 0 : myPath.hashCode());
         result = prime * result + myPort;
-        result = prime * result + ((myQuery == null) ? 0 : myQuery.hashCode());
+        result = prime * result + myQuery.hashCode();
         return prime * result + ((myScheme == null) ? 0 : myScheme.hashCode());
     }
 

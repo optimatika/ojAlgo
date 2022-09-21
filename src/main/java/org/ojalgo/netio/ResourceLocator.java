@@ -206,7 +206,6 @@ public final class ResourceLocator {
         private final KeyedValues myForm = new KeyedValues();
         private ResourceLocator.Method myMethod = ResourceLocator.Method.GET;
         private final ResourceSpecification myResourceSpecification;
-
         private final ResourceLocator.Session mySession;
 
         Request(final ResourceLocator.Session session) {
@@ -230,14 +229,7 @@ public final class ResourceLocator {
                 return false;
             }
             Request other = (Request) obj;
-            if (myForm == null) {
-                if (other.myForm != null) {
-                    return false;
-                }
-            } else if (!myForm.equals(other.myForm)) {
-                return false;
-            }
-            if (myMethod != other.myMethod) {
+            if (!myForm.equals(other.myForm) || (myMethod != other.myMethod)) {
                 return false;
             }
             if (myResourceSpecification == null) {
@@ -289,7 +281,7 @@ public final class ResourceLocator {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((myForm == null) ? 0 : myForm.hashCode());
+            result = prime * result + myForm.hashCode();
             result = prime * result + ((myMethod == null) ? 0 : myMethod.hashCode());
             result = prime * result + ((myResourceSpecification == null) ? 0 : myResourceSpecification.hashCode());
             return prime * result + ((mySession == null) ? 0 : mySession.hashCode());
@@ -533,18 +525,7 @@ public final class ResourceLocator {
                 return false;
             }
             Session other = (Session) obj;
-            if (myCookieManager == null) {
-                if (other.myCookieManager != null) {
-                    return false;
-                }
-            } else if (!myCookieManager.equals(other.myCookieManager)) {
-                return false;
-            }
-            if (myParameters == null) {
-                if (other.myParameters != null) {
-                    return false;
-                }
-            } else if (!myParameters.equals(other.myParameters)) {
+            if (!myCookieManager.equals(other.myCookieManager) || !myParameters.equals(other.myParameters)) {
                 return false;
             }
             return true;
@@ -558,8 +539,8 @@ public final class ResourceLocator {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((myCookieManager == null) ? 0 : myCookieManager.hashCode());
-            return prime * result + ((myParameters == null) ? 0 : myParameters.hashCode());
+            result = prime * result + myCookieManager.hashCode();
+            return prime * result + myParameters.hashCode();
         }
 
         public ResourceLocator.Session parameter(final String key, final String value) {
