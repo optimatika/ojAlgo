@@ -124,14 +124,7 @@ public final class ServiceClient {
             } else if (!myBuilder.equals(other.myBuilder)) {
                 return false;
             }
-            if (myForm == null) {
-                if (other.myForm != null) {
-                    return false;
-                }
-            } else if (!myForm.equals(other.myForm)) {
-                return false;
-            }
-            if (myMethod != other.myMethod) {
+            if (!myForm.equals(other.myForm) || (myMethod != other.myMethod)) {
                 return false;
             }
             if (myResourceSpecification == null) {
@@ -195,7 +188,7 @@ public final class ServiceClient {
             int result = 1;
             result = prime * result + ((myBody == null) ? 0 : myBody.hashCode());
             result = prime * result + ((myBuilder == null) ? 0 : myBuilder.hashCode());
-            result = prime * result + ((myForm == null) ? 0 : myForm.hashCode());
+            result = prime * result + myForm.hashCode();
             result = prime * result + ((myMethod == null) ? 0 : myMethod.hashCode());
             result = prime * result + ((myResourceSpecification == null) ? 0 : myResourceSpecification.hashCode());
             return prime * result + ((mySession == null) ? 0 : mySession.hashCode());
