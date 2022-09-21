@@ -158,7 +158,6 @@ public final class DataSource implements FinanceData<DatePrice> {
     }
 
     private final DataFetcher myFetcher;
-
     private final BasicParser<? extends DatePrice> myParser;
 
     DataSource(final DataFetcher fetcher, final BasicParser<? extends DatePrice> parser) {

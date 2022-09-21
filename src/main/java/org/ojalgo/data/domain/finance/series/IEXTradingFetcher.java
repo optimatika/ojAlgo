@@ -6,8 +6,16 @@ import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * This service has been moved/renamed/repackaged – this {@link DataFetcher} no longer works. Looks to me as
+ * if they still offer a historical data download service – possibly even a free alternative – but this
+ * fetcher needs to be re-implemented.
+ * <p>
+ * https://iexcloud.io
+ *
  * @author stefanvanegmond
+ * @deprecated It needs to be updated to function...
  */
+@Deprecated
 public class IEXTradingFetcher implements DataFetcher {
 
     private final ResourceLocator myResourceLocator;

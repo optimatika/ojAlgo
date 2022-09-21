@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -38,6 +39,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -1319,6 +1321,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     public void writeTo(final File file) {
         ToFileWriter.mkdirs(file.getParentFile());
         try (FileOutputStream output = new FileOutputStream(file)) {
+            FileFormatEBM.write(this, output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public void writeTo(final InMemoryFile file) {
+        try (OutputStream output = file.newOutputStream()) {
             FileFormatEBM.write(this, output);
         } catch (IOException cause) {
             throw new RuntimeException(cause);

@@ -22,8 +22,6 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.CalendarDateUnit;
@@ -33,13 +31,11 @@ import org.ojalgo.type.CalendarDateUnit;
  *
  * @author apete
  */
-@Tag("unstable")
-@Disabled
-public class YahooTest extends FinanceDataTests {
+public class YahooDataSourceTest extends FinanceSeriesTests {
 
     private static YahooSession SESSION = new YahooSession();
 
-    public YahooTest() {
+    public YahooDataSourceTest() {
         super();
     }
 
@@ -48,7 +44,7 @@ public class YahooTest extends FinanceDataTests {
 
         final DataSource dataSource = DataSource.newYahoo(SESSION, "MSFT", CalendarDateUnit.DAY);
 
-        FinanceDataTests.doTestDeriveDistribution(dataSource);
+        FinanceSeriesTests.doTestDeriveDistribution(dataSource);
     }
 
     @Test
@@ -80,7 +76,7 @@ public class YahooTest extends FinanceDataTests {
 
         final DataSource dataSource = DataSource.newYahoo(SESSION, "AAPL", CalendarDateUnit.DAY);
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1);
     }
 
     @Test
@@ -88,7 +84,7 @@ public class YahooTest extends FinanceDataTests {
 
         final DataSource dataSource = DataSource.newYahoo(SESSION, "AAPL", CalendarDateUnit.MONTH);
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1);
     }
 
     @Test
@@ -96,7 +92,7 @@ public class YahooTest extends FinanceDataTests {
 
         final DataSource dataSource = DataSource.newYahoo(SESSION, "AAPL", CalendarDateUnit.WEEK);
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1);
     }
 
 }
