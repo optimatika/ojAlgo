@@ -33,7 +33,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.type.function.AutoSupplier;
 
-public class DataParserTest {
+public class DataParserTest extends FinanceSeriesTests {
 
     static class ResultsConsumer<DP extends DatePrice> implements Consumer<DP> {
 

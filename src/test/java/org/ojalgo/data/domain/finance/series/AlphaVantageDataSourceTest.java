@@ -27,13 +27,11 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
- * SymbolDataTest
- *
  * @author stefanvanegmond
  */
-public class AlphaVantageTest extends FinanceDataTests {
+public class AlphaVantageDataSourceTest extends FinanceSeriesTests {
 
-    public AlphaVantageTest() {
+    public AlphaVantageDataSourceTest() {
         super();
     }
 
@@ -42,7 +40,7 @@ public class AlphaVantageTest extends FinanceDataTests {
 
         DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 100);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 100);
     }
 
     @Test
@@ -50,7 +48,7 @@ public class AlphaVantageTest extends FinanceDataTests {
 
         DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.MONTH, "demo");
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 240);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 240);
     }
 
     @Test
@@ -58,7 +56,7 @@ public class AlphaVantageTest extends FinanceDataTests {
 
         DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.WEEK, "demo");
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1044);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1044);
     }
 
     @Test
@@ -66,7 +64,7 @@ public class AlphaVantageTest extends FinanceDataTests {
 
         DataSource dataSource = DataSource.newAlphaVantage("MSFT", CalendarDateUnit.DAY, "demo");
 
-        FinanceDataTests.doTestDeriveDistribution(dataSource);
+        FinanceSeriesTests.doTestDeriveDistribution(dataSource);
     }
 
     @Test

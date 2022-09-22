@@ -26,29 +26,32 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
 /**
- * SymbolDataTest
+ * Tests are disabled since {@link IEXTradingFetcher} no longer works.
  *
+ * @see IEXTradingFetcher
  * @author stefanvanegmond
  */
 @Disabled
-public class IEXTradingTest extends FinanceDataTests {
+public class IEXTradingDataSourceTest extends FinanceSeriesTests {
 
-    public IEXTradingTest() {
+    public IEXTradingDataSourceTest() {
         super();
     }
 
     @Test
     public void testDeriveDistributions() {
 
-        final DataSource dataSource = DataSource.newIEXTrading("AAPL");
+        DataSource dataSource = DataSource.newIEXTrading("AAPL");
 
-        FinanceDataTests.doTestDeriveDistribution(dataSource);
+        FinanceSeriesTests.doTestDeriveDistribution(dataSource);
     }
 
     @Test
     public void testFetchDaily() {
 
-        if (DataSource.newIEXTrading("AAPL").getHistoricalPrices().size() <= 1) {
+        DataSource dataSource = DataSource.newIEXTrading("AAPL");
+
+        if (dataSource.getHistoricalPrices().size() <= 1) {
             TestUtils.fail("No data!");
         }
     }
@@ -56,9 +59,9 @@ public class IEXTradingTest extends FinanceDataTests {
     @Test
     public void testIEXTradingDailyMSFT() {
 
-        final DataSource dataSource = DataSource.newIEXTrading("MSFT");
+        DataSource dataSource = DataSource.newIEXTrading("MSFT");
 
-        FinanceDataTests.assertAtLeastExpectedItems(dataSource, 1258);
+        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1258);
     }
 
 }

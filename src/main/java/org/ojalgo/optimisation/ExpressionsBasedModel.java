@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -38,6 +39,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -141,60 +143,74 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
         /**
-         * @see org.ojalgo.optimisation.Optimisation.Integration#extractSolverState(org.ojalgo.optimisation.Optimisation.Model)
+         * @see Optimisation.Integration#extractSolverState(Optimisation.Model)
          */
         public final Result extractSolverState(final ExpressionsBasedModel model) {
             return this.toSolverState(model.getVariableValues(), model);
         }
 
+        /**
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
+         * is the reverse mapping of {@link #toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
+         *
+         * @see Optimisation.Integration#toModelState(Optimisation.Result, Optimisation.Model)
+         * @see #toSolverState(Optimisation.Result, ExpressionsBasedModel)
+         */
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            final int numbVariables = model.countVariables();
-
-            if (this.isSolutionMapped()) {
-
-                final List<Variable> freeVariables = model.getFreeVariables();
-                final Set<IntIndex> fixedVariables = model.getFixedVariables();
-
-                if (solverState.count() != freeVariables.size()) {
-                    throw new IllegalStateException();
-                }
-
-                final PrimitiveR064 modelSolution = PrimitiveR064.make(numbVariables);
-
-                for (final IntIndex fixedIndex : fixedVariables) {
-                    modelSolution.set(fixedIndex.index, model.getVariable(fixedIndex.index).getValue());
-                }
-
-                for (int f = 0; f < freeVariables.size(); f++) {
-                    final int freeIndex = model.indexOf(freeVariables.get(f));
-                    modelSolution.set(freeIndex, solverState.doubleValue(f));
-                }
-
-                return new Result(solverState.getState(), modelSolution);
+            if (!this.isSolutionMapped()) {
+                return solverState;
             }
 
-            if (solverState.count() != numbVariables) {
-                throw new IllegalStateException();
+            List<Variable> freeVariables = model.getFreeVariables();
+            Set<IntIndex> fixedVariables = model.getFixedVariables();
+            int nbFreeVars = freeVariables.size();
+            int nbModelVars = model.countVariables();
+
+            PrimitiveR064 modelSolution = PrimitiveR064.make(nbModelVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
             }
 
-            return solverState;
+            for (IntIndex fixed : fixedVariables) {
+                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
+            }
+
+            return new Result(solverState.getState(), modelSolution);
         }
 
+        /**
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented!
+         * <p>
+         * If {@link #isSolutionMapped()} returns false this implementation does nothing – the input model
+         * state is returned as the solver state.
+         * <p>
+         * If {@link #isSolutionMapped()} returns true the standard mapping is applied - just accounting for
+         * that not all model variables are present in the solver. Variables that are fixed, by the presolver
+         * in the model, are typically not present in the solver.
+         * <p>
+         * If mapping needs to be performed, but it is not the standard mapping, then this method needs to be
+         * overridden for the specific implementation. For instance an LP simplex solver that separates
+         * between the positive and negative parts of variables need to do that. In that case
+         * {@link #isSolutionMapped()} is irrelevant, but should return true for good measure.
+         *
+         * @see Optimisation.Integration#toSolverState(Optimisation.Result, Optimisation.Model)
+         */
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
             if (!this.isSolutionMapped()) {
-
                 return modelState;
             }
-            final List<Variable> tmpFreeVariables = model.getFreeVariables();
-            final int numbFreeVars = tmpFreeVariables.size();
 
-            final PrimitiveR064 solverSolution = PrimitiveR064.make(numbFreeVars);
+            List<Variable> freeVariables = model.getFreeVariables();
+            int nbFreeVars = freeVariables.size();
 
-            for (int i = 0; i < numbFreeVars; i++) {
-                final Variable variable = tmpFreeVariables.get(i);
-                final int modelIndex = model.indexOf(variable);
+            PrimitiveR064 solverSolution = PrimitiveR064.make(nbFreeVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                Variable variable = freeVariables.get(i);
+                int modelIndex = model.indexOf(variable);
                 solverSolution.set(i, modelState.doubleValue(modelIndex));
             }
 
@@ -1227,7 +1243,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * This methods validtes model construction only. All the other validate(...) method validates the
      * solution (one way or another).
      *
-     * @see org.ojalgo.optimisation.Optimisation.Model#validate()
+     * @see Optimisation.Model#validate()
      */
     public boolean validate() {
 
@@ -1319,6 +1335,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     public void writeTo(final File file) {
         ToFileWriter.mkdirs(file.getParentFile());
         try (FileOutputStream output = new FileOutputStream(file)) {
+            FileFormatEBM.write(this, output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public void writeTo(final InMemoryFile file) {
+        try (OutputStream output = file.newOutputStream()) {
             FileFormatEBM.write(this, output);
         } catch (IOException cause) {
             throw new RuntimeException(cause);

@@ -22,10 +22,9 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +119,20 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
         return retVal;
     }
 
+    public InputStream getInputStream() {
+        if (myFile != null) {
+            try {
+                return new FileInputStream(myFile);
+            } catch (FileNotFoundException cause) {
+                throw new RuntimeException(cause);
+            }
+        } else if (myInMemoryFile != null) {
+            return myInMemoryFile.newInputStream();
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
         BasicSeries<LocalDate, PrimitiveNumber> retVal = new SimpleSeries<>();
@@ -145,20 +158,6 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
 
     public CalendarDateUnit getResolution() {
         return myResolution;
-    }
-
-    public Reader getStreamOfCSV() {
-        if (myFile != null) {
-            try {
-                return new FileReader(myFile);
-            } catch (FileNotFoundException cause) {
-                throw new RuntimeException(cause);
-            }
-        } else if (myInMemoryFile != null) {
-            return new InputStreamReader(myInMemoryFile.newInputStream());
-        } else {
-            throw new IllegalStateException();
-        }
     }
 
     public String getSymbol() {

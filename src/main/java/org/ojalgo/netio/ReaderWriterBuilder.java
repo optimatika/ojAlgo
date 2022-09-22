@@ -34,7 +34,7 @@ abstract class ReaderWriterBuilder<B extends ReaderWriterBuilder<B>> {
 
     private static volatile ExecutorService EXECUTOR = null;
 
-    private static ExecutorService executor() {
+    static ExecutorService executor() {
         if (EXECUTOR == null) {
             synchronized (ReaderWriterBuilder.class) {
                 if (EXECUTOR == null) {

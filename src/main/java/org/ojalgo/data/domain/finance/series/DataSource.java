@@ -22,7 +22,6 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
-import java.io.Reader;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -45,6 +44,7 @@ import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 public final class DataSource implements FinanceData<DatePrice> {
@@ -158,7 +158,6 @@ public final class DataSource implements FinanceData<DatePrice> {
     }
 
     private final DataFetcher myFetcher;
-
     private final BasicParser<? extends DatePrice> myParser;
 
     DataSource(final DataFetcher fetcher, final BasicParser<? extends DatePrice> parser) {
@@ -222,8 +221,8 @@ public final class DataSource implements FinanceData<DatePrice> {
 
         List<DatePrice> value = new ArrayList<>();
 
-        try (Reader streamOfCSV = myFetcher.getStreamOfCSV()) {
-            myParser.parse(streamOfCSV, row -> value.add(row));
+        try (AutoSupplier<? extends DatePrice> reader = myFetcher.getReader(myParser)) {
+            reader.forEach(value::add);
         } catch (final Exception cause) {
             BasicLogger.error(cause, "Fetch problem for {}!", myFetcher.getClass().getSimpleName());
             BasicLogger.error("Symbol & Resolution: {} & {}", myFetcher.getSymbol(), myFetcher.getResolution());

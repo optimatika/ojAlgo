@@ -38,7 +38,7 @@ import org.ojalgo.type.CalendarDateUnit;
 /**
  * @author apete
  */
-public abstract class FinanceDataTests {
+public abstract class FinanceSeriesTests {
 
     static boolean DEBUG = false;
 
@@ -103,7 +103,7 @@ public abstract class FinanceDataTests {
         TestUtils.assertEquals("Monthly StdDev", expDistr.getStandardDeviation(), actDistr.getStandardDeviation(), delta);
     }
 
-    protected FinanceDataTests() {
+    protected FinanceSeriesTests() {
         super();
     }
 

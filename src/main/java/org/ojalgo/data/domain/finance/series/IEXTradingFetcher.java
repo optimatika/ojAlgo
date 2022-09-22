@@ -1,16 +1,27 @@
 package org.ojalgo.data.domain.finance.series;
 
-import java.io.Reader;
+import java.io.InputStream;
+import java.net.http.HttpResponse.BodyHandlers;
 
-import org.ojalgo.netio.ResourceLocator;
+import org.ojalgo.netio.ServiceClient;
+import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * Fetch historical financial time series data from IEX Trading: https://exchange.iex.io / https://iexcloud.io
+ * <p>
+ * This service has been moved/renamed/repackaged – this {@link DataFetcher} no longer works. Looks to me as
+ * if they still offer a historical data download service – possibly even a free alternative – but this
+ * fetcher needs to be re-implemented.
+ *
  * @author stefanvanegmond
+ * @see https://iexcloud.io
+ * @deprecated It needs to be updated to function...
  */
+@Deprecated
 public class IEXTradingFetcher implements DataFetcher {
 
-    private final ResourceLocator myResourceLocator;
+    private final ServiceClient.Request myRequest;
     private final String mySymbol;
 
     /**
@@ -24,7 +35,16 @@ public class IEXTradingFetcher implements DataFetcher {
 
         mySymbol = symbol;
 
-        myResourceLocator = new ResourceLocator().host("cloud.iexapis.com").path("/1.0/stock/" + symbol + "/chart/5y").query("format", "csv");
+        myRequest = ServiceClient.newRequest().host("cloud.iexapis.com").path("/1.0/stock/" + symbol + "/chart/5y").query("format", "csv");
+    }
+
+    public InputStream getInputStream() {
+        Response<InputStream> response = myRequest.send(BodyHandlers.ofInputStream());
+        if (response.isResponseOK()) {
+            return response.getBody();
+        } else {
+            return InputStream.nullInputStream();
+        }
     }
 
     /**
@@ -36,11 +56,8 @@ public class IEXTradingFetcher implements DataFetcher {
         return CalendarDateUnit.DAY;
     }
 
-    public Reader getStreamOfCSV() {
-        return myResourceLocator.getStreamReader();
-    }
-
     public String getSymbol() {
         return mySymbol;
     }
+
 }
