@@ -309,8 +309,8 @@ public class RandomNumberTest extends RandomTests {
             tmpSumSqrDiff += tmpVal * tmpVal;
         }
         TestUtils.assertEquals(tmpGeometricStandardDeviation / tmpGeometricStandardDeviation,
-                EXP.invoke(SQRT.invoke(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.00005);
-        // Check that the geometric standard deviation is within ±0.005% of what it should be.
+                EXP.invoke(SQRT.invoke(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.0001);
+        // Check that the geometric standard deviation is within ±0.01% of what it should be.
     }
 
     @Test
