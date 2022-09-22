@@ -31,6 +31,12 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 
+/**
+ * Fetch historical financial time series data from Yahoo Finance: https://finance.yahoo.com
+ *
+ * @see https://finance.yahoo.com
+ * @author apete
+ */
 public final class YahooSession {
 
     public static final class Fetcher implements DataFetcher {

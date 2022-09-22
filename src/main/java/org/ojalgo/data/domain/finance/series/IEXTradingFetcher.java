@@ -8,13 +8,14 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * Fetch historical financial time series data from IEX Trading: https://exchange.iex.io / https://iexcloud.io
+ * <p>
  * This service has been moved/renamed/repackaged – this {@link DataFetcher} no longer works. Looks to me as
  * if they still offer a historical data download service – possibly even a free alternative – but this
  * fetcher needs to be re-implemented.
- * <p>
- * https://iexcloud.io
  *
  * @author stefanvanegmond
+ * @see https://iexcloud.io
  * @deprecated It needs to be updated to function...
  */
 @Deprecated

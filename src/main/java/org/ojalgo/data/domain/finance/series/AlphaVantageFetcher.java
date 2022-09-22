@@ -8,6 +8,9 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * Fetch historical financial time series data from Alpha Vantage: https://www.alphavantage.co
+ *
+ * @see https://www.alphavantage.co
  * @author stefanvanegmond
  */
 public final class AlphaVantageFetcher implements DataFetcher {
