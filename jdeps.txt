@@ -477,6 +477,10 @@ ojalgo-52.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-52.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.service                    -> java.lang                                          java.base
+   org.ojalgo.optimisation.service                    -> org.junit.jupiter.api                              not found
+   org.ojalgo.optimisation.service                    -> org.ojalgo                                         ojalgo-52.0.0-SNAPSHOT-tests.jar
+   org.ojalgo.optimisation.service                    -> org.ojalgo.optimisation                            ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.random                                  -> java.lang                                          java.base
    org.ojalgo.random                                  -> java.lang.invoke                                   java.base
    org.ojalgo.random                                  -> org.junit.jupiter.api                              not found
@@ -561,6 +565,7 @@ ojalgo-52.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.type.context                            -> org.ojalgo.function.constant                       ojalgo-52.0.0-SNAPSHOT.jar
 ojalgo-52.0.0-SNAPSHOT.jar -> java.base
 ojalgo-52.0.0-SNAPSHOT.jar -> java.management
+ojalgo-52.0.0-SNAPSHOT.jar -> java.net.http
 ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo                                         -> java.lang                                          java.base
    org.ojalgo                                         -> java.lang.invoke                                   java.base
@@ -713,6 +718,7 @@ ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.data.domain.finance.series              -> java.io                                            java.base
    org.ojalgo.data.domain.finance.series              -> java.lang                                          java.base
    org.ojalgo.data.domain.finance.series              -> java.lang.invoke                                   java.base
+   org.ojalgo.data.domain.finance.series              -> java.net.http                                      java.net.http
    org.ojalgo.data.domain.finance.series              -> java.time                                          java.base
    org.ojalgo.data.domain.finance.series              -> java.time.chrono                                   java.base
    org.ojalgo.data.domain.finance.series              -> java.time.format                                   java.base
@@ -922,14 +928,17 @@ ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.netio                                   -> java.lang.reflect                                  java.base
    org.ojalgo.netio                                   -> java.math                                          java.base
    org.ojalgo.netio                                   -> java.net                                           java.base
+   org.ojalgo.netio                                   -> java.net.http                                      java.net.http
    org.ojalgo.netio                                   -> java.nio                                           java.base
    org.ojalgo.netio                                   -> java.nio.charset                                   java.base
    org.ojalgo.netio                                   -> java.security                                      java.base
+   org.ojalgo.netio                                   -> java.time                                          java.base
    org.ojalgo.netio                                   -> java.util                                          java.base
    org.ojalgo.netio                                   -> java.util.concurrent                               java.base
    org.ojalgo.netio                                   -> java.util.function                                 java.base
    org.ojalgo.netio                                   -> java.util.stream                                   java.base
    org.ojalgo.netio                                   -> java.util.zip                                      java.base
+   org.ojalgo.netio                                   -> javax.net.ssl                                      java.base
    org.ojalgo.netio                                   -> org.ojalgo                                         ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.netio                                   -> org.ojalgo.array                                   ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.netio                                   -> org.ojalgo.concurrent                              ojalgo-52.0.0-SNAPSHOT.jar
@@ -1023,7 +1032,6 @@ ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.linear                     -> org.ojalgo                                         ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.array                                   ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.array.operation                         ojalgo-52.0.0-SNAPSHOT.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.concurrent                              ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.equation                                ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-52.0.0-SNAPSHOT.jar
@@ -1036,6 +1044,10 @@ ojalgo-52.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type.keyvalue                           ojalgo-52.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.service                    -> java.lang                                          java.base
+   org.ojalgo.optimisation.service                    -> java.lang.invoke                                   java.base
+   org.ojalgo.optimisation.service                    -> org.ojalgo.netio                                   ojalgo-52.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.service                    -> org.ojalgo.optimisation                            ojalgo-52.0.0-SNAPSHOT.jar
    org.ojalgo.random                                  -> java.lang                                          java.base
    org.ojalgo.random                                  -> java.lang.invoke                                   java.base
    org.ojalgo.random                                  -> java.util                                          java.base
