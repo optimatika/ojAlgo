@@ -36,6 +36,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New class `InMemoryFile` to be used when writing to and/or reading from "files" that never actually exist on disk – for dynamically creating files for downloading or parsing uploaded "files". The `TextLineWriter` and `TextLineReader`, in particular, gained support for this.
 - The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
 - New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
+- New `ServiceClient`. It's an http client based on Java 11's `HttpClient` designed to replace `ResourceLocator`.
 
 #### org.ojalgo.structure
 
@@ -53,6 +54,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New generalised way to create memory-mapped file-based array classes
 - Quite a bit of refactory to support everything that's new - better support for any/all primitive type, off-heap arrays and more.
+
+#### org.ojalgo.data
+
+- The `DataFetcher` interface had some additions and deprecations, and all the implementations are refactored to use the new `ServiceClient` rather than `ResourceLocator`.
 
 #### org.ojalgo.equation
 
@@ -73,11 +78,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
 - The `KeyValue` interface was deprecated, but is no longer. Instead `EntryPair` now extends `KeyValue`, and `KeyValue` gained a collection of factory mehods to create pairs. Further the definition of `Dual` moved from `EntryPair` to `KeyValue`.
 
-### Changed
+### Deprecated
 
 #### org.ojalgo.structure
 
 - All the various `fillOne(...)` methods in the `Mutate*D.Fillable` interfaces are deprecated. Just use `set(...)` instead,
+
+### Fixed
+
+#### org.ojalgo.data
+
+- Downloading historical financial data from Yahoo Finance works again!
 
 ### Removed
 
