@@ -57,17 +57,14 @@ import org.ojalgo.type.context.NumberContext;
  * {@linkplain Expression#lower(Comparable)}, {@linkplain Expression#upper(Comparable)} or
  * {@linkplain Expression#level(Comparable)}. An expression or variable is made part of (contributing to) the
  * objective function by setting a contribution weight. Use {@linkplain Expression#weight(Comparable)}.
- * </p>
  * <p>
  * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted
  * combinations of variables. They are both model entities and it is as such they can be turned into
  * constraints and set to contribute to the objective function. Alternatively you may choose to disregard the
  * fact that variables are model entities and simply treat them as index values. In this case everything
  * (constraints and objective) needs to be defined using expressions.
- * </p>
  * <p>
  * Basic instructions:
- * </p>
  * <ol>
  * <li>Define (create) a set of variables. Set contribution weights and lower/upper limits as needed.</li>
  * <li>Create a model using that set of variables.</li>
@@ -80,7 +77,6 @@ import org.ojalgo.type.context.NumberContext;
  * various solvers describe requirements on input formats and similar. This is handled for you and should
  * absolutely NOT be considered here! Compared to using the various solvers directly this class actually does
  * something for you:
- * </p>
  * <ol>
  * <li>You can model your problems without worrying about specific solver requirements.</li>
  * <li>It knows which solver to use.</li>
