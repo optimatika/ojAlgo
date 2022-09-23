@@ -69,6 +69,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New method in `IterativeSolverTask.SparseDelegate` that lets you (re)solve with a supplied RHS.
 - Slight modification to how the preconditioning in `ConjugateGradientSolver` works.
 
+#### org.ojalgo.optimisation
+
+- Some refactoring regarding how parameters are extracted from `ExpressionsBasedModel`, `Expression` and `variable`.
+
 #### org.ojalgo.structure
 
 - The `Mutate*D.Fillable` interfaces now extend their respective `Mutate*D` interface.
@@ -82,7 +86,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.structure
 
-- All the various `fillOne(...)` methods in the `Mutate*D.Fillable` interfaces are deprecated. Just use `set(...)` instead,
+- All the various `fillOne(...)` methods in the `Mutate*D.Fillable` interfaces are deprecated. Just use `set(...)` instead.
 
 ### Fixed
 
