@@ -305,7 +305,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             }
 
             public Double get(final long index) {
-                return this.doubleValue(index);
+                return Double.valueOf(this.doubleValue(index));
             }
 
             @Override
