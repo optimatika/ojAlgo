@@ -106,16 +106,16 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     }
 
-    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ScalarC128.FACTORY);
-    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ScalarH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ScalarQ128.FACTORY);
-    public static final Factory<Double> R032 = ArrayAnyD.factory(PrimitiveR032.FACTORY);
-    public static final Factory<Double> R064 = ArrayAnyD.factory(PrimitiveR064.FACTORY);
-    public static final Factory<BigDecimal> R128 = ArrayAnyD.factory(ReferenceTypeR128.FACTORY);
-    public static final Factory<Double> Z008 = ArrayAnyD.factory(PrimitiveZ008.FACTORY);
-    public static final Factory<Double> Z016 = ArrayAnyD.factory(PrimitiveZ016.FACTORY);
-    public static final Factory<Double> Z032 = ArrayAnyD.factory(PrimitiveZ032.FACTORY);
-    public static final Factory<Double> Z064 = ArrayAnyD.factory(PrimitiveZ064.FACTORY);
+    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
+    public static final Factory<Double> R032 = ArrayAnyD.factory(ArrayR032.FACTORY);
+    public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
+    public static final Factory<BigDecimal> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
+    public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
 
     /**
      * @deprecated v52 Use {@link #R128} instead

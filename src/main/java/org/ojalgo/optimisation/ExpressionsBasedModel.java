@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
@@ -163,7 +163,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             int nbFreeVars = freeVariables.size();
             int nbModelVars = model.countVariables();
 
-            PrimitiveR064 modelSolution = PrimitiveR064.make(nbModelVars);
+            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
 
             for (int i = 0; i < nbFreeVars; i++) {
                 modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
@@ -202,7 +202,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             List<Variable> freeVariables = model.getFreeVariables();
             int nbFreeVars = freeVariables.size();
 
-            PrimitiveR064 solverSolution = PrimitiveR064.make(nbFreeVars);
+            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
 
             for (int i = 0; i < nbFreeVars; i++) {
                 Variable variable = freeVariables.get(i);

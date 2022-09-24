@@ -30,8 +30,8 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.PrimitiveR064;
-import org.ojalgo.array.ScalarC128;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayC128;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -65,7 +65,7 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public final class Primitive64Store extends PrimitiveR064 implements PhysicalStore<Double>, DecompositionStore<Double> {
+public final class Primitive64Store extends ArrayR064 implements PhysicalStore<Double>, DecompositionStore<Double> {
 
     public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PrimitiveFactory<Primitive64Store>() {
 
@@ -442,7 +442,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;
-        final double[] tmpColumn = ((PrimitiveR064) multipliers).data;
+        final double[] tmpColumn = ((ArrayR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyCholesky.THRESHOLD) {
 
@@ -464,7 +464,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
 
     public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] column = ((PrimitiveR064) multipliers).data;
+        final double[] column = ((ArrayR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyLDL.THRESHOLD) {
 
@@ -486,7 +486,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
 
     public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] column = ((PrimitiveR064) multipliers).data;
+        final double[] column = ((ArrayR064) multipliers).data;
 
         if (myColDim - iterationPoint - 1 > ApplyLU.THRESHOLD) {
 
@@ -539,7 +539,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
         final double[] aRawImag = tmpDiags[1];
         final int tmpLength = Math.min(aRawReal.length, aRawImag.length);
 
-        final ScalarC128 retVal = ScalarC128.make(tmpLength);
+        final ArrayC128 retVal = ArrayC128.make(tmpLength);
         final ComplexNumber[] tmpRaw = retVal.data;
 
         for (int i = 0; i < tmpLength; i++) {
@@ -570,7 +570,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
         final double[] tmpData = data;
         final int tmpRowDim = myRowDim;
 
-        final double[] tmpDestination = ((PrimitiveR064) destination).data;
+        final double[] tmpDestination = ((ArrayR064) destination).data;
 
         int tmpIndex = row + column * tmpRowDim;
         final double tmpDenominator = tmpData[tmpIndex];
@@ -1062,7 +1062,7 @@ public final class Primitive64Store extends PrimitiveR064 implements PhysicalSto
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {
-        HouseholderHermitian.tred2j(data, ((PrimitiveR064) mainDiagonal).data, ((PrimitiveR064) offDiagonal).data, yesvecs);
+        HouseholderHermitian.tred2j(data, ((ArrayR064) mainDiagonal).data, ((ArrayR064) offDiagonal).data, yesvecs);
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {

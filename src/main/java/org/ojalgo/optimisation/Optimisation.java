@@ -27,8 +27,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.PrimitiveR064;
-import org.ojalgo.array.ReferenceTypeR128;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayR128;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
@@ -361,7 +361,7 @@ public interface Optimisation {
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
-            return new Result(state, value, PrimitiveR064.wrap(solution));
+            return new Result(state, value, ArrayR064.wrap(solution));
         }
 
         public static Result of(final Optimisation.State state, final double... solution) {
@@ -382,7 +382,7 @@ public interface Optimisation {
 
             State state = Optimisation.State.valueOf(strState);
             double value = Double.parseDouble(strValue);
-            ReferenceTypeR128 solution = ReferenceTypeR128.make(strSolution.length);
+            ArrayR128 solution = ArrayR128.make(strSolution.length);
             for (int i = 0; i < strSolution.length; i++) {
                 solution.set(i, new BigDecimal(strSolution[i]));
             }
@@ -458,7 +458,7 @@ public interface Optimisation {
         public Optimisation.Result getSolution(final NumberContext precision) {
             Optimisation.State state = this.getState();
             double value = this.getValue();
-            ReferenceTypeR128 solution = ReferenceTypeR128.make(this.size());
+            ArrayR128 solution = ArrayR128.make(this.size());
             for (int i = 0, limit = solution.data.length; i < limit; i++) {
                 solution.set(i, precision.enforce(this.get(i)));
             }

@@ -42,7 +42,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
+public class ArrayR128 extends ReferenceTypeArray<BigDecimal> {
 
     public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<>() {
 
@@ -68,24 +68,24 @@ public class ReferenceTypeR128 extends ReferenceTypeArray<BigDecimal> {
 
         @Override
         PlainArray<BigDecimal> makeDenseArray(final long size) {
-            return ReferenceTypeR128.make((int) size);
+            return ArrayR128.make((int) size);
         }
 
     };
 
-    public static ReferenceTypeR128 make(final int size) {
-        return new ReferenceTypeR128(size);
+    public static ArrayR128 make(final int size) {
+        return new ArrayR128(size);
     }
 
-    public static ReferenceTypeR128 wrap(final BigDecimal... data) {
-        return new ReferenceTypeR128(data);
+    public static ArrayR128 wrap(final BigDecimal... data) {
+        return new ArrayR128(data);
     }
 
-    protected ReferenceTypeR128(final BigDecimal[] data) {
+    protected ArrayR128(final BigDecimal[] data) {
         super(FACTORY, data);
     }
 
-    protected ReferenceTypeR128(final int size) {
+    protected ArrayR128(final int size) {
         super(FACTORY, size);
     }
 

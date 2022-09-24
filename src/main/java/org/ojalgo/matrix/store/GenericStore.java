@@ -30,9 +30,9 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.ScalarArray;
-import org.ojalgo.array.ScalarC128;
-import org.ojalgo.array.ScalarH256;
-import org.ojalgo.array.ScalarQ128;
+import org.ojalgo.array.ArrayC128;
+import org.ojalgo.array.ArrayH256;
+import org.ojalgo.array.ArrayQ128;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -337,9 +337,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     }
 
-    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = new GenericStore.Factory<>(ScalarC128.FACTORY);
-    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = new GenericStore.Factory<>(ScalarH256.FACTORY);
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(ScalarQ128.FACTORY);
+    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = new GenericStore.Factory<>(ArrayC128.FACTORY);
+    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = new GenericStore.Factory<>(ArrayH256.FACTORY);
+    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(ArrayQ128.FACTORY);
 
     public static <N extends Scalar<N>> GenericStore<N> wrap(final GenericStore.Factory<N> factory, final N... data) {
         return new GenericStore<>(factory, data.length, 1, data);

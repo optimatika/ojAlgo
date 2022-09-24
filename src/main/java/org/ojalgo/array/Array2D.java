@@ -268,16 +268,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
 
     }
 
-    public static final Factory<ComplexNumber> C128 = Array2D.factory(ScalarC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array2D.factory(ScalarH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array2D.factory(ScalarQ128.FACTORY);
-    public static final Factory<Double> R032 = Array2D.factory(PrimitiveR032.FACTORY);
-    public static final Factory<Double> R064 = Array2D.factory(PrimitiveR064.FACTORY);
-    public static final Factory<BigDecimal> R128 = Array2D.factory(ReferenceTypeR128.FACTORY);
-    public static final Factory<Double> Z008 = Array2D.factory(PrimitiveZ008.FACTORY);
-    public static final Factory<Double> Z016 = Array2D.factory(PrimitiveZ016.FACTORY);
-    public static final Factory<Double> Z032 = Array2D.factory(PrimitiveZ032.FACTORY);
-    public static final Factory<Double> Z064 = Array2D.factory(PrimitiveZ064.FACTORY);
+    public static final Factory<ComplexNumber> C128 = Array2D.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = Array2D.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = Array2D.factory(ArrayQ128.FACTORY);
+    public static final Factory<Double> R032 = Array2D.factory(ArrayR032.FACTORY);
+    public static final Factory<Double> R064 = Array2D.factory(ArrayR064.FACTORY);
+    public static final Factory<BigDecimal> R128 = Array2D.factory(ArrayR128.FACTORY);
+    public static final Factory<Double> Z008 = Array2D.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = Array2D.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = Array2D.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = Array2D.factory(ArrayZ064.FACTORY);
 
     /**
      * @deprecated v52 Use {@link #R128} instead

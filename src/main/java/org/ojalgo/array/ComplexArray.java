@@ -28,7 +28,7 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 @Deprecated
-public class ComplexArray extends ScalarC128 {
+public class ComplexArray extends ArrayC128 {
 
     public static ComplexArray make(final int size) {
         return new ComplexArray(size);

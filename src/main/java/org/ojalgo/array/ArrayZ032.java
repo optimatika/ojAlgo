@@ -49,7 +49,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class PrimitiveZ016 extends PrimitiveArray {
+public class ArrayZ032 extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
@@ -70,37 +70,37 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
         @Override
         MathType getMathType() {
-            return MathType.Z016;
+            return MathType.Z032;
         }
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return PrimitiveZ016.make((int) size);
+            return ArrayZ032.make((int) size);
         }
 
     };
 
-    public static PrimitiveZ016 make(final int size) {
-        return new PrimitiveZ016(size);
+    public static ArrayZ032 make(final int size) {
+        return new ArrayZ032(size);
     }
 
-    public static PrimitiveZ016 wrap(final short... data) {
-        return new PrimitiveZ016(data);
+    public static ArrayZ032 wrap(final int... data) {
+        return new ArrayZ032(data);
     }
 
-    public final short[] data;
+    public final int[] data;
 
-    protected PrimitiveZ016(final int size) {
+    protected ArrayZ032(final int size) {
 
         super(FACTORY, size);
 
-        data = new short[size];
+        data = new int[size];
     }
 
     /**
      * Array not copied! No checking!
      */
-    protected PrimitiveZ016(final short[] data) {
+    protected ArrayZ032(final int[] data) {
 
         super(FACTORY, data.length);
 
@@ -109,7 +109,7 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     public void reset() {
-        Arrays.fill(data, (short) 0);
+        Arrays.fill(data, 0);
     }
 
     @Override
@@ -126,16 +126,16 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        data[index] += NumberDefinition.shortValue(addend);
+        data[index] += NumberDefinition.intValue(addend);
     }
 
     @Override
     protected void add(final int index, final double addend) {
-        data[index] += (short) Math.round(addend);
+        data[index] += (int) Math.round(addend);
     }
 
     @Override
-    protected void add(final int index, final short addend) {
+    protected void add(final int index, final int addend) {
         data[index] += addend;
     }
 
@@ -156,7 +156,7 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        FillAll.fill(data, first, limit, step, value.shortValue());
+        FillAll.fill(data, first, limit, step, value.intValue());
     }
 
     @Override
@@ -166,17 +166,17 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = values.shortValue(valueIndex);
+        data[index] = values.intValue(valueIndex);
     }
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        data[index] = value.shortValue();
+        data[index] = value.intValue();
     }
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        data[index] = supplier.shortValue();
+        data[index] = supplier.intValue();
     }
 
     @Override
@@ -192,6 +192,11 @@ public class PrimitiveZ016 extends PrimitiveArray {
     @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
+    }
+
+    @Override
+    protected int intValue(final int index) {
+        return data[index];
     }
 
     @Override
@@ -226,32 +231,27 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected int searchAscending(final Double number) {
-        return Arrays.binarySearch(data, number.shortValue());
+        return Arrays.binarySearch(data, number.intValue());
     }
 
     @Override
     protected void set(final int index, final Comparable<?> number) {
-        data[index] = Scalar.shortValue(number);
+        data[index] = Scalar.intValue(number);
     }
 
     @Override
     protected void set(final int index, final double value) {
-        data[index] = (short) Math.round(value);
+        data[index] = (int) Math.round(value);
     }
 
     @Override
     protected void set(final int index, final float value) {
-        data[index] = (short) Math.round(value);
-    }
-
-    @Override
-    protected void set(final int index, final short value) {
-        data[index] = value;
+        data[index] = Math.round(value);
     }
 
     @Override
     protected short shortValue(final int index) {
-        return data[index];
+        return (short) data[index];
     }
 
     @Override
@@ -266,12 +266,12 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        data[intIndex] = function.invoke(left.shortValue(extIndex), data[intIndex]);
+        data[intIndex] = function.invoke(left.intValue(extIndex), data[intIndex]);
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        data[intIndex] = function.invoke(data[intIndex], right.shortValue(extIndex));
+        data[intIndex] = function.invoke(data[intIndex], right.intValue(extIndex));
     }
 
     @Override
@@ -281,7 +281,12 @@ public class PrimitiveZ016 extends PrimitiveArray {
 
     @Override
     protected void set(final int index, final long value) {
-        data[index] = (short) value;
+        data[index] = (int) value;
+    }
+
+    @Override
+    protected void set(final int index, final int value) {
+        data[index] = value;
     }
 
 }

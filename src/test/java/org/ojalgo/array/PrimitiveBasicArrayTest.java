@@ -51,7 +51,7 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testHugeSparse() {
-        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
+        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
     }
 
     @Test
@@ -70,47 +70,47 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testPrimitiveR032() {
-        this.doTest(PrimitiveR032.make(COUNT));
+        this.doTest(ArrayR032.make(COUNT));
     }
 
     @Test
     public void testPrimitiveR064() {
-        this.doTest(PrimitiveR064.make(COUNT));
+        this.doTest(ArrayR064.make(COUNT));
     }
 
     @Test
     public void testPrimitiveZ008() {
-        this.doTest(PrimitiveZ008.make(COUNT));
+        this.doTest(ArrayZ008.make(COUNT));
     }
 
     @Test
     public void testPrimitiveZ016() {
-        this.doTest(PrimitiveZ016.make(COUNT));
+        this.doTest(ArrayZ016.make(COUNT));
     }
 
     @Test
     public void testPrimitiveZ032() {
-        this.doTest(PrimitiveZ032.make(COUNT));
+        this.doTest(ArrayZ032.make(COUNT));
     }
 
     @Test
     public void testPrimitiveZ064() {
-        this.doTest(PrimitiveZ064.make(COUNT));
+        this.doTest(ArrayZ064.make(COUNT));
     }
 
     @Test
     public void testSegmentedPrimitive() {
-        this.doTest(PrimitiveR064.FACTORY.makeSegmented(COUNT));
+        this.doTest(ArrayR064.FACTORY.makeSegmented(COUNT));
     }
 
     @Test
     public void testSegmentedSparse() {
-        this.doTest(new BasicArray.Factory<>(PrimitiveR064.FACTORY).makeSegmented(COUNT));
+        this.doTest(new BasicArray.Factory<>(ArrayR064.FACTORY).makeSegmented(COUNT));
     }
 
     @Test
     public void testSparse() {
-        this.doTest(SparseArray.factory(PrimitiveR064.FACTORY).limit(COUNT).initial(DenseCapacityStrategy.capacity(COUNT)).make());
+        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(COUNT).initial(DenseCapacityStrategy.capacity(COUNT)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);
