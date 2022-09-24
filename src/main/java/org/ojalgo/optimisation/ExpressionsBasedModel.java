@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
@@ -226,6 +227,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          *         negative part, then this method must return true
          */
         protected abstract boolean isSolutionMapped();
+
+        public final ExpressionsBasedModel.Integration<S> withPredicate(final Predicate<ExpressionsBasedModel> predicate) {
+            return new PredicateIntegration<>(this, predicate);
+        }
 
     }
 
