@@ -436,6 +436,14 @@ public final class Expression extends ModelEntity<Expression> {
 
     }
 
+    public double doubleValue(final IntIndex key, final boolean adjusted) {
+        return this.getLinearFactor(key, adjusted).doubleValue();
+    }
+
+    public double doubleValue(final IntRowColumn key, final boolean adjusted) {
+        return this.getQuadraticFactor(key, adjusted).doubleValue();
+    }
+
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
 
         BigDecimal retVal = this.getConstant();
@@ -511,26 +519,50 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedLinearFactor(final int aVar) {
         return this.getAdjustedLinearFactor(new IntIndex(aVar));
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedLinearFactor(final IntIndex key) {
         return this.getLinearFactor(key, true).doubleValue();
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedLinearFactor(final Variable aVar) {
         return this.getAdjustedLinearFactor(aVar.getIndex());
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedQuadraticFactor(final int aVar1, final int aVar2) {
         return this.getAdjustedQuadraticFactor(new IntRowColumn(aVar1, aVar2));
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedQuadraticFactor(final IntRowColumn key) {
         return this.getQuadraticFactor(key, true).doubleValue();
     }
 
+    /**
+     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
+     */
+    @Deprecated
     public double getAdjustedQuadraticFactor(final Variable aVar1, final Variable aVar2) {
         return this.getAdjustedQuadraticFactor(myModel.indexOf(aVar1), myModel.indexOf(aVar2));
     }

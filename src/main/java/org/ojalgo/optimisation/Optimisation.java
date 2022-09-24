@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.PrimitiveR064;
 import org.ojalgo.array.ReferenceTypeR128;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -360,7 +361,7 @@ public interface Optimisation {
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
-            return new Result(state, value, Access1D.wrap(solution));
+            return new Result(state, value, PrimitiveR064.wrap(solution));
         }
 
         public static Result of(final Optimisation.State state, final double... solution) {
