@@ -21,64 +21,64 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.RationalAggregator;
-import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
+ * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
  *
  * @author apete
  */
-public class ScalarQ128 extends ScalarArray<RationalNumber> {
+public class ArrayC128 extends ScalarArray<ComplexNumber> {
 
-    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<>() {
+    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<>() {
 
         @Override
-        public AggregatorSet<RationalNumber> aggregator() {
-            return RationalAggregator.getSet();
+        public AggregatorSet<ComplexNumber> aggregator() {
+            return ComplexAggregator.getSet();
         }
 
         @Override
-        public FunctionSet<RationalNumber> function() {
-            return RationalFunction.getSet();
+        public FunctionSet<ComplexNumber> function() {
+            return ComplexFunction.getSet();
         }
 
         @Override
-        public Scalar.Factory<RationalNumber> scalar() {
-            return RationalNumber.FACTORY;
+        public Scalar.Factory<ComplexNumber> scalar() {
+            return ComplexNumber.FACTORY;
         }
 
         @Override
         MathType getMathType() {
-            return MathType.Q128;
+            return MathType.C128;
         }
 
         @Override
-        PlainArray<RationalNumber> makeDenseArray(final long size) {
-            return ScalarQ128.make((int) size);
+        PlainArray<ComplexNumber> makeDenseArray(final long size) {
+            return ArrayC128.make((int) size);
         }
 
     };
 
-    public static ScalarQ128 make(final int size) {
-        return new ScalarQ128(size);
+    public static ArrayC128 make(final int size) {
+        return new ArrayC128(size);
     }
 
-    public static ScalarQ128 wrap(final RationalNumber... data) {
-        return new ScalarQ128(data);
+    public static ArrayC128 wrap(final ComplexNumber... data) {
+        return new ArrayC128(data);
     }
 
-    protected ScalarQ128(final int size) {
-        super(FACTORY, size);
-    }
-
-    protected ScalarQ128(final RationalNumber[] data) {
+    protected ArrayC128(final ComplexNumber[] data) {
         super(FACTORY, data);
+    }
+
+    protected ArrayC128(final int size) {
+        super(FACTORY, size);
     }
 
 }

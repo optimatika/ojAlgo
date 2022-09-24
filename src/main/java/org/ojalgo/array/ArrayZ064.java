@@ -21,11 +21,15 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 import java.util.Arrays;
 
-import org.ojalgo.array.operation.*;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.array.operation.Exchange;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -34,11 +38,9 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 
@@ -47,7 +49,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class PrimitiveR032 extends PrimitiveArray {
+public class ArrayZ064 extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
@@ -68,106 +70,46 @@ public class PrimitiveR032 extends PrimitiveArray {
 
         @Override
         MathType getMathType() {
-            return MathType.R032;
+            return MathType.Z064;
         }
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return PrimitiveR032.make((int) size);
+            return ArrayZ064.make((int) size);
         }
 
     };
 
-    public static PrimitiveR032 make(final int size) {
-        return new PrimitiveR032(size);
+    public static ArrayZ064 make(final int size) {
+        return new ArrayZ064(size);
     }
 
-    public static PrimitiveR032 wrap(final float... data) {
-        return new PrimitiveR032(data);
+    public static ArrayZ064 wrap(final long... data) {
+        return new ArrayZ064(data);
     }
 
-    public final float[] data;
+    public final long[] data;
+
+    protected ArrayZ064(final int size) {
+
+        super(FACTORY, size);
+
+        data = new long[size];
+    }
 
     /**
      * Array not copied! No checking!
      */
-    protected PrimitiveR032(final float[] data) {
+    protected ArrayZ064(final long[] data) {
 
         super(FACTORY, data.length);
 
         this.data = data;
     }
 
-    protected PrimitiveR032(final int size) {
-
-        super(FACTORY, size);
-
-        data = new float[size];
-    }
-
-    @Override
-    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
-        AXPY.invoke(y, a, data);
-    }
-
-    @Override
-    public double dot(final Access1D<?> vector) {
-
-        double retVal = ZERO;
-
-        for (int i = 0, limit = Math.min(data.length, (int) vector.count()); i < limit; i++) {
-            retVal += data[i] * vector.doubleValue(i);
-        }
-
-        return retVal;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj) || !(obj instanceof PrimitiveR032)) {
-            return false;
-        }
-        PrimitiveR032 other = (PrimitiveR032) obj;
-        if (!Arrays.equals(data, other.data)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void fillMatching(final Access1D<?> values) {
-        if (values instanceof PrimitiveR032) {
-            FillMatchingSingle.fill(data, ((PrimitiveR032) values).data);
-        } else {
-            FillMatchingSingle.fill(data, values);
-        }
-    }
-
-    @Override
-    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
-        OperationBinary.invoke(data, 0, limit, 1, left, function, right);
-    }
-
-    @Override
-    public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
-        int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
-        OperationUnary.invoke(data, 0, limit, 1, arguments, function);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        return prime * result + Arrays.hashCode(data);
-    }
-
     @Override
     public void reset() {
-        Arrays.fill(data, 0.0F);
+        Arrays.fill(data, 0L);
     }
 
     @Override
@@ -183,70 +125,58 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
-    public void supplyTo(final Mutate1D receiver) {
-        int limit = Math.min(data.length, receiver.size());
-        for (int i = 0; i < limit; i++) {
-            receiver.set(i, data[i]);
-        }
-    }
-
-    @Override
     protected void add(final int index, final Comparable<?> addend) {
-        data[index] += NumberDefinition.floatValue(addend);
+        data[index] += NumberDefinition.longValue(addend);
     }
 
     @Override
     protected void add(final int index, final double addend) {
-        data[index] += (float) addend;
+        data[index] += Math.round(addend);
     }
 
     @Override
-    protected void add(final int index, final float addend) {
+    protected void add(final int index, final long addend) {
         data[index] += addend;
     }
 
     @Override
     protected byte byteValue(final int index) {
-        return (byte) Math.round(data[index]);
-    }
-
-    protected final float[] copyOfData() {
-        return COPY.copyOf(data);
+        return (byte) data[index];
     }
 
     @Override
-    protected final double doubleValue(final int index) {
+    protected double doubleValue(final int index) {
         return data[index];
     }
 
     @Override
-    protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
+    protected void exchange(final int firstA, final int firstB, final int step, final int count) {
         Exchange.exchange(data, firstA, firstB, step, count);
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final Double value) {
-        FillAll.fill(data, first, limit, step, value.floatValue());
+    protected void fill(final int first, final int limit, final int step, final Double value) {
+        FillAll.fill(data, first, limit, step, value.longValue());
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+    protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         FillAll.fill(data, first, limit, step, supplier);
     }
 
     @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = (float) values.doubleValue(valueIndex);
+        data[index] = values.longValue(valueIndex);
     }
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        data[index] = value.floatValue();
+        data[index] = value.longValue();
     }
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        data[index] = supplier.floatValue();
+        data[index] = supplier.longValue();
     }
 
     @Override
@@ -260,13 +190,13 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
-    protected final int indexOfLargest(final int first, final int limit, final int step) {
+    protected int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
     }
 
     @Override
     protected int intValue(final int index) {
-        return Math.round(data[index]);
+        return (int) data[index];
     }
 
     @Override
@@ -280,52 +210,57 @@ public class PrimitiveR032 extends PrimitiveArray {
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
+    protected long longValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    protected void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
         OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
+    protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
         OperationBinary.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
+    protected void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
         OperationUnary.invoke(data, first, limit, step, this, function);
     }
 
     @Override
-    protected final void modifyOne(final int index, final UnaryFunction<Double> modifier) {
+    protected void modifyOne(final int index, final UnaryFunction<Double> modifier) {
         data[index] = modifier.invoke(data[index]);
     }
 
     @Override
-    protected final int searchAscending(final Double number) {
-        return Arrays.binarySearch(data, number.floatValue());
+    protected int searchAscending(final Double number) {
+        return Arrays.binarySearch(data, number.longValue());
     }
 
     @Override
-    protected final void set(final int index, final Comparable<?> value) {
-        data[index] = Scalar.floatValue(value);
+    protected void set(final int index, final Comparable<?> number) {
+        data[index] = Scalar.longValue(number);
     }
 
     @Override
-    protected final void set(final int index, final double value) {
-        data[index] = (float) value;
+    protected void set(final int index, final double value) {
+        data[index] = Math.round(value);
     }
 
     @Override
-    protected final void set(final int index, final float value) {
-        data[index] = value;
+    protected void set(final int index, final float value) {
+        data[index] = Math.round(value);
     }
 
     @Override
     protected short shortValue(final int index) {
-        return (short) Math.round(data[index]);
+        return (short) data[index];
     }
 
     @Override
-    protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
+    protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         OperationVoid.invoke(data, first, limit, step, visitor);
     }
 
@@ -336,12 +271,12 @@ public class PrimitiveR032 extends PrimitiveArray {
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        data[intIndex] = (float) function.invoke(left.doubleValue(extIndex), data[intIndex]);
+        data[intIndex] = function.invoke(left.longValue(extIndex), data[intIndex]);
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        data[intIndex] = (float) function.invoke(data[intIndex], right.doubleValue(extIndex));
+        data[intIndex] = function.invoke(data[intIndex], right.longValue(extIndex));
     }
 
     @Override

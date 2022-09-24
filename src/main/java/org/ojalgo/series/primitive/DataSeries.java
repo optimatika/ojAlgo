@@ -22,7 +22,7 @@
 package org.ojalgo.series.primitive;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -40,7 +40,7 @@ public final class DataSeries extends PrimitiveSeries {
     }
 
     public static DataSeries wrap(final double[] raw) {
-        return new DataSeries(Array1D.R064.wrap(PrimitiveR064.wrap(raw)));
+        return new DataSeries(Array1D.R064.wrap(ArrayR064.wrap(raw)));
     }
 
     private final Array1D<Double> myValues;

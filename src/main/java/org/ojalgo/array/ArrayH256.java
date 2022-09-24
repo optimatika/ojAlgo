@@ -34,7 +34,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class ScalarH256 extends ScalarArray<Quaternion> {
+public class ArrayH256 extends ScalarArray<Quaternion> {
 
     public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<>() {
 
@@ -60,24 +60,24 @@ public class ScalarH256 extends ScalarArray<Quaternion> {
 
         @Override
         PlainArray<Quaternion> makeDenseArray(final long size) {
-            return ScalarH256.make((int) size);
+            return ArrayH256.make((int) size);
         }
 
     };
 
-    public static ScalarH256 make(final int size) {
-        return new ScalarH256(size);
+    public static ArrayH256 make(final int size) {
+        return new ArrayH256(size);
     }
 
-    public static ScalarH256 wrap(final Quaternion... data) {
-        return new ScalarH256(data);
+    public static ArrayH256 wrap(final Quaternion... data) {
+        return new ArrayH256(data);
     }
 
-    protected ScalarH256(final int size) {
+    protected ArrayH256(final int size) {
         super(FACTORY, size);
     }
 
-    protected ScalarH256(final Quaternion[] data) {
+    protected ArrayH256(final Quaternion[] data) {
         super(FACTORY, data);
     }
 

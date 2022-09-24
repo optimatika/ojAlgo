@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -117,7 +117,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     public M makeDiagonal(final double... diagonal) {
-        return this.makeDiagonal(PrimitiveR064.wrap(diagonal));
+        return this.makeDiagonal(ArrayR064.wrap(diagonal));
     }
 
     public M makeEye(final int rows, final int columns) {

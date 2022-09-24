@@ -24,7 +24,7 @@ package org.ojalgo.tensor;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayAnyD;
-import org.ojalgo.array.ScalarQ128;
+import org.ojalgo.array.ArrayQ128;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -40,9 +40,9 @@ public class TensorTest {
     private static final RationalMatrix ELEMENTS_D = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
 
     private static final RationalMatrix.Factory FACTORY__M = RationalMatrix.FACTORY;
-    private static final TensorFactory1D<RationalNumber, VectorTensor<RationalNumber>> FACTORY_1 = VectorTensor.factory(ScalarQ128.FACTORY);
-    private static final TensorFactory2D<RationalNumber, MatrixTensor<RationalNumber>> FACTORY_2 = MatrixTensor.factory(ScalarQ128.FACTORY);
-    private static final TensorFactoryAnyD<RationalNumber, AnyTensor<RationalNumber>> FACTORY_N = AnyTensor.factory(ScalarQ128.FACTORY);
+    private static final TensorFactory1D<RationalNumber, VectorTensor<RationalNumber>> FACTORY_1 = VectorTensor.factory(ArrayQ128.FACTORY);
+    private static final TensorFactory2D<RationalNumber, MatrixTensor<RationalNumber>> FACTORY_2 = MatrixTensor.factory(ArrayQ128.FACTORY);
+    private static final TensorFactoryAnyD<RationalNumber, AnyTensor<RationalNumber>> FACTORY_N = AnyTensor.factory(ArrayQ128.FACTORY);
 
     static final boolean DEBUG = false;
 

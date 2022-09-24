@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
@@ -719,7 +719,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     protected Array1D<Double> makeSingularValues() {
-        return Array1D.R064.wrap(PrimitiveR064.wrap(s));
+        return Array1D.R064.wrap(ArrayR064.wrap(s));
     }
 
     void setD(final MatrixStore<N> someD) {

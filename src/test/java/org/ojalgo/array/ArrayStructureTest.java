@@ -32,10 +32,10 @@ import org.ojalgo.structure.StructureAnyD;
  */
 public class ArrayStructureTest extends ArrayTests {
 
-    private static PrimitiveR064 ARRAY_1D;
-    private static PrimitiveR064 ARRAY_2D;
-    private static PrimitiveR064 ARRAY_3D;
-    private static PrimitiveR064 ARRAY_4D;
+    private static ArrayR064 ARRAY_1D;
+    private static ArrayR064 ARRAY_2D;
+    private static ArrayR064 ARRAY_3D;
+    private static ArrayR064 ARRAY_4D;
 
     private static int[] STRUCTURE_1D;
     private static int[] STRUCTURE_2D;
@@ -53,7 +53,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_1D[i] = 2 - i;
         }
 
-        ARRAY_1D = new PrimitiveR064(StructureAnyD.count(STRUCTURE_1D));
+        ARRAY_1D = new ArrayR064(StructureAnyD.count(STRUCTURE_1D));
 
         for (int i = 0; i < ARRAY_1D.size(); i++) {
             ARRAY_1D.set(i, Double.valueOf(i));
@@ -68,7 +68,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_2D[i] = 3 - i;
         }
 
-        ARRAY_2D = new PrimitiveR064(StructureAnyD.count(STRUCTURE_2D));
+        ARRAY_2D = new ArrayR064(StructureAnyD.count(STRUCTURE_2D));
 
         for (int i = 0; i < ARRAY_2D.size(); i++) {
             ARRAY_2D.set(i, Double.valueOf(i));
@@ -83,7 +83,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_3D[i] = 4 - i;
         }
 
-        ARRAY_3D = new PrimitiveR064(StructureAnyD.count(STRUCTURE_3D));
+        ARRAY_3D = new ArrayR064(StructureAnyD.count(STRUCTURE_3D));
 
         for (int i = 0; i < ARRAY_3D.size(); i++) {
             ARRAY_3D.set(i, Double.valueOf(i));
@@ -98,7 +98,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_4D[i] = 5 - i;
         }
 
-        ARRAY_4D = new PrimitiveR064(StructureAnyD.count(STRUCTURE_4D));
+        ARRAY_4D = new ArrayR064(StructureAnyD.count(STRUCTURE_4D));
 
         for (int i = 0; i < ARRAY_4D.size(); i++) {
             ARRAY_4D.set(i, Double.valueOf(i));

@@ -244,16 +244,16 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     }
 
-    public static final Factory<ComplexNumber> C128 = Array1D.factory(ScalarC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array1D.factory(ScalarH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array1D.factory(ScalarQ128.FACTORY);
-    public static final Factory<Double> R032 = Array1D.factory(PrimitiveR032.FACTORY);
-    public static final Factory<Double> R064 = Array1D.factory(PrimitiveR064.FACTORY);
-    public static final Factory<BigDecimal> R128 = Array1D.factory(ReferenceTypeR128.FACTORY);
-    public static final Factory<Double> Z008 = Array1D.factory(PrimitiveZ008.FACTORY);
-    public static final Factory<Double> Z016 = Array1D.factory(PrimitiveZ016.FACTORY);
-    public static final Factory<Double> Z032 = Array1D.factory(PrimitiveZ032.FACTORY);
-    public static final Factory<Double> Z064 = Array1D.factory(PrimitiveZ064.FACTORY);
+    public static final Factory<ComplexNumber> C128 = Array1D.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = Array1D.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = Array1D.factory(ArrayQ128.FACTORY);
+    public static final Factory<Double> R032 = Array1D.factory(ArrayR032.FACTORY);
+    public static final Factory<Double> R064 = Array1D.factory(ArrayR064.FACTORY);
+    public static final Factory<BigDecimal> R128 = Array1D.factory(ArrayR128.FACTORY);
+    public static final Factory<Double> Z008 = Array1D.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = Array1D.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = Array1D.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = Array1D.factory(ArrayZ064.FACTORY);
 
     /**
      * @deprecated v52 Use {@link #Q128} instead

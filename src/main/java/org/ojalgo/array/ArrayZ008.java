@@ -49,7 +49,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class PrimitiveZ008 extends PrimitiveArray {
+public class ArrayZ008 extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
@@ -75,17 +75,17 @@ public class PrimitiveZ008 extends PrimitiveArray {
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return PrimitiveZ008.make((int) size);
+            return ArrayZ008.make((int) size);
         }
 
     };
 
-    public static PrimitiveZ008 make(final int size) {
-        return new PrimitiveZ008(size);
+    public static ArrayZ008 make(final int size) {
+        return new ArrayZ008(size);
     }
 
-    public static PrimitiveZ008 wrap(final byte... data) {
-        return new PrimitiveZ008(data);
+    public static ArrayZ008 wrap(final byte... data) {
+        return new ArrayZ008(data);
     }
 
     public final byte[] data;
@@ -93,14 +93,14 @@ public class PrimitiveZ008 extends PrimitiveArray {
     /**
      * Array not copied! No checking!
      */
-    protected PrimitiveZ008(final byte[] data) {
+    protected ArrayZ008(final byte[] data) {
 
         super(FACTORY, data.length);
 
         this.data = data;
     }
 
-    protected PrimitiveZ008(final int size) {
+    protected ArrayZ008(final int size) {
 
         super(FACTORY, size);
 

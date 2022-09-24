@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive32Store;
@@ -88,7 +88,7 @@ public class FileFormatTest extends ANNTest {
         network1.writeTo(file);
         ArtificialNeuralNetwork network2 = ArtificialNeuralNetwork.from(file);
 
-        PrimitiveR064 input = PrimitiveR064.wrap(0.1, 0.2, 0.3, 0.4, 0.5);
+        ArrayR064 input = ArrayR064.wrap(0.1, 0.2, 0.3, 0.4, 0.5);
 
         NetworkInvoker invoker1 = network1.newInvoker();
         NetworkInvoker invoker2 = network2.newInvoker();

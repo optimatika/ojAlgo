@@ -28,7 +28,7 @@ import java.math.BigDecimal;
  * @author apete
  */
 @Deprecated
-public class BigArray extends ReferenceTypeR128 {
+public class BigArray extends ArrayR128 {
 
     public static BigArray make(final int size) {
         return new BigArray(size);

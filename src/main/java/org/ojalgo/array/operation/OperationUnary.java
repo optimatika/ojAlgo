@@ -22,12 +22,12 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.PrimitiveR032;
-import org.ojalgo.array.PrimitiveR064;
-import org.ojalgo.array.PrimitiveZ008;
-import org.ojalgo.array.PrimitiveZ016;
-import org.ojalgo.array.PrimitiveZ032;
-import org.ojalgo.array.PrimitiveZ064;
+import org.ojalgo.array.ArrayR032;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayZ008;
+import org.ojalgo.array.ArrayZ016;
+import org.ojalgo.array.ArrayZ032;
+import org.ojalgo.array.ArrayZ064;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
@@ -59,8 +59,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final byte[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveZ008) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveZ008) values).data, function);
+        if (values instanceof ArrayZ008) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayZ008) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.byteValue(i));
@@ -89,8 +89,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveR064) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveR064) values).data, function);
+        if (values instanceof ArrayR064) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayR064) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.doubleValue(i));
@@ -120,8 +120,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final float[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveR032) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveR032) values).data, function);
+        if (values instanceof ArrayR032) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayR032) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.floatValue(i));
@@ -151,8 +151,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final int[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveZ032) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveZ032) values).data, function);
+        if (values instanceof ArrayZ032) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayZ032) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.intValue(i));
@@ -181,8 +181,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final long[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveZ064) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveZ064) values).data, function);
+        if (values instanceof ArrayZ064) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayZ064) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.longValue(i));
@@ -218,8 +218,8 @@ public abstract class OperationUnary implements ArrayOperation {
 
     public static void invoke(final short[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveZ016) {
-            OperationUnary.invoke(data, first, limit, step, ((PrimitiveZ016) values).data, function);
+        if (values instanceof ArrayZ016) {
+            OperationUnary.invoke(data, first, limit, step, ((ArrayZ016) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.shortValue(i));

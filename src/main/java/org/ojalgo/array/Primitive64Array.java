@@ -26,7 +26,7 @@ package org.ojalgo.array;
  * @author apete
  */
 @Deprecated
-public final class Primitive64Array extends PrimitiveR064 {
+public final class Primitive64Array extends ArrayR064 {
 
     public static Primitive64Array make(final int size) {
         return new Primitive64Array(size);

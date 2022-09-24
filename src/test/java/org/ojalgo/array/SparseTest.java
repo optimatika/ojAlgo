@@ -36,7 +36,7 @@ public class SparseTest extends ArrayTests {
         long dim2 = dim * dim;
         final long count = dim2;
 
-        SparseArray<Double> plain = SparseArray.factory(PrimitiveR064.FACTORY).limit(count).make();
+        SparseArray<Double> plain = SparseArray.factory(ArrayR064.FACTORY).limit(count).make();
         Array1D<Double> array1D = Array1D.R064.make(dim2);
         Array2D<Double> array2D = Array2D.R064.make(dim, dim);
 
@@ -66,7 +66,7 @@ public class SparseTest extends ArrayTests {
 
         long dim = 100_000L;
 
-        SparseArray<Double> array = SparseArray.factory(PrimitiveR064.FACTORY).limit(dim * dim).make();
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).limit(dim * dim).make();
 
         for (long i = 0L; i < dim; i++) {
             array.set(Uniform.randomInteger(dim * dim), 1.0);

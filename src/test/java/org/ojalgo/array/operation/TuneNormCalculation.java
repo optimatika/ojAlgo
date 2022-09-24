@@ -22,7 +22,7 @@
 package org.ojalgo.array.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -95,7 +95,7 @@ public class TuneNormCalculation {
     @Setup
     public void setup() {
 
-        PrimitiveR064 l = PrimitiveR064.make(dim);
+        ArrayR064 l = ArrayR064.make(dim);
         l.fillAll(Uniform.standard());
 
         array = l.data;

@@ -26,7 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.PrimitiveR064;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -58,12 +58,12 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     public static SampleSet make() {
-        return new SampleSet(PrimitiveR064.make(4));
+        return new SampleSet(ArrayR064.make(4));
     }
 
     public static SampleSet make(final RandomNumber randomNumber, final int size) {
 
-        final PrimitiveR064 retVal = PrimitiveR064.make(size);
+        final ArrayR064 retVal = ArrayR064.make(size);
         final double[] tmpData = retVal.data;
 
         for (int i = 0; i < size; i++) {

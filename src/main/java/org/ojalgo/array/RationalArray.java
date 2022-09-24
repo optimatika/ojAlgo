@@ -28,7 +28,7 @@ import org.ojalgo.scalar.RationalNumber;
  * @author apete
  */
 @Deprecated
-public class RationalArray extends ScalarQ128 {
+public class RationalArray extends ArrayQ128 {
 
     public static RationalArray make(final int size) {
         return new RationalArray(size);

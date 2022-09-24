@@ -28,7 +28,7 @@ import org.ojalgo.scalar.Quaternion;
  * @author apete
  */
 @Deprecated
-public class QuaternionArray extends ScalarH256 {
+public class QuaternionArray extends ArrayH256 {
 
     public static QuaternionArray make(final int size) {
         return new QuaternionArray(size);

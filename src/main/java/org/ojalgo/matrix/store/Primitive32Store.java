@@ -28,7 +28,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.PrimitiveR032;
+import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.RotateLeft;
 import org.ojalgo.array.operation.RotateRight;
@@ -64,13 +64,13 @@ import org.ojalgo.type.NumberDefinition;
  *
  * @author apete
  */
-public final class Primitive32Store extends PrimitiveR032 implements PhysicalStore<Double> {
+public final class Primitive32Store extends ArrayR032 implements PhysicalStore<Double> {
 
     public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PrimitiveFactory<Primitive32Store>() {
 
         @Override
         public DenseArray.Factory<Double> array() {
-            return PrimitiveR032.FACTORY;
+            return ArrayR032.FACTORY;
         }
 
         public Primitive32Store columns(final Access1D<?>... source) {

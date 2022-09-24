@@ -49,7 +49,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class PrimitiveZ064 extends PrimitiveArray {
+public class ArrayZ016 extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<>() {
 
@@ -70,37 +70,37 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
         @Override
         MathType getMathType() {
-            return MathType.Z064;
+            return MathType.Z016;
         }
 
         @Override
         PlainArray<Double> makeDenseArray(final long size) {
-            return PrimitiveZ064.make((int) size);
+            return ArrayZ016.make((int) size);
         }
 
     };
 
-    public static PrimitiveZ064 make(final int size) {
-        return new PrimitiveZ064(size);
+    public static ArrayZ016 make(final int size) {
+        return new ArrayZ016(size);
     }
 
-    public static PrimitiveZ064 wrap(final long... data) {
-        return new PrimitiveZ064(data);
+    public static ArrayZ016 wrap(final short... data) {
+        return new ArrayZ016(data);
     }
 
-    public final long[] data;
+    public final short[] data;
 
-    protected PrimitiveZ064(final int size) {
+    protected ArrayZ016(final int size) {
 
         super(FACTORY, size);
 
-        data = new long[size];
+        data = new short[size];
     }
 
     /**
      * Array not copied! No checking!
      */
-    protected PrimitiveZ064(final long[] data) {
+    protected ArrayZ016(final short[] data) {
 
         super(FACTORY, data.length);
 
@@ -109,7 +109,7 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     public void reset() {
-        Arrays.fill(data, 0L);
+        Arrays.fill(data, (short) 0);
     }
 
     @Override
@@ -126,16 +126,16 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        data[index] += NumberDefinition.longValue(addend);
+        data[index] += NumberDefinition.shortValue(addend);
     }
 
     @Override
     protected void add(final int index, final double addend) {
-        data[index] += Math.round(addend);
+        data[index] += (short) Math.round(addend);
     }
 
     @Override
-    protected void add(final int index, final long addend) {
+    protected void add(final int index, final short addend) {
         data[index] += addend;
     }
 
@@ -156,7 +156,7 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        FillAll.fill(data, first, limit, step, value.longValue());
+        FillAll.fill(data, first, limit, step, value.shortValue());
     }
 
     @Override
@@ -166,17 +166,17 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = values.longValue(valueIndex);
+        data[index] = values.shortValue(valueIndex);
     }
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        data[index] = value.longValue();
+        data[index] = value.shortValue();
     }
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        data[index] = supplier.longValue();
+        data[index] = supplier.shortValue();
     }
 
     @Override
@@ -195,11 +195,6 @@ public class PrimitiveZ064 extends PrimitiveArray {
     }
 
     @Override
-    protected int intValue(final int index) {
-        return (int) data[index];
-    }
-
-    @Override
     protected boolean isAbsolute(final int index) {
         return PrimitiveScalar.isAbsolute(data[index]);
     }
@@ -207,11 +202,6 @@ public class PrimitiveZ064 extends PrimitiveArray {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected long longValue(final int index) {
-        return data[index];
     }
 
     @Override
@@ -236,27 +226,32 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     protected int searchAscending(final Double number) {
-        return Arrays.binarySearch(data, number.longValue());
+        return Arrays.binarySearch(data, number.shortValue());
     }
 
     @Override
     protected void set(final int index, final Comparable<?> number) {
-        data[index] = Scalar.longValue(number);
+        data[index] = Scalar.shortValue(number);
     }
 
     @Override
     protected void set(final int index, final double value) {
-        data[index] = Math.round(value);
+        data[index] = (short) Math.round(value);
     }
 
     @Override
     protected void set(final int index, final float value) {
-        data[index] = Math.round(value);
+        data[index] = (short) Math.round(value);
+    }
+
+    @Override
+    protected void set(final int index, final short value) {
+        data[index] = value;
     }
 
     @Override
     protected short shortValue(final int index) {
-        return (short) data[index];
+        return data[index];
     }
 
     @Override
@@ -271,12 +266,12 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        data[intIndex] = function.invoke(left.longValue(extIndex), data[intIndex]);
+        data[intIndex] = function.invoke(left.shortValue(extIndex), data[intIndex]);
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        data[intIndex] = function.invoke(data[intIndex], right.longValue(extIndex));
+        data[intIndex] = function.invoke(data[intIndex], right.shortValue(extIndex));
     }
 
     @Override
@@ -286,7 +281,7 @@ public class PrimitiveZ064 extends PrimitiveArray {
 
     @Override
     protected void set(final int index, final long value) {
-        data[index] = value;
+        data[index] = (short) value;
     }
 
 }
