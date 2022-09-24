@@ -42,6 +42,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
+import org.ojalgo.optimisation.Optimisation.Integration;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -228,6 +229,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          */
         protected abstract boolean isSolutionMapped();
 
+        /**
+         * Use this to limit the cases where this {@link Integration} would be used.
+         * <p>
+         * Returns a new Integration instance where the supplied {@link Predicate} needs to test true in
+         * addition to the underlying {@link #isCapable(Optimisation.Model)}.
+         */
         public final ExpressionsBasedModel.Integration<S> withPredicate(final Predicate<ExpressionsBasedModel> predicate) {
             return new PredicateIntegration<>(this, predicate);
         }
