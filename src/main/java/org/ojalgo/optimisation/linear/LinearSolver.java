@@ -66,7 +66,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexTableau.make(this, options);
+            SimplexTableau tableau = SimplexTableau.make(this, options);
 
             return new PrimalSimplex(tableau, options);
         }
@@ -259,9 +259,29 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
 
+        private static ArrayR064 toModelVariableValues(final Access1D<?> solverVariableValues, final ExpressionsBasedModel model,
+                final ArrayR064 modelVariableValues) {
+
+            List<Variable> positiveVariables = model.getPositiveVariables();
+            for (int p = 0; p < positiveVariables.size(); p++) {
+                Variable variable = positiveVariables.get(p);
+                int index = model.indexOf(variable);
+                modelVariableValues.set(index, solverVariableValues.doubleValue(p));
+            }
+
+            List<Variable> negativeVariables = model.getNegativeVariables();
+            for (int n = 0; n < negativeVariables.size(); n++) {
+                Variable variable = negativeVariables.get(n);
+                int index = model.indexOf(variable);
+                modelVariableValues.add(index, -solverVariableValues.doubleValue(positiveVariables.size() + n));
+            }
+
+            return modelVariableValues;
+        }
+
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
+            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
 
             return new PrimalSimplex(tableau, options);
         }
@@ -280,49 +300,37 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            final ArrayR064 tmpModelSolution = ArrayR064.make(model.countVariables());
+            ArrayR064 modelSolution = ArrayR064.make(model.countVariables());
 
-            for (final IntIndex tmpFixed : model.getFixedVariables()) {
-                tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
+            for (IntIndex fixed : model.getFixedVariables()) {
+                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue().doubleValue());
             }
 
-            final List<Variable> tmpPositives = model.getPositiveVariables();
-            for (int p = 0; p < tmpPositives.size(); p++) {
-                final Variable tmpVariable = tmpPositives.get(p);
-                final int tmpIndex = model.indexOf(tmpVariable);
-                tmpModelSolution.set(tmpIndex, solverState.doubleValue(p));
-            }
+            ModelIntegration.toModelVariableValues(solverState, model, modelSolution);
 
-            final List<Variable> tmpNegatives = model.getNegativeVariables();
-            for (int n = 0; n < tmpNegatives.size(); n++) {
-                final Variable tmpVariable = tmpNegatives.get(n);
-                final int tmpIndex = model.indexOf(tmpVariable);
-                tmpModelSolution.set(tmpIndex, tmpModelSolution.doubleValue(tmpIndex) - solverState.doubleValue(tmpPositives.size() + n));
-            }
-
-            return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
+            return new Result(solverState.getState(), solverState.getValue(), modelSolution);
         }
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-            final List<Variable> tmpPositives = model.getPositiveVariables();
-            final List<Variable> tmpNegatives = model.getNegativeVariables();
+            List<Variable> tmpPositives = model.getPositiveVariables();
+            List<Variable> tmpNegatives = model.getNegativeVariables();
 
-            final int tmpCountPositives = tmpPositives.size();
-            final int tmpCountNegatives = tmpNegatives.size();
+            int tmpCountPositives = tmpPositives.size();
+            int tmpCountNegatives = tmpNegatives.size();
 
-            final ArrayR064 tmpSolverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
+            ArrayR064 tmpSolverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
 
             for (int p = 0; p < tmpCountPositives; p++) {
-                final Variable tmpVariable = tmpPositives.get(p);
-                final int tmpIndex = model.indexOf(tmpVariable);
+                Variable tmpVariable = tmpPositives.get(p);
+                int tmpIndex = model.indexOf(tmpVariable);
                 tmpSolverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
             }
 
             for (int n = 0; n < tmpCountNegatives; n++) {
-                final Variable tmpVariable = tmpNegatives.get(n);
-                final int tmpIndex = model.indexOf(tmpVariable);
+                Variable tmpVariable = tmpNegatives.get(n);
+                int tmpIndex = model.indexOf(tmpVariable);
                 tmpSolverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
             }
 

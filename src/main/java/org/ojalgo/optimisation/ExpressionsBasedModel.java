@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
@@ -41,6 +42,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ToFileWriter;
+import org.ojalgo.optimisation.Optimisation.Integration;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -226,6 +228,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          *         negative part, then this method must return true
          */
         protected abstract boolean isSolutionMapped();
+
+        /**
+         * Use this to limit the cases where this {@link Integration} would be used.
+         * <p>
+         * Returns a new Integration instance where the supplied {@link Predicate} needs to test true in
+         * addition to the underlying {@link #isCapable(Optimisation.Model)}.
+         */
+        public final ExpressionsBasedModel.Integration<S> withPredicate(final Predicate<ExpressionsBasedModel> predicate) {
+            return new PredicateIntegration<>(this, predicate);
+        }
 
     }
 
