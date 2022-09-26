@@ -99,6 +99,10 @@ public enum MathType {
         return myComponents;
     }
 
+    public Class<?> getJavaClass() {
+        return myJavaType.getJavaClass();
+    }
+
     public JavaType getJavaType() {
         return myJavaType;
     }

@@ -80,7 +80,7 @@ public enum JavaType {
         return myInformationBits;
     }
 
-    Class<?> getJavaClass() {
+    public Class<?> getJavaClass() {
         return myJavaClass;
     }
 
