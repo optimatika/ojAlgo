@@ -76,6 +76,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - The `Mutate*D.Fillable` interfaces now extend their respective `Mutate*D` interface.
+- The method `StructureAnyD.loopAll(ReferenceCallback)` has been renamed `StructureAnyD.loopAllReferences(ReferenceCallback)` to better differentiate it from `Structure1D.loopAll(IndexCallback)`. (It also got a more efficient default implementation.)
 
 #### org.ojalgo.type
 

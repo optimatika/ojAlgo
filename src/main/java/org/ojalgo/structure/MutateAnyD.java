@@ -190,7 +190,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         @Override
         default void accept(final AccessAnyD<?> supplied) {
             if (this.isAcceptable(supplied)) {
-                supplied.loopAll((final long[] ref) -> this.set(ref, supplied.get(ref)));
+                supplied.loopAllReferences(ref -> this.set(ref, supplied.get(ref)));
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }

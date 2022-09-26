@@ -127,7 +127,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         long[] transp = retVal.shape().clone();
         int max = this.rank() - 1;
 
-        array.loopAll((final long[] ref) -> {
+        array.loopAllReferences(ref -> {
             for (int i = 0; i < transp.length; i++) {
                 transp[max - i] = ref[i];
             }

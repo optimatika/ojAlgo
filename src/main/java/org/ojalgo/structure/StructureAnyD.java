@@ -548,10 +548,20 @@ public interface StructureAnyD extends Structure1D {
         }
     }
 
-    default void loopAll(final ReferenceCallback callback) {
+    default void loopAllReferences(final ReferenceCallback callback) {
+
         long[] shape = this.shape();
-        for (long i = 0L; i < this.count(); i++) {
-            callback.call(StructureAnyD.reference(i, shape));
+
+        long totalCount = this.count();
+        long firstCount = this.count(0);
+        long repetitionsCount = totalCount / firstCount;
+
+        for (long r = 0L; r < repetitionsCount; r++) {
+            long[] reference = StructureAnyD.reference(r * firstCount, shape);
+            for (long i = 0L; i < firstCount; i++) {
+                callback.call(reference);
+                reference[0]++;
+            }
         }
     }
 

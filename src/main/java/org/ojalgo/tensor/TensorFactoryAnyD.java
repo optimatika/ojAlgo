@@ -73,7 +73,7 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
         for (AccessAnyD<N> tensor : tensors) {
 
-            tensor.loopAll((final long[] inRef) -> {
+            tensor.loopAllReferences(inRef -> {
 
                 double value = tensor.doubleValue(inRef);
 
@@ -153,8 +153,7 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
     public T make(final long... structure) {
@@ -178,7 +177,7 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
 
         T retVal = myFactory.make(shape);
 
-        retVal.loopAll((final long[] ref) -> {
+        retVal.loopAllReferences(ref -> {
             double val = 1.0;
             for (int d = 0; d < ref.length; d++) {
                 val *= vectors[d].doubleValue(ref[d]);
