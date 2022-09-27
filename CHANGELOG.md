@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [52.0.0] – 2022-09-27
+
 ### Added
 
 #### org.ojalgo.algebra

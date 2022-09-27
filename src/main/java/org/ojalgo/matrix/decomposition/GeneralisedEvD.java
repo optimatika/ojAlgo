@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.ArrayC128;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;

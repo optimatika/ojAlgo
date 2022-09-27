@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;

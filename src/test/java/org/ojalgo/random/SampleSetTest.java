@@ -23,8 +23,8 @@ package org.ojalgo.random;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.NumberList;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.NumberList;
 
 /**
  * SampleSetTest

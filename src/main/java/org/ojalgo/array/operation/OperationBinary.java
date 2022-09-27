@@ -21,13 +21,13 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayZ008;
 import org.ojalgo.array.ArrayZ016;
 import org.ojalgo.array.ArrayZ032;
 import org.ojalgo.array.ArrayZ064;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;

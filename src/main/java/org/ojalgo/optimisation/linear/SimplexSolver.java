@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;

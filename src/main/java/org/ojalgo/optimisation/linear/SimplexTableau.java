@@ -28,8 +28,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
