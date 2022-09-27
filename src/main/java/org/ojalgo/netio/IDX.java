@@ -25,8 +25,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.ojalgo.array.ArrayAnyD;
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.ArrayR032;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.structure.Access2D;
 
 /**

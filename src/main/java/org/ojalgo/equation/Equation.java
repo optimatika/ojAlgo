@@ -26,10 +26,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;

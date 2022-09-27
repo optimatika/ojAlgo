@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.NumberList;
 import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.NumberList;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
