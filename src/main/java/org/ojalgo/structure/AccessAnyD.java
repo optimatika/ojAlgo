@@ -131,6 +131,11 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return StructureAnyD.reference(myDelegate1D.index(), myStructure);
         }
 
+        @Override
+        public String toString() {
+            return myDelegate1D.toString();
+        }
+
         public ElementView<N> trySplit() {
 
             ElementView1D<N, ?> delegateSpliterator = myDelegate1D.trySplit();

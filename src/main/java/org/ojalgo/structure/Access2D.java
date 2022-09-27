@@ -293,6 +293,11 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             return Structure2D.row(myDelegate1D.index(), myStructure);
         }
 
+        @Override
+        public String toString() {
+            return myDelegate1D.toString();
+        }
+
         public ElementView<N> trySplit() {
 
             ElementView1D<N, ?> delegateSpliterator = myDelegate1D.trySplit();
