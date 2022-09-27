@@ -95,6 +95,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Downloading historical financial data from Yahoo Finance works again!
 
+#### org.ojalgo.optimisation
+
+- Fixed rare case of inconsistencies between branches in the IntegerSolver. (Could result in wrong solutions!)
+
 ### Removed
 
 #### org.ojalgo.type

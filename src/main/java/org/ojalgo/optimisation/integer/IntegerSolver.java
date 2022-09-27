@@ -403,9 +403,15 @@ public final class IntegerSolver extends GenericSolver {
             myDeferredNodes.add(lowerBranch);
             lowerBranch = null;
         }
-        if (!strategy.isDirect(upperBranch, myBestResultSoFar != null)) {
+        if (lowerBranch != null || !strategy.isDirect(upperBranch, myBestResultSoFar != null)) {
             myDeferredNodes.add(upperBranch);
             upperBranch = null;
+        }
+
+        if (lowerBranch != null && upperBranch != null) {
+            // Node model data is reused when continuing down in the same thread.
+            // Can't do 2 branches in the same thread, using the same parent model.
+            throw new IllegalStateException();
         }
 
         boolean retVal = true;

@@ -134,7 +134,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
         @Override
         protected boolean isDirect(final NodeKey node, final boolean found) {
-            return found ? node.displacement <= THIRD : node.displacement <= HALF;
+            return found ? node.displacement < THIRD : node.displacement < HALF;
         }
 
         @Override
