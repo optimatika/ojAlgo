@@ -30,7 +30,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  *
  * @author apete
  */
-public final class ASUM implements ArrayOperation {
+public abstract class ASUM implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

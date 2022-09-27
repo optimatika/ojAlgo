@@ -72,7 +72,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
         public SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
-            return this.make(templateBody, templateRHS, Access2D.isHermitian(templateBody), false);
+            return this.make(templateBody, templateRHS, templateBody.isHermitian(), false);
         }
 
         public abstract SolverTask<N> make(Structure2D templateBody, Structure2D templateRHS, boolean symmetric, boolean positiveDefinite);
@@ -86,7 +86,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<>() {
 
         @Override
         public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
@@ -105,7 +105,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<>() {
 
         @Override
         public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric, final boolean positiveDefinite) {
@@ -168,7 +168,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<>() {
 
         @Override
         public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
@@ -187,7 +187,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<>() {
 
         @Override
         public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,

@@ -22,74 +22,152 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ojalgo.netio.BasicParser;
+import org.ojalgo.netio.InMemoryFile;
+import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.function.AutoSupplier;
+import org.ojalgo.type.keyvalue.KeyValue;
 
-public final class FinanceDataReader<T extends DatePrice> implements FinanceData<T>, DataFetcher {
+public final class FinanceDataReader<DP extends DatePrice> implements FinanceData<DP>, DataFetcher {
 
-    public static <T extends DatePrice> FinanceDataReader<T> of(final File file, final BasicParser<T> parser) {
+    public static <T extends DatePrice> FinanceDataReader<T> of(final File file, final TextLineReader.Parser<T> parser) {
         return new FinanceDataReader<>(file, parser, CalendarDateUnit.DAY);
     }
 
-    public static <T extends DatePrice> FinanceDataReader<T> of(final File file, final BasicParser<T> parser, final CalendarDateUnit resolution) {
+    public static <T extends DatePrice> FinanceDataReader<T> of(final File file, final TextLineReader.Parser<T> parser, final CalendarDateUnit resolution) {
         return new FinanceDataReader<>(file, parser, resolution);
     }
 
+    public static <T extends DatePrice> FinanceDataReader<T> of(final InMemoryFile file, final TextLineReader.Parser<T> parser) {
+        return new FinanceDataReader<>(file, parser, CalendarDateUnit.DAY);
+    }
+
+    public static <T extends DatePrice> FinanceDataReader<T> of(final InMemoryFile file, final TextLineReader.Parser<T> parser,
+            final CalendarDateUnit resolution) {
+        return new FinanceDataReader<>(file, parser, resolution);
+    }
+
+    public static String toSymbol(final String fileName) {
+
+        if (fileName == null || fileName.length() <= 0) {
+            return "UNKNOWN";
+        }
+
+        String retVal = fileName;
+        int lastDotIndex = retVal.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            retVal = retVal.substring(0, lastDotIndex);
+        }
+        return retVal.toUpperCase();
+    }
+
     private final File myFile;
-    private final BasicParser<T> myParser;
+    private final InMemoryFile myInMemoryFile;
+    private final TextLineReader.Parser<DP> myParser;
     private final CalendarDateUnit myResolution;
 
-    FinanceDataReader(final File file, final BasicParser<T> parser, final CalendarDateUnit resolution) {
+    FinanceDataReader(final File file, final TextLineReader.Parser<DP> parser, final CalendarDateUnit resolution) {
         super();
         myFile = file;
+        myInMemoryFile = null;
         myParser = parser;
         myResolution = resolution;
     }
 
-    public List<T> getHistoricalPrices() {
+    FinanceDataReader(final InMemoryFile file, final TextLineReader.Parser<DP> parser, final CalendarDateUnit resolution) {
+        super();
+        myFile = null;
+        myInMemoryFile = file;
+        myParser = parser;
+        myResolution = resolution;
+    }
 
-        List<T> retVal = new ArrayList<>();
+    public KeyValue<String, List<DP>> getHistoricalData() {
+        return KeyValue.of(this.getSymbol(), this.getHistoricalPrices());
+    }
 
-        myParser.parse(myFile, retVal::add);
+    public List<DP> getHistoricalPrices() {
+
+        List<DP> retVal = new ArrayList<>();
+
+        if (myFile != null) {
+            try (TextLineReader reader = TextLineReader.of(myFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+                supplier.forEach(retVal::add);
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
+            }
+        } else if (myInMemoryFile != null) {
+            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+                supplier.forEach(retVal::add);
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
+            }
+        } else {
+            throw new IllegalStateException();
+        }
 
         return retVal;
     }
 
+    public InputStream getInputStream() {
+        if (myFile != null) {
+            try {
+                return new FileInputStream(myFile);
+            } catch (FileNotFoundException cause) {
+                throw new RuntimeException(cause);
+            }
+        } else if (myInMemoryFile != null) {
+            return myInMemoryFile.newInputStream();
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
-        BasicSeries<LocalDate, PrimitiveNumber> series = new SimpleSeries<>();
+        BasicSeries<LocalDate, PrimitiveNumber> retVal = new SimpleSeries<>();
 
-        myParser.parse(myFile, dp -> series.put(dp.date, dp));
+        if (myFile != null) {
+            try (TextLineReader reader = TextLineReader.of(myFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+                supplier.forEach(dp -> retVal.put(dp.date, dp));
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
+            }
+        } else if (myInMemoryFile != null) {
+            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+                supplier.forEach(dp -> retVal.put(dp.date, dp));
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
+            }
+        } else {
+            throw new IllegalStateException();
+        }
 
-        return series;
+        return retVal;
     }
 
     public CalendarDateUnit getResolution() {
         return myResolution;
     }
 
-    public Reader getStreamOfCSV() {
-        try {
-            return new FileReader(myFile);
-        } catch (FileNotFoundException cause) {
-            throw new RuntimeException(cause);
-        }
-    }
-
     public String getSymbol() {
-        String name = myFile.getName();
-        int limit = name.indexOf('.');
-        return name.substring(0, limit);
+        if (myFile != null) {
+            return FinanceDataReader.toSymbol(myFile.getName());
+        } else if (myInMemoryFile != null) {
+            return FinanceDataReader.toSymbol(myInMemoryFile.getName().orElse(""));
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
 }

@@ -60,7 +60,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     }
 
-    public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
+    public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<>() {
 
         @Override
         public Quaternion cast(final Comparable<?> number) {
@@ -219,16 +219,14 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         }
 
         if (number instanceof Quaternion) {
-
             return (Quaternion) number;
-
         }
-        if (number instanceof ComplexNumber) {
 
+        if (number instanceof ComplexNumber) {
             ComplexNumber tmpComplex = (ComplexNumber) number;
             return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
-
         }
+
         return new Quaternion(NumberDefinition.doubleValue(number));
     }
 
@@ -383,9 +381,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         if (retVal != 0) {
             return retVal;
         }
-        retVal = Double.compare(k, other.k);
-
-        return retVal;
+        return Double.compare(k, other.k);
     }
 
     @Override
@@ -594,8 +590,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         temp = Double.doubleToLongBits(k);
         result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myScalar);
-        result = prime * result + (int) (temp ^ temp >>> 32);
-        return result;
+        return prime * result + (int) (temp ^ temp >>> 32);
     }
 
     @Override

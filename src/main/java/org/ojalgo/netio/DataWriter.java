@@ -60,10 +60,18 @@ public final class DataWriter<T> implements ToFileWriter<T> {
         return new DataWriter<>(filter.apply(ToFileWriter.output(file)), serializer);
     }
 
+    public static <T> DataWriter<T> of(final InMemoryFile file, final DataWriter.Serializer<T> serializer) {
+        return new DataWriter<>(file.newOutputStream(), serializer);
+    }
+
+    public static <T> DataWriter<T> of(final InMemoryFile file, final DataWriter.Serializer<T> serializer, final OperatorWithException<OutputStream> filter) {
+        return new DataWriter<>(filter.apply(file.newOutputStream()), serializer);
+    }
+
     private final DataOutputStream myOutput;
     private final DataWriter.Serializer<T> mySerializer;
 
-    DataWriter(final OutputStream outputStream, final DataWriter.Serializer<T> serializer) {
+    public DataWriter(final OutputStream outputStream, final DataWriter.Serializer<T> serializer) {
 
         super();
 

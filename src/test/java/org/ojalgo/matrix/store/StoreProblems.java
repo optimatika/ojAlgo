@@ -210,17 +210,17 @@ public class StoreProblems extends MatrixStoreTests {
         qr.decompose(m);
 
         if (DEBUG) {
-            BasicLogger.debug("Original", m);
-            BasicLogger.debug("Q", qr.getQ());
-            BasicLogger.debug("R", qr.getR());
-            BasicLogger.debug("Receiver (before)", r);
+            BasicLogger.debugMatrix("Original", m);
+            BasicLogger.debugMatrix("Q", qr.getQ());
+            BasicLogger.debugMatrix("R", qr.getR());
+            BasicLogger.debugMatrix("Receiver (before)", r);
         }
 
         // java.lang.ArrayIndexOutOfBoundsException was thrown here
         qr.getR().supplyTo(r);
 
         if (DEBUG) {
-            BasicLogger.debug("Receiver (after)", r);
+            BasicLogger.debugMatrix("Receiver (after)", r);
         }
 
         TestUtils.assertEquals(qr.getR(), r);
@@ -261,9 +261,9 @@ public class StoreProblems extends MatrixStoreTests {
         c.set(1, 1, 1.0);
 
         if (DEBUG) {
-            BasicLogger.debug("A", a);
-            BasicLogger.debug("B", b);
-            BasicLogger.debug("C", c);
+            BasicLogger.debugMatrix("A", a);
+            BasicLogger.debugMatrix("B", b);
+            BasicLogger.debugMatrix("C", c);
         }
 
         TestUtils.assertEquals(c, a.multiply(b));

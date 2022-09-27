@@ -32,6 +32,56 @@ import org.ojalgo.type.keyvalue.EntryPair;
 
 public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
 
+    static final class DefaultDP extends DatePrice {
+
+        private final double myPrice;
+
+        DefaultDP(final CharSequence text, final DateTimeFormatter formatter, final double price) {
+            super(text, formatter);
+            myPrice = price;
+        }
+
+        DefaultDP(final CharSequence text, final double price) {
+            super(text);
+            myPrice = price;
+        }
+
+        DefaultDP(final LocalDate key, final double price) {
+            super(key);
+            myPrice = price;
+        }
+
+        @Override
+        public double getPrice() {
+            return myPrice;
+        }
+
+    }
+
+    public static DatePrice of(final CharSequence date, final CharSequence price) {
+        return new DefaultDP(date, Double.parseDouble(price.toString()));
+    }
+
+    public static DatePrice of(final CharSequence date, final DateTimeFormatter formatter, final CharSequence price) {
+        return new DefaultDP(date, formatter, Double.parseDouble(price.toString()));
+    }
+
+    public static DatePrice of(final CharSequence date, final DateTimeFormatter formatter, final double price) {
+        return new DefaultDP(date, formatter, price);
+    }
+
+    public static DatePrice of(final CharSequence date, final double price) {
+        return new DefaultDP(date, price);
+    }
+
+    public static DatePrice of(final LocalDate date, final CharSequence price) {
+        return new DefaultDP(date, Double.parseDouble(price.toString()));
+    }
+
+    public static DatePrice of(final LocalDate date, final double price) {
+        return new DefaultDP(date, price);
+    }
+
     public final LocalDate date;
 
     protected DatePrice(final CharSequence text) {

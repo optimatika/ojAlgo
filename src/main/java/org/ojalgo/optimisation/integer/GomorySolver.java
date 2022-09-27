@@ -37,7 +37,7 @@ import org.ojalgo.structure.Access1D;
  */
 public final class GomorySolver extends GenericSolver {
 
-    static final class ModelIntegration extends ExpressionsBasedModel.Integration<GomorySolver> {
+    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<GomorySolver> {
 
         public GomorySolver build(final ExpressionsBasedModel model) {
             return new GomorySolver(model);

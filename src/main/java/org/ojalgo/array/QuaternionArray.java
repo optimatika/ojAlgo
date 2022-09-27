@@ -21,66 +21,29 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.QuaternionFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.QuaternionAggregator;
-import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.Scalar;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.Quaternion}.
- *
+ * @deprecated v52
  * @author apete
  */
-public class QuaternionArray extends ScalarArray<Quaternion> {
+@Deprecated
+public class QuaternionArray extends ArrayH256 {
 
-    public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<Quaternion>() {
-
-        @Override
-        public AggregatorSet<Quaternion> aggregator() {
-            return QuaternionAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<Quaternion> function() {
-            return QuaternionFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<Quaternion> scalar() {
-            return Quaternion.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<Quaternion> makeDenseArray(final long size) {
-            return QuaternionArray.make((int) size);
-        }
-
-    };
-
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
-
-    public static final QuaternionArray make(final int size) {
+    public static QuaternionArray make(final int size) {
         return new QuaternionArray(size);
     }
 
-    public static final QuaternionArray wrap(final Quaternion... data) {
+    public static QuaternionArray wrap(final Quaternion... data) {
         return new QuaternionArray(data);
     }
 
-    protected QuaternionArray(final int size) {
-        super(FACTORY, size);
+    QuaternionArray(final Quaternion[] data) {
+        super(data);
     }
 
-    protected QuaternionArray(final Quaternion[] data) {
-        super(FACTORY, data);
+    QuaternionArray(final int size) {
+        super(size);
     }
 
 }

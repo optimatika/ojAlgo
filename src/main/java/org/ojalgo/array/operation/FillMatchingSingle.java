@@ -28,7 +28,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
-public final class FillMatchingSingle implements ArrayOperation {
+public abstract class FillMatchingSingle implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

@@ -7,6 +7,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.scalar.Scalar.Factory;
+import org.ojalgo.type.math.MathType;
 
 /**
  * To be used by implementations that delegate to a DenseArray
@@ -18,7 +19,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
     /**
      * 512
      */
-    static long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / Primitive64Array.ELEMENT_SIZE;
+    static long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / MathType.R064.getTotalMemory();
     static long INITIAL = 4L;
     static long LIMIT = Long.MAX_VALUE;
     static long SEGMENT = 32_768L;
@@ -30,7 +31,7 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
 
         double tmpInitialCapacity = count;
 
-        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
+        while (tmpInitialCapacity > PlainArray.MAX_SIZE) {
             tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
         }
 

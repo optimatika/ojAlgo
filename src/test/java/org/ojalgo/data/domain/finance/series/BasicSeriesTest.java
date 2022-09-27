@@ -35,7 +35,7 @@ import org.ojalgo.type.CalendarDateUnit;
 /**
  * @author apete
  */
-public class BasicSeriesTest extends FinanceDataTests {
+public class BasicSeriesTest extends FinanceSeriesTests {
 
     private static final File FILE = new File("./src/test/resources/org/ojalgo/data/domain/finance/series/Yahoo-AAPL-daily.csv");
 

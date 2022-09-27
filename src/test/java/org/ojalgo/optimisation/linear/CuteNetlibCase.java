@@ -943,7 +943,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     @Tag("slow")
     @Tag("unstable")
     public void testQAP8() {
-        CuteNetlibCase.doTest("QAP8.SIF", "1234567890", "1234567890", NumberContext.of(7, 4));
+        CuteNetlibCase.doTest("QAP8.SIF", "2.0350000000E+02", null, NumberContext.of(7, 4));
     }
 
     /**

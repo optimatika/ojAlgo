@@ -28,7 +28,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  *
  * @author apete
  */
-public final class NRMINF implements ArrayOperation {
+public abstract class NRMINF implements ArrayOperation {
 
     public static double invoke(final double[] data, final int first, final int limit) {
         double retVal = ZERO;

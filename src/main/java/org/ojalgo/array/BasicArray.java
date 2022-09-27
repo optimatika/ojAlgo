@@ -22,6 +22,11 @@
 package org.ojalgo.array;
 
 import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.Exchange;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -34,19 +39,17 @@ import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * <p>
  * A BasicArray is 1-dimensional, but designed to easily be extended or encapsulated, and then treated as
  * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Comparable} elements
  * depending on the subclass/implementation.
- * </p>
  * <p>
  * This abstract class defines a set of methods to access and modify array elements. It does not "know"
  * anything about linear algebra or similar.
- * </p>
  *
  * @author apete
  */
@@ -85,11 +88,16 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         }
 
         @Override
+        MathType getMathType() {
+            return myDenseFactory.getMathType();
+        }
+
+        @Override
         BasicArray<N> makeStructuredZero(final long... structure) {
 
-            final long total = StructureAnyD.count(structure);
+            long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> strategy = this.strategy();
+            DenseCapacityStrategy<N> strategy = this.strategy();
 
             if (total > SPARSE_SEGMENTATION_LIMIT) {
 
@@ -107,9 +115,9 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         BasicArray<N> makeToBeFilled(final long... structure) {
 
-            final long total = StructureAnyD.count(structure);
+            long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> strategy = this.strategy();
+            DenseCapacityStrategy<N> strategy = this.strategy();
 
             if (strategy.isSegmented(total)) {
 
@@ -123,38 +131,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
             return new DenseCapacityStrategy<>(myDenseFactory);
         }
 
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newDecreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeDecreasingRange(final int first, final int count) {
-        return Structure1D.newDecreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newDecreasingRange(long,int)} instead
-     */
-    @Deprecated
-    public static long[] makeDecreasingRange(final long first, final int count) {
-        return Structure1D.newDecreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newIncreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeIncreasingRange(final int first, final int count) {
-        return Structure1D.newIncreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated Use {@link Structure1D#newIncreasingRange(long,int)} instead
-     */
-    @Deprecated
-    public static long[] makeIncreasingRange(final long first, final int count) {
-        return Structure1D.newIncreasingRange(first, count);
     }
 
     private final ArrayFactory<N, ?> myFactory;
@@ -186,7 +162,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         if (!(obj instanceof BasicArray)) {
             return false;
         }
-        BasicArray other = (BasicArray) obj;
+        BasicArray<?> other = (BasicArray<?>) obj;
         if (myFactory == null) {
             if (other.myFactory != null) {
                 return false;
@@ -197,15 +173,23 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return true;
     }
 
+    public final MathType getMathType() {
+        return myFactory.getMathType();
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
+        int prime = 31;
         int result = 1;
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
+    }
+
+    public final boolean isPrimitive() {
+        return myFactory.getMathType().isPrimitive();
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
@@ -246,23 +230,37 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         this.visit(first, limit, 1L, visitor);
     }
 
-    protected abstract void exchange(long firstA, long firstB, long step, long count);
+    protected void exchange(final long firstA, final long firstB, final long step, final long count) {
+        Exchange.exchange(this, firstA, firstB, step, count);
+    }
 
-    protected abstract void fill(long first, long limit, long step, N value);
+    protected void fill(final long first, final long limit, final long step, final N value) {
+        FillAll.fill(this, first, limit, step, value);
+    }
 
-    protected abstract void fill(long first, long limit, long step, NullaryFunction<?> supplier);
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
+        FillAll.fill(this, first, limit, step, supplier);
+    }
 
     protected long indexOfLargest(final long first, final long limit, final long step) {
         return AMAX.invoke(this, first, limit, step);
     }
 
-    protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
+    protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
+        OperationBinary.invoke(this, first, limit, step, left, function, this);
+    }
 
-    protected abstract void modify(long first, long limit, long step, BinaryFunction<N> function, Access1D<N> right);
+    protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
+        OperationBinary.invoke(this, first, limit, step, this, function, right);
+    }
 
-    protected abstract void modify(long first, long limit, long step, UnaryFunction<N> function);
+    protected void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
+        OperationUnary.invoke(this, first, limit, step, this, function);
+    }
 
-    protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
+    protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
+        OperationVoid.invoke(this, first, limit, step, visitor);
+    }
 
     /**
      * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
@@ -293,32 +291,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
     final ArrayFactory<N, ?> factory() {
         return myFactory;
-    }
-
-    /**
-     * Safe to cast as DenseArray.
-     */
-    final boolean isDense() {
-        return this instanceof PlainArray;
-    }
-
-    /**
-     * Primitive (double) elements
-     */
-    abstract boolean isPrimitive();
-
-    /**
-     * Safe to cast as SegmentedArray.
-     */
-    final boolean isSegmented() {
-        return this instanceof SegmentedArray;
-    }
-
-    /**
-     * Safe to cast as SparseArray.
-     */
-    final boolean isSparse() {
-        return this instanceof SparseArray;
     }
 
 }

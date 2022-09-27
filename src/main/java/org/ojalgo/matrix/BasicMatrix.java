@@ -363,7 +363,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = Access1D.hashCode(this.store());
+            final Access1D<?> access = this.store();
+            int limit = access.size();
+            int retVal = limit + 31;
+            for (int ij = 0; ij < limit; ij++) {
+                retVal *= access.intValue(ij);
+            }
+            myHashCode = retVal;
         }
         return myHashCode;
     }
@@ -407,16 +413,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      */
     public M invert() {
         return this.newInstance(this.getInverseProvider(false).invert().orElseGet(() -> this.getInverseProvider(true).invert().get()));
-    }
-
-    /**
-     * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing
-     * @deprecated v50 Just use {@link #getRank()}
-     */
-    @Deprecated
-    public boolean isFullRank() {
-        return this.getRank() == this.getMinDim();
     }
 
     public boolean isHermitian() {

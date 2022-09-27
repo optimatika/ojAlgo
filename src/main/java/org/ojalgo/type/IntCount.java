@@ -69,10 +69,7 @@ public final class IntCount {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof IntCount)) {
+        if ((obj == null) || !(obj instanceof IntCount)) {
             return false;
         }
         final IntCount other = (IntCount) obj;
@@ -97,8 +94,7 @@ public final class IntCount {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + count;
-        result = (prime * result) + (modified ? 1231 : 1237);
-        return result;
+        return (prime * result) + (modified ? 1231 : 1237);
     }
 
     /**

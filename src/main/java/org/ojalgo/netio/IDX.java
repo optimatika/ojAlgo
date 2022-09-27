@@ -25,8 +25,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.ojalgo.array.ArrayAnyD;
+import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive32Array;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -37,7 +37,7 @@ import org.ojalgo.structure.Access2D;
 public abstract class IDX {
 
     public static ArrayAnyD<Double> parse(final File filePath) {
-        return IDX.parse(filePath, Primitive32Array.FACTORY);
+        return IDX.parse(filePath, ArrayR032.FACTORY);
     }
 
     public static ArrayAnyD<Double> parse(final File file, final DenseArray.Factory<Double> factory) {

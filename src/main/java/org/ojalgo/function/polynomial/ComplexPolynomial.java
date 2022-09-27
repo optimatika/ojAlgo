@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access1D;
 public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 
     public ComplexPolynomial(final int degree) {
-        super(Array1D.COMPLEX.make(degree + 1));
+        super(Array1D.C128.make(degree + 1));
     }
 
     ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
@@ -87,7 +87,7 @@ public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 
     @Override
     protected AbstractPolynomial<ComplexNumber> makeInstance(final int size) {
-        return new ComplexPolynomial(Array1D.COMPLEX.make(size));
+        return new ComplexPolynomial(Array1D.C128.make(size));
     }
 
 }

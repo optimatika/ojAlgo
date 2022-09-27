@@ -22,19 +22,15 @@
 package org.ojalgo.array;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
 /**
- * <p>
  * Each and every element occupies memory and holds a value.
- * </p>
  *
  * @author apete
  */
@@ -43,36 +39,13 @@ public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> 
     public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>> implements Factory1D.Dense<DenseArray<N>> {
 
         @Override
-        public DenseArray<N> copy(final Access1D<?> source) {
-            return super.copy(source);
-        }
-
-        @Override
-        public DenseArray<N> copy(final Comparable<?>... source) {
-            return super.copy(source);
-        }
-
-        @Override
-        public DenseArray<N> copy(final double... source) {
-            return super.copy(source);
-        }
-
-        @Override
-        public DenseArray<N> copy(final List<? extends Comparable<?>> source) {
-            return super.copy(source);
-        }
-
-        @Override
-        public DenseArray<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            return super.makeFilled(count, supplier);
-        }
-
-        @Override
         long getCapacityLimit() {
-            return MAX_ARRAY_SIZE;
+            return PlainArray.MAX_SIZE;
         }
 
-        abstract long getElementSize();
+        final long getElementSize() {
+            return this.getMathType().getTotalMemory();
+        }
 
         abstract DenseArray<N> makeDenseArray(long size);
 
@@ -111,8 +84,11 @@ public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> 
     /**
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
      * Integer.MAX_VALUE - 2, but other JVM:s may have different limits.
+     *
+     * @deprecated Use {@link PlainArray#MAX_SIZE} instead
      */
-    public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    @Deprecated
+    public static final int MAX_ARRAY_SIZE = PlainArray.MAX_SIZE;
 
     protected DenseArray(final DenseArray.Factory<N> factory) {
         super(factory);

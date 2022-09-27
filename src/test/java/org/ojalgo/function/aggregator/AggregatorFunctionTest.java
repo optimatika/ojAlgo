@@ -33,8 +33,8 @@ public class AggregatorFunctionTest extends FunctionAggregatorTests {
     @Test
     public void testIsFinitite() {
 
-        ArrayAnyD<Double> array1 = ArrayAnyD.PRIMITIVE64.make(9, 5, 7, 3);
-        ArrayAnyD<Double> array2 = ArrayAnyD.PRIMITIVE64.make(9, 5, 7, 3);
+        ArrayAnyD<Double> array1 = ArrayAnyD.R064.make(9, 5, 7, 3);
+        ArrayAnyD<Double> array2 = ArrayAnyD.R064.make(9, 5, 7, 3);
 
         array1.fillAll(1.0);
         array2.fillAll(Double.NaN);

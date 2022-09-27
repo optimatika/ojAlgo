@@ -22,10 +22,12 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +44,8 @@ import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.function.AutoSupplier;
+import org.ojalgo.type.keyvalue.KeyValue;
 
 public final class DataSource implements FinanceData<DatePrice> {
 
@@ -102,10 +106,17 @@ public final class DataSource implements FinanceData<DatePrice> {
 
     }
 
-    @SuppressWarnings("deprecation")
-    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) FinanceData.FRIDAY_OF_WEEK.adjustInto(d);
-    @SuppressWarnings("deprecation")
-    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) FinanceData.LAST_DAY_OF_MONTH.adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to a Friday.
+     */
+    public static final UnaryOperator<LocalDate> FRIDAY_OF_WEEK = d -> (LocalDate) TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY).adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to the last day of the month.
+     */
+    public static final UnaryOperator<LocalDate> LAST_DAY_OF_MONTH = d -> (LocalDate) TemporalAdjusters.lastDayOfMonth().adjustInto(d);
+    /**
+     * Move the date forward, if necessary, to the last day of the year.
+     */
     public static final UnaryOperator<LocalDate> LAST_DAY_OF_YEAR = d -> LocalDate.of(d.getYear(), 12, 31);
 
     public static Coordinated coordinated() {
@@ -147,7 +158,6 @@ public final class DataSource implements FinanceData<DatePrice> {
     }
 
     private final DataFetcher myFetcher;
-
     private final BasicParser<? extends DatePrice> myParser;
 
     DataSource(final DataFetcher fetcher, final BasicParser<? extends DatePrice> parser) {
@@ -205,17 +215,26 @@ public final class DataSource implements FinanceData<DatePrice> {
         return this.getCalendarDateSeries(myFetcher.getResolution(), time, zoneId);
     }
 
-    public List<DatePrice> getHistoricalPrices() {
-        try {
-            final ArrayList<DatePrice> retVal = new ArrayList<>();
-            myParser.parse(myFetcher.getStreamOfCSV(), row -> retVal.add(row));
-            Collections.sort(retVal);
-            return retVal;
+    public KeyValue<String, List<DatePrice>> getHistoricalData() {
+
+        String key = myFetcher.getSymbol();
+
+        List<DatePrice> value = new ArrayList<>();
+
+        try (AutoSupplier<? extends DatePrice> reader = myFetcher.getReader(myParser)) {
+            reader.forEach(value::add);
         } catch (final Exception cause) {
-            BasicLogger.error("Fetch problem for {}!", myFetcher.getClass().getSimpleName());
+            BasicLogger.error(cause, "Fetch problem for {}!", myFetcher.getClass().getSimpleName());
             BasicLogger.error("Symbol & Resolution: {} & {}", myFetcher.getSymbol(), myFetcher.getResolution());
-            return Collections.emptyList();
         }
+
+        Collections.sort(value);
+
+        return KeyValue.of(key, value);
+    }
+
+    public List<DatePrice> getHistoricalPrices() {
+        return this.getHistoricalData().getValue();
     }
 
     public BasicSeries<LocalDate, PrimitiveNumber> getLocalDateSeries() {

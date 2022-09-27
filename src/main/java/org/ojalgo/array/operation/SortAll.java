@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-public final class SortAll implements ArrayOperation {
+public abstract class SortAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
@@ -29,16 +29,16 @@ public final class SortAll implements ArrayOperation {
 
         boolean tmpSwapped;
 
-        final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
+        int tmpLimit = Math.min(primary.length, secondary.length) - 1;
 
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
                 if (primary[i] > primary[i + 1]) {
-                    final long tmpPrimVal = primary[i];
+                    long tmpPrimVal = primary[i];
                     primary[i] = primary[i + 1];
                     primary[i + 1] = tmpPrimVal;
-                    final double tmpSecoVal = secondary[i];
+                    double tmpSecoVal = secondary[i];
                     secondary[i] = secondary[i + 1];
                     secondary[i + 1] = tmpSecoVal;
                     tmpSwapped = true;
@@ -51,16 +51,16 @@ public final class SortAll implements ArrayOperation {
 
         boolean tmpSwapped;
 
-        final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
+        int tmpLimit = Math.min(primary.length, secondary.length) - 1;
 
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
                 if (primary[i] > primary[i + 1]) {
-                    final long tmpPrimVal = primary[i];
+                    long tmpPrimVal = primary[i];
                     primary[i] = primary[i + 1];
                     primary[i + 1] = tmpPrimVal;
-                    final Object tmpSecoVal = secondary[i];
+                    Object tmpSecoVal = secondary[i];
                     secondary[i] = secondary[i + 1];
                     secondary[i + 1] = tmpSecoVal;
                     tmpSwapped = true;

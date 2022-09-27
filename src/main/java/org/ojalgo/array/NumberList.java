@@ -410,7 +410,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     @Override
     public NumberList<N> subList(final int fromIndex, final int toIndex) {
         final NumberList<N> retVal = new NumberList<>(myStrategy);
-        if (myStorage instanceof Primitive64Array) {
+        if (myStorage instanceof ArrayR064) {
             for (int i = 0; i < toIndex; i++) {
                 retVal.add(this.doubleValue(i));
             }

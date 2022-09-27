@@ -53,7 +53,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 25.4624074360364, 1.29066167576123, 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 25.4624074360364, 1.29066167576123, 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -67,7 +67,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY.rows(new double[][] { { 4.0, 0.0 }, { 3.0, -5.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -81,7 +81,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -98,8 +98,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final MatrixStore<Double> leftD = decompEvD.getD();
         final MatrixStore<Double> leftV = decompEvD.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Left D", leftD, CONTEXT);
-            BasicLogger.debug("Left V", leftV, CONTEXT);
+            BasicLogger.debugMatrix("Left D", leftD, CONTEXT);
+            BasicLogger.debugMatrix("Left V", leftV, CONTEXT);
         }
         // Check that the eigenvalue decomposition of the "left" matrix is correct
         TestUtils.assertEquals(leftA, decompEvD, CONTEXT);
@@ -108,8 +108,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final MatrixStore<Double> rightD = decompEvD.getD();
         final MatrixStore<Double> rightV = decompEvD.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Right D", rightD, CONTEXT);
-            BasicLogger.debug("Right V", rightV, CONTEXT);
+            BasicLogger.debugMatrix("Right D", rightD, CONTEXT);
+            BasicLogger.debugMatrix("Right V", rightV, CONTEXT);
         }
         // Check that the eigenvalue decomposition of the "right" matrix is correct
         TestUtils.assertEquals(rightA, decompEvD, CONTEXT);
@@ -131,9 +131,9 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug("Experimental  S: {}.", tmpExperimental.getSingularValues());
-            BasicLogger.debug("D", tmpExperimental.getD(), CONTEXT);
-            BasicLogger.debug("Q1", tmpExperimental.getU(), CONTEXT);
-            BasicLogger.debug("Q2", tmpExperimental.getV(), CONTEXT);
+            BasicLogger.debugMatrix("D", tmpExperimental.getD(), CONTEXT);
+            BasicLogger.debugMatrix("Q1", tmpExperimental.getU(), CONTEXT);
+            BasicLogger.debugMatrix("Q2", tmpExperimental.getV(), CONTEXT);
         }
 
         TestUtils.assertEquals(matrixA, tmpExperimental, CONTEXT);

@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.BigArray;
+import org.ojalgo.array.ArrayR128;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.RationalMatrix;
@@ -612,7 +612,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         c6.set(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
-        BigArray tmpExpSol = BigArray
+        ArrayR128 tmpExpSol = ArrayR128
                 .wrap(new BigDecimal[] { BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));

@@ -28,6 +28,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.ojalgo.type.management.MBeanUtils;
@@ -65,10 +66,17 @@ public interface AutoSupplier<T> extends AutoCloseable, Supplier<T>, AutoFunctio
     }
 
     /**
-     * Get something but map/transform before returning it
+     * Get something and map/transform before returning it
      */
     static <T, U> AutoSupplier<U> mapped(final Supplier<T> supplier, final Function<T, U> mapper) {
         return new MappedSupplier<>(supplier, mapper);
+    }
+
+    /**
+     * Get something, that passes the test, and map/transform before returning it
+     */
+    static <T, U> AutoSupplier<U> mapped(final Supplier<T> supplier, final Predicate<T> filter, final Function<T, U> mapper) {
+        return new MappedSupplier<>(supplier, filter, mapper);
     }
 
     /**

@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -70,7 +70,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
     Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
 
     Factory<Double> PRIMITIVE = (typical, fullSize) -> {
-        if (fullSize || 1024L < typical.countColumns() && typical.count() <= DenseArray.MAX_ARRAY_SIZE) {
+        if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new SingularValueDecomposition.Primitive(fullSize);
         }
         return new RawSingularValue();

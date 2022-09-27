@@ -21,37 +21,56 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.keyvalue.KeyValue;
 
+/**
+ * A source of (historical) financial time series data.
+ */
+@FunctionalInterface
 public interface FinanceData<DP extends DatePrice> {
 
+    KeyValue<String, List<DP>> getHistoricalData();
+
     /**
-     * Assumes there will be no data for weekends. If there is the implementation nedds to be changed to
-     * <code>(temporal) -> TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY).adjustInto(temporal.minus(2, ChronoUnit.DAYS))</code>.
-     *
-     * @deprecated Use {@link TemporalAdjusters#nextOrSame(DayOfWeek)} or {@link DataSource#FRIDAY_OF_WEEK}
-     *             instead.
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
      */
     @Deprecated
-    TemporalAdjuster FRIDAY_OF_WEEK = TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY);
+    default List<DP> getHistoricalPrices() {
+        return this.getHistoricalData().getValue();
+    }
+
     /**
-     * @deprecated Use {@link TemporalAdjusters#lastDayOfMonth()} or {@link DataSource#LAST_DAY_OF_MONTH}
-     *             instead.
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
      */
     @Deprecated
-    TemporalAdjuster LAST_DAY_OF_MONTH = TemporalAdjusters.lastDayOfMonth();
+    default BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
-    List<DP> getHistoricalPrices();
+        KeyValue<String, List<DP>> data = this.getHistoricalData();
 
-    BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries();
+        BasicSeries<LocalDate, PrimitiveNumber> series = new SimpleSeries<>();
 
-    String getSymbol();
+        series.setName(data.getKey());
+
+        for (DP item : data.getValue()) {
+            series.put(item.getKey(), item.getValue());
+        }
+
+        return series;
+    }
+
+    /**
+     * @deprecated v52 Use {@link #getHistoricalData()} instead.
+     */
+    @Deprecated
+    default String getSymbol() {
+        return this.getHistoricalData().getKey();
+
+    }
 
 }

@@ -22,17 +22,24 @@
 package org.ojalgo.type.function;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 final class MappedSupplier<IN, OUT> implements AutoSupplier<OUT> {
 
     private final Function<IN, OUT> myMapper;
     private final Supplier<IN> mySupplier;
+    private final Predicate<IN> myFilter;
 
     MappedSupplier(final Supplier<IN> supplier, final Function<IN, OUT> mapper) {
+        this(supplier, in -> true, mapper);
+    }
+
+    MappedSupplier(final Supplier<IN> supplier, final Predicate<IN> filter, final Function<IN, OUT> mapper) {
         super();
-        myMapper = mapper;
         mySupplier = supplier;
+        myFilter = filter;
+        myMapper = mapper;
     }
 
     public void close() throws Exception {
@@ -42,12 +49,15 @@ final class MappedSupplier<IN, OUT> implements AutoSupplier<OUT> {
     }
 
     public OUT read() {
-        IN unmapped = mySupplier.get();
-        if (unmapped != null) {
-            return myMapper.apply(unmapped);
-        } else {
-            return null;
+
+        IN unmapped = null;
+        OUT retVal = null;
+
+        while ((unmapped = mySupplier.get()) != null && (!myFilter.test(unmapped) || (retVal = myMapper.apply(unmapped)) == null)) {
+            // Read until we get a non-null item that passes the test and mapping works (return not-null)
         }
+
+        return retVal;
     }
 
 }

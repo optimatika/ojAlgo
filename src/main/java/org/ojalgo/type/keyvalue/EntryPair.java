@@ -35,62 +35,9 @@ import org.ojalgo.type.PrimitiveNumber;
  *
  * @author apete
  */
-public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
-
-    final class Dual<T> {
-
-        public final T first;
-        public final T second;
-
-        Dual(final T obj1, final T obj2) {
-
-            super();
-
-            first = obj1;
-            second = obj2;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof Dual)) {
-                return false;
-            }
-            Dual other = (Dual) obj;
-            if (first == null) {
-                if (other.first != null) {
-                    return false;
-                }
-            } else if (!first.equals(other.first)) {
-                return false;
-            }
-            if (second == null) {
-                if (other.second != null) {
-                    return false;
-                }
-            } else if (!second.equals(other.second)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((first == null) ? 0 : first.hashCode());
-            return prime * result + ((second == null) ? 0 : second.hashCode());
-        }
-
-    }
+public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K, V> {
 
     interface KeyedPrimitive<K> extends EntryPair<K, PrimitiveNumber>, PrimitiveNumber {
-
-        default Set<Entry<K, PrimitiveNumber>> entrySet() {
-            return Collections.singleton(this);
-        }
 
         default PrimitiveNumber getValue() {
             return this;
@@ -559,8 +506,30 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return myValue.equals(value);
         }
 
-        public Set<Entry<K, V>> entrySet() {
-            return Collections.singleton(this);
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof ObjectObject)) {
+                return false;
+            }
+            ObjectObject<?, ?> other = (ObjectObject<?, ?>) obj;
+            if (myKey == null) {
+                if (other.myKey != null) {
+                    return false;
+                }
+            } else if (!myKey.equals(other.myKey)) {
+                return false;
+            }
+            if (myValue == null) {
+                if (other.myValue != null) {
+                    return false;
+                }
+            } else if (!myValue.equals(other.myValue)) {
+                return false;
+            }
+            return true;
         }
 
         public V get(final Object key) {
@@ -576,6 +545,14 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
         public V getValue() {
             return myValue;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((myKey == null) ? 0 : myKey.hashCode());
+            return prime * result + ((myValue == null) ? 0 : myValue.hashCode());
         }
 
         public Set<K> keySet() {
@@ -703,32 +680,32 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
         return new ObjectInt<>(key, value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final byte value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final byte value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final double value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final double value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final float value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final float value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final int value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final int value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final long value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final long value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K> KeyedPrimitive<Dual<K>> of(final K key1, final K key2, final short value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K> KeyedPrimitive<KeyValue.Dual<K>> of(final K key1, final K key2, final short value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
-    static <K, V> EntryPair<Dual<K>, V> of(final K key1, final K key2, final V value) {
-        return EntryPair.of(new Dual<>(key1, key2), value);
+    static <K, V> EntryPair<KeyValue.Dual<K>, V> of(final K key1, final K key2, final V value) {
+        return EntryPair.of(new KeyValue.Dual<>(key1, key2), value);
     }
 
     static <K> KeyedPrimitive<K> of(final K key, final long value) {
@@ -777,6 +754,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
     default void clear() {
         throw new UnsupportedOperationException();
+    }
+
+    default Set<Entry<K, V>> entrySet() {
+        return Collections.singleton(this);
     }
 
     default boolean isEmpty() {

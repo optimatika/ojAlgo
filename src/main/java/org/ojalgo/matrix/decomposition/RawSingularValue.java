@@ -168,7 +168,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public Array1D<Double> getSingularValues() {
-        return Array1D.PRIMITIVE64.copy(s);
+        return Array1D.R064.copy(s);
     }
 
     public void getSingularValues(final double[] values) {

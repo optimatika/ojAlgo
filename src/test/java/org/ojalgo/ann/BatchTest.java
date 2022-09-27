@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.ojalgo.TestUtils;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.data.DataBatch;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -57,11 +57,11 @@ public class BatchTest extends ANNTest {
 
         DataBatch batch = invBtch.newInputBatch();
 
-        Primitive64Array input;
+        ArrayR064 input;
         MatrixStore<?>[] expected = new MatrixStore<?>[BATCH_SIZE];
 
         for (int i = 0; i < BATCH_SIZE; i++) {
-            input = Primitive64Array.make(NB_INPUTS);
+            input = ArrayR064.make(NB_INPUTS);
             input.fillAll(Uniform.standard());
             batch.addRow(input);
 
@@ -98,10 +98,10 @@ public class BatchTest extends ANNTest {
             inputBatch.reset();
             outputBatch.reset();
 
-            Primitive64Array input = Primitive64Array.make(NB_INPUTS);
+            ArrayR064 input = ArrayR064.make(NB_INPUTS);
             input.fillAll(Uniform.standard());
 
-            Primitive64Array output = Primitive64Array.make(NB_OUTPUTS);
+            ArrayR064 output = ArrayR064.make(NB_OUTPUTS);
             output.set(l % NB_OUTPUTS, 1.0);
 
             for (int b = 0; b < BATCH_SIZE; b++) {

@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
+import org.ojalgo.matrix.task.iterative.ParallelGaussSeidelSolver;
 import org.ojalgo.random.Uniform;
 
 public class SolverTest extends MatrixTaskTests {
@@ -53,6 +54,9 @@ public class SolverTest extends MatrixTaskTests {
 
         GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
         TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+
+        ParallelGaussSeidelSolver tmpParallelGaussSeidelSolver = new ParallelGaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
 
         ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
         TestUtils.assertEquals(tmpExpected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
@@ -92,6 +96,8 @@ public class SolverTest extends MatrixTaskTests {
         GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
         TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
 
+        ParallelGaussSeidelSolver tmpParallelGaussSeidelSolver = new ParallelGaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpParallelGaussSeidelSolver.solve(tmpA, tmpB).get());
     }
 
     @Test
@@ -145,6 +151,9 @@ public class SolverTest extends MatrixTaskTests {
 
         GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
         TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(body, rhs).get());
+
+        ParallelGaussSeidelSolver tmpParallelGaussSeidelSolver = new ParallelGaussSeidelSolver();
+        TestUtils.assertEquals(expected, tmpParallelGaussSeidelSolver.solve(body, rhs).get());
 
         ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
         TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());

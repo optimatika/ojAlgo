@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-public final class IndexOf implements ArrayOperation {
+public abstract class IndexOf implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

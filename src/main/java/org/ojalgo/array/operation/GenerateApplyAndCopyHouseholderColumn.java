@@ -26,15 +26,15 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperation {
+public abstract class GenerateApplyAndCopyHouseholderColumn implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
     public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive64 destination) {
 
-        final int tmpColBase = col * structure;
+        int tmpColBase = col * structure;
 
-        final double[] tmpVector = destination.vector;
+        double[] tmpVector = destination.vector;
         destination.first = row;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
@@ -82,9 +82,9 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
 
     public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive32 destination) {
 
-        final int tmpColBase = col * structure;
+        int tmpColBase = col * structure;
 
-        final float[] tmpVector = destination.vector;
+        float[] tmpVector = destination.vector;
         destination.first = row;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
@@ -133,9 +133,9 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
     public static <N extends Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 
-        final int tmpColBase = col * structure;
+        int tmpColBase = col * structure;
 
-        final N[] tmpVector = destination.vector;
+        N[] tmpVector = destination.vector;
         destination.first = row;
 
         double tmpNormInf = PrimitiveMath.ZERO;

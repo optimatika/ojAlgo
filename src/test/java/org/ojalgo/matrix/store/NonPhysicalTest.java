@@ -41,8 +41,8 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
         final PhysicalStore<N> copied = anyStore.copy();
 
         if (DEBUG) {
-            BasicLogger.debug("Any", anyStore);
-            BasicLogger.debug("Copy", copied);
+            BasicLogger.debugMatrix("Any", anyStore);
+            BasicLogger.debugMatrix("Copy", copied);
         }
 
         N expected;

@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
@@ -414,7 +414,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        return this.makeDiagonal(Primitive64Array.wrap(d)).get();
+        return this.makeDiagonal(ArrayR064.wrap(d)).get();
     }
 
     @Override
@@ -422,7 +422,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         int length = d.length;
 
-        Array1D<ComplexNumber> retVal = Array1D.COMPLEX.make(length);
+        Array1D<ComplexNumber> retVal = Array1D.C128.make(length);
 
         for (int ij = 0; ij < length; ij++) {
             retVal.set(ij, ComplexNumber.valueOf(d[ij]));

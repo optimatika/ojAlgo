@@ -106,14 +106,57 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<>(BigArray.FACTORY);
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<>(ComplexArray.FACTORY);
-    public static final Factory<Double> DIRECT32 = new Factory<>(BufferArray.DIRECT32);
-    public static final Factory<Double> DIRECT64 = new Factory<>(BufferArray.DIRECT64);
-    public static final Factory<Double> PRIMITIVE32 = new Factory<>(Primitive32Array.FACTORY);
-    public static final Factory<Double> PRIMITIVE64 = new Factory<>(Primitive64Array.FACTORY);
-    public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
-    public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
+    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
+    public static final Factory<Double> R032 = ArrayAnyD.factory(ArrayR032.FACTORY);
+    public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
+    public static final Factory<BigDecimal> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
+    public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
+
+    /**
+     * @deprecated v52 Use {@link #R128} instead
+     */
+    @Deprecated
+    public static final Factory<BigDecimal> BIG = R128;
+    /**
+     * @deprecated v52 Use {@link #C128} instead
+     */
+    @Deprecated
+    public static final Factory<ComplexNumber> COMPLEX = C128;
+    /**
+     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
+     */
+    @Deprecated
+    public static final Factory<Double> DIRECT32 = ArrayAnyD.factory(BufferArray.DIRECT32);
+    /**
+     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
+     */
+    @Deprecated
+    public static final Factory<Double> DIRECT64 = ArrayAnyD.factory(BufferArray.DIRECT64);
+    /**
+     * @deprecated v52 Use {@link #R032} instead
+     */
+    @Deprecated
+    public static final Factory<Double> PRIMITIVE32 = R032;
+    /**
+     * @deprecated v52 Use {@link #R064} instead
+     */
+    @Deprecated
+    public static final Factory<Double> PRIMITIVE64 = R064;
+    /**
+     * @deprecated v52 Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final Factory<RationalNumber> RATIONAL = Q128;
+    /**
+     * @deprecated v52 Use {@link #H256} instead
+     */
+    @Deprecated
+    public static final Factory<Quaternion> QUATERNION = H256;
 
     public static <N extends Comparable<N>> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new ArrayAnyD.Factory<>(denseArray);
@@ -136,6 +179,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final long index, final byte addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(index, addend);
     }
@@ -151,6 +199,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void add(final long index, final int addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final long addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long index, final short addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final byte addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
     public void add(final long[] reference, final Comparable<?> addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
@@ -162,6 +230,21 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public void add(final long[] reference, final float addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final int addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final long addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    @Override
+    public void add(final long[] reference, final short addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
@@ -187,6 +270,16 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public byte byteValue(final long index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
+    public byte byteValue(final long... ref) {
+        return myDelegate.byteValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
     public long count() {
         return myDelegate.count();
     }
@@ -202,7 +295,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public double doubleValue(final long[] ref) {
+    public double doubleValue(final long... ref) {
         return myDelegate.doubleValue(StructureAnyD.index(myStructure, ref));
     }
 
@@ -316,12 +409,22 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public float floatValue(final long index) {
+        return myDelegate.floatValue(index);
+    }
+
+    @Override
+    public float floatValue(final long... ref) {
+        return myDelegate.floatValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
     public N get(final long index) {
         return myDelegate.get(index);
     }
 
     @Override
-    public N get(final long[] ref) {
+    public N get(final long... ref) {
         return myDelegate.get(StructureAnyD.index(myStructure, ref));
     }
 
@@ -330,13 +433,32 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         int prime = 31;
         int result = 1;
         result = prime * result + (myDelegate == null ? 0 : myDelegate.hashCode());
-        result = prime * result + Arrays.hashCode(myStructure);
-        return result;
+        return prime * result + Arrays.hashCode(myStructure);
     }
 
     @Override
     public long indexOfLargest() {
         return myDelegate.indexOfLargest();
+    }
+
+    @Override
+    public int intValue(final long index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
+    public int intValue(final long... ref) {
+        return myDelegate.intValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
+    public long longValue(final long index) {
+        return myDelegate.longValue(index);
+    }
+
+    @Override
+    public long longValue(final long... ref) {
+        return myDelegate.longValue(StructureAnyD.index(myStructure, ref));
     }
 
     @Override
@@ -464,6 +586,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void set(final long index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         myDelegate.set(index, value);
     }
@@ -476,6 +603,26 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public void set(final long index, final float value) {
         myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final short value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long[] reference, final byte value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
     @Override
@@ -494,8 +641,33 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public void set(final long[] reference, final int value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final long value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
+    public void set(final long[] reference, final short value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
+    }
+
+    @Override
     public long[] shape() {
         return myStructure;
+    }
+
+    @Override
+    public short shortValue(final long index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
+    public short shortValue(final long... ref) {
+        return myDelegate.shortValue(StructureAnyD.index(myStructure, ref));
     }
 
     @Override

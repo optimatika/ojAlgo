@@ -119,7 +119,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };
@@ -136,12 +136,12 @@ public class CaseSingularValue extends MatrixDecompositionTests {
             MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug("Scale = {}", tmpScale);
-                BasicLogger.debug("A", tmpOriginalMtrx);
-                BasicLogger.debug("Q1", tmpBidiagonal.getLQ());
-                BasicLogger.debug("D", tmpBidiagonal.getD());
-                BasicLogger.debug("Q2", tmpBidiagonal.getRQ());
-                BasicLogger.debug("Reconstructed", tmpReconstructed);
+                BasicLogger.debugMatrix("Scale = {}", tmpScale);
+                BasicLogger.debugMatrix("A", tmpOriginalMtrx);
+                BasicLogger.debugMatrix("Q1", tmpBidiagonal.getLQ());
+                BasicLogger.debugMatrix("D", tmpBidiagonal.getD());
+                BasicLogger.debugMatrix("Q2", tmpBidiagonal.getRQ());
+                BasicLogger.debugMatrix("Reconstructed", tmpReconstructed);
             }
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, NumberContext.of(7, 6));
         }
@@ -150,7 +150,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug("Scale = {}", tmpScale);
+                BasicLogger.debugMatrix("Scale = {}", tmpScale);
             }
 
             PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.copy(tmpBaseMtrx);
@@ -168,8 +168,8 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
             MatrixStore<ComplexNumber> tmpReconstructed = tmpSVD.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
-                BasicLogger.debug("Original", tmpOriginalMtrx);
-                BasicLogger.debug("Reconstructed", tmpReconstructed);
+                BasicLogger.debugMatrix("Original", tmpOriginalMtrx);
+                BasicLogger.debugMatrix("Reconstructed", tmpReconstructed);
             }
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, NumberContext.of(7, 6));
         }
@@ -282,15 +282,15 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug(tmpDecomposition.toString());
-            BasicLogger.debug("Original", tmpOriginal);
-            BasicLogger.debug("Q1", tmpDecomposition.getU());
-            BasicLogger.debug("D", tmpDecomposition.getD());
-            BasicLogger.debug("Q2", tmpDecomposition.getV());
-            BasicLogger.debug("Reconstructed", tmpReconstructed);
+            BasicLogger.debugMatrix("Original", tmpOriginal);
+            BasicLogger.debugMatrix("Q1", tmpDecomposition.getU());
+            BasicLogger.debugMatrix("D", tmpDecomposition.getD());
+            BasicLogger.debugMatrix("Q2", tmpDecomposition.getV());
+            BasicLogger.debugMatrix("Reconstructed", tmpReconstructed);
             PhysicalStore<ComplexNumber> tmpCopy = tmpOriginal.copy();
             // tmpCopy.maxpy(ComplexNumber.NEG, tmpReconstructed);
             tmpReconstructed.axpy(-1, tmpCopy);
-            BasicLogger.debug("Diff", tmpCopy);
+            BasicLogger.debugMatrix("Diff", tmpCopy);
         }
 
         TestUtils.assertEquals(tmpOriginal, tmpReconstructed, NumberContext.of(7, 6));
@@ -377,42 +377,42 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   D", IMPL_BIG.getD());
-            BasicLogger.debug("Cmplx D", IMPL_COMPLEX.getD());
-            BasicLogger.debug("Jama  D", IMPL_RAW.getD());
-            BasicLogger.debug("Direc D", IMPL_PRIMITIVE.getD());
+            BasicLogger.debugMatrix("Big   D", IMPL_BIG.getD());
+            BasicLogger.debugMatrix("Cmplx D", IMPL_COMPLEX.getD());
+            BasicLogger.debugMatrix("Jama  D", IMPL_RAW.getD());
+            BasicLogger.debugMatrix("Direc D", IMPL_PRIMITIVE.getD());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1", IMPL_BIG.getU());
-            BasicLogger.debug("Cmplx Q1", IMPL_COMPLEX.getU());
-            BasicLogger.debug("Jama  Q1", IMPL_RAW.getU());
-            BasicLogger.debug("Direc Q1", IMPL_PRIMITIVE.getU());
+            BasicLogger.debugMatrix("Big   Q1", IMPL_BIG.getU());
+            BasicLogger.debugMatrix("Cmplx Q1", IMPL_COMPLEX.getU());
+            BasicLogger.debugMatrix("Jama  Q1", IMPL_RAW.getU());
+            BasicLogger.debugMatrix("Direc Q1", IMPL_PRIMITIVE.getU());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getU().conjugate().multiply(IMPL_BIG.getU()));
-            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getU().conjugate().multiply(IMPL_COMPLEX.getU()));
-            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getU().conjugate().multiply(IMPL_RAW.getU()));
-            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getU().conjugate().multiply(IMPL_PRIMITIVE.getU()));
+            BasicLogger.debugMatrix("Big   Q1 unitary", IMPL_BIG.getU().conjugate().multiply(IMPL_BIG.getU()));
+            BasicLogger.debugMatrix("Cmplx Q1 unitary", IMPL_COMPLEX.getU().conjugate().multiply(IMPL_COMPLEX.getU()));
+            BasicLogger.debugMatrix("Jama  Q1 unitary", IMPL_RAW.getU().conjugate().multiply(IMPL_RAW.getU()));
+            BasicLogger.debugMatrix("Direc Q1 unitary", IMPL_PRIMITIVE.getU().conjugate().multiply(IMPL_PRIMITIVE.getU()));
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2", IMPL_BIG.getV());
-            BasicLogger.debug("Cmplx Q2", IMPL_COMPLEX.getV());
-            BasicLogger.debug("Jama  Q2", IMPL_RAW.getV());
-            BasicLogger.debug("Direc Q2", IMPL_PRIMITIVE.getV());
+            BasicLogger.debugMatrix("Big   Q2", IMPL_BIG.getV());
+            BasicLogger.debugMatrix("Cmplx Q2", IMPL_COMPLEX.getV());
+            BasicLogger.debugMatrix("Jama  Q2", IMPL_RAW.getV());
+            BasicLogger.debugMatrix("Direc Q2", IMPL_PRIMITIVE.getV());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getV().multiply(IMPL_BIG.getV().conjugate()));
-            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getV().multiply(IMPL_COMPLEX.getV().conjugate()));
-            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getV().multiply(IMPL_RAW.getV().conjugate()));
-            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getV().multiply(IMPL_PRIMITIVE.getV().conjugate()));
+            BasicLogger.debugMatrix("Big   Q2 unitary", IMPL_BIG.getV().multiply(IMPL_BIG.getV().conjugate()));
+            BasicLogger.debugMatrix("Cmplx Q2 unitary", IMPL_COMPLEX.getV().multiply(IMPL_COMPLEX.getV().conjugate()));
+            BasicLogger.debugMatrix("Jama  Q2 unitary", IMPL_RAW.getV().multiply(IMPL_RAW.getV().conjugate()));
+            BasicLogger.debugMatrix("Direc Q2 unitary", IMPL_PRIMITIVE.getV().multiply(IMPL_PRIMITIVE.getV().conjugate()));
         }
 
         tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getFunction(PrimitiveFunction.getSet());
@@ -428,18 +428,18 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Recreated", IMPL_BIG.reconstruct());
-            BasicLogger.debug("Cmplx Recreated", IMPL_COMPLEX.reconstruct());
-            BasicLogger.debug("Jama  Recreated", IMPL_RAW.reconstruct());
-            BasicLogger.debug("Direc Recreated", IMPL_PRIMITIVE.reconstruct());
+            BasicLogger.debugMatrix("Big   Recreated", IMPL_BIG.reconstruct());
+            BasicLogger.debugMatrix("Cmplx Recreated", IMPL_COMPLEX.reconstruct());
+            BasicLogger.debugMatrix("Jama  Recreated", IMPL_RAW.reconstruct());
+            BasicLogger.debugMatrix("Direc Recreated", IMPL_PRIMITIVE.reconstruct());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   inverse", IMPL_BIG.getInverse());
-            BasicLogger.debug("Cmplx inverse", IMPL_COMPLEX.getInverse());
-            BasicLogger.debug("Jama  inverse", IMPL_RAW.getInverse());
-            BasicLogger.debug("Direc inverse", IMPL_PRIMITIVE.getInverse());
+            BasicLogger.debugMatrix("Big   inverse", IMPL_BIG.getInverse());
+            BasicLogger.debugMatrix("Cmplx inverse", IMPL_COMPLEX.getInverse());
+            BasicLogger.debugMatrix("Jama  inverse", IMPL_RAW.getInverse());
+            BasicLogger.debugMatrix("Direc inverse", IMPL_PRIMITIVE.getInverse());
         }
 
         TestUtils.assertEquals(tmpBigStore, IMPL_BIG, CNTXT_REAL_DECOMP);
@@ -466,15 +466,15 @@ public class CaseSingularValue extends MatrixDecompositionTests {
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug(tmpImpl.toString());
-                BasicLogger.debug("Original", aMtrx);
-                BasicLogger.debug("Q1", tmpImpl.getU());
-                BasicLogger.debug("D", tmpImpl.getD());
-                BasicLogger.debug("Q2", tmpImpl.getV());
-                BasicLogger.debug("Reconstructed", tmpReconstructed);
+                BasicLogger.debugMatrix("Original", aMtrx);
+                BasicLogger.debugMatrix("Q1", tmpImpl.getU());
+                BasicLogger.debugMatrix("D", tmpImpl.getD());
+                BasicLogger.debugMatrix("Q2", tmpImpl.getV());
+                BasicLogger.debugMatrix("Reconstructed", tmpReconstructed);
                 PhysicalStore<Double> tmpCopy = aMtrx.copy();
                 // tmpCopy.maxpy(-1.0, tmpReconstructed);
                 tmpReconstructed.axpy(-1, tmpCopy);
-                BasicLogger.debug("Diff", tmpCopy);
+                BasicLogger.debugMatrix("Diff", tmpCopy);
             }
 
         }

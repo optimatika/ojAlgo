@@ -1,53 +1,63 @@
 package org.ojalgo.data.domain.finance.series;
 
-import java.io.Reader;
+import java.io.InputStream;
+import java.net.http.HttpResponse.BodyHandlers;
 
-import org.ojalgo.netio.ResourceLocator;
+import org.ojalgo.netio.ServiceClient;
+import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * Fetch historical financial time series data from Alpha Vantage: https://www.alphavantage.co
+ *
+ * @see https://www.alphavantage.co
  * @author stefanvanegmond
  */
-public class AlphaVantageFetcher implements DataFetcher {
+public final class AlphaVantageFetcher implements DataFetcher {
 
+    private final ServiceClient.Request myRequest;
     private final CalendarDateUnit myResolution;
-    private final ResourceLocator myResourceLocator;
     private final String mySymbol;
 
-    public AlphaVantageFetcher(final String symbol, final CalendarDateUnit resolution, final String apiKey, boolean fullOutputSize) {
+    public AlphaVantageFetcher(final String symbol, final CalendarDateUnit resolution, final String apiKey, final boolean fullOutputSize) {
 
         super();
 
         mySymbol = symbol;
         myResolution = resolution;
 
-        myResourceLocator = new ResourceLocator().host("www.alphavantage.co").path("/query");
+        myRequest = ServiceClient.newRequest().host("www.alphavantage.co").path("/query");
 
         switch (resolution) {
         case MONTH:
-            myResourceLocator.query("function", "TIME_SERIES_MONTHLY_ADJUSTED");
+            myRequest.query("function", "TIME_SERIES_MONTHLY_ADJUSTED");
             break;
         case WEEK:
-            myResourceLocator.query("function", "TIME_SERIES_WEEKLY_ADJUSTED");
+            myRequest.query("function", "TIME_SERIES_WEEKLY_ADJUSTED");
             break;
         default:
-            myResourceLocator.query("function", "TIME_SERIES_DAILY_ADJUSTED");
+            myRequest.query("function", "TIME_SERIES_DAILY_ADJUSTED");
             break;
         }
-        myResourceLocator.query("symbol", symbol);
-        myResourceLocator.query("apikey", apiKey);
-        myResourceLocator.query("datatype", "csv");
+        myRequest.query("symbol", symbol);
+        myRequest.query("apikey", apiKey);
+        myRequest.query("datatype", "csv");
         if (fullOutputSize && (resolution == CalendarDateUnit.DAY) && !"demo".equals(apiKey)) {
-            myResourceLocator.query("outputsize", "full");
+            myRequest.query("outputsize", "full");
+        }
+    }
+
+    public InputStream getInputStream() {
+        Response<InputStream> response = myRequest.send(BodyHandlers.ofInputStream());
+        if (response.isResponseOK()) {
+            return response.getBody();
+        } else {
+            return InputStream.nullInputStream();
         }
     }
 
     public CalendarDateUnit getResolution() {
         return myResolution;
-    }
-
-    public Reader getStreamOfCSV() {
-        return myResourceLocator.getStreamReader();
     }
 
     public String getSymbol() {

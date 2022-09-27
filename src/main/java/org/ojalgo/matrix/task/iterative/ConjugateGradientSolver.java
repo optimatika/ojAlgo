@@ -35,9 +35,13 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A (Jacobi) preconditioned conjugate gradient solver.
+ * For solving [A][x]=[b] when [A] is symmetric and positive-definite.
+ * <p>
+ * This implementation is (Jacobi) preconditioned – using the diagonal elements to scale the residual.
  *
  * @author apete
+ * @see https://en.wikipedia.org/wiki/Conjugate_gradient_method
+ * @see https://optimization.cbe.cornell.edu/index.php?title=Conjugate_gradient_methods
  */
 public final class ConjugateGradientSolver extends KrylovSubspaceSolver implements IterativeSolverTask.SparseDelegate {
 
@@ -52,7 +56,11 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
-        int numbEquations = equations.size();
+        int nbEquations = equations.size();
+
+        int iterations = 0;
+        int limit = this.getIterationsLimit();
+        NumberContext accuracy = this.getAccuracyContext();
 
         double normErr = POSITIVE_INFINITY;
         double normRHS = ONE;
@@ -62,27 +70,28 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         Primitive64Store preconditioned = this.preconditioned(solution);
         Primitive64Store vector = this.vector(solution);
 
-        double stepLength;
-        double gradientCorrectionFactor;
+        double stepLength; // alpha
+        double gradientCorrectionFactor; // beta
 
         double zr0 = 1;
-        double zr1 = 1;
+        double zr1;
         double pAp0 = 0;
 
-        for (int r = 0; r < numbEquations; r++) {
+        for (int r = 0; r < nbEquations; r++) {
             Equation row = equations.get(r);
             double tmpVal = row.getRHS();
             normRHS = HYPOT.invoke(normRHS, tmpVal);
             tmpVal -= row.dot(solution);
             residual.set(row.index, tmpVal);
-            preconditioned.set(row.index, tmpVal / row.getPivot()); // precondition
+            double pivot = row.getPivot();
+            if (accuracy.isZero(pivot)) {
+                preconditioned.set(row.index, tmpVal);
+            } else {
+                preconditioned.set(row.index, tmpVal / pivot);
+            }
         }
 
         direction.fillMatching(preconditioned);
-
-        int iterations = 0;
-        int limit = this.getIterationsLimit();
-        NumberContext accuracy = this.getAccuracyContext();
 
         zr1 = preconditioned.dot(residual);
 
@@ -90,7 +99,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             zr0 = zr1;
 
-            for (int i = 0; i < numbEquations; i++) {
+            for (int i = 0; i < nbEquations; i++) {
                 Equation row = equations.get(i);
                 vector.set(row.index, row.dot(direction));
             }
@@ -108,11 +117,16 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             normErr = ZERO;
 
-            for (int r = 0; r < numbEquations; r++) {
+            for (int r = 0; r < nbEquations; r++) {
                 Equation row = equations.get(r);
                 double tmpVal = residual.doubleValue(row.index);
                 normErr = HYPOT.invoke(normErr, tmpVal);
-                preconditioned.set(row.index, tmpVal / row.getPivot());
+                double pivot = row.getPivot();
+                if (accuracy.isZero(pivot)) {
+                    preconditioned.set(row.index, tmpVal);
+                } else {
+                    preconditioned.set(row.index, tmpVal / pivot);
+                }
             }
 
             zr1 = preconditioned.dot(residual);

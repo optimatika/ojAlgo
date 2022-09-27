@@ -119,13 +119,13 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
 
-            BasicLogger.debug("Primitive Q", primitiveDecomp.getQ());
-            BasicLogger.debug("Complex Q", complexDecomp.getQ());
-            BasicLogger.debug("Rational Q", rationalDecomp.getQ());
+            BasicLogger.debugMatrix("Primitive Q", primitiveDecomp.getQ());
+            BasicLogger.debugMatrix("Complex Q", complexDecomp.getQ());
+            BasicLogger.debugMatrix("Rational Q", rationalDecomp.getQ());
 
-            BasicLogger.debug("Primitive D", primitiveDecomp.getD());
-            BasicLogger.debug("Complex D", complexDecomp.getD());
-            BasicLogger.debug("Rational D", rationalDecomp.getD());
+            BasicLogger.debugMatrix("Primitive D", primitiveDecomp.getD());
+            BasicLogger.debugMatrix("Complex D", complexDecomp.getD());
+            BasicLogger.debugMatrix("Rational D", rationalDecomp.getD());
         }
 
         final NumberContext precision = NumberContext.of(7, 14);

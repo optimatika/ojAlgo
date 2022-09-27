@@ -97,13 +97,13 @@ public class P20030512Case extends BasicMatrixTest {
     @Test
     public void testIsFullRank() {
 
-        boolean expected = rAA.isFullRank();
+        boolean expected = rAA.getRank() == rAA.getMinDim();
         boolean actual;
 
-        actual = cAA.isFullRank();
+        actual = cAA.getRank() == cAA.getMinDim();
         TestUtils.assertEquals(expected, actual);
 
-        actual = p64AA.isFullRank();
+        actual = p64AA.getRank() == p64AA.getMinDim();
         TestUtils.assertEquals(expected, actual);
 
         // TODO Why doesn't this work?

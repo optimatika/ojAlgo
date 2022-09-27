@@ -32,57 +32,52 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.math.MathType;
 
-abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D<I> {
+abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D.Dense<I> {
 
-    public abstract FunctionSet<N> function();
-
-    public final I make(final long count) {
-        return this.makeStructuredZero(count);
-    }
-
-    public abstract Scalar.Factory<N> scalar();
-
-    abstract AggregatorSet<N> aggregator();
-
-    I copy(final Access1D<?> source) {
-        final long count = source.count();
-        final I retVal = this.makeToBeFilled(count);
+    public I copy(final Access1D<?> source) {
+        long count = source.count();
+        I retVal = this.makeToBeFilled(count);
         retVal.fillMatching(source);
         return retVal;
     }
 
-    I copy(final Comparable<?>... source) {
-        final int length = source.length;
-        final I retVal = this.makeToBeFilled(length);
+    public I copy(final Comparable<?>... source) {
+        int length = source.length;
+        I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {
             retVal.set(i, source[i]);
         }
         return retVal;
     }
 
-    I copy(final double... source) {
-        final int length = source.length;
-        final I retVal = this.makeToBeFilled(length);
+    public I copy(final double... source) {
+        int length = source.length;
+        I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {
             retVal.set(i, source[i]);
         }
         return retVal;
     }
 
-    I copy(final List<? extends Comparable<?>> source) {
-        final int size = source.size();
-        final I retVal = this.makeToBeFilled(size);
+    public I copy(final List<? extends Comparable<?>> source) {
+        int size = source.size();
+        I retVal = this.makeToBeFilled(size);
         for (int i = 0; i < size; i++) {
             retVal.set(i, source.get(i));
         }
         return retVal;
     }
 
-    abstract long getCapacityLimit();
+    public abstract FunctionSet<N> function();
 
-    I makeFilled(final long count, final NullaryFunction<?> supplier) {
-        final I retVal = this.makeToBeFilled(count);
+    public I make(final long count) {
+        return this.makeStructuredZero(count);
+    }
+
+    public I makeFilled(final long count, final NullaryFunction<?> supplier) {
+        I retVal = this.makeToBeFilled(count);
         if (retVal.isPrimitive()) {
             for (long i = 0L; i < count; i++) {
                 retVal.set(i, supplier.doubleValue());
@@ -95,18 +90,26 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         return retVal;
     }
 
-    final SegmentedArray<N> makeSegmented(final long... structure) {
+    public abstract Scalar.Factory<N> scalar();
 
-        final long totalCount = StructureAnyD.count(structure);
+    abstract AggregatorSet<N> aggregator();
 
-        final int max = PowerOf2.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
-        final int min = PowerOf2.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
+    abstract long getCapacityLimit();
+
+    abstract MathType getMathType();
+
+    SegmentedArray<N> makeSegmented(final long... structure) {
+
+        long totalCount = StructureAnyD.count(structure);
+
+        int max = PowerOf2.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
+        int min = PowerOf2.powerOf2Larger(totalCount / PlainArray.MAX_SIZE);
 
         if (min > max) {
             throw new IllegalArgumentException();
         }
 
-        final int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
+        int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
 
         return new SegmentedArray<>(totalCount, indexBits, this);
     }
@@ -114,12 +117,12 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
     /**
      * Typically sparse, but if very small then dense If very large then also segmented
      */
-    abstract I makeStructuredZero(final long... structure);
+    abstract I makeStructuredZero(long... structure);
 
     /**
      * Always dense, but maybe segmented
      */
-    abstract I makeToBeFilled(final long... structure);
+    abstract I makeToBeFilled(long... structure);
 
     /**
      * There are several requirements on the segments:

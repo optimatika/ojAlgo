@@ -274,7 +274,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
-        Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
@@ -296,7 +296,7 @@ public class DesignCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("Matrix not square!", matrix.countRows(), matrix.countColumns());
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Original", matrix);
+            BasicLogger.debugMatrix("Original", matrix);
             BasicLogger.debug("Solver: {}", solver.getClass());
         }
 
@@ -311,8 +311,8 @@ public class DesignCase extends MatrixDecompositionTests {
         MatrixStore<Double> tmpSolInv = solver.getSolution(tmpEye);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Direct Inverse", tmpDirInv);
-            BasicLogger.debug("Solved Inverse", tmpSolInv);
+            BasicLogger.debugMatrix("Direct Inverse", tmpDirInv);
+            BasicLogger.debugMatrix("Solved Inverse", tmpSolInv);
         }
 
         TestUtils.assertEquals("Not inverted/solved correctly!", tmpDirInv, tmpSolInv);

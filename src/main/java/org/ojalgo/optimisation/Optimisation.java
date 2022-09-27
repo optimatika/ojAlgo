@@ -27,7 +27,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.BigArray;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.ArrayR128;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
@@ -360,11 +361,33 @@ public interface Optimisation {
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
-            return new Result(state, value, Access1D.wrap(solution));
+            return new Result(state, value, ArrayR064.wrap(solution));
         }
 
         public static Result of(final Optimisation.State state, final double... solution) {
             return new Result(state, Double.NaN, Access1D.wrap(solution));
+        }
+
+        /**
+         * Parse a {@link String}, as produced by the {@link #toString()} method, into a new instance.
+         */
+        public static Result parse(final String result) {
+
+            int indexOfFirstSpace = result.indexOf(" ");
+            int indexOfAtMark = result.indexOf(" @ ");
+
+            String strState = result.substring(0, indexOfFirstSpace);
+            String strValue = result.substring(indexOfFirstSpace + 1, indexOfAtMark);
+            String[] strSolution = result.substring(indexOfAtMark + 5, result.length() - 2).split(", ");
+
+            State state = Optimisation.State.valueOf(strState);
+            double value = Double.parseDouble(strValue);
+            ArrayR128 solution = ArrayR128.make(strSolution.length);
+            for (int i = 0; i < strSolution.length; i++) {
+                solution.set(i, new BigDecimal(strSolution[i]));
+            }
+
+            return new Result(state, value, solution);
         }
 
         private transient Access1D<?> myMultipliers = null;
@@ -433,9 +456,9 @@ public interface Optimisation {
          * Will round the solution to the given precision
          */
         public Optimisation.Result getSolution(final NumberContext precision) {
-            final Optimisation.State state = this.getState();
-            final double value = this.getValue();
-            final BigArray solution = BigArray.make((int) this.count());
+            Optimisation.State state = this.getState();
+            double value = this.getValue();
+            ArrayR128 solution = ArrayR128.make(this.size());
             for (int i = 0, limit = solution.data.length; i < limit; i++) {
                 solution.set(i, precision.enforce(this.get(i)));
             }
@@ -472,6 +495,10 @@ public interface Optimisation {
             return (int) this.count();
         }
 
+        /**
+         * May potentially be a very long {@link String} as it must contain all variable values. The
+         * {@link String} produced here is (must be) usable by the {@link #parse(String)} method.
+         */
         @Override
         public String toString() {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);

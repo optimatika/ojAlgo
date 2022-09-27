@@ -294,11 +294,11 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return myShape[dimension];
         }
 
-        public double doubleValue(final long[] ref) {
+        public double doubleValue(final long... ref) {
             return myFullData.doubleValue(this.translate(ref));
         }
 
-        public N get(final long[] ref) {
+        public N get(final long... ref) {
             return myFullData.get(this.translate(ref));
         }
 
@@ -493,7 +493,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
     }
 
     static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<Double>() {
+        return new AccessAnyD<>() {
 
             public long count() {
                 return access.count();
@@ -507,7 +507,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] ref) {
+            public double doubleValue(final long... ref) {
                 return access.doubleValue(ref);
             }
 
@@ -515,7 +515,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
                 return access.doubleValue(index);
             }
 
-            public Double get(final long[] ref) {
+            public Double get(final long... ref) {
                 return access.doubleValue(ref);
             }
 
@@ -546,7 +546,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
     }
 
     default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
-        return new Collectable<NN, R>() {
+        return new Collectable<>() {
 
             public long count(final int dimension) {
                 return AccessAnyD.this.count(dimension);
@@ -567,7 +567,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.byteValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default byte byteValue(final long[] ref) {
+    default byte byteValue(final long... ref) {
         return (byte) this.shortValue(ref);
     }
 
@@ -579,7 +579,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.doubleValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    double doubleValue(long[] ref);
+    double doubleValue(long... ref);
 
     default ElementViewAnyD<N, ?> elements() {
         return new AccessAnyD.ElementView<>(Access1D.super.elements(), this.shape());
@@ -589,7 +589,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.floatValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default float floatValue(final long[] ref) {
+    default float floatValue(final long... ref) {
         return (float) this.doubleValue(ref);
     }
 
@@ -597,13 +597,13 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.get(StructureAnyD.reference(index, this.shape()));
     }
 
-    N get(long[] ref);
+    N get(long... ref);
 
     default int intValue(final long index) {
         return this.intValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default int intValue(final long[] ref) {
+    default int intValue(final long... ref) {
         return (int) this.longValue(ref);
     }
 
@@ -611,7 +611,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.longValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default long longValue(final long[] ref) {
+    default long longValue(final long... ref) {
         return Math.round(this.doubleValue(ref));
     }
 
@@ -635,7 +635,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return this.shortValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default short shortValue(final long[] ref) {
+    default short shortValue(final long... ref) {
         return (short) this.intValue(ref);
     }
 

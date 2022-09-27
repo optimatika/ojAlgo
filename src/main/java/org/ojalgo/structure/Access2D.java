@@ -30,10 +30,6 @@ import java.util.stream.StreamSupport;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -550,7 +546,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
-        return new Access2D<Double>() {
+        return new Access2D<>() {
 
             public long count() {
                 return access.count();
@@ -592,60 +588,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         return accessA.countRows() == accessB.countRows() && accessA.countColumns() == accessB.countColumns() && Access1D.equals(accessA, accessB, accuracy);
     }
 
-    /**
-     * @deprecated v47 Use {@link MatrixStore#isHermitian()} instead
-     */
-    @Deprecated
-    static boolean isHermitian(final Access2D<?> matrix) {
-
-        long rows = matrix.countRows();
-        long cols = matrix.countColumns();
-
-        Comparable<?> anyElement = matrix.get(0L);
-
-        boolean retVal = rows == cols;
-
-        if (anyElement instanceof ComplexNumber) {
-
-            for (int j = 0; retVal && j < cols; j++) {
-
-                double imagDiag = ComplexNumber.valueOf(matrix.get(j, j)).i;
-
-                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, imagDiag);
-
-                for (int i = j + 1; retVal && i < rows; i++) {
-
-                    ComplexNumber lowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
-                    ComplexNumber upperRight = ComplexNumber.valueOf(matrix.get(j, i));
-
-                    double diff = lowerLeft.subtract(upperRight).norm();
-                    double sum = lowerLeft.add(upperRight).norm();
-
-                    retVal &= PrimitiveScalar.isSmall(sum, diff);
-                }
-            }
-
-        } else {
-
-            for (int j = 0; retVal && j < cols; j++) {
-                for (int i = j + 1; retVal && i < rows; i++) {
-
-                    double lowerLeft = matrix.doubleValue(i, j);
-                    double upperRight = matrix.doubleValue(j, i);
-
-                    double diff = lowerLeft - upperRight;
-                    double sum = lowerLeft + upperRight;
-
-                    retVal &= PrimitiveScalar.isSmall(sum, diff);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<Double, R>() {
+        return new Access2D.Collectable<>() {
 
             public long countColumns() {
                 return 1L;
@@ -664,7 +608,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveRowCollectable(final Access1D<?> anything1D) {
-        return new Access2D.Collectable<Double, R>() {
+        return new Access2D.Collectable<>() {
 
             public long countColumns() {
                 return anything1D.count();
@@ -722,7 +666,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static Access2D<Double> wrap(final double[][] target) {
-        return new Access2D<Double>() {
+        return new Access2D<>() {
 
             public long count() {
                 return Structure2D.count(target.length, target[0].length);
@@ -753,7 +697,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static <N extends Comparable<N>> Access2D<N> wrap(final N[][] target) {
-        return new Access2D<N>() {
+        return new Access2D<>() {
 
             public long count() {
                 return Structure2D.count(target.length, target[0].length);
@@ -788,7 +732,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     default <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
-        return new Collectable<NN, R>() {
+        return new Collectable<>() {
 
             public long countColumns() {
                 return Access2D.this.countColumns();

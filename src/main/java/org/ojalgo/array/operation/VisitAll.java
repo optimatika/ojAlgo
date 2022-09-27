@@ -25,7 +25,7 @@ import java.util.function.DoubleConsumer;
 
 import org.ojalgo.structure.Structure2D;
 
-public final class VisitAll implements ArrayOperation {
+public abstract class VisitAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

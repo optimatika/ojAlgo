@@ -48,7 +48,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Fillable<N extends Comparable<N>> extends Structure2D, Mutate1D.Fillable<N> {
+    interface Fillable<N extends Comparable<N>> extends Mutate2D, Mutate1D.Fillable<N> {
 
         default void fillColumn(final long col, final Access1D<N> values) {
             this.fillColumn(0L, col, values);
@@ -98,24 +98,54 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillDiagonal(0L, 0L, supplier);
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
             long structure = this.countRows();
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), values, valueIndex);
         }
 
-        void fillOne(long row, long col, Access1D<?> values, long valueIndex);
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            this.fillOne(row, col, (N) values.get(valueIndex));
+        }
 
-        void fillOne(long row, long col, N value);
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long row, final long col, final N value) {
+            this.set(row, col, value);
+        }
 
-        void fillOne(long row, long col, NullaryFunction<?> supplier);
+        /**
+         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
+         */
+        @Deprecated
+        default void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
+            this.set(row, col, supplier.get());
+        }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final N value) {
             long structure = this.countRows();
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
         }
 
+        /**
+         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
+         */
+        @Deprecated
         @Override
         default void fillOne(final long index, final NullaryFunction<?> supplier) {
             long structure = this.countRows();
@@ -170,6 +200,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     interface Modifiable<N extends Comparable<N>> extends Structure2D, Mutate1D.Modifiable<N> {
 
         @Override
+        default void add(final long index, final byte addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
         default void add(final long index, final Comparable<?> addend) {
             long structure = this.countRows();
             this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
@@ -187,12 +223,46 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
         }
 
+        @Override
+        default void add(final long index, final int addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final long addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        default void add(final long row, final long col, final byte addend) {
+            this.add(row, col, (short) addend);
+        }
+
         void add(long row, long col, Comparable<?> addend);
 
         void add(long row, long col, double addend);
 
         default void add(final long row, final long col, final float addend) {
             this.add(row, col, (double) addend);
+        }
+
+        default void add(final long row, final long col, final int addend) {
+            this.add(row, col, (long) addend);
+        }
+
+        default void add(final long row, final long col, final long addend) {
+            this.add(row, col, (double) addend);
+        }
+
+        default void add(final long row, final long col, final short addend) {
+            this.add(row, col, (int) addend);
+        }
+
+        @Override
+        default void add(final long index, final short addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
         }
 
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -276,6 +346,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     @Override
+    default void set(final long index, final byte addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    @Override
     default void set(final long index, final Comparable<?> addend) {
         long structure = this.countRows();
         this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
@@ -293,12 +369,46 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
     }
 
+    @Override
+    default void set(final long index, final int addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    @Override
+    default void set(final long index, final long addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+    }
+
+    default void set(final long row, final long col, final byte value) {
+        this.set(row, col, (short) value);
+    }
+
     void set(long row, long col, Comparable<?> value);
 
     void set(long row, long col, double value);
 
     default void set(final long row, final long col, final float value) {
         this.set(row, col, (double) value);
+    }
+
+    default void set(final long row, final long col, final int value) {
+        this.set(row, col, (long) value);
+    }
+
+    default void set(final long row, final long col, final long value) {
+        this.set(row, col, (double) value);
+    }
+
+    default void set(final long row, final long col, final short value) {
+        this.set(row, col, (int) value);
+    }
+
+    @Override
+    default void set(final long index, final short addend) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
     }
 
 }

@@ -112,8 +112,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         List<Eigenpair> eigenpairs = evd.getEigenpairs();
 
         if (DEBUG) {
-            BasicLogger.debug("D", mtrxD);
-            BasicLogger.debug("V", mtrxV);
+            BasicLogger.debugMatrix("D", mtrxD);
+            BasicLogger.debugMatrix("V", mtrxV);
             for (Eigenpair eigenpair : eigenpairs) {
                 BasicLogger.debug("Value: {}", eigenpair.value.toString());
                 BasicLogger.debug("Vector: {}", eigenpair.vector.toString());
@@ -154,8 +154,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         mtrxB.set(1, 1, ComplexNumber.of(5.0, 0.0));
 
         if (DEBUG) {
-            BasicLogger.debug("A", mtrxA);
-            BasicLogger.debug("B", mtrxB);
+            BasicLogger.debugMatrix("A", mtrxA);
+            BasicLogger.debugMatrix("B", mtrxB);
         }
 
         Eigenvalue.Generalised<ComplexNumber> evd = Eigenvalue.COMPLEX.makeGeneralised(mtrxA, Generalisation.A_B);
@@ -167,8 +167,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         List<Eigenpair> eigenpairs = evd.getEigenpairs();
 
         if (DEBUG) {
-            BasicLogger.debug("D", mtrxD);
-            BasicLogger.debug("V", mtrxV);
+            BasicLogger.debugMatrix("D", mtrxD);
+            BasicLogger.debugMatrix("V", mtrxV);
             for (Eigenpair eigenpair : eigenpairs) {
                 BasicLogger.debug("Value: {}", eigenpair.value.toString());
                 BasicLogger.debug("Vector: {}", eigenpair.vector.toString());
@@ -189,8 +189,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> right = mtrxB.multiply(mtrxV).multiply(mtrxD);
 
         if (DEBUG) {
-            BasicLogger.debug("left", left);
-            BasicLogger.debug("right", right);
+            BasicLogger.debugMatrix("left", left);
+            BasicLogger.debugMatrix("right", right);
         }
 
         TestUtils.assertEquals(left, right);
@@ -277,7 +277,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         ComplexNumber tmp33 = ComplexNumber.ZERO;
         ComplexNumber tmp44 = tmp33;
 
-        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
+        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.C128.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
         NumberContext accuracyContext = NumberContext.of(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
@@ -291,14 +291,14 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Eigenvalues = {}", tmpEigenvalues);
-            BasicLogger.debug("D = {}", tmpD);
-            BasicLogger.debug("V = {}", tmpV);
+            BasicLogger.debugMatrix("D = {}", tmpD);
+            BasicLogger.debugMatrix("V = {}", tmpV);
         }
 
         tmpRecreatedMatrix = tmpV.multiply(tmpDecomposition.getD()).multiply(tmpV.transpose());
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Original = {}", tmpOriginalMatrix);
-            BasicLogger.debug("Recreated = {}", tmpRecreatedMatrix);
+            BasicLogger.debugMatrix("Original = {}", tmpOriginalMatrix);
+            BasicLogger.debugMatrix("Recreated = {}", tmpRecreatedMatrix);
         }
         TestUtils.assertEquals(tmpOriginalMatrix.multiply(tmpV), tmpV.multiply(tmpDecomposition.getD()), accuracyContext);
 
@@ -318,11 +318,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
-        Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.make(2);
+        Array1D<ComplexNumber> tmpExpVals = Array1D.C128.make(2);
         tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 
-        Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.make(2, 2);
+        Array2D<ComplexNumber> tmpExpVecs = Array2D.C128.make(2, 2);
         tmpExpVecs.set(0, 0, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));

@@ -26,7 +26,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class DOTC implements ArrayOperation {
+public abstract class DOTC implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

@@ -55,11 +55,11 @@ public class FinanceUtilsTest extends FinanceTests {
         Primitive64Matrix reconstructedPlain = FinanceUtils.toCovariances(plainVolatilities, plainCorrelations);
 
         if (DEBUG) {
-            BasicLogger.debug("Original", original);
-            BasicLogger.debug("Plain Correlations", plainCorrelations);
-            BasicLogger.debug("Plain Volatilities", plainVolatilities);
-            BasicLogger.debug("Reconstructed Plain", reconstructedPlain);
-            BasicLogger.debug("Difference", original.subtract(reconstructedPlain), IDENTICAL_ACCURACY);
+            BasicLogger.debugMatrix("Original", original);
+            BasicLogger.debugMatrix("Plain Correlations", plainCorrelations);
+            BasicLogger.debugMatrix("Plain Volatilities", plainVolatilities);
+            BasicLogger.debugMatrix("Reconstructed Plain", reconstructedPlain);
+            BasicLogger.debugMatrix("Difference", original.subtract(reconstructedPlain), IDENTICAL_ACCURACY);
         }
 
         TestUtils.assertEquals(original, reconstructedPlain, IDENTICAL_ACCURACY);
@@ -69,11 +69,11 @@ public class FinanceUtilsTest extends FinanceTests {
         Primitive64Matrix reconstructedCleaned = FinanceUtils.toCovariances(cleanedVolatilities, cleanedCorrelations);
 
         if (DEBUG) {
-            BasicLogger.debug("Original", original);
-            BasicLogger.debug("Plain Correlations", cleanedCorrelations);
-            BasicLogger.debug("Plain Volatilities", cleanedVolatilities);
-            BasicLogger.debug("Reconstructed Plain", reconstructedCleaned);
-            BasicLogger.debug("Difference", original.subtract(reconstructedCleaned), ACCEPTABLE_ACCURACY);
+            BasicLogger.debugMatrix("Original", original);
+            BasicLogger.debugMatrix("Plain Correlations", cleanedCorrelations);
+            BasicLogger.debugMatrix("Plain Volatilities", cleanedVolatilities);
+            BasicLogger.debugMatrix("Reconstructed Plain", reconstructedCleaned);
+            BasicLogger.debugMatrix("Difference", original.subtract(reconstructedCleaned), ACCEPTABLE_ACCURACY);
         }
 
         svd.decompose(reconstructedCleaned);
@@ -88,9 +88,9 @@ public class FinanceUtilsTest extends FinanceTests {
         TestUtils.assertEquals(original, reconstructedPlain, ACCEPTABLE_ACCURACY);
 
         if (DEBUG) {
-            BasicLogger.debug("Original", original);
-            BasicLogger.debug("Cleaned", reconstructedCleaned);
-            BasicLogger.debug("Difference", original.subtract(reconstructedCleaned), ACCEPTABLE_ACCURACY);
+            BasicLogger.debugMatrix("Original", original);
+            BasicLogger.debugMatrix("Cleaned", reconstructedCleaned);
+            BasicLogger.debugMatrix("Difference", original.subtract(reconstructedCleaned), ACCEPTABLE_ACCURACY);
         }
     }
 

@@ -1,7 +1,7 @@
 package org.ojalgo.machine;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.matrix.RationalMatrix;
 
 public class TestMemoryEstimator {
@@ -9,7 +9,7 @@ public class TestMemoryEstimator {
     @Test
     public void testPrimitiveArray() {
 
-        final long tmpEstimate = MemoryEstimator.estimateObject(Primitive64Array.class);
+        final long tmpEstimate = MemoryEstimator.estimateObject(ArrayR064.class);
 
         final long tmpManually = 0L;
 

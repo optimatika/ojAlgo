@@ -11,6 +11,103 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [52.0.0] – 2022-09-27
+
+### Added
+
+#### org.ojalgo.algebra
+
+- New enum `NumberSet` outlining the number sets used within ojAlgo.
+
+#### org.ojalgo.array
+
+- Restored support for native/off-heap memory based array implementations, `OffHeapArray`. For a while now this was supported via an extension artifact, ojAlgo-unsafe.That artifact is now deprecated and will not be updated further.
+- New primitives based array classes for `long`, `int`, `short` and `byte` elements. This includes native off-heap and buffer based variants - even the memory mapped file-backed variants.
+- New naming scheme for the various "array" classes and the factories. Most (if not all) the old/previous classes, factories and factory methods sill exist but are deprecated. The new names are based on the members of the `org.ojalgo.type.math.MathType` enum.
+
+#### org.ojalgo.data
+
+- New `DatePriceParser` parser that will analyse the contents (first header line) to determine the file format, and then choose an appropriate parser to use.
+
+#### org.ojalgo.matrix
+
+- Experimental `ParallelGaussSeidelSolver`. The name says what it is. Seems to work and improve performance.
+
+#### org.ojalgo.netio
+
+- New class `InMemoryFile` to be used when writing to and/or reading from "files" that never actually exist on disk – for dynamically creating files for downloading or parsing uploaded "files". The `TextLineWriter` and `TextLineReader`, in particular, gained support for this.
+- The `TextLineReader` now support filtered parsing – text lines that do not match the filter are skipped.
+- New abstract class `DetectingParser`. It's a single parser that can switch between a collection of internal delegate parsers. Create a subclass to specify which parsers are avalable, as well as logic to choose between them. The new `org.ojalgo.data.domain.finance.series.DatePriceParser` makes use of this.
+- New `ServiceClient`. It's an http client based on Java 11's `HttpClient` designed to replace `ResourceLocator`.
+
+#### org.ojalgo.structure
+
+- Support for getting/setting elements of all (numeric) primitive types.
+
+#### org.ojalgo.type
+
+- The `MappedSupplier` now supports an optional filter. Items that don't pass this filter are not mapped, instead the `MappedSupplier` moves on to the next item.
+- New enum `MathType` outlining the types used in ojAlgo. It's the mathematical number set paired with info about how it is implemented (ComplexNumber = 2 * double)
+- `NativeMemory` now support initialising and filling off-heap arrays.
+
+### Changed
+
+#### org.ojalgo.array
+
+- New generalised way to create memory-mapped file-based array classes
+- Quite a bit of refactory to support everything that's new - better support for any/all primitive type, off-heap arrays and more.
+
+#### org.ojalgo.data
+
+- The `DataFetcher` interface had some additions and deprecations, and all the implementations are refactored to use the new `ServiceClient` rather than `ResourceLocator`.
+
+#### org.ojalgo.equation
+
+- The RHS property of `Equation` is now mutable – there is both get- and a set-method.
+- Bunch of new factory methods for `Equation` (variants of the previously existing ones with the array factory set to `Primitive64Array.FACTORY`).
+
+#### org.ojalgo.matrix
+
+- New method in `IterativeSolverTask.SparseDelegate` that lets you (re)solve with a supplied RHS.
+- Slight modification to how the preconditioning in `ConjugateGradientSolver` works.
+
+#### org.ojalgo.optimisation
+
+- Some refactoring regarding how parameters are extracted from `ExpressionsBasedModel`, `Expression` and `variable`.
+
+#### org.ojalgo.structure
+
+- The `Mutate*D.Fillable` interfaces now extend their respective `Mutate*D` interface.
+- The method `StructureAnyD.loopAll(ReferenceCallback)` has been renamed `StructureAnyD.loopAllReferences(ReferenceCallback)` to better differentiate it from `Structure1D.loopAll(IndexCallback)`. (It also got a more efficient default implementation.)
+
+#### org.ojalgo.type
+
+- If a `QueuedConsumer` delegates to a `Consumer` that is also an `AutoConsumer` the `QueuedConsumer` will call the `AutoConsumer`'s `writeBatch(Iterable)` method rather than the `write(Object)` method – it will push batches, rather than individual items, to the delegate.
+- The `KeyValue` interface was deprecated, but is no longer. Instead `EntryPair` now extends `KeyValue`, and `KeyValue` gained a collection of factory mehods to create pairs. Further the definition of `Dual` moved from `EntryPair` to `KeyValue`.
+
+### Deprecated
+
+#### org.ojalgo.structure
+
+- All the various `fillOne(...)` methods in the `Mutate*D.Fillable` interfaces are deprecated. Just use `set(...)` instead.
+
+### Fixed
+
+#### org.ojalgo.data
+
+- Downloading historical financial data from Yahoo Finance works again!
+
+#### org.ojalgo.optimisation
+
+- Fixed rare case of inconsistencies between branches in the IntegerSolver. (Could result in wrong solutions!)
+
+### Removed
+
+#### org.ojalgo.type
+
+- A bunch of stuff in `org.ojalgo.type.keyvalue` that has been deprecated for a while is now actually removed.
+- Some old code in `org.ojalgo.netio` that was deprecated is now removed.
+
 ## [51.4.1] – 2022-08-26
 
 ### Fixed
@@ -24,6 +121,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Fixed a regression with `RandomNumber` where it was no longer possible to set a seed for the underlying `java.util.Random` instance.
 
 ## [51.4.0] – 2022-07-05
+
+Last version to target Java 8!
 
 ### Added
 

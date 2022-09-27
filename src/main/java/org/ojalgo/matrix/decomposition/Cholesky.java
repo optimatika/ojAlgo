@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -56,7 +56,7 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
     Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
 
     Factory<Double> PRIMITIVE = typical -> {
-        if ((32L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+        if ((32L < typical.countColumns()) && (typical.count() <= PlainArray.MAX_SIZE)) {
             return new CholeskyDecomposition.Primitive();
         } else {
             return new RawCholesky();
@@ -73,9 +73,7 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
-
-        return retVal;
+        return Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
     }
 
     /**

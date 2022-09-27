@@ -29,7 +29,7 @@ import org.ojalgo.structure.Access1D;
 public abstract class PrimitiveSeries implements Access1D<Double> {
 
     public static PrimitiveSeries copy(final Access1D<?> template) {
-        return new AccessSeries(Array1D.PRIMITIVE64.copy(template));
+        return new AccessSeries(Array1D.R064.copy(template));
     }
 
     public static PrimitiveSeries wrap(final Access1D<?> base) {

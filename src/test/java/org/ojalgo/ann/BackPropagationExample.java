@@ -118,7 +118,7 @@ abstract class BackPropagationExample extends ANNTest {
             BasicLogger.debug("Weights before training");
             final AtomicInteger layer = new AtomicInteger();
             trainer.getWeights().forEach(l -> {
-                BasicLogger.debug(layer.toString(), l);
+                BasicLogger.debugMatrix(layer.toString(), l);
                 layer.incrementAndGet();
             });
         }
@@ -167,8 +167,8 @@ abstract class BackPropagationExample extends ANNTest {
             if (DEBUG) {
                 BasicLogger.debug("");
                 BasicLogger.debug("Calculated for layer " + layer);
-                BasicLogger.debug("Weighs", newWeights);
-                BasicLogger.debug("Bias", newBias);
+                BasicLogger.debugMatrix("Weighs", newWeights);
+                BasicLogger.debugMatrix("Bias", newBias);
             }
         }
 
@@ -177,7 +177,7 @@ abstract class BackPropagationExample extends ANNTest {
             BasicLogger.debug("Weights reset/before training");
             final AtomicInteger layer = new AtomicInteger();
             trainer.getWeights().forEach(l -> {
-                BasicLogger.debug(layer.toString(), l);
+                BasicLogger.debugMatrix(layer.toString(), l);
                 layer.incrementAndGet();
             });
         }
@@ -189,7 +189,7 @@ abstract class BackPropagationExample extends ANNTest {
             BasicLogger.debug("Weights after training");
             final AtomicInteger layer = new AtomicInteger();
             trainer.getWeights().forEach(l -> {
-                BasicLogger.debug(layer.toString(), l);
+                BasicLogger.debugMatrix(layer.toString(), l);
                 layer.incrementAndGet();
             });
         }

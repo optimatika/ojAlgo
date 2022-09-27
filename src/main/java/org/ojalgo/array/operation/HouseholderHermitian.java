@@ -37,19 +37,19 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class HouseholderHermitian implements ArrayOperation {
+public abstract class HouseholderHermitian implements ArrayOperation {
 
     public static void invoke(final double[] data, final Householder.Primitive64 householder, final double[] worker) {
 
-        final double[] tmpVector = householder.vector;
-        final int tmpFirst = householder.first;
-        final int tmpLength = tmpVector.length;
-        final double tmpBeta = householder.beta;
-        final int tmpCount = tmpLength - tmpFirst;
+        double[] tmpVector = householder.vector;
+        int tmpFirst = householder.first;
+        int tmpLength = tmpVector.length;
+        double tmpBeta = householder.beta;
+        int tmpCount = tmpLength - tmpFirst;
 
         if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
 
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+            DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
@@ -75,7 +75,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
         if (tmpCount > HermitianRank2Update.THRESHOLD) {
 
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+            DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
@@ -94,15 +94,15 @@ public final class HouseholderHermitian implements ArrayOperation {
     public static <N extends Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
             final Scalar.Factory<N> scalar) {
 
-        final N[] tmpVector = householder.vector;
-        final int tmpFirst = householder.first;
-        final int tmpLength = tmpVector.length;
-        final N tmpBeta = householder.beta;
-        final int tmpCount = tmpLength - tmpFirst;
+        N[] tmpVector = householder.vector;
+        int tmpFirst = householder.first;
+        int tmpLength = tmpVector.length;
+        N tmpBeta = householder.beta;
+        int tmpCount = tmpLength - tmpFirst;
 
         if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
 
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+            DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
@@ -131,7 +131,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
         if (tmpCount > HermitianRank2Update.THRESHOLD) {
 
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+            DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
@@ -161,8 +161,8 @@ public final class HouseholderHermitian implements ArrayOperation {
          * the tridiagonal result
          */
 
-        final int n = d.length; // rows, columns, structure
-        final int tmpLast = n - 1;
+        int n = d.length; // rows, columns, structure
+        int tmpLast = n - 1;
 
         double scale;
         double h;
@@ -170,7 +170,7 @@ public final class HouseholderHermitian implements ArrayOperation {
         double g;
         double tmpVal; // Nothing special, just some transient value
 
-        final int tmpRowDim = n;
+        int tmpRowDim = n;
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
@@ -178,7 +178,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
-            final int l = i - 1; // col index of target householder point
+            int l = i - 1; // col index of target householder point
 
             h = scale = PrimitiveMath.ZERO;
 
@@ -252,7 +252,7 @@ public final class HouseholderHermitian implements ArrayOperation {
 
             for (int i = 0; i < tmpLast; i++) {
 
-                final int l = i + 1;
+                int l = i + 1;
 
                 data[tmpLast + tmpRowDim * i] = data[i + tmpRowDim * i];
                 data[i + tmpRowDim * i] = PrimitiveMath.ONE;
@@ -295,9 +295,9 @@ public final class HouseholderHermitian implements ArrayOperation {
      */
     public static void tred2nr(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
 
-        final int n = d.length;
+        int n = d.length;
         int l;
-        final int tmpRowDim = n;
+        int tmpRowDim = n;
 
         double scale;
         double h;

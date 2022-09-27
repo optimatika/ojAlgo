@@ -48,7 +48,7 @@ abstract class AbstractDistribution1D implements Distribution1D {
 
         final int tmpLength = tmpVar.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
+        final Array1D<Double> retVal = Array1D.R064.make(tmpLength);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, PrimitiveMath.SQRT.invoke(tmpVar.doubleValue(i)));
@@ -69,7 +69,7 @@ abstract class AbstractDistribution1D implements Distribution1D {
 
         final int tmpLength = tmpStdDev.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
+        final Array1D<Double> retVal = Array1D.R064.make(tmpLength);
 
         double tmpVal;
         for (int i = 0; i < tmpLength; i++) {

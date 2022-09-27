@@ -32,14 +32,14 @@ public class Alternator<T> {
     private final T myAlternativeB;
     private boolean mySwitch;
 
-    public Alternator(final T anAlternativeA, final T anAlternativeB) {
+    public Alternator(final T alternativeA, final T alternativeB) {
 
         super();
 
         mySwitch = false;
 
-        myAlternativeA = anAlternativeA;
-        myAlternativeB = anAlternativeB;
+        myAlternativeA = alternativeA;
+        myAlternativeB = alternativeB;
     }
 
     @SuppressWarnings("unused")

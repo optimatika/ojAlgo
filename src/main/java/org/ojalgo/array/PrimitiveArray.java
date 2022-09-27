@@ -21,35 +21,24 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Mutate1D;
 
 public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
 
     public static PrimitiveArray make(final int size) {
-        return Primitive64Array.make(size);
+        return ArrayR064.make(size);
     }
 
     public static PrimitiveArray wrap(final double... data) {
-        return Primitive64Array.wrap(data);
+        return ArrayR064.wrap(data);
     }
 
     public static PrimitiveArray wrap(final float... data) {
-        return Primitive32Array.wrap(data);
+        return ArrayR032.wrap(data);
     }
 
     PrimitiveArray(final DenseArray.Factory<Double> factory, final int size) {
         super(factory, size);
-    }
-
-    @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    @Override
-    final boolean isPrimitive() {
-        return true;
     }
 
 }

@@ -21,9 +21,47 @@
  */
 package org.ojalgo.array.operation;
 
-public final class Exchange implements ArrayOperation {
+import org.ojalgo.array.BasicArray;
+
+public abstract class Exchange implements ArrayOperation {
 
     public static int THRESHOLD = 256;
+
+    public static <N extends Comparable<N>> void exchange(final BasicArray<N> data, final long firstA, final long firstB, final long step, final long count) {
+
+        long indexA = firstA;
+        long indexB = firstB;
+
+        N tmpVal;
+
+        for (long i = 0L; i < count; i++) {
+
+            tmpVal = data.get(indexA);
+            data.set(indexA, data.get(indexB));
+            data.set(indexB, tmpVal);
+
+            indexA += step;
+            indexB += step;
+        }
+    }
+
+    public static void exchange(final byte[] data, final int firstA, final int firstB, final int step, final int count) {
+
+        int indexA = firstA;
+        int indexB = firstB;
+
+        byte tmpVal;
+
+        for (int i = 0; i < count; i++) {
+
+            tmpVal = data[indexA];
+            data[indexA] = data[indexB];
+            data[indexB] = tmpVal;
+
+            indexA += step;
+            indexB += step;
+        }
+    }
 
     public static void exchange(final double[] data, final int firstA, final int firstB, final int step, final int count) {
 
@@ -61,12 +99,66 @@ public final class Exchange implements ArrayOperation {
         }
     }
 
+    public static void exchange(final int[] data, final int firstA, final int firstB, final int step, final int count) {
+
+        int indexA = firstA;
+        int indexB = firstB;
+
+        int tmpVal;
+
+        for (int i = 0; i < count; i++) {
+
+            tmpVal = data[indexA];
+            data[indexA] = data[indexB];
+            data[indexB] = tmpVal;
+
+            indexA += step;
+            indexB += step;
+        }
+    }
+
+    public static void exchange(final long[] data, final int firstA, final int firstB, final int step, final int count) {
+
+        int indexA = firstA;
+        int indexB = firstB;
+
+        long tmpVal;
+
+        for (int i = 0; i < count; i++) {
+
+            tmpVal = data[indexA];
+            data[indexA] = data[indexB];
+            data[indexB] = tmpVal;
+
+            indexA += step;
+            indexB += step;
+        }
+    }
+
     public static <N extends Comparable<N>> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int count) {
 
         int indexA = firstA;
         int indexB = firstB;
 
         N tmpVal;
+
+        for (int i = 0; i < count; i++) {
+
+            tmpVal = data[indexA];
+            data[indexA] = data[indexB];
+            data[indexB] = tmpVal;
+
+            indexA += step;
+            indexB += step;
+        }
+    }
+
+    public static void exchange(final short[] data, final int firstA, final int firstB, final int step, final int count) {
+
+        int indexA = firstA;
+        int indexB = firstB;
+
+        short tmpVal;
 
         for (int i = 0; i < count; i++) {
 

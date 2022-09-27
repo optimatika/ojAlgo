@@ -24,8 +24,8 @@ package org.ojalgo.optimisation.linear;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -144,7 +144,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         TestUtils.assertStateNotLessThanOptimal(feasResult);
 
-        GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
+        GeneralBuilder linear = convex.toLinearApproximation(ArrayR064.make(convex.countVariables()));
         Result lineResult = linear.build(model.options).solve();
 
         if (DEBUG) {
@@ -254,8 +254,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         dualModel.addExpression().set(y1, 8).set(y2, 1).set(y3, 2).lower(3);
 
         double optimalValue = 4.75;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.5, 1.25 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
+        DenseArray<Double> optimalX = ArrayR064.FACTORY.copy(new double[] { 0.5, 1.25 });
+        DenseArray<Double> optimalY = ArrayR064.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
 
         PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
@@ -281,8 +281,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         dualModel.addExpression().set(y1, 3).set(y2, 0).set(y3, 4).lower(3);
 
         double optimalValue = 36.0;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 3.0, 8.0 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 0.2, 0.0, 0.6 });
+        DenseArray<Double> optimalX = ArrayR064.FACTORY.copy(new double[] { 3.0, 8.0 });
+        DenseArray<Double> optimalY = ArrayR064.FACTORY.copy(new double[] { 0.2, 0.0, 0.6 });
 
         PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
@@ -308,8 +308,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         dualModel.addExpression().set(y1, 1).set(y2, 4).lower(13);
 
         double optimalValue = 294.0;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 36.0, 0.0, 6.0 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 11, 0.5 });
+        DenseArray<Double> optimalX = ArrayR064.FACTORY.copy(new double[] { 36.0, 0.0, 6.0 });
+        DenseArray<Double> optimalY = ArrayR064.FACTORY.copy(new double[] { 11, 0.5 });
 
         PrimalDualTest.doCompareModels(primModel, dualModel, optimalValue, optimalX, optimalY, true);
     }
@@ -349,7 +349,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         TestUtils.assertStateNotLessThanOptimal(feasResult);
 
-        GeneralBuilder linear = convex.toLinearApproximation(Primitive64Array.make(convex.countVariables()));
+        GeneralBuilder linear = convex.toLinearApproximation(ArrayR064.make(convex.countVariables()));
         Result lineResult = linear.build(model.options).solve();
 
         if (OptimisationLinearTests.DEBUG) {
@@ -406,8 +406,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
     public void testWikipediaExample() {
 
         double optimalValue = 14.0 / 3.0;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.0, 7.0 / 6.0 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 4.0 / 6.0 });
+        DenseArray<Double> optimalX = ArrayR064.FACTORY.copy(new double[] { 0.0, 7.0 / 6.0 });
+        DenseArray<Double> optimalY = ArrayR064.FACTORY.copy(new double[] { 4.0 / 6.0 });
 
         ExpressionsBasedModel primModel = new ExpressionsBasedModel();
         Variable x1 = primModel.addVariable("X1").lower(0).weight(3);

@@ -120,7 +120,10 @@ public final class SourceCache {
     private void update(final Value cacheValue, final FinanceData cacheKey, final CalendarDate now) {
         BasicSeries<LocalDate, PrimitiveNumber> priceSeries = cacheKey.getPriceSeries();
         for (Entry<LocalDate, PrimitiveNumber> entry : priceSeries.entrySet()) {
-            cacheValue.series.put(entry.getKey(), entry.getValue());
+            LocalDate entryKey = entry.getKey();
+            PrimitiveNumber entryValue = entry.getValue();
+            BasicSeries<LocalDate, PrimitiveNumber> cacheValueSeries = cacheValue.series;
+            cacheValueSeries.put(entryKey, entryValue);
         }
         cacheValue.updated = now;
     }

@@ -143,12 +143,20 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return retVal;
     }
 
+    /**
+     * @deprecated v52 Use {@link #getLowerLimit(boolean, double)} instead.
+     */
+    @Deprecated
     public final double getAdjustedLowerLimit() {
-        return this.toLowerValue(true);
+        return this.getLowerLimit(true, Double.NEGATIVE_INFINITY);
     }
 
+    /**
+     * @deprecated v52 Use {@link #getUpperLimit(boolean, double)} instead.
+     */
+    @Deprecated
     public final double getAdjustedUpperLimit() {
-        return this.toUpperValue(true);
+        return this.getUpperLimit(true, Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -166,20 +174,70 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myLowerLimit;
     }
 
+    public final double getLowerLimit(final boolean adjusted, final double defaultValue) {
+
+        BigDecimal limit = null;
+        if (adjusted && myLowerLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myLowerLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myLowerLimit;
+            }
+        } else {
+            limit = myLowerLimit;
+        }
+
+        if (limit != null) {
+            return limit.doubleValue();
+        }
+
+        return defaultValue;
+    }
+
     public final String getName() {
         return myName;
     }
 
+    /**
+     * @deprecated v52 Use {@link #getLowerLimit(boolean, double)} instead.
+     */
+    @Deprecated
     public final double getUnadjustedLowerLimit() {
-        return this.toLowerValue(false);
+        return this.getLowerLimit(false, Double.NEGATIVE_INFINITY);
     }
 
+    /**
+     * @deprecated v52 Use {@link #getUpperLimit(boolean, double)} instead.
+     */
+    @Deprecated
     public final double getUnadjustedUpperLimit() {
-        return this.toUpperValue(false);
+        return this.getUpperLimit(false, Double.POSITIVE_INFINITY);
     }
 
     public final BigDecimal getUpperLimit() {
         return myUpperLimit;
+    }
+
+    public final double getUpperLimit(final boolean adjusted, final double defaultValue) {
+
+        BigDecimal limit = null;
+        if (adjusted && myUpperLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myUpperLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myUpperLimit;
+            }
+        } else {
+            limit = myUpperLimit;
+        }
+
+        if (limit != null) {
+            return limit.doubleValue();
+        }
+
+        return defaultValue;
     }
 
     @Override
@@ -379,46 +437,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     public final ME weight(final long weight) {
         return this.weight(BigDecimal.valueOf(weight));
-    }
-
-    private double toLowerValue(final boolean adjusted) {
-
-        final BigDecimal limit;
-        if (adjusted && myLowerLimit != null) {
-            final int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myLowerLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myLowerLimit;
-            }
-        } else {
-            limit = myLowerLimit;
-        }
-
-        if (limit != null) {
-            return limit.doubleValue();
-        }
-        return Double.NEGATIVE_INFINITY;
-    }
-
-    private double toUpperValue(final boolean adjusted) {
-
-        final BigDecimal limit;
-        if (adjusted && myUpperLimit != null) {
-            final int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myUpperLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myUpperLimit;
-            }
-        } else {
-            limit = myUpperLimit;
-        }
-
-        if (limit != null) {
-            return limit.doubleValue();
-        }
-        return Double.POSITIVE_INFINITY;
     }
 
     protected void appendLeftPart(final StringBuilder builder) {

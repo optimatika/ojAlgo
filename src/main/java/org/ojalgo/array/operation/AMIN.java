@@ -31,7 +31,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  *
  * @author apete
  */
-public final class AMIN implements ArrayOperation {
+public abstract class AMIN implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
