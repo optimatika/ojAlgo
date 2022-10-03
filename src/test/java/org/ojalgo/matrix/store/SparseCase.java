@@ -29,6 +29,7 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Structure2D;
 
 public class SparseCase extends NonPhysicalTest {
 
@@ -76,6 +77,26 @@ public class SparseCase extends NonPhysicalTest {
 
         numberOfRows = dim;
         numberOfColumns = dim;
+    }
+
+    @Test
+    public void testIndexOfLargest() {
+
+        SparseStore<Double> sparseStore = SparseStore.PRIMITIVE64.make(1_000L, 1_000L);
+
+        for (int i = 0; i < 100; i++) {
+            long row = Uniform.randomInteger(1_000L);
+            long col = Uniform.randomInteger(1_000L);
+            sparseStore.set(row, col, Math.random());
+        }
+
+        long row = Uniform.randomInteger(1_000L);
+        long col = Uniform.randomInteger(1_000L);
+        sparseStore.set(row, col, -2.0);
+
+        long expected = Structure2D.index(1_000L, row, col);
+        long actual = sparseStore.indexOfLargest();
+        TestUtils.assertEquals(expected, actual);
     }
 
     @Test

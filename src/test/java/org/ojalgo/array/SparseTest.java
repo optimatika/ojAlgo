@@ -60,6 +60,22 @@ public class SparseTest extends ArrayTests {
     }
 
     @Test
+    public void testIndexOfLargest() {
+
+        SparseArray<Double> sparseArray = SparseArray.factory(ArrayR064.FACTORY).make(1_000_000L);
+
+        for (int i = 0; i < 100; i++) {
+            long index = Uniform.randomInteger(1_000_000L);
+            sparseArray.set(index, Math.random());
+        }
+
+        long index = Uniform.randomInteger(1_000_000L);
+        sparseArray.set(index, -2.0);
+
+        TestUtils.assertEquals(index, sparseArray.indexOfLargest());
+    }
+
+    @Test
     @Tag("slow")
     @Tag("unstable")
     public void testRandomAccess() {
