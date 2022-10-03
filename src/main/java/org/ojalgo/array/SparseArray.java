@@ -426,6 +426,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return myZeroNumber;
     }
 
+    @Override
+    public long indexOfLargest() {
+        return myIndices[Math.toIntExact(myValues.indexOfLargest(0L, myActualLength, 1L))];
+    }
+
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
         int tmpFoundAt = this.index(rangeLimit - 1L);
         if (tmpFoundAt < 0) {

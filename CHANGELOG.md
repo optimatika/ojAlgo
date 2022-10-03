@@ -11,6 +11,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- New method `describe()` in `ExpressionsBasedModel` that returns an object with various descriptive counts (number of variables, constraints, integers...)
+
+### Fixed
+
+#### org.ojalgo.array
+
+- Optimised implementation of `indexOfLargest` in `SparseArray`.
+
+#### org.ojalgo.matrix
+
+- Optimised implementation of `indexOfLargest` in `SparseStore`.
+
 ## [52.0.0] – 2022-09-27
 
 ### Added
