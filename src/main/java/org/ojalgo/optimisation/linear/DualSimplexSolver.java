@@ -21,13 +21,30 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.optimisation.Optimisation;
+
 /**
- * OptimisationLinearPackageTests
+ * Requires all variables to have both lower and upper bounds.
  *
  * @author apete
  */
-abstract class OptimisationLinearTests {
+final class DualSimplexSolver extends SimplexSolver {
 
-    static final boolean DEBUG = true;
+    DualSimplexSolver(final Options solverOptions, final SimplexStore simplexStore) {
+        super(solverOptions, simplexStore);
+    }
+
+    public Result solve(final Result kickStarter) {
+
+        IterDescr iteration = this.prepareToIterate(false, false);
+
+        this.doDualIterations(iteration);
+
+        if (this.getState().isFeasible() && this.isDualFeasible()) {
+            this.setState(Optimisation.State.OPTIMAL);
+        }
+
+        return this.extractResult();
+    }
 
 }

@@ -473,6 +473,83 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
+    /**
+     * An integration to a new/alternative/experimental LP-solver. That solver is intended to replace the
+     * current solver, but is not yet ready to do that. You're welcome to try it - just add this integration
+     * by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
+     */
+    public static final ExpressionsBasedModel.Integration<SimplexSolver> NEW_INTEGRATION = new ExpressionsBasedModel.Integration<>() {
+
+        public SimplexSolver build(final ExpressionsBasedModel model) {
+
+            PhasedSimplexSolver solver = SimplexStore.build(model, structure -> {
+                if (Boolean.TRUE.equals(model.options.sparse)) {
+                    return new RevisedStore(structure);
+                } else if (Boolean.FALSE.equals(model.options.sparse)) {
+                    return new TableauStore(structure);
+                } else {
+                    return SimplexStore.newInstance(structure);
+                }
+            }).newPhasedSimplexSolver(model.options);
+
+            if (model.options.validate) {
+                solver.setValidator(solvState -> {
+
+                    Result modState = this.toModelState(solvState, model);
+
+                    if (!model.validate(modState)) {
+                        BasicLogger.error();
+                        BasicLogger.error("Validation with Model Failed!");
+                        BasicLogger.error();
+                    }
+                });
+            }
+
+            return solver;
+        }
+
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
+        }
+
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            List<Variable> freeVariables = model.getFreeVariables();
+            Set<IntIndex> fixedVariables = model.getFixedVariables();
+            int nbFreeVars = freeVariables.size();
+            int nbModelVars = model.countVariables();
+
+            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
+            }
+
+            for (IntIndex fixed : fixedVariables) {
+                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
+            }
+
+            return new Result(solverState.getState(), modelSolution);
+        }
+
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+            List<Variable> freeVariables = model.getFreeVariables();
+            int nbFreeVars = freeVariables.size();
+
+            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                Variable variable = freeVariables.get(i);
+                int modelIndex = model.indexOf(variable);
+                solverSolution.set(i, modelState.doubleValue(modelIndex));
+            }
+
+            return new Result(modelState.getState(), solverSolution);
+        }
+
+    };
+
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
     }

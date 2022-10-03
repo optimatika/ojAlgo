@@ -21,13 +21,30 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.optimisation.Optimisation;
+
 /**
- * OptimisationLinearPackageTests
+ * Requires the initial basis to be feasible (doesn't do a phase-1).
  *
  * @author apete
  */
-abstract class OptimisationLinearTests {
+final class PrimalSimplexSolver extends SimplexSolver {
 
-    static final boolean DEBUG = true;
+    PrimalSimplexSolver(final Options solverOptions, final SimplexStore simplexStore) {
+        super(solverOptions, simplexStore);
+    }
+
+    public Result solve(final Result kickStarter) {
+
+        IterDescr iteration = this.prepareToIterate(true, false);
+
+        this.doPrimalIterations(iteration);
+
+        if (this.getState().isOptimal() && !this.isPrimalFeasible()) {
+            this.setState(Optimisation.State.FAILED);
+        }
+
+        return this.extractResult();
+    }
 
 }

@@ -1521,8 +1521,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                 }
             } else if (ConvexSolver.INTEGRATION.isCapable(this)) {
                 retVal = ConvexSolver.INTEGRATION;
-            } else if (LinearSolver.INTEGRATION.isCapable(this)) {
-                retVal = LinearSolver.INTEGRATION;
+            } else if (LinearSolver.NEW_INTEGRATION.isCapable(this)) {
+                retVal = LinearSolver.NEW_INTEGRATION;
             }
         }
 

@@ -22,12 +22,30 @@
 package org.ojalgo.optimisation.linear;
 
 /**
- * OptimisationLinearPackageTests
+ * First runs the dual algorithm (with a modified objective fuction) to establish feasibility, and then the
+ * primal to reach optimality.
  *
  * @author apete
  */
-abstract class OptimisationLinearTests {
+final class PhasedSimplexSolver extends SimplexSolver {
 
-    static final boolean DEBUG = true;
+    PhasedSimplexSolver(final Options solverOptions, final SimplexStore simplexStore) {
+        super(solverOptions, simplexStore);
+    }
+
+    public Result solve(final Result kickStarter) {
+
+        this.initiatePhase1();
+
+        IterDescr iteration = this.prepareToIterate(false, true);
+
+        this.doDualIterations(iteration); // Phase-1
+
+        this.switchToPhase2();
+
+        this.doPrimalIterations(iteration); // Phase-2
+
+        return this.extractResult();
+    }
 
 }
