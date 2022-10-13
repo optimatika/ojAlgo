@@ -92,10 +92,6 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
  */
 public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
 
-    public UpdatableSolver.EntityMap getEntityMap() {
-        return null;
-    }
-
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
         private ConvexObjectiveFunction myObjective = null;
@@ -717,6 +713,10 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         myMatrices.reset();
     }
 
+    public UpdatableSolver.EntityMap getEntityMap() {
+        return null;
+    }
+
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
         if (this.initialise(kickStarter)) {
@@ -736,13 +736,18 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return this.buildResult();
     }
 
-    protected boolean isIteratingPossible() {
-        return true;
-    }
-
     @Override
     public String toString() {
         return myMatrices.toString();
+    }
+
+    protected Optimisation.Result buildResult() {
+
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
+
+        return new Optimisation.Result(state, value, solution);
     }
 
     protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
@@ -761,15 +766,13 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return myMatrices.countVariables();
     }
 
-    @Override
     protected double evaluateFunction(final Access1D<?> solution) {
 
-        final MatrixStore<Double> tmpX = this.getSolutionX();
+        MatrixStore<Double> tmpX = this.getSolutionX();
 
         return tmpX.transpose().multiply(this.getMatrixQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getMatrixC())).doubleValue(0L);
     }
 
-    @Override
     protected MatrixStore<Double> extractSolution() {
 
         return this.getSolutionX().copy();
@@ -923,6 +926,10 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         return symmetric && semidefinite;
+    }
+
+    protected boolean isIteratingPossible() {
+        return true;
     }
 
     protected boolean isSolvableGeneral() {

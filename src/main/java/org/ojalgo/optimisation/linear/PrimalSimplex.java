@@ -42,7 +42,7 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
-final class PrimalSimplex extends SimplexSolver {
+final class PrimalSimplex extends SimplexTableauSolver {
 
     /**
      * Variant of
@@ -410,7 +410,7 @@ final class PrimalSimplex extends SimplexSolver {
         return retVal;
     }
 
-    private static void set(final ExpressionsBasedModel model, final SimplexSolver.Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
+    private static void set(final ExpressionsBasedModel model, final SimplexTableauSolver.Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
             final int baseNegVars, final IntIndex key, final double factor) {
 
         int tmpPosInd = model.indexOfPositiveVariable(key);
@@ -424,7 +424,7 @@ final class PrimalSimplex extends SimplexSolver {
         }
     }
 
-    private static void set(final ExpressionsBasedModel model, final SimplexSolver.Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
+    private static void set(final ExpressionsBasedModel model, final SimplexTableauSolver.Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
             final int baseNegVars, final Variable variable, final double factor) {
 
         int tmpPosInd = model.indexOfPositiveVariable(variable);
@@ -459,7 +459,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         int nbVars = convex.countVariables();
 
-        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexSolver.Primitive1D() {
+        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public int size() {
@@ -630,9 +630,9 @@ final class PrimalSimplex extends SimplexSolver {
         SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars, needDuals,
                 model.options);
         MetaData meta = retVal.meta;
-        SimplexSolver.Primitive2D retConstraintsBdy = retVal.constraintsBody();
-        SimplexSolver.Primitive1D retConstraintsRHS = retVal.constraintsRHS();
-        SimplexSolver.Primitive1D retObjective = retVal.objective();
+        SimplexTableauSolver.Primitive2D retConstraintsBdy = retVal.constraintsBody();
+        SimplexTableauSolver.Primitive1D retConstraintsRHS = retVal.constraintsRHS();
+        SimplexTableauSolver.Primitive1D retObjective = retVal.objective();
 
         int basePosVars = 0; // 0 + 0
         int baseNegVars = nbPosProbVars; // 0 + nbPosProbVars
@@ -873,7 +873,7 @@ final class PrimalSimplex extends SimplexSolver {
 
         int nbVars = convex.countVariables();
 
-        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexSolver.Primitive1D() {
+        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public int size() {

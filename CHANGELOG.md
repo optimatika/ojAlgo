@@ -17,6 +17,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New method `describe()` in `ExpressionsBasedModel` that returns an object with various descriptive counts (number of variables, constraints, integers...)
 
+#### org.ojalgo.type
+
+- New utility `EnumPartition` which is a generalised alternative to `IndexSelector`.
+
+### Changed
+
+#### org.ojalgo.type
+
+- The `getIncluded()` and `getExcluded()` methods of `IndexSelector` now return cached/reused int[]:s when possible.
+
 ### Fixed
 
 #### org.ojalgo.array

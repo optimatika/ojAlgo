@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class SimplexSolver extends LinearSolver {
+abstract class SimplexTableauSolver extends LinearSolver {
 
     static final class IterationPoint {
 
@@ -189,16 +189,16 @@ public abstract class SimplexSolver extends LinearSolver {
     private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
     private LongToNumberMap<Double> myFixedVariables = null;
 
-    private final SimplexSolver.IterationPoint myPoint;
+    private final SimplexTableauSolver.IterationPoint myPoint;
     private final SimplexTableau myTableau;
 
-    SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
+    SimplexTableauSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
 
         super(solverOptions);
 
         myTableau = tableau;
 
-        myPoint = new SimplexSolver.IterationPoint();
+        myPoint = new SimplexTableauSolver.IterationPoint();
 
         if (this.isLogProgress()) {
             this.log("");
@@ -337,9 +337,8 @@ public abstract class SimplexSolver extends LinearSolver {
         return -myTableau.value(false);
     }
 
-    @Override
     protected Result buildResult() {
-        Result result = super.buildResult();
+        Result result = this.buildResult2();
         if (myTableau.isAbleToExtractDual()) {
             return result.multipliers(this.extractMultipliers());
         }
@@ -347,7 +346,15 @@ public abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    @Override
+    protected Optimisation.Result buildResult2() {
+
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
+
+        return new Optimisation.Result(state, value, solution);
+    }
+
     protected double evaluateFunction(final Access1D<?> solution) {
         return -myTableau.value(false);
     }
@@ -380,9 +387,9 @@ public abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * Extract solution MatrixStore from the tableau
+     * Extract solution MatrixStore from the tableau. Should be able to feed this to
+     * {@link #evaluateFunction(Access1D)}.
      */
-    @Override
     protected Access1D<?> extractSolution() {
 
         int colRHS = myTableau.countVariablesTotally();
@@ -406,12 +413,10 @@ public abstract class SimplexSolver extends LinearSolver {
         return solution;
     }
 
-    @Override
     protected boolean initialise(final Result kickStarter) {
         return false;
     }
 
-    @Override
     protected boolean needsAnotherIteration() {
 
         if (this.isLogDebug()) {
@@ -423,24 +428,21 @@ public abstract class SimplexSolver extends LinearSolver {
         boolean retVal = false;
         myPoint.reset();
 
-        if (myPoint.isPhase1()) {
+        if (myPoint.isPhase1() && (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials())) {
 
-            if (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials()) {
+            this.cleanUpPhase1Artificials();
 
-                this.cleanUpPhase1Artificials();
-
-                if (this.isLogDebug()) {
-                    this.log();
-                    this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
-                            this.infeasibility());
-                    this.log();
-                }
-
-                // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
-
-                myPoint.switchToPhase2();
-                this.setState(Optimisation.State.FEASIBLE);
+            if (this.isLogDebug()) {
+                this.log();
+                this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
+                        this.infeasibility());
+                this.log();
             }
+
+            // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
+
+            myPoint.switchToPhase2();
+            this.setState(Optimisation.State.FEASIBLE);
         }
 
         myPoint.col = this.findNextPivotCol();
@@ -602,7 +604,7 @@ public abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    void performIteration(final SimplexSolver.IterationPoint pivot) {
+    void performIteration(final SimplexTableauSolver.IterationPoint pivot) {
 
         double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
         int tmpColRHS = myTableau.countVariablesTotally();
@@ -633,11 +635,9 @@ public abstract class SimplexSolver extends LinearSolver {
                 }
             }
 
-            if (minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) {
-                if (this.isLogDebug()) {
-                    this.log("Entire RHS columns: {}", colRHS);
-                    this.log();
-                }
+            if ((minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) && this.isLogDebug()) {
+                this.log("Entire RHS columns: {}", colRHS);
+                this.log();
             }
 
         }

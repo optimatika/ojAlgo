@@ -37,8 +37,8 @@ import org.ojalgo.type.context.NumberContext;
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private static final NumberContext LAGRANGE = ACCURACY.withScale(6);
-    private static final NumberContext SOLUTION = ACCURACY.withPrecision(6).withScale(4);
     private static final NumberContext SLACK = ACCURACY.withPrecision(6).withScale(10);
+    private static final NumberContext SOLUTION = ACCURACY.withPrecision(6).withScale(4);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -284,11 +284,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     @Override
-    protected boolean isIteratingPossible() {
-        return !this.isZeroQ();// Can't iterate, return what we have, maybe it's the LP solution
-    }
-
-    @Override
     protected boolean initialise(final Result kickStarter) {
 
         boolean ok = super.initialise(kickStarter);
@@ -337,6 +332,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         this.setState(state);
         return ok && state.isFeasible();
+    }
+
+    @Override
+    protected boolean isIteratingPossible() {
+        return !this.isZeroQ();// Can't iterate, return what we have, maybe it's the LP solution
     }
 
     @Override
