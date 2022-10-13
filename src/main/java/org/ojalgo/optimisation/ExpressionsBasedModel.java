@@ -114,11 +114,9 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         public final int nbEqualityBounds;
         public final int nbEqualityConstraints;
         public final int nbIntegerVariables;
-
         public final int nbLowerBounds;
         public final int nbLowerConstraints;
         public final int nbNegativeVariables;
-
         public final int nbPositiveVariables;
         public final int nbUpperBounds;
         public final int nbUpperConstraints;
@@ -141,6 +139,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             nbNegativeVariables = varNegative;
             nbPositiveVariables = varPositive;
             nbVariables = varTotal;
+        }
+
+        /**
+         * The total number of constraints
+         */
+        public int constraints() {
+            return nbEqualityConstraints + nbLowerConstraints + nbUpperConstraints;
         }
 
     }

@@ -284,6 +284,147 @@ public final class IntegerSolver extends GenericSolver {
         return options.validate || this.isLogProgress() ? CharacterRing.newRingLogger() : null;
     }
 
+    protected Optimisation.Result buildResult() {
+
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
+
+        return new Optimisation.Result(state, value, solution);
+    }
+
+    protected double evaluateFunction(final Access1D<?> solution) {
+        if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
+            return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
+        }
+        return Double.NaN;
+    }
+
+    protected MatrixStore<Double> extractSolution() {
+        return Primitive64Store.FACTORY.columns(this.getBestResultSoFar());
+    }
+
+    protected Optimisation.Result getBestEstimate() {
+        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
+    }
+
+    protected Optimisation.Result getBestResultSoFar() {
+
+        Result currentlyTheBest = myBestResultSoFar;
+
+        if (currentlyTheBest != null) {
+            return currentlyTheBest;
+        }
+
+        State tmpSate = State.INVALID;
+        double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+        MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(myIntegerModel.countVariables(), 1);
+
+        return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
+    }
+
+    protected boolean isIterationNecessary() {
+
+        if (myBestResultSoFar == null) {
+            return true;
+        }
+
+        return this.countTime() < options.time_suffice && this.countIterations() < options.iterations_suffice;
+    }
+
+    @Override
+    protected void logProgress(final int iterationsDone, final String classSimpleName, final CalendarDateDuration duration) {
+        this.log("Done {} {} iterations in {} with {}", iterationsDone, classSimpleName, duration, myNodeStatistics);
+    }
+
+    protected synchronized void markInteger(final NodeKey key, final Optimisation.Result result, final ModelStrategy strategy) {
+
+        if (this.isLogProgress()) {
+
+            double low = Double.NEGATIVE_INFINITY;
+            double high = Double.POSITIVE_INFINITY;
+
+            if (key != null) {
+                if (myMinimisation) {
+                    low = Math.max(low, key.objective);
+                } else {
+                    high = Math.min(high, key.objective);
+                }
+            }
+
+            if (myBestResultSoFar != null) {
+                if (myMinimisation) {
+                    high = Math.min(high, myBestResultSoFar.getValue());
+                } else {
+                    low = Math.max(low, myBestResultSoFar.getValue());
+                }
+            }
+
+            this.log("[{}, {}] -> {}", low, high, result.toString());
+            if (key != null) {
+                this.log("\t @ {}", key);
+            }
+        }
+
+        Optimisation.Result previouslyTheBest = myBestResultSoFar;
+
+        if (previouslyTheBest == null) {
+            myBestResultSoFar = result;
+            this.setState(Optimisation.State.FEASIBLE);
+        } else if (myMinimisation ? result.getValue() < previouslyTheBest.getValue() : result.getValue() > previouslyTheBest.getValue()) {
+            myBestResultSoFar = result;
+        }
+
+        strategy.markInteger(key, result);
+
+        double bestIntegerSolutionValue = myBestResultSoFar.getValue();
+
+        if (!strategy.getGapTolerance().isZero(bestIntegerSolutionValue)) {
+
+            double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
+
+            if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
+                BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
+                myIntegerModel.limitObjective(null, upper);
+            } else {
+                BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
+                myIntegerModel.limitObjective(lower, null);
+            }
+        }
+    }
+
+    /**
+     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
+     * method should only be called if {@linkplain org.ojalgo.optimisation.Optimisation.Options#validate} is
+     * set to true. In addition to returning true or false the implementation should set the state to either
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#VALID} or
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#INVALID} (or possibly
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#FAILED}). Typically the method should be called
+     * at the very beginning of the solve-method.
+     *
+     * @return Is the solver instance valid?
+     */
+    protected boolean validate() {
+
+        boolean retVal = true;
+        this.setState(State.VALID);
+
+        try {
+
+            if (!(retVal = myIntegerModel.validate())) {
+                retVal = false;
+                this.setState(State.INVALID);
+            }
+
+        } catch (Exception cause) {
+
+            retVal = false;
+            this.setState(State.FAILED);
+        }
+
+        return retVal;
+    }
+
     boolean compute(final NodeKey nodeKey, final NodeSolver nodeSolver, final RingLogger nodePrinter, final ModelStrategy strategy) {
 
         if (this.isLogDebug()) {
@@ -421,140 +562,6 @@ public final class IntegerSolver extends GenericSolver {
         if (upperBranch != null) {
             retVal = retVal && this.compute(upperBranch, nodeSolver, nodePrinter, strategy);
         }
-        return retVal;
-    }
-
-    @Override
-    protected double evaluateFunction(final Access1D<?> solution) {
-        if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
-            return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
-        }
-        return Double.NaN;
-    }
-
-    @Override
-    protected MatrixStore<Double> extractSolution() {
-        return Primitive64Store.FACTORY.columns(this.getBestResultSoFar());
-    }
-
-    protected Optimisation.Result getBestEstimate() {
-        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
-    }
-
-    protected Optimisation.Result getBestResultSoFar() {
-
-        Result currentlyTheBest = myBestResultSoFar;
-
-        if (currentlyTheBest != null) {
-            return currentlyTheBest;
-        }
-
-        State tmpSate = State.INVALID;
-        double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(myIntegerModel.countVariables(), 1);
-
-        return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
-    }
-
-    protected boolean isIterationNecessary() {
-
-        if (myBestResultSoFar == null) {
-            return true;
-        }
-
-        return this.countTime() < options.time_suffice && this.countIterations() < options.iterations_suffice;
-    }
-
-    @Override
-    protected void logProgress(final int iterationsDone, final String classSimpleName, final CalendarDateDuration duration) {
-        this.log("Done {} {} iterations in {} with {}", iterationsDone, classSimpleName, duration, myNodeStatistics);
-    }
-
-    protected synchronized void markInteger(final NodeKey key, final Optimisation.Result result, final ModelStrategy strategy) {
-
-        if (this.isLogProgress()) {
-
-            double low = Double.NEGATIVE_INFINITY;
-            double high = Double.POSITIVE_INFINITY;
-
-            if (key != null) {
-                if (myMinimisation) {
-                    low = Math.max(low, key.objective);
-                } else {
-                    high = Math.min(high, key.objective);
-                }
-            }
-
-            if (myBestResultSoFar != null) {
-                if (myMinimisation) {
-                    high = Math.min(high, myBestResultSoFar.getValue());
-                } else {
-                    low = Math.max(low, myBestResultSoFar.getValue());
-                }
-            }
-
-            this.log("[{}, {}] -> {}", low, high, result.toString());
-            if (key != null) {
-                this.log("\t @ {}", key);
-            }
-        }
-
-        Optimisation.Result previouslyTheBest = myBestResultSoFar;
-
-        if (previouslyTheBest == null) {
-            myBestResultSoFar = result;
-            this.setState(Optimisation.State.FEASIBLE);
-        } else if (myMinimisation ? result.getValue() < previouslyTheBest.getValue() : result.getValue() > previouslyTheBest.getValue()) {
-            myBestResultSoFar = result;
-        }
-
-        strategy.markInteger(key, result);
-
-        double bestIntegerSolutionValue = myBestResultSoFar.getValue();
-
-        if (!strategy.getGapTolerance().isZero(bestIntegerSolutionValue)) {
-
-            double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
-
-            if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
-                BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
-                myIntegerModel.limitObjective(null, upper);
-            } else {
-                BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
-                myIntegerModel.limitObjective(lower, null);
-            }
-        }
-    }
-
-    /**
-     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
-     * method should only be called if {@linkplain org.ojalgo.optimisation.Optimisation.Options#validate} is
-     * set to true. In addition to returning true or false the implementation should set the state to either
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#VALID} or
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#INVALID} (or possibly
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#FAILED}). Typically the method should be called
-     * at the very beginning of the solve-method.
-     *
-     * @return Is the solver instance valid?
-     */
-    protected boolean validate() {
-
-        boolean retVal = true;
-        this.setState(State.VALID);
-
-        try {
-
-            if (!(retVal = myIntegerModel.validate())) {
-                retVal = false;
-                this.setState(State.INVALID);
-            }
-
-        } catch (Exception cause) {
-
-            retVal = false;
-            this.setState(State.FAILED);
-        }
-
         return retVal;
     }
 

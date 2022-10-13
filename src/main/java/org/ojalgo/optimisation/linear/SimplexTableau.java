@@ -42,7 +42,7 @@ import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.UpdatableSolver;
-import org.ojalgo.optimisation.linear.SimplexSolver.Primitive1D;
+import org.ojalgo.optimisation.linear.SimplexTableauSolver.Primitive1D;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
@@ -52,7 +52,7 @@ import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
-abstract class SimplexTableau extends SimplexSolver.Primitive2D {
+abstract class SimplexTableau extends SimplexTableauSolver.Primitive2D {
 
     static final class DenseRawTableau extends DenseTableau {
 
@@ -197,7 +197,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive2D newConstraintsBody() {
+        SimplexTableauSolver.Primitive2D newConstraintsBody() {
 
             double[][] store = myRaw;
 
@@ -207,7 +207,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int nbIdentitySlackVariables = this.countIdentitySlackVariables();
             int dualIdentityBase = this.getDualIdentityBase();
 
-            return new SimplexSolver.Primitive2D() {
+            return new SimplexTableauSolver.Primitive2D() {
 
                 @Override
                 public double doubleValue(final int row, final int col) {
@@ -242,7 +242,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newConstraintsRHS() {
+        SimplexTableauSolver.Primitive1D newConstraintsRHS() {
 
             double[][] store = myRaw;
 
@@ -252,7 +252,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int dualIdentityBase = DenseRawTableau.this.getDualIdentityBase();
             boolean artificials = DenseRawTableau.this.isArtificials();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -282,13 +282,13 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newObjective() {
+        SimplexTableauSolver.Primitive1D newObjective() {
 
             double[][] store = myRaw;
 
             int nbConstraints = DenseRawTableau.this.countConstraints();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -309,7 +309,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        void pivot(final SimplexSolver.IterationPoint iterationPoint) {
+        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
 
             int row = iterationPoint.row;
             int col = iterationPoint.col;
@@ -482,7 +482,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive2D newConstraintsBody() {
+        SimplexTableauSolver.Primitive2D newConstraintsBody() {
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
@@ -492,7 +492,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int nbIdentitySlackVariables = this.countIdentitySlackVariables();
             int dualIdentityBase = this.getDualIdentityBase();
 
-            return new SimplexSolver.Primitive2D() {
+            return new SimplexTableauSolver.Primitive2D() {
 
                 @Override
                 public double doubleValue(final int row, final int col) {
@@ -527,7 +527,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newConstraintsRHS() {
+        SimplexTableauSolver.Primitive1D newConstraintsRHS() {
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
@@ -537,7 +537,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int dualIdentityBase = DenseTransposedTableau.this.getDualIdentityBase();
             boolean artificials = DenseTransposedTableau.this.isArtificials();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -567,13 +567,13 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newObjective() {
+        SimplexTableauSolver.Primitive1D newObjective() {
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
             int nbConstraints = DenseTransposedTableau.this.countConstraints();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -594,7 +594,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        void pivot(final SimplexSolver.IterationPoint iterationPoint) {
+        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
 
             int row = iterationPoint.row;
             int col = iterationPoint.col;
@@ -918,12 +918,12 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive2D newConstraintsBody() {
+        SimplexTableauSolver.Primitive2D newConstraintsBody() {
 
             int nbIdentitySlackVariables = this.countIdentitySlackVariables();
             int dualIdentityBase = this.getDualIdentityBase();
 
-            return new SimplexSolver.Primitive2D() {
+            return new SimplexTableauSolver.Primitive2D() {
 
                 @Override
                 public double doubleValue(final int row, final int col) {
@@ -958,7 +958,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newConstraintsRHS() {
+        SimplexTableauSolver.Primitive1D newConstraintsRHS() {
 
             Array1D<Double> rhs = SparseTableau.this.getRHS();
 
@@ -966,7 +966,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
             int dualIdentityBase = SparseTableau.this.getDualIdentityBase();
             boolean artificials = SparseTableau.this.isArtificials();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -996,11 +996,11 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        SimplexSolver.Primitive1D newObjective() {
+        SimplexTableauSolver.Primitive1D newObjective() {
 
             Array1D<Double> objectiveWeights = SparseTableau.this.getObjectiveWeights();
 
-            return new SimplexSolver.Primitive1D() {
+            return new SimplexTableauSolver.Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
@@ -1021,7 +1021,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         }
 
         @Override
-        void pivot(final SimplexSolver.IterationPoint iterationPoint) {
+        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
 
             int row = iterationPoint.row;
             int col = iterationPoint.col;
@@ -1134,14 +1134,14 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
     }
 
     private final int[] myBasis;
-    private transient SimplexSolver.Primitive2D myConstraintsBody = null;
-    private transient SimplexSolver.Primitive1D myConstraintsRHS = null;
+    private transient SimplexTableauSolver.Primitive2D myConstraintsBody = null;
+    private transient SimplexTableauSolver.Primitive1D myConstraintsRHS = null;
     private final int myNumberOfArtificialVariables;
     private final int myNumberOfConstraints;
     private final int myNumberOfIdentitySlackVariables;
     private final int myNumberOfProblemVariables;
     private final int myNumberOfSlackVariables;
-    private transient SimplexSolver.Primitive1D myObjective = null;
+    private transient SimplexTableauSolver.Primitive1D myObjective = null;
     private final IndexSelector mySelector;
 
     final MetaData meta;
@@ -1181,7 +1181,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
     /**
      * The area of the tableau corresponding to the constraints' body (excluding any artificial variables).
      */
-    final SimplexSolver.Primitive2D constraintsBody() {
+    final SimplexTableauSolver.Primitive2D constraintsBody() {
         if (myConstraintsBody == null) {
             myConstraintsBody = this.newConstraintsBody();
         }
@@ -1191,7 +1191,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
     /**
      * The area of the tableau corresponding to the constraints' RHS.
      */
-    final SimplexSolver.Primitive1D constraintsRHS() {
+    final SimplexTableauSolver.Primitive1D constraintsRHS() {
         if (myConstraintsRHS == null) {
             myConstraintsRHS = this.newConstraintsRHS();
         }
@@ -1367,27 +1367,27 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         return mySelector.isIncluded(index);
     }
 
-    abstract SimplexSolver.Primitive2D newConstraintsBody();
+    abstract SimplexTableauSolver.Primitive2D newConstraintsBody();
 
-    abstract SimplexSolver.Primitive1D newConstraintsRHS();
+    abstract SimplexTableauSolver.Primitive1D newConstraintsRHS();
 
-    abstract SimplexSolver.Primitive1D newObjective();
+    abstract SimplexTableauSolver.Primitive1D newObjective();
 
     /**
      * The area of the tableau corresponding to the objective function.
      */
-    final SimplexSolver.Primitive1D objective() {
+    final SimplexTableauSolver.Primitive1D objective() {
         if (myObjective == null) {
             myObjective = this.newObjective();
         }
         return myObjective;
     }
 
-    abstract void pivot(SimplexSolver.IterationPoint iterationPoint);
+    abstract void pivot(SimplexTableauSolver.IterationPoint iterationPoint);
 
-    final SimplexSolver.Primitive1D sliceBodyColumn(final int col) {
+    final SimplexTableauSolver.Primitive1D sliceBodyColumn(final int col) {
 
-        return new SimplexSolver.Primitive1D() {
+        return new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
@@ -1407,9 +1407,9 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         };
     }
 
-    final SimplexSolver.Primitive1D sliceBodyRow(final int row) {
+    final SimplexTableauSolver.Primitive1D sliceBodyRow(final int row) {
 
-        return new SimplexSolver.Primitive1D() {
+        return new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
@@ -1429,21 +1429,21 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         };
     }
 
-    final SimplexSolver.Primitive1D sliceConstraintsRHS() {
+    final SimplexTableauSolver.Primitive1D sliceConstraintsRHS() {
         return this.constraintsRHS();
     }
 
     /**
      * @return An array of the dual variable values (of the original problem, never phase 1).
      */
-    final SimplexSolver.Primitive1D sliceDualVariables() {
+    final SimplexTableauSolver.Primitive1D sliceDualVariables() {
 
         int nbConstraints = this.countConstraints();
         int nbVariables = this.countVariablesTotally();
 
         int dualIdentityBase = this.getDualIdentityBase();
 
-        return new SimplexSolver.Primitive1D() {
+        return new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
@@ -1463,9 +1463,9 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         };
     }
 
-    final SimplexSolver.Primitive1D sliceTableauColumn(final int col) {
+    final SimplexTableauSolver.Primitive1D sliceTableauColumn(final int col) {
 
-        return new SimplexSolver.Primitive1D() {
+        return new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
@@ -1485,9 +1485,9 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         };
     }
 
-    final SimplexSolver.Primitive1D sliceTableauRow(final int row) {
+    final SimplexTableauSolver.Primitive1D sliceTableauRow(final int row) {
 
-        return new SimplexSolver.Primitive1D() {
+        return new SimplexTableauSolver.Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
@@ -1528,7 +1528,7 @@ abstract class SimplexTableau extends SimplexSolver.Primitive2D {
         this.update(Math.toIntExact(pivotRow), Math.toIntExact(pivotCol));
     }
 
-    void update(final SimplexSolver.IterationPoint point) {
+    void update(final SimplexTableauSolver.IterationPoint point) {
         this.update(point.row, point.col);
     }
 

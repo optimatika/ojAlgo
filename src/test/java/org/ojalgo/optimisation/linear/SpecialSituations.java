@@ -64,7 +64,7 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
+        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 1;
@@ -130,7 +130,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
+        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 0;
@@ -170,7 +170,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertEquals(dense, sparse);
 
-        SimplexSolver.IterationPoint pivot = new SimplexSolver.IterationPoint();
+        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
         pivot.row = 0;

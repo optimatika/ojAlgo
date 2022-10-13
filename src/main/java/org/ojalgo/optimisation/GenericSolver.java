@@ -257,15 +257,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         options = solverOptions;
     }
 
-    protected Optimisation.Result buildResult() {
-
-        Access1D<?> solution = this.extractSolution();
-        double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
-
-        return new Optimisation.Result(state, value, solution);
-    }
-
     protected final int countIterations() {
         return myIterationsCount.get();
     }
@@ -280,13 +271,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final void error(final String messagePattern, final Object... arguments) {
         BasicLogger.error(messagePattern, arguments);
     }
-
-    protected abstract double evaluateFunction(final Access1D<?> solution);
-
-    /**
-     * Should be able to feed this to {@link #evaluateFunction(Access1D)}.
-     */
-    protected abstract Access1D<?> extractSolution();
 
     protected final String getClassSimpleName() {
         if (myClassSimpleName == null) {

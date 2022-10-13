@@ -35,7 +35,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerProblems;
-import org.ojalgo.optimisation.linear.SimplexSolver.Primitive1D;
+import org.ojalgo.optimisation.linear.SimplexTableauSolver.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
 public class TableauCutGeneratorTest extends OptimisationLinearTests {

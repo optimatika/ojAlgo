@@ -25,14 +25,21 @@ import java.util.Arrays;
 
 import org.ojalgo.random.Uniform;
 
+/**
+ * An array of int:s (indices) that are partitioned to be either "included" or "excluded". If you need more
+ * than 2 different states then {@link EnumPartition} is an alternative.
+ *
+ * @see EnumPartition
+ * @author apete
+ */
 public final class IndexSelector {
 
+    private transient int[] myExcluded = null;
     private int myExcludedLength;
+    private transient int[] myIncluded = null;
     private int myIncludedLength;
-
     private int myLastExcluded;
     private int myLastIncluded;
-
     private final boolean[] mySelector;
 
     public IndexSelector(final int count) {
@@ -77,7 +84,7 @@ public final class IndexSelector {
         }
     }
 
-    public void exclude(final int[] indecesToExclude) {
+    public void exclude(final int... indecesToExclude) {
         int tmpIndex;
         for (int i = 0; i < indecesToExclude.length; i++) {
             tmpIndex = indecesToExclude[i];
@@ -95,32 +102,36 @@ public final class IndexSelector {
 
     public int[] getExcluded() {
 
-        int[] retVal = new int[myExcludedLength];
+        if (myExcluded == null || myExcluded.length != myExcludedLength) {
+            myExcluded = new int[myExcludedLength];
+        }
 
         int j = 0;
         for (int i = 0; i < mySelector.length; i++) {
             if (!mySelector[i]) {
-                retVal[j] = i;
+                myExcluded[j] = i;
                 j++;
             }
         }
 
-        return retVal;
+        return myExcluded;
     }
 
     public int[] getIncluded() {
 
-        int[] retVal = new int[myIncludedLength];
+        if (myIncluded == null || myIncluded.length != myIncludedLength) {
+            myIncluded = new int[myIncludedLength];
+        }
 
         int j = 0;
         for (int i = 0; i < mySelector.length; i++) {
             if (mySelector[i]) {
-                retVal[j] = i;
+                myIncluded[j] = i;
                 j++;
             }
         }
 
-        return retVal;
+        return myIncluded;
     }
 
     public int getLastExcluded() {
@@ -161,7 +172,7 @@ public final class IndexSelector {
         }
     }
 
-    public void include(final int[] indecesToInclude) {
+    public void include(final int... indecesToInclude) {
         int tmpIndex;
         for (int i = 0; i < indecesToInclude.length; i++) {
             tmpIndex = indecesToInclude[i];
@@ -197,6 +208,11 @@ public final class IndexSelector {
      */
     public boolean isLastIncluded() {
         return mySelector[myLastIncluded];
+    }
+
+    public void pivot(final int indexToExclude, final int indexToInclude) {
+        this.exclude(indexToExclude);
+        this.include(indexToInclude);
     }
 
     public void revertLastExclusion() {

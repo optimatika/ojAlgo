@@ -58,7 +58,9 @@ final class OptimisationData {
     private RowsSupplier<Double> myAI = null;
     private MatrixStore<Double> myBE = null;
     private MatrixStore<Double> myBI = null;
+    private Primitive64Store myLB = null;
     private MultiaryFunction.TwiceDifferentiable<Double> myObjective;
+    private Primitive64Store myUB = null;
 
     OptimisationData() {
         super();
@@ -198,12 +200,20 @@ final class OptimisationData {
         return myBI.doubleValue(row);
     }
 
+    Primitive64Store getLowerBounds() {
+        return myLB;
+    }
+
     <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
         return (T) myObjective;
     }
 
     RowView<Double> getRowsAI() {
         return myAI.rows();
+    }
+
+    Primitive64Store getUpperBounds() {
+        return myUB;
     }
 
     boolean hasAdditionalConstraints() {
@@ -245,6 +255,23 @@ final class OptimisationData {
         myBE = null;
         myBI = null;
         myObjective = null;
+    }
+
+    void setBounds(final Access1D<Double> lower, final Access1D<Double> upper) {
+
+        ProgrammingError.throwIfNull(lower, upper);
+
+        if (lower instanceof Primitive64Store) {
+            myLB = (Primitive64Store) lower;
+        } else {
+            myLB = FACTORY.columns(lower);
+        }
+
+        if (upper instanceof Primitive64Store) {
+            myUB = (Primitive64Store) upper;
+        } else {
+            myUB = FACTORY.columns(upper);
+        }
     }
 
     void setEqualities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
