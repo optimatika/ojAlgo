@@ -36,10 +36,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -85,110 +81,13 @@ abstract class SimplexTableauSolver extends LinearSolver {
 
     }
 
-    static abstract class Primitive1D implements Access1D<Double>, Mutate1D {
-
-        static Primitive1D of(final double... values) {
-            return new Primitive1D() {
-
-                @Override
-                public int size() {
-                    return values.length;
-                }
-
-                @Override
-                double doubleValue(final int index) {
-                    return values[index];
-                }
-
-                @Override
-                void set(final int index, final double value) {
-                    values[index] = value;
-                }
-
-            };
-        }
-
-        public final long count() {
-            return this.size();
-        }
-
-        public final double doubleValue(final long index) {
-            return this.doubleValue(Math.toIntExact(index));
-        }
-
-        public final Double get(final long index) {
-            return Double.valueOf(this.doubleValue(Math.toIntExact(index)));
-        }
-
-        public final void set(final long index, final Comparable<?> value) {
-            this.set(Math.toIntExact(index), NumberDefinition.doubleValue(value));
-        }
-
-        public final void set(final long index, final double value) {
-            this.set(Math.toIntExact(index), value);
-        }
-
-        public abstract int size();
-
-        @Override
-        public final String toString() {
-            return Access1D.toString(this);
-        }
-
-        abstract double doubleValue(final int index);
-
-        abstract void set(final int index, final double value);
-
-    }
-
-    static abstract class Primitive2D implements Access2D<Double>, Mutate2D {
-
-        public final long countColumns() {
-            return this.getColDim();
-        }
-
-        public final long countRows() {
-            return this.getRowDim();
-        }
-
-        public final double doubleValue(final long row, final long col) {
-            return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
-        }
-
-        public final Double get(final long row, final long col) {
-            return Double.valueOf(this.doubleValue(Math.toIntExact(row), Math.toIntExact(col)));
-        }
-
-        public abstract int getColDim();
-
-        public abstract int getRowDim();
-
-        public final void set(final long row, final long col, final Comparable<?> value) {
-            this.set(Math.toIntExact(row), Math.toIntExact(col), NumberDefinition.doubleValue(value));
-        }
-
-        public final void set(final long row, final long col, final double value) {
-            this.set(Math.toIntExact(row), Math.toIntExact(col), value);
-        }
-
-        @Override
-        public final String toString() {
-            return Access2D.toString(this);
-        }
-
-        abstract double doubleValue(final int row, final int col);
-
-        abstract void set(final int row, final int col, final double value);
-    }
-
     private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
-
     private static final NumberContext PHASE1 = ACCURACY.withScale(7);
     private static final NumberContext PIVOT = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
     private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
-    private LongToNumberMap<Double> myFixedVariables = null;
 
+    private LongToNumberMap<Double> myFixedVariables = null;
     private final SimplexTableauSolver.IterationPoint myPoint;
     private final SimplexTableau myTableau;
 
@@ -338,21 +237,19 @@ abstract class SimplexTableauSolver extends LinearSolver {
     }
 
     protected Result buildResult() {
-        Result result = this.buildResult2();
-        if (myTableau.isAbleToExtractDual()) {
-            return result.multipliers(this.extractMultipliers());
-        }
-        return result;
-
-    }
-
-    protected Optimisation.Result buildResult2() {
 
         Access1D<?> solution = this.extractSolution();
         double value = this.evaluateFunction(solution);
         Optimisation.State state = this.getState();
 
-        return new Optimisation.Result(state, value, solution);
+        Result result = new Optimisation.Result(state, value, solution);
+
+        if (myTableau.isAbleToExtractDual()) {
+            return result.multipliers(this.extractMultipliers());
+        }
+
+        return result;
+
     }
 
     protected double evaluateFunction(final Access1D<?> solution) {

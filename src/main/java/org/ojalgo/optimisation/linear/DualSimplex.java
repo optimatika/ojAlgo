@@ -182,7 +182,7 @@ final class DualSimplex extends SimplexTableauSolver {
 
         Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), result);
 
-        retVal.multipliers(new SimplexTableauSolver.Primitive1D() {
+        retVal.multipliers(new Primitive1D() {
 
             @Override
             public int size() {

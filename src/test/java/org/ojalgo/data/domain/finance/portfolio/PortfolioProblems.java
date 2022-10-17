@@ -55,9 +55,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20090115() {
 
-        final int assetNum = 7;
+        int assetNum = 7;
 
-        final double[][] assets_return = {
+        double[][] assets_return = {
                 { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997,
                         0.0 },
                 { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
@@ -68,25 +68,25 @@ public class PortfolioProblems extends FinancePortfolioTests {
                 { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4,
                         0.0 } };
 
-        final P20090115 tm = new P20090115();
-        final Primitive64Matrix covariances = tm.getCovariances(assets_return);
-        final Primitive64Matrix expectedExcessReturns = tm.getExpectedExcessReturns(assets_return); // Why not negate?
-        final BigDecimal riskAversion = new BigDecimal(1.0);
+        P20090115 tm = new P20090115();
+        Primitive64Matrix covariances = tm.getCovariances(assets_return);
+        Primitive64Matrix expectedExcessReturns = tm.getExpectedExcessReturns(assets_return); // Why not negate?
+        BigDecimal riskAversion = new BigDecimal(1.0);
 
-        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
-        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns);
+        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
+        MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns);
 
         for (int i = 0; i < assetNum; i++) {
             markowitzModel.setLowerLimit(i, new BigDecimal(0.0));
             markowitzModel.setUpperLimit(i, new BigDecimal(1.0));
         }
 
-        final List<BigDecimal> re = markowitzModel.getWeights();
+        List<BigDecimal> re = markowitzModel.getWeights();
 
         // TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal());
 
-        for (final BigDecimal tmpBigDecimal : re) {
-            if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {
+        for (BigDecimal tmpBigDecimal : re) {
+            if (tmpBigDecimal.compareTo(BigMath.ZERO) < 0 || tmpBigDecimal.compareTo(BigMath.ONE) > 0) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }
         }
@@ -98,7 +98,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20110614() {
 
-        final Primitive64Matrix.DenseReceiver tmpCovarsBuilder = Primitive64Matrix.FACTORY.makeDense(3, 3);
+        Primitive64Matrix.DenseReceiver tmpCovarsBuilder = Primitive64Matrix.FACTORY.makeDense(3, 3);
         tmpCovarsBuilder.set(0, 0, 0.04);
         tmpCovarsBuilder.set(0, 1, 0.01);
         tmpCovarsBuilder.set(0, 2, 0.02);
@@ -108,25 +108,25 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpCovarsBuilder.set(2, 0, 0.02);
         tmpCovarsBuilder.set(2, 1, 0.01);
         tmpCovarsBuilder.set(2, 2, 0.16);
-        final Primitive64Matrix tmpCovars = tmpCovarsBuilder.get();
-        final Primitive64Matrix.DenseReceiver tmpReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(3, 1);
+        Primitive64Matrix tmpCovars = tmpCovarsBuilder.get();
+        Primitive64Matrix.DenseReceiver tmpReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(3, 1);
         tmpReturnsBuilder.set(0, 0, 0.10);
         tmpReturnsBuilder.set(1, 0, 0.15);
         tmpReturnsBuilder.set(2, 0, 0.18);
-        final Primitive64Matrix tmpReturs = tmpReturnsBuilder.get();
+        Primitive64Matrix tmpReturs = tmpReturnsBuilder.get();
 
-        final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
+        MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
 
-        final MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpReturs);
+        MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpReturs);
 
         for (int i = 1; i < 10; i++) {
 
             tmpMarkowitz.setRiskAversion(new BigDecimal(i));
 
-            final List<BigDecimal> tmpWeights = tmpMarkowitz.getWeights();
+            List<BigDecimal> tmpWeights = tmpMarkowitz.getWeights();
 
-            for (final BigDecimal tmpBigDecimal : tmpWeights) {
-                if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {
+            for (BigDecimal tmpBigDecimal : tmpWeights) {
+                if (tmpBigDecimal.compareTo(BigMath.ZERO) < 0 || tmpBigDecimal.compareTo(BigMath.ONE) > 0) {
                     TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
                 }
             }
@@ -134,16 +134,16 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // As the Markowitz model built it the problem
 
-        final MatrixStore<Double> tmpQ = Primitive64Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
-        final MatrixStore<Double> tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
+        MatrixStore<Double> tmpQ = Primitive64Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
+        MatrixStore<Double> tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
 
-        final MatrixStore<Double> tmpAE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
-        final MatrixStore<Double> tmpBE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 } });
+        MatrixStore<Double> tmpAE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
+        MatrixStore<Double> tmpBE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 } });
 
         MatrixStore<Double> tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
         MatrixStore<Double> tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final MatrixStore<Double> tmpX = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
+        MatrixStore<Double> tmpX = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
 
         ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
@@ -194,21 +194,20 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20130329() {
 
-        final Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY
-                .rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
+        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
 
-        //        final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+        //         Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
         //        tmpEvD.compute(tmpCovariances, true);
         //        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
 
-        final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
+        MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
 
-        final Primitive64Matrix.DenseReceiver tmpExcessReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(2, 1);
+        Primitive64Matrix.DenseReceiver tmpExcessReturnsBuilder = Primitive64Matrix.FACTORY.makeDense(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
-        final Primitive64Matrix tmpExcessReturns = tmpExcessReturnsBuilder.get();
+        Primitive64Matrix tmpExcessReturns = tmpExcessReturnsBuilder.get();
 
-        final MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
+        MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
         tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);
         tmpMarkowitzModel.setUpperLimit(0, BigMath.ONE);
         tmpMarkowitzModel.setLowerLimit(1, BigMath.ZERO);
@@ -217,12 +216,12 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         for (int t = 8; t <= 14; t++) {
 
-            final BigDecimal tmpTargetReturn = BigMath.DIVIDE.invoke(new BigDecimal(t), BigMath.HUNDRED);
+            BigDecimal tmpTargetReturn = BigMath.DIVIDE.invoke(new BigDecimal(t), BigMath.HUNDRED);
             tmpMarkowitzModel.setTargetReturn(tmpTargetReturn);
 
-            final List<BigDecimal> tmpWeights = tmpMarkowitzModel.getWeights();
+            List<BigDecimal> tmpWeights = tmpMarkowitzModel.getWeights();
 
-            final State tmpOptimisationState = tmpMarkowitzModel.optimiser().getState();
+            State tmpOptimisationState = tmpMarkowitzModel.optimiser().getState();
 
             if (DEBUG) {
                 BasicLogger.debug("State {} {}", tmpOptimisationState, tmpWeights);
@@ -260,7 +259,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20141202() {
 
-        final double[][] assets_return = {
+        double[][] assets_return = {
                 { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997,
                         0.0 },
                 { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
@@ -271,19 +270,19 @@ public class PortfolioProblems extends FinancePortfolioTests {
                 { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4,
                         0.0 } };
 
-        final P20090115 tm = new P20090115();
-        final Primitive64Matrix tmpCovariances = tm.getCovariances(assets_return);
-        final Primitive64Matrix tmpExpectedExcessReturns = tm.getExpectedExcessReturns(assets_return).negate();
+        P20090115 tm = new P20090115();
+        Primitive64Matrix tmpCovariances = tm.getCovariances(assets_return);
+        Primitive64Matrix tmpExpectedExcessReturns = tm.getExpectedExcessReturns(assets_return).negate();
 
-        final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances).clean();
-        final MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpExpectedExcessReturns);
+        MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances).clean();
+        MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpExpectedExcessReturns);
 
-        final BigDecimal[] tmpRiskAversions = new BigDecimal[] { BigMath.HUNDREDTH, BigMath.TWELFTH, BigMath.EIGHTH, BigMath.HALF, BigMath.ONE, BigMath.TWO,
-                BigMath.EIGHT, BigMath.TWELVE, BigMath.HUNDRED, BigMath.THOUSAND };
-        final double[] tmpPortfolioReturn = new double[tmpRiskAversions.length];
-        final double[] tmpPortfolioVariance = new double[tmpRiskAversions.length];
+        BigDecimal[] tmpRiskAversions = { BigMath.HUNDREDTH, BigMath.TWELFTH, BigMath.EIGHTH, BigMath.HALF, BigMath.ONE, BigMath.TWO, BigMath.EIGHT,
+                BigMath.TWELVE, BigMath.HUNDRED, BigMath.THOUSAND };
+        double[] tmpPortfolioReturn = new double[tmpRiskAversions.length];
+        double[] tmpPortfolioVariance = new double[tmpRiskAversions.length];
 
-        final BigDecimal tmpInitialRiskAversion = tmpMarkowitz.getRiskAversion().toBigDecimal();
+        BigDecimal tmpInitialRiskAversion = tmpMarkowitz.getRiskAversion().toBigDecimal();
 
         for (int ra = 0; ra < tmpRiskAversions.length; ra++) {
             tmpMarkowitz.setRiskAversion(tmpRiskAversions[ra]);
@@ -326,19 +325,19 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20160608() {
 
-        final Primitive64Matrix.Factory matrixFactory = Primitive64Matrix.FACTORY;
-        final Primitive64Matrix cov = matrixFactory.rows(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } });
-        final Primitive64Matrix ret = matrixFactory.columns(new double[] { 0.0427, 0.0015, 0.0285 });
+        Primitive64Matrix.Factory matrixFactory = Primitive64Matrix.FACTORY;
+        Primitive64Matrix cov = matrixFactory.rows(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } });
+        Primitive64Matrix ret = matrixFactory.columns(new double[] { 0.0427, 0.0015, 0.0285 });
 
-        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
-        final MarkowitzModel markowitz = new MarkowitzModel(marketEquilibrium, ret);
+        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
+        MarkowitzModel markowitz = new MarkowitzModel(marketEquilibrium, ret);
         markowitz.setShortingAllowed(true);
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
         List<BigDecimal> tmpWeights = markowitz.getWeights();
         TestUtils.assertTrue(markowitz.optimiser().getState().isFeasible());
 
-        final NumberContext tmpTestPrecision = StandardType.PERCENT.withPrecision(4);
+        NumberContext tmpTestPrecision = StandardType.PERCENT.withPrecision(4);
 
         // Solution reachable without shorting, but since it is allowed the optimal solution is different
         TestUtils.assertEquals(0.82745, tmpWeights.get(0).doubleValue(), tmpTestPrecision); // 0.82745
@@ -371,24 +370,24 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpBuilder.add(0, 1, 0.1000);
         tmpBuilder.add(1, 0, 0.1000);
         tmpBuilder.add(1, 1, 0.250000);
-        final Primitive64Matrix covariances = tmpBuilder.get();
+        Primitive64Matrix covariances = tmpBuilder.get();
 
         tmpBuilder = Primitive64Matrix.FACTORY.makeDense(2);
         tmpBuilder.add(0, 0.20000);
         tmpBuilder.add(1, 0.40000);
-        final Primitive64Matrix returns = tmpBuilder.get();
+        Primitive64Matrix returns = tmpBuilder.get();
 
-        final MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
-        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
+        MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
+        MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
 
         for (int r = 0; r <= 10; r++) {
-            final BigDecimal targetReturn = StandardType.PERCENT.enforce(new BigDecimal(0.2 + 0.02 * r));
+            BigDecimal targetReturn = StandardType.PERCENT.enforce(new BigDecimal(0.2 + 0.02 * r));
             markowitzModel.setTargetReturn(targetReturn);
 
             markowitzModel.optimiser().validate(false);
             markowitzModel.optimiser().debug(false);
 
-            final List<BigDecimal> tmpWeights = markowitzModel.getWeights();
+            List<BigDecimal> tmpWeights = markowitzModel.getWeights();
 
             if (DEBUG) {
                 BasicLogger.debug("{} => {} {}", targetReturn, markowitzModel.optimiser().getState(), markowitzModel.toSimplePortfolio());
@@ -410,30 +409,29 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20181204() {
 
-        final double[][] assetsCovariances = {
-                { 0.0036133015701268483, 7.389913608466776E-4, 6.41031397418522E-4, -2.3105096877969656E-5, 8.879125330915954E-4 },
+        double[][] assetsCovariances = { { 0.0036133015701268483, 7.389913608466776E-4, 6.41031397418522E-4, -2.3105096877969656E-5, 8.879125330915954E-4 },
                 { 7.389913608466776E-4, 1.8348350177020605E-4, 1.1482397012107551E-4, -8.167817650045201E-6, 2.701855163781939E-4 },
                 { 6.41031397418522E-4, 1.1482397012107551E-4, 1.2573449753628196E-4, -3.721569692276288E-5, 1.3670994762578353E-4 },
                 { -2.3105096877969656E-5, -8.167817650045201E-6, -3.721569692276288E-5, 3.7685337454122363E-4, -3.022900619430631E-4 },
                 { 8.879125330915954E-4, 2.701855163781939E-4, 1.3670994762578353E-4, -3.022900619430631E-4, 6.934651608369498E-4 } };
-        final double[] assetsReturns = { 1.43676262431851, 0.9538185507216703, 1.069364872519786, 1.1612520648051148, 0.8803365994805741 };
-        final double targetReturn = 0.08;
+        double[] assetsReturns = { 1.43676262431851, 0.9538185507216703, 1.069364872519786, 1.1612520648051148, 0.8803365994805741 };
+        double targetReturn = 0.08;
 
-        final DenseReceiver assetsCovariancesMatrix = Primitive64Matrix.FACTORY.makeDense(assetsCovariances.length, assetsCovariances.length);
+        DenseReceiver assetsCovariancesMatrix = Primitive64Matrix.FACTORY.makeDense(assetsCovariances.length, assetsCovariances.length);
         for (int i = 0; i < assetsCovariances.length; i++) {
             for (int j = 0; j < assetsCovariances[i].length; j++) {
                 assetsCovariancesMatrix.set(i, j, assetsCovariances[i][j]);
             }
         }
 
-        final DenseReceiver assetsReturnsMatrix = Primitive64Matrix.FACTORY.makeDense(assetsReturns.length);
+        DenseReceiver assetsReturnsMatrix = Primitive64Matrix.FACTORY.makeDense(assetsReturns.length);
         for (int i = 0; i < assetsReturns.length; i++) {
             assetsReturnsMatrix.set(i, 0, assetsReturns[i]);
         }
 
-        final MarketEquilibrium marketEq = new MarketEquilibrium(assetsCovariancesMatrix.get());
-        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, assetsReturnsMatrix.get());
-        final BigDecimal value = StandardType.PERCENT.enforce(BigDecimal.valueOf(targetReturn));
+        MarketEquilibrium marketEq = new MarketEquilibrium(assetsCovariancesMatrix.get());
+        MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, assetsReturnsMatrix.get());
+        BigDecimal value = StandardType.PERCENT.enforce(BigDecimal.valueOf(targetReturn));
 
         markowitzModel.setTargetReturn(value);
 
@@ -486,13 +484,13 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
 
-        final MarkowitzModel markowitzWithTimeLimit = new MarkowitzModel(marketEquilibrium, ret);
+        MarkowitzModel markowitzWithTimeLimit = new MarkowitzModel(marketEquilibrium, ret);
         markowitzWithTimeLimit.optimiser().time(new CalendarDateDuration(5, CalendarDateUnit.SECOND));
 
         List<BigDecimal> tmpWeights1 = markowitzWithTimeLimit.getWeights();
         TestUtils.assertTrue(markowitzWithTimeLimit.optimiser().getState().isFeasible());
 
-        final MarkowitzModel cleanedMarkowitz = new MarkowitzModel(marketEquilibrium.clean(), ret);
+        MarkowitzModel cleanedMarkowitz = new MarkowitzModel(marketEquilibrium.clean(), ret);
 
         List<BigDecimal> tmpWeights2 = cleanedMarkowitz.getWeights();
         TestUtils.assertTrue(cleanedMarkowitz.optimiser().getState().isFeasible());
