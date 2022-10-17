@@ -39,8 +39,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.SimplexTableauSolver.Primitive1D;
-import org.ojalgo.optimisation.linear.SimplexTableauSolver.Primitive2D;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;

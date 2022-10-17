@@ -566,7 +566,10 @@ public interface Optimisation {
         FEASIBLE(16),
 
         /**
-         * No solution that complies with all constraints exists
+         * No solution that complies with all constraints exists (found).
+         * <p>
+         * In practise this often means "infeasible or unbounded". The key thing is that with this state the
+         * returned solution is not (known to be) feasible.
          */
         INFEASIBLE(-8),
 
@@ -582,8 +585,18 @@ public interface Optimisation {
 
         /**
          * There's an infinite number of feasible solutions and no bound on the objective function value.
-         * Please note that using this state indicator implies a feasible solution. If a feasible solution has
-         * not been been found you should instead use {@link #INFEASIBLE} or {@link #INVALID}.
+         * <p>
+         * Note that using this state indicator implies a feasible solution! This is not in line with how many
+         * other optimisation tools interpret "unbounded".
+         * <p>
+         * If a feasible solution has not been found, the correct state indicator to use is
+         * {@link #INFEASIBLE} or possibly {@link #INVALID}, {@link} #FAILED} or {@link #APPROXIMATE}.
+         * <p>
+         * If a problem is concluded to be unbounded but a feasible solution has been found, it may still be
+         * preferable to us {@link #FEASIBLE} rather than {@link #UNBOUNDED}.
+         * <p>
+         * There is, unfortunately, no way to convey that a problem is proven to be unbounded without a
+         * feasible solution.
          */
         UNBOUNDED(-32),
 

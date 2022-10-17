@@ -1588,13 +1588,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         if (myInfeasible) {
             return true;
         }
-        for (final Expression tmpExpression : myExpressions.values()) {
-            if (tmpExpression.isInfeasible()) {
+        for (Expression expression : myExpressions.values()) {
+            if (expression.isInfeasible()) {
                 return myInfeasible = true;
             }
         }
-        for (final Variable tmpVariable : myVariables) {
-            if (tmpVariable.isInfeasible()) {
+        for (Variable variable : myVariables) {
+            if (variable.isInfeasible()) {
                 return myInfeasible = true;
             }
         }
