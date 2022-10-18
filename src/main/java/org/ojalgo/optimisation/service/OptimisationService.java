@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.service;
 
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.ServiceClient;
 import org.ojalgo.netio.ServiceClient.Response;
@@ -52,6 +53,7 @@ public abstract class OptimisationService {
                 if (response.isResponseOK() && response.getBody().contains("VALID")) {
                     myCapable = Boolean.TRUE;
                 } else {
+                    BasicLogger.error("Calling {} failed!", myHost + PATH_TEST);
                     myCapable = Boolean.FALSE;
                 }
             }
