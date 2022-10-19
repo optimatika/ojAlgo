@@ -23,6 +23,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.matrix
+
+- Slight modification to how the preconditioning in `ConjugateGradientSolver` works, this is a revert of a change in the last release.
+
 #### org.ojalgo.type
 
 - The `getIncluded()` and `getExcluded()` methods of `IndexSelector` now return cached/reused int[]:s when possible.

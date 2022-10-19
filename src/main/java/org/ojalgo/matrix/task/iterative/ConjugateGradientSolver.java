@@ -84,11 +84,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpVal -= row.dot(solution);
             residual.set(row.index, tmpVal);
             double pivot = row.getPivot();
-            if (accuracy.isZero(pivot)) {
-                preconditioned.set(row.index, tmpVal);
-            } else {
-                preconditioned.set(row.index, tmpVal / pivot);
-            }
+            preconditioned.set(row.index, tmpVal / pivot);
         }
 
         direction.fillMatching(preconditioned);
@@ -122,11 +118,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
                 double tmpVal = residual.doubleValue(row.index);
                 normErr = HYPOT.invoke(normErr, tmpVal);
                 double pivot = row.getPivot();
-                if (accuracy.isZero(pivot)) {
-                    preconditioned.set(row.index, tmpVal);
-                } else {
-                    preconditioned.set(row.index, tmpVal / pivot);
-                }
+                preconditioned.set(row.index, tmpVal / pivot);
             }
 
             zr1 = preconditioned.dot(residual);

@@ -339,7 +339,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            final ConvexSolver.Builder builder = ConvexSolver.newBuilder();
+            ConvexSolver.Builder builder = ConvexSolver.newBuilder();
 
             ConvexSolver.copy(model, builder);
 
