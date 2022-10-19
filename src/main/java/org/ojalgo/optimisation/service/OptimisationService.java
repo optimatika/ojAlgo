@@ -28,6 +28,20 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 
+/**
+ * {@link Solver} and {@link Integration} implementations that make use of Optimatika's
+ * Optimisation-as-a-Service (OaaS).
+ * <p>
+ * There is a test/demo version of that service available at: http://test-service.optimatika.se
+ * <p>
+ * That particular instance is NOT for production use, and may be restricted or removed without warning.
+ * <p>
+ * If you'd like access to a service instance for (private) production use, you should contact Optimatika
+ * using: https://www.optimatika.se/products-services-inquiry/
+ *
+ * @author apete
+ * @see https://www.optimatika.se/products-services-inquiry/
+ */
 public abstract class OptimisationService {
 
     public static final class Integration extends ExpressionsBasedModel.Integration<OptimisationService.Solver> {
