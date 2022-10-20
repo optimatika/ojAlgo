@@ -322,35 +322,39 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test7LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
+        Variable[] variables = { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.set(i, new BigDecimal[] { ONE, ONE }[i]);
+        BigDecimal[] paramC1 = { ONE, ONE };
+        Expression exprC1 = model.addExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
+            exprC1.set(i, paramC1[i]);
         }
-        tmpExprC1.upper(TEN);
+        exprC1.upper(TEN);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.set(i, new BigDecimal[] { ONE, TWO }[i]);
+        BigDecimal[] paramC2 = { ONE, TWO };
+        Expression exprC2 = model.addExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
+            exprC2.set(i, paramC2[i]);
         }
-        tmpExprC2.lower(TWELVE);
+        exprC2.lower(TWELVE);
 
-        Expression tmpExprC3 = tmpModel.addExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.set(i, new BigDecimal[] { TWO, ONE }[i]);
+        BigDecimal[] paramC3 = { TWO, ONE };
+        Expression exprC3 = model.addExpression("C3");
+        for (int i = 0; i < model.countVariables(); i++) {
+            exprC3.set(i, paramC3[i]);
         }
-        tmpExprC3.lower(TWELVE);
+        exprC3.lower(TWELVE);
 
-        Optimisation.Result tmpResult = tmpModel.minimise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
 
-        PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 4.0 }, { 4.0 } });
-        PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(0, 1));
+        Optimisation.Result expected = Optimisation.Result.of(State.OPTIMAL, 4.0, 4.0);
+        Optimisation.Result actual = model.minimise();
 
-        TestUtils.assertEquals(tmpExpX, tmpActX);
+        TestUtils.assertStateAndSolution(expected, actual);
     }
 
     /**
