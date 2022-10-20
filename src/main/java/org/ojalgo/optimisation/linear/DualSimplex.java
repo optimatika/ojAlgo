@@ -32,7 +32,7 @@ import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.type.context.NumberContext;
 
-final class DualSimplex extends SimplexSolver {
+final class DualSimplex extends SimplexTableauSolver {
 
     /**
      * Variant of
@@ -182,7 +182,7 @@ final class DualSimplex extends SimplexSolver {
 
         Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), result);
 
-        retVal.multipliers(new SimplexSolver.Primitive1D() {
+        retVal.multipliers(new Primitive1D() {
 
             @Override
             public int size() {

@@ -288,6 +288,10 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return prime * result + Arrays.hashCode(myLimits);
     }
 
+    public long indexOfLargest() {
+        return myElements.indexOfLargest();
+    }
+
     @Override
     public int limitOfColumn(final int col) {
 

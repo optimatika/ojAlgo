@@ -36,10 +36,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -48,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class SimplexSolver extends LinearSolver {
+abstract class SimplexTableauSolver extends LinearSolver {
 
     static final class IterationPoint {
 
@@ -85,120 +81,23 @@ public abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    static abstract class Primitive1D implements Access1D<Double>, Mutate1D {
-
-        static Primitive1D of(final double... values) {
-            return new Primitive1D() {
-
-                @Override
-                public int size() {
-                    return values.length;
-                }
-
-                @Override
-                double doubleValue(final int index) {
-                    return values[index];
-                }
-
-                @Override
-                void set(final int index, final double value) {
-                    values[index] = value;
-                }
-
-            };
-        }
-
-        public final long count() {
-            return this.size();
-        }
-
-        public final double doubleValue(final long index) {
-            return this.doubleValue(Math.toIntExact(index));
-        }
-
-        public final Double get(final long index) {
-            return Double.valueOf(this.doubleValue(Math.toIntExact(index)));
-        }
-
-        public final void set(final long index, final Comparable<?> value) {
-            this.set(Math.toIntExact(index), NumberDefinition.doubleValue(value));
-        }
-
-        public final void set(final long index, final double value) {
-            this.set(Math.toIntExact(index), value);
-        }
-
-        public abstract int size();
-
-        @Override
-        public final String toString() {
-            return Access1D.toString(this);
-        }
-
-        abstract double doubleValue(final int index);
-
-        abstract void set(final int index, final double value);
-
-    }
-
-    static abstract class Primitive2D implements Access2D<Double>, Mutate2D {
-
-        public final long countColumns() {
-            return this.getColDim();
-        }
-
-        public final long countRows() {
-            return this.getRowDim();
-        }
-
-        public final double doubleValue(final long row, final long col) {
-            return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
-        }
-
-        public final Double get(final long row, final long col) {
-            return Double.valueOf(this.doubleValue(Math.toIntExact(row), Math.toIntExact(col)));
-        }
-
-        public abstract int getColDim();
-
-        public abstract int getRowDim();
-
-        public final void set(final long row, final long col, final Comparable<?> value) {
-            this.set(Math.toIntExact(row), Math.toIntExact(col), NumberDefinition.doubleValue(value));
-        }
-
-        public final void set(final long row, final long col, final double value) {
-            this.set(Math.toIntExact(row), Math.toIntExact(col), value);
-        }
-
-        @Override
-        public final String toString() {
-            return Access2D.toString(this);
-        }
-
-        abstract double doubleValue(final int row, final int col);
-
-        abstract void set(final int row, final int col, final double value);
-    }
-
     private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
-
     private static final NumberContext PHASE1 = ACCURACY.withScale(7);
     private static final NumberContext PIVOT = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
     private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
-    private LongToNumberMap<Double> myFixedVariables = null;
 
-    private final SimplexSolver.IterationPoint myPoint;
+    private LongToNumberMap<Double> myFixedVariables = null;
+    private final SimplexTableauSolver.IterationPoint myPoint;
     private final SimplexTableau myTableau;
 
-    SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
+    SimplexTableauSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
 
         super(solverOptions);
 
         myTableau = tableau;
 
-        myPoint = new SimplexSolver.IterationPoint();
+        myPoint = new SimplexTableauSolver.IterationPoint();
 
         if (this.isLogProgress()) {
             this.log("");
@@ -337,17 +236,22 @@ public abstract class SimplexSolver extends LinearSolver {
         return -myTableau.value(false);
     }
 
-    @Override
     protected Result buildResult() {
-        Result result = super.buildResult();
+
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
+
+        Result result = new Optimisation.Result(state, value, solution);
+
         if (myTableau.isAbleToExtractDual()) {
             return result.multipliers(this.extractMultipliers());
         }
+
         return result;
 
     }
 
-    @Override
     protected double evaluateFunction(final Access1D<?> solution) {
         return -myTableau.value(false);
     }
@@ -380,9 +284,9 @@ public abstract class SimplexSolver extends LinearSolver {
     }
 
     /**
-     * Extract solution MatrixStore from the tableau
+     * Extract solution MatrixStore from the tableau. Should be able to feed this to
+     * {@link #evaluateFunction(Access1D)}.
      */
-    @Override
     protected Access1D<?> extractSolution() {
 
         int colRHS = myTableau.countVariablesTotally();
@@ -406,12 +310,10 @@ public abstract class SimplexSolver extends LinearSolver {
         return solution;
     }
 
-    @Override
     protected boolean initialise(final Result kickStarter) {
         return false;
     }
 
-    @Override
     protected boolean needsAnotherIteration() {
 
         if (this.isLogDebug()) {
@@ -423,24 +325,21 @@ public abstract class SimplexSolver extends LinearSolver {
         boolean retVal = false;
         myPoint.reset();
 
-        if (myPoint.isPhase1()) {
+        if (myPoint.isPhase1() && (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials())) {
 
-            if (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials()) {
+            this.cleanUpPhase1Artificials();
 
-                this.cleanUpPhase1Artificials();
-
-                if (this.isLogDebug()) {
-                    this.log();
-                    this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
-                            this.infeasibility());
-                    this.log();
-                }
-
-                // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
-
-                myPoint.switchToPhase2();
-                this.setState(Optimisation.State.FEASIBLE);
+            if (this.isLogDebug()) {
+                this.log();
+                this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
+                        this.infeasibility());
+                this.log();
             }
+
+            // BasicLogger.debug("Phase1 iters: {}", this.countIterations());
+
+            myPoint.switchToPhase2();
+            this.setState(Optimisation.State.FEASIBLE);
         }
 
         myPoint.col = this.findNextPivotCol();
@@ -602,7 +501,7 @@ public abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    void performIteration(final SimplexSolver.IterationPoint pivot) {
+    void performIteration(final SimplexTableauSolver.IterationPoint pivot) {
 
         double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
         int tmpColRHS = myTableau.countVariablesTotally();
@@ -633,11 +532,9 @@ public abstract class SimplexSolver extends LinearSolver {
                 }
             }
 
-            if (minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) {
-                if (this.isLogDebug()) {
-                    this.log("Entire RHS columns: {}", colRHS);
-                    this.log();
-                }
+            if ((minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) && this.isLogDebug()) {
+                this.log("Entire RHS columns: {}", colRHS);
+                this.log();
             }
 
         }

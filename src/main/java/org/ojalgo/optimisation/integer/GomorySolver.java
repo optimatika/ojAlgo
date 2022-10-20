@@ -25,6 +25,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.integer.IntegerStrategy.GMICutConfiguration;
 import org.ojalgo.structure.Access1D;
 
@@ -105,7 +106,15 @@ public final class GomorySolver extends GenericSolver {
         return retVal;
     }
 
-    @Override
+    protected Optimisation.Result buildResult() {
+
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
+
+        return new Optimisation.Result(state, value, solution);
+    }
+
     protected double evaluateFunction(final Access1D<?> solution) {
         if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
             return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
@@ -113,7 +122,6 @@ public final class GomorySolver extends GenericSolver {
         return Double.NaN;
     }
 
-    @Override
     protected Access1D<?> extractSolution() {
         return myIntegerModel.getVariableValues();
     }

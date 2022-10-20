@@ -11,6 +11,38 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [52.0.1] – 2022-10-20
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- New method `describe()` in `ExpressionsBasedModel` that returns an object with various descriptive counts (number of variables, constraints, integers...)
+
+#### org.ojalgo.type
+
+- New utility `EnumPartition` which is a generalised alternative to `IndexSelector`.
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- Slight modification to how the preconditioning in `ConjugateGradientSolver` works, this is a revert of a change in the last release.
+
+#### org.ojalgo.type
+
+- The `getIncluded()` and `getExcluded()` methods of `IndexSelector` now return cached/reused int[]:s when possible.
+
+### Fixed
+
+#### org.ojalgo.array
+
+- Optimised implementation of `indexOfLargest` in `SparseArray`.
+
+#### org.ojalgo.matrix
+
+- Optimised implementation of `indexOfLargest` in `SparseStore`.
+
 ## [52.0.0] – 2022-09-27
 
 ### Added

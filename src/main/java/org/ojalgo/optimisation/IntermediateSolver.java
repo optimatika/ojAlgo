@@ -167,15 +167,15 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return myResult;
     }
 
-    protected boolean isSolved() {
-        return mySolver != null && myResult != null;
-    }
-
     protected Optimisation.Solver getSolver() {
         if (mySolver == null) {
             mySolver = this.getIntegration().build(myModel);
         }
         return mySolver;
+    }
+
+    protected boolean isSolved() {
+        return mySolver != null && myResult != null;
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {

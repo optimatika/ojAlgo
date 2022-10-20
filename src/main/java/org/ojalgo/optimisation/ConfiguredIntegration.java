@@ -21,25 +21,32 @@
  */
 package org.ojalgo.optimisation;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-final class PredicateIntegration<S extends Optimisation.Solver> extends ExpressionsBasedModel.Integration<S> {
+final class ConfiguredIntegration<S extends Optimisation.Solver> extends ExpressionsBasedModel.Integration<S> {
 
+    private final Predicate<ExpressionsBasedModel> myCapabilityPredicate;
     private final ExpressionsBasedModel.Integration<S> myDelegate;
-    private final Predicate<ExpressionsBasedModel> myPredicate;
+    private final Consumer<Optimisation.Options> myOptionsModifier;
 
-    PredicateIntegration(final ExpressionsBasedModel.Integration<S> delegate, final Predicate<ExpressionsBasedModel> predicate) {
+    ConfiguredIntegration(final ExpressionsBasedModel.Integration<S> delegate, final Predicate<ExpressionsBasedModel> capabilityPredicate,
+            final Consumer<Optimisation.Options> optionsModifier) {
         super();
         myDelegate = delegate;
-        myPredicate = predicate;
+        myCapabilityPredicate = capabilityPredicate;
+        myOptionsModifier = optionsModifier;
     }
 
     public S build(final ExpressionsBasedModel model) {
+        if (myOptionsModifier != null) {
+            myOptionsModifier.accept(model.options);
+        }
         return myDelegate.build(model);
     }
 
     public boolean isCapable(final ExpressionsBasedModel model) {
-        return myPredicate.test(model) && myDelegate.isCapable(model);
+        return (myCapabilityPredicate == null || myCapabilityPredicate.test(model)) && myDelegate.isCapable(model);
     }
 
     @Override

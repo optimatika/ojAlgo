@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -102,6 +103,52 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public final class ExpressionsBasedModel implements Optimisation.Model {
+
+    /**
+     * Counts of different kinds of model entities.
+     *
+     * @author apete
+     */
+    public static final class Description {
+
+        public final int nbEqualityBounds;
+        public final int nbEqualityConstraints;
+        public final int nbIntegerVariables;
+        public final int nbLowerBounds;
+        public final int nbLowerConstraints;
+        public final int nbNegativeVariables;
+        public final int nbPositiveVariables;
+        public final int nbUpperBounds;
+        public final int nbUpperConstraints;
+        public final int nbVariables;
+
+        Description(final int varTotal, final int varPositive, final int varNegative, final int varInteger, final int nbLoBound, final int nbUpBound,
+                final int nbEqBound, final int nbLoCnstr, final int nbUpCnstr, final int nbEqCnstr) {
+
+            super();
+
+            nbLowerBounds = nbLoBound;
+            nbUpperBounds = nbUpBound;
+            nbEqualityBounds = nbEqBound;
+
+            nbLowerConstraints = nbLoCnstr;
+            nbUpperConstraints = nbUpCnstr;
+            nbEqualityConstraints = nbEqCnstr;
+
+            nbIntegerVariables = varInteger;
+            nbNegativeVariables = varNegative;
+            nbPositiveVariables = varPositive;
+            nbVariables = varTotal;
+        }
+
+        /**
+         * The total number of constraints
+         */
+        public int constraints() {
+            return nbEqualityConstraints + nbLowerConstraints + nbUpperConstraints;
+        }
+
+    }
 
     public enum FileFormat {
 
@@ -216,6 +263,23 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
+         * Use this to limit the cases where this {@link Integration} would be used.
+         * <p>
+         * Returns a new Integration instance where the supplied {@link Predicate} needs to test true in
+         * addition to the underlying {@link #isCapable(Optimisation.Model)}.
+         */
+        public final ExpressionsBasedModel.Integration<S> withCapabilityPredicate(final Predicate<ExpressionsBasedModel> capabilityPredicate) {
+            return new ConfiguredIntegration<>(this, capabilityPredicate, null);
+        }
+
+        /**
+         * Intercept and modify the {@link Optimisation.Options} instance before building the solver.
+         */
+        public final ExpressionsBasedModel.Integration<S> withOptionsModifier(final Consumer<Optimisation.Options> optionsModifier) {
+            return new ConfiguredIntegration<>(this, null, optionsModifier);
+        }
+
+        /**
          * @return The index with which one can reference parameters related to this variable in the solver.
          */
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
@@ -228,16 +292,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          *         negative part, then this method must return true
          */
         protected abstract boolean isSolutionMapped();
-
-        /**
-         * Use this to limit the cases where this {@link Integration} would be used.
-         * <p>
-         * Returns a new Integration instance where the supplied {@link Predicate} needs to test true in
-         * addition to the underlying {@link #isCapable(Optimisation.Model)}.
-         */
-        public final ExpressionsBasedModel.Integration<S> withPredicate(final Predicate<ExpressionsBasedModel> predicate) {
-            return new PredicateIntegration<>(this, predicate);
-        }
 
     }
 
@@ -787,6 +841,51 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public int countVariables() {
         return myVariables.size();
+    }
+
+    /**
+     * Counts variables and expressions of different categories.
+     */
+    public Description describe() {
+
+        int nbUpCnstr = 0;
+        int nbUpBound = 0;
+        int nbLoCnstr = 0;
+        int nbLoBound = 0;
+        int nbEqCnstr = 0;
+        int nbEqBound = 0;
+
+        for (Variable variable : myVariables) {
+            if (variable.isLowerConstraint()) {
+                nbLoBound++;
+            }
+            if (variable.isUpperConstraint()) {
+                nbUpBound++;
+            }
+            if (variable.isEqualityConstraint()) {
+                nbEqBound++;
+            }
+        }
+
+        for (Expression expression : myExpressions.values()) {
+            if (expression.isLowerConstraint()) {
+                nbLoCnstr++;
+            }
+            if (expression.isUpperConstraint()) {
+                nbUpCnstr++;
+            }
+            if (expression.isEqualityConstraint()) {
+                nbEqCnstr++;
+            }
+        }
+
+        VariablesCategorisation variablesCategorisation = new VariablesCategorisation();
+        int nbTotVars = myVariables.size();
+        int nbIntVars = variablesCategorisation.getIntegerVariables(myVariables).size();
+        int nbPosVars = variablesCategorisation.getPositiveVariables(myVariables).size();
+        int nbNegVars = variablesCategorisation.getNegativeVariables(myVariables).size();
+
+        return new Description(nbTotVars, nbPosVars, nbNegVars, nbIntVars, nbLoBound, nbUpBound, nbEqBound, nbLoCnstr, nbUpCnstr, nbEqCnstr);
     }
 
     @Override
@@ -1489,13 +1588,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         if (myInfeasible) {
             return true;
         }
-        for (final Expression tmpExpression : myExpressions.values()) {
-            if (tmpExpression.isInfeasible()) {
+        for (Expression expression : myExpressions.values()) {
+            if (expression.isInfeasible()) {
                 return myInfeasible = true;
             }
         }
-        for (final Variable tmpVariable : myVariables) {
-            if (tmpVariable.isInfeasible()) {
+        for (Variable variable : myVariables) {
+            if (variable.isInfeasible()) {
                 return myInfeasible = true;
             }
         }

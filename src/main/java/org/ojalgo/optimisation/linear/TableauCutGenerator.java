@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.equation.Equation;
-import org.ojalgo.optimisation.linear.SimplexSolver.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class TableauCutGenerator {
