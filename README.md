@@ -10,7 +10,7 @@ General information about ojAlgo is available at the project web site: http://oj
 
 ### Artifacts
 
-ojAlgo is available at [The Central (Maven) Repository](https://search.maven.org/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool.
+ojAlgo is available at [The Central (Maven) Repository](https://mvnrepository.com/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool.
 
 ```xml
 <!-- https://mvnrepository.com/artifact/org.ojalgo/ojalgo -->
