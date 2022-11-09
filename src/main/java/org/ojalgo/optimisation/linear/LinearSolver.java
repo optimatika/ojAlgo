@@ -93,6 +93,23 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.inequalities(mtrxAI, mtrxBI);
         }
 
+        @Override
+        public LinearSolver.GeneralBuilder inequality(final double rhs, final double... factors) {
+            return super.inequality(rhs, factors);
+        }
+
+        public GeneralBuilder lower(final double... bounds) {
+            double[] lowerBounds = this.getLowerBounds(ZERO);
+            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
+                lowerBounds[i] = bounds[i];
+            }
+            return this;
+        }
+
+        public GeneralBuilder objective(final double... factors) {
+            return this.objective(FACTORY.column(factors));
+        }
+
         public GeneralBuilder objective(final MatrixStore<Double> mtrxC) {
             this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
             return this;
@@ -161,6 +178,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             retVal.equalities(mtrxAE, mtrxBE);
 
             return retVal;
+        }
+
+        public GeneralBuilder upper(final double... bounds) {
+            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY);
+            for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
+                upperBounds[i] = bounds[i];
+            }
+            return this;
         }
 
         @Override
@@ -407,9 +432,29 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             this.objective(mtrxC);
         }
 
+        public StandardBuilder lower(final double... bounds) {
+            double[] lowerBounds = this.getLowerBounds(ZERO);
+            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
+                lowerBounds[i] = bounds[i];
+            }
+            return this;
+        }
+
+        public StandardBuilder objective(final double... factors) {
+            return this.objective(FACTORY.column(factors));
+        }
+
         @Override
         public StandardBuilder objective(final MatrixStore<Double> mtrxC) {
             return super.objective(mtrxC);
+        }
+
+        public StandardBuilder upper(final double... bounds) {
+            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY);
+            for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
+                upperBounds[i] = bounds[i];
+            }
+            return this;
         }
 
     }
@@ -418,6 +463,10 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
+    }
+
+    public static LinearSolver.GeneralBuilder newGeneralBuilder(final double... objective) {
+        return LinearSolver.newGeneralBuilder().objective(objective);
     }
 
     public static LinearSolver newSolver(final ExpressionsBasedModel model) {
@@ -429,6 +478,10 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static LinearSolver.StandardBuilder newStandardBuilder() {
         return new LinearSolver.StandardBuilder();
+    }
+
+    public static LinearSolver.StandardBuilder newStandardBuilder(final double... objective) {
+        return LinearSolver.newStandardBuilder().objective(objective);
     }
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {

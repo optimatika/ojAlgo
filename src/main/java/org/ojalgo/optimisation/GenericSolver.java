@@ -99,6 +99,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return (B) this;
         }
 
+        public B equality(final double rhs, final double... factors) {
+
+            Primitive64Store mBody = FACTORY.make(1, this.countVariables());
+            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
+                mBody.set(i, factors[i]);
+            }
+
+            MatrixStore<Double> mRHS = FACTORY.makeSingle(rhs);
+
+            myData.addEqualities(mBody, mRHS);
+
+            return (B) this;
+        }
+
         /**
          * [AE][X] == [BE]
          */
@@ -215,6 +229,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getBI(row);
         }
 
+        protected double[] getLowerBounds(final double defaultValue) {
+            return myData.getLowerBounds(defaultValue).data;
+        }
+
         protected <T extends TwiceDifferentiable<Double>> T getObjective() {
             return myData.getObjective();
         }
@@ -223,8 +241,26 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getRowsAI();
         }
 
+        protected double[] getUpperBounds(final double defaultValue) {
+            return myData.getUpperBounds(defaultValue).data;
+        }
+
         protected B inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
             myData.setInequalities(mtrxAI, mtrxBI);
+            return (B) this;
+        }
+
+        protected B inequality(final double rhs, final double... factors) {
+
+            Primitive64Store mBody = FACTORY.make(1, this.countVariables());
+            for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
+                mBody.set(i, factors[i]);
+            }
+
+            MatrixStore<Double> mRHS = FACTORY.makeSingle(rhs);
+
+            myData.addInequalities(mBody, mRHS);
+
             return (B) this;
         }
 
@@ -313,11 +349,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return false;
         }
 
-        if (myState.isFeasible()) {
+        if (myState.isOptimal()) {
+            return false;
+        } else if (myState.isFeasible()) {
             return this.countTime() < options.time_suffice && this.countIterations() < options.iterations_suffice;
+        } else {
+            return this.countTime() < options.time_abort && this.countIterations() < options.iterations_abort;
         }
-
-        return this.countTime() < options.time_abort && this.countIterations() < options.iterations_abort;
     }
 
     /**
@@ -344,6 +382,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final void log() {
         if (options.logger_appender != null) {
             options.logger_appender.println();
+        }
+    }
+
+    protected final void log(final int tabs, final String messagePattern, final Object... arguments) {
+        if (options.logger_appender != null) {
+            options.logger_appender.println(tabs, messagePattern, arguments);
         }
     }
 
