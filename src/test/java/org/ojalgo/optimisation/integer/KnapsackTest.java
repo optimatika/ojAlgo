@@ -29,10 +29,8 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
@@ -62,18 +60,22 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
         ExpressionsBasedModel build() {
 
-            final Variable[] tmpVariables = new Variable[items.size()];
-            for (int i = 0; i < tmpVariables.length; i++) {
-                tmpVariables[i] = new Variable("Var" + String.valueOf(i));
-                tmpVariables[i].lower(ZERO).upper(ONE).weight(items.get(i).value).integer(true);
+            Variable[] variables = new Variable[items.size()];
+            for (int i = 0; i < variables.length; i++) {
+                variables[i] = new Variable("Var" + String.valueOf(i));
+                variables[i].lower(ZERO).upper(ONE).weight(items.get(i).value).integer(true);
             }
 
-            final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-            final Expression tmpTotalWeightExpr = retVal.addExpression("Total Weight");
+            ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
+            Expression totalWeightExpr = retVal.addExpression("Total Weight");
             for (int i = 0; i < items.size(); i++) {
-                tmpTotalWeightExpr.set(i, items.get(i).weight);
+                totalWeightExpr.set(i, items.get(i).weight);
             }
-            tmpTotalWeightExpr.lower(ZERO).upper(maxWeight);
+            totalWeightExpr.lower(ZERO).upper(maxWeight);
+
+            if (DEBUG) {
+                retVal.options.debug(IntegerSolver.class);
+            }
 
             return retVal;
         }
@@ -83,12 +85,10 @@ public class KnapsackTest extends OptimisationIntegerTests {
     @Test
     public void testVaryingMaxWeight0() {
         ExpressionsBasedModel model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
-        //        model.options.debug(IntegerSolver.class);
         model.maximise();
         //Expected: just first item
         this.assertOne(model.getVariables().get(0));
         this.assertZero(model.getVariables().get(1));
-
     }
 
     @Test
@@ -122,11 +122,6 @@ public class KnapsackTest extends OptimisationIntegerTests {
     public void testVaryingMaxWeight4() {
 
         ExpressionsBasedModel model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
-
-        if (DEBUG) {
-            BasicLogger.debug(model);
-            model.options.debug(Optimisation.Solver.class);
-        }
 
         model.maximise();
         //Expected: just second item

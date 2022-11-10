@@ -37,14 +37,14 @@ public class Uniform extends AbstractContinuous {
     }
 
     /**
-     * @return An integer: 0 &lt;= ? &lt; limit
+     * @return An integer: 0 <= ? < limit
      */
     public static int randomInteger(final int limit) {
         return (int) PrimitiveMath.FLOOR.invoke(limit * Math.random());
     }
 
     /**
-     * @return An integer: lower &lt;= ? &lt; higher
+     * @return An integer: lower <= ? < higher
      */
     public static int randomInteger(final int lower, final int higher) {
         return lower + Uniform.randomInteger(higher - lower);

@@ -262,13 +262,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final int[] pivotOrder = myPivot.getOrder();
-        final int numbRows = this.getRowDim();
+        int[] pivotOrder = myPivot.getOrder();
+        int numbRows = this.getRowDim();
         for (int i = 0; i < numbRows; i++) {
             preallocated.set(i, pivotOrder[i], ONE);
         }
 
-        final RawStore body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
         preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
@@ -279,7 +279,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final MatrixStore<Double> body = this.getInternalStore();
+        MatrixStore<Double> body = this.getInternalStore();
 
         preallocated.substituteForwards(body, true, false, false);
 

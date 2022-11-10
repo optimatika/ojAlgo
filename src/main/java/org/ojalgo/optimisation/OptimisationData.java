@@ -50,17 +50,54 @@ final class OptimisationData {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
+    private static MatrixStore<Double> add(final RowsSupplier<Double> baseA, final MatrixStore<Double> baseB, final Access2D<Double> addA,
+            final Access1D<Double> addB) {
+
+        ProgrammingError.throwIfNull(addA, addB);
+        ProgrammingError.throwIfNotEqualRowDimensions(addA, addB);
+
+        int baseRowDim = baseA.getRowDim();
+        int addRowDim = addA.getRowDim();
+        int addColDim = addA.getColDim();
+
+        baseA.addRows(addRowDim);
+
+        if (addA instanceof SparseStore) {
+
+            ((SparseStore<Double>) addA).nonzeros().forEach(nz -> baseA.getRow(baseRowDim + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
+
+        } else {
+
+            double value;
+            for (int i = 0; i < addRowDim; i++) {
+                SparseArray<Double> tmpRow = baseA.getRow(baseRowDim + i);
+                for (int j = 0; j < addColDim; j++) {
+                    value = addA.doubleValue(i, j);
+                    if (value != PrimitiveMath.ZERO) {
+                        tmpRow.set(j, value);
+                    }
+                }
+            }
+        }
+
+        Primitive64Store retB = FACTORY.make(baseRowDim + addRowDim, 1);
+        retB.fillMatching(baseB);
+        retB.regionByOffsets(baseRowDim, 0).fillMatching(addB);
+
+        return retB;
+    }
+
     /**
      * Assumed constrained to be <= 0.0
      */
     private Map<String, MultiaryFunction.TwiceDifferentiable<Double>> myAdditionalConstraints;
-    private MatrixStore<Double> myAE = null;
+    private RowsSupplier<Double> myAE = null;
     private RowsSupplier<Double> myAI = null;
     private MatrixStore<Double> myBE = null;
     private MatrixStore<Double> myBI = null;
-    private Primitive64Store myLB = null;
+    private Primitive64Store myLowerBounds = null;
     private MultiaryFunction.TwiceDifferentiable<Double> myObjective;
-    private Primitive64Store myUB = null;
+    private Primitive64Store myUpperBounds = null;
 
     OptimisationData() {
         super();
@@ -92,38 +129,30 @@ final class OptimisationData {
         myAdditionalConstraints.put(key, value);
     }
 
+    void addEqualities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
+
+        ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
+        ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
+
+        if (myAE == null || myBE == null) {
+            myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
+            myBE = FACTORY.makeZero(0, 1);
+        }
+
+        myBE = OptimisationData.add(myAE, myBE, mtrxAE, mtrxBE);
+    }
+
     void addInequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
 
         ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
 
         if (myAI == null || myBI == null) {
-            this.setInequalities(mtrxAI, mtrxBI);
+            myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
+            myBI = FACTORY.makeZero(0, 0);
         }
 
-        int offset = myAI.getRowDim();
-
-        myAI.addRows(mtrxAI.getRowDim());
-
-        if (mtrxAI instanceof SparseStore) {
-
-            ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow(offset + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
-
-        } else {
-
-            double value;
-            for (int i = 0; i < mtrxAI.getRowDim(); i++) {
-                SparseArray<Double> tmpRow = myAI.getRow(offset + i);
-                for (int j = 0; j < mtrxAI.getColDim(); j++) {
-                    value = mtrxAI.doubleValue(i, j);
-                    if (value != PrimitiveMath.ZERO) {
-                        tmpRow.set(j, value);
-                    }
-                }
-            }
-        }
-
-        myBI = myBI.below(mtrxBI);
+        myBI = OptimisationData.add(myAI, myBI, mtrxAI, mtrxBI);
     }
 
     void clearEqualities() {
@@ -164,14 +193,22 @@ final class OptimisationData {
      * Equality constraints body: [AE][X] == [BE]
      */
     MatrixStore<Double> getAE() {
-        return myAE;
+        if (myAE != null) {
+            return myAE.get();
+        } else {
+            return FACTORY.makeZero(0, this.countVariables());
+        }
     }
 
     /**
      * Inequality constraints body: [AI][X] &lt;= [BI]
      */
     MatrixStore<Double> getAI() {
-        return myAI.get();
+        if (myAI != null) {
+            return myAI.get();
+        } else {
+            return FACTORY.makeZero(0, this.countVariables());
+        }
     }
 
     SparseArray<Double> getAI(final int row) {
@@ -186,14 +223,22 @@ final class OptimisationData {
      * Equality constraints RHS: [AE][X] == [BE]
      */
     MatrixStore<Double> getBE() {
-        return myBE;
+        if (myBE != null) {
+            return myBE;
+        } else {
+            return FACTORY.makeZero(0, 1);
+        }
     }
 
     /**
      * Inequality constraints RHS: [AI][X] &lt;= [BI]
      */
     MatrixStore<Double> getBI() {
-        return myBI;
+        if (myBI != null) {
+            return myBI;
+        } else {
+            return FACTORY.makeZero(0, 1);
+        }
     }
 
     double getBI(final int row) {
@@ -201,7 +246,15 @@ final class OptimisationData {
     }
 
     Primitive64Store getLowerBounds() {
-        return myLB;
+        return myLowerBounds;
+    }
+
+    Primitive64Store getLowerBounds(final double defaultValue) {
+        if (myLowerBounds == null) {
+            myLowerBounds = FACTORY.make(this.countVariables(), 1);
+            myLowerBounds.fillAll(defaultValue);
+        }
+        return myLowerBounds;
     }
 
     <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
@@ -213,7 +266,15 @@ final class OptimisationData {
     }
 
     Primitive64Store getUpperBounds() {
-        return myUB;
+        return myUpperBounds;
+    }
+
+    Primitive64Store getUpperBounds(final double defaultValue) {
+        if (myUpperBounds == null) {
+            myUpperBounds = FACTORY.make(this.countVariables(), 1);
+            myUpperBounds.fillAll(defaultValue);
+        }
+        return myUpperBounds;
     }
 
     boolean hasAdditionalConstraints() {
@@ -262,15 +323,15 @@ final class OptimisationData {
         ProgrammingError.throwIfNull(lower, upper);
 
         if (lower instanceof Primitive64Store) {
-            myLB = (Primitive64Store) lower;
+            myLowerBounds = (Primitive64Store) lower;
         } else {
-            myLB = FACTORY.columns(lower);
+            myLowerBounds = FACTORY.columns(lower);
         }
 
         if (upper instanceof Primitive64Store) {
-            myUB = (Primitive64Store) upper;
+            myUpperBounds = (Primitive64Store) upper;
         } else {
-            myUB = FACTORY.columns(upper);
+            myUpperBounds = FACTORY.columns(upper);
         }
     }
 
@@ -279,17 +340,10 @@ final class OptimisationData {
         ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
 
-        if (mtrxAE instanceof MatrixStore) {
-            myAE = (MatrixStore<Double>) mtrxAE;
-        } else {
-            myAE = Primitive64Store.FACTORY.makeWrapper(mtrxAE);
-        }
+        myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
+        myBE = FACTORY.makeZero(0, 0);
 
-        if (mtrxBE instanceof MatrixStore) {
-            myBE = (MatrixStore<Double>) mtrxBE;
-        } else {
-            myBE = FACTORY.columns(mtrxBE);
-        }
+        myBE = OptimisationData.add(myAE, myBE, mtrxAE, mtrxBE);
     }
 
     void setInequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
@@ -297,39 +351,10 @@ final class OptimisationData {
         ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
 
-        if (mtrxAI instanceof RowsSupplier) {
+        myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
+        myBI = FACTORY.makeZero(0, 0);
 
-            myAI = (RowsSupplier<Double>) mtrxAI;
-
-        } else {
-
-            myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
-            myAI.addRows(mtrxAI.getRowDim());
-
-            if (mtrxAI instanceof SparseStore) {
-
-                ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow(Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
-
-            } else {
-
-                double value;
-                for (int i = 0; i < mtrxAI.countRows(); i++) {
-                    SparseArray<Double> tmpRow = myAI.getRow(i);
-                    for (int j = 0; j < mtrxAI.countColumns(); j++) {
-                        value = mtrxAI.doubleValue(i, j);
-                        if (value != PrimitiveMath.ZERO) {
-                            tmpRow.set(j, value);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (mtrxBI instanceof MatrixStore) {
-            myBI = (MatrixStore<Double>) mtrxBI;
-        } else {
-            myBI = FACTORY.columns(mtrxBI);
-        }
+        myBI = OptimisationData.add(myAI, myBI, mtrxAI, mtrxBI);
     }
 
     void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {

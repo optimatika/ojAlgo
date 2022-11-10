@@ -122,6 +122,10 @@ public final class EnumPartition<E extends Enum<E>> {
         return myValues[index] == value.ordinal();
     }
 
+    public int size() {
+        return myValues.length;
+    }
+
     public void update(final int index, final E value) {
 
         int oldKey = myValues[index];

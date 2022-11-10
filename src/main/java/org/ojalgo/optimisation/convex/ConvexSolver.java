@@ -197,6 +197,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return super.inequalities(mtrxAI, mtrxBI);
         }
 
+        @Override
+        public Builder inequality(final double rhs, final double... factors) {
+            return super.inequality(rhs, factors);
+        }
+
         /**
          * @deprecated v50 Use {@link #objective(MatrixStore, MatrixStore)} instead, or build a
          *             {@link LinearSolver}.

@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- New alternatives for the various solver builders to simplify building small test case models - just cleaner api.
+
 ## [52.0.1] – 2022-10-20
 
 ### Added

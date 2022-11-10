@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -573,66 +574,72 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         x2013.lower(BigDecimal.valueOf(1245L));
         x2014.lower(BigDecimal.valueOf(1269L));
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
-        tmpModel.addVariable(x1);
-        tmpModel.addVariable(x2013);
-        tmpModel.addVariable(x2014);
-        tmpModel.addVariable(x2015);
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x1);
+        model.addVariable(x2013);
+        model.addVariable(x2014);
+        model.addVariable(x2015);
 
-        Expression obj = tmpModel.addExpression("obj");
+        Expression obj = model.addExpression("obj");
         obj.set(x1, 1);
         obj.weight(BigDecimal.valueOf(1));
 
-        Expression c1 = tmpModel.addExpression("c1");
+        Expression c1 = model.addExpression("c1");
         c1.set(x1, 1);
         c1.lower(BigDecimal.valueOf(0));
 
-        Expression c2 = tmpModel.addExpression("c2");
+        Expression c2 = model.addExpression("c2");
         c2.set(x2014, -5000);
         c2.set(x2013, 5100);
         c2.set(x1, -1);
         c2.upper(BigDecimal.valueOf(0));
 
-        Expression c3 = tmpModel.addExpression("c3");
+        Expression c3 = model.addExpression("c3");
         c3.set(x2014, -5000);
         c3.set(x2013, 5100);
         c3.set(x1, 1);
         c3.lower(BigDecimal.valueOf(0));
 
-        Expression c4 = tmpModel.addExpression("c4");
+        Expression c4 = model.addExpression("c4");
         c4.set(x2014, 150);
         c4.set(x2013, 5100);
         c4.set(x2015, -5000);
         c4.set(x1, -1);
         c4.upper(BigDecimal.valueOf(0));
 
-        Expression c5 = tmpModel.addExpression("c5");
+        Expression c5 = model.addExpression("c5");
         c5.set(x2014, 150);
         c5.set(x2013, 5100);
         c5.set(x2015, -5000);
         c5.set(x1, 1);
         c5.lower(BigDecimal.valueOf(0));
 
-        Expression c6 = tmpModel.addExpression("c6");
+        Expression c6 = model.addExpression("c6");
         c6.set(x2015, 5000);
         c6.set(x2014, 5000);
         c6.set(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
-        ArrayR128 tmpExpSol = ArrayR128.wrap(BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269),
-                BigDecimal.valueOf(1307));
+        ArrayR128 expected = ArrayR128.wrap(BigDecimal.valueOf(4850), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307));
 
-        TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
+        TestUtils.assertTrue("Expected Solution Not Valid", model.validate(expected));
 
-        // tmpModel.options.debug(LinearSolver.class);
-        //tmpModel.options.problem = NumberContext.getGeneral(8);
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
 
-        Result tmpResult = tmpModel.minimise();
+        Result actual = model.minimise();
 
-        // BasicLogger.debug(tmpResult.toString());
+        if (DEBUG) {
+            BasicLogger.debug("Expected: {}", expected);
+            BasicLogger.debug("Actual: {}", actual);
+        }
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.of(8, 8));
-        TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
+        TestUtils.assertStateNotLessThanOptimal(actual);
+
+        TestUtils.assertTrue("Actual Solution Not Valid", model.validate(actual));
+
+        TestUtils.assertEquals(expected, actual);
     }
 
     @Test
