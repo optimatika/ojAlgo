@@ -49,7 +49,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>11</version.java>
         <version.org.junit.jupiter>5.9.1</version.org.junit.jupiter>
-        <version.org.openjdk.jmh>1.35</version.org.openjdk.jmh>
+        <version.org.openjdk.jmh>1.36</version.org.openjdk.jmh>
     </properties>
     <dependencies>
         <dependency>
