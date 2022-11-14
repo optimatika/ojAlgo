@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -62,6 +63,18 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         Primitive(final boolean fullSize) {
             super(Primitive64Store.FACTORY, fullSize);
+        }
+
+    }
+
+    static final class Quad extends QRDecomposition<Quadruple> {
+
+        Quad() {
+            this(false);
+        }
+
+        Quad(final boolean fullSize) {
+            super(GenericStore.QUADRUPLE, fullSize);
         }
 
     }

@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -135,6 +136,24 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
                 return QR.PRIMITIVE.make(template);
             }
             return SingularValue.PRIMITIVE.make(template);
+        }
+
+    };
+
+    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+
+        @Override
+        public InverterTask<Quadruple> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
+            if (template.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.QUADRUPLE.make(template);
+                }
+                return LU.QUADRUPLE.make(template);
+            }
+            if (template.isTall()) {
+                return QR.QUADRUPLE.make(template);
+            }
+            return SingularValue.QUADRUPLE.make(template);
         }
 
     };

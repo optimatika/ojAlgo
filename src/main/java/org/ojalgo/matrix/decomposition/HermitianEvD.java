@@ -40,6 +40,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -98,6 +99,14 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         Rational() {
             super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
+        }
+
+    }
+
+    static final class Quad extends HermitianEvD<Quadruple> {
+
+        Quad() {
+            super(GenericStore.QUADRUPLE, new DeferredTridiagonal.Quad());
         }
 
     }

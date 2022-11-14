@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -57,6 +58,8 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
     Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
 
     Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.Primitive();
+
+    Factory<Quadruple> QUADRUPLE = typical -> new LDLDecomposition.Quad();
 
     Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
 

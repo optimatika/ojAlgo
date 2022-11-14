@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -76,6 +77,8 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
         }
         return new RawQR();
     };
+
+    Factory<Quadruple> QUADRUPLE = (typical, fullSize) -> new QRDecomposition.Quad(fullSize);
 
     Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);
 

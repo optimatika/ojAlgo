@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -52,6 +53,14 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
         Primitive() {
             super(Primitive64Store.FACTORY);
+        }
+
+    }
+
+    static final class Quad extends CholeskyDecomposition<Quadruple> {
+
+        Quad() {
+            super(GenericStore.QUADRUPLE);
         }
 
     }

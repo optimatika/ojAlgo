@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
@@ -147,7 +147,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Primitive64Matrix claimedSolutionOdd = claimedSolutionFull.rows(new int[] { 0, 2, 4 });
         Primitive64Matrix claimedSolutionEven = claimedSolutionFull.rows(new int[] { 1, 3, 5 });
 
-        TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(ArrayR128.FACTORY.copy(claimedSolutionFull), ACCURACY));
+        TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(ArrayR256.FACTORY.copy(claimedSolutionFull), ACCURACY));
 
         Double tmpActualValue = modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(claimedSolutionFull));
         //  BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
@@ -302,7 +302,7 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addExpression("first").set(x, 2).set(y, 3).upper(1);
         model.addExpression("second").set(x, -2).set(y, 3).lower(1);
 
-        ArrayR128 expected = ArrayR128.wrap(BigMath.ZERO, BigMath.THIRD);
+        ArrayR256 expected = ArrayR256.wrap(BigMath.ZERO, BigMath.THIRD);
 
         Optimisation.Result result = model.maximise();
         TestUtils.assertEquals(expected, result);
@@ -346,7 +346,7 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addExpression().set(x, -1).set(y, 0).lower(0);
         model.addExpression().set(x, -1).set(y, 3).level(2);
 
-        ArrayR128 expected = ArrayR128.wrap(BigMath.ZERO, BigMath.TWO.multiply(BigMath.THIRD));
+        ArrayR256 expected = ArrayR256.wrap(BigMath.ZERO, BigMath.TWO.multiply(BigMath.THIRD));
 
         Optimisation.Result result = model.maximise();
         TestUtils.assertEquals(expected, result);
@@ -422,7 +422,7 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addExpression().set(x, 1).set(y, 2).lower(-5);
         model.addExpression().set(x, 3).set(y, 1).upper(2);
 
-        ArrayR128 expected = ArrayR128.wrap(DIVIDE.invoke(TWO, THREE), ZERO);
+        ArrayR256 expected = ArrayR256.wrap(DIVIDE.invoke(TWO, THREE), ZERO);
         TestUtils.assertTrue(model.validate(expected));
 
         Optimisation.Result solution = model.maximise();

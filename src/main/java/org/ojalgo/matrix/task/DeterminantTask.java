@@ -29,6 +29,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -110,6 +111,18 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
             } else {
                 return LU.PRIMITIVE.make(template);
             }
+        }
+
+    };
+
+    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+
+        @Override
+        public DeterminantTask<Quadruple> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.QUADRUPLE.make(template);
+            }
+            return LU.QUADRUPLE.make(template);
         }
 
     };

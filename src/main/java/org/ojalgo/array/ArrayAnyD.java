@@ -34,6 +34,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -111,7 +112,8 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = ArrayAnyD.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
-    public static final Factory<BigDecimal> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
+    public static final Factory<Quadruple> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
+    public static final Factory<BigDecimal> R256 = ArrayAnyD.factory(ArrayR256.FACTORY);
     public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
     public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
     public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
@@ -121,7 +123,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
      * @deprecated v52 Use {@link #R128} instead
      */
     @Deprecated
-    public static final Factory<BigDecimal> BIG = R128;
+    public static final Factory<BigDecimal> BIG = R256;
     /**
      * @deprecated v52 Use {@link #C128} instead
      */

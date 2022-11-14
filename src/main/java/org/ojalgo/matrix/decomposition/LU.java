@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -66,6 +67,8 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
         }
         return new RawLU();
     };
+
+    Factory<Quadruple> QUADRUPLE = typical -> new LUDecomposition.Quad();
 
     Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
 

@@ -61,8 +61,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getCAPMReturns() {
 
         //double[][] tmpArr = new double[][] { { 0.0002 }, { 0.0018 }, { 0.0557 }, { 0.0339 }, { 0.0659 }, { 0.0316 }, { 0.0392 }, { 0.0560 } };
-        final double[][] tmpArr = new double[][] { { 0.000202 }, { 0.001804 }, { 0.055754 }, { 0.033945 }, { 0.065950 }, { 0.031631 }, { 0.039204 },
-                { 0.056023 } };
+        final double[][] tmpArr = { { 0.000202 }, { 0.001804 }, { 0.055754 }, { 0.033945 }, { 0.065950 }, { 0.031631 }, { 0.039204 }, { 0.056023 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -70,15 +69,14 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getCAPMWeights() {
 
         //double[][] tmpArr = new double[][] { { 0.2133 }, { 0.0519 }, { 0.1080 }, { 0.1082 }, { 0.0373 }, { -0.0049 }, { 0.1710 }, { 0.0214 } };
-        final double[][] tmpArr = new double[][] { { 0.213842 }, { 0.051058 }, { 0.107461 }, { 0.107260 }, { 0.037030 }, { -0.004974 }, { 0.172613 },
-                { 0.021511 } };
+        final double[][] tmpArr = { { 0.213842 }, { 0.051058 }, { 0.107461 }, { 0.107260 }, { 0.037030 }, { -0.004974 }, { 0.172613 }, { 0.021511 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
 
     public static Primitive64Matrix getCovariances() {
 
-        final double[][] tmpArr = new double[][] { { 0.001005, 0.001328, -0.000579, -0.000675, 0.000121, 0.000128, -0.000445, -0.000437 },
+        final double[][] tmpArr = { { 0.001005, 0.001328, -0.000579, -0.000675, 0.000121, 0.000128, -0.000445, -0.000437 },
                 { 0.001328, 0.007277, -0.001307, -0.000610, -0.002237, -0.000989, 0.001442, -0.001535 },
                 { -0.000579, -0.001307, 0.059852, 0.027588, 0.063497, 0.023036, 0.032967, 0.048039 },
                 { -0.000675, -0.000610, 0.027588, 0.029609, 0.026572, 0.021465, 0.020697, 0.029854 },
@@ -93,8 +91,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getHistoricalReturns() {
 
         //double[][] tmpArr = new double[][] { { 0.0315 }, { 0.0175 }, { -0.0639 }, { -0.0286 }, { -0.0675 }, { -0.0054 }, { -0.0675 }, { -0.0526 } };
-        final double[][] tmpArr = new double[][] { { 0.031500 }, { 0.017528 }, { -0.063973 }, { -0.028605 }, { -0.067555 }, { -0.005411 }, { -0.067549 },
-                { -0.052644 } };
+        final double[][] tmpArr = { { 0.031500 }, { 0.017528 }, { -0.063973 }, { -0.028605 }, { -0.067555 }, { -0.005411 }, { -0.067549 }, { -0.052644 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -102,8 +99,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getHistoricalWeights() {
 
         //double[][] tmpArr = new double[][] { { 11.4432 }, { -1.0459 }, { 0.5499 }, { -0.0529 }, { -0.6052 }, { 0.8147 }, { -1.0436 }, { 0.1459 } };
-        final double[][] tmpArr = new double[][] { { 11.446735 }, { -1.048314 }, { 0.551087 }, { -0.054698 }, { -0.606396 }, { 0.815627 }, { -1.041846 },
-                { 0.145857 } };
+        final double[][] tmpArr = { { 11.446735 }, { -1.048314 }, { 0.551087 }, { -0.054698 }, { -0.606396 }, { 0.815627 }, { -1.041846 }, { 0.145857 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -129,7 +125,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
     public static Primitive64Matrix getInvestorPortfoliosMatrix() {
 
-        final double[][] tmpArr = new double[][] { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        final double[][] tmpArr = { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.9, -0.9, 0.1, -0.1, 0.0, 0.0 } };
 
         return BlackLittermanTest.make(tmpArr);
@@ -137,7 +133,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
     public static Primitive64Matrix getInvestorReturnsMatrix() {
 
-        final double[][] tmpArr = new double[][] { { 0.0525 }, { 0.0025 }, { 0.0200 } };
+        final double[][] tmpArr = { { 0.0525 }, { 0.0025 }, { 0.0200 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -145,8 +141,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getMarketReturns() {
 
         //double[][] tmpArr = new double[][] { { 0.0008 }, { 0.0067 }, { 0.0641 }, { 0.0408 }, { 0.0743 }, { 0.0370 }, { 0.0480 }, { 0.0660 } };
-        final double[][] tmpArr = new double[][] { { 0.000815 }, { 0.006694 }, { 0.064171 }, { 0.040839 }, { 0.074352 }, { 0.037044 }, { 0.048039 },
-                { 0.066028 } };
+        final double[][] tmpArr = { { 0.000815 }, { 0.006694 }, { 0.064171 }, { 0.040839 }, { 0.074352 }, { 0.037044 }, { 0.048039 }, { 0.066028 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -154,8 +149,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getMarketWeights() {
 
         //double[][] tmpArr = new double[][] { { 0.1934 }, { 0.2613 }, { 0.1209 }, { 0.1209 }, { 0.0134 }, { 0.0134 }, { 0.2418 }, { 0.0349 } };
-        final double[][] tmpArr = new double[][] { { 0.185692 }, { 0.263222 }, { 0.119554 }, { 0.121806 }, { 0.014606 }, { 0.012035 }, { 0.240974 },
-                { 0.035165 } };
+        final double[][] tmpArr = { { 0.185692 }, { 0.263222 }, { 0.119554 }, { 0.121806 }, { 0.014606 }, { 0.012035 }, { 0.240974 }, { 0.035165 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -163,8 +157,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getModifiedReturns() {
 
         //double[][] tmpArr = new double[][] { { 0.0007 }, { 0.0050 }, { 0.0650 }, { 0.0432 }, { 0.0759 }, { 0.0394 }, { 0.0493 }, { 0.0684 } };
-        final double[][] tmpArr = new double[][] { { 0.000684 }, { 0.004997 }, { 0.065031 }, { 0.043242 }, { 0.075933 }, { 0.039419 }, { 0.049355 },
-                { 0.068440 } };
+        final double[][] tmpArr = { { 0.000684 }, { 0.004997 }, { 0.065031 }, { 0.043242 }, { 0.075933 }, { 0.039419 }, { 0.049355 }, { 0.068440 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -172,8 +165,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     public static Primitive64Matrix getModifiedWeights() {
 
         //double[][] tmpArr = new double[][] { { 0.2988 }, { 0.1559 }, { 0.0935 }, { 0.1482 }, { 0.0104 }, { 0.0165 }, { 0.2781 }, { 0.0349 } };
-        final double[][] tmpArr = new double[][] { { 0.304440 }, { 0.155307 }, { 0.094349 }, { 0.147546 }, { 0.009930 }, { 0.017213 }, { 0.277067 },
-                { 0.035045 } };
+        final double[][] tmpArr = { { 0.304440 }, { 0.155307 }, { 0.094349 }, { 0.147546 }, { 0.009930 }, { 0.017213 }, { 0.277067 }, { 0.035045 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -184,7 +176,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
     public static Primitive64Matrix getVarianceOfInvestorViewPortfolios() {
 
-        final double[][] tmpArr = new double[][] { { 0.02836 }, { 0.00563 }, { 0.03462 } };
+        final double[][] tmpArr = { { 0.02836 }, { 0.00563 }, { 0.03462 } };
 
         return BlackLittermanTest.make(tmpArr);
     }
@@ -333,7 +325,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
         for (int i = 0; i < tmpViewPortfolios.countRows(); i++) {
             final int row = i;
-            tmpBLM.addViewWithBalancedConfidence(Array1D.R128.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
+            tmpBLM.addViewWithBalancedConfidence(Array1D.R256.copy(tmpViewPortfolios.logical().rows(i).get()),
                     TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)));
         }
 
@@ -359,7 +351,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
             final int row = i;
             final int row1 = i;
             final int col = i;
-            tmpBLM.addViewWithStandardDeviation(Array1D.R128.copy(tmpViewPortfolios.logical().rows(new int[] { i }).get()),
+            tmpBLM.addViewWithStandardDeviation(Array1D.R256.copy(tmpViewPortfolios.logical().rows(i).get()),
                     TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)),
                     BigMath.SQRT.invoke(TypeUtils.toBigDecimal(tmpConfidenceMatrix.get(row1, col))));
         }
@@ -420,9 +412,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final String[] tmpNames = BlackLittermanTest.getAssetNames();
         final Primitive64Matrix tmpCovars = BlackLittermanTest.getCovariances();
 
-        final MarketEquilibrium retVal = new MarketEquilibrium(tmpNames, tmpCovars, BlackLittermanTest.getRiskAversionFactor());
-
-        return retVal;
+        return new MarketEquilibrium(tmpNames, tmpCovars, BlackLittermanTest.getRiskAversionFactor());
     }
 
 }

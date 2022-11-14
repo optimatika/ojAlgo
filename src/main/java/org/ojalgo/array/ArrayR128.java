@@ -21,44 +21,36 @@
  */
 package org.ojalgo.array;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.ojalgo.array.operation.AMAX;
-import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.QuadrupleFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.BigAggregator;
-import org.ojalgo.scalar.BigScalar;
+import org.ojalgo.function.aggregator.QuadrupleAggregator;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.math.MathType;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
+ * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.Quadruple}.
  *
  * @author apete
  */
-public class ArrayR128 extends ReferenceTypeArray<BigDecimal> {
+public class ArrayR128 extends ScalarArray<Quadruple> {
 
-    public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<>() {
+    public static final DenseArray.Factory<Quadruple> FACTORY = new DenseArray.Factory<>() {
 
         @Override
-        public AggregatorSet<BigDecimal> aggregator() {
-            return BigAggregator.getSet();
+        public AggregatorSet<Quadruple> aggregator() {
+            return QuadrupleAggregator.getSet();
         }
 
         @Override
-        public FunctionSet<BigDecimal> function() {
-            return BigFunction.getSet();
+        public FunctionSet<Quadruple> function() {
+            return QuadrupleFunction.getSet();
         }
 
         @Override
-        public Scalar.Factory<BigDecimal> scalar() {
-            return BigScalar.FACTORY;
+        public Scalar.Factory<Quadruple> scalar() {
+            return Quadruple.FACTORY;
         }
 
         @Override
@@ -67,7 +59,7 @@ public class ArrayR128 extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        PlainArray<BigDecimal> makeDenseArray(final long size) {
+        PlainArray<Quadruple> makeDenseArray(final long size) {
             return ArrayR128.make((int) size);
         }
 
@@ -77,96 +69,16 @@ public class ArrayR128 extends ReferenceTypeArray<BigDecimal> {
         return new ArrayR128(size);
     }
 
-    public static ArrayR128 wrap(final BigDecimal... data) {
+    public static ArrayR128 wrap(final Quadruple... data) {
         return new ArrayR128(data);
-    }
-
-    protected ArrayR128(final BigDecimal[] data) {
-        super(FACTORY, data);
     }
 
     protected ArrayR128(final int size) {
         super(FACTORY, size);
     }
 
-    @Override
-    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
-        AXPY.invoke(y, a, data);
-    }
-
-    @Override
-    public void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected byte byteValue(final int index) {
-        return this.get(index).byteValue();
-    }
-
-    @Override
-    protected double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
-    }
-
-    @Override
-    protected float floatValue(final int index) {
-        return data[index].floatValue();
-    }
-
-    @Override
-    protected int indexOfLargest(final int first, final int limit, final int step) {
-        return AMAX.invoke(data, first, limit, step);
-    }
-
-    @Override
-    protected int intValue(final int index) {
-        return this.get(index).intValue();
-    }
-
-    @Override
-    protected boolean isAbsolute(final int index) {
-        return BigScalar.isAbsolute(data[index]);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return BigScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected long longValue(final int index) {
-        return this.get(index).longValue();
-    }
-
-    @Override
-    protected short shortValue(final int index) {
-        return this.get(index).shortValue();
-    }
-
-    @Override
-    protected void set(final int index, final long value) {
-        data[index] = new BigDecimal(value);
+    protected ArrayR128(final Quadruple[] data) {
+        super(FACTORY, data);
     }
 
 }

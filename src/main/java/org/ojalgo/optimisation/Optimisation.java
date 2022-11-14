@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
@@ -382,7 +382,7 @@ public interface Optimisation {
 
             State state = Optimisation.State.valueOf(strState);
             double value = Double.parseDouble(strValue);
-            ArrayR128 solution = ArrayR128.make(strSolution.length);
+            ArrayR256 solution = ArrayR256.make(strSolution.length);
             for (int i = 0; i < strSolution.length; i++) {
                 solution.set(i, new BigDecimal(strSolution[i]));
             }
@@ -458,7 +458,7 @@ public interface Optimisation {
         public Optimisation.Result getSolution(final NumberContext precision) {
             Optimisation.State state = this.getState();
             double value = this.getValue();
-            ArrayR128 solution = ArrayR128.make(this.size());
+            ArrayR256 solution = ArrayR256.make(this.size());
             for (int i = 0, limit = solution.data.length; i < limit; i++) {
                 solution.set(i, precision.enforce(this.get(i)));
             }

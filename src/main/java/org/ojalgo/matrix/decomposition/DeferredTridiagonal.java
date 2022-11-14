@@ -32,6 +32,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -88,6 +89,18 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
             return null;
         }
 
+    }
+
+    static final class Quad extends DeferredTridiagonal<Quadruple> {
+
+        Quad() {
+            super(GenericStore.QUADRUPLE);
+        }
+
+        @Override
+        Array1D<Quadruple> makeReal(final BasicArray<Quadruple> offDiagonal) {
+            return null;
+        }
     }
 
     static final class Quat extends DeferredTridiagonal<Quaternion> {

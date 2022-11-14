@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -62,6 +63,8 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
             return new RawCholesky();
         }
     };
+
+    Factory<Quadruple> QUADRUPLE = typical -> new CholeskyDecomposition.Quad();
 
     Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
 

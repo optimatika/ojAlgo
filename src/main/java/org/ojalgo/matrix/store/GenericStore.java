@@ -25,14 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.array.ArrayC128;
-import org.ojalgo.array.ArrayH256;
-import org.ojalgo.array.ArrayQ128;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.ScalarArray;
+import org.ojalgo.array.*;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -53,6 +46,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -338,6 +332,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = new GenericStore.Factory<>(ArrayC128.FACTORY);
+    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> QUADRUPLE = new GenericStore.Factory<>(ArrayR128.FACTORY);
     public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = new GenericStore.Factory<>(ArrayH256.FACTORY);
     public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(ArrayQ128.FACTORY);
 

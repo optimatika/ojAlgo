@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -317,6 +318,25 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.RATIONAL;
             Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
             Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+
+        @Override
+        public Eigenvalue<Quadruple> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Quad() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Quadruple> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> factory = GenericStore.QUADRUPLE;
+            Cholesky<Quadruple> cholesky = Cholesky.QUADRUPLE.make(typical);
+            Eigenvalue<Quadruple> eigenvalue = this.make(typical, true);
 
             return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }

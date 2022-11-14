@@ -994,7 +994,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         State retState = State.UNEXPLORED;
         double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.R128.make(numberOfVariables);
+        final Array1D<BigDecimal> retSolution = Array1D.R256.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
 

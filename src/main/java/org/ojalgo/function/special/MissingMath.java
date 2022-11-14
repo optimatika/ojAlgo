@@ -21,10 +21,11 @@
  */
 package org.ojalgo.function.special;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * Math utilities missing from {@link Math}.
@@ -32,6 +33,11 @@ import java.math.MathContext;
  * @author apete
  */
 public abstract class MissingMath {
+
+    /**
+     * Corresponding to binary 256 octuple precision
+     */
+    private static final MathContext MC256 = new MathContext(71, RoundingMode.HALF_EVEN);
 
     public static double acosh(final double arg) {
         return Math.log(arg + Math.sqrt(arg * arg - 1.0));
@@ -80,7 +86,7 @@ public abstract class MissingMath {
     }
 
     public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
-        return numerator.divide(denominator, MathContext.DECIMAL128);
+        return numerator.divide(denominator, MC256);
     }
 
     /**
@@ -395,14 +401,14 @@ public abstract class MissingMath {
         case 1:
             return arg;
         case 2:
-            return arg.multiply(arg, MathContext.DECIMAL128);
+            return arg.multiply(arg, MC256);
         case 3:
-            return arg.multiply(arg).multiply(arg, MathContext.DECIMAL128);
+            return arg.multiply(arg).multiply(arg, MC256);
         case 4:
             BigDecimal arg2 = arg.multiply(arg);
-            return arg2.multiply(arg2, MathContext.DECIMAL128);
+            return arg2.multiply(arg2, MC256);
         default:
-            return arg.pow(param, MathContext.DECIMAL128);
+            return arg.pow(param, MC256);
         }
     }
 
@@ -447,16 +453,14 @@ public abstract class MissingMath {
     public static BigDecimal root(final BigDecimal arg, final int param) {
 
         if (param <= 0) {
-
             throw new IllegalArgumentException();
-
         }
+
         if (param == 1) {
-
             return arg;
-
         }
-        BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
+
+        BigDecimal bigArg = arg.round(MC256);
         BigDecimal bigParam = BigDecimal.valueOf(param);
 
         BigDecimal retVal = BigDecimal.ZERO;
@@ -467,7 +471,7 @@ public abstract class MissingMath {
 
         BigDecimal shouldBeZero;
         while ((shouldBeZero = MissingMath.power(retVal, param).subtract(bigArg)).signum() != 0) {
-            retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
+            retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MC256));
         }
 
         return retVal;

@@ -27,6 +27,7 @@ import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Structure2D;
@@ -75,6 +76,8 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
         }
         return new RawSingularValue();
     };
+
+    Factory<Quadruple> QUADRUPLE = (typical, fullSize) -> new SingularValueDecomposition.Quad(fullSize);
 
     Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
 

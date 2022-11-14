@@ -32,6 +32,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -138,6 +139,23 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
         @Override
         Array1D<Double>[] makeReal() {
+            return null;
+        }
+
+    }
+
+    static final class Quad extends BidiagonalDecomposition<Quadruple> {
+
+        Quad() {
+            this(false);
+        }
+
+        Quad(final boolean fullSize) {
+            super(GenericStore.QUADRUPLE, fullSize);
+        }
+
+        @Override
+        Array1D<Quadruple>[] makeReal() {
             return null;
         }
 
