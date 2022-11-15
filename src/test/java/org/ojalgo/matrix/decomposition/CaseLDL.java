@@ -95,10 +95,10 @@ public class CaseLDL extends MatrixDecompositionTests {
         TestUtils.assertEquals(mtrxA, reconstructed);
 
         // TODO Change to new RawLDL() when it's done
-        LDL<Double> rawLDL = new LDLDecomposition.Primitive();
+        LDL<Double> rawLDL = new LDLDecomposition.R064();
         rawLDL.decompose(mtrxA);
 
-        LDL<Double> primLDL = new LDLDecomposition.Primitive();
+        LDL<Double> primLDL = new LDLDecomposition.R064();
         primLDL.decompose(mtrxA.triangular(false, false));
 
         if (MatrixDecompositionTests.DEBUG) {

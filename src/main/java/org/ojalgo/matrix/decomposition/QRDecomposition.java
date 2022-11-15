@@ -43,62 +43,62 @@ import org.ojalgo.type.NumberDefinition;
 
 abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
 
-    static final class Complex extends QRDecomposition<ComplexNumber> {
+    static final class C128 extends QRDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             this(false);
         }
 
-        Complex(final boolean fullSize) {
+        C128(final boolean fullSize) {
             super(GenericStore.COMPLEX, fullSize);
         }
 
     }
 
-    static final class Primitive extends QRDecomposition<Double> {
+    static final class H256 extends QRDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
             this(false);
         }
 
-        Primitive(final boolean fullSize) {
-            super(Primitive64Store.FACTORY, fullSize);
-        }
-
-    }
-
-    static final class Quad extends QRDecomposition<Quadruple> {
-
-        Quad() {
-            this(false);
-        }
-
-        Quad(final boolean fullSize) {
-            super(GenericStore.QUADRUPLE, fullSize);
-        }
-
-    }
-
-    static final class Quat extends QRDecomposition<Quaternion> {
-
-        Quat() {
-            this(false);
-        }
-
-        Quat(final boolean fullSize) {
+        H256(final boolean fullSize) {
             super(GenericStore.QUATERNION, fullSize);
         }
 
     }
 
-    static final class Rational extends QRDecomposition<RationalNumber> {
+    static final class Q128 extends QRDecomposition<RationalNumber> {
 
-        Rational() {
+        Q128() {
             this(false);
         }
 
-        Rational(final boolean fullSize) {
+        Q128(final boolean fullSize) {
             super(GenericStore.RATIONAL, fullSize);
+        }
+
+    }
+
+    static final class R064 extends QRDecomposition<Double> {
+
+        R064() {
+            this(false);
+        }
+
+        R064(final boolean fullSize) {
+            super(Primitive64Store.FACTORY, fullSize);
+        }
+
+    }
+
+    static final class R128 extends QRDecomposition<Quadruple> {
+
+        R128() {
+            this(false);
+        }
+
+        R128(final boolean fullSize) {
+            super(GenericStore.QUADRUPLE, fullSize);
         }
 
     }

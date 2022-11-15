@@ -55,15 +55,15 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.C128();
 
-    Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.Primitive();
+    Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.R064();
 
-    Factory<Quadruple> QUADRUPLE = typical -> new LDLDecomposition.Quad();
+    Factory<Quadruple> QUADRUPLE = typical -> new LDLDecomposition.R128();
 
-    Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.H256();
 
-    Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Q128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);

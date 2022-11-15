@@ -48,9 +48,9 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
      * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
      * = V*D*inverse(V) depends upon V.cond().
      **/
-    static final class Primitive extends GeneralEvD<Double> {
+    static final class R064 extends GeneralEvD<Double> {
 
-        Primitive() {
+        R064() {
             super(Primitive64Store.FACTORY);
         }
 

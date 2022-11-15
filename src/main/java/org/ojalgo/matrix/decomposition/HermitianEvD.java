@@ -63,10 +63,10 @@ import org.ojalgo.structure.Structure2D;
  **/
 abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
-    static final class Complex extends HermitianEvD<ComplexNumber> {
+    static final class C128 extends HermitianEvD<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX, new DeferredTridiagonal.Complex());
+        C128() {
+            super(GenericStore.COMPLEX, new DeferredTridiagonal.C128());
         }
 
         public Eigenpair getEigenpair(final int index) {
@@ -79,34 +79,34 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     }
 
-    static final class Primitive extends HermitianEvD<Double> {
+    static final class R064 extends HermitianEvD<Double> {
 
-        Primitive() {
+        R064() {
             super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }
 
-    static final class Quat extends HermitianEvD<Quaternion> {
+    static final class H256 extends HermitianEvD<Quaternion> {
 
-        Quat() {
-            super(GenericStore.QUATERNION, new DeferredTridiagonal.Quat());
+        H256() {
+            super(GenericStore.QUATERNION, new DeferredTridiagonal.H256());
         }
 
     }
 
-    static final class Rational extends HermitianEvD<RationalNumber> {
+    static final class Q128 extends HermitianEvD<RationalNumber> {
 
-        Rational() {
-            super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
+        Q128() {
+            super(GenericStore.RATIONAL, new DeferredTridiagonal.Q128());
         }
 
     }
 
-    static final class Quad extends HermitianEvD<Quadruple> {
+    static final class R128 extends HermitianEvD<Quadruple> {
 
-        Quad() {
-            super(GenericStore.QUADRUPLE, new DeferredTridiagonal.Quad());
+        R128() {
+            super(GenericStore.QUADRUPLE, new DeferredTridiagonal.R128());
         }
 
     }

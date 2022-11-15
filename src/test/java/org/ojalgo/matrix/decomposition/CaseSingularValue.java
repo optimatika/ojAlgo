@@ -52,7 +52,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     private static final SingularValue<RationalNumber> IMPL_BIG = SingularValue.RATIONAL.make();
     private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
-    private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
+    private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.R064();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
     private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));

@@ -58,21 +58,21 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.C128();
 
     Factory<Double> PRIMITIVE = typical -> {
 
         if (512L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new LUDecomposition.Primitive();
+            return new LUDecomposition.R064();
         }
         return new RawLU();
     };
 
-    Factory<Quadruple> QUADRUPLE = typical -> new LUDecomposition.Quad();
+    Factory<Quadruple> QUADRUPLE = typical -> new LUDecomposition.R128();
 
-    Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.H256();
 
-    Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Q128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
 

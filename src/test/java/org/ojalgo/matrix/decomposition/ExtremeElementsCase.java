@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.decomposition.HermitianEvD.Primitive;
+import org.ojalgo.matrix.decomposition.HermitianEvD.R064;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -350,7 +350,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
-        Primitive tmpAlgorithm = new HermitianEvD.Primitive();
+        R064 tmpAlgorithm = new HermitianEvD.R064();
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -389,7 +389,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                         1.6929815829013701 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 307)));
 
-        SingularValueDecomposition.Primitive tmpAlgorithm = new SingularValueDecomposition.Primitive();
+        SingularValueDecomposition.R064 tmpAlgorithm = new SingularValueDecomposition.R064();
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -511,7 +511,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         tmpBody.modifyAll(tmpSecond);
         tmpRHS.modifyAll(tmpSecond);
 
-        SolverTask<Double> tmpAlgorithm = new LUDecomposition.Primitive();
+        SolverTask<Double> tmpAlgorithm = new LUDecomposition.R064();
 
         ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }

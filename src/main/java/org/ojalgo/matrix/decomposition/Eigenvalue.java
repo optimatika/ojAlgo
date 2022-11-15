@@ -223,7 +223,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Complex() : null;
+            return hermitian ? new HermitianEvD.C128() : null;
         }
 
         @Override
@@ -255,7 +255,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
             if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                return new DynamicEvD.Primitive();
+                return new DynamicEvD.R064();
             }
             return new RawEigenvalue.Dynamic();
         }
@@ -264,12 +264,12 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
                 if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                    return new HermitianEvD.Primitive();
+                    return new HermitianEvD.R064();
                 }
                 return new RawEigenvalue.Symmetric();
             }
             if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                return new GeneralEvD.Primitive();
+                return new GeneralEvD.R064();
             }
             return new RawEigenvalue.General();
         }
@@ -290,7 +290,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Quat() : null;
+            return hermitian ? new HermitianEvD.H256() : null;
         }
 
         @Override
@@ -309,7 +309,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Rational() : null;
+            return hermitian ? new HermitianEvD.Q128() : null;
         }
 
         @Override
@@ -328,7 +328,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         @Override
         public Eigenvalue<Quadruple> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Quad() : null;
+            return hermitian ? new HermitianEvD.R128() : null;
         }
 
         @Override

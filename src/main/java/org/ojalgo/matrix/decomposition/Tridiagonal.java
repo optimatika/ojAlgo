@@ -43,13 +43,13 @@ public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecompositio
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.C128();
 
-    Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
+    Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.R064();
 
-    Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.H256();
 
-    Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Q128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 

@@ -168,7 +168,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Original", m);
         }
 
-        QR<Double> qr1 = new QRDecomposition.Primitive(false);
+        QR<Double> qr1 = new QRDecomposition.R064(false);
         qr1.decompose(m);
 
         if (DEBUG) {
@@ -458,7 +458,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         Primitive64Matrix input = Primitive64Matrix.FACTORY.rows(data);
         try {
             //   SingularValue<Double> svd = SingularValue.make(input);
-            SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
+            SingularValue<Double> svd = new SingularValueDecomposition.R064();
             svd.invert(input);
         } catch (RecoverableCondition exception) {
             // TODO Auto-generated catch block

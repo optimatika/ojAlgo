@@ -41,42 +41,42 @@ import org.ojalgo.structure.Structure2D;
 
 abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
-    static final class Complex extends CholeskyDecomposition<ComplexNumber> {
+    static final class C128 extends CholeskyDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             super(GenericStore.COMPLEX);
         }
 
     }
 
-    static final class Primitive extends CholeskyDecomposition<Double> {
+    static final class H256 extends CholeskyDecomposition<Quaternion> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY);
-        }
-
-    }
-
-    static final class Quad extends CholeskyDecomposition<Quadruple> {
-
-        Quad() {
-            super(GenericStore.QUADRUPLE);
-        }
-
-    }
-
-    static final class Quat extends CholeskyDecomposition<Quaternion> {
-
-        Quat() {
+        H256() {
             super(GenericStore.QUATERNION);
         }
 
     }
 
-    static final class Rational extends CholeskyDecomposition<RationalNumber> {
+    static final class Q128 extends CholeskyDecomposition<RationalNumber> {
 
-        Rational() {
+        Q128() {
             super(GenericStore.RATIONAL);
+        }
+
+    }
+
+    static final class R064 extends CholeskyDecomposition<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY);
+        }
+
+    }
+
+    static final class R128 extends CholeskyDecomposition<Quadruple> {
+
+        R128() {
+            super(GenericStore.QUADRUPLE);
         }
 
     }

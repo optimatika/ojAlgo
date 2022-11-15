@@ -57,13 +57,13 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.C128(fullSize);
 
-    Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.Primitive(fullSize);
+    Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.R064(fullSize);
 
-    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.Quat(fullSize);
+    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.H256(fullSize);
 
-    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Rational(fullSize);
+    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Q128(fullSize);
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 

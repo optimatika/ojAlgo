@@ -68,20 +68,20 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.C128(fullSize);
 
     Factory<Double> PRIMITIVE = (typical, fullSize) -> {
         if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new SingularValueDecomposition.Primitive(fullSize);
+            return new SingularValueDecomposition.R064(fullSize);
         }
         return new RawSingularValue();
     };
 
-    Factory<Quadruple> QUADRUPLE = (typical, fullSize) -> new SingularValueDecomposition.Quad(fullSize);
+    Factory<Quadruple> QUADRUPLE = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
 
-    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
+    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
 
-    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
+    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 

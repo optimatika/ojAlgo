@@ -119,7 +119,7 @@ public class PrimitiveOrRawCholesky extends AbstractPrimitiveOrRaw<Cholesky<Doub
 
     @Override
     protected Cholesky<Double> makePrimitive() {
-        return new CholeskyDecomposition.Primitive();
+        return new CholeskyDecomposition.R064();
     }
 
     @Override

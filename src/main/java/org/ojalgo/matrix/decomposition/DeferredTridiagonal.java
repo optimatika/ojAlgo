@@ -42,9 +42,9 @@ import org.ojalgo.structure.Access2D;
  */
 abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalDecomposition<N> {
 
-    static final class Complex extends DeferredTridiagonal<ComplexNumber> {
+    static final class C128 extends DeferredTridiagonal<ComplexNumber> {
 
-        Complex() {
+        C128() {
             super(GenericStore.COMPLEX);
         }
 
@@ -78,34 +78,9 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
     }
 
-    static final class Primitive extends DeferredTridiagonal<Double> {
+    static final class H256 extends DeferredTridiagonal<Quaternion> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY);
-        }
-
-        @Override
-        Array1D<Double> makeReal(final BasicArray<Double> offDiagonal) {
-            return null;
-        }
-
-    }
-
-    static final class Quad extends DeferredTridiagonal<Quadruple> {
-
-        Quad() {
-            super(GenericStore.QUADRUPLE);
-        }
-
-        @Override
-        Array1D<Quadruple> makeReal(final BasicArray<Quadruple> offDiagonal) {
-            return null;
-        }
-    }
-
-    static final class Quat extends DeferredTridiagonal<Quaternion> {
-
-        Quat() {
+        H256() {
             super(GenericStore.QUATERNION);
         }
 
@@ -139,14 +114,39 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
     }
 
-    static final class Rational extends DeferredTridiagonal<RationalNumber> {
+    static final class Q128 extends DeferredTridiagonal<RationalNumber> {
 
-        Rational() {
+        Q128() {
             super(GenericStore.RATIONAL);
         }
 
         @Override
         Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
+            return null;
+        }
+    }
+
+    static final class R064 extends DeferredTridiagonal<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY);
+        }
+
+        @Override
+        Array1D<Double> makeReal(final BasicArray<Double> offDiagonal) {
+            return null;
+        }
+
+    }
+
+    static final class R128 extends DeferredTridiagonal<Quadruple> {
+
+        R128() {
+            super(GenericStore.QUADRUPLE);
+        }
+
+        @Override
+        Array1D<Quadruple> makeReal(final BasicArray<Quadruple> offDiagonal) {
             return null;
         }
     }

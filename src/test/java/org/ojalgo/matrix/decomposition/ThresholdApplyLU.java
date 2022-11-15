@@ -75,7 +75,7 @@ public class ThresholdApplyLU extends AbstractThresholdTuner {
     @Param({ "1", "2" })
     public int z;
 
-    LU<Double> decomposition = new LUDecomposition.Primitive();
+    LU<Double> decomposition = new LUDecomposition.R064();
 
     Primitive64Store matrix;
 

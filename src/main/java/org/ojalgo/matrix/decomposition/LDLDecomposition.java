@@ -45,42 +45,42 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LDL<N> {
 
-    static final class Complex extends LDLDecomposition<ComplexNumber> {
+    static final class C128 extends LDLDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             super(GenericStore.COMPLEX);
         }
 
     }
 
-    static final class Primitive extends LDLDecomposition<Double> {
+    static final class H256 extends LDLDecomposition<Quaternion> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY);
-        }
-
-    }
-
-    static final class Quad extends LDLDecomposition<Quadruple> {
-
-        Quad() {
-            super(GenericStore.QUADRUPLE);
-        }
-
-    }
-
-    static final class Quat extends LDLDecomposition<Quaternion> {
-
-        Quat() {
+        H256() {
             super(GenericStore.QUATERNION);
         }
 
     }
 
-    static final class Rational extends LDLDecomposition<RationalNumber> {
+    static final class Q128 extends LDLDecomposition<RationalNumber> {
 
-        Rational() {
+        Q128() {
             super(GenericStore.RATIONAL);
+        }
+
+    }
+
+    static final class R064 extends LDLDecomposition<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY);
+        }
+
+    }
+
+    static final class R128 extends LDLDecomposition<Quadruple> {
+
+        R128() {
+            super(GenericStore.QUADRUPLE);
         }
 
     }

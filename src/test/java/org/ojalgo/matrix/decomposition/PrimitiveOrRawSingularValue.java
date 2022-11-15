@@ -138,7 +138,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
 
     @Override
     protected SingularValue<Double> makePrimitive() {
-        return new SingularValueDecomposition.Primitive();
+        return new SingularValueDecomposition.R064();
     }
 
     @Override

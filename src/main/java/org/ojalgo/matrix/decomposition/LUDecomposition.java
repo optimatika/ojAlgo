@@ -44,42 +44,42 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
 
-    static final class Complex extends LUDecomposition<ComplexNumber> {
+    static final class C128 extends LUDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             super(GenericStore.COMPLEX);
         }
 
     }
 
-    static final class Primitive extends LUDecomposition<Double> {
+    static final class H256 extends LUDecomposition<Quaternion> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY);
-        }
-
-    }
-
-    static final class Quad extends LUDecomposition<Quadruple> {
-
-        Quad() {
-            super(GenericStore.QUADRUPLE);
-        }
-
-    }
-
-    static final class Quat extends LUDecomposition<Quaternion> {
-
-        Quat() {
+        H256() {
             super(GenericStore.QUATERNION);
         }
 
     }
 
-    static final class Rational extends LUDecomposition<RationalNumber> {
+    static final class Q128 extends LUDecomposition<RationalNumber> {
 
-        Rational() {
+        Q128() {
             super(GenericStore.RATIONAL);
+        }
+
+    }
+
+    static final class R064 extends LUDecomposition<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY);
+        }
+
+    }
+
+    static final class R128 extends LUDecomposition<Quadruple> {
+
+        R128() {
+            super(GenericStore.QUADRUPLE);
         }
 
     }
