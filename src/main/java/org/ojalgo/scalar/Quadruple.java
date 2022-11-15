@@ -34,6 +34,13 @@ import org.ojalgo.type.context.NumberContext;
  * https://stackoverflow.com/questions/66962567/how-to-emulate-double-precision-using-two-floats-in-opengl-es
  * <P>
  * https://blog.cyclemap.link/2011-06-09-glsl-part2-emu/
+ * <P>
+ * https://www.researchgate.net/publication/228570156_Library_for_Double-Double_and_Quad-Double_Arithmetic
+ * <P>
+ * https://libntl.org
+ * <P>
+ * http://mrob.com/pub/math/f161.html
+ * <P>
  *
  * @author apete
  */
