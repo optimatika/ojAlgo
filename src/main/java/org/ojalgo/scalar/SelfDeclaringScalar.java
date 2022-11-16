@@ -8,7 +8,9 @@ interface SelfDeclaringScalar<S extends SelfDeclaringScalar<S>> extends Scalar<S
     S add(double scalarAddend);
 
     @Override
-    S add(float scalarAddend);
+    default S add(final float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
 
     @Override
     S add(S scalarAddend);
@@ -20,7 +22,9 @@ interface SelfDeclaringScalar<S extends SelfDeclaringScalar<S>> extends Scalar<S
     S divide(double scalarDivisor);
 
     @Override
-    S divide(float scalarDivisor);
+    default S divide(final float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
 
     @Override
     S divide(S scalarDivisor);
@@ -32,7 +36,9 @@ interface SelfDeclaringScalar<S extends SelfDeclaringScalar<S>> extends Scalar<S
     S multiply(double scalarMultiplicand);
 
     @Override
-    S multiply(float scalarMultiplicand);
+    default S multiply(final float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
 
     @Override
     S multiply(S scalarMultiplicand);
@@ -50,7 +56,9 @@ interface SelfDeclaringScalar<S extends SelfDeclaringScalar<S>> extends Scalar<S
     S subtract(double scalarSubtrahend);
 
     @Override
-    S subtract(float scalarSubtrahend);
+    default S subtract(final float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
 
     @Override
     S subtract(S scalarSubtrahend);

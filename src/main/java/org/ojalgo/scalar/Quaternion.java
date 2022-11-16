@@ -336,11 +336,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public Quaternion add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
     public Quaternion add(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -433,11 +428,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         final double tmpK = k / arg;
 
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
-    }
-
-    @Override
-    public Quaternion divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     /**
@@ -661,11 +651,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public Quaternion multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
     public Quaternion multiply(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -725,11 +710,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
             return new Quaternion(myScalar - arg);
         }
         return new Quaternion(myScalar - arg, i, j, k);
-    }
-
-    @Override
-    public Quaternion subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override

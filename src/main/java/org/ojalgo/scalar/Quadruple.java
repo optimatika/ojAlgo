@@ -41,6 +41,8 @@ import org.ojalgo.type.context.NumberContext;
  * <P>
  * http://mrob.com/pub/math/f161.html
  * <P>
+ * https://www.davidhbailey.com/dhbsoftware/
+ * <P>
  *
  * @author apete
  */
@@ -233,11 +235,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     @Override
-    public Quadruple add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
     public Quadruple add(final Quadruple arg) {
 
         if (this.isNaN() || arg.isNaN()) {
@@ -274,11 +271,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple divide(final double arg) {
         return this.divide(Quadruple.valueOf(arg));
-    }
-
-    @Override
-    public Quadruple divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -370,11 +362,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     }
 
     @Override
-    public Quadruple multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
     public Quadruple multiply(final Quadruple arg) {
 
         if (this.isNaN() || arg.isNaN()) {
@@ -430,11 +417,6 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple subtract(final double arg) {
         return new Quadruple(myBase - arg, myRemainder);
-    }
-
-    @Override
-    public Quadruple subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override
