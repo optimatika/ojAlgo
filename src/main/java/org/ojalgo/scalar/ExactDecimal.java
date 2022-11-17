@@ -121,7 +121,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final S conjugate() {
         return (S) this;
     }

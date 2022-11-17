@@ -982,7 +982,6 @@ ojalgo-52.1.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.convex                     -> java.lang                                          java.base
    org.ojalgo.optimisation.convex                     -> java.lang.invoke                                   java.base
    org.ojalgo.optimisation.convex                     -> java.util                                          java.base
-   org.ojalgo.optimisation.convex                     -> java.util.concurrent.atomic                        java.base
    org.ojalgo.optimisation.convex                     -> java.util.function                                 java.base
    org.ojalgo.optimisation.convex                     -> java.util.stream                                   java.base
    org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-52.1.0-SNAPSHOT.jar
@@ -995,7 +994,6 @@ ojalgo-52.1.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.decomposition                    ojalgo-52.1.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-52.1.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task.iterative                   ojalgo-52.1.0-SNAPSHOT.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-52.1.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation                            ojalgo-52.1.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.optimisation.linear                     ojalgo-52.1.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.scalar                                  ojalgo-52.1.0-SNAPSHOT.jar

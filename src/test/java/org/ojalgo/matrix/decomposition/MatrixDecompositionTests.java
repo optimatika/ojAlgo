@@ -59,12 +59,12 @@ public abstract class MatrixDecompositionTests {
 
     public static Bidiagonal<?>[] getAnyBidiagonal() {
         return new Bidiagonal<?>[] { new BidiagonalDecomposition.C128(), new BidiagonalDecomposition.R064(), new BidiagonalDecomposition.H256(),
-                new BidiagonalDecomposition.Q128() };
+                new BidiagonalDecomposition.Q128(), new BidiagonalDecomposition.R128() };
     }
 
     public static Cholesky<?>[] getAnyCholesky() {
         return new Cholesky<?>[] { new CholeskyDecomposition.C128(), new CholeskyDecomposition.R064(), new CholeskyDecomposition.H256(),
-                new CholeskyDecomposition.Q128(), new RawCholesky() };
+                new CholeskyDecomposition.Q128(), new RawCholesky(), new CholeskyDecomposition.R128() };
     }
 
     public static List<Eigenvalue<?>> getAnyEigenvalue() {
@@ -87,21 +87,22 @@ public abstract class MatrixDecompositionTests {
 
     public static Eigenvalue<?>[] getAnyEigenvalueHermitian() {
         return new Eigenvalue<?>[] { new HermitianEvD.R064(), new RawEigenvalue.Symmetric(), new HermitianEvD.Q128(), new HermitianEvD.C128(),
-                new HermitianEvD.H256() };
+                new HermitianEvD.H256(), new HermitianEvD.R128() };
     }
 
     public static Hessenberg<?>[] getAnyHessenberg() {
         return new Hessenberg<?>[] { new HessenbergDecomposition.C128(), new HessenbergDecomposition.R064(), new HessenbergDecomposition.H256(),
-                new HessenbergDecomposition.Q128() };
+                new HessenbergDecomposition.Q128(), new HessenbergDecomposition.R128() };
     }
 
     public static LDL<?>[] getAnyLDL() {
-        return new LDL<?>[] { new LDLDecomposition.C128(), new LDLDecomposition.R064(), new LDLDecomposition.H256(), new LDLDecomposition.Q128() };
+        return new LDL<?>[] { new LDLDecomposition.C128(), new LDLDecomposition.R064(), new LDLDecomposition.H256(), new LDLDecomposition.Q128(),
+                new LDLDecomposition.R128() };
     }
 
     public static LU<?>[] getAnyLU() {
-        return new LU<?>[] { new LUDecomposition.C128(), new LUDecomposition.R064(), new LUDecomposition.H256(), new LUDecomposition.Q128(),
-                new RawLU() };
+        return new LU<?>[] { new LUDecomposition.C128(), new LUDecomposition.R064(), new LUDecomposition.H256(), new LUDecomposition.Q128(), new RawLU(),
+                new LUDecomposition.R128() };
     }
 
     public static List<MatrixDecomposition.RankRevealing<?>> getAnyMatrixDecompositionRankRevealing() {
@@ -131,18 +132,18 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static QR<?>[] getAnyQR() {
-        return new QR<?>[] { new QRDecomposition.C128(), new QRDecomposition.R064(), new QRDecomposition.H256(), new QRDecomposition.Q128(),
-                new RawQR() };
+        return new QR<?>[] { new QRDecomposition.C128(), new QRDecomposition.R064(), new QRDecomposition.H256(), new QRDecomposition.Q128(), new RawQR(),
+                new QRDecomposition.R128() };
     }
 
     public static SingularValue<?>[] getAnySingularValue() {
-        return new SingularValue<?>[] { new SingularValueDecomposition.C128(), new SingularValueDecomposition.R064(),
-                new SingularValueDecomposition.H256(), new SingularValueDecomposition.Q128(), new RawSingularValue() };
+        return new SingularValue<?>[] { new SingularValueDecomposition.C128(), new SingularValueDecomposition.R064(), new SingularValueDecomposition.H256(),
+                new SingularValueDecomposition.Q128(), new RawSingularValue(), new SingularValueDecomposition.R128() };
     }
 
     public static Tridiagonal<?>[] getAnyTridiagonal() {
         return new Tridiagonal<?>[] { new DeferredTridiagonal.C128(), new DeferredTridiagonal.R064(), new DeferredTridiagonal.H256(),
-                new DeferredTridiagonal.Q128(), new SimultaneousTridiagonal() };
+                new DeferredTridiagonal.Q128(), new SimultaneousTridiagonal(), new DeferredTridiagonal.R128() };
     }
 
     public static List<MatrixDecomposition<Double>> getPrimitiveAll() {
@@ -166,12 +167,10 @@ public abstract class MatrixDecompositionTests {
         return Collections.unmodifiableList(retVal);
     }
 
-    @SuppressWarnings("unchecked")
     public static Bidiagonal<Double>[] getPrimitiveBidiagonal() {
         return (Bidiagonal<Double>[]) new Bidiagonal<?>[] { new BidiagonalDecomposition.R064() };
     }
 
-    @SuppressWarnings("unchecked")
     public static Cholesky<Double>[] getPrimitiveCholesky() {
         return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.R064(), new RawCholesky() };
     }
@@ -186,32 +185,26 @@ public abstract class MatrixDecompositionTests {
         return Collections.unmodifiableList(retVal);
     }
 
-    @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getPrimitiveEigenvalueDynamic() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new DynamicEvD.R064(), new RawEigenvalue.Dynamic() };
     }
 
-    @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getPrimitiveEigenvalueGeneral() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.R064(), new RawEigenvalue.General() };
     }
 
-    @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getPrimitiveEigenvalueSymmetric() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.R064(), new RawEigenvalue.Symmetric() };
     }
 
-    @SuppressWarnings("unchecked")
     public static Hessenberg<Double>[] getPrimitiveHessenberg() {
         return (Hessenberg<Double>[]) new Hessenberg<?>[] { new HessenbergDecomposition.R064() };
     }
 
-    @SuppressWarnings("unchecked")
     public static LDL<Double>[] getPrimitiveLDL() {
         return (LDL<Double>[]) new LDL<?>[] { new LDLDecomposition.R064() };
     }
 
-    @SuppressWarnings("unchecked")
     public static LU<Double>[] getPrimitiveLU() {
         return (LU<Double>[]) new LU<?>[] { new LUDecomposition.R064(), new RawLU() };
     }
@@ -242,17 +235,14 @@ public abstract class MatrixDecompositionTests {
         return Collections.unmodifiableList(retVal);
     }
 
-    @SuppressWarnings("unchecked")
     public static QR<Double>[] getPrimitiveQR() {
         return (QR<Double>[]) new QR<?>[] { new QRDecomposition.R064(), new RawQR() };
     }
 
-    @SuppressWarnings("unchecked")
     public static SingularValue<Double>[] getPrimitiveSingularValue() {
         return (SingularValue<Double>[]) new SingularValue<?>[] { new SingularValueDecomposition.R064(), new RawSingularValue() };
     }
 
-    @SuppressWarnings("unchecked")
     public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.R064(), new SimultaneousTridiagonal() };
     }
