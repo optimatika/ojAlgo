@@ -51,9 +51,9 @@ public class P20061119Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 2);
 
-    public static RationalMatrix getProblematic() {
+    public static Primitive64Matrix getProblematic() {
 
-        final RationalMatrix retVal = RationalMatrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
+        Primitive64Matrix retVal = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
                 { -8.32, -0.12, 8.68, -2.32, 2.08 }, { 7.68, 0.88, -10.32, 3.68, -1.92 }, { -13.12, -1.92, 10.88, -5.12, 9.28 } });
 
         return retVal.enforce(DEFINITION);
@@ -63,14 +63,12 @@ public class P20061119Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // evaluation = NumberContext.getGeneral(8).withPrecision(14);
+        mtrxA = P20061119Case.getProblematic();
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = P20061119Case.getProblematic();
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -84,13 +82,13 @@ public class P20061119Case extends BasicMatrixTest {
     @Test
     public void testGetRank() {
 
-        int expected = rAA.getRank();
+        int expected = mtrxA.getRank();
         int actual;
 
-        actual = cAA.getRank();
+        actual = mtrxA.getRank();
         TestUtils.assertEquals(expected, actual);
 
-        actual = p64AA.getRank();
+        actual = mtrxA.getRank();
         TestUtils.assertEquals(expected, actual);
 
         // TODO Why doesn't this work?
@@ -98,31 +96,13 @@ public class P20061119Case extends BasicMatrixTest {
         // TestUtils.assertEquals(expected, actual);
     }
 
-    @Override
-    @Test
-    public void testIsFullRank() {
-
-        boolean expected = rAA.getRank() == rAA.getMinDim();
-        boolean actual;
-
-        actual = cAA.getRank() == cAA.getMinDim();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.getRank() == p64AA.getMinDim();
-        TestUtils.assertEquals(expected, actual);
-
-        // TODO Why doesn't this work?
-        // actual = p32AA.isFullRank();
-        // TestUtils.assertEquals(expected, actual);
-    }
-
     @Test
     public void testProblem() {
 
-        final RationalMatrix tmpMatrix = P20061119Case.getProblematic();
+        Primitive64Matrix tmpMatrix = P20061119Case.getProblematic();
 
-        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
-        final PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
+        Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
+        PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 
         TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, ACCURACY);

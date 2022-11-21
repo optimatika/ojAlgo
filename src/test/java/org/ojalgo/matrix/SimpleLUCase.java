@@ -38,18 +38,18 @@ public class SimpleLUCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static RationalMatrix getOrginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+    public static Primitive64Matrix getOrginal() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMtrxL() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+    private static Primitive64Matrix getMtrxL() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMtrxU() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
+    private static Primitive64Matrix getMtrxU() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -57,14 +57,12 @@ public class SimpleLUCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 9);
+        mtrxA = SimpleLUCase.getMtrxL();
+        mtrxX = SimpleLUCase.getMtrxU();
+        mtrxB = SimpleLUCase.getOrginal();
 
-        rAA = SimpleLUCase.getMtrxL();
-        rAX = SimpleLUCase.getMtrxU();
-        rAB = SimpleLUCase.getOrginal();
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -86,7 +84,7 @@ public class SimpleLUCase extends BasicMatrixTest {
 
         // PLDU
 
-        final LU<RationalNumber> tmpLU = LU.RATIONAL.make();
+        LU<RationalNumber> tmpLU = LU.RATIONAL.make();
         tmpLU.decompose(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
 
         TestUtils.assertEquals(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, ACCURACY);

@@ -421,6 +421,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple subtract(final Quadruple arg) {
+
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
         }

@@ -72,42 +72,42 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     @Test
     public void testBasicMatrixP20030422Case() {
-        this.doTestTypes(P20030422Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030422Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20030512Case() {
-        this.doTestTypes(P20030512Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030512Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20030528Case() {
-        this.doTestTypes(P20030528Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030528Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20050125Case() {
-        this.doTestTypes(P20050125Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20050125Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20050827Case() {
-        this.doTestTypes(RationalMatrix.FACTORY.copy(P20050827Case.getProblematic()));
+        CaseSingularValue.doTestTypes(RationalMatrix.FACTORY.copy(P20050827Case.getProblematic()));
     }
 
     @Test
     public void testBasicMatrixP20061119Case() {
-        this.doTestTypes(P20061119Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20061119Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20071019FatCase() {
-        this.doTestTypes(P20071019Case.getFatProblematic());
+        CaseSingularValue.doTestTypes(P20071019Case.getFatProblematic());
     }
 
     @Test
     public void testBasicMatrixP20071019TallCase() {
-        this.doTestTypes(P20071019Case.getTallProblematic());
+        CaseSingularValue.doTestTypes(P20071019Case.getTallProblematic());
     }
 
     /**
@@ -119,9 +119,10 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        double[] data = { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 };
+        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(data);
 
-        ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
+        ComplexNumber[] tmpScales = { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };
 
         Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
@@ -300,17 +301,17 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     @Test
     public void testRandomFatCase() {
-        this.doTestTypes(MTRX_FAT);
+        CaseSingularValue.doTestTypes(MTRX_FAT);
     }
 
     @Test
     public void testRandomSquareCase() {
-        this.doTestTypes(MTRX_SQUARE);
+        CaseSingularValue.doTestTypes(MTRX_SQUARE);
     }
 
     @Test
     public void testRandomTallCase() {
-        this.doTestTypes(MTRX_TALL);
+        CaseSingularValue.doTestTypes(MTRX_TALL);
     }
 
     @Test
@@ -337,7 +338,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final RationalMatrix original) {
+    private static void doTestTypes(final Access2D<?> original) {
 
         PhysicalStore<RationalNumber> tmpBigStore = GenericStore.RATIONAL.copy(original);
         PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.COMPLEX.copy(original);

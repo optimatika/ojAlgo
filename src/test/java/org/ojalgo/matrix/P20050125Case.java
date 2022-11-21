@@ -41,9 +41,9 @@ public class P20050125Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 9);
 
-    public static RationalMatrix getProblematic() {
+    public static Primitive64Matrix getProblematic() {
         int DIM = 3;
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
@@ -51,14 +51,12 @@ public class P20050125Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = NumberContext.of(7,6);
+        mtrxA = P20050125Case.getProblematic();
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = P20050125Case.getProblematic();
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -66,22 +64,22 @@ public class P20050125Case extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
+        Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(mtrxA));
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rAA), tmpDelegate, ACCURACY);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(mtrxA), tmpDelegate, ACCURACY);
     }
 
     @Test
     public void testProblem() {
 
-        final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
+        Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(mtrxA));
 
-        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(rI));
+        MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(mtrxI));
 
-        final MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(rI);
-        final MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(rAA).multiply(tmpInv);
+        MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(mtrxI);
+        MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(mtrxA).multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, ACCURACY);
     }

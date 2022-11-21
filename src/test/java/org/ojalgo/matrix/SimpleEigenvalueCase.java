@@ -24,7 +24,7 @@ package org.ojalgo.matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.RationalMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -39,18 +39,18 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 14);
 
-    public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
+    public static Primitive64Matrix getOriginal() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMatrixD() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
+    private static Primitive64Matrix getMatrixD() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMatrixV() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
+    private static Primitive64Matrix getMatrixV() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -58,14 +58,12 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 3);
+        mtrxA = SimpleEigenvalueCase.getOriginal();
+        mtrxX = SimpleEigenvalueCase.getMatrixV();
+        mtrxB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
-        rAA = SimpleEigenvalueCase.getOriginal();
-        rAX = SimpleEigenvalueCase.getMatrixV();
-        rAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -89,23 +87,23 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         BasicMatrix<?, ?> actMtrx;
         BasicMatrix<?, ?> expMtrx;
 
-        final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
         tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
-        final MatrixStore<Double> tmpV = tmpEigen.getV();
-        final MatrixStore<Double> tmpD = tmpEigen.getD();
+        MatrixStore<Double> tmpV = tmpEigen.getV();
+        MatrixStore<Double> tmpD = tmpEigen.getD();
 
         expMtrx = SimpleEigenvalueCase.getMatrixD();
         actMtrx = Primitive64Matrix.FACTORY.copy(tmpD);
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
-        final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
-        final RationalMatrix tmpActV = RationalMatrix.FACTORY.copy(tmpV);
+        Primitive64Matrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
+        Primitive64Matrix tmpActV = Primitive64Matrix.FACTORY.copy(tmpV);
 
-        RationalMatrix.DenseReceiver tmpCopy = tmpExpV.copy();
-        tmpCopy.modifyMatching(RationalMath.DIVIDE, tmpActV);
-        final RationalMatrix tmpMtrx = tmpCopy.get();
+        Primitive64Matrix.DenseReceiver tmpCopy = tmpExpV.copy();
+        tmpCopy.modifyMatching(PrimitiveMath.DIVIDE, tmpActV);
+        Primitive64Matrix tmpMtrx = tmpCopy.get();
         double tmpExp;
         double tmpAct;
         for (int j = 0; j < tmpMtrx.countColumns(); j++) {

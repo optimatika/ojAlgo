@@ -37,7 +37,7 @@ public class P20030422Case extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 6);
 
     public static RationalMatrix getProblematic() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+        RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 0.973950, 0.132128, -0.009493, 0.052934, -0.069248, 0.015658, -0.008564, 0.004549 },
                         { -0.006969, -0.829742, -0.036236, 0.161777, -0.210089, 0.047385, -0.025882, 0.013746 },
                         { 0.000143, 0.006440, -0.998445, -0.016720, 0.021093, -0.004711, 0.002560, -0.001359 },
@@ -53,14 +53,12 @@ public class P20030422Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 3);
+        mtrxA = Primitive64Matrix.FACTORY.copy(P20030422Case.getProblematic());
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = P20030422Case.getProblematic();
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -69,15 +67,12 @@ public class P20030422Case extends BasicMatrixTest {
     @Test
     public void testInvert() {
 
-        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
+        if (mtrxA.isSquare() && mtrxA.getRank() >= mtrxA.countColumns()) {
 
-            BasicMatrix<?, ?> expected = rAA.invert();
+            BasicMatrix<?, ?> expected = mtrxA.invert();
             BasicMatrix<?, ?> actual;
 
-            actual = cAA.invert();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
-
-            actual = p64AA.invert();
+            actual = mtrxA.invert();
             TestUtils.assertEquals(expected, actual, ACCURACY);
 
             // TODO Probably ok that this doesn't work in this case
@@ -94,27 +89,6 @@ public class P20030422Case extends BasicMatrixTest {
 
         // The RationalMatrix implementation can do this do 6 decimals, but not the others
         TestUtils.assertEquals(expected, actual, DEFINITION);
-    }
-
-    @Override
-    @Test
-    public void testSolveMatrix() {
-
-        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
-
-            BasicMatrix<?, ?> expected = rAA.solve(rAB);
-            BasicMatrix<?, ?> actual;
-
-            actual = cAA.solve(cAB);
-            TestUtils.assertEquals(expected, actual, ACCURACY);
-
-            actual = p64AA.solve(p64AB);
-            TestUtils.assertEquals(expected, actual, ACCURACY);
-
-            // TODO Probably ok that this doesn't work in this case
-            // actual = p32AA.solve(p64AB);
-            // TestUtils.assertEquals(expected, actual, ACCURACY);
-        }
     }
 
 }

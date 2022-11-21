@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
@@ -50,8 +51,8 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     @Test
     public void testComplex() {
 
-        RationalMatrix square = SimpleEquationCase.getBody();
-        GenericStore<ComplexNumber> degenerate = GenericStore.COMPLEX.copy(RationalMatrix.FACTORY.make(square).below(square).below(square));
+        Primitive64Matrix square = SimpleEquationCase.getBody();
+        GenericStore<ComplexNumber> degenerate = GenericStore.COMPLEX.copy(square.below(square).below(square));
 
         LU<ComplexNumber> decomp = LU.COMPLEX.make();
         decomp.decompose(degenerate);
@@ -62,8 +63,8 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     @Test
     public void testDensePrimitive32() {
 
-        RationalMatrix square = SimpleEquationCase.getBody();
-        Primitive32Store degenerate = Primitive32Store.FACTORY.copy(RationalMatrix.FACTORY.make(square).below(square).below(square));
+        Primitive64Matrix square = SimpleEquationCase.getBody();
+        Primitive32Store degenerate = Primitive32Store.FACTORY.copy(square.below(square).below(square));
 
         LU<Double> decomp = LU.PRIMITIVE.make();
         decomp.decompose(degenerate);
@@ -74,8 +75,8 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     @Test
     public void testDensePrimitive64() {
 
-        RationalMatrix square = SimpleEquationCase.getBody();
-        Primitive64Store degenerate = Primitive64Store.FACTORY.copy(RationalMatrix.FACTORY.make(square).below(square).below(square));
+        Primitive64Matrix square = SimpleEquationCase.getBody();
+        Primitive64Store degenerate = Primitive64Store.FACTORY.copy(square.below(square).below(square));
 
         LU<Double> decomp = LU.PRIMITIVE.make();
         decomp.decompose(degenerate);
@@ -86,8 +87,8 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     @Test
     public void testRational() {
 
-        RationalMatrix square = SimpleEquationCase.getBody();
-        RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).below(square).below(square);
+        Primitive64Matrix square = SimpleEquationCase.getBody();
+        RationalMatrix degenerate = RationalMatrix.FACTORY.copy(square.below(square).below(square));
 
         LU<RationalNumber> decomp = LU.RATIONAL.make();
         decomp.decompose(degenerate);
@@ -98,8 +99,8 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     @Test
     public void testRawPrimitive() {
 
-        RationalMatrix square = SimpleEquationCase.getBody();
-        RawStore degenerate = RawStore.FACTORY.copy(RationalMatrix.FACTORY.make(square).below(square).below(square));
+        Primitive64Matrix square = SimpleEquationCase.getBody();
+        RawStore degenerate = RawStore.FACTORY.copy(square.below(square).below(square));
 
         LU<Double> decomp = new RawLU();
         decomp.decompose(degenerate);

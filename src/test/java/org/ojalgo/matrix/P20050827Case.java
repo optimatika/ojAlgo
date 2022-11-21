@@ -46,13 +46,13 @@ public class P20050827Case extends BasicMatrixTest {
      */
     public static ComplexMatrix getProblematic() {
 
-        final Normal tmpRand = new Normal(0.0, 9.9);
+        Normal tmpRand = new Normal(0.0, 9.9);
         ComplexNumber tmpNmbr;
 
-        final int tmpRowDim = 3;
-        final int tmpColDim = 5;
+        int tmpRowDim = 3;
+        int tmpColDim = 5;
 
-        final Array2D<ComplexNumber> tmpArray = Array2D.C128.make(tmpRowDim, tmpColDim);
+        Array2D<ComplexNumber> tmpArray = Array2D.C128.make(tmpRowDim, tmpColDim);
 
         for (int i = 0; i < tmpRowDim; i++) {
             for (int j = 0; j < tmpColDim; j++) {
@@ -68,14 +68,12 @@ public class P20050827Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = NumberContext.getGeneral(6).withPrecision(12);
+        mtrxA = Primitive64Matrix.FACTORY.copy(P20050827Case.getProblematic());
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -84,22 +82,22 @@ public class P20050827Case extends BasicMatrixTest {
     public void testData() {
 
         // 3x5
-        final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
+        ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
         TestUtils.assertEquals(3, tmpProblematic.countRows());
         TestUtils.assertEquals(5, tmpProblematic.countColumns());
 
         // 5x5
-        final ComplexMatrix tmpBig = tmpProblematic.conjugate().multiply(tmpProblematic);
+        ComplexMatrix tmpBig = tmpProblematic.conjugate().multiply(tmpProblematic);
         TestUtils.assertEquals(5, tmpBig.countRows());
         TestUtils.assertEquals(5, tmpBig.countColumns());
 
         // 3x3
-        final ComplexMatrix tmpSmall = tmpProblematic.multiply(tmpProblematic.conjugate());
+        ComplexMatrix tmpSmall = tmpProblematic.multiply(tmpProblematic.conjugate());
         TestUtils.assertEquals(3, tmpSmall.countRows());
         TestUtils.assertEquals(3, tmpSmall.countColumns());
 
-        final Scalar<ComplexNumber> tmpBigTrace = tmpBig.getTrace();
-        final Scalar<ComplexNumber> tmpSmallTrace = tmpSmall.getTrace();
+        Scalar<ComplexNumber> tmpBigTrace = tmpBig.getTrace();
+        Scalar<ComplexNumber> tmpSmallTrace = tmpSmall.getTrace();
 
         for (int ij = 0; ij < 3; ij++) {
             TestUtils.assertTrue(tmpSmall.toScalar(ij, ij).toString(), tmpSmall.get(ij, ij).isReal());
@@ -115,12 +113,12 @@ public class P20050827Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
+        ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
 
-        final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
-        final ComplexNumber tmpVal = tmpMtrx.getTrace().get();
-        final ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
-        final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
+        ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
+        ComplexNumber tmpVal = tmpMtrx.getTrace().get();
+        ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
+        ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
 
         TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), ACCURACY);
         TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);

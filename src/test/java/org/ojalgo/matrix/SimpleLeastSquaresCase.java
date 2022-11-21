@@ -36,30 +36,30 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
-    public static RationalMatrix getBody() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+    public static Primitive64Matrix getBody() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getRHS() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
+    public static Primitive64Matrix getRHS() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getSolution() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
+    public static Primitive64Matrix getSolution() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+    private static Primitive64Matrix getFactorR() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY
                 .rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getTransformedRHS() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
+    private static Primitive64Matrix getTransformedRHS() {
+        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -67,14 +67,12 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = NumberContext.of(4,4); // TODO Something must be wrong here!
+        mtrxA = SimpleLeastSquaresCase.getFactorR();
+        mtrxX = SimpleLeastSquaresCase.getSolution();
+        mtrxB = SimpleLeastSquaresCase.getTransformedRHS();
 
-        rAA = SimpleLeastSquaresCase.getFactorR();
-        rAX = SimpleLeastSquaresCase.getSolution();
-        rAB = SimpleLeastSquaresCase.getTransformedRHS();
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
