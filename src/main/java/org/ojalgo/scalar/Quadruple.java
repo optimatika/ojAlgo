@@ -116,6 +116,11 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         return value.isSmall(comparedTo);
     }
 
+    public static Quadruple parse(final CharSequence plainNumberString) {
+        BigDecimal decimal = new BigDecimal(plainNumberString.toString());
+        return Quadruple.valueOf(decimal);
+    }
+
     public static Quadruple valueOf(final BigDecimal number) {
 
         double base = number.doubleValue();
