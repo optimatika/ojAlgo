@@ -242,11 +242,11 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple add(final Quadruple arg) {
 
-        if (this.isNaN() || arg.isNaN()) {
+        if (Quadruple.isNaN(this) || Quadruple.isNaN(arg)) {
             return NaN;
         }
 
-        if (this.isInfinite()) {
+        if (Quadruple.isInfinite(this)) {
             if (!Quadruple.isInfinite(arg) || (this.sign() == arg.sign())) {
                 return this;
             } else {
@@ -281,7 +281,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple divide(final Quadruple arg) {
 
-        if (this.isNaN() || arg.isNaN()) {
+        if (Quadruple.isNaN(this) || Quadruple.isNaN(arg)) {
             return NaN;
         }
 
@@ -369,11 +369,11 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple multiply(final Quadruple arg) {
 
-        if (this.isNaN() || arg.isNaN()) {
+        if (Quadruple.isNaN(this) || Quadruple.isNaN(arg)) {
             return NaN;
         }
 
-        if (this.isInfinite()) {
+        if (Quadruple.isInfinite(this)) {
             return arg.sign() > 0 ? this : this.negate();
         }
 
@@ -410,7 +410,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
     @Override
     public Quadruple signum() {
-        if (!this.isInfinite() && Quadruple.isSmall(PrimitiveMath.ONE, this)) {
+        if (!Quadruple.isInfinite(this) && Quadruple.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
         } else if (this.sign() == -1) {
             return NEG;
@@ -427,12 +427,12 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
     @Override
     public Quadruple subtract(final Quadruple arg) {
 
-        if (this.isNaN() || arg.isNaN()) {
+        if (Quadruple.isNaN(this) || Quadruple.isNaN(arg)) {
             return NaN;
         }
 
-        if (this.isInfinite()) {
-            if (!arg.isInfinite() || (this.sign() != arg.sign())) {
+        if (Quadruple.isInfinite(this)) {
+            if (!Quadruple.isInfinite(arg) || (this.sign() != arg.sign())) {
                 return this;
             } else {
                 return NaN;
@@ -466,20 +466,8 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         return context.enforce(this.toBigDecimal()).toString();
     }
 
-    private boolean isInfinite() {
-        return Quadruple.isInfinite(this);
-    }
-
-    private boolean isNaN() {
-        return Quadruple.isNaN(this);
-    }
-
     private int sign() {
-        return Long.compare((long) myBase, 0L);
-    }
-
-    private long size() {
-        return (long) Math.max(Math.abs(myBase), myRemainder);
+        return Double.compare(this.doubleValue(), 0L);
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
