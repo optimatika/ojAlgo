@@ -40,19 +40,19 @@ public class SimpleQRCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.ofScale(9).withScale(18);
 
-    public static Primitive64Matrix getOriginal() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+    public static MatrixR064 getOriginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getFactorQ() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
+    private static MatrixR064 getFactorQ() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
                 { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getFactorR() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
+    private static MatrixR064 getFactorR() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -77,8 +77,8 @@ public class SimpleQRCase extends BasicMatrixTest {
         BasicMatrix<?, ?> expMtrx;
 
         expMtrx = SimpleQRCase.getOriginal();
-        Primitive64Matrix tmpFactorQ = SimpleQRCase.getFactorQ();
-        Primitive64Matrix tmpFactorR = SimpleQRCase.getFactorR();
+        MatrixR064 tmpFactorQ = SimpleQRCase.getFactorQ();
+        MatrixR064 tmpFactorR = SimpleQRCase.getFactorR();
         actMtrx = tmpFactorQ.multiply(tmpFactorR);
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
@@ -99,21 +99,21 @@ public class SimpleQRCase extends BasicMatrixTest {
         MatrixStore<RationalNumber> tmpR = tmpQR.getR();
 
         expMtrx = SimpleQRCase.getOriginal();
-        actMtrx = Primitive64Matrix.FACTORY.copy(tmpQ.multiply(tmpR));
+        actMtrx = MatrixR064.FACTORY.copy(tmpQ.multiply(tmpR));
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
         // Q
 
         expMtrx = SimpleQRCase.getFactorQ();
-        actMtrx = Primitive64Matrix.FACTORY.copy(tmpQ);
+        actMtrx = MatrixR064.FACTORY.copy(tmpQ);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
 
         // R
 
         expMtrx = SimpleQRCase.getFactorR();
-        actMtrx = Primitive64Matrix.FACTORY.copy(tmpR);
+        actMtrx = MatrixR064.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }

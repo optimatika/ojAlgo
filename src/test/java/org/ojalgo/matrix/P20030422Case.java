@@ -36,8 +36,8 @@ public class P20030422Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 6);
 
-    public static RationalMatrix getProblematic() {
-        RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+    public static MatrixQ128 getProblematic() {
+        MatrixQ128 tmpMtrx = MatrixQ128.FACTORY
                 .rows(new double[][] { { 0.973950, 0.132128, -0.009493, 0.052934, -0.069248, 0.015658, -0.008564, 0.004549 },
                         { -0.006969, -0.829742, -0.036236, 0.161777, -0.210089, 0.047385, -0.025882, 0.013746 },
                         { 0.000143, 0.006440, -0.998445, -0.016720, 0.021093, -0.004711, 0.002560, -0.001359 },
@@ -53,7 +53,7 @@ public class P20030422Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        mtrxA = Primitive64Matrix.FACTORY.copy(P20030422Case.getProblematic());
+        mtrxA = MatrixR064.FACTORY.copy(P20030422Case.getProblematic());
         mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
         mtrxB = mtrxA;
 
@@ -84,10 +84,10 @@ public class P20030422Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        RationalMatrix expected = P20030422Case.getProblematic();
-        RationalMatrix actual = expected.invert().invert();
+        MatrixQ128 expected = P20030422Case.getProblematic();
+        MatrixQ128 actual = expected.invert().invert();
 
-        // The RationalMatrix implementation can do this do 6 decimals, but not the others
+        // The MatrixQ128 implementation can do this do 6 decimals, but not the others
         TestUtils.assertEquals(expected, actual, DEFINITION);
     }
 

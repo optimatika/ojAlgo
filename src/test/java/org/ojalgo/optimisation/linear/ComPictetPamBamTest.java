@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
@@ -94,7 +94,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;
             TestUtils.assertTrue(message, validated);
             if (validated) {
-                return Primitive64Store.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
+                return Primitive64Store.FACTORY.copy(MatrixQ128.FACTORY.columns(tmpResult));
             }
         } else {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;

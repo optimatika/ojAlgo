@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -39,52 +40,54 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link RationalNumber} elements.
+ * A matrix (linear algebra) with Rational {@link NumberSet#Q} elements, implemented using dual 64-bit long
+ * values. (2 x 64 = 128)
  *
  * @see BasicMatrix
+ * @see RationalNumber
  * @author apete
  */
-public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
+public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
 
-    public static final class DenseReceiver extends Mutator2D<RationalNumber, RationalMatrix, PhysicalStore<RationalNumber>> {
+    public static final class DenseReceiver extends Mutator2D<RationalNumber, MatrixQ128, PhysicalStore<RationalNumber>> {
 
         DenseReceiver(final PhysicalStore<RationalNumber> delegate) {
             super(delegate);
         }
 
         @Override
-        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+        MatrixQ128 instantiate(final MatrixStore<RationalNumber> store) {
             return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<RationalNumber, MatrixQ128, MatrixQ128.DenseReceiver, MatrixQ128.SparseReceiver> {
 
         Factory() {
-            super(RationalMatrix.class, GenericStore.RATIONAL);
+            super(MatrixQ128.class, GenericStore.RATIONAL);
         }
 
         @Override
-        RationalMatrix.DenseReceiver dense(final PhysicalStore<RationalNumber> store) {
-            return new RationalMatrix.DenseReceiver(store);
+        MatrixQ128.DenseReceiver dense(final PhysicalStore<RationalNumber> store) {
+            return new MatrixQ128.DenseReceiver(store);
         }
 
         @Override
-        RationalMatrix.SparseReceiver sparse(final SparseStore<RationalNumber> store) {
-            return new RationalMatrix.SparseReceiver(store);
+        MatrixQ128.SparseReceiver sparse(final SparseStore<RationalNumber> store) {
+            return new MatrixQ128.SparseReceiver(store);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<RationalNumber, RationalMatrix, SparseStore<RationalNumber>> {
+    public static final class SparseReceiver extends Mutator2D<RationalNumber, MatrixQ128, SparseStore<RationalNumber>> {
 
         SparseReceiver(final SparseStore<RationalNumber> delegate) {
             super(delegate);
         }
 
         @Override
-        RationalMatrix instantiate(final MatrixStore<RationalNumber> store) {
+        MatrixQ128 instantiate(final MatrixStore<RationalNumber> store) {
             return FACTORY.instantiate(store);
         }
 
@@ -95,13 +98,13 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    RationalMatrix(final ElementsSupplier<RationalNumber> supplier) {
+    MatrixQ128(final ElementsSupplier<RationalNumber> supplier) {
         super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
-    public RationalMatrix.DenseReceiver copy() {
-        return new RationalMatrix.DenseReceiver(this.store().copy());
+    public MatrixQ128.DenseReceiver copy() {
+        return new MatrixQ128.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -120,8 +123,8 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
-    RationalMatrix newInstance(final ElementsSupplier<RationalNumber> store) {
-        return new RationalMatrix(store);
+    MatrixQ128 newInstance(final ElementsSupplier<RationalNumber> store) {
+        return new MatrixQ128(store);
     }
 
     @Override

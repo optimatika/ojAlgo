@@ -36,7 +36,7 @@ import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20050827Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.P20071019Case;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -55,9 +55,9 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.R064();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));
-    private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
-    private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
+    private static final MatrixQ128 MTRX_FAT = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));
+    private static final MatrixQ128 MTRX_SQUARE = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
+    private static final MatrixQ128 MTRX_TALL = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = NumberContext.of(3, 2);
     static final NumberContext CNTXT_CPLX_VALUES = NumberContext.of(7, 7);
@@ -92,7 +92,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     @Test
     public void testBasicMatrixP20050827Case() {
-        CaseSingularValue.doTestTypes(RationalMatrix.FACTORY.copy(P20050827Case.getProblematic()));
+        CaseSingularValue.doTestTypes(MatrixQ128.FACTORY.copy(P20050827Case.getProblematic()));
     }
 
     @Test

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.P20061119Case;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
@@ -47,7 +47,7 @@ public class CaseLU extends MatrixDecompositionTests {
     @Test
     public void testP20061119Case() {
 
-        Primitive64Matrix tmpProblematic = P20061119Case.getProblematic();
+        MatrixR064 tmpProblematic = P20061119Case.getProblematic();
 
         LU<RationalNumber> tmpBig = LU.RATIONAL.make();
         tmpBig.decompose(GenericStore.RATIONAL.copy(tmpProblematic));

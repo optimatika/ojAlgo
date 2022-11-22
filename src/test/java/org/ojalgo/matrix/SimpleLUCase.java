@@ -38,18 +38,18 @@ public class SimpleLUCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static Primitive64Matrix getOrginal() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+    public static MatrixR064 getOrginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMtrxL() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+    private static MatrixR064 getMtrxL() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMtrxU() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
+    private static MatrixR064 getMtrxU() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

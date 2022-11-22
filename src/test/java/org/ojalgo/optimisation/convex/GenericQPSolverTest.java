@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -60,7 +60,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     @BeforeEach
     public void setUp() {
 
-        final RationalMatrix[] tmpMatrices = this.getMatrices();
+        final MatrixQ128[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
             myAE = Primitive64Store.FACTORY.copy(tmpMatrices[0]);
@@ -142,6 +142,6 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     /**
      * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
      */
-    abstract protected RationalMatrix[] getMatrices();
+    abstract protected MatrixQ128[] getMatrices();
 
 }

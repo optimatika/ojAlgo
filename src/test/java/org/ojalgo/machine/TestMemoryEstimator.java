@@ -2,7 +2,7 @@ package org.ojalgo.machine;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 
 public class TestMemoryEstimator {
 
@@ -22,7 +22,7 @@ public class TestMemoryEstimator {
     @Test
     public void testRationalMatrix() {
 
-        final long tmpEstimate = MemoryEstimator.estimateObject(RationalMatrix.class);
+        final long tmpEstimate = MemoryEstimator.estimateObject(MatrixQ128.class);
 
         final long tmpManually = 0L;
 

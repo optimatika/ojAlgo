@@ -35,7 +35,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.ErrorFunction;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -121,7 +121,7 @@ public abstract class FinanceUtils {
     /**
      * @return Annualised covariances
      */
-    public static <V extends Comparable<V>> Primitive64Matrix makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
+    public static <V extends Comparable<V>> MatrixR064 makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
 
         CoordinationSet<V> tmpCoordinator = new CoordinationSet<>(timeSeriesCollection).prune();
 
@@ -141,7 +141,7 @@ public abstract class FinanceUtils {
 
         int tmpSize = timeSeriesCollection.size();
 
-        Primitive64Matrix.DenseReceiver retValStore = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retValStore = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
 
         double tmpToYearFactor = (double) CalendarDateUnit.YEAR.toDurationInMillis() / (double) tmpCoordinator.getResolution().toDurationInMillis();
 
@@ -168,7 +168,7 @@ public abstract class FinanceUtils {
      * @param mayBeMissingValues Individual series may be missing some values - try to fix this or not
      * @return Annualised covariances
      */
-    public static <N extends Comparable<N>> Primitive64Matrix makeCovarianceMatrix(final List<CalendarDateSeries<N>> listOfTimeSeries,
+    public static <N extends Comparable<N>> MatrixR064 makeCovarianceMatrix(final List<CalendarDateSeries<N>> listOfTimeSeries,
             final boolean mayBeMissingValues) {
 
         int tmpSize = listOfTimeSeries.size();
@@ -181,7 +181,7 @@ public abstract class FinanceUtils {
 
         CoordinationSet<N> tmpCoordinated = tmpUncoordinated.prune(tmpDataResolution);
 
-        Primitive64Matrix.DenseReceiver tmpMatrixBuilder = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver tmpMatrixBuilder = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
 
         double tmpToYearFactor = (double) CalendarDateUnit.YEAR.toDurationInMillis() / (double) tmpDataResolution.toDurationInMillis();
 
@@ -346,7 +346,7 @@ public abstract class FinanceUtils {
         return PrimitiveMath.EXPM1.invoke(growthRate * tmpGrowthRateUnitsPerYear);
     }
 
-    public static Primitive64Matrix toCorrelations(final Access2D<?> covariances) {
+    public static MatrixR064 toCorrelations(final Access2D<?> covariances) {
         return FinanceUtils.toCorrelations(covariances, false);
     }
 
@@ -354,7 +354,7 @@ public abstract class FinanceUtils {
      * Will extract the correlation coefficients from the input covariance matrix. If "cleaning" is enabled
      * small and negative eigenvalues of the covariance matrix will be replaced with a new minimal value.
      */
-    public static Primitive64Matrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
+    public static MatrixR064 toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
@@ -380,7 +380,7 @@ public abstract class FinanceUtils {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size, size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -418,11 +418,11 @@ public abstract class FinanceUtils {
      * Vill constract a covariance matrix from the standard deviations (volatilities) and correlation
      * coefficient,
      */
-    public static Primitive64Matrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
+    public static MatrixR064 toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
         int tmpSize = (int) volatilities.count();
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);
@@ -463,7 +463,7 @@ public abstract class FinanceUtils {
         return tmpAnnualGrowthRate * tmpYearsPerGrowthRateUnit;
     }
 
-    public static Primitive64Matrix toVolatilities(final Access2D<?> covariances) {
+    public static MatrixR064 toVolatilities(final Access2D<?> covariances) {
         return FinanceUtils.toVolatilities(covariances, false);
     }
 
@@ -471,11 +471,11 @@ public abstract class FinanceUtils {
      * Will extract the standard deviations (volatilities) from the input covariance matrix. If "cleaning" is
      * enabled small variances will be replaced with a new minimal value.
      */
-    public static Primitive64Matrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+    public static MatrixR064 toVolatilities(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size);
 
         if (clean) {
 

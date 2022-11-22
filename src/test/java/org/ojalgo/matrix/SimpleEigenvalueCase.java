@@ -39,18 +39,18 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 14);
 
-    public static Primitive64Matrix getOriginal() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
+    public static MatrixR064 getOriginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMatrixD() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
+    private static MatrixR064 getMatrixD() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMatrixV() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
+    private static MatrixR064 getMatrixV() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -94,16 +94,16 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         MatrixStore<Double> tmpD = tmpEigen.getD();
 
         expMtrx = SimpleEigenvalueCase.getMatrixD();
-        actMtrx = Primitive64Matrix.FACTORY.copy(tmpD);
+        actMtrx = MatrixR064.FACTORY.copy(tmpD);
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
-        Primitive64Matrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
-        Primitive64Matrix tmpActV = Primitive64Matrix.FACTORY.copy(tmpV);
+        MatrixR064 tmpExpV = SimpleEigenvalueCase.getMatrixV();
+        MatrixR064 tmpActV = MatrixR064.FACTORY.copy(tmpV);
 
-        Primitive64Matrix.DenseReceiver tmpCopy = tmpExpV.copy();
+        MatrixR064.DenseReceiver tmpCopy = tmpExpV.copy();
         tmpCopy.modifyMatching(PrimitiveMath.DIVIDE, tmpActV);
-        Primitive64Matrix tmpMtrx = tmpCopy.get();
+        MatrixR064 tmpMtrx = tmpCopy.get();
         double tmpExp;
         double tmpAct;
         for (int j = 0; j < tmpMtrx.countColumns(); j++) {

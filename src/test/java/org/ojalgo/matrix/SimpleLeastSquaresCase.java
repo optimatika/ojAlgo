@@ -36,30 +36,30 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
-    public static Primitive64Matrix getBody() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY
+    public static MatrixR064 getBody() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static Primitive64Matrix getRHS() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
+    public static MatrixR064 getRHS() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static Primitive64Matrix getSolution() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
+    public static MatrixR064 getSolution() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getFactorR() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY
+    private static MatrixR064 getFactorR() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
                 .rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getTransformedRHS() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
+    private static MatrixR064 getTransformedRHS() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

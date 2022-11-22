@@ -24,7 +24,7 @@ package org.ojalgo.data.domain.finance;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.NextGenSysModTest;
@@ -43,16 +43,16 @@ public class FinanceUtilsTest extends FinanceTests {
 
     private static void doTestCleaning(final double[][] rawOriginal) {
 
-        Primitive64Matrix original = Primitive64Matrix.FACTORY.rows(rawOriginal);
+        MatrixR064 original = MatrixR064.FACTORY.rows(rawOriginal);
 
         SingularValue<Double> svd = SingularValue.PRIMITIVE.make(original);
         svd.decompose(original);
         double refCondition = svd.getCondition();
         int refRank = svd.getRank();
 
-        Primitive64Matrix plainCorrelations = FinanceUtils.toCorrelations(original, false);
-        Primitive64Matrix plainVolatilities = FinanceUtils.toVolatilities(original, false);
-        Primitive64Matrix reconstructedPlain = FinanceUtils.toCovariances(plainVolatilities, plainCorrelations);
+        MatrixR064 plainCorrelations = FinanceUtils.toCorrelations(original, false);
+        MatrixR064 plainVolatilities = FinanceUtils.toVolatilities(original, false);
+        MatrixR064 reconstructedPlain = FinanceUtils.toCovariances(plainVolatilities, plainCorrelations);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("Original", original);
@@ -64,9 +64,9 @@ public class FinanceUtilsTest extends FinanceTests {
 
         TestUtils.assertEquals(original, reconstructedPlain, IDENTICAL_ACCURACY);
 
-        Primitive64Matrix cleanedCorrelations = FinanceUtils.toCorrelations(original, true);
-        Primitive64Matrix cleanedVolatilities = FinanceUtils.toVolatilities(original, true);
-        Primitive64Matrix reconstructedCleaned = FinanceUtils.toCovariances(cleanedVolatilities, cleanedCorrelations);
+        MatrixR064 cleanedCorrelations = FinanceUtils.toCorrelations(original, true);
+        MatrixR064 cleanedVolatilities = FinanceUtils.toVolatilities(original, true);
+        MatrixR064 reconstructedCleaned = FinanceUtils.toCovariances(cleanedVolatilities, cleanedCorrelations);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("Original", original);

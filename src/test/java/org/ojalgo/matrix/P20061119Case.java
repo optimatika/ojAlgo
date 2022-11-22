@@ -51,9 +51,9 @@ public class P20061119Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 2);
 
-    public static Primitive64Matrix getProblematic() {
+    public static MatrixR064 getProblematic() {
 
-        Primitive64Matrix retVal = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
+        MatrixR064 retVal = MatrixR064.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
                 { -8.32, -0.12, 8.68, -2.32, 2.08 }, { 7.68, 0.88, -10.32, 3.68, -1.92 }, { -13.12, -1.92, 10.88, -5.12, 9.28 } });
 
         return retVal.enforce(DEFINITION);
@@ -99,7 +99,7 @@ public class P20061119Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        Primitive64Matrix tmpMatrix = P20061119Case.getProblematic();
+        MatrixR064 tmpMatrix = P20061119Case.getProblematic();
 
         Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
         PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);

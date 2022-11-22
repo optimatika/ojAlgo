@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -39,52 +40,54 @@ import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link Quadruple} elements.
+ * A matrix (linear algebra) with Real {@link NumberSet#R} elements, approximated by 128-bit floating-point
+ * values (implemented using dual 64-bit double). (2 x 64 = 128)
  *
  * @see BasicMatrix
+ * @see Quadruple
  * @author apete
  */
-public final class QuadrupleMatrix extends BasicMatrix<Quadruple, QuadrupleMatrix> {
+public final class MatrixR128 extends BasicMatrix<Quadruple, MatrixR128> {
 
-    public static final class DenseReceiver extends Mutator2D<Quadruple, QuadrupleMatrix, PhysicalStore<Quadruple>> {
+    public static final class DenseReceiver extends Mutator2D<Quadruple, MatrixR128, PhysicalStore<Quadruple>> {
 
         DenseReceiver(final PhysicalStore<Quadruple> delegate) {
             super(delegate);
         }
 
         @Override
-        QuadrupleMatrix instantiate(final MatrixStore<Quadruple> store) {
+        MatrixR128 instantiate(final MatrixStore<Quadruple> store) {
             return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends MatrixFactory<Quadruple, QuadrupleMatrix, QuadrupleMatrix.DenseReceiver, QuadrupleMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<Quadruple, MatrixR128, MatrixR128.DenseReceiver, MatrixR128.SparseReceiver> {
 
         Factory() {
-            super(QuadrupleMatrix.class, GenericStore.QUADRUPLE);
+            super(MatrixR128.class, GenericStore.QUADRUPLE);
         }
 
         @Override
-        QuadrupleMatrix.DenseReceiver dense(final PhysicalStore<Quadruple> store) {
-            return new QuadrupleMatrix.DenseReceiver(store);
+        MatrixR128.DenseReceiver dense(final PhysicalStore<Quadruple> store) {
+            return new MatrixR128.DenseReceiver(store);
         }
 
         @Override
-        QuadrupleMatrix.SparseReceiver sparse(final SparseStore<Quadruple> store) {
-            return new QuadrupleMatrix.SparseReceiver(store);
+        MatrixR128.SparseReceiver sparse(final SparseStore<Quadruple> store) {
+            return new MatrixR128.SparseReceiver(store);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<Quadruple, QuadrupleMatrix, SparseStore<Quadruple>> {
+    public static final class SparseReceiver extends Mutator2D<Quadruple, MatrixR128, SparseStore<Quadruple>> {
 
         SparseReceiver(final SparseStore<Quadruple> delegate) {
             super(delegate);
         }
 
         @Override
-        QuadrupleMatrix instantiate(final MatrixStore<Quadruple> store) {
+        MatrixR128 instantiate(final MatrixStore<Quadruple> store) {
             return FACTORY.instantiate(store);
         }
 
@@ -95,13 +98,13 @@ public final class QuadrupleMatrix extends BasicMatrix<Quadruple, QuadrupleMatri
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    QuadrupleMatrix(final ElementsSupplier<Quadruple> supplier) {
+    MatrixR128(final ElementsSupplier<Quadruple> supplier) {
         super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
-    public QuadrupleMatrix.DenseReceiver copy() {
-        return new QuadrupleMatrix.DenseReceiver(this.store().copy());
+    public MatrixR128.DenseReceiver copy() {
+        return new MatrixR128.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -120,8 +123,8 @@ public final class QuadrupleMatrix extends BasicMatrix<Quadruple, QuadrupleMatri
     }
 
     @Override
-    QuadrupleMatrix newInstance(final ElementsSupplier<Quadruple> store) {
-        return new QuadrupleMatrix(store);
+    MatrixR128 newInstance(final ElementsSupplier<Quadruple> store) {
+        return new MatrixR128(store);
     }
 
     @Override

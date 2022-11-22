@@ -31,18 +31,18 @@ public class SimpleEquationCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static Primitive64Matrix getBody() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
+    public static MatrixR064 getBody() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static Primitive64Matrix getRHS() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
+    public static MatrixR064 getRHS() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static Primitive64Matrix getSolution() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
+    public static MatrixR064 getSolution() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

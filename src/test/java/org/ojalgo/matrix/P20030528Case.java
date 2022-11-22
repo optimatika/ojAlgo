@@ -40,8 +40,8 @@ public class P20030528Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static Primitive64Matrix getProblematic() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY
+    public static MatrixR064 getProblematic() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
                 .rows(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
@@ -63,7 +63,7 @@ public class P20030528Case extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        Primitive64Matrix tmpProb = P20030528Case.getProblematic();
+        MatrixR064 tmpProb = P20030528Case.getProblematic();
 
         TestUtils.assertFalse(tmpProb.isEmpty());
         TestUtils.assertTrue(tmpProb.isFat());

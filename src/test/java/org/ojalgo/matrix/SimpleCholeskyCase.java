@@ -43,17 +43,17 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
      *
      * @return The data00 value
      */
-    public static Primitive64Matrix getOriginal() {
-        return Primitive64Matrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+    public static MatrixR064 getOriginal() {
+        return MatrixR064.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getFactorL() {
-        return Primitive64Matrix.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } })
+    private static MatrixR064 getFactorL() {
+        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } })
                 .enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getFactorR() {
-        return Primitive64Matrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } })
+    private static MatrixR064 getFactorR() {
+        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } })
                 .enforce(DEFINITION);
     }
 
@@ -76,9 +76,9 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
         NumberContext accuracy = NumberContext.of(4, 3);
 
-        Primitive64Matrix tmpA = SimpleCholeskyCase.getOriginal();
-        Primitive64Matrix tmpL = SimpleCholeskyCase.getFactorL();
-        Primitive64Matrix tmpR = SimpleCholeskyCase.getFactorR();
+        MatrixR064 tmpA = SimpleCholeskyCase.getOriginal();
+        MatrixR064 tmpL = SimpleCholeskyCase.getFactorL();
+        MatrixR064 tmpR = SimpleCholeskyCase.getFactorR();
 
         BasicMatrix<?, ?> actMtrx;
         BasicMatrix<?, ?> expMtrx;
@@ -97,7 +97,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        Primitive64Matrix tmpMtrx = SimpleCholeskyCase.getOriginal();
+        MatrixR064 tmpMtrx = SimpleCholeskyCase.getOriginal();
         Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
         tmpDecomp.decompose(GenericStore.RATIONAL.copy(tmpMtrx));
 

@@ -39,23 +39,23 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static Primitive64Matrix getOriginal() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
+    public static MatrixR064 getOriginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMatrixD() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
+    private static MatrixR064 getMatrixD() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMatrixQ1() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+    private static MatrixR064 getMatrixQ1() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static Primitive64Matrix getMatrixQ2() {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
+    private static MatrixR064 getMatrixQ2() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

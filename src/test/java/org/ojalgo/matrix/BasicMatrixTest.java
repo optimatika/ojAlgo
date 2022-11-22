@@ -45,26 +45,26 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     protected static final NumberContext ACCURACY = NumberContext.of(6, 4);
 
-    public static Primitive64Matrix getIdentity(final long rows, final long columns, final NumberContext context) {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
+    public static MatrixR064 getIdentity(final long rows, final long columns, final NumberContext context) {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
         return tmpMtrx.enforce(context);
     }
 
-    public static Primitive64Matrix getSafe(final long rows, final long columns, final NumberContext context) {
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
+    public static MatrixR064 getSafe(final long rows, final long columns, final NumberContext context) {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
 
     static MatrixFactory<?, ?, ?, ?>[] factories() {
-        return new MatrixFactory<?, ?, ?, ?>[] { Primitive64Matrix.FACTORY, Primitive32Matrix.FACTORY, QuadrupleMatrix.FACTORY, RationalMatrix.FACTORY,
-                ComplexMatrix.FACTORY, QuaternionMatrix.FACTORY };
+        return new MatrixFactory<?, ?, ?, ?>[] { MatrixR064.FACTORY, MatrixR032.FACTORY, MatrixR128.FACTORY, MatrixQ128.FACTORY,
+                MatrixC128.FACTORY, MatrixH256.FACTORY };
     }
 
-    Primitive64Matrix mtrxA;
-    Primitive64Matrix mtrxB;
-    Primitive64Matrix mtrxI;
-    Primitive64Matrix mtrxSafe;
-    Primitive64Matrix mtrxX;
+    MatrixR064 mtrxA;
+    MatrixR064 mtrxB;
+    MatrixR064 mtrxI;
+    MatrixR064 mtrxSafe;
+    MatrixR064 mtrxX;
 
     double scalar;
 

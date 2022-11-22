@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -30,7 +31,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive32Store;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -38,52 +39,52 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with 32-bit primitive float elements.
+ * A matrix (linear algebra) with Real {@link NumberSet#R} elements, approximated by 64-bit double.
  *
  * @see BasicMatrix
  * @author apete
  */
-public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
+public final class MatrixR064 extends BasicMatrix<Double, MatrixR064> {
 
-    public static final class DenseReceiver extends Mutator2D<Double, Primitive32Matrix, PhysicalStore<Double>> {
+    public static final class DenseReceiver extends Mutator2D<Double, MatrixR064, PhysicalStore<Double>> {
 
         DenseReceiver(final PhysicalStore<Double> delegate) {
             super(delegate);
         }
 
         @Override
-        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+        MatrixR064 instantiate(final MatrixStore<Double> store) {
             return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<Double, MatrixR064, MatrixR064.DenseReceiver, MatrixR064.SparseReceiver> {
 
         Factory() {
-            super(Primitive32Matrix.class, Primitive32Store.FACTORY);
+            super(MatrixR064.class, Primitive64Store.FACTORY);
         }
 
         @Override
-        Primitive32Matrix.DenseReceiver dense(final PhysicalStore<Double> store) {
-            return new Primitive32Matrix.DenseReceiver(store);
+        MatrixR064.DenseReceiver dense(final PhysicalStore<Double> store) {
+            return new MatrixR064.DenseReceiver(store);
         }
 
         @Override
-        Primitive32Matrix.SparseReceiver sparse(final SparseStore<Double> store) {
-            return new Primitive32Matrix.SparseReceiver(store);
+        MatrixR064.SparseReceiver sparse(final SparseStore<Double> store) {
+            return new MatrixR064.SparseReceiver(store);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<Double, Primitive32Matrix, SparseStore<Double>> {
+    public static final class SparseReceiver extends Mutator2D<Double, MatrixR064, SparseStore<Double>> {
 
         SparseReceiver(final SparseStore<Double> delegate) {
             super(delegate);
         }
 
         @Override
-        Primitive32Matrix instantiate(final MatrixStore<Double> store) {
+        MatrixR064 instantiate(final MatrixStore<Double> store) {
             return FACTORY.instantiate(store);
         }
 
@@ -94,13 +95,13 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    Primitive32Matrix(final ElementsSupplier<Double> supplier) {
+    MatrixR064(final ElementsSupplier<Double> supplier) {
         super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
-    public Primitive32Matrix.DenseReceiver copy() {
-        return new Primitive32Matrix.DenseReceiver(this.store().copy());
+    public MatrixR064.DenseReceiver copy() {
+        return new MatrixR064.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -119,8 +120,8 @@ public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matr
     }
 
     @Override
-    Primitive32Matrix newInstance(final ElementsSupplier<Double> store) {
-        return new Primitive32Matrix(store);
+    MatrixR064 newInstance(final ElementsSupplier<Double> store) {
+        return new MatrixR064(store);
     }
 
     @Override

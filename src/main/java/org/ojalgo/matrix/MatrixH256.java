@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -39,52 +40,54 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link Quaternion} elements.
+ * A matrix (linear algebra) with Quaternion {@link NumberSet#H} elements, implemented using four 64-bit
+ * double values. (4 x 64 = 256)
  *
  * @see BasicMatrix
+ * @see Quaternion
  * @author apete
  */
-public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {
+public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
 
-    public static final class DenseReceiver extends Mutator2D<Quaternion, QuaternionMatrix, PhysicalStore<Quaternion>> {
+    public static final class DenseReceiver extends Mutator2D<Quaternion, MatrixH256, PhysicalStore<Quaternion>> {
 
         DenseReceiver(final PhysicalStore<Quaternion> delegate) {
             super(delegate);
         }
 
         @Override
-        QuaternionMatrix instantiate(final MatrixStore<Quaternion> store) {
+        MatrixH256 instantiate(final MatrixStore<Quaternion> store) {
             return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<Quaternion, MatrixH256, MatrixH256.DenseReceiver, MatrixH256.SparseReceiver> {
 
         Factory() {
-            super(QuaternionMatrix.class, GenericStore.QUATERNION);
+            super(MatrixH256.class, GenericStore.QUATERNION);
         }
 
         @Override
-        QuaternionMatrix.DenseReceiver dense(final PhysicalStore<Quaternion> store) {
-            return new QuaternionMatrix.DenseReceiver(store);
+        MatrixH256.DenseReceiver dense(final PhysicalStore<Quaternion> store) {
+            return new MatrixH256.DenseReceiver(store);
         }
 
         @Override
-        QuaternionMatrix.SparseReceiver sparse(final SparseStore<Quaternion> store) {
-            return new QuaternionMatrix.SparseReceiver(store);
+        MatrixH256.SparseReceiver sparse(final SparseStore<Quaternion> store) {
+            return new MatrixH256.SparseReceiver(store);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<Quaternion, QuaternionMatrix, SparseStore<Quaternion>> {
+    public static final class SparseReceiver extends Mutator2D<Quaternion, MatrixH256, SparseStore<Quaternion>> {
 
         SparseReceiver(final SparseStore<Quaternion> delegate) {
             super(delegate);
         }
 
         @Override
-        QuaternionMatrix instantiate(final MatrixStore<Quaternion> store) {
+        MatrixH256 instantiate(final MatrixStore<Quaternion> store) {
             return FACTORY.instantiate(store);
         }
 
@@ -95,13 +98,13 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    QuaternionMatrix(final ElementsSupplier<Quaternion> supplier) {
+    MatrixH256(final ElementsSupplier<Quaternion> supplier) {
         super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
-    public QuaternionMatrix.DenseReceiver copy() {
-        return new QuaternionMatrix.DenseReceiver(this.store().copy());
+    public MatrixH256.DenseReceiver copy() {
+        return new MatrixH256.DenseReceiver(this.store().copy());
     }
 
     @Override
@@ -120,8 +123,8 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
-    QuaternionMatrix newInstance(final ElementsSupplier<Quaternion> store) {
-        return new QuaternionMatrix(store);
+    MatrixH256 newInstance(final ElementsSupplier<Quaternion> store) {
+        return new MatrixH256(store);
     }
 
     @Override

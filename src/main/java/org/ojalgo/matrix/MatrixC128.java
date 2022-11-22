@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -40,52 +41,54 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link ComplexNumber} elements.
+ * A matrix (linear algebra) with Complex {@link NumberSet#C} elements, implemented using dual 64-bit double
+ * values. (2 x 64 = 128)
  *
  * @see BasicMatrix
+ * @see ComplexNumber
  * @author apete
  */
-public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
+public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
 
-    public static final class DenseReceiver extends Mutator2D<ComplexNumber, ComplexMatrix, PhysicalStore<ComplexNumber>> {
+    public static final class DenseReceiver extends Mutator2D<ComplexNumber, MatrixC128, PhysicalStore<ComplexNumber>> {
 
         DenseReceiver(final PhysicalStore<ComplexNumber> delegate) {
             super(delegate);
         }
 
         @Override
-        ComplexMatrix instantiate(final MatrixStore<ComplexNumber> store) {
+        MatrixC128 instantiate(final MatrixStore<ComplexNumber> store) {
             return FACTORY.instantiate(store);
         }
 
     }
 
-    public static final class Factory extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
+    public static final class Factory extends MatrixFactory<ComplexNumber, MatrixC128, MatrixC128.DenseReceiver, MatrixC128.SparseReceiver> {
 
         Factory() {
-            super(ComplexMatrix.class, GenericStore.COMPLEX);
+            super(MatrixC128.class, GenericStore.COMPLEX);
         }
 
         @Override
-        ComplexMatrix.DenseReceiver dense(final PhysicalStore<ComplexNumber> store) {
-            return new ComplexMatrix.DenseReceiver(store);
+        MatrixC128.DenseReceiver dense(final PhysicalStore<ComplexNumber> store) {
+            return new MatrixC128.DenseReceiver(store);
         }
 
         @Override
-        ComplexMatrix.SparseReceiver sparse(final SparseStore<ComplexNumber> store) {
-            return new ComplexMatrix.SparseReceiver(store);
+        MatrixC128.SparseReceiver sparse(final SparseStore<ComplexNumber> store) {
+            return new MatrixC128.SparseReceiver(store);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<ComplexNumber, ComplexMatrix, SparseStore<ComplexNumber>> {
+    public static final class SparseReceiver extends Mutator2D<ComplexNumber, MatrixC128, SparseStore<ComplexNumber>> {
 
         SparseReceiver(final SparseStore<ComplexNumber> delegate) {
             super(delegate);
         }
 
         @Override
-        ComplexMatrix instantiate(final MatrixStore<ComplexNumber> store) {
+        MatrixC128 instantiate(final MatrixStore<ComplexNumber> store) {
             return FACTORY.instantiate(store);
         }
 
@@ -96,41 +99,41 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    ComplexMatrix(final ElementsSupplier<ComplexNumber> supplier) {
+    MatrixC128(final ElementsSupplier<ComplexNumber> supplier) {
         super(FACTORY.getPhysicalFactory(), supplier);
     }
 
     @Override
-    public ComplexMatrix.DenseReceiver copy() {
-        return new ComplexMatrix.DenseReceiver(this.store().copy());
+    public MatrixC128.DenseReceiver copy() {
+        return new MatrixC128.DenseReceiver(this.store().copy());
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
-    public Primitive64Matrix getArgument() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.store()));
+    public MatrixR064 getArgument() {
+        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
-    public Primitive64Matrix getImaginary() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.store()));
+    public MatrixR064 getImaginary() {
+        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
-    public Primitive64Matrix getModulus() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.store()));
+    public MatrixR064 getModulus() {
+        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
-    public Primitive64Matrix getReal() {
-        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.store()));
+    public MatrixR064 getReal() {
+        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexReal(this.store()));
     }
 
     @Override
@@ -149,8 +152,8 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    ComplexMatrix newInstance(final ElementsSupplier<ComplexNumber> store) {
-        return new ComplexMatrix(store);
+    MatrixC128 newInstance(final ElementsSupplier<ComplexNumber> store) {
+        return new MatrixC128(store);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class P20050827Case extends BasicMatrixTest {
     /**
      * @return A fat, 3x5, matrix with complex valued elements.
      */
-    public static ComplexMatrix getProblematic() {
+    public static MatrixC128 getProblematic() {
 
         Normal tmpRand = new Normal(0.0, 9.9);
         ComplexNumber tmpNmbr;
@@ -61,14 +61,14 @@ public class P20050827Case extends BasicMatrixTest {
             }
         }
 
-        return ComplexMatrix.FACTORY.copy(tmpArray).enforce(DEFINITION);
+        return MatrixC128.FACTORY.copy(tmpArray).enforce(DEFINITION);
     }
 
     @Override
     @BeforeEach
     public void doBeforeEach() {
 
-        mtrxA = Primitive64Matrix.FACTORY.copy(P20050827Case.getProblematic());
+        mtrxA = MatrixR064.FACTORY.copy(P20050827Case.getProblematic());
         mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
         mtrxB = mtrxA;
 
@@ -82,17 +82,17 @@ public class P20050827Case extends BasicMatrixTest {
     public void testData() {
 
         // 3x5
-        ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
+        MatrixC128 tmpProblematic = P20050827Case.getProblematic();
         TestUtils.assertEquals(3, tmpProblematic.countRows());
         TestUtils.assertEquals(5, tmpProblematic.countColumns());
 
         // 5x5
-        ComplexMatrix tmpBig = tmpProblematic.conjugate().multiply(tmpProblematic);
+        MatrixC128 tmpBig = tmpProblematic.conjugate().multiply(tmpProblematic);
         TestUtils.assertEquals(5, tmpBig.countRows());
         TestUtils.assertEquals(5, tmpBig.countColumns());
 
         // 3x3
-        ComplexMatrix tmpSmall = tmpProblematic.multiply(tmpProblematic.conjugate());
+        MatrixC128 tmpSmall = tmpProblematic.multiply(tmpProblematic.conjugate());
         TestUtils.assertEquals(3, tmpSmall.countRows());
         TestUtils.assertEquals(3, tmpSmall.countColumns());
 
@@ -113,9 +113,9 @@ public class P20050827Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
+        MatrixC128 tmpProblematic = P20050827Case.getProblematic();
 
-        ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
+        MatrixC128 tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
         ComplexNumber tmpVal = tmpMtrx.getTrace().get();
         ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
         ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));

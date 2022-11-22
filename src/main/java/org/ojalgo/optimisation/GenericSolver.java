@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -53,7 +53,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 builder.append("\n[");
                 builder.append(label);
                 builder.append("] = ");
-                builder.append(Primitive64Matrix.FACTORY.copy(matrix));
+                builder.append(MatrixR064.FACTORY.copy(matrix));
             }
         }
 

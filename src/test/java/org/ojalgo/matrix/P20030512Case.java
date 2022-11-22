@@ -36,9 +36,9 @@ public class P20030512Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(16, 18);
 
-    public static RationalMatrix getProblematic() {
+    public static MatrixQ128 getProblematic() {
 
-        RationalMatrix problematic = RationalMatrix.FACTORY.rows(new double[][] {
+        MatrixQ128 problematic = MatrixQ128.FACTORY.rows(new double[][] {
                 { -0.9739496281920735, 0.13212842225762753, -0.009493226825028579, 0.05293424713580207, -0.06924760059060892, 0.015657944731764042,
                         -0.008564346745847575, 0.004549185362729688 },
                 { -0.006968800104298036, -0.8297418413337506, -0.0362355854907016, 0.16177736191417533, -0.2100891795366892, 0.047384677993178616,
@@ -65,7 +65,7 @@ public class P20030512Case extends BasicMatrixTest {
 
         // ACCURACY = new NumberContext(8, 6);
 
-        mtrxA = Primitive64Matrix.FACTORY.copy(P20030512Case.getProblematic());
+        mtrxA = MatrixR064.FACTORY.copy(P20030512Case.getProblematic());
         mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
         mtrxB = mtrxA;
 

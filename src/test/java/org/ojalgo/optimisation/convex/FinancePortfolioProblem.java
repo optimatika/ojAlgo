@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -41,21 +41,21 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
     public static final class P20170508 {
 
-        static final Primitive64Matrix COVARIANCES;
-        static final Primitive64Matrix RETURNS;
+        static final MatrixR064 COVARIANCES;
+        static final MatrixR064 RETURNS;
 
         static {
 
-            Primitive64Matrix.DenseReceiver mtrxBuilder;
+            MatrixR064.DenseReceiver mtrxBuilder;
 
-            mtrxBuilder = Primitive64Matrix.FACTORY.makeDense(2, 2);
+            mtrxBuilder = MatrixR064.FACTORY.makeDense(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);
             mtrxBuilder.add(0, 1, 0.1000);
             mtrxBuilder.add(1, 0, 0.1000);
             mtrxBuilder.add(1, 1, 0.250000);
             COVARIANCES = mtrxBuilder.get();
 
-            mtrxBuilder = Primitive64Matrix.FACTORY.makeDense(2);
+            mtrxBuilder = MatrixR064.FACTORY.makeDense(2);
             mtrxBuilder.add(0, 0.20000);
             mtrxBuilder.add(1, 0.40000);
             RETURNS = mtrxBuilder.get();
@@ -64,7 +64,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
     }
 
-    private static ExpressionsBasedModel buildModel(final Primitive64Matrix covariances, final Primitive64Matrix returns, final BigDecimal riskAversion) {
+    private static ExpressionsBasedModel buildModel(final MatrixR064 covariances, final MatrixR064 returns, final BigDecimal riskAversion) {
 
         ProgrammingError.throwIfNotSquare(covariances);
         ProgrammingError.throwIfNotEqualRowDimensions(covariances, returns);

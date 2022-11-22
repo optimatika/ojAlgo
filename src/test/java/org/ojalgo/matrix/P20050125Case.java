@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct.
- * (This case tests that RationalMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
+ * (This case tests that MatrixQ128 doesn't have the same problem.) Problem reported to jama(a)nist.gov
  *
  * @author apete
  */
@@ -41,9 +41,9 @@ public class P20050125Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 9);
 
-    public static Primitive64Matrix getProblematic() {
+    public static MatrixR064 getProblematic() {
         int DIM = 3;
-        Primitive64Matrix tmpMtrx = Primitive64Matrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 

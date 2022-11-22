@@ -39,11 +39,11 @@ public class P20071019Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.ofScale(9);
 
-    public static Primitive64Matrix getFatProblematic() {
+    public static MatrixR064 getFatProblematic() {
         return SimpleLeastSquaresCase.getBody().transpose();
     }
 
-    public static Primitive64Matrix getTallProblematic() {
+    public static MatrixR064 getTallProblematic() {
         return SimpleLeastSquaresCase.getBody();
     }
 

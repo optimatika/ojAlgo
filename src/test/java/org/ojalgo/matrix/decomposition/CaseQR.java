@@ -27,9 +27,9 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.matrix.P20030422Case;
-import org.ojalgo.matrix.Primitive64Matrix;
-import org.ojalgo.matrix.Primitive64Matrix.DenseReceiver;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixR064;
+import org.ojalgo.matrix.MatrixR064.DenseReceiver;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -97,17 +97,17 @@ public class CaseQR extends MatrixDecompositionTests {
 
         tmpDecomp.decompose(a2d);
 
-        DenseReceiver dr = Primitive64Matrix.FACTORY.makeDense(3, 3);
+        DenseReceiver dr = MatrixR064.FACTORY.makeDense(3, 3);
         dr.fillAll(Normal.standard());
         tmpDecomp.decompose(dr);
 
-        Primitive64Matrix ps = dr.get();
+        MatrixR064 ps = dr.get();
         tmpDecomp.decompose(ps);
 
-        Primitive64Matrix lb = dr.get().below(2);
+        MatrixR064 lb = dr.get().below(2);
         tmpDecomp.decompose(lb);
 
-        Primitive64Matrix bm = lb;
+        MatrixR064 bm = lb;
         tmpDecomp.decompose(bm);
     }
 
@@ -223,7 +223,7 @@ public class CaseQR extends MatrixDecompositionTests {
     @Test
     public void testP20030422Case() {
 
-        final RationalMatrix tmpOriginal = P20030422Case.getProblematic();
+        final MatrixQ128 tmpOriginal = P20030422Case.getProblematic();
 
         final QR<RationalNumber> tmpBigDecomp = QR.RATIONAL.make();
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();

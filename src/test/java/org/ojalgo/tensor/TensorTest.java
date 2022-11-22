@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.ArrayQ128;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.RationalNumber;
@@ -34,12 +34,12 @@ public class TensorTest {
 
     private static final int DIM = 2;
 
-    private static final RationalMatrix ELEMENTS_A = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final RationalMatrix ELEMENTS_B = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final RationalMatrix ELEMENTS_C = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
-    private static final RationalMatrix ELEMENTS_D = RationalMatrix.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final MatrixQ128 ELEMENTS_A = MatrixQ128.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final MatrixQ128 ELEMENTS_B = MatrixQ128.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final MatrixQ128 ELEMENTS_C = MatrixQ128.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
+    private static final MatrixQ128 ELEMENTS_D = MatrixQ128.FACTORY.makeFilled(DIM, DIM, Uniform.standard());
 
-    private static final RationalMatrix.Factory FACTORY__M = RationalMatrix.FACTORY;
+    private static final MatrixQ128.Factory FACTORY__M = MatrixQ128.FACTORY;
     private static final TensorFactory1D<RationalNumber, VectorTensor<RationalNumber>> FACTORY_1 = VectorTensor.factory(ArrayQ128.FACTORY);
     private static final TensorFactory2D<RationalNumber, MatrixTensor<RationalNumber>> FACTORY_2 = MatrixTensor.factory(ArrayQ128.FACTORY);
     private static final TensorFactoryAnyD<RationalNumber, AnyTensor<RationalNumber>> FACTORY_N = AnyTensor.factory(ArrayQ128.FACTORY);
@@ -157,10 +157,10 @@ public class TensorTest {
         MatrixTensor<RationalNumber> product1 = FACTORY_2.kronecker(tensorA, tensorB);
         MatrixTensor<RationalNumber> product2 = FACTORY_2.kronecker(tensorC, tensorD);
 
-        RationalMatrix matrixS1 = FACTORY__M.copy(sum1);
-        RationalMatrix matrixS2 = FACTORY__M.copy(sum2);
-        RationalMatrix matrixP1 = FACTORY__M.copy(product1);
-        RationalMatrix matrixP2 = FACTORY__M.copy(product2);
+        MatrixQ128 matrixS1 = FACTORY__M.copy(sum1);
+        MatrixQ128 matrixS2 = FACTORY__M.copy(sum2);
+        MatrixQ128 matrixP1 = FACTORY__M.copy(product1);
+        MatrixQ128 matrixP2 = FACTORY__M.copy(product2);
 
         TestUtils.assertEquals(ELEMENTS_A.getDeterminant().multiply(ELEMENTS_B.getDeterminant()), matrixS1.getDeterminant());
         TestUtils.assertEquals(ELEMENTS_C.getDeterminant().multiply(ELEMENTS_D.getDeterminant()), matrixS2.getDeterminant());
@@ -205,9 +205,9 @@ public class TensorTest {
         MatrixTensor<RationalNumber> matrixC = FACTORY_2.copy(ELEMENTS_C);
         MatrixTensor<RationalNumber> matrixD = FACTORY_2.copy(ELEMENTS_D);
 
-        RationalMatrix matrixAkB = FACTORY__M.copy(FACTORY_2.kronecker(matrixA, matrixB));
-        RationalMatrix matrixCkD = FACTORY__M.copy(FACTORY_2.kronecker(matrixC, matrixD));
-        RationalMatrix matrixAkBmCkD = matrixAkB.multiply(matrixCkD);
+        MatrixQ128 matrixAkB = FACTORY__M.copy(FACTORY_2.kronecker(matrixA, matrixB));
+        MatrixQ128 matrixCkD = FACTORY__M.copy(FACTORY_2.kronecker(matrixC, matrixD));
+        MatrixQ128 matrixAkBmCkD = matrixAkB.multiply(matrixCkD);
 
         MatrixTensor<RationalNumber> matrixAmC = FACTORY_2.copy(ELEMENTS_A.multiply(ELEMENTS_C));
         MatrixTensor<RationalNumber> matrixBmD = FACTORY_2.copy(ELEMENTS_B.multiply(ELEMENTS_D));

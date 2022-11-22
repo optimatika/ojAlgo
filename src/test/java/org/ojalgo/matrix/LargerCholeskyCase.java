@@ -39,11 +39,11 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
-    public static Primitive64Matrix getOriginal() {
+    public static MatrixR064 getOriginal() {
 
         PhysicalStore<ComplexNumber> randomComplex = TestUtils.makeRandomComplexStore(9, 9);
 
-        return Primitive64Matrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
+        return MatrixR064.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
         tmpCholesky.decompose(mtrxB);
 
-        mtrxA = Primitive64Matrix.FACTORY.copy(tmpCholesky.getL());
+        mtrxA = MatrixR064.FACTORY.copy(tmpCholesky.getL());
         mtrxX = mtrxA.transpose();
 
         mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
@@ -67,7 +67,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        Primitive64Matrix tmpMtrx = LargerCholeskyCase.getOriginal();
+        MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
         Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
@@ -76,7 +76,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        Primitive64Matrix tmpMtrx = LargerCholeskyCase.getOriginal();
+        MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
         Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(tmpMtrx);
 
