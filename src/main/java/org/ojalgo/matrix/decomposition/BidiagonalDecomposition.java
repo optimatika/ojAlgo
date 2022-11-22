@@ -32,20 +32,21 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
 abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
-    static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
+    static final class C128 extends BidiagonalDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             this(false);
         }
 
-        Complex(final boolean fullSize) {
-            super(GenericStore.COMPLEX, fullSize);
+        C128(final boolean fullSize) {
+            super(GenericStore.C128, fullSize);
         }
 
         @Override
@@ -126,31 +127,14 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class Primitive extends BidiagonalDecomposition<Double> {
+    static final class H256 extends BidiagonalDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
             this(false);
         }
 
-        Primitive(final boolean fullSize) {
-            super(Primitive64Store.FACTORY, fullSize);
-        }
-
-        @Override
-        Array1D<Double>[] makeReal() {
-            return null;
-        }
-
-    }
-
-    static final class Quat extends BidiagonalDecomposition<Quaternion> {
-
-        Quat() {
-            this(false);
-        }
-
-        Quat(final boolean fullSize) {
-            super(GenericStore.QUATERNION, fullSize);
+        H256(final boolean fullSize) {
+            super(GenericStore.H256, fullSize);
         }
 
         @Override
@@ -161,18 +145,52 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class Rational extends BidiagonalDecomposition<RationalNumber> {
+    static final class Q128 extends BidiagonalDecomposition<RationalNumber> {
 
-        Rational() {
+        Q128() {
             this(false);
         }
 
-        Rational(final boolean fullSize) {
-            super(GenericStore.RATIONAL, fullSize);
+        Q128(final boolean fullSize) {
+            super(GenericStore.Q128, fullSize);
         }
 
         @Override
         Array1D<RationalNumber>[] makeReal() {
+            return null;
+        }
+
+    }
+
+    static final class R064 extends BidiagonalDecomposition<Double> {
+
+        R064() {
+            this(false);
+        }
+
+        R064(final boolean fullSize) {
+            super(Primitive64Store.FACTORY, fullSize);
+        }
+
+        @Override
+        Array1D<Double>[] makeReal() {
+            return null;
+        }
+
+    }
+
+    static final class R128 extends BidiagonalDecomposition<Quadruple> {
+
+        R128() {
+            this(false);
+        }
+
+        R128(final boolean fullSize) {
+            super(GenericStore.R128, fullSize);
+        }
+
+        @Override
+        Array1D<Quadruple>[] makeReal() {
             return null;
         }
 

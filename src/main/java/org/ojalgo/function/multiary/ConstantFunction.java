@@ -39,11 +39,11 @@ import org.ojalgo.structure.Access1D;
 public final class ConstantFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Constant<N> {
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        return new ConstantFunction<>(arity, GenericStore.COMPLEX);
+        return new ConstantFunction<>(arity, GenericStore.C128);
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericStore.COMPLEX, constant);
+        return new ConstantFunction<>(arity, GenericStore.C128, constant);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity) {
@@ -55,11 +55,11 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
     }
 
     public static ConstantFunction<RationalNumber> makeRational(final int arity) {
-        return new ConstantFunction<>(arity, GenericStore.RATIONAL);
+        return new ConstantFunction<>(arity, GenericStore.Q128);
     }
 
     public static ConstantFunction<RationalNumber> makeRational(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericStore.RATIONAL, constant);
+        return new ConstantFunction<>(arity, GenericStore.Q128, constant);
     }
 
     private final int myArity;

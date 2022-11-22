@@ -25,12 +25,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -42,29 +39,27 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
-    public static RationalMatrix getOriginal() {
+    public static MatrixR064 getOriginal() {
 
-        final PhysicalStore<ComplexNumber> randomComplex = TestUtils.makeRandomComplexStore(9, 9);
+        PhysicalStore<ComplexNumber> randomComplex = TestUtils.makeRandomComplexStore(9, 9);
 
-        return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
+        return MatrixR064.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
     @Override
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 3);
+        mtrxB = LargerCholeskyCase.getOriginal();
 
-        rAB = LargerCholeskyCase.getOriginal();
+        Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
+        tmpCholesky.decompose(mtrxB);
 
-        final Cholesky<RationalNumber> tmpCholesky = Cholesky.RATIONAL.make();
-        tmpCholesky.decompose(GenericStore.RATIONAL.copy(rAB));
+        mtrxA = MatrixR064.FACTORY.copy(tmpCholesky.getL());
+        mtrxX = mtrxA.transpose();
 
-        rAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
-        rAX = rAA.transpose();
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -72,8 +67,8 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final MatrixStore<Double> tmpMtrx = Primitive64Store.FACTORY.copy(LargerCholeskyCase.getOriginal());
-        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
+        Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }
@@ -81,9 +76,9 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final RationalMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
-        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
-        tmpDecomp.decompose(Primitive64Store.FACTORY.copy(tmpMtrx));
+        MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
+        Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        tmpDecomp.decompose(tmpMtrx);
 
         TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, ACCURACY);
     }

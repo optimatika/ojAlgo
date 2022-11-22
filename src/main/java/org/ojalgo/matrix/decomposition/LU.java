@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -57,19 +58,51 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
+    Factory<ComplexNumber> C128 = typical -> new LUDecomposition.C128();
 
-    Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> R064 = typical -> {
 
         if (512L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new LUDecomposition.Primitive();
+            return new LUDecomposition.R064();
         }
         return new RawLU();
     };
 
-    Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
+    Factory<Quadruple> R128 = typical -> new LUDecomposition.R128();
 
-    Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
+    Factory<Quaternion> H256 = typical -> new LUDecomposition.H256();
+
+    Factory<RationalNumber> Q128 = typical -> new LUDecomposition.Q128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
 

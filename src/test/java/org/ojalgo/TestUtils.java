@@ -541,7 +541,7 @@ public abstract class TestUtils /* extends Assertions */ {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.make(numberOfRows, numberOfColumns);
 
         Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 

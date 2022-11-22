@@ -27,10 +27,10 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -180,7 +180,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         tmpExprC2.level(SIX);
 
         Optimisation.Result tmpResult = tmpModel.maximise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
         PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(0, 1, 2));
@@ -217,7 +217,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         tmpExprC3.level(FOUR);
 
         Optimisation.Result tmpResult = tmpModel.maximise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
         PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(0, 1));
@@ -255,7 +255,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         tmpExprC3.level(FIVE);
 
         Optimisation.Result tmpResult = tmpModel.minimise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
         PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(0, 1, 2));
@@ -293,7 +293,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         tmpExprC3.level(TEN);
 
         Optimisation.Result tmpResult = tmpModel.minimise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         PhysicalStore<Double> tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 5.0 }, { 5.0 } });
         PhysicalStore<Double> tmpActX = Primitive64Store.FACTORY.copy(tmpSolution.rows(0, 1));
@@ -530,7 +530,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         ExpressionsBasedModel tmpModel = LinearDesignTestCases.buildOldKnapsackTestModel();
 
         Optimisation.Result tmpResult = tmpModel.maximise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         MatrixStore<Double> tmpExpX = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
@@ -545,7 +545,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         ExpressionsBasedModel tmpModel = LinearDesignTestCases.buildOldKnapsackTestModel();
 
         Optimisation.Result tmpResult = tmpModel.minimise();
-        RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.columns(tmpResult);
 
         MatrixStore<Double> tmpExpX = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
@@ -620,7 +620,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         c6.set(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
-        ArrayR128 expected = ArrayR128.wrap(BigDecimal.valueOf(4850), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307));
+        ArrayR256 expected = ArrayR256.wrap(BigDecimal.valueOf(4850), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307));
 
         TestUtils.assertTrue("Expected Solution Not Valid", model.validate(expected));
 

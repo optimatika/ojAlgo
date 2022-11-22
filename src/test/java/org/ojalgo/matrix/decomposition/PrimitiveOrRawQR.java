@@ -100,7 +100,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
         }
 
         public static QR<Double> newPrimitive() {
-            return new QRDecomposition.Primitive();
+            return new QRDecomposition.R064();
         }
 
         public static QR<Double> newRaw() {
@@ -161,7 +161,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
 
     @Override
     protected QR<Double> makePrimitive() {
-        return new QRDecomposition.Primitive();
+        return new QRDecomposition.R064();
     }
 
     @Override

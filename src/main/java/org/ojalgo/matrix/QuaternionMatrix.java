@@ -39,11 +39,9 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link Quaternion} elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixH256} instead.
  */
+@Deprecated
 public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {
 
     public static final class DenseReceiver extends Mutator2D<Quaternion, QuaternionMatrix, PhysicalStore<Quaternion>> {
@@ -62,7 +60,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class Factory extends MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver> {
 
         Factory() {
-            super(QuaternionMatrix.class, GenericStore.QUATERNION);
+            super(QuaternionMatrix.class, GenericStore.H256);
         }
 
         @Override

@@ -28,40 +28,49 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
 abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
-    static final class Complex extends HessenbergDecomposition<ComplexNumber> {
+    static final class C128 extends HessenbergDecomposition<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX);
+        C128() {
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class Primitive extends HessenbergDecomposition<Double> {
+    static final class H256 extends HessenbergDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
+            super(GenericStore.H256);
+        }
+
+    }
+
+    static final class Q128 extends HessenbergDecomposition<RationalNumber> {
+
+        Q128() {
+            super(GenericStore.Q128);
+        }
+
+    }
+
+    static final class R064 extends HessenbergDecomposition<Double> {
+
+        R064() {
             super(Primitive64Store.FACTORY);
         }
 
     }
 
-    static final class Quat extends HessenbergDecomposition<Quaternion> {
+    static final class R128 extends HessenbergDecomposition<Quadruple> {
 
-        Quat() {
-            super(GenericStore.QUATERNION);
-        }
-
-    }
-
-    static final class Rational extends HessenbergDecomposition<RationalNumber> {
-
-        Rational() {
-            super(GenericStore.RATIONAL);
+        R128() {
+            super(GenericStore.R128);
         }
 
     }

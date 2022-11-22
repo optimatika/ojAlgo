@@ -106,7 +106,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<ComplexNumber> sparseB = SparseStore.makeComplex(8, 9);
         SparseStore<ComplexNumber> sparseC = SparseStore.makeComplex(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.COMPLEX);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.C128);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<Quaternion> sparseB = SparseStore.makeQuaternion(8, 9);
         SparseStore<Quaternion> sparseC = SparseStore.makeQuaternion(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.QUATERNION);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.H256);
     }
 
     @Test
@@ -136,7 +136,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<RationalNumber> sparseB = SparseStore.makeRational(8, 9);
         SparseStore<RationalNumber> sparseC = SparseStore.makeRational(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.RATIONAL);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.Q128);
     }
 
     @Test

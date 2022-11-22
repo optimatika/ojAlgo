@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.ErrorFunction;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
@@ -47,19 +47,19 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
         double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio);
 
-        Primitive64Matrix getAssetReturns();
+        MatrixR064 getAssetReturns();
 
-        Primitive64Matrix getAssetVolatilities();
+        MatrixR064 getAssetVolatilities();
 
-        Primitive64Matrix getCorrelations();
+        MatrixR064 getCorrelations();
 
-        Primitive64Matrix getCovariances();
+        MatrixR064 getCovariances();
 
         int size();
 
     }
 
-    protected static final Primitive64Matrix.Factory MATRIX_FACTORY = Primitive64Matrix.FACTORY;
+    protected static final MatrixR064.Factory MATRIX_FACTORY = MatrixR064.FACTORY;
 
     protected FinancePortfolio() {
         super();
@@ -81,8 +81,8 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
     public final double getConformance(final FinancePortfolio reference) {
 
-        final Primitive64Matrix tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
-        final Primitive64Matrix tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
+        final MatrixR064 tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
+        final MatrixR064 tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
 
         final double tmpNumerator = tmpMyWeights.dot(tmpRefWeights);
         final double tmpDenom1 = PrimitiveMath.SQRT.invoke(tmpMyWeights.dot(tmpMyWeights));

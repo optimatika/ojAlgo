@@ -31,10 +31,10 @@ import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
 
-    static final class Primitive extends DynamicEvD<Double> {
+    static final class R064 extends DynamicEvD<Double> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
+        R064() {
+            super(Primitive64Store.FACTORY, new HermitianEvD.R064(), new GeneralEvD.R064());
         }
 
     }

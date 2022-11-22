@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -106,11 +106,11 @@ public final class MarkowitzModel extends OptimisedPortfolio {
         super(portfolioContext);
     }
 
-    public MarkowitzModel(final MarketEquilibrium marketEquilibrium, final Primitive64Matrix expectedExcessReturns) {
+    public MarkowitzModel(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
         super(marketEquilibrium, expectedExcessReturns);
     }
 
-    public MarkowitzModel(final Primitive64Matrix covarianceMatrix, final Primitive64Matrix expectedExcessReturns) {
+    public MarkowitzModel(final MatrixR064 covarianceMatrix, final MatrixR064 expectedExcessReturns) {
         super(covarianceMatrix, expectedExcessReturns);
     }
 
@@ -220,7 +220,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
      * Constrained optimisation.
      */
     @Override
-    protected Primitive64Matrix calculateAssetWeights() {
+    protected MatrixR064 calculateAssetWeights() {
 
         if (this.getOptimisationOptions().logger_appender != null) {
             BasicLogger.debug();
@@ -318,7 +318,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
 
     }
 
-    Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final Primitive64Matrix returnsVctr) {
+    Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final MatrixR064 returnsVctr) {
         return super.calculatePortfolioReturn(MATRIX_FACTORY.columns(weightsVctr), returnsVctr);
     }
 

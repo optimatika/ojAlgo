@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -168,7 +168,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Original", m);
         }
 
-        QR<Double> qr1 = new QRDecomposition.Primitive(false);
+        QR<Double> qr1 = new QRDecomposition.R064(false);
         qr1.decompose(m);
 
         if (DEBUG) {
@@ -346,7 +346,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         PhysicalStore<ComplexNumber> tmpSquare = TestUtils.makeRandomComplexStore(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        PhysicalStore<ComplexNumber> tmpExpected = GenericStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> tmpExpected = GenericStore.C128.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
@@ -387,7 +387,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         int tmpDim = Uniform.randomInteger(2, 6);
 
         PhysicalStore<ComplexNumber> original = TestUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
-        PhysicalStore<ComplexNumber> identity = GenericStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> identity = GenericStore.C128.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")
@@ -455,10 +455,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
         data[0][1] = 1.01;
 
-        Primitive64Matrix input = Primitive64Matrix.FACTORY.rows(data);
+        MatrixR064 input = MatrixR064.FACTORY.rows(data);
         try {
             //   SingularValue<Double> svd = SingularValue.make(input);
-            SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
+            SingularValue<Double> svd = new SingularValueDecomposition.R064();
             svd.invert(input);
         } catch (RecoverableCondition exception) {
             // TODO Auto-generated catch block

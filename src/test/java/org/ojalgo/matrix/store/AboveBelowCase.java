@@ -37,8 +37,8 @@ public class AboveBelowCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> above = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         MatrixStore<ComplexNumber> below = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new AboveBelowStore<>(GenericStore.RATIONAL.copy(above), GenericStore.RATIONAL.copy(below));
-        complexStore = new AboveBelowStore<>(GenericStore.COMPLEX.copy(above), GenericStore.COMPLEX.copy(below));
+        rationalStore = new AboveBelowStore<>(GenericStore.Q128.copy(above), GenericStore.Q128.copy(below));
+        complexStore = new AboveBelowStore<>(GenericStore.C128.copy(above), GenericStore.C128.copy(below));
         primitiveStore = new AboveBelowStore<>(Primitive64Store.FACTORY.copy(above), Primitive64Store.FACTORY.copy(below));
 
         numberOfRows = tmpRowDim + tmpRowDim;

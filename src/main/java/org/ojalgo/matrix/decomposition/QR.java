@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -40,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  * Note: Either Q or R will be square. The interface does not specify which.
  * <p>
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #RATIONAL}, {@linkplain #COMPLEX}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
+ * {@linkplain #Q128}, {@linkplain #C128}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
  * </p>
  * <p>
  * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
@@ -68,18 +69,50 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> C128 = (typical, fullSize) -> new QRDecomposition.C128(fullSize);
 
-    Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+    Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new QRDecomposition.Primitive(fullSize);
+            return new QRDecomposition.R064(fullSize);
         }
         return new RawQR();
     };
 
-    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);
+    Factory<Quadruple> R128 = (typical, fullSize) -> new QRDecomposition.R128(fullSize);
 
-    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
+    Factory<Quaternion> H256 = (typical, fullSize) -> new QRDecomposition.H256(fullSize);
+
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new QRDecomposition.Q128(fullSize);
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
 

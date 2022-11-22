@@ -40,6 +40,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -62,10 +63,10 @@ import org.ojalgo.structure.Structure2D;
  **/
 abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
-    static final class Complex extends HermitianEvD<ComplexNumber> {
+    static final class C128 extends HermitianEvD<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX, new DeferredTridiagonal.Complex());
+        C128() {
+            super(GenericStore.C128, new DeferredTridiagonal.C128());
         }
 
         public Eigenpair getEigenpair(final int index) {
@@ -78,26 +79,34 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     }
 
-    static final class Primitive extends HermitianEvD<Double> {
+    static final class R064 extends HermitianEvD<Double> {
 
-        Primitive() {
+        R064() {
             super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }
 
-    static final class Quat extends HermitianEvD<Quaternion> {
+    static final class H256 extends HermitianEvD<Quaternion> {
 
-        Quat() {
-            super(GenericStore.QUATERNION, new DeferredTridiagonal.Quat());
+        H256() {
+            super(GenericStore.H256, new DeferredTridiagonal.H256());
         }
 
     }
 
-    static final class Rational extends HermitianEvD<RationalNumber> {
+    static final class Q128 extends HermitianEvD<RationalNumber> {
 
-        Rational() {
-            super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
+        Q128() {
+            super(GenericStore.Q128, new DeferredTridiagonal.Q128());
+        }
+
+    }
+
+    static final class R128 extends HermitianEvD<Quadruple> {
+
+        R128() {
+            super(GenericStore.R128, new DeferredTridiagonal.R128());
         }
 
     }

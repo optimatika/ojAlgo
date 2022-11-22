@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -53,19 +54,51 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
+    Factory<ComplexNumber> C128 = typical -> new CholeskyDecomposition.C128();
 
-    Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> R064 = typical -> {
         if ((32L < typical.countColumns()) && (typical.count() <= PlainArray.MAX_SIZE)) {
-            return new CholeskyDecomposition.Primitive();
+            return new CholeskyDecomposition.R064();
         } else {
             return new RawCholesky();
         }
     };
 
-    Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
+    Factory<Quadruple> R128 = typical -> new CholeskyDecomposition.R128();
 
-    Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
+    Factory<Quaternion> H256 = typical -> new CholeskyDecomposition.H256();
+
+    Factory<RationalNumber> Q128 = typical -> new CholeskyDecomposition.Q128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
 

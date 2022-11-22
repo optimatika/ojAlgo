@@ -40,8 +40,8 @@ public class P20030528Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static RationalMatrix getProblematic() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+    public static MatrixR064 getProblematic() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
                 .rows(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
@@ -50,14 +50,12 @@ public class P20030528Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 9);
+        mtrxA = P20030528Case.getProblematic();
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = P20030528Case.getProblematic();
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -65,7 +63,7 @@ public class P20030528Case extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final RationalMatrix tmpProb = P20030528Case.getProblematic();
+        MatrixR064 tmpProb = P20030528Case.getProblematic();
 
         TestUtils.assertFalse(tmpProb.isEmpty());
         TestUtils.assertTrue(tmpProb.isFat());
@@ -74,9 +72,9 @@ public class P20030528Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
+        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
 
-        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
+        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         // tmpSVD.equals(tmpA, EVALUATION);

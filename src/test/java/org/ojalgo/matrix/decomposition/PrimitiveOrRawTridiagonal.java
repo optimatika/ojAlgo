@@ -152,7 +152,7 @@ public class PrimitiveOrRawTridiagonal extends AbstractPrimitiveOrRaw<Tridiagona
 
     @Override
     protected Tridiagonal<Double> makePrimitive() {
-        return new DeferredTridiagonal.Primitive();
+        return new DeferredTridiagonal.R064();
     }
 
     @Override

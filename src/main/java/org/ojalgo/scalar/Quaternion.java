@@ -336,11 +336,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public Quaternion add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
     public Quaternion add(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -433,11 +428,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         final double tmpK = k / arg;
 
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
-    }
-
-    @Override
-    public Quaternion divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     /**
@@ -661,11 +651,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public Quaternion multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
     public Quaternion multiply(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -728,11 +713,6 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public Quaternion subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
-    }
-
-    @Override
     public Quaternion subtract(final Quaternion arg) {
 
         final double tmpScalar = myScalar - arg.scalar();
@@ -770,7 +750,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public MatrixStore<ComplexNumber> toComplexMatrix() {
 
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(2L, 2L);
+        final GenericStore<ComplexNumber> retVal = GenericStore.C128.make(2L, 2L);
 
         retVal.set(0L, ComplexNumber.of(myScalar, i));
         retVal.set(1L, ComplexNumber.of(-j, k));

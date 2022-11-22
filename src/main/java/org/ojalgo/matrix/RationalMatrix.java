@@ -39,11 +39,9 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link RationalNumber} elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixQ128} instead.
  */
+@Deprecated
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
     public static final class DenseReceiver extends Mutator2D<RationalNumber, RationalMatrix, PhysicalStore<RationalNumber>> {
@@ -62,7 +60,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
 
         Factory() {
-            super(RationalMatrix.class, GenericStore.RATIONAL);
+            super(RationalMatrix.class, GenericStore.Q128);
         }
 
         @Override

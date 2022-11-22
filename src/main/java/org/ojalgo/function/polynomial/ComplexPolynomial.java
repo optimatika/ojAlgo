@@ -38,7 +38,7 @@ public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-        this.estimate(x, y, GenericStore.COMPLEX, QR.COMPLEX);
+        this.estimate(x, y, GenericStore.C128, QR.COMPLEX);
     }
 
     public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {

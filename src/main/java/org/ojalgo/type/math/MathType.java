@@ -22,7 +22,6 @@
 package org.ojalgo.type.math;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 
 import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.machine.JavaType;
@@ -63,11 +62,18 @@ public enum MathType {
      */
     R064(NumberSet.R, 1, JavaType.DOUBLE),
     /**
+     * Real Number: 2 * double
+     * <p>
+     * Quadruple precision emulated using a pair of double precision numbers
+     */
+    R128(NumberSet.R, 2, JavaType.DOUBLE),
+    /**
      * Real Number: {@link BigDecimal}
      * <p>
-     * Refer to it as "128" since the {@link MathContext#DECIMAL128} is used by default (when necessary).
+     * Refer to it as "256" since (the way it's used in ojAlgo) it roughly corresponds to binary 256 octuple
+     * precision.
      */
-    R128(NumberSet.R, 1, JavaType.REFERENCE),
+    R256(NumberSet.R, 1, JavaType.REFERENCE),
     /**
      * Integer: byte
      */

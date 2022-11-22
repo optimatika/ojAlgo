@@ -38,11 +38,9 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with 64-bit primitive double elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixR064} instead.
  */
+@Deprecated
 public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matrix> {
 
     public static final class DenseReceiver extends Mutator2D<Double, Primitive64Matrix, PhysicalStore<Double>> {

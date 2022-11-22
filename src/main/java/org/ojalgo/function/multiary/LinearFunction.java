@@ -38,11 +38,11 @@ import org.ojalgo.structure.Access1D;
 public final class LinearFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericStore.COMPLEX.rows(coefficients));
+        return new LinearFunction<>(GenericStore.C128.rows(coefficients));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(GenericStore.COMPLEX.make(1, arity));
+        return new LinearFunction<>(GenericStore.C128.make(1, arity));
     }
 
     public static LinearFunction<Double> makePrimitive(final Access1D<?> coefficients) {
@@ -54,11 +54,11 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
     }
 
     public static LinearFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericStore.RATIONAL.rows(coefficients));
+        return new LinearFunction<>(GenericStore.Q128.rows(coefficients));
     }
 
     public static LinearFunction<RationalNumber> makeRational(final int arity) {
-        return new LinearFunction<>(GenericStore.RATIONAL.make(1, arity));
+        return new LinearFunction<>(GenericStore.Q128.make(1, arity));
     }
 
     public static <N extends Comparable<N>> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {

@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -43,34 +44,42 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
 
-    static final class Complex extends LUDecomposition<ComplexNumber> {
+    static final class C128 extends LUDecomposition<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX);
+        C128() {
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class Primitive extends LUDecomposition<Double> {
+    static final class H256 extends LUDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
+            super(GenericStore.H256);
+        }
+
+    }
+
+    static final class Q128 extends LUDecomposition<RationalNumber> {
+
+        Q128() {
+            super(GenericStore.Q128);
+        }
+
+    }
+
+    static final class R064 extends LUDecomposition<Double> {
+
+        R064() {
             super(Primitive64Store.FACTORY);
         }
 
     }
 
-    static final class Quat extends LUDecomposition<Quaternion> {
+    static final class R128 extends LUDecomposition<Quadruple> {
 
-        Quat() {
-            super(GenericStore.QUATERNION);
-        }
-
-    }
-
-    static final class Rational extends LUDecomposition<RationalNumber> {
-
-        Rational() {
-            super(GenericStore.RATIONAL);
+        R128() {
+            super(GenericStore.R128);
         }
 
     }

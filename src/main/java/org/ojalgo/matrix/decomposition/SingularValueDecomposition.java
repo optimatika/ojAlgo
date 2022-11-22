@@ -37,6 +37,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -48,50 +49,62 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class SingularValueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
-    static final class Complex extends SingularValueDecomposition<ComplexNumber> {
+    static final class C128 extends SingularValueDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             this(false);
         }
 
-        Complex(final boolean fullSize) {
-            super(GenericStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
+        C128(final boolean fullSize) {
+            super(GenericStore.C128, new BidiagonalDecomposition.C128(fullSize), fullSize);
         }
 
     }
 
-    static final class Primitive extends SingularValueDecomposition<Double> {
+    static final class H256 extends SingularValueDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
             this(false);
         }
 
-        Primitive(final boolean fullSize) {
-            super(Primitive64Store.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
+        H256(final boolean fullSize) {
+            super(GenericStore.H256, new BidiagonalDecomposition.H256(fullSize), fullSize);
         }
 
     }
 
-    static final class Quat extends SingularValueDecomposition<Quaternion> {
+    static final class Q128 extends SingularValueDecomposition<RationalNumber> {
 
-        Quat() {
+        Q128() {
             this(false);
         }
 
-        Quat(final boolean fullSize) {
-            super(GenericStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
+        Q128(final boolean fullSize) {
+            super(GenericStore.Q128, new BidiagonalDecomposition.Q128(fullSize), fullSize);
         }
 
     }
 
-    static final class Rational extends SingularValueDecomposition<RationalNumber> {
+    static final class R064 extends SingularValueDecomposition<Double> {
 
-        Rational() {
+        R064() {
             this(false);
         }
 
-        Rational(final boolean fullSize) {
-            super(GenericStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
+        R064(final boolean fullSize) {
+            super(Primitive64Store.FACTORY, new BidiagonalDecomposition.R064(fullSize), fullSize);
+        }
+
+    }
+
+    static final class R128 extends SingularValueDecomposition<Quadruple> {
+
+        R128() {
+            this(false);
+        }
+
+        R128(final boolean fullSize) {
+            super(GenericStore.R128, new BidiagonalDecomposition.R128(fullSize), fullSize);
         }
 
     }

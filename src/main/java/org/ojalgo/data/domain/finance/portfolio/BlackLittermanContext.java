@@ -21,7 +21,7 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 
 final class BlackLittermanContext implements FinancePortfolio.Context {
 
@@ -39,22 +39,22 @@ final class BlackLittermanContext implements FinancePortfolio.Context {
         return 0;
     }
 
-    public Primitive64Matrix getAssetReturns() {
+    public MatrixR064 getAssetReturns() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Primitive64Matrix getAssetVolatilities() {
+    public MatrixR064 getAssetVolatilities() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Primitive64Matrix getCorrelations() {
+    public MatrixR064 getCorrelations() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Primitive64Matrix getCovariances() {
+    public MatrixR064 getCovariances() {
         // TODO Auto-generated method stub
         return null;
     }

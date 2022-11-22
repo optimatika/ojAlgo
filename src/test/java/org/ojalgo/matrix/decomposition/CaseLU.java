@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.P20061119Case;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
@@ -47,21 +47,21 @@ public class CaseLU extends MatrixDecompositionTests {
     @Test
     public void testP20061119Case() {
 
-        final RationalMatrix tmpProblematic = P20061119Case.getProblematic();
+        MatrixR064 tmpProblematic = P20061119Case.getProblematic();
 
-        final LU<RationalNumber> tmpBig = LU.RATIONAL.make();
-        tmpBig.decompose(GenericStore.RATIONAL.copy(tmpProblematic));
+        LU<RationalNumber> tmpBig = LU.RATIONAL.make();
+        tmpBig.decompose(GenericStore.Q128.copy(tmpProblematic));
 
-        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(GenericStore.COMPLEX.copy(tmpProblematic));
+        LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
+        tmpComplex.decompose(GenericStore.C128.copy(tmpProblematic));
 
-        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
+        LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
-        final LU<Double> tmpJama = new RawLU();
+        LU<Double> tmpJama = new RawLU();
         tmpJama.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
-        final NumberContext tmpPrintContext = NumberContext.ofScale(20);
+        NumberContext tmpPrintContext = NumberContext.ofScale(20);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debugMatrix("Big L", tmpBig.getL(), tmpPrintContext);
@@ -77,7 +77,7 @@ public class CaseLU extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Jama U", tmpJama.getU(), tmpPrintContext);
         }
 
-        final SingularValue<Double> tmpSVD = new RawSingularValue();
+        SingularValue<Double> tmpSVD = new RawSingularValue();
         tmpSVD.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());

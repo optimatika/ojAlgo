@@ -38,11 +38,9 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with 32-bit primitive float elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixR032} instead.
  */
+@Deprecated
 public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
 
     public static final class DenseReceiver extends Mutator2D<Double, Primitive32Matrix, PhysicalStore<Double>> {

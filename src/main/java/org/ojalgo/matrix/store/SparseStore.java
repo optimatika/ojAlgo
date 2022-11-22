@@ -66,7 +66,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public static final SparseStore.Factory<RationalNumber> RATIONAL = SparseStore::makeRational;
 
     public static SparseStore<ComplexNumber> makeComplex(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.COMPLEX, rowsCount, columnsCount);
+        return SparseStore.makeSparse(GenericStore.C128, rowsCount, columnsCount);
     }
 
     public static SparseStore<Double> makePrimitive(final long rowsCount, final long columnsCount) {
@@ -78,11 +78,11 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public static SparseStore<Quaternion> makeQuaternion(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.QUATERNION, rowsCount, columnsCount);
+        return SparseStore.makeSparse(GenericStore.H256, rowsCount, columnsCount);
     }
 
     public static SparseStore<RationalNumber> makeRational(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.RATIONAL, rowsCount, columnsCount);
+        return SparseStore.makeSparse(GenericStore.Q128, rowsCount, columnsCount);
     }
 
     private static <N extends Scalar<N>> void doGenericColumnAXPY(final SparseArray<N> elements, final long colX, final long colY, final N a,

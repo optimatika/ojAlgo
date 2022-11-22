@@ -138,7 +138,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
 
     @Override
     protected Eigenvalue<Double> makePrimitive() {
-        return new HermitianEvD.Primitive();
+        return new HermitianEvD.R064();
     }
 
     @Override
@@ -147,7 +147,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
     }
 
     protected Eigenvalue<Double> makeSimultaneousPrimitive() {
-        return new HermitianEvD.Primitive();
+        return new HermitianEvD.R064();
     }
 
 }

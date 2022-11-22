@@ -301,11 +301,6 @@ public final class ComplexNumber
         return new ComplexNumber(myRealValue + arg, i);
     }
 
-    @Override
-    public ComplexNumber add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
     /**
      * First compares the real values. Only if they are equal will compare the imaginary part.
      */
@@ -382,11 +377,6 @@ public final class ComplexNumber
     @Override
     public ComplexNumber divide(final double arg) {
         return new ComplexNumber(myRealValue / arg, i / arg);
-    }
-
-    @Override
-    public ComplexNumber divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -562,11 +552,6 @@ public final class ComplexNumber
         return new ComplexNumber(myRealValue * arg, i * arg);
     }
 
-    @Override
-    public ComplexNumber multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
     /**
      * Performs the unary operation '-'.
      *
@@ -635,11 +620,6 @@ public final class ComplexNumber
     @Override
     public ComplexNumber subtract(final double arg) {
         return new ComplexNumber(myRealValue - arg, i);
-    }
-
-    @Override
-    public ComplexNumber subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.netio.BasicLogger;
@@ -132,21 +132,21 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20071210() {
 
-        Primitive64Matrix A, Bu, K, sx, currentState;
+        MatrixR064 A, Bu, K, sx, currentState;
 
         final double[][] a = { { 1, 2 }, { 3, 4 } };
-        A = Primitive64Matrix.FACTORY.rows(a);
+        A = MatrixR064.FACTORY.rows(a);
         final double[][] bu = { { 1, 0 }, { 0, 1 } };
-        Bu = Primitive64Matrix.FACTORY.rows(bu);
-        Primitive64Matrix.FACTORY.makeEye(2, 2);
-        K = Primitive64Matrix.FACTORY.makeEye(2, 2);
+        Bu = MatrixR064.FACTORY.rows(bu);
+        MatrixR064.FACTORY.makeEye(2, 2);
+        K = MatrixR064.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final Primitive64Matrix eye = Primitive64Matrix.FACTORY.makeEye(A);
-        final Primitive64Matrix Aprime = A.subtract(Bu.multiply(K));
-        Primitive64Matrix Apow = Primitive64Matrix.FACTORY.copy(Aprime);
-        final Primitive64Matrix tmp = Aprime.subtract(eye);
-        sx = Primitive64Matrix.FACTORY.copy(eye);
+        final MatrixR064 eye = MatrixR064.FACTORY.makeEye(A);
+        final MatrixR064 Aprime = A.subtract(Bu.multiply(K));
+        MatrixR064 Apow = MatrixR064.FACTORY.copy(Aprime);
+        final MatrixR064 tmp = Aprime.subtract(eye);
+        sx = MatrixR064.FACTORY.copy(eye);
         sx = sx.below(tmp);
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
@@ -154,7 +154,7 @@ public class StoreProblems extends MatrixStoreTests {
             sx = sx.below(tmp.multiply(Apow));
             Apow = Apow.multiply(Apow);
         }
-        currentState = Primitive64Matrix.FACTORY.make(A.countRows(), 1);
+        currentState = MatrixR064.FACTORY.make(A.countRows(), 1);
         currentState = currentState.add(1.0);
         sx.multiply(currentState);
     }

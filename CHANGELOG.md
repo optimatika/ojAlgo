@@ -13,9 +13,25 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Added
 
+#### org.ojalgo.array
+
+- Implementations to support the new `Quadruple` element type.
+
+#### org.ojalgo.function
+
+- Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implemenations. Proper `Quadruple` implementations can be done later.
+
+#### org.ojalgo.matrix
+
+- All sorts of additions – many many – to fully support the new `Quadruple` element type.
+
 #### org.ojalgo.optimisation
 
-- New alternatives for the various solver builders to simplify building small test case models - just cleaner api.
+- New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
+
+#### org.ojalgo.scalar
+
+- New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s
 
 ## [52.0.1] – 2022-10-20
 

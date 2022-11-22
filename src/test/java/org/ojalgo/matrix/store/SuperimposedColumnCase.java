@@ -38,8 +38,8 @@ public class SuperimposedColumnCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> tmpColumn = NonPhysicalTest.makeRandomMatrix(tmpRowDim, 1);
         int tmpIndex = Uniform.randomInteger(tmpColDim);
 
-        rationalStore = new SuperimposedStore<>(GenericStore.RATIONAL.copy(tmpBase), 0, tmpIndex, GenericStore.RATIONAL.copy(tmpColumn));
-        complexStore = new SuperimposedStore<>(GenericStore.COMPLEX.copy(tmpBase), 0, tmpIndex, GenericStore.COMPLEX.copy(tmpColumn));
+        rationalStore = new SuperimposedStore<>(GenericStore.Q128.copy(tmpBase), 0, tmpIndex, GenericStore.Q128.copy(tmpColumn));
+        complexStore = new SuperimposedStore<>(GenericStore.C128.copy(tmpBase), 0, tmpIndex, GenericStore.C128.copy(tmpColumn));
         primitiveStore = new SuperimposedStore<>(Primitive64Store.FACTORY.copy(tmpBase), 0, tmpIndex, Primitive64Store.FACTORY.copy(tmpColumn));
 
         numberOfRows = tmpRowDim;

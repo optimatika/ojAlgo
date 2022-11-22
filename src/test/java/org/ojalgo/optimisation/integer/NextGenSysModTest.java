@@ -31,7 +31,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -1209,16 +1209,16 @@ public class NextGenSysModTest {
             return myCovarianceMtrx.length;
         }
 
-        public Primitive64Matrix toCleanedCovariances() {
+        public MatrixR064 toCleanedCovariances() {
             return NextGenSysModTest.toCovariances(this.toVolatilities(), this.toCorrelations());
         }
 
-        public Primitive64Matrix toCorrelations() {
-            return NextGenSysModTest.toCorrelations(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
+        public MatrixR064 toCorrelations() {
+            return NextGenSysModTest.toCorrelations(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
         }
 
-        public Primitive64Matrix toVolatilities() {
-            return NextGenSysModTest.toVolatilities(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
+        public MatrixR064 toVolatilities() {
+            return NextGenSysModTest.toVolatilities(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
         }
 
     }
@@ -1247,7 +1247,7 @@ public class NextGenSysModTest {
 
     public static ExpressionsBasedModel buildModel(final CaseData data) {
 
-        Primitive64Matrix covar = data.toCleanedCovariances();
+        MatrixR064 covar = data.toCleanedCovariances();
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1302,7 +1302,7 @@ public class NextGenSysModTest {
 
     public static Optimisation.Result solveSequentially(final CaseData data) {
 
-        Primitive64Matrix covar = data.toCleanedCovariances();
+        MatrixR064 covar = data.toCleanedCovariances();
 
         int numberOfAssets = data.numberOfAssets();
 
@@ -1384,7 +1384,7 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
+    static MatrixR064 toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
@@ -1410,7 +1410,7 @@ public class NextGenSysModTest {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size, size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -1453,11 +1453,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
+    static MatrixR064 toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
         int tmpSize = (int) volatilities.count();
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);
@@ -1481,11 +1481,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+    static MatrixR064 toVolatilities(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size);
 
         if (clean) {
 

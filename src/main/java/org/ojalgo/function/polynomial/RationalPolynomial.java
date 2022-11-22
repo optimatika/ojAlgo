@@ -38,7 +38,7 @@ public final class RationalPolynomial extends AbstractPolynomial<RationalNumber>
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-        this.estimate(x, y, GenericStore.RATIONAL, QR.RATIONAL);
+        this.estimate(x, y, GenericStore.Q128, QR.RATIONAL);
     }
 
     public RationalNumber integrate(final RationalNumber fromPoint, final RationalNumber toPoint) {

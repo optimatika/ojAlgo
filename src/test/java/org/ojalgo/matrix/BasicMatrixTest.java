@@ -21,29 +21,17 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.constant.QuaternionMath;
-import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
-import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
-import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D.ColumnView;
 import org.ojalgo.structure.Access2D.RowView;
@@ -52,51 +40,33 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
+@SuppressWarnings("rawtypes")
 public abstract class BasicMatrixTest extends MatrixTests {
 
     protected static final NumberContext ACCURACY = NumberContext.of(6, 4);
 
-    public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
-        RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
+    public static MatrixR064 getIdentity(final long rows, final long columns, final NumberContext context) {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
         return tmpMtrx.enforce(context);
     }
 
-    public static RationalMatrix getSafe(final long rows, final long columns, final NumberContext context) {
-        RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
+    public static MatrixR064 getSafe(final long rows, final long columns, final NumberContext context) {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
 
-    ComplexMatrix cAA;
-    ComplexMatrix cAB;
-    ComplexMatrix cAX;
-    ComplexMatrix cI;
-    ComplexMatrix cSafe;
+    static MatrixFactory<?, ?, ?, ?>[] factories() {
+        return new MatrixFactory<?, ?, ?, ?>[] { MatrixR064.FACTORY, MatrixR032.FACTORY, MatrixR128.FACTORY, MatrixQ128.FACTORY,
+                MatrixC128.FACTORY, MatrixH256.FACTORY };
+    }
 
-    Primitive32Matrix p32AA;
-    Primitive32Matrix p32AB;
-    Primitive32Matrix p32AX;
-    Primitive32Matrix p32I;
-    Primitive32Matrix p32Safe;
+    MatrixR064 mtrxA;
+    MatrixR064 mtrxB;
+    MatrixR064 mtrxI;
+    MatrixR064 mtrxSafe;
+    MatrixR064 mtrxX;
 
-    Primitive64Matrix p64AA;
-    Primitive64Matrix p64AB;
-    Primitive64Matrix p64AX;
-    Primitive64Matrix p64I;
-    Primitive64Matrix p64Safe;
-
-    QuaternionMatrix qAA;
-    QuaternionMatrix qAB;
-    QuaternionMatrix qAX;
-    QuaternionMatrix qI;
-    QuaternionMatrix qSafe;
-
-    RationalMatrix rAA;
-    RationalMatrix rAB;
-    RationalMatrix rAX;
-    RationalMatrix rI;
-    RationalMatrix rSafe;
-
-    BigDecimal scalar;
+    double scalar;
 
     @AfterEach
     public void doAfterEach() {
@@ -108,63 +78,33 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         TestUtils.minimiseAllBranchLimits();
 
-        p32AA = Primitive32Matrix.FACTORY.copy(rAA);
-        p32AX = Primitive32Matrix.FACTORY.copy(rAX);
-        p32AB = Primitive32Matrix.FACTORY.copy(rAB);
-        p32I = Primitive32Matrix.FACTORY.copy(rI);
-        p32Safe = Primitive32Matrix.FACTORY.copy(rSafe);
-
-        p64AA = Primitive64Matrix.FACTORY.copy(rAA);
-        p64AX = Primitive64Matrix.FACTORY.copy(rAX);
-        p64AB = Primitive64Matrix.FACTORY.copy(rAB);
-        p64I = Primitive64Matrix.FACTORY.copy(rI);
-        p64Safe = Primitive64Matrix.FACTORY.copy(rSafe);
-
-        cAA = ComplexMatrix.FACTORY.copy(rAA);
-        cAX = ComplexMatrix.FACTORY.copy(rAX);
-        cAB = ComplexMatrix.FACTORY.copy(rAB);
-        cI = ComplexMatrix.FACTORY.copy(rI);
-        cSafe = ComplexMatrix.FACTORY.copy(rSafe);
-
-        qAA = QuaternionMatrix.FACTORY.copy(rAA);
-        qAX = QuaternionMatrix.FACTORY.copy(rAX);
-        qAB = QuaternionMatrix.FACTORY.copy(rAB);
-        qI = QuaternionMatrix.FACTORY.copy(rI);
-        qSafe = QuaternionMatrix.FACTORY.copy(rSafe);
-
-        scalar = new BigDecimal(Math.random());
+        scalar = Math.random();
     }
 
     /**
-     * @see BasicMatrix.PhysicalReceiver#add(long, long, Comparable)
+     * @see org.ojalgo.matrix.Mutator2D#add(long, long, Comparable)
      */
     @Test
     public void testAddElement() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        long row = Uniform.randomInteger(mtrxA.countRows());
+        long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        long row = Uniform.randomInteger(rAA.countRows());
-        long col = Uniform.randomInteger(rAA.countColumns());
+        Mutator2D mutator = mtrxA.copy();
+        mutator.add(row, col, scalar);
+        BasicMatrix expected = mutator.get();
 
-        RationalMatrix.DenseReceiver rBuilder = rAA.copy();
-        rBuilder.add(row, col, scalar);
-        expected = rBuilder.get();
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
-        cBuilder.add(row, col, scalar);
-        actual = cBuilder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
-        p64Builder.add(row, col, scalar);
-        actual = p64Builder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            mutator = tmpA.copy();
+            mutator.add(row, col, scalar);
+            actual = mutator.get();
 
-        Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
-        p32Builder.add(row, col, scalar);
-        actual = p32Builder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -173,40 +113,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testAddMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.add(mtrxSafe);
 
-        expected = rAA.add(rSafe);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.add(cSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        actual = p64AA.add(p64Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.add(tmpSafe);
 
-        actual = p32AA.add(p32Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#add(Comparable)
+     * @see org.ojalgo.matrix.BasicMatrix#add(double)
      */
     @Test
     public void testAddScalar() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.add(scalar);
 
-        expected = rAA.add(RationalNumber.valueOf(scalar));
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.add(ComplexNumber.valueOf(scalar));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.add(scalar.doubleValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.add(scalar);
 
-        actual = p32AA.add(scalar.floatValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -215,35 +152,33 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testConjugate() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.conjugate();
 
-        expected = rAA.conjugate();
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.conjugate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.conjugate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.conjugate();
 
-        actual = p32AA.conjugate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#count()
+     */
     @Test
     public void testCount() {
 
-        long expected = rAA.count();
+        long expected = mtrxA.count();
+
         long actual;
-
-        actual = cAA.count();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.count();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.count();
-        TestUtils.assertEquals(expected, actual);
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            actual = tmpA.count();
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -252,17 +187,14 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testCountColumns() {
 
-        long expected = rAA.countColumns();
+        long expected = mtrxA.countColumns();
+
         long actual;
-
-        actual = cAA.countColumns();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.countColumns();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.countColumns();
-        TestUtils.assertEquals(expected, actual);
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            actual = tmpA.countColumns();
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -271,43 +203,35 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testCountRows() {
 
-        long expected = rAA.countRows();
+        long expected = mtrxA.countRows();
+
         long actual;
-
-        actual = cAA.countRows();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.countRows();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.countRows();
-        TestUtils.assertEquals(expected, actual);
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            actual = tmpA.countRows();
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     @Test
     public void testDivideElementsBasicMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        Mutator2D mutator = mtrxA.copy();
+        mutator.modifyMatching(PrimitiveMath.DIVIDE, mtrxSafe);
+        BasicMatrix expected = mutator.get();
 
-        RationalMatrix.DenseReceiver copyRational = rAA.copy();
-        copyRational.modifyMatching(RationalMath.DIVIDE, rSafe);
-        expected = copyRational.get();
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        Primitive64Matrix.DenseReceiver copyPrimitive = p64AA.copy();
-        copyPrimitive.modifyMatching(PrimitiveMath.DIVIDE, p64Safe);
-        actual = copyPrimitive.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        ComplexMatrix.DenseReceiver copyComplex = cAA.copy();
-        copyComplex.modifyMatching(ComplexMath.DIVIDE, cSafe);
-        actual = copyComplex.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            mutator = tmpA.copy();
+            mutator.modifyMatching(factory.function().divide(), tmpSafe);
+            actual = mutator.get();
 
-        QuaternionMatrix.DenseReceiver copyQuaternion = qAA.copy();
-        copyQuaternion.modifyMatching(QuaternionMath.DIVIDE, qSafe);
-        actual = copyQuaternion.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -316,41 +240,35 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDivideScalar() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.divide(scalar);
 
-        expected = rAA.divide(RationalNumber.valueOf(scalar));
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.divide(ComplexNumber.valueOf(scalar));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.divide(scalar.doubleValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.divide(scalar);
 
-        actual = p32AA.divide(scalar.floatValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testDotAccess1D() {
 
+        int col = Uniform.randomInteger(mtrxA.getColDim());
+
+        double expected = mtrxA.column(col).dot(mtrxSafe.column(col));
+
         double actual;
-        double expected = 0.0;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        int col = Uniform.randomInteger(rAA.getColDim());
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        for (int i = 0; i < rAA.getRowDim(); i++) {
-            expected += rAA.doubleValue(i, col) * rSafe.doubleValue(i, col);
+            actual = tmpA.column(col).dot(tmpSafe.column(col));
+            TestUtils.assertEquals(expected, actual, ACCURACY);
         }
-
-        actual = rAA.column(col).dot(rSafe.column(col));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = cAA.column(col).dot(cSafe.column(col));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = p64AA.column(col).dot(p64Safe.column(col));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
     /**
@@ -359,42 +277,41 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDoubleValueIntInt() {
 
-        Comparable<?> actual;
-        Comparable<?> expected;
+        long row = Uniform.randomInteger(mtrxA.countRows());
+        long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
-        int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
+        double expected = mtrxA.doubleValue(row, col);
 
-        expected = rAA.doubleValue(tmpRow, tmpCol);
+        double actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.doubleValue(row, col);
 
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testGetColumnsIntArray() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
-
-        int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countColumns()))];
-
-        for (int i = 0; i < tmpArr.length; i++) {
-            tmpArr[i] = (int) Uniform.randomInteger(rAA.countColumns());
+        int[] cols = new int[1 + Uniform.randomInteger(mtrxA.getColDim())];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = Uniform.randomInteger(mtrxA.getColDim());
         }
 
-        expected = rAA.columns(tmpArr);
+        BasicMatrix expected = mtrxA.columns(cols);
 
-        actual = cAA.columns(tmpArr);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = p64AA.columns(tmpArr);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
+            actual = tmpA.columns(cols);
+
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -403,18 +320,22 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetCondition() {
 
-        if (rAA.getRank() == rAA.getMinDim()) {
+        if (mtrxA.getRank() == mtrxA.getMinDim()) {
 
             // Difficult to test numerically
             // Will only check that they are the same order of magnitude
 
-            long expected = Math.round(PrimitiveMath.LOG10.invoke(rAA.getCondition()));
+            long expected = Math.round(Math.log10(mtrxA.getCondition()));
 
-            long actual = Math.round(PrimitiveMath.LOG10.invoke(p64AA.getCondition()));
-            TestUtils.assertEquals(expected, actual);
+            long actual;
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            actual = Math.round(PrimitiveMath.LOG10.invoke(cAA.getCondition()));
-            TestUtils.assertEquals(expected, actual);
+                BasicMatrix tmpA = factory.copy(mtrxA);
+
+                actual = Math.round(Math.log10(tmpA.getCondition()));
+
+                TestUtils.assertEquals(expected, actual);
+            }
         }
     }
 
@@ -424,42 +345,39 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetDeterminant() {
 
-        if (rAA.isSquare()) {
+        if (mtrxA.isSquare()) {
+
+            Comparable<?> expected = mtrxA.getDeterminant();
 
             Comparable<?> actual;
-            Comparable<?> expected;
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            expected = rAA.getDeterminant();
+                BasicMatrix tmpA = factory.copy(mtrxA);
 
-            actual = cAA.getDeterminant();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                actual = tmpA.getDeterminant();
 
-            actual = p64AA.getDeterminant();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                TestUtils.assertEquals(expected, actual, ACCURACY);
+            }
         }
     }
 
     @Test
     public void testGetEigenvalues() {
 
-        if (rAA.isSquare() && rAA.isHermitian()) {
+        if (mtrxA.isSquare() && mtrxA.isHermitian()) {
 
-            List<Eigenpair> expected = rAA.getEigenpairs();
+            List<Eigenpair> expected = mtrxA.getEigenpairs();
+
             List<Eigenpair> actual;
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            actual = cAA.getEigenpairs();
-            for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, ACCURACY);
-            }
+                BasicMatrix tmpA = factory.copy(mtrxA);
 
-            actual = p64AA.getEigenpairs();
-            for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, ACCURACY);
-            }
+                actual = tmpA.getEigenpairs();
 
-            actual = p32AA.getEigenpairs();
-            for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, ACCURACY);
+                for (int i = 0; i < expected.size(); i++) {
+                    TestUtils.assertEquals(expected.get(i).value, actual.get(i).value, ACCURACY);
+                }
             }
         }
     }
@@ -467,34 +385,33 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetInfinityNorm() {
 
+        double expected = BasicMatrix.calculateInfinityNorm(mtrxA);
+
         double actual;
-        double expected;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        expected = BasicMatrix.calculateInfinityNorm(rAA);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = BasicMatrix.calculateInfinityNorm(cAA);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = BasicMatrix.calculateInfinityNorm(tmpA);
 
-        actual = BasicMatrix.calculateInfinityNorm(p64AA);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testGetOneNorm() {
 
+        double expected = BasicMatrix.calculateOneNorm(mtrxA);
+
         double actual;
-        double expected;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        expected = BasicMatrix.calculateOneNorm(rAA);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = BasicMatrix.calculateOneNorm(cAA);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = BasicMatrix.calculateOneNorm(tmpA);
 
-        actual = BasicMatrix.calculateOneNorm(p64AA);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = BasicMatrix.calculateOneNorm(p32AA);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -503,63 +420,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetRank() {
 
-        int expected = rAA.getRank();
+        int expected = mtrxA.getRank();
+
         int actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.getRank();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.getRank();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.getRank();
 
-        actual = p32AA.getRank();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     @Test
     public void testGetRowsIntArray() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
-
-        int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rAA.countRows()))];
-
-        for (int i = 0; i < tmpArr.length; i++) {
-            tmpArr[i] = (int) Uniform.randomInteger(rAA.countRows());
+        int[] rows = new int[1 + Uniform.randomInteger(mtrxA.getRowDim())];
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = Uniform.randomInteger(mtrxA.getRowDim());
         }
 
-        expected = rAA.rows(tmpArr);
+        BasicMatrix expected = mtrxA.rows(rows);
 
-        actual = cAA.rows(tmpArr);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = p64AA.rows(tmpArr);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-    }
+            actual = tmpA.rows(rows);
 
-    @Test
-    public void testGetSingularValues() {
-
-        SingularValue<RationalNumber> rationalSVD = SingularValue.RATIONAL.make(rAA);
-        rationalSVD.compute(rAA);
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rAA), rationalSVD, ACCURACY);
-        Array1D<Double> expected = rationalSVD.getSingularValues();
-
-        SingularValue<ComplexNumber> complexSVD = SingularValue.COMPLEX.make(cAA);
-        complexSVD.compute(cAA);
-        TestUtils.assertEquals(GenericStore.COMPLEX.copy(cAA), complexSVD, ACCURACY);
-        TestUtils.assertEquals(expected, complexSVD.getSingularValues(), ACCURACY);
-
-        SingularValue<Quaternion> quaternionSVD = SingularValue.QUATERNION.make(qAA);
-        quaternionSVD.compute(qAA);
-        TestUtils.assertEquals(GenericStore.QUATERNION.copy(qAA), quaternionSVD, ACCURACY);
-        TestUtils.assertEquals(expected, quaternionSVD.getSingularValues(), ACCURACY);
-
-        for (SingularValue<Double> primitiveSVD : MatrixDecompositionTests.getPrimitiveSingularValue()) {
-            primitiveSVD.compute(p64AA);
-            TestUtils.assertEquals(Primitive64Store.FACTORY.copy(p64AA), primitiveSVD, ACCURACY);
-            TestUtils.assertEquals(expected, primitiveSVD.getSingularValues(), ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
         }
     }
 
@@ -569,34 +460,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetTrace() {
 
+        Comparable<?> expected = mtrxA.getTrace();
+
         Comparable<?> actual;
-        Comparable<?> expected;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        expected = rAA.getTrace();
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = cAA.getTrace();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.getTrace();
 
-        actual = p64AA.getTrace();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-    }
-
-    @Test
-    public void testLogicalBuilder() {
-
-        BasicMatrix<?, ?> actual;
-        RationalMatrix expected;
-
-        expected = rAA.below(rSafe).repeat(1, 2).onAll(RationalMath.SIN).diagonal();
-
-        actual = rAA.below(rSafe).repeat(1, 2).diagonal().onAll(RationalMath.SIN);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = p64AA.below(p64Safe).repeat(1, 2).diagonal().onAll(PrimitiveMath.SIN);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = p64AA.onAll(PrimitiveMath.SIN).below(p64Safe.onAll(PrimitiveMath.SIN)).repeat(1, 2).diagonal();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -605,19 +479,19 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testInvert() {
 
-        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
+        if (mtrxA.isSquare() && mtrxA.getRank() >= mtrxA.getColDim()) {
 
-            BasicMatrix<?, ?> expected = rAA.invert();
-            BasicMatrix<?, ?> actual;
+            BasicMatrix expected = mtrxA.invert();
 
-            actual = cAA.invert();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix actual;
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            actual = p64AA.invert();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                BasicMatrix tmpA = factory.copy(mtrxA);
 
-            actual = p32AA.invert();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                actual = tmpA.invert();
+
+                TestUtils.assertEquals(expected, actual, ACCURACY);
+            }
         }
     }
 
@@ -627,17 +501,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsEmpty() {
 
-        boolean expected = rAA.isEmpty();
+        boolean expected = mtrxA.isEmpty();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isEmpty();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isEmpty();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isEmpty();
 
-        actual = p32AA.isEmpty();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -646,36 +520,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsFat() {
 
-        boolean expected = rAA.isFat();
+        boolean expected = mtrxA.isFat();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isFat();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isFat();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isFat();
 
-        actual = p32AA.isFat();
-        TestUtils.assertEquals(expected, actual);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#isFullRank()
-     */
-    @Test
-    public void testIsFullRank() {
-
-        boolean expected = rAA.getRank() == rAA.getMinDim();
-        boolean actual;
-
-        actual = cAA.getRank() == cAA.getMinDim();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.getRank() == p64AA.getMinDim();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.getRank() == p32AA.getMinDim();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -684,17 +539,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsHermitian() {
 
-        boolean expected = rAA.isHermitian();
+        boolean expected = mtrxA.isHermitian();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isHermitian();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isHermitian();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isHermitian();
 
-        actual = p32AA.isHermitian();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -703,17 +558,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsSquare() {
 
-        boolean expected = rAA.isSquare();
+        boolean expected = mtrxA.isSquare();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isSquare();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isSquare();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isSquare();
 
-        actual = p32AA.isSquare();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -722,17 +577,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsSymmetric() {
 
-        boolean expected = rAA.isSymmetric();
+        boolean expected = mtrxA.isSymmetric();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isSymmetric();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isSymmetric();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isSymmetric();
 
-        actual = p32AA.isSymmetric();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -741,17 +596,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsTall() {
 
-        boolean expected = rAA.isTall();
+        boolean expected = mtrxA.isTall();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isTall();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isTall();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isTall();
 
-        actual = p32AA.isTall();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -760,79 +615,93 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsVector() {
 
-        boolean expected = rAA.isVector();
+        boolean expected = mtrxA.isVector();
+
         boolean actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.isVector();
-        TestUtils.assertEquals(expected, actual);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.isVector();
-        TestUtils.assertEquals(expected, actual);
+            actual = tmpA.isVector();
 
-        actual = p32AA.isVector();
-        TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void testLogicalBuilder() {
+
+        BasicMatrix expected = mtrxA.below(mtrxSafe).repeat(1, 2).onAll(PrimitiveMath.SIN).diagonal();
+
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
+
+            UnaryFunction sin = factory.function().sin();
+
+            actual = tmpA.below(tmpSafe).repeat(1, 2).diagonal().onAll(sin);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+
+            actual = tmpA.onAll(sin).below(tmpSafe.onAll(sin)).repeat(1, 2).diagonal();
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testMergeColumnsBasicMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.below(mtrxSafe);
 
-        expected = rAA.below(rSafe);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = p64AA.below(p64Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        actual = cAA.below(cSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.below(tmpSafe);
 
-        actual = qAA.below(qSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testMergeRowsBasicMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.right(mtrxSafe);
 
-        expected = rAA.right(rSafe);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = p64AA.right(p64Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        actual = cAA.right(cSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.right(tmpSafe);
 
-        actual = qAA.right(qSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testMultiplyElementsBasicMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        Mutator2D mutator = mtrxA.copy();
+        mutator.modifyMatching(PrimitiveMath.MULTIPLY, mtrxSafe);
+        BasicMatrix expected = mutator.get();
 
-        RationalMatrix.DenseReceiver copyRational = rAA.copy();
-        copyRational.modifyMatching(RationalMath.MULTIPLY, rSafe);
-        expected = copyRational.get();
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        Primitive64Matrix.DenseReceiver copyPrimitive = p64AA.copy();
-        copyPrimitive.modifyMatching(PrimitiveMath.MULTIPLY, p64Safe);
-        actual = copyPrimitive.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        ComplexMatrix.DenseReceiver copyComplex = cAA.copy();
-        copyComplex.modifyMatching(ComplexMath.MULTIPLY, cSafe);
-        actual = copyComplex.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            mutator = tmpA.copy();
+            mutator.modifyMatching(factory.function().multiply(), tmpSafe);
+            actual = mutator.get();
 
-        QuaternionMatrix.DenseReceiver copyQuaternion = qAA.copy();
-        copyQuaternion.modifyMatching(QuaternionMath.MULTIPLY, qSafe);
-        actual = copyQuaternion.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -841,19 +710,18 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.multiply(mtrxX);
 
-        expected = rAA.multiply(rAX);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.multiply(cAX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpX = factory.copy(mtrxX);
 
-        actual = p64AA.multiply(p64AX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.multiply(tmpX);
 
-        actual = p32AA.multiply(p32AX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -862,19 +730,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyScalar() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.multiply(scalar);
 
-        expected = rAA.multiply(RationalNumber.valueOf(scalar));
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.multiply(ComplexNumber.valueOf(scalar));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.multiply(scalar.doubleValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.multiply(scalar);
 
-        actual = p32AA.multiply(scalar.floatValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -883,17 +749,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testNegate() {
 
-        BasicMatrix<?, ?> expected = rAA.negate();
-        BasicMatrix<?, ?> actual;
+        BasicMatrix expected = mtrxA.negate();
 
-        actual = cAA.negate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = p64AA.negate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p32AA.negate();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.negate();
+
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -902,25 +768,25 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testNorm() {
 
-        double expected = rAA.norm();
+        double expected = mtrxA.norm();
+
         double actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.norm();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.norm();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.norm();
 
-        actual = p32AA.norm();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     @Test
     public void testReduceRowsAndColumns() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> intermediate;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix actual;
+        BasicMatrix intermediate;
+        BasicMatrix expected;
 
         for (Aggregator aggregator : Aggregator.values()) {
 
@@ -932,49 +798,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             // rows -> cols
 
-            intermediate = rAA.reduceRows(aggregator);
+            intermediate = mtrxA.reduceRows(aggregator);
             expected = intermediate.reduceColumns(aggregator);
 
-            TestUtils.assertEquals(1, expected.count());
+            TestUtils.assertEquals(1L, expected.count());
 
-            intermediate = p32AA.reduceRows(aggregator);
-            actual = intermediate.reduceColumns(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            intermediate = p64AA.reduceRows(aggregator);
-            actual = intermediate.reduceColumns(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                BasicMatrix tmpA = factory.copy(mtrxA);
 
-            intermediate = cAA.reduceRows(aggregator);
-            actual = intermediate.reduceColumns(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                intermediate = tmpA.reduceRows(aggregator);
+                actual = intermediate.reduceColumns(aggregator);
 
-            intermediate = qAA.reduceRows(aggregator);
-            actual = intermediate.reduceColumns(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                TestUtils.assertEquals(name, expected, actual, ACCURACY);
+            }
 
             // cols -> rows
 
-            intermediate = rAA.reduceColumns(aggregator);
+            intermediate = mtrxA.reduceColumns(aggregator);
             expected = intermediate.reduceRows(aggregator);
 
-            TestUtils.assertEquals(1, expected.count());
+            TestUtils.assertEquals(1L, expected.count());
 
-            intermediate = p32AA.reduceColumns(aggregator);
-            actual = intermediate.reduceRows(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            intermediate = p64AA.reduceColumns(aggregator);
-            actual = intermediate.reduceRows(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                BasicMatrix tmpA = factory.copy(mtrxA);
 
-            intermediate = cAA.reduceColumns(aggregator);
-            actual = intermediate.reduceRows(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                intermediate = tmpA.reduceColumns(aggregator);
+                actual = intermediate.reduceRows(aggregator);
 
-            intermediate = qAA.reduceColumns(aggregator);
-            actual = intermediate.reduceRows(aggregator);
-            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+                TestUtils.assertEquals(name, expected, actual, ACCURACY);
+            }
         }
     }
 
@@ -984,28 +838,24 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSetElement() {
 
-        long tmpRow = Uniform.randomInteger(rAA.countRows());
-        long tmpCol = Uniform.randomInteger(rAA.countColumns());
+        long row = Uniform.randomInteger(mtrxA.countRows());
+        long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        RationalMatrix.DenseReceiver rBuilder = rAA.copy();
-        rBuilder.set(tmpRow, tmpCol, scalar);
-        BasicMatrix<?, ?> expected = rBuilder.get();
-        BasicMatrix<?, ?> actual;
+        Mutator2D mutator = mtrxA.copy();
+        mutator.set(row, col, scalar);
+        BasicMatrix expected = mutator.get();
 
-        ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
-        cBuilder.set(tmpRow, tmpCol, scalar);
-        actual = cBuilder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
-        p64Builder.set(tmpRow, tmpCol, scalar);
-        actual = p64Builder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
-        p32Builder.set(tmpRow, tmpCol, scalar);
-        actual = p32Builder.get();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            mutator = tmpA.copy();
+            mutator.set(row, col, scalar);
+            actual = mutator.get();
+
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -1014,19 +864,20 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSolveMatrix() {
 
-        if (rAA.isSquare() && rAA.getRank() >= rAA.countColumns()) {
+        if (mtrxA.isSquare() && mtrxA.getRank() >= mtrxA.countColumns()) {
 
-            BasicMatrix<?, ?> expected = rAA.solve(rAB);
-            BasicMatrix<?, ?> actual;
+            BasicMatrix expected = mtrxA.solve(mtrxB);
 
-            actual = cAA.solve(cAB);
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix actual;
+            for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-            actual = p64AA.solve(p64AB);
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                BasicMatrix tmpA = factory.copy(mtrxA);
+                BasicMatrix tmpB = factory.copy(mtrxB);
 
-            actual = p32AA.solve(p64AB);
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+                actual = tmpA.solve(tmpB);
+
+                TestUtils.assertEquals(expected, actual, ACCURACY);
+            }
         }
     }
 
@@ -1036,19 +887,18 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSubtractMatrix() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.subtract(mtrxSafe);
 
-        expected = rAA.subtract(rSafe);
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.subtract(cSafe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+            BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
-        actual = p64AA.subtract(p64Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.subtract(tmpSafe);
 
-        actual = p32AA.subtract(p32Safe);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -1057,52 +907,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSubtractScalar() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.subtract(scalar);
 
-        expected = rAA.subtract(RationalNumber.valueOf(scalar));
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.subtract(ComplexNumber.valueOf(scalar));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.subtract(scalar.doubleValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.subtract(scalar);
 
-        actual = p32AA.subtract(scalar.floatValue());
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-    }
-
-    @Test
-    public void testToComplexNumberIntInt() {
-
-        Comparable<?> actual;
-        Comparable<?> expected;
-
-        int tmpRow = (int) Uniform.randomInteger(rAA.countRows());
-        int tmpCol = (int) Uniform.randomInteger(rAA.countColumns());
-
-        expected = ComplexNumber.valueOf(rAA.get(tmpRow, tmpCol));
-
-        actual = ComplexNumber.valueOf(cAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = ComplexNumber.valueOf(p64AA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-    }
-
-    @Test
-    public void testToComplexStore() {
-
-        PhysicalStore<ComplexNumber> tmpExpStore = GenericStore.COMPLEX.copy(rAA);
-        PhysicalStore<ComplexNumber> tmpActStore;
-
-        tmpActStore = GenericStore.COMPLEX.copy(cAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
-        tmpActStore = GenericStore.COMPLEX.copy(p64AA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -1111,13 +926,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfColumns() {
 
-        Iterable<ColumnView<RationalNumber>> tmpColumns = rAA.columns();
+        BasicMatrix expected = mtrxA;
 
-        for (ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
-            long j = tmpColumnView.column();
-            for (long i = 0L; i < tmpColumnView.count(); i++) {
-                TestUtils.assertEquals(tmpColumnView.get(i), cAA.get(i, j), ACCURACY);
-                TestUtils.assertEquals(tmpColumnView.get(i), p64AA.get(i, j), ACCURACY);
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+
+            BasicMatrix tmpA = factory.copy(mtrxA);
+
+            Iterable<ColumnView> columns = tmpA.columns();
+
+            for (ColumnView actual : columns) {
+
+                long j = actual.column();
+
+                for (int i = 0; i < actual.size(); i++) {
+                    TestUtils.assertEquals(expected.doubleValue(i, j), actual.doubleValue(i), ACCURACY);
+                }
             }
         }
     }
@@ -1128,43 +951,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfRows() {
 
-        Iterable<RowView<RationalNumber>> tmpRows = rAA.rows();
+        BasicMatrix expected = mtrxA;
 
-        for (RowView<RationalNumber> tmpRowView : tmpRows) {
-            long i = tmpRowView.row();
-            for (long j = 0L; j < tmpRowView.count(); j++) {
-                TestUtils.assertEquals(tmpRowView.get(j), cAA.get(i, j), ACCURACY);
-                TestUtils.assertEquals(tmpRowView.get(j), p64AA.get(i, j), ACCURACY);
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
+
+            BasicMatrix tmpA = factory.copy(mtrxA);
+
+            Iterable<RowView> rows = tmpA.rows();
+
+            for (RowView actual : rows) {
+
+                long i = actual.row();
+
+                for (int j = 0; j < actual.size(); j++) {
+                    TestUtils.assertEquals(expected.doubleValue(i, j), actual.doubleValue(j), ACCURACY);
+                }
             }
         }
-    }
-
-    @Test
-    public void testToPrimitiveStore() {
-
-        PhysicalStore<Double> tmpExpStore = Primitive64Store.FACTORY.copy(rAA);
-        PhysicalStore<Double> tmpActStore;
-
-        tmpActStore = Primitive64Store.FACTORY.copy(cAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
-        tmpActStore = Primitive64Store.FACTORY.copy(p64AA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
-    }
-
-    @Test
-    public void testToRationalStore() {
-
-        PhysicalStore<RationalNumber> tmpExpStore = GenericStore.RATIONAL.copy(rAA);
-        PhysicalStore<RationalNumber> tmpActStore;
-
-        tmpActStore = GenericStore.RATIONAL.copy(cAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
-        tmpActStore = GenericStore.RATIONAL.copy(p64AA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, ACCURACY);
-
     }
 
     /**
@@ -1173,30 +976,19 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRawCopy1D() {
 
-        double[] tmpExpStore = rAA.toRawCopy1D();
-        double[] tmpActStore;
+        double[] expected = mtrxA.toRawCopy1D();
 
-        int tmpFirstIndex = 0;
-        int tmpLastIndex = (int) (rAA.count() - 1);
+        double[] actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        tmpActStore = cAA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], ACCURACY);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], ACCURACY);
-        if (rAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
+
+            actual = tmpA.toRawCopy1D();
+
+            for (int i = 0; i < expected.length; i++) {
+                TestUtils.assertEquals(expected[i], actual[i], ACCURACY);
             }
         }
-
-        tmpActStore = p64AA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], ACCURACY);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], ACCURACY);
-        if (rAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], ACCURACY);
-            }
-        }
-
     }
 
     /**
@@ -1205,20 +997,20 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToScalarIntInt() {
 
-        long tmpRow = Uniform.randomInteger(rAA.countRows());
-        long tmpCol = Uniform.randomInteger(rAA.countColumns());
+        long row = Uniform.randomInteger(mtrxA.countRows());
+        long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        Scalar<?> expected = rAA.toScalar(tmpRow, tmpCol);
+        Scalar<?> expected = mtrxA.toScalar(row, col);
+
         Scalar<?> actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.toScalar(tmpRow, tmpCol);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.toScalar(tmpRow, tmpCol);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.toScalar(row, col);
 
-        actual = p32AA.toScalar(tmpRow, tmpCol);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
     /**
@@ -1227,19 +1019,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testTranspose() {
 
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
+        BasicMatrix expected = mtrxA.transpose();
 
-        expected = rAA.transpose();
+        BasicMatrix actual;
+        for (MatrixFactory factory : BasicMatrixTest.factories()) {
 
-        actual = cAA.transpose();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            BasicMatrix tmpA = factory.copy(mtrxA);
 
-        actual = p64AA.transpose();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            actual = tmpA.transpose();
 
-        actual = p32AA.transpose();
-        TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
 }

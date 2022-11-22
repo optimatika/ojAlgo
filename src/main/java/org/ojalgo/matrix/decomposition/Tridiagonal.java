@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -43,13 +44,39 @@ public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecompositio
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
+    Factory<ComplexNumber> C128 = typical -> new DeferredTridiagonal.C128();
 
-    Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
+    Factory<Double> R064 = typical -> new DeferredTridiagonal.R064();
 
-    Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.Quat();
+    Factory<Quadruple> R128 = typical -> new DeferredTridiagonal.R128();
 
-    Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
+    Factory<Quaternion> H256 = typical -> new DeferredTridiagonal.H256();
+
+    Factory<RationalNumber> Q128 = typical -> new DeferredTridiagonal.Q128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 

@@ -111,11 +111,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    public S add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
     public final S add(final S scalarAddend) {
         return this.wrap(myNumerator + scalarAddend.numerator());
     }
@@ -126,7 +121,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final S conjugate() {
         return (S) this;
     }
@@ -134,11 +128,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     @Override
     public final S divide(final double scalarDivisor) {
         return this.wrap(Math.round(myNumerator / scalarDivisor));
-    }
-
-    @Override
-    public S divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -201,11 +190,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     }
 
     @Override
-    public S multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
     public final S multiply(final S scalarMultiplicand) {
         return this.wrap(myNumerator * scalarMultiplicand.numerator() / this.descriptor().denominator());
     }
@@ -257,11 +241,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDec
     @Override
     public final S subtract(final double scalarSubtrahend) {
         return this.wrap(myNumerator - Math.round(scalarSubtrahend * this.descriptor().denominator()));
-    }
-
-    @Override
-    public S subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override
