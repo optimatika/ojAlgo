@@ -52,7 +52,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     public void testComplex() {
 
         MatrixR064 square = SimpleEquationCase.getBody();
-        GenericStore<ComplexNumber> degenerate = GenericStore.COMPLEX.copy(square.below(square).below(square));
+        GenericStore<ComplexNumber> degenerate = GenericStore.C128.copy(square.below(square).below(square));
 
         LU<ComplexNumber> decomp = LU.COMPLEX.make();
         decomp.decompose(degenerate);
@@ -93,7 +93,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         LU<RationalNumber> decomp = LU.RATIONAL.make();
         decomp.decompose(degenerate);
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(degenerate), decomp, ACCURACY);
+        TestUtils.assertEquals(GenericStore.Q128.copy(degenerate), decomp, ACCURACY);
     }
 
     @Test

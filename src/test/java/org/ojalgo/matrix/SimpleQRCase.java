@@ -93,7 +93,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         // QR
 
         QR<RationalNumber> tmpQR = QR.RATIONAL.make();
-        tmpQR.decompose(GenericStore.RATIONAL.copy(SimpleQRCase.getOriginal()));
+        tmpQR.decompose(GenericStore.Q128.copy(SimpleQRCase.getOriginal()));
 
         MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
         MatrixStore<RationalNumber> tmpR = tmpQR.getR();

@@ -60,7 +60,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class Factory extends MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver> {
 
         Factory() {
-            super(QuaternionMatrix.class, GenericStore.QUATERNION);
+            super(QuaternionMatrix.class, GenericStore.H256);
         }
 
         @Override

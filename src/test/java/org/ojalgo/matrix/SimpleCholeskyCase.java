@@ -99,9 +99,9 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
         MatrixR064 tmpMtrx = SimpleCholeskyCase.getOriginal();
         Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
-        tmpDecomp.decompose(GenericStore.RATIONAL.copy(tmpMtrx));
+        tmpDecomp.decompose(GenericStore.Q128.copy(tmpMtrx));
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpMtrx), tmpDecomp, ACCURACY);
+        TestUtils.assertEquals(GenericStore.Q128.copy(tmpMtrx), tmpDecomp, ACCURACY);
     }
 
 }

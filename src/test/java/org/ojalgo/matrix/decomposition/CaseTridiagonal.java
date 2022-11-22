@@ -106,8 +106,8 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
         final MatrixStore<Double> primitiveA = Primitive64Store.FACTORY.copy(tmpSymmetricRandoml);
-        final MatrixStore<ComplexNumber> complexA = GenericStore.COMPLEX.copy(tmpSymmetricRandoml);
-        final MatrixStore<RationalNumber> rationalA = GenericStore.RATIONAL.copy(tmpSymmetricRandoml);
+        final MatrixStore<ComplexNumber> complexA = GenericStore.C128.copy(tmpSymmetricRandoml);
+        final MatrixStore<RationalNumber> rationalA = GenericStore.Q128.copy(tmpSymmetricRandoml);
 
         final Tridiagonal<Double> primitiveDecomp = Tridiagonal.PRIMITIVE.make();
         final Tridiagonal<ComplexNumber> complexDecomp = Tridiagonal.COMPLEX.make();

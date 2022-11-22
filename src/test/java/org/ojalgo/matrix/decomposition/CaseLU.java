@@ -50,10 +50,10 @@ public class CaseLU extends MatrixDecompositionTests {
         MatrixR064 tmpProblematic = P20061119Case.getProblematic();
 
         LU<RationalNumber> tmpBig = LU.RATIONAL.make();
-        tmpBig.decompose(GenericStore.RATIONAL.copy(tmpProblematic));
+        tmpBig.decompose(GenericStore.Q128.copy(tmpProblematic));
 
         LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(GenericStore.COMPLEX.copy(tmpProblematic));
+        tmpComplex.decompose(GenericStore.C128.copy(tmpProblematic));
 
         LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));

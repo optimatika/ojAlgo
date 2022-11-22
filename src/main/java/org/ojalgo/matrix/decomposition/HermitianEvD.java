@@ -66,7 +66,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     static final class C128 extends HermitianEvD<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX, new DeferredTridiagonal.C128());
+            super(GenericStore.C128, new DeferredTridiagonal.C128());
         }
 
         public Eigenpair getEigenpair(final int index) {
@@ -90,7 +90,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     static final class H256 extends HermitianEvD<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION, new DeferredTridiagonal.H256());
+            super(GenericStore.H256, new DeferredTridiagonal.H256());
         }
 
     }
@@ -98,7 +98,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     static final class Q128 extends HermitianEvD<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL, new DeferredTridiagonal.Q128());
+            super(GenericStore.Q128, new DeferredTridiagonal.Q128());
         }
 
     }
@@ -106,7 +106,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     static final class R128 extends HermitianEvD<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE, new DeferredTridiagonal.R128());
+            super(GenericStore.R128, new DeferredTridiagonal.R128());
         }
 
     }

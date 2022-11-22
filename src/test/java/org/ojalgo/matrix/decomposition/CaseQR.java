@@ -126,15 +126,15 @@ public class CaseQR extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
 
-        final DecompositionStore<ComplexNumber> tmpInPlace = GenericStore.COMPLEX.copy(tmpOriginal);
+        final DecompositionStore<ComplexNumber> tmpInPlace = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpNowQ = GenericStore.COMPLEX.makeEye(DIMENSION, DIMENSION);
-        final DecompositionStore<ComplexNumber> tmpNowR = GenericStore.COMPLEX.copy(tmpOriginal);
+        final DecompositionStore<ComplexNumber> tmpNowQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
+        final DecompositionStore<ComplexNumber> tmpNowR = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpForwardQ = GenericStore.COMPLEX.makeEye(DIMENSION, DIMENSION);
-        final DecompositionStore<ComplexNumber> tmpForwardR = GenericStore.COMPLEX.copy(tmpOriginal);
+        final DecompositionStore<ComplexNumber> tmpForwardQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
+        final DecompositionStore<ComplexNumber> tmpForwardR = GenericStore.C128.copy(tmpOriginal);
 
-        final DecompositionStore<ComplexNumber> tmpReverseQ = GenericStore.COMPLEX.makeEye(DIMENSION, DIMENSION);
+        final DecompositionStore<ComplexNumber> tmpReverseQ = GenericStore.C128.makeEye(DIMENSION, DIMENSION);
 
         final Householder.Generic<ComplexNumber>[] tmpHouseholders = new Householder.Generic[tmpLim];
 
@@ -229,8 +229,8 @@ public class CaseQR extends MatrixDecompositionTests {
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
         final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
 
-        tmpBigDecomp.decompose(GenericStore.RATIONAL.copy(tmpOriginal));
-        tmpComplexDecomp.decompose(GenericStore.COMPLEX.copy(tmpOriginal));
+        tmpBigDecomp.decompose(GenericStore.Q128.copy(tmpOriginal));
+        tmpComplexDecomp.decompose(GenericStore.C128.copy(tmpOriginal));
         tmpPrimitiveDecomp.decompose(Primitive64Store.FACTORY.copy(tmpOriginal));
 
         final MatrixStore<RationalNumber> tmpBigQ = tmpBigDecomp.getQ();
@@ -253,8 +253,8 @@ public class CaseQR extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Primitive R", tmpPrimitiveR);
         }
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));
-        TestUtils.assertEquals(GenericStore.COMPLEX.copy(tmpOriginal), tmpComplexDecomp, NumberContext.of(7, 14));
+        TestUtils.assertEquals(GenericStore.Q128.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));
+        TestUtils.assertEquals(GenericStore.C128.copy(tmpOriginal), tmpComplexDecomp, NumberContext.of(7, 14));
         TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
     }
 

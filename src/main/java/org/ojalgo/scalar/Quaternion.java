@@ -750,7 +750,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public MatrixStore<ComplexNumber> toComplexMatrix() {
 
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(2L, 2L);
+        final GenericStore<ComplexNumber> retVal = GenericStore.C128.make(2L, 2L);
 
         retVal.set(0L, ComplexNumber.of(myScalar, i));
         retVal.set(1L, ComplexNumber.of(-j, k));

@@ -38,7 +38,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class C128 extends HessenbergDecomposition<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX);
+            super(GenericStore.C128);
         }
 
     }
@@ -46,7 +46,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class H256 extends HessenbergDecomposition<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION);
+            super(GenericStore.H256);
         }
 
     }
@@ -54,7 +54,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class Q128 extends HessenbergDecomposition<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL);
+            super(GenericStore.Q128);
         }
 
     }
@@ -70,7 +70,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class R128 extends HessenbergDecomposition<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE);
+            super(GenericStore.R128);
         }
 
     }

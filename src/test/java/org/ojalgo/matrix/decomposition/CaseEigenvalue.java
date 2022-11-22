@@ -97,7 +97,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testComplexEigenpair() {
 
-        GenericStore<ComplexNumber> matrix = GenericStore.COMPLEX.make(2, 2);
+        GenericStore<ComplexNumber> matrix = GenericStore.C128.make(2, 2);
         matrix.set(0, 0, ComplexNumber.of(6.0, 0.0));
         matrix.set(1, 0, ComplexNumber.of(-2.0, -1.0));
         matrix.set(0, 1, ComplexNumber.of(-2.0, 1.0));
@@ -141,13 +141,13 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testGeneralisedComplexEigenvalue() {
 
-        GenericStore<ComplexNumber> mtrxA = GenericStore.COMPLEX.make(2, 2);
+        GenericStore<ComplexNumber> mtrxA = GenericStore.C128.make(2, 2);
         mtrxA.set(0, 0, ComplexNumber.of(5.0, 0.0));
         mtrxA.set(1, 0, ComplexNumber.of(0.0, -3.0));
         mtrxA.set(0, 1, ComplexNumber.of(0.0, 3.0));
         mtrxA.set(1, 1, ComplexNumber.of(2.0, 0.0));
 
-        GenericStore<ComplexNumber> mtrxB = GenericStore.COMPLEX.make(2, 2);
+        GenericStore<ComplexNumber> mtrxB = GenericStore.C128.make(2, 2);
         mtrxB.set(0, 0, ComplexNumber.of(6.0, 0.0));
         mtrxB.set(1, 0, ComplexNumber.of(-2.0, -1.0));
         mtrxB.set(0, 1, ComplexNumber.of(-2.0, 1.0));
@@ -347,15 +347,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             TestUtils.assertEquals(tmpSliceColumn.get(1).multiply(tmpFactor), tmpActual.get(1));
         }
 
-        GenericStore<ComplexNumber> tmpCmplA = GenericStore.COMPLEX.copy(tmpA);
-        GenericStore<ComplexNumber> tmpCmplD = GenericStore.COMPLEX.copy(tmpD);
-        GenericStore<ComplexNumber> tmpCmplV = GenericStore.COMPLEX.copy(tmpV);
+        GenericStore<ComplexNumber> tmpCmplA = GenericStore.C128.copy(tmpA);
+        GenericStore<ComplexNumber> tmpCmplD = GenericStore.C128.copy(tmpD);
+        GenericStore<ComplexNumber> tmpCmplV = GenericStore.C128.copy(tmpV);
 
         MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericStore<ComplexNumber> tmpComplexD = GenericStore.COMPLEX.make(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpComplexD = GenericStore.C128.make(tmpLength, tmpLength);
         for (int j = 0; j < tmpLength; j++) {
             tmpComplexD.set(j, j, tmpValues.get(j));
         }
@@ -388,15 +388,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
         MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
 
-        GenericStore<ComplexNumber> tmpCmplA = GenericStore.COMPLEX.copy(tmpA);
-        GenericStore<ComplexNumber> tmpCmplD = GenericStore.COMPLEX.copy(tmpD);
-        GenericStore<ComplexNumber> tmpCmplV = GenericStore.COMPLEX.copy(tmpV);
+        GenericStore<ComplexNumber> tmpCmplA = GenericStore.C128.copy(tmpA);
+        GenericStore<ComplexNumber> tmpCmplD = GenericStore.C128.copy(tmpD);
+        GenericStore<ComplexNumber> tmpCmplV = GenericStore.C128.copy(tmpV);
 
         MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericStore<ComplexNumber> tmpAltD = GenericStore.COMPLEX.make(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpAltD = GenericStore.C128.make(tmpLength, tmpLength);
         MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
 
         for (int j = 0; j < tmpLength; j++) {

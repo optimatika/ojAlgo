@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  * Note: Either Q or R will be square. The interface does not specify which.
  * <p>
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #RATIONAL}, {@linkplain #COMPLEX}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
+ * {@linkplain #Q128}, {@linkplain #C128}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
  * </p>
  * <p>
  * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method

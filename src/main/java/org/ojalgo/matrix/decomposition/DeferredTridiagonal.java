@@ -45,7 +45,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class C128 extends DeferredTridiagonal<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX);
+            super(GenericStore.C128);
         }
 
         @Override
@@ -81,7 +81,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class H256 extends DeferredTridiagonal<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION);
+            super(GenericStore.H256);
         }
 
         @Override
@@ -117,7 +117,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class Q128 extends DeferredTridiagonal<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL);
+            super(GenericStore.Q128);
         }
 
         @Override
@@ -142,7 +142,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class R128 extends DeferredTridiagonal<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE);
+            super(GenericStore.R128);
         }
 
         @Override

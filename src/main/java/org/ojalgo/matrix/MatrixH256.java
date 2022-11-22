@@ -65,7 +65,7 @@ public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
     public static final class Factory extends MatrixFactory<Quaternion, MatrixH256, MatrixH256.DenseReceiver, MatrixH256.SparseReceiver> {
 
         Factory() {
-            super(MatrixH256.class, GenericStore.QUATERNION);
+            super(MatrixH256.class, GenericStore.H256);
         }
 
         @Override

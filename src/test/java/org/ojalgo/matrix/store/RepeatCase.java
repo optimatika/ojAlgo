@@ -18,8 +18,8 @@ public class RepeatCase extends NonPhysicalTest {
 
         MatrixStore<ComplexNumber> base = NonPhysicalTest.makeRandomMatrix(baseRowDim, baseColDim);
 
-        rationalStore = GenericStore.RATIONAL.copy(base).repeat(rowsRep, colsRep);
-        complexStore = GenericStore.COMPLEX.copy(base).repeat(rowsRep, colsRep);
+        rationalStore = GenericStore.Q128.copy(base).repeat(rowsRep, colsRep);
+        complexStore = GenericStore.C128.copy(base).repeat(rowsRep, colsRep);
         primitiveStore = Primitive64Store.FACTORY.copy(base).repeat(rowsRep, colsRep);
 
         numberOfRows = baseRowDim * rowsRep;

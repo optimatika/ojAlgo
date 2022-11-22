@@ -56,7 +56,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.COMPLEX, new BidiagonalDecomposition.C128(fullSize), fullSize);
+            super(GenericStore.C128, new BidiagonalDecomposition.C128(fullSize), fullSize);
         }
 
     }
@@ -68,7 +68,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.QUATERNION, new BidiagonalDecomposition.H256(fullSize), fullSize);
+            super(GenericStore.H256, new BidiagonalDecomposition.H256(fullSize), fullSize);
         }
 
     }
@@ -80,7 +80,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.RATIONAL, new BidiagonalDecomposition.Q128(fullSize), fullSize);
+            super(GenericStore.Q128, new BidiagonalDecomposition.Q128(fullSize), fullSize);
         }
 
     }
@@ -104,7 +104,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.QUADRUPLE, new BidiagonalDecomposition.R128(fullSize), fullSize);
+            super(GenericStore.R128, new BidiagonalDecomposition.R128(fullSize), fullSize);
         }
 
     }

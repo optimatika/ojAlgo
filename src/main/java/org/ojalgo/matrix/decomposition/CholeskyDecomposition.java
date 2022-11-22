@@ -44,7 +44,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class C128 extends CholeskyDecomposition<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX);
+            super(GenericStore.C128);
         }
 
     }
@@ -52,7 +52,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class H256 extends CholeskyDecomposition<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION);
+            super(GenericStore.H256);
         }
 
     }
@@ -60,7 +60,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class Q128 extends CholeskyDecomposition<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL);
+            super(GenericStore.Q128);
         }
 
     }
@@ -76,7 +76,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class R128 extends CholeskyDecomposition<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE);
+            super(GenericStore.R128);
         }
 
     }

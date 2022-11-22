@@ -48,7 +48,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     static final class C128 extends LDLDecomposition<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX);
+            super(GenericStore.C128);
         }
 
     }
@@ -56,7 +56,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     static final class H256 extends LDLDecomposition<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION);
+            super(GenericStore.H256);
         }
 
     }
@@ -64,7 +64,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     static final class Q128 extends LDLDecomposition<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL);
+            super(GenericStore.Q128);
         }
 
     }
@@ -80,7 +80,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     static final class R128 extends LDLDecomposition<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE);
+            super(GenericStore.R128);
         }
 
     }

@@ -52,10 +52,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MultiplyBoth.fillMxN_G(expected, left, c, right);
                     MultiplyBoth.Generic<Quadruple> generic = MultiplyBoth.newGeneric(m, n);
@@ -74,10 +74,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MatrixStore<Quadruple> l = left.tridiagonal();
                     MatrixStore<Quadruple> r = right.tridiagonal();
@@ -99,10 +99,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MultiplyLeft.fillMxN(expected.data, left, c, right.data, Quadruple.FACTORY);
                     MultiplyLeft.Generic<Quadruple> generic = MultiplyLeft.newGeneric(m, n);
@@ -121,10 +121,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MatrixStore<Quadruple> l = left.tridiagonal();
 
@@ -145,10 +145,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MultiplyNeither.fillMxN(expected.data, left.data, c, right.data, Quadruple.FACTORY);
                     MultiplyNeither.Generic<Quadruple> generic = MultiplyNeither.newGeneric(m, n);
@@ -167,10 +167,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MultiplyRight.fillMxN(expected.data, left.data, c, right, Quadruple.FACTORY);
                     MultiplyRight.Generic<Quadruple> generic = MultiplyRight.newGeneric(m, n);
@@ -189,10 +189,10 @@ public class TestSpecificSizeImplementationQuadruple {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<Quadruple> left = GenericStore.QUADRUPLE.makeFilled(m, c, Normal.standard());
-                    GenericStore<Quadruple> right = GenericStore.QUADRUPLE.makeFilled(c, n, Normal.standard());
-                    GenericStore<Quadruple> expected = GenericStore.QUADRUPLE.make(m, n);
-                    GenericStore<Quadruple> actual = GenericStore.QUADRUPLE.make(m, n);
+                    GenericStore<Quadruple> left = GenericStore.R128.makeFilled(m, c, Normal.standard());
+                    GenericStore<Quadruple> right = GenericStore.R128.makeFilled(c, n, Normal.standard());
+                    GenericStore<Quadruple> expected = GenericStore.R128.make(m, n);
+                    GenericStore<Quadruple> actual = GenericStore.R128.make(m, n);
 
                     MatrixStore<Quadruple> r = right.tridiagonal();
 

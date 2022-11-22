@@ -50,7 +50,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.COMPLEX, fullSize);
+            super(GenericStore.C128, fullSize);
         }
 
     }
@@ -62,7 +62,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.QUATERNION, fullSize);
+            super(GenericStore.H256, fullSize);
         }
 
     }
@@ -74,7 +74,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.RATIONAL, fullSize);
+            super(GenericStore.Q128, fullSize);
         }
 
     }
@@ -98,7 +98,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.QUADRUPLE, fullSize);
+            super(GenericStore.R128, fullSize);
         }
 
     }

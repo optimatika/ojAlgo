@@ -40,11 +40,11 @@ import org.ojalgo.structure.Access2D;
 public final class PureQuadraticFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.PureQuadratic<N> {
 
     public static PureQuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> coefficients) {
-        return new PureQuadraticFunction<>(GenericStore.COMPLEX.copy(coefficients));
+        return new PureQuadraticFunction<>(GenericStore.C128.copy(coefficients));
     }
 
     public static PureQuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new PureQuadraticFunction<>(GenericStore.COMPLEX.make(arity, arity));
+        return new PureQuadraticFunction<>(GenericStore.C128.make(arity, arity));
     }
 
     public static PureQuadraticFunction<Double> makePrimitive(final Access2D<?> coefficients) {
@@ -56,11 +56,11 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
     }
 
     public static PureQuadraticFunction<RationalNumber> makeRational(final Access2D<?> coefficients) {
-        return new PureQuadraticFunction<>(GenericStore.RATIONAL.copy(coefficients));
+        return new PureQuadraticFunction<>(GenericStore.Q128.copy(coefficients));
     }
 
     public static PureQuadraticFunction<RationalNumber> makeRational(final int arity) {
-        return new PureQuadraticFunction<>(GenericStore.RATIONAL.make(arity, arity));
+        return new PureQuadraticFunction<>(GenericStore.Q128.make(arity, arity));
     }
 
     public static <N extends Comparable<N>> PureQuadraticFunction<N> wrap(final PhysicalStore<N> coefficients) {

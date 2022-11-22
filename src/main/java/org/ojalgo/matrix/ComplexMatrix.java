@@ -61,7 +61,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class Factory extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
 
         Factory() {
-            super(ComplexMatrix.class, GenericStore.COMPLEX);
+            super(ComplexMatrix.class, GenericStore.C128);
         }
 
         @Override

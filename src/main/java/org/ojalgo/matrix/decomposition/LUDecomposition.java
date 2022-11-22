@@ -47,7 +47,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     static final class C128 extends LUDecomposition<ComplexNumber> {
 
         C128() {
-            super(GenericStore.COMPLEX);
+            super(GenericStore.C128);
         }
 
     }
@@ -55,7 +55,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     static final class H256 extends LUDecomposition<Quaternion> {
 
         H256() {
-            super(GenericStore.QUATERNION);
+            super(GenericStore.H256);
         }
 
     }
@@ -63,7 +63,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     static final class Q128 extends LUDecomposition<RationalNumber> {
 
         Q128() {
-            super(GenericStore.RATIONAL);
+            super(GenericStore.Q128);
         }
 
     }
@@ -79,7 +79,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     static final class R128 extends LUDecomposition<Quadruple> {
 
         R128() {
-            super(GenericStore.QUADRUPLE);
+            super(GenericStore.R128);
         }
 
     }

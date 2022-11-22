@@ -40,11 +40,11 @@ import org.ojalgo.structure.Access2D;
 public final class QuadraticFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Quadratic<N> {
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> quadratic, final Access1D<?> linear) {
-        return new QuadraticFunction<>(GenericStore.COMPLEX.copy(quadratic), GenericStore.COMPLEX.columns(linear));
+        return new QuadraticFunction<>(GenericStore.C128.copy(quadratic), GenericStore.C128.columns(linear));
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new QuadraticFunction<>(GenericStore.COMPLEX.make(arity, arity), GenericStore.COMPLEX.make(arity, 1));
+        return new QuadraticFunction<>(GenericStore.C128.make(arity, arity), GenericStore.C128.make(arity, 1));
     }
 
     public static QuadraticFunction<Double> makePrimitive(final Access2D<?> quadratic, final Access1D<?> linear) {
@@ -56,11 +56,11 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
     }
 
     public static QuadraticFunction<RationalNumber> makeRational(final Access2D<?> quadratic, final Access1D<?> linear) {
-        return new QuadraticFunction<>(GenericStore.RATIONAL.copy(quadratic), GenericStore.RATIONAL.columns(linear));
+        return new QuadraticFunction<>(GenericStore.Q128.copy(quadratic), GenericStore.Q128.columns(linear));
     }
 
     public static QuadraticFunction<RationalNumber> makeRational(final int arity) {
-        return new QuadraticFunction<>(GenericStore.RATIONAL.make(arity, arity), GenericStore.RATIONAL.make(arity, 1));
+        return new QuadraticFunction<>(GenericStore.Q128.make(arity, arity), GenericStore.Q128.make(arity, 1));
     }
 
     public static <N extends Comparable<N>> QuadraticFunction<N> wrap(final PhysicalStore<N> quadratic, final PhysicalStore<N> linear) {

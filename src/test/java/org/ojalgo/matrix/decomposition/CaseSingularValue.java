@@ -130,7 +130,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         for (ComplexNumber tmpScale : tmpScales) {
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.transpose(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.C128.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
@@ -154,7 +154,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Scale = {}", tmpScale);
             }
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.copy(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.C128.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
@@ -340,12 +340,12 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     private static void doTestTypes(final Access2D<?> original) {
 
-        PhysicalStore<RationalNumber> tmpBigStore = GenericStore.RATIONAL.copy(original);
-        PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.COMPLEX.copy(original);
+        PhysicalStore<RationalNumber> tmpBigStore = GenericStore.Q128.copy(original);
+        PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.C128.copy(original);
         PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(original);
 
-        IMPL_BIG.decompose(GenericStore.RATIONAL.copy(original));
-        IMPL_COMPLEX.decompose(GenericStore.COMPLEX.copy(original));
+        IMPL_BIG.decompose(GenericStore.Q128.copy(original));
+        IMPL_COMPLEX.decompose(GenericStore.C128.copy(original));
         IMPL_RAW.decompose(Primitive64Store.FACTORY.copy(original));
         IMPL_PRIMITIVE.decompose(Primitive64Store.FACTORY.copy(original));
 

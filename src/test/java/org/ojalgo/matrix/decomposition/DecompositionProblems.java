@@ -346,7 +346,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         PhysicalStore<ComplexNumber> tmpSquare = TestUtils.makeRandomComplexStore(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        PhysicalStore<ComplexNumber> tmpExpected = GenericStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> tmpExpected = GenericStore.C128.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
@@ -387,7 +387,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         int tmpDim = Uniform.randomInteger(2, 6);
 
         PhysicalStore<ComplexNumber> original = TestUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
-        PhysicalStore<ComplexNumber> identity = GenericStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> identity = GenericStore.C128.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")

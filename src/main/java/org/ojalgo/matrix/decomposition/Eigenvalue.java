@@ -229,7 +229,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.COMPLEX;
+            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.C128;
             Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
 
@@ -296,7 +296,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.QUATERNION;
+            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.H256;
             Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
             Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
 
@@ -315,7 +315,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.RATIONAL;
+            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.Q128;
             Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
             Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
@@ -334,7 +334,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue.Generalised<Quadruple> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> factory = GenericStore.QUADRUPLE;
+            PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> factory = GenericStore.R128;
             Cholesky<Quadruple> cholesky = Cholesky.QUADRUPLE.make(typical);
             Eigenvalue<Quadruple> eigenvalue = this.make(typical, true);
 
@@ -504,7 +504,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         final long tmpDimension = this.getV().countColumns();
 
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
+        final GenericStore<ComplexNumber> retVal = GenericStore.C128.make(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

@@ -39,11 +39,11 @@ import org.ojalgo.structure.Access1D;
 public final class AffineFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
 
     public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericStore.COMPLEX.rows(coefficients));
+        return new AffineFunction<>(GenericStore.C128.rows(coefficients));
     }
 
     public static AffineFunction<ComplexNumber> makeComplex(final int arity) {
-        return new AffineFunction<>(GenericStore.COMPLEX.make(1, arity));
+        return new AffineFunction<>(GenericStore.C128.make(1, arity));
     }
 
     public static AffineFunction<Double> makePrimitive(final Access1D<?> coefficients) {
@@ -55,11 +55,11 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
     }
 
     public static AffineFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericStore.RATIONAL.rows(coefficients));
+        return new AffineFunction<>(GenericStore.Q128.rows(coefficients));
     }
 
     public static AffineFunction<RationalNumber> makeRational(final int arity) {
-        return new AffineFunction<>(GenericStore.RATIONAL.make(1, arity));
+        return new AffineFunction<>(GenericStore.Q128.make(1, arity));
     }
 
     public static <N extends Comparable<N>> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {

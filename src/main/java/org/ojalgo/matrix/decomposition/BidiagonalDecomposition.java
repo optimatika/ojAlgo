@@ -46,7 +46,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.COMPLEX, fullSize);
+            super(GenericStore.C128, fullSize);
         }
 
         @Override
@@ -134,7 +134,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.QUATERNION, fullSize);
+            super(GenericStore.H256, fullSize);
         }
 
         @Override
@@ -152,7 +152,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.RATIONAL, fullSize);
+            super(GenericStore.Q128, fullSize);
         }
 
         @Override
@@ -186,7 +186,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.QUADRUPLE, fullSize);
+            super(GenericStore.R128, fullSize);
         }
 
         @Override

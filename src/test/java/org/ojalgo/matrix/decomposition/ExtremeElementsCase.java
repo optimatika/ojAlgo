@@ -278,8 +278,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
 
-        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
@@ -416,8 +416,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         LU<Double> tmpRaw = new RawLU();
 
-        TestUtils.assertTrue("Rational.compute()", tmpRational.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpRational.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpRaw.decompose(tmpProblematic));
 
@@ -475,8 +475,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
         QR<Double> tmpJama = new RawQR();
 
-        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 

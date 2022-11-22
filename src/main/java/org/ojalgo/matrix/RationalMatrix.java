@@ -60,7 +60,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
 
         Factory() {
-            super(RationalMatrix.class, GenericStore.RATIONAL);
+            super(RationalMatrix.class, GenericStore.Q128);
         }
 
         @Override
