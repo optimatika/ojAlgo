@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Structure2D;
@@ -57,13 +58,39 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.C128(fullSize);
+    Factory<ComplexNumber> C128 = (typical, fullSize) -> new BidiagonalDecomposition.C128(fullSize);
 
-    Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.R064(fullSize);
+    Factory<Quadruple> R128 = (typical, fullSize) -> new BidiagonalDecomposition.R128(fullSize);
 
-    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.H256(fullSize);
+    Factory<Double> R064 = (typical, fullSize) -> new BidiagonalDecomposition.R064(fullSize);
 
-    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Q128(fullSize);
+    Factory<Quaternion> H256 = (typical, fullSize) -> new BidiagonalDecomposition.H256(fullSize);
+
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new BidiagonalDecomposition.Q128(fullSize);
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 

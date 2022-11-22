@@ -219,7 +219,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<>() {
+    Factory<ComplexNumber> C128 = new Factory<>() {
 
         @Override
         public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
@@ -238,19 +238,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    /**
-     * Sorts on the norm in descending order. If the 2 eigenvalues have equal norm then the usual
-     * {@link ComplexNumber} sort order is used (reversed).
-     */
-    Comparator<ComplexNumber> DESCENDING_NORM = (arg1, arg2) -> {
-        int retVal = Double.compare(arg2.norm(), arg1.norm());
-        if (retVal == 0) {
-            return arg2.compareTo(arg1);
-        }
-        return retVal;
-    };
-
-    Factory<Double> PRIMITIVE = new Factory<>() {
+    Factory<Double> R064 = new Factory<>() {
 
         @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
@@ -286,7 +274,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<>() {
+    Factory<Quaternion> H256 = new Factory<>() {
 
         @Override
         public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
@@ -305,7 +293,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<>() {
+    Factory<RationalNumber> Q128 = new Factory<>() {
 
         @Override
         public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
@@ -324,7 +312,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     };
 
-    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+    Factory<Quadruple> R128 = new Factory<>() {
 
         @Override
         public Eigenvalue<Quadruple> make(final Structure2D typical, final boolean hermitian) {
@@ -342,6 +330,48 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         }
 
     };
+
+    /**
+     * Sorts on the norm in descending order. If the 2 eigenvalues have equal norm then the usual
+     * {@link ComplexNumber} sort order is used (reversed).
+     */
+    Comparator<ComplexNumber> DESCENDING_NORM = (arg1, arg2) -> {
+        int retVal = Double.compare(arg2.norm(), arg1.norm());
+        if (retVal == 0) {
+            return arg2.compareTo(arg1);
+        }
+        return retVal;
+    };
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
 

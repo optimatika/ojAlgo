@@ -68,20 +68,50 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.C128(fullSize);
+    Factory<ComplexNumber> C128 = (typical, fullSize) -> new SingularValueDecomposition.C128(fullSize);
 
-    Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+    Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new SingularValueDecomposition.R064(fullSize);
         }
         return new RawSingularValue();
     };
 
-    Factory<Quadruple> QUADRUPLE = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
+    Factory<Quadruple> R128 = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
 
-    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
+    Factory<Quaternion> H256 = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
 
-    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 
