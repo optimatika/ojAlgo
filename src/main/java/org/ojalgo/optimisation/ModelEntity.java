@@ -46,18 +46,13 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
     static final NumberContext DISPLAY = NumberContext.ofScale(6);
+    static final int RANGE = 8;
 
     static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, final int range) {
 
         double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
 
-        int doubleRange = 2 * range;
-
-        if (expL > doubleRange) {
-            return 0;
-        }
-
-        double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
+        double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -range), expL - range);
 
         double negatedAverage = (expL + expS) / -PrimitiveMath.TWO;
 

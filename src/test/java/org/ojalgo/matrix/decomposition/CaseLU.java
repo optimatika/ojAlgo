@@ -24,9 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.MatrixR064;
+import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -85,6 +86,24 @@ public class CaseLU extends MatrixDecompositionTests {
         TestUtils.assertEquals("LU.rank SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
 
+    }
+
+    @Test
+    public void testReconstructWhenPivoted() {
+
+        MatrixStore<Double> matrix = CaseLDL.newSpecialSchnabelEskow();
+
+        LU<Double> decomp = LU.R064.make(matrix);
+        decomp.decompose(matrix);
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Original", matrix);
+            BasicLogger.debugMatrix("L", decomp.getL());
+            BasicLogger.debugMatrix("U", decomp.getU());
+            BasicLogger.debugMatrix("Reconstructed", decomp.reconstruct());
+        }
+
+        TestUtils.assertEquals(matrix, decomp.reconstruct());
     }
 
 }

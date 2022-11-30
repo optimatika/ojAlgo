@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.task;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.special.MissingMath;

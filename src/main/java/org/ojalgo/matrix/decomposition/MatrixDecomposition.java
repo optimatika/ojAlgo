@@ -143,8 +143,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
             if (matrix.isHermitian()) {
                 return this.decompose(matrix);
+            } else {
+                return false;
             }
-            return false;
         }
     }
 
@@ -195,6 +196,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
+
+        int[] getReversePivotOrder();
 
         /**
          * @return The pivot (row and/or columnn) order

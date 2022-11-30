@@ -21,7 +21,7 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SIGMOID;
 
 import java.util.ArrayList;
 import java.util.List;

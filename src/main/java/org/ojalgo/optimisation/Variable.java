@@ -329,7 +329,7 @@ public final class Variable extends ModelEntity<Variable> {
             }
         }
 
-        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
+        return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
     }
 
     @Override

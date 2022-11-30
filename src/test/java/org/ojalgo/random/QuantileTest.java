@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.TEN;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -115,33 +115,45 @@ final class DualSimplex extends SimplexTableauSolver {
         Primitive1D objective = retVal.objective();
 
         MatrixStore<Double> convexC = convex.getC();
-        MatrixStore<Double> convexAE = convex.getAE();
-        MatrixStore<Double> convexBE = convex.getBE();
 
         for (int i = 0; i < nbVars; i++) {
             double rhs = checkFeasibility ? ZERO : convexC.doubleValue(i);
             boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
-            for (int j = 0; j < nbEqus; j++) {
-                double valE = convexAE.doubleValue(j, i);
-                constraintsBody.set(i, j, neg ? -valE : valE);
-                constraintsBody.set(i, nbEqus + j, neg ? valE : -valE);
-            }
             constraintsRHS.set(i, neg ? -rhs : rhs);
         }
 
-        for (RowView<Double> rowAI : convex.getRowsAI()) {
-            int tabJ = Math.toIntExact(rowAI.row());
+        if (nbEqus > 0) {
+            for (RowView<Double> rowAE : convex.getRowsAE()) {
+                int j = Math.toIntExact(rowAE.row());
 
-            for (ElementView1D<Double, ?> element : rowAI.nonzeros()) {
-                int tabI = Math.toIntExact(element.index());
+                for (ElementView1D<Double, ?> element : rowAE.nonzeros()) {
+                    int i = Math.toIntExact(element.index());
 
-                double tabVal = element.doubleValue();
-                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, meta.negatedDual[tabI] ? -tabVal : tabVal);
+                    boolean neg = meta.negatedDual[i];
+
+                    double valE = element.doubleValue();
+                    constraintsBody.set(i, j, neg ? -valE : valE);
+                    constraintsBody.set(i, nbEqus + j, neg ? valE : -valE);
+
+                }
+            }
+        }
+
+        if (nbInes > 0) {
+            for (RowView<Double> rowAI : convex.getRowsAI()) {
+                int j = Math.toIntExact(rowAI.row());
+
+                for (ElementView1D<Double, ?> element : rowAI.nonzeros()) {
+                    int i = Math.toIntExact(element.index());
+
+                    double valI = element.doubleValue();
+                    constraintsBody.set(i, nbEqus + nbEqus + j, meta.negatedDual[i] ? -valI : valI);
+                }
             }
         }
 
         for (int j = 0; j < nbEqus; j++) {
-            double valBE = convexBE.doubleValue(j);
+            double valBE = convex.getBE(j);
             objective.set(j, valBE);
             objective.set(nbEqus + j, -valBE);
         }

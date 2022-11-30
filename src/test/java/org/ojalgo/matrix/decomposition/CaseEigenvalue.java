@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.P20050125Case;
@@ -48,8 +50,10 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -65,6 +69,62 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         PhysicalStore<Double> V;
 
+    }
+
+    /**
+     * Creates a square symmetric random matrix with the specified eigenvalues.
+     */
+    public static MatrixStore<Double> newRandom(final double... eigenvalues) {
+
+        int dim = eigenvalues.length;
+
+        Primitive64Store seed = Primitive64Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
+        QR<Double> qr = QR.R064.make(seed);
+        qr.decompose(seed);
+
+        MatrixStore<Double> mtrxQ = qr.getQ();
+
+        DiagonalStore<Double, ArrayR064> mtrxD = Primitive64Store.FACTORY.makeDiagonal(ArrayR064.wrap(eigenvalues)).get();
+
+        return mtrxQ.multiply(mtrxD).multiply(mtrxQ.conjugate());
+    }
+
+    private static void doTestEigenvalues(final MatrixStore<Double> matrix, final NumberContext accuracy, final double... expected) {
+
+        TestUtils.assertEquals(expected.length, matrix.getRowDim());
+        TestUtils.assertEquals(expected.length, matrix.getColDim());
+        TestUtils.assertTrue(matrix.isHermitian());
+
+        Eigenvalue<Double>[] evds = MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric();
+        for (Eigenvalue<Double> evd : evds) {
+
+            evd.decompose(matrix);
+
+            Array1D<ComplexNumber> actual = evd.getEigenvalues();
+
+            if (DEBUG) {
+
+                BasicLogger.debug();
+                BasicLogger.debug("{}, ordered={}", evd.getClass(), evd.isOrdered());
+                BasicLogger.debug("Eigenvalues: {}", actual);
+            }
+
+            if (!evd.isOrdered()) {
+                actual.sort(Comparator.comparing(ComplexNumber::norm).reversed());
+            }
+
+            for (int i = 0; i < expected.length; i++) {
+                TestUtils.assertEquals(expected[i], actual.doubleValue(i), accuracy);
+                TestUtils.assertEquals(0.0, actual.get(i).i, accuracy);
+            }
+        }
+    }
+
+    private static void doTestEigenvaluesOfGenerated(final double... expected) {
+
+        MatrixStore<Double> generated = CaseEigenvalue.newRandom(expected);
+
+        CaseEigenvalue.doTestEigenvalues(generated, NumberContext.of(8), expected);
     }
 
     private static void doVerifyGeneral(final Primitive64Store matrix) {
@@ -194,6 +254,26 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals(left, right);
+    }
+
+    @Test
+    public void testGenerateRandomAllNegative() {
+        CaseEigenvalue.doTestEigenvaluesOfGenerated(-10, -5, -2, -1);
+    }
+
+    @Test
+    public void testGenerateRandomAllPositive() {
+        CaseEigenvalue.doTestEigenvaluesOfGenerated(10, 5, 2, 1);
+    }
+
+    @Test
+    public void testGenerateRandomSomeNegative() {
+        CaseEigenvalue.doTestEigenvaluesOfGenerated(10, 5, 2, -1);
+    }
+
+    @Test
+    public void testGenerateRandomSomeZero() {
+        CaseEigenvalue.doTestEigenvaluesOfGenerated(10, 5, 2, 0);
     }
 
     /**
@@ -612,6 +692,14 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
                 TestUtils.assertEquals(expected, actual, evaluationContext);
             }
         }
+    }
+
+    @Test
+    public void testSpecial4by4() {
+
+        RawStore matrix = CaseLDL.newSpecialSchnabelEskow();
+
+        CaseEigenvalue.doTestEigenvalues(matrix, NumberContext.of(2), 8242.869, -0.378, -0.343, -0.248);
     }
 
 }

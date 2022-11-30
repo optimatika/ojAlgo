@@ -50,8 +50,7 @@ final class OptimisationData {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
-    private static MatrixStore<Double> add(final RowsSupplier<Double> baseA, final MatrixStore<Double> baseB, final Access2D<Double> addA,
-            final Access1D<Double> addB) {
+    private static MatrixStore<Double> add(final RowsSupplier<Double> baseA, final MatrixStore<Double> baseB, final Access2D<?> addA, final Access1D<?> addB) {
 
         ProgrammingError.throwIfNull(addA, addB);
         ProgrammingError.throwIfNotEqualRowDimensions(addA, addB);
@@ -64,7 +63,7 @@ final class OptimisationData {
 
         if (addA instanceof SparseStore) {
 
-            ((SparseStore<Double>) addA).nonzeros().forEach(nz -> baseA.getRow(baseRowDim + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
+            ((SparseStore<?>) addA).nonzeros().forEach(nz -> baseA.getRow(baseRowDim + Math.toIntExact(nz.row())).set(nz.column(), nz.doubleValue()));
 
         } else {
 
@@ -129,7 +128,7 @@ final class OptimisationData {
         myAdditionalConstraints.put(key, value);
     }
 
-    void addEqualities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
+    void addEqualities(final MatrixStore<?> mtrxAE, final MatrixStore<?> mtrxBE) {
 
         ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
@@ -142,7 +141,7 @@ final class OptimisationData {
         myBE = OptimisationData.add(myAE, myBE, mtrxAE, mtrxBE);
     }
 
-    void addInequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
+    void addInequalities(final MatrixStore<?> mtrxAI, final MatrixStore<?> mtrxBI) {
 
         ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
@@ -200,8 +199,16 @@ final class OptimisationData {
         }
     }
 
+    SparseArray<Double> getAE(final int row) {
+        return myAE.getRow(row);
+    }
+
+    RowsSupplier<Double> getAE(final int... rows) {
+        return myAE.selectRows(rows);
+    }
+
     /**
-     * Inequality constraints body: [AI][X] &lt;= [BI]
+     * Inequality constraints body: [AI][X] <= [BI]
      */
     MatrixStore<Double> getAI() {
         if (myAI != null) {
@@ -231,7 +238,7 @@ final class OptimisationData {
     }
 
     /**
-     * Inequality constraints RHS: [AI][X] &lt;= [BI]
+     * Inequality constraints RHS: [AI][X] <= [BI]
      */
     MatrixStore<Double> getBI() {
         if (myBI != null) {
@@ -243,6 +250,10 @@ final class OptimisationData {
 
     double getBI(final int row) {
         return myBI.doubleValue(row);
+    }
+
+    double getBE(final int row) {
+        return myBE.doubleValue(row);
     }
 
     Primitive64Store getLowerBounds() {
@@ -263,6 +274,10 @@ final class OptimisationData {
 
     RowView<Double> getRowsAI() {
         return myAI.rows();
+    }
+
+    RowView<Double> getRowsAE() {
+        return myAE.rows();
     }
 
     Primitive64Store getUpperBounds() {
@@ -335,7 +350,7 @@ final class OptimisationData {
         }
     }
 
-    void setEqualities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
+    void setEqualities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
 
         ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
@@ -346,7 +361,7 @@ final class OptimisationData {
         myBE = OptimisationData.add(myAE, myBE, mtrxAE, mtrxBE);
     }
 
-    void setInequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+    void setInequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
 
         ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
         ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);

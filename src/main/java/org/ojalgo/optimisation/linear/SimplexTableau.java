@@ -1052,29 +1052,25 @@ abstract class SimplexTableau extends Primitive2D {
 
     static void copy(final LinearSolver.Builder builder, final SimplexTableau tableau) {
 
-        MatrixStore<Double> mtrxAE = builder.getAE();
         Mutate2D body = tableau.constraintsBody();
-        for (int i = 0; i < mtrxAE.getRowDim(); i++) {
-            for (int j = 0; j < mtrxAE.getColDim(); j++) {
-                double value = mtrxAE.doubleValue(i, j);
-                if (Math.abs(value) > MACHINE_EPSILON) {
-                    body.set(i, j, value);
-                }
+        for (RowView<Double> row : builder.getRowsAE()) {
+            for (ElementView1D<Double, ?> element : row.nonzeros()) {
+                body.set(row.row(), element.index(), element.doubleValue());
             }
+
         }
 
-        MatrixStore<Double> mtrxBE = builder.getBE();
         Mutate1D rhs = tableau.constraintsRHS();
+        MatrixStore<Double> mtrxBE = builder.getBE();
         for (int i = 0; i < mtrxBE.size(); i++) {
             rhs.set(i, mtrxBE.doubleValue(i));
         }
 
-        MatrixStore<Double> mtrxC = builder.getC();
         Mutate1D obj = tableau.objective();
+        MatrixStore<Double> mtrxC = builder.getC();
         for (int i = 0; i < mtrxC.size(); i++) {
             obj.set(i, mtrxC.doubleValue(i));
         }
-
     }
 
     static boolean isSparse(final Optimisation.Options options) {

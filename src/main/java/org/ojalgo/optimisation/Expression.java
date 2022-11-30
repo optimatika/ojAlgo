@@ -1107,7 +1107,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
-
         AggregatorFunction<BigDecimal> largest = aggregators.largest();
         AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
 
@@ -1118,19 +1117,21 @@ public final class Expression extends ModelEntity<Expression> {
                 smallest.invoke(quadraticFactor);
             }
 
-            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 6);
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
 
-        }
-        if (!this.isAnyLinearFactorNonZero()) {
+        } else if (this.isAnyLinearFactorNonZero()) {
+
+            for (BigDecimal linearFactor : myLinear.values()) {
+                largest.invoke(linearFactor);
+                smallest.invoke(linearFactor);
+            }
+
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
+
+        } else {
 
             return 0;
         }
-        for (BigDecimal linearFactor : myLinear.values()) {
-            largest.invoke(linearFactor);
-            smallest.invoke(linearFactor);
-        }
-
-        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
     }
 
     /**

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.AbstractList;
 import java.util.Arrays;

@@ -531,17 +531,14 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     public void divideAndCopyColumn(final int row, final int column, final BasicArray<N> destination) {
 
-        final N[] tmpData = data;
-        final int tmpRowDim = myRowDim;
+        N[] destinationData = ((ScalarArray<N>) destination).data;
 
-        final N[] tmpDestination = ((ScalarArray<N>) destination).data;
+        int index = row + column * myRowDim;
+        N denominator = data[index];
 
-        int tmpIndex = row + column * tmpRowDim;
-        final N tmpDenominator = tmpData[tmpIndex];
-
-        for (int i = row + 1; i < tmpRowDim; i++) {
-            tmpIndex++;
-            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator).get();
+        for (int i = row + 1; i < myRowDim; i++) {
+            index++;
+            destinationData[i] = data[index] = data[index].divide(denominator).get();
         }
     }
 

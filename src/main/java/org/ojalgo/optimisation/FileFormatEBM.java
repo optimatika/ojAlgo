@@ -92,6 +92,10 @@ abstract class FileFormatEBM {
         FileFormatEBM.readModelEntity(variable, fields);
 
         variable.integer(Boolean.parseBoolean(fields[5]));
+
+        if (fields.length > 6 && fields[6].length() > 0) {
+            variable.setValue(new BigDecimal(fields[6]));
+        }
     }
 
     private static void writeExpression(final Expression expression, final BufferedWriter writer) throws IOException {
@@ -151,6 +155,11 @@ abstract class FileFormatEBM {
         FileFormatEBM.writeModelEntity(variable, writer);
         writer.write(ASCII.HT);
         writer.write(Boolean.toString(variable.isInteger()));
+        writer.write(ASCII.HT);
+        BigDecimal value = variable.getValue();
+        if (value != null) {
+            writer.write(value.toPlainString());
+        }
         writer.newLine();
     }
 

@@ -127,6 +127,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.getOrder();
     }
 
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
+    }
+
     public double getRankThreshold() {
 
         double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);

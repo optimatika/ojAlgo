@@ -164,6 +164,10 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return myPivot.getOrder();
     }
 
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
+    }
+
     public double getRankThreshold() {
 
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -40,8 +38,8 @@ abstract class ConstrainedSolver extends ConvexSolver {
         int numberOfEqualityConstraints = this.countEqualityConstraints();
         int numberOfInequalityConstraints = this.countInequalityConstraints();
 
-        mySlackE = Primitive64Store.FACTORY.make(numberOfEqualityConstraints, 1L);
-        mySolutionL = Primitive64Store.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
+        mySlackE = MATRIX_FACTORY.make(numberOfEqualityConstraints, 1L);
+        mySolutionL = MATRIX_FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
     }
 
     @Override
@@ -55,14 +53,14 @@ abstract class ConstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
+    protected Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
         MatrixStore<Double> iterQ = this.getIterationQ();
         MatrixStore<Double> iterA = this.getIterationA();
         return iterQ.right(iterA.transpose()).below(iterA);
     }
 
     @Override
-    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
+    protected Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
         MatrixStore<Double> iterC = this.getIterationC();
         MatrixStore<Double> iterB = this.getIterationB();
         return iterC.below(iterB);
@@ -108,25 +106,26 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     MatrixStore<Double> getIterationL(final int[] included) {
 
-        final int tmpCountE = this.countEqualityConstraints();
+        int tmpCountE = this.countEqualityConstraints();
 
-        final MatrixStore<Double> tmpLI = mySolutionL.offsets(tmpCountE, 0).rows(included);
+        MatrixStore<Double> tmpLI = mySolutionL.offsets(tmpCountE, 0).rows(included);
 
         return mySolutionL.limits(tmpCountE, 1).below(tmpLI);
     }
 
-    final PhysicalStore<Double> getIterationQ() {
+    PhysicalStore<Double> getIterationQ() {
         return this.getMatrixQ();
     }
 
     PhysicalStore<Double> getSlackE() {
 
-        MatrixStore<Double> mtrxAE = this.getMatrixAE();
         MatrixStore<Double> mtrxBE = this.getMatrixBE();
         PhysicalStore<Double> mtrxX = this.getSolutionX();
 
-        if (mtrxAE != null && mtrxAE.count() != 0L) {
-            mtrxX.premultiply(mtrxAE).onMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
+        mySlackE.fillMatching(mtrxBE);
+
+        for (int i = 0, limit = mtrxBE.getRowDim(); i < limit; i++) {
+            mySlackE.add(i, -this.getMatrixAE(i).dot(mtrxX));
         }
 
         return mySlackE;

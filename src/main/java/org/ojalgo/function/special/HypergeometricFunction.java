@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.special;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 public class HypergeometricFunction {
 

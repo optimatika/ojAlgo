@@ -17,6 +17,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Implementations to support the new `Quadruple` element type.
 
+#### org.ojalgo.equation
+
+- It is now possible to wrap an existing `BasicArray` instance in an `Equation`, as the equation body, and then later retrieve that instance to be recycled/reused.
+
 #### org.ojalgo.function
 
 - Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implemenations. Proper `Quadruple` implementations can be done later.
@@ -24,14 +28,51 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - All sorts of additions – many many – to fully support the new `Quadruple` element type.
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renamed copies of the old.
+- Modified LDL (Cholesky) decomposition – set a threshold value on the diagonal elements while decomposing.
 
 #### org.ojalgo.optimisation
 
 - New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
+- New structure in `Optimisation.Options`. Options for the LP- and QP-solversare are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
 
 #### org.ojalgo.scalar
 
 - New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s
+
+### Changed
+
+#### org.ojalgo.array
+
+- The `ArrayR128` class changed from being `BigDecimal` based to `Quadruple` based. Instead there is a new `ArrayR256` class that is `BigDecimal` based.
+
+#### org.ojalgo.optimisation
+
+- Changes to how parameter scaling is done.
+- When constructing convex (QP) solver, simple variable bounds are no longer scaled.
+- Modified the EBM file format to also include known variable values. Format (reader/writer) compatible with both old and new variants.
+- Refactoring of the `ConvexSolver` class hierarchy. In particular with the `ActiveSetSolver` there should now be a lot less copying of data.
+
+#### org.ojalgo.type
+
+- The definition of `MathType.R128` changed. It used to refer to a `BigDecimal` based Real number. Now `MathType.R128` refers to implementations using the new `Quadruple` class, and the `BigDecimal` based stuff is referred to as `R256`.
+
+### Deprecated
+
+#### org.ojalgo.matrix
+
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renmed copies of the old.
+
+#### org.ojalgo.scalar
+
+- `BigScalar` will be removed shortly.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered althought the decomposition instance reported they should be.
+- The `reconstruct()` methods of the `LU` and `LDL` decompositions did not correctly handle pivoting, resulting in incorrect reconstructed matrices.
 
 ## [52.0.1] – 2022-10-20
 

@@ -52,6 +52,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     @Deprecated
     public static abstract class Builder extends GenericSolver.Builder<LinearSolver.StandardBuilder, LinearSolver> {
 
+        private LinearFunction<Double> myObjective = null;
+
         Builder() {
             super();
         }
@@ -62,12 +64,36 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
+        public void reset() {
+            super.reset();
+            myObjective = null;
+        }
+
+        @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
             SimplexTableau tableau = SimplexTableau.make(this, options);
 
             return new PrimalSimplex(tableau, options);
         }
+
+        @Override
+        protected LinearFunction<Double> getObjective() {
+            if (myObjective == null) {
+                myObjective = LinearFunction.makePrimitive(this.countVariables());
+                super.setObjective(myObjective);
+            }
+            return myObjective;
+        }
+
+        protected void setObjective(final LinearFunction<Double> objective) {
+            myObjective = objective;
+            super.setObjective(objective);
+        }
+    }
+
+    public static final class Configuration {
+
     }
 
     /**
@@ -84,12 +110,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      */
     public static final class GeneralBuilder extends GenericSolver.Builder<LinearSolver.GeneralBuilder, LinearSolver> {
 
+        private LinearFunction<Double> myObjective = null;
+
         GeneralBuilder() {
             super();
         }
 
         @Override
-        public LinearSolver.GeneralBuilder inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+        public LinearSolver.GeneralBuilder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
             return super.inequalities(mtrxAI, mtrxBI);
         }
 
@@ -107,12 +135,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public GeneralBuilder objective(final double... factors) {
-            return this.objective(FACTORY.column(factors));
+            this.getObjective().linear().fillMatching(FACTORY.column(factors));
+            return this;
+        }
+
+        public GeneralBuilder objective(final int index, final double value) {
+            this.getObjective().linear().set(index, value);
+            return this;
         }
 
         public GeneralBuilder objective(final MatrixStore<Double> mtrxC) {
             this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
             return this;
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            myObjective = null;
         }
 
         /**
@@ -278,6 +318,20 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return new PrimalSimplex(tableau, options);
         }
 
+        @Override
+        protected LinearFunction<Double> getObjective() {
+            if (myObjective == null) {
+                myObjective = LinearFunction.makePrimitive(this.countVariables());
+                super.setObjective(myObjective);
+            }
+            return myObjective;
+        }
+
+        protected void setObjective(final LinearFunction<Double> objective) {
+            myObjective = objective;
+            super.setObjective(objective);
+        }
+
     }
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
@@ -441,7 +495,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public StandardBuilder objective(final double... factors) {
-            return this.objective(FACTORY.column(factors));
+            this.getObjective().linear().fillMatching(FACTORY.column(factors));
+            return this;
+        }
+
+        public StandardBuilder objective(final int index, final double value) {
+            this.getObjective().linear().set(index, value);
+            return this;
         }
 
         @Override

@@ -132,6 +132,10 @@ public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunctio
 
     AggregatorFunction<N> reset();
 
+    /**
+     * @deprecated v53 Will be removed
+     */
+    @Deprecated
     Scalar<N> toScalar();
 
 }

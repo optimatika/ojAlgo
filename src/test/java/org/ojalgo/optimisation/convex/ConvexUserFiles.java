@@ -21,8 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.junit.jupiter.api.Test;
-import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.type.context.NumberContext;
@@ -33,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class ConvexUserFiles extends OptimisationConvexTests implements ModelFileTest {
 
-    private static final NumberContext ACCURACY = NumberContext.of(8, 6);
+    private static final NumberContext ACCURACY = NumberContext.of(8);
 
     private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         return ConvexUserFiles.doTest(modelName, expMinValString, expMaxValString, ACCURACY);
@@ -57,19 +55,6 @@ public class ConvexUserFiles extends OptimisationConvexTests implements ModelFil
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
 
         return model;
-    }
-
-    /**
-     * This model was reported to have worked with v51.4.1 but failed with v52.0.0. The change that caused the
-     * regression was in the {@link ConjugateGradientSolver}. The underlying difficulty is with the problem
-     * formulation, it has rather extreme model parameters.
-     * <P>
-     * Gurobi # -2.0788951439317316e+00 {-9.9543353633269049e-05, 8.61193135185848e-05,
-     * 1.8459753694143321e-05, -5.0356252991766056e-06, 1.9421945389085489e-14}
-     */
-    @Test
-    public void testModelWorkAndFail() {
-        ConvexUserFiles.doTest("modelWorkAndFail.ebm", "-2.0788951439317316e+00", null);
     }
 
 }

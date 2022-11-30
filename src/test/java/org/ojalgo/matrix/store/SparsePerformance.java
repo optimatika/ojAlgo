@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import java.util.Set;
 import java.util.TreeSet;

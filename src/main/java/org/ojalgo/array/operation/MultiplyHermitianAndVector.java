@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.scalar.Scalar;
 

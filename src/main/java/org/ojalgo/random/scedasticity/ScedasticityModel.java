@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random.scedasticity;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.SQRT;
 
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.series.primitive.DataSeries;

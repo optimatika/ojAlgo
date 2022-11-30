@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random.scedasticity;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 public final class Homoscedastic extends AbstractScedasticity {
 

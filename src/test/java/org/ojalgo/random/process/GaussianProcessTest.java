@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.TWO;
 
 import java.util.Collection;
 

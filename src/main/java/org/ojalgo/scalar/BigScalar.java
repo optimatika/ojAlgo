@@ -34,7 +34,10 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * A {@link BigDecimal} based implementation of the {@link Scalar} interface. Most/all other implementations
  * are based on primitive components. This implementation exists for historical reasons, and is now primarily
  * used for tests.
+ *
+ * @deprecated v53 Will be removed
  */
+@Deprecated
 public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScalar> {
 
     public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<>() {

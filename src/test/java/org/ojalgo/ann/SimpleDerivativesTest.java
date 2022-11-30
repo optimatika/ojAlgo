@@ -21,7 +21,7 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SOFTMAX;
 
 import java.util.Collections;
 import java.util.List;

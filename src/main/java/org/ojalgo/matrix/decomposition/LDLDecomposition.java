@@ -86,6 +86,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     }
 
     private final Pivot myPivot = new Pivot();
+    private double myThreshold = Double.NaN;
 
     protected LDLDecomposition(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
@@ -158,7 +159,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.rows(myPivot.getInverseOrder());
+        return preallocated.rows(myPivot.reverseOrder());
     }
 
     public MatrixStore<N> getL() {
@@ -169,6 +170,10 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
     public int[] getPivotOrder() {
         return myPivot.getOrder();
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public double getRankThreshold() {
@@ -201,7 +206,7 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
 
         preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.rows(myPivot.getInverseOrder());
+        return preallocated.rows(myPivot.reverseOrder());
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
@@ -287,8 +292,27 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
                 }
             }
 
+            double storeDiagVal = store.doubleValue(ij, ij);
+
+            if (Double.isFinite(myThreshold) && myThreshold > ZERO) {
+
+                // double maxColVal = ZERO;
+                // for (int i = ij + 1; i < dim; i++) {
+                //     maxColVal = Math.max(maxColVal, Math.abs(store.doubleValue(i, ij)));
+                // }
+                // maxColVal *= myThreshold;
+                // maxColVal *= maxColVal;
+
+                double candidate = Math.max(Math.abs(storeDiagVal), myThreshold);
+
+                if (candidate > storeDiagVal) {
+                    storeDiagVal = candidate;
+                    store.set(ij, ij, storeDiagVal);
+                }
+            }
+
             // Do the calculations...
-            if (NumberContext.compare(store.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
+            if (NumberContext.compare(storeDiagVal, PrimitiveMath.ZERO) != 0) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal
@@ -310,6 +334,10 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
     @Override
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
+    }
+
+    void setThreshold(final N threshold) {
+        myThreshold = NumberDefinition.doubleValue(threshold);
     }
 
 }
