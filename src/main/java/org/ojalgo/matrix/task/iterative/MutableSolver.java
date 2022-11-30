@@ -64,7 +64,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         if (row.count() != mySize) {
             throw new IllegalArgumentException();
         }
-        final boolean retVal = myRows.add(row);
+        boolean retVal = myRows.add(row);
         Collections.sort(myRows);
         return retVal;
     }
@@ -97,9 +97,8 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         return myDelegate.solve(body, rhs, current);
     }
 
-    protected double doubleValue(final int row, final int column) {
-        final Equation tmpRow = myRows.get(row);
-        return tmpRow.doubleValue(column);
+    protected double doubleValue(final int row, final int col) {
+        return myRows.get(row).doubleValue(col);
     }
 
     protected final D getDelegate() {

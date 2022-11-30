@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 /**
  * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res

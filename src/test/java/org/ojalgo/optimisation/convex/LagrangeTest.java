@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.matrix.store.Primitive64Store.*;
+import static org.ojalgo.matrix.store.Primitive64Store.FACTORY;
 
 import java.util.Optional;
 

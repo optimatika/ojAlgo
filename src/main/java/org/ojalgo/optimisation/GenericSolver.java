@@ -58,6 +58,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         private final OptimisationData myData = new OptimisationData();
+        private transient int myNumberOfVariables = -1;
 
         protected Builder() {
             super();
@@ -91,10 +92,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         public int countVariables() {
-            return myData.countVariables();
+            if (myNumberOfVariables < 0) {
+                myNumberOfVariables = myData.countVariables();
+            }
+            return myNumberOfVariables;
         }
 
-        public B equalities(final Access2D<Double> mtrxAE, final Access1D<Double> mtrxBE) {
+        public B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
             myData.setEqualities(mtrxAE, mtrxBE);
             return (B) this;
         }
@@ -131,6 +135,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getObjective().getLinearFactors();
         }
 
+        public RowView<Double> getRowsAE() {
+            return myData.getRowsAE();
+        }
+
         public boolean hasEqualityConstraints() {
             return myData.countEqualityConstraints() > 0;
         }
@@ -149,6 +157,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         public void reset() {
             myData.reset();
+            myNumberOfVariables = -1;
+        }
+
+        public Optimisation.Result solve() {
+            return this.build().solve();
         }
 
         /**
@@ -203,6 +216,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected abstract S doBuild(Optimisation.Options options);
 
+        protected SparseArray<Double> getAE(final int row) {
+            return myData.getAE(row);
+        }
+
+        protected RowsSupplier<Double> getAE(final int... rows) {
+            return myData.getAE(rows);
+        }
+
         /**
          * [AI][X] &lt;= [BI]
          */
@@ -216,6 +237,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected RowsSupplier<Double> getAI(final int... rows) {
             return myData.getAI(rows);
+        }
+
+        protected double getBE(final int row) {
+            return myData.getBE(row);
         }
 
         /**
@@ -245,7 +270,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getUpperBounds(defaultValue).data;
         }
 
-        protected B inequalities(final Access2D<Double> mtrxAI, final Access1D<Double> mtrxBI) {
+        protected B inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
             myData.setInequalities(mtrxAI, mtrxBI);
             return (B) this;
         }
@@ -264,12 +289,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return (B) this;
         }
 
+        protected void setNumberOfVariables(final int numberOfVariables) {
+            myNumberOfVariables = numberOfVariables;
+        }
+
         protected void setObjective(final TwiceDifferentiable<Double> objective) {
             myData.setObjective(objective);
         }
 
     }
 
+    /**
+     * @deprecated Don't use/depend on this. Define new instances independent of this.
+     */
+    @Deprecated
     protected static final NumberContext ACCURACY = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
 
     public final Optimisation.Options options;

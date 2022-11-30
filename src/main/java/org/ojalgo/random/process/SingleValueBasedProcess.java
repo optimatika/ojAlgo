@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import org.ojalgo.array.Array2D;
 import org.ojalgo.random.Distribution;

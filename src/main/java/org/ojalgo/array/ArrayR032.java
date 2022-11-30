@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.constant;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.scalar.RationalNumber;
 
@@ -108,248 +106,60 @@ public abstract class RationalMath {
      * org.ojalgo.function.special.MissingMath.
      */
 
-    public static final RationalFunction.Unary ABS = arg -> {
-        if (arg.compareTo(RationalNumber.ZERO) == -1) {
-            return arg.negate();
-        }
-        return arg;
-    };
-    public static final RationalFunction.Unary ACOS = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.ACOS.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary ACOSH = arg -> {
-
-        final RationalNumber tmpNmbr = arg.multiply(arg).subtract(RationalNumber.ONE);
-
-        return RationalMath.LOG.invoke(arg.add(RationalMath.SQRT.invoke(tmpNmbr)));
-    };
+    public static final RationalFunction.Unary ABS = arg -> ((arg.compareTo(RationalNumber.ZERO) < 0) ? arg.negate() : arg);
+    public static final RationalFunction.Unary ACOS = arg -> RationalNumber.valueOf(BigMath.ACOS.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary ACOSH = arg -> RationalMath.LOG
+            .invoke(arg.add(RationalMath.SQRT.invoke(arg.multiply(arg).subtract(RationalNumber.ONE))));
     public static final RationalFunction.Binary ADD = (arg1, arg2) -> arg1.add(arg2);
-    public static final RationalFunction.Unary ASIN = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.ASIN.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary ASINH = arg -> {
-
-        final RationalNumber tmpNmbr = arg.multiply(arg).add(RationalNumber.ONE);
-
-        return RationalMath.LOG.invoke(arg.add(RationalMath.SQRT.invoke(tmpNmbr)));
-    };
-    public static final RationalFunction.Unary ATAN = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.ATAN.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Binary ATAN2 = (arg1, arg2) -> {
-
-        final BigDecimal tmpArg1 = arg1.toBigDecimal();
-        final BigDecimal tmpArg2 = arg2.toBigDecimal();
-
-        final BigDecimal tmpResult = BigMath.ATAN2.invoke(tmpArg1, tmpArg2);
-
-        return RationalNumber.valueOf(tmpResult);
-    };
-    public static final RationalFunction.Unary ATANH = arg -> {
-
-        final RationalNumber tmpNmbr = arg.add(RationalNumber.ONE).divide(RationalNumber.ONE.subtract(arg));
-
-        return RationalMath.LOG.invoke(tmpNmbr).divide(RationalNumber.TWO);
-    };
+    public static final RationalFunction.Unary ASIN = arg -> RationalNumber.valueOf(BigMath.ASIN.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary ASINH = arg -> RationalMath.LOG
+            .invoke(arg.add(RationalMath.SQRT.invoke(arg.multiply(arg).add(RationalNumber.ONE))));
+    public static final RationalFunction.Unary ATAN = arg -> RationalNumber.valueOf(BigMath.ATAN.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Binary ATAN2 = (arg1, arg2) -> RationalNumber.valueOf(BigMath.ATAN2.invoke(arg1.toBigDecimal(), arg2.toBigDecimal()));
+    public static final RationalFunction.Unary ATANH = arg -> RationalMath.LOG.invoke(arg.add(RationalNumber.ONE).divide(RationalNumber.ONE.subtract(arg)))
+            .divide(RationalNumber.TWO);
     public static final RationalFunction.Unary CARDINALITY = arg -> arg.compareTo(RationalNumber.ZERO) == 0 ? RationalNumber.ZERO : RationalNumber.ONE;
-    public static final RationalFunction.Unary CBRT = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.CBRT.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary CEIL = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.CEIL.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary CBRT = arg -> RationalNumber.valueOf(BigMath.CBRT.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary CEIL = arg -> RationalNumber.valueOf(BigMath.CEIL.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary CONJUGATE = RationalNumber::conjugate;
-    public static final RationalFunction.Unary COS = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.COS.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary COS = arg -> RationalNumber.valueOf(BigMath.COS.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary COSH = arg -> RationalMath.EXP.invoke(arg).add(RationalMath.EXP.invoke(arg.negate())).divide(RationalNumber.TWO);
     public static final RationalFunction.Binary DIVIDE = (arg1, arg2) -> arg1.divide(arg2);
-    public static final RationalFunction.Unary EXP = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.EXP.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary EXPM1 = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.EXPM1.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary FLOOR = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.FLOOR.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Binary HYPOT = (arg1, arg2) -> {
-
-        final BigDecimal tmpArg1 = arg1.toBigDecimal();
-        final BigDecimal tmpArg2 = arg2.toBigDecimal();
-
-        final BigDecimal tmpResult = BigMath.HYPOT.invoke(tmpArg1, tmpArg2);
-
-        return RationalNumber.valueOf(tmpResult);
-    };
+    public static final RationalFunction.Unary EXP = arg -> RationalNumber.valueOf(BigMath.EXP.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary EXPM1 = arg -> RationalNumber.valueOf(BigMath.EXPM1.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary FLOOR = arg -> RationalNumber.valueOf(BigMath.FLOOR.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Binary HYPOT = (arg1, arg2) -> RationalNumber.valueOf(BigMath.HYPOT.invoke(arg1.toBigDecimal(), arg2.toBigDecimal()));
     public static final RationalFunction.Unary INVERT = RationalNumber::invert;
-    public static final RationalFunction.Unary LOG = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.LOG.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary LOG10 = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.LOG10.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary LOG1P = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.LOG1P.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary LOG = arg -> RationalNumber.valueOf(BigMath.LOG.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary LOG10 = arg -> RationalNumber.valueOf(BigMath.LOG10.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Unary LOG1P = arg -> RationalNumber.valueOf(BigMath.LOG1P.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary LOGISTIC = arg -> RationalNumber.valueOf(BigMath.LOGISTIC.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary LOGIT = arg -> RationalNumber.valueOf(BigMath.LOGIT.invoke(arg.toBigDecimal()));
-    public static final RationalFunction.Binary MAX = (arg1, arg2) -> {
-
-        RationalNumber retVal = null;
-
-        if (arg1.compareTo(arg2) >= 0) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
-    public static final RationalFunction.Binary MIN = (arg1, arg2) -> {
-
-        RationalNumber retVal = null;
-
-        if (arg1.compareTo(arg2) <= 0) {
-            retVal = arg1;
-        } else {
-            retVal = arg2;
-        }
-
-        return retVal;
-    };
+    public static final RationalFunction.Binary MAX = (arg1, arg2) -> ((arg1.compareTo(arg2) >= 0) ? arg1 : arg2);
+    public static final RationalFunction.Binary MIN = (arg1, arg2) -> ((arg1.compareTo(arg2) <= 0) ? arg1 : arg2);
     public static final RationalFunction.Binary MULTIPLY = (arg1, arg2) -> arg1.multiply(arg2);
     public static final RationalFunction.Unary NEGATE = RationalNumber::negate;
     public static final RationalFunction.Binary POW = (arg1, arg2) -> EXP.invoke(LOG.invoke(arg1).multiply(arg2));
-    public static final RationalFunction.Parameter POWER = (arg, param) -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.POWER.invoke(tmpArg, param);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Unary RINT = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.RINT.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Parameter ROOT = (arg, param) -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.ROOT.invoke(tmpArg, param);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
-    public static final RationalFunction.Parameter SCALE = (arg, param) -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.SCALE.invoke(tmpArg, param);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Parameter POWER = (arg, param) -> RationalNumber.valueOf(BigMath.POWER.invoke(arg.toBigDecimal(), param));
+    public static final RationalFunction.Unary RINT = arg -> RationalNumber.valueOf(BigMath.RINT.invoke(arg.toBigDecimal()));
+    public static final RationalFunction.Parameter ROOT = (arg, param) -> RationalNumber.valueOf(BigMath.ROOT.invoke(arg.toBigDecimal(), param));
+    public static final RationalFunction.Parameter SCALE = (arg, param) -> RationalNumber.valueOf(BigMath.SCALE.invoke(arg.toBigDecimal(), param));
     public static final RationalFunction.Unary SIGNUM = RationalNumber::signum;
-    public static final RationalFunction.Unary SIN = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.SIN.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary SIN = arg -> RationalNumber.valueOf(BigMath.SIN.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary SINH = arg -> EXP.invoke(arg).subtract(EXP.invoke(arg.negate())).divide(RationalNumber.TWO);
-    public static final RationalFunction.Unary SQRT = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.SQRT.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary SQRT = arg -> RationalNumber.valueOf(BigMath.SQRT.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary SQRT1PX2 = arg -> SQRT.invoke(RationalNumber.ONE.add(arg.multiply(arg)));
     public static final RationalFunction.Binary SUBTRACT = (arg1, arg2) -> arg1.subtract(arg2);
-    public static final RationalFunction.Unary TAN = arg -> {
-
-        final BigDecimal tmpArg = arg.toBigDecimal();
-
-        final BigDecimal tmpRet = BigMath.TAN.invoke(tmpArg);
-
-        return RationalNumber.valueOf(tmpRet);
-    };
+    public static final RationalFunction.Unary TAN = arg -> RationalNumber.valueOf(BigMath.TAN.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary TANH = arg -> {
 
         RationalNumber retVal;
 
-        final RationalNumber tmpPlus = EXP.invoke(arg);
-        final RationalNumber tmpMinus = EXP.invoke(arg.negate());
+        RationalNumber tmpPlus = EXP.invoke(arg);
+        RationalNumber tmpMinus = EXP.invoke(arg.negate());
 
-        final RationalNumber tmpDividend = tmpPlus.subtract(tmpMinus);
-        final RationalNumber tmpDivisor = tmpPlus.add(tmpMinus);
+        RationalNumber tmpDividend = tmpPlus.subtract(tmpMinus);
+        RationalNumber tmpDivisor = tmpPlus.add(tmpMinus);
 
         if (tmpDividend.equals(tmpDivisor)) {
             retVal = RationalNumber.ONE;

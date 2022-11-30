@@ -119,6 +119,12 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         }
     }
 
+    public static RationalNumber parse(final CharSequence plainNumberString) {
+        String string = plainNumberString.toString();
+        BigDecimal number = new BigDecimal(string);
+        return RationalNumber.valueOf(number);
+    }
+
     public static RationalNumber rational(final double d) {
         if (d < 0) {
             return RationalNumber.rational(-d, 1.0, 39).negate();

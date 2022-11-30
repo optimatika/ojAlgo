@@ -30,8 +30,10 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.ArrayR256;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
@@ -227,19 +229,6 @@ public interface Optimisation {
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * @deprecated v51.1.0 No longer used for anything! Instead it is possible to specify an
-         *             {@link IntegerStrategy} that offers much more control.
-         */
-        @Deprecated
-        public double mip_defer = 0.99;
-
-        /**
-         * @deprecated v51.1.0 No longer used! Use {@link IntegerStrategy#getGapTolerance()} instead.
-         */
-        @Deprecated
-        public double mip_gap = 1.0E-6;
-
-        /**
          * For display only!
          */
         public NumberContext print = NumberContext.of(8, 10);
@@ -291,7 +280,9 @@ public interface Optimisation {
         public boolean validate = false;
 
         private Object myConfigurator = null;
+        private ConvexSolver.Configuration myConvexConfiguration = new ConvexSolver.Configuration();
         private IntegerStrategy myIntegerStrategy = IntegerStrategy.DEFAULT;
+        private LinearSolver.Configuration myLinearConfiguration = new LinearSolver.Configuration();
 
         public Options() {
             super();
@@ -304,13 +295,27 @@ public interface Optimisation {
         }
 
         /**
+         * Configurations specific to ojAlgo's built-in {@link ConvexSolver}.
+         */
+        public ConvexSolver.Configuration convex() {
+            return myConvexConfiguration;
+        }
+
+        public Options convex(final ConvexSolver.Configuration configuration) {
+            Objects.requireNonNull(configuration);
+            myConvexConfiguration = configuration;
+            return this;
+        }
+
+        /**
          * Will configure detailed debug logging and validation
          */
-        public void debug(final Class<? extends Optimisation.Solver> solver) {
+        public Options debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
             logger_detailed = (solver != null);
             validate = (solver != null);
+            return this;
         }
 
         public <T> Optional<T> getConfigurator(final Class<T> type) {
@@ -335,16 +340,33 @@ public interface Optimisation {
             return this;
         }
 
+        public LinearSolver.Configuration linear() {
+            return myLinearConfiguration;
+        }
+
+        /**
+         * Configurations specific to ojAlgo's built-in {@link LinearSolver}.
+         */
+        public Options linear(final LinearSolver.Configuration configuration) {
+            Objects.requireNonNull(configuration);
+            myLinearConfiguration = configuration;
+            return this;
+        }
+
         /**
          * Will configure high level (low volume) progress logging
          */
-        public void progress(final Class<? extends Optimisation.Solver> solver) {
+        public Options progress(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
             logger_detailed = false;
             validate = false;
+            return this;
         }
 
+        /**
+         * A configurator for 3:d party solvers. Each such solver may define its own configurator type.
+         */
         public void setConfigurator(final Object configurator) {
             ProgrammingError.throwIfNull(configurator);
             myConfigurator = configurator;

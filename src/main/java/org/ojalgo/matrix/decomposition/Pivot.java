@@ -37,7 +37,7 @@ final class Pivot {
 
         if (ind1 != ind2) {
 
-            final int tmpRow = myOrder[ind1];
+            int tmpRow = myOrder[ind1];
             myOrder[ind1] = myOrder[ind2];
             myOrder[ind2] = tmpRow;
 
@@ -50,7 +50,7 @@ final class Pivot {
         }
     }
 
-    int[] getInverseOrder() {
+    int[] reverseOrder() {
         int[] inverse = new int[myOrder.length];
         for (int i = 0; i < myOrder.length; i++) {
             inverse[myOrder[i]] = i;

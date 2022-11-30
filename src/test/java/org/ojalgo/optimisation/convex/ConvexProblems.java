@@ -36,8 +36,8 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.MatrixQ128;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -61,9 +61,9 @@ public class ConvexProblems extends OptimisationConvexTests {
     public static ExpressionsBasedModel buildP20080117() {
 
         // create expected returns matrix
-        MatrixR064 tmpReturns = MatrixR064.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 },
-                { -0.004130184341000032 }, { -0.005639860515211043 }, { 0.0007211966666666817 }, { 0.0003258225000000077 }, { -0.005754291666666666 },
-                { -0.004264291666666667 }, { -0.0017500000000000003 } });
+        MatrixR064 tmpReturns = MatrixR064.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 }, { -0.004130184341000032 },
+                { -0.005639860515211043 }, { 0.0007211966666666817 }, { 0.0003258225000000077 }, { -0.005754291666666666 }, { -0.004264291666666667 },
+                { -0.0017500000000000003 } });
 
         // create covariance matrix
         MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {
@@ -391,8 +391,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         NumberContext accuracy = StandardType.PERCENT.withPrecision(5);
 
-        double[] data = { 0.02, 0.02, 0.02, 0.02, 0.80, 0.06, 0.02, 0.02, 0.02 };
-        Access1D<BigDecimal> expected = ArrayR256.FACTORY.copy(data);
+        double[] source = { 0.02, 0.02, 0.02, 0.02, 0.80, 0.06, 0.02, 0.02, 0.02 };
+        Access1D<BigDecimal> expected = ArrayR256.FACTORY.copy(source);
 
         TestUtils.assertTrue(model.validate(expected, accuracy));
         TestUtils.assertTrue(model.validate(actual, accuracy));
@@ -415,8 +415,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080118() {
 
         // create expected returns matrix
-        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 },
-                { 9.996579 }, { 9.990690 }, { 9.994904 }, { 9.994514 }, { 9.984064 }, { 9.987534 } });
+        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 }, { 9.996579 },
+                { 9.990690 }, { 9.994904 }, { 9.994514 }, { 9.984064 }, { 9.987534 } });
 
         // create covariance matrix
         MatrixR064 covarianceMatrix = MatrixR064.FACTORY.rows(new double[][] {
@@ -454,8 +454,8 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.35"));
         }
 
-        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(MatrixQ128.FACTORY
-                .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
+        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(
+                MatrixQ128.FACTORY.rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
@@ -496,8 +496,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080124() {
         // create expected returns matrix
-        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
-                { 9.998392 }, { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
+        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 }, { 9.998392 },
+                { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
         // create covariance matrix
         MatrixR064 covarianceMatrix = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.0013191354374342357, 7.786471466322114E-5, -3.810886655309235E-5, -2.28102405899103E-4, -1.2589115740653127E-4, -1.3247692268411991E-5,
@@ -602,8 +602,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080204() {
 
         // create expected returns matrix
-        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 },
-                { 10.056851 }, { 9.997920 }, { 9.999011 }, { 10.050971 }, { 9.989124 }, { 9.989912 } });
+        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 }, { 10.056851 },
+                { 9.997920 }, { 9.999011 }, { 10.050971 }, { 9.989124 }, { 9.989912 } });
         // create covariance matrix
         MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.014531344652473037, 4.444675045533674E-4, 0.007234717654072837, -9.455312097865225E-4, 0.0016345464996349748, 1.5256808879495097E-4,
@@ -684,8 +684,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080208() {
 
         // create expected returns matrix
-        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 },
-                { 10.055549 }, { 9.999127 }, { 9.999720 }, { 10.049002 }, { 9.988769 }, { 9.990095 } });
+        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 }, { 10.055549 },
+                { 9.999127 }, { 9.999720 }, { 10.049002 }, { 9.988769 }, { 9.990095 } });
 
         // create covariance matrix
         MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix;
 
-import static org.ojalgo.function.aggregator.Aggregator.*;
+import static org.ojalgo.function.aggregator.Aggregator.AVERAGE;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;

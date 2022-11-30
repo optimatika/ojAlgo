@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.NaN;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

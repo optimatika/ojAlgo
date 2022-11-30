@@ -21,9 +21,9 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SIGMOID;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+import static org.ojalgo.function.constant.PrimitiveMath.HALF;
 
 import java.util.Collections;
 import java.util.List;

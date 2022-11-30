@@ -567,16 +567,13 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
 
     public void divideAndCopyColumn(final int row, final int column, final BasicArray<Double> destination) {
 
-        final double[] tmpData = data;
-        final int tmpRowDim = myRowDim;
+        double[] destinationData = ((ArrayR064) destination).data;
 
-        final double[] tmpDestination = ((ArrayR064) destination).data;
+        int index = row + column * myRowDim;
+        double denominator = data[index];
 
-        int tmpIndex = row + column * tmpRowDim;
-        final double tmpDenominator = tmpData[tmpIndex];
-
-        for (int i = row + 1; i < tmpRowDim; i++) {
-            tmpDestination[i] = tmpData[++tmpIndex] /= tmpDenominator;
+        for (int i = row + 1; i < myRowDim; i++) {
+            destinationData[i] = data[++index] /= denominator;
         }
     }
 

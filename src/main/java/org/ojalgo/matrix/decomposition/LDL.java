@@ -27,6 +27,7 @@ import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -53,17 +54,37 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<LDL<N>> {
 
+        /**
+         * @see LDL#modified(Factory, Comparable)
+         */
+        default Factory<N> modified(final N threshold) {
+            return new ModifiedFactory<>(this, threshold);
+        }
+
+    }
+
+    final class ModifiedFactory<N extends Comparable<N>> implements Factory<N> {
+
+        private final Factory<N> myDelegate;
+        private final N myThreshold;
+
+        ModifiedFactory(final Factory<N> delegate, final N threshold) {
+            super();
+            myDelegate = delegate;
+            myThreshold = threshold;
+        }
+
+        public LDL<N> make(final Structure2D typical) {
+            LDL<N> retVal = myDelegate.make(typical);
+            if (myThreshold != null && retVal instanceof LDLDecomposition) {
+                ((LDLDecomposition<N>) retVal).setThreshold(myThreshold);
+            }
+            return retVal;
+        }
+
     }
 
     Factory<ComplexNumber> C128 = typical -> new LDLDecomposition.C128();
-
-    Factory<Double> R064 = typical -> new LDLDecomposition.R064();
-
-    Factory<Quadruple> R128 = typical -> new LDLDecomposition.R128();
-
-    Factory<Quaternion> H256 = typical -> new LDLDecomposition.H256();
-
-    Factory<RationalNumber> Q128 = typical -> new LDLDecomposition.Q128();
 
     /**
      * @deprecated
@@ -71,11 +92,25 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
     @Deprecated
     Factory<ComplexNumber> COMPLEX = C128;
 
+    Factory<Quaternion> H256 = typical -> new LDLDecomposition.H256();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    Factory<Double> R064 = typical -> new LDLDecomposition.R064();
+
+    Factory<Quadruple> R128 = typical -> new LDLDecomposition.R128();
+
     /**
      * @deprecated
      */
     @Deprecated
     Factory<Double> PRIMITIVE = R064;
+
+    Factory<RationalNumber> Q128 = typical -> new LDLDecomposition.Q128();
 
     /**
      * @deprecated
@@ -87,16 +122,23 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
      * @deprecated
      */
     @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
     Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
+    }
+
+    /**
+     * Will return a modified LDL decomposition algoritm. It's the Gill, Murray and Wright (GMW) algorithm.
+     * <p>
+     * The input threshold is the bound on the diagonal values.
+     * <p>
+     * The second parameter of the GMW algorithm, that is supposed to cap the magnitude of the elements in the
+     * triangular (Cholesky) matrices, is set to something very large. More correctly, it is assumed to be
+     * very large and therefore resulting in a negligible contribution to the algorithm.
+     */
+    static <N extends Comparable<N>> Factory<N> modified(final Factory<N> delegate, final N threshold) {
+        return new ModifiedFactory<>(delegate, threshold);
     }
 
     MatrixStore<N> getD();
@@ -121,8 +163,8 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         MatrixStore<N> mtrxD = this.getD();
         MatrixStore<N> mtrxR = this.getR();
 
-        int[] pivotOrder = this.getPivotOrder();
+        int[] reverseOrder = this.getReversePivotOrder();
 
-        return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(pivotOrder).columns(pivotOrder);
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(reverseOrder).columns(reverseOrder);
     }
 }
