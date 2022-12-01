@@ -16,7 +16,7 @@ public class OptimisationServiceTest {
     private static final String HOST = "http://test-service.optimatika.se";
     // private static final String HOST = "http://localhost:8080";
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     @AfterEach
     public void clearIntegrations() {

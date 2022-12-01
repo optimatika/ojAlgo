@@ -40,6 +40,7 @@ import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
@@ -57,6 +58,8 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public class ConvexProblems extends OptimisationConvexTests {
+
+    private static final Factory<Double, Primitive64Store> R064 = Primitive64Store.FACTORY;
 
     public static ExpressionsBasedModel buildP20080117() {
 
@@ -1653,6 +1656,33 @@ public class ConvexProblems extends OptimisationConvexTests {
         MatrixStore<Double> computedB = AE.multiply(expectedX);
         TestUtils.assertEquals(BE, computedB, accuracy);
 
+        TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
+    }
+
+    /**
+     * Copy/variant of {@link #testP20200924()} demonstrating how to use new builder api.
+     */
+    @Test
+    public void testP20200924NG() {
+
+        // Nog enklast att fortfarande skapa en Q-matris
+        Primitive64Store Q = R064.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+
+        Result result = ConvexSolver.newBuilder(Q) //
+                .linear(8, 3, 3) // Finns olika sätt att bygga målfunktionen
+                .equality(3, 1, 0, 1) // 1x + 0y + 1z = 3
+                .equality(0, 0, 1, 1) // 0x + 1y + 1z = 0
+                .build().solve();
+
+        NumberContext accuracy = NumberContext.of(12);
+
+        Primitive64Store expectedX = R064.column(2, -1, 1);
+        TestUtils.assertEquals(expectedX, result, accuracy);
+
+        Optional<Access1D<?>> multipliers = result.getMultipliers();
+        TestUtils.assertTrue(" No multipliers present", multipliers.isPresent());
+
+        Primitive64Store expectedDual = R064.column(-3, 2);
         TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
     }
 
