@@ -24,7 +24,7 @@ package org.ojalgo.machine;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
-public class TestBasicMachine {
+public class TestBasicMachine extends MachineTests {
 
     @Test
     public void testEquals_equal() {

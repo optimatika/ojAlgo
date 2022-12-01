@@ -3,7 +3,7 @@ package org.ojalgo.machine;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
-public class TestHardware {
+public class TestHardware extends MachineTests {
 
     @Test
     public void testCompare() {

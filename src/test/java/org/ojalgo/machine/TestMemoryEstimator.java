@@ -1,34 +1,35 @@
 package org.ojalgo.machine;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.array.ArrayR064;
-import org.ojalgo.matrix.MatrixQ128;
+import org.ojalgo.TestUtils;
+import org.ojalgo.netio.BasicLogger;
 
-public class TestMemoryEstimator {
+/**
+ * TestMemoryEstimator
+ *
+ * @author apete
+ */
+public class TestMemoryEstimator extends MachineTests {
 
+    /**
+     * https://lemire.me/blog/2022/11/22/what-is-the-size-of-a-byte-array-in-java/
+     */
     @Test
-    public void testPrimitiveArray() {
+    public void testByteArray() {
 
-        final long tmpEstimate = MemoryEstimator.estimateObject(ArrayR064.class);
+        long[] expected = { 16, 24, 24, 24, 24, 24, 24, 24, 24, 32 };
 
-        final long tmpManually = 0L;
+        for (int i = 0; i < expected.length; i++) {
 
-        if (tmpEstimate == tmpManually) {
+            long estimate = MemoryEstimator.estimateArray(byte.class, i);
 
+            if (DEBUG) {
+                BasicLogger.debug("byte[{}] == {} bytes", i, estimate);
+            }
+
+            TestUtils.assertEquals(expected[i], estimate);
         }
 
     }
 
-    @Test
-    public void testRationalMatrix() {
-
-        final long tmpEstimate = MemoryEstimator.estimateObject(MatrixQ128.class);
-
-        final long tmpManually = 0L;
-
-        if (tmpEstimate == tmpManually) {
-
-        }
-
-    }
 }

@@ -231,8 +231,6 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.machine                                 -> java.lang                                          java.base
    org.ojalgo.machine                                 -> org.junit.jupiter.api                              not found
    org.ojalgo.machine                                 -> org.ojalgo                                         ojalgo-53.0.0-SNAPSHOT-tests.jar
-   org.ojalgo.machine                                 -> org.ojalgo.array                                   ojalgo-53.0.0-SNAPSHOT.jar
-   org.ojalgo.machine                                 -> org.ojalgo.matrix                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix                                  -> java.lang                                          java.base
    org.ojalgo.matrix                                  -> java.lang.invoke                                   java.base
    org.ojalgo.matrix                                  -> java.util                                          java.base
@@ -259,6 +257,7 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.decomposition                    -> java.math                                          java.base
    org.ojalgo.matrix.decomposition                    -> java.nio.file                                      java.base
    org.ojalgo.matrix.decomposition                    -> java.util                                          java.base
+   org.ojalgo.matrix.decomposition                    -> java.util.function                                 java.base
    org.ojalgo.matrix.decomposition                    -> java.util.stream                                   java.base
    org.ojalgo.matrix.decomposition                    -> org.junit.jupiter.api                              not found
    org.ojalgo.matrix.decomposition                    -> org.ojalgo                                         ojalgo-53.0.0-SNAPSHOT-tests.jar
@@ -409,7 +408,6 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix                                  ojalgo-53.0.0-SNAPSHOT.jar
-   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.decomposition                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task                             ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-53.0.0-SNAPSHOT.jar
