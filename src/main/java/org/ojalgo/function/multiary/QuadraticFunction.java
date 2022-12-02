@@ -24,7 +24,6 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -39,28 +38,89 @@ import org.ojalgo.structure.Access2D;
  */
 public final class QuadraticFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Quadratic<N> {
 
+    public static final class Factory<N extends Comparable<N>> {
+
+        private final LinearFunction.Factory<N> myLinear;
+        private final PureQuadraticFunction.Factory<N> myPureQuadratic;
+
+        Factory(final PhysicalStore.Factory<N, ?> factory) {
+            super();
+            myPureQuadratic = new PureQuadraticFunction.Factory<>(factory);
+            myLinear = new LinearFunction.Factory<>(factory);
+        }
+
+        public QuadraticFunction.Factory<N> linear(final Access1D<?> coefficients) {
+            myLinear.coefficients(coefficients);
+            return this;
+        }
+
+        public QuadraticFunction<N> make(final int arity) {
+            return new QuadraticFunction<>(myPureQuadratic.make(arity), myLinear.make(arity));
+        }
+
+        public QuadraticFunction.Factory<N> quadratic(final Access2D<?> coefficients) {
+            myPureQuadratic.coefficients(coefficients);
+            return this;
+        }
+
+    }
+
+    public static <N extends Comparable<N>> Factory<N> factory(final PhysicalStore.Factory<N, ?> factory) {
+        return new Factory<>(factory);
+    }
+
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> quadratic, final Access1D<?> linear) {
-        return new QuadraticFunction<>(GenericStore.C128.copy(quadratic), GenericStore.C128.columns(linear));
+        // return new QuadraticFunction<>(GenericStore.C128.copy(quadratic), GenericStore.C128.columns(linear));
+        return QuadraticFunction.factory(GenericStore.C128).quadratic(quadratic).linear(linear).make(linear.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new QuadraticFunction<>(GenericStore.C128.make(arity, arity), GenericStore.C128.make(arity, 1));
+        // return new QuadraticFunction<>(GenericStore.C128.make(arity, arity), GenericStore.C128.make(arity, 1));
+        return QuadraticFunction.factory(GenericStore.C128).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<Double> makePrimitive(final Access2D<?> quadratic, final Access1D<?> linear) {
-        return new QuadraticFunction<>(Primitive64Store.FACTORY.copy(quadratic), Primitive64Store.FACTORY.columns(linear));
+        // return new QuadraticFunction<>(Primitive64Store.FACTORY.copy(quadratic), Primitive64Store.FACTORY.columns(linear));
+        return QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<Double> makePrimitive(final int arity) {
-        return new QuadraticFunction<>(Primitive64Store.FACTORY.make(arity, arity), Primitive64Store.FACTORY.make(arity, 1));
+        // return new QuadraticFunction<>(Primitive64Store.FACTORY.make(arity, arity), Primitive64Store.FACTORY.make(arity, 1));
+        return QuadraticFunction.factory(Primitive64Store.FACTORY).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<RationalNumber> makeRational(final Access2D<?> quadratic, final Access1D<?> linear) {
-        return new QuadraticFunction<>(GenericStore.Q128.copy(quadratic), GenericStore.Q128.columns(linear));
+        // return new QuadraticFunction<>(GenericStore.Q128.copy(quadratic), GenericStore.Q128.columns(linear));
+        return QuadraticFunction.factory(GenericStore.Q128).quadratic(quadratic).linear(linear).make(linear.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static QuadraticFunction<RationalNumber> makeRational(final int arity) {
-        return new QuadraticFunction<>(GenericStore.Q128.make(arity, arity), GenericStore.Q128.make(arity, 1));
+        // return new QuadraticFunction<>(GenericStore.Q128.make(arity, arity), GenericStore.Q128.make(arity, 1));
+        return QuadraticFunction.factory(GenericStore.Q128).make(arity);
     }
 
     public static <N extends Comparable<N>> QuadraticFunction<N> wrap(final PhysicalStore<N> quadratic, final PhysicalStore<N> linear) {
@@ -71,12 +131,13 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
     private final PureQuadraticFunction<N> myPureQuadratic;
 
     QuadraticFunction(final MatrixStore<N> quadratic, final MatrixStore<N> linear) {
+        this(new PureQuadraticFunction<>(quadratic), new LinearFunction<>(linear));
+    }
 
+    QuadraticFunction(final PureQuadraticFunction<N> pureQuadratic, final LinearFunction<N> linear) {
         super();
-
-        myPureQuadratic = new PureQuadraticFunction<>(quadratic);
-        myLinear = new LinearFunction<>(linear);
-
+        myPureQuadratic = pureQuadratic;
+        myLinear = linear;
         if (myPureQuadratic.arity() != myLinear.arity()) {
             throw new IllegalArgumentException("Must have the same arity!");
         }
@@ -123,7 +184,7 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         myPureQuadratic.setConstant(constant);
     }
 
-    Factory<N, ?> factory() {
+    PhysicalStore.Factory<N, ?> factory() {
         return myLinear.factory();
     }
 

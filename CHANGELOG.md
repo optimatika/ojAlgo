@@ -46,6 +46,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The `ArrayR128` class changed from being `BigDecimal` based to `Quadruple` based. Instead there is a new `ArrayR256` class that is `BigDecimal` based.
 
+#### org.ojalgo.function
+
+- New set of factory methods for `MultiaryFunction`:s. The old ones are deprecated.
+- Renamed the existing `PolynomialFunction` implementations. The old classes are still there, but deprecated. Also added a few new subclasses/element types.
+
 #### org.ojalgo.optimisation
 
 - Changes to how parameter scaling is done.
@@ -62,10 +67,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renmed copies of the old.
-
-#### org.ojalgo.scalar
-
-- `BigScalar` will be removed shortly.
 
 ### Fixed
 

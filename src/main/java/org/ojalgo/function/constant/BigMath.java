@@ -150,7 +150,26 @@ public abstract class BigMath {
     public static final BigFunction.Unary SQRT1PX2 = arg -> MissingMath.root(ONE.add(arg.multiply(arg)), 2);
     public static final BigFunction.Binary SUBTRACT = BigDecimal::subtract;
     public static final BigFunction.Unary TAN = arg -> BigDecimal.valueOf(Math.tan(arg.doubleValue()));
-    public static final BigFunction.Unary TANH = arg -> BigDecimal.valueOf(Math.tanh(arg.doubleValue()));
+    public static final BigFunction.Unary TANH = arg -> {
+
+        BigDecimal retVal;
+
+        BigDecimal tmpPlus = EXP.invoke(arg);
+        BigDecimal tmpMinus = EXP.invoke(arg.negate());
+
+        BigDecimal tmpDividend = tmpPlus.subtract(tmpMinus);
+        BigDecimal tmpDivisor = tmpPlus.add(tmpMinus);
+
+        if (tmpDividend.equals(tmpDivisor)) {
+            retVal = BigDecimal.ONE;
+        } else if (tmpDividend.equals(tmpDivisor.negate())) {
+            retVal = BigDecimal.ONE.negate();
+        } else {
+            retVal = DIVIDE.apply(tmpDividend, tmpDivisor);
+        }
+
+        return retVal;
+    };
     public static final BigFunction.Unary VALUE = arg -> arg;
 
 }

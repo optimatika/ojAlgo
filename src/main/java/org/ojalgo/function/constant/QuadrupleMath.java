@@ -151,26 +151,7 @@ public abstract class QuadrupleMath {
     public static final QuadrupleFunction.Unary SQRT1PX2 = arg -> SQRT.invoke(Quadruple.ONE.add(arg.multiply(arg)));
     public static final QuadrupleFunction.Binary SUBTRACT = Quadruple::subtract;
     public static final QuadrupleFunction.Unary TAN = arg -> Quadruple.valueOf(BigMath.TAN.invoke(arg.toBigDecimal()));
-    public static final QuadrupleFunction.Unary TANH = arg -> {
-
-        Quadruple retVal;
-
-        Quadruple tmpPlus = EXP.invoke(arg);
-        Quadruple tmpMinus = EXP.invoke(arg.negate());
-
-        Quadruple tmpDividend = tmpPlus.subtract(tmpMinus);
-        Quadruple tmpDivisor = tmpPlus.add(tmpMinus);
-
-        if (tmpDividend.equals(tmpDivisor)) {
-            retVal = Quadruple.ONE;
-        } else if (tmpDividend.equals(tmpDivisor.negate())) {
-            retVal = Quadruple.ONE.negate();
-        } else {
-            retVal = tmpDividend.divide(tmpDivisor);
-        }
-
-        return retVal;
-    };
+    public static final QuadrupleFunction.Unary TANH = arg -> Quadruple.valueOf(BigMath.TANH.invoke(arg.toBigDecimal()));
     public static final QuadrupleFunction.Unary VALUE = arg -> arg;
 
 }

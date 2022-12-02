@@ -35,9 +35,7 @@ import org.ojalgo.type.TypeUtils;
 abstract class AbstractPolynomial<N extends Comparable<N>> implements PolynomialFunction<N> {
 
     private final Array1D<N> myCoefficients;
-
     private transient AbstractPolynomial<N> myDerivative = null;
-
     private transient AbstractPolynomial<N> myPrimitive = null;
 
     @SuppressWarnings("unused")
@@ -52,11 +50,11 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         myCoefficients = coefficients;
     }
 
-    public final PolynomialFunction<N> buildDerivative() {
+    public PolynomialFunction<N> buildDerivative() {
 
         if (myDerivative == null) {
 
-            final int tmpSize = Math.max(1, myCoefficients.size() - 1);
+            int tmpSize = Math.max(1, myCoefficients.size() - 1);
 
             myDerivative = this.makeInstance(tmpSize);
 
@@ -68,11 +66,11 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return myDerivative;
     }
 
-    public final PolynomialFunction<N> buildPrimitive() {
+    public PolynomialFunction<N> buildPrimitive() {
 
         if (myPrimitive == null) {
 
-            final int tmpSize = myCoefficients.size() + 1;
+            int tmpSize = myCoefficients.size() + 1;
 
             myPrimitive = this.makeInstance(tmpSize);
 
@@ -88,15 +86,15 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return this.size();
     }
 
-    public final int degree() {
+    public int degree() {
         return myCoefficients.size() - 1;
     }
 
-    public final double doubleValue(final long power) {
+    public double doubleValue(final long power) {
         return myCoefficients.doubleValue(power);
     }
 
-    public final void estimate(final List<? extends N> x, final List<? extends N> y) {
+    public void estimate(final List<? extends N> x, final List<? extends N> y) {
         this.estimate(Access1D.wrap(x), Access1D.wrap(y));
     }
 
@@ -126,15 +124,15 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         this.set(tmpQR.getSolution(tmpRHS));
     }
 
-    public final void estimate(final NumberSeries<?> samples) {
+    public void estimate(final NumberSeries<?> samples) {
         this.estimate(samples.accessKeys(), samples.accessValues());
     }
 
-    public final N get(final long power) {
+    public N get(final long power) {
         return myCoefficients.get(power);
     }
 
-    public final double invoke(final double arg) {
+    public double invoke(final double arg) {
 
         int power = this.degree();
 
@@ -147,7 +145,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return retVal;
     }
 
-    public final float invoke(final float arg) {
+    public float invoke(final float arg) {
 
         int power = this.degree();
 
@@ -160,19 +158,19 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return retVal;
     }
 
-    public final void set(final int power, final double coefficient) {
+    public void set(final int power, final double coefficient) {
         myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
 
-    public final void set(final int power, final N coefficient) {
+    public void set(final int power, final N coefficient) {
         myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
 
-    public final int size() {
+    public int size() {
         return myCoefficients.size();
     }
 

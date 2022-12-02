@@ -24,7 +24,6 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -37,28 +36,87 @@ import org.ojalgo.structure.Access1D;
  */
 public final class LinearFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
 
+    public static final class Factory<N extends Comparable<N>> {
+
+        private Access1D<?> myCoefficients = null;
+        private final PhysicalStore.Factory<N, ?> myFactory;
+
+        Factory(final PhysicalStore.Factory<N, ?> factory) {
+            super();
+            myFactory = factory;
+        }
+
+        public Factory<N> coefficients(final Access1D<?> coefficients) {
+            myCoefficients = coefficients;
+            return this;
+        }
+
+        public LinearFunction<N> make(final int arity) {
+            if (myCoefficients != null) {
+                return new LinearFunction<>(myFactory.rows(myCoefficients));
+            } else {
+                return new LinearFunction<>(myFactory.make(1, arity));
+            }
+        }
+
+    }
+
+    public static <N extends Comparable<N>> Factory<N> factory(final PhysicalStore.Factory<N, ?> factory) {
+        return new Factory<>(factory);
+    }
+
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericStore.C128.rows(coefficients));
+        // return new LinearFunction<>(GenericStore.C128.rows(coefficients));
+        return LinearFunction.factory(GenericStore.C128).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(GenericStore.C128.make(1, arity));
+        // return new LinearFunction<>(GenericStore.C128.make(1, arity));
+        return LinearFunction.factory(GenericStore.C128).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        return new LinearFunction<>(Primitive64Store.FACTORY.rows(coefficients));
+        // return new LinearFunction<>(Primitive64Store.FACTORY.rows(coefficients));
+        return LinearFunction.factory(Primitive64Store.FACTORY).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<Double> makePrimitive(final int arity) {
-        return new LinearFunction<>(Primitive64Store.FACTORY.make(1, arity));
+        // return new LinearFunction<>(Primitive64Store.FACTORY.make(1, arity));
+        return LinearFunction.factory(Primitive64Store.FACTORY).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericStore.Q128.rows(coefficients));
+        // return new LinearFunction<>(GenericStore.Q128.rows(coefficients));
+        return LinearFunction.factory(GenericStore.Q128).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static LinearFunction<RationalNumber> makeRational(final int arity) {
-        return new LinearFunction<>(GenericStore.Q128.make(1, arity));
+        // return new LinearFunction<>(GenericStore.Q128.make(1, arity));
+        return LinearFunction.factory(GenericStore.Q128).make(arity);
     }
 
     public static <N extends Comparable<N>> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {
@@ -95,8 +153,9 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
     public MatrixStore<N> getLinearFactors() {
         if (myCoefficients.countRows() == 1L) {
             return myCoefficients.transpose();
+        } else {
+            return myCoefficients;
         }
-        return myCoefficients;
     }
 
     @Override
@@ -113,7 +172,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
         return (PhysicalStore<N>) myCoefficients;
     }
 
-    Factory<N, ?> factory() {
+    PhysicalStore.Factory<N, ?> factory() {
         return myCoefficients.physical();
     }
 

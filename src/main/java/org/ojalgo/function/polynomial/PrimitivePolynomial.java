@@ -22,63 +22,19 @@
 package org.ojalgo.function.polynomial;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access1D;
 
-public final class PrimitivePolynomial extends AbstractPolynomial<Double> {
+/**
+ * @deprecated v53 use {@link PolynomialR064} instead
+ */
+@Deprecated
+public final class PrimitivePolynomial extends PolynomialR064 {
 
     public PrimitivePolynomial(final int degree) {
-        super(Array1D.R064.make(degree + 1));
+        super(degree);
     }
 
-    PrimitivePolynomial(final Array1D<Double> coefficients) {
+    public PrimitivePolynomial(final Array1D<Double> coefficients) {
         super(coefficients);
-    }
-
-    public void estimate(final Access1D<?> x, final Access1D<?> y) {
-        this.estimate(x, y, Primitive64Store.FACTORY, QR.PRIMITIVE);
-    }
-
-    public Double integrate(final Double fromPoint, final Double toPoint) {
-
-        PolynomialFunction<Double> tmpPrim = this.buildPrimitive();
-
-        double tmpFromVal = tmpPrim.invoke(fromPoint.doubleValue());
-        double tmpToVal = tmpPrim.invoke(toPoint.doubleValue());
-
-        return Double.valueOf(tmpToVal - tmpFromVal);
-    }
-
-    public Double invoke(final Double arg) {
-        return Double.valueOf(this.invoke(arg.doubleValue()));
-    }
-
-    public void set(final Access1D<?> coefficients) {
-        int tmpLimit = Math.min(this.size(), coefficients.size());
-        for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, coefficients.doubleValue(p));
-        }
-    }
-
-    @Override
-    protected Double getDerivativeFactor(final int power) {
-        int tmpNextIndex = power + 1;
-        return Double.valueOf(tmpNextIndex * this.doubleValue(tmpNextIndex));
-    }
-
-    @Override
-    protected Double getPrimitiveFactor(final int power) {
-        if (power <= 0) {
-            return Double.valueOf(PrimitiveMath.ZERO);
-        }
-        return Double.valueOf(this.doubleValue(power - 1) / power);
-    }
-
-    @Override
-    protected AbstractPolynomial<Double> makeInstance(final int size) {
-        return new PrimitivePolynomial(Array1D.R064.make(size));
     }
 
 }

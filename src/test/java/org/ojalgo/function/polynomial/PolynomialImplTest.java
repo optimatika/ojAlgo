@@ -48,7 +48,7 @@ public class PolynomialImplTest {
             }
 
             final int tmpDegree = tmpSamples - 1;
-            final PrimitivePolynomial tmpPoly = new PrimitivePolynomial(tmpDegree);
+            final PolynomialR064 tmpPoly = new PolynomialR064(tmpDegree);
 
             tmpPoly.estimate(Access1D.wrap(x), Access1D.wrap(y));
 
@@ -64,7 +64,7 @@ public class PolynomialImplTest {
 
         final int tmpDegree = 10;
 
-        final PrimitivePolynomial tmpPoly = new PrimitivePolynomial(tmpDegree);
+        final PolynomialR064 tmpPoly = new PolynomialR064(tmpDegree);
 
         tmpPoly.set(0, 5.0);
 

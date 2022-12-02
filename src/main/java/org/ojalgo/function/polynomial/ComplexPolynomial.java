@@ -22,72 +22,20 @@
 package org.ojalgo.function.polynomial;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access1D;
 
-public final class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
+/**
+ * @deprecated v53 use {@link PolynomialC128} instead
+ */
+@Deprecated
+public final class ComplexPolynomial extends PolynomialC128 {
 
     public ComplexPolynomial(final int degree) {
-        super(Array1D.C128.make(degree + 1));
+        super(degree);
     }
 
-    ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
+    public ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
         super(coefficients);
-    }
-
-    public void estimate(final Access1D<?> x, final Access1D<?> y) {
-        this.estimate(x, y, GenericStore.C128, QR.COMPLEX);
-    }
-
-    public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
-
-        PolynomialFunction<ComplexNumber> tmpPrim = this.buildPrimitive();
-
-        ComplexNumber tmpFromVal = tmpPrim.invoke(fromPoint);
-        ComplexNumber tmpToVal = tmpPrim.invoke(toPoint);
-
-        return tmpToVal.subtract(tmpFromVal);
-    }
-
-    public ComplexNumber invoke(final ComplexNumber arg) {
-
-        int tmpPower = this.degree();
-
-        ComplexNumber retVal = this.get(tmpPower);
-
-        while (--tmpPower >= 0) {
-            retVal = this.get(tmpPower).add(arg.multiply(retVal));
-        }
-
-        return retVal;
-    }
-
-    public void set(final Access1D<?> coefficients) {
-        int tmpLimit = Math.min(this.size(), coefficients.size());
-        for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, ComplexNumber.valueOf(coefficients.get(p)));
-        }
-    }
-
-    @Override
-    protected ComplexNumber getDerivativeFactor(final int power) {
-        int tmpNextIndex = power + 1;
-        return this.get(tmpNextIndex).multiply(tmpNextIndex);
-    }
-
-    @Override
-    protected ComplexNumber getPrimitiveFactor(final int power) {
-        if (power <= 0) {
-            return ComplexNumber.ZERO;
-        }
-        return this.get(power - 1).divide(power);
-    }
-
-    @Override
-    protected AbstractPolynomial<ComplexNumber> makeInstance(final int size) {
-        return new ComplexPolynomial(Array1D.C128.make(size));
     }
 
 }

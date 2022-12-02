@@ -151,26 +151,7 @@ public abstract class RationalMath {
     public static final RationalFunction.Unary SQRT1PX2 = arg -> SQRT.invoke(RationalNumber.ONE.add(arg.multiply(arg)));
     public static final RationalFunction.Binary SUBTRACT = (arg1, arg2) -> arg1.subtract(arg2);
     public static final RationalFunction.Unary TAN = arg -> RationalNumber.valueOf(BigMath.TAN.invoke(arg.toBigDecimal()));
-    public static final RationalFunction.Unary TANH = arg -> {
-
-        RationalNumber retVal;
-
-        RationalNumber tmpPlus = EXP.invoke(arg);
-        RationalNumber tmpMinus = EXP.invoke(arg.negate());
-
-        RationalNumber tmpDividend = tmpPlus.subtract(tmpMinus);
-        RationalNumber tmpDivisor = tmpPlus.add(tmpMinus);
-
-        if (tmpDividend.equals(tmpDivisor)) {
-            retVal = RationalNumber.ONE;
-        } else if (tmpDividend.equals(tmpDivisor.negate())) {
-            retVal = RationalNumber.ONE.negate();
-        } else {
-            retVal = tmpDividend.divide(tmpDivisor);
-        }
-
-        return retVal;
-    };
+    public static final RationalFunction.Unary TANH = arg -> RationalNumber.valueOf(BigMath.TANH.invoke(arg.toBigDecimal()));
     public static final RationalFunction.Unary VALUE = arg -> arg;
 
 }

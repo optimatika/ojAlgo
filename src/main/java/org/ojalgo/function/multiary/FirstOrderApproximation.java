@@ -22,7 +22,7 @@
 package org.ojalgo.function.multiary;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 
 public final class FirstOrderApproximation<N extends Comparable<N>> extends ApproximateFunction<N> {
@@ -50,10 +50,7 @@ public final class FirstOrderApproximation<N extends Comparable<N>> extends Appr
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof FirstOrderApproximation)) {
+        if ((obj == null) || !(obj instanceof FirstOrderApproximation)) {
             return false;
         }
         final FirstOrderApproximation<?> other = (FirstOrderApproximation<?>) obj;
@@ -79,8 +76,7 @@ public final class FirstOrderApproximation<N extends Comparable<N>> extends Appr
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
-        return result;
+        return (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
     }
 
     public N invoke(final Access1D<N> arg) {
@@ -93,7 +89,7 @@ public final class FirstOrderApproximation<N extends Comparable<N>> extends Appr
     }
 
     @Override
-    Factory<N, ?> factory() {
+    PhysicalStore.Factory<N, ?> factory() {
         return myDelegate.factory();
     }
 
