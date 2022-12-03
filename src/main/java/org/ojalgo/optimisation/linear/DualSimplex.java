@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
@@ -39,7 +39,7 @@ final class DualSimplex extends SimplexTableauSolver {
      * {@link #build(org.ojalgo.optimisation.convex.ConvexSolver.Builder, org.ojalgo.optimisation.Optimisation.Options, boolean)}
      * that sets a RHS to correspond to the phase 1 objective of the primal.
      */
-    private static SimplexTableau buildAlt(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    private static SimplexTableau buildAlt(final OptimisationData convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
@@ -54,7 +54,7 @@ final class DualSimplex extends SimplexTableauSolver {
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC();
+        MatrixStore<Double> convexC = convex.getObjective().getLinearFactors(true);
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
 
@@ -102,7 +102,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return retVal;
     }
 
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    static SimplexTableau build(final OptimisationData convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
@@ -114,7 +114,7 @@ final class DualSimplex extends SimplexTableauSolver {
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC();
+        MatrixStore<Double> convexC = convex.getObjective().getLinearFactors(true);
 
         for (int i = 0; i < nbVars; i++) {
             double rhs = checkFeasibility ? ZERO : convexC.doubleValue(i);
@@ -165,7 +165,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return retVal;
     }
 
-    static Optimisation.Result doSolve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+    static Optimisation.Result doSolve(final OptimisationData convex, final Optimisation.Options options, final boolean zeroC) {
 
         SimplexTableau tableau = DualSimplex.build(convex, options, zeroC);
 
@@ -176,7 +176,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return DualSimplex.toConvexState(result, convex);
     }
 
-    static int size(final ConvexSolver.Builder convex) {
+    static int size(final OptimisationData convex) {
 
         int numbVars = convex.countVariables();
         int numbEqus = convex.countEqualityConstraints();
@@ -185,7 +185,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0, 0, true);
     }
 
-    static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
+    static Optimisation.Result toConvexState(final Result result, final OptimisationData convex) {
 
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();

@@ -87,13 +87,21 @@ public class LinearCase extends MultiaryFunctionTests {
     @Test
     public void testGetLinearFactors() {
 
-        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(), myLinearFunction2.getLinearFactors());
-        TestUtils.assertEquals(myAffineFunction1.getLinearFactors(), myAffineFunction2.getLinearFactors());
-        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(), myQuadraticFunction2.getLinearFactors());
+        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(false), myLinearFunction2.getLinearFactors(false));
+        TestUtils.assertEquals(myAffineFunction1.getLinearFactors(false), myAffineFunction2.getLinearFactors(false));
+        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(false), myQuadraticFunction2.getLinearFactors(false));
 
-        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(), myAffineFunction1.getLinearFactors());
-        TestUtils.assertEquals(myAffineFunction2.getLinearFactors(), myQuadraticFunction2.getLinearFactors());
-        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(), myLinearFunction2.getLinearFactors());
+        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(false), myAffineFunction1.getLinearFactors(false));
+        TestUtils.assertEquals(myAffineFunction2.getLinearFactors(false), myQuadraticFunction2.getLinearFactors(false));
+        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(false), myLinearFunction2.getLinearFactors(false));
+
+        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(true), myLinearFunction2.getLinearFactors(true));
+        TestUtils.assertEquals(myAffineFunction1.getLinearFactors(true), myAffineFunction2.getLinearFactors(true));
+        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(true), myQuadraticFunction2.getLinearFactors(true));
+
+        TestUtils.assertEquals(myLinearFunction1.getLinearFactors(true), myAffineFunction1.getLinearFactors(true));
+        TestUtils.assertEquals(myAffineFunction2.getLinearFactors(true), myQuadraticFunction2.getLinearFactors(true));
+        TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(true), myLinearFunction2.getLinearFactors(true));
     }
 
     @Test

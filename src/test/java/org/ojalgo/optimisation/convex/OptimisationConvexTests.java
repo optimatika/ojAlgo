@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -43,7 +44,7 @@ public abstract class OptimisationConvexTests {
             options.solution = accuracy;
         }
 
-        if (builder.hasInequalityConstraints()) {
+        if (builder.countInequalityConstraints() > 0) {
             // ActiveSetSolver (ASS)
 
             DirectASS directASS = new DirectASS(builder, options);
@@ -69,6 +70,10 @@ public abstract class OptimisationConvexTests {
         ConvexSolver.copy(model, builder);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy, model.options);
+    }
+
+    public static OptimisationData getOptimisationData(final ConvexSolver.Builder convexSolverBuilder) {
+        return convexSolverBuilder.getOptimisationData();
     }
 
 }

@@ -142,7 +142,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getLinearFactors();
+        return this.getLinearFactors(false);
     }
 
     @Override
@@ -150,12 +150,19 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
         return this.factory().makeZero(this.arity(), this.arity());
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+
+        MatrixStore<N> retVal = myCoefficients;
+
         if (myCoefficients.countRows() == 1L) {
-            return myCoefficients.transpose();
-        } else {
-            return myCoefficients;
+            retVal = retVal.transpose();
         }
+
+        if (negated) {
+            retVal = retVal.negate();
+        }
+
+        return retVal;
     }
 
     @Override

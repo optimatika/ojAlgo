@@ -70,7 +70,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public Array1D<N> copy(final Comparable<?>... source) {
+        public Array1D<N> copy(final Comparable<?>[] source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 

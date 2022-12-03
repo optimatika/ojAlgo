@@ -58,8 +58,8 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder.getOptimisationData());
+        SparseTableau sparse = SimplexTableau.newSparse(builder.getOptimisationData());
 
         // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
@@ -125,8 +125,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder.getOptimisationData());
+        SparseTableau sparse = SimplexTableau.newSparse(builder.getOptimisationData());
 
         TestUtils.assertEquals(dense, sparse);
 
@@ -165,8 +165,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = SimplexTableau.newDense(builder.getOptimisationData());
+        SparseTableau sparse = SimplexTableau.newSparse(builder.getOptimisationData());
 
         TestUtils.assertEquals(dense, sparse);
 

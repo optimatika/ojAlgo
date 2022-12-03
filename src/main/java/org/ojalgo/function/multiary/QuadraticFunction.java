@@ -163,8 +163,8 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         return myPureQuadratic.getHessian(point);
     }
 
-    public MatrixStore<N> getLinearFactors() {
-        return myLinear.getLinearFactors();
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+        return myLinear.getLinearFactors(negated);
     }
 
     @Override

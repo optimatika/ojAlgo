@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -53,7 +52,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 builder.append("\n[");
                 builder.append(label);
                 builder.append("] = ");
-                builder.append(MatrixR064.FACTORY.copy(matrix));
+                builder.append(Access2D.toString(matrix));
             }
         }
 
@@ -75,23 +74,23 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return this.doBuild(options);
         }
 
-        public int countAdditionalConstraints() {
+        public final int countAdditionalConstraints() {
             return myData.countAdditionalConstraints();
         }
 
-        public int countConstraints() {
-            return this.countEqualityConstraints() + this.countInequalityConstraints() + this.countAdditionalConstraints();
+        public final int countConstraints() {
+            return myData.countConstraints();
         }
 
-        public int countEqualityConstraints() {
+        public final int countEqualityConstraints() {
             return myData.countEqualityConstraints();
         }
 
-        public int countInequalityConstraints() {
+        public final int countInequalityConstraints() {
             return myData.countInequalityConstraints();
         }
 
-        public int countVariables() {
+        public final int countVariables() {
             if (myNumberOfVariables < 0) {
                 myNumberOfVariables = myData.countVariables();
             }
@@ -117,42 +116,8 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return (B) this;
         }
 
-        /**
-         * [AE][X] == [BE]
-         */
-        public MatrixStore<Double> getAE() {
-            return myData.getAE();
-        }
-
-        /**
-         * [AE][X] == [BE]
-         */
-        public MatrixStore<Double> getBE() {
-            return myData.getBE();
-        }
-
-        public MatrixStore<Double> getC() {
-            return myData.getObjective().getLinearFactors();
-        }
-
-        public RowView<Double> getRowsAE() {
-            return myData.getRowsAE();
-        }
-
-        public boolean hasEqualityConstraints() {
-            return myData.countEqualityConstraints() > 0;
-        }
-
-        public boolean hasInequalityConstraints() {
-            return myData.countInequalityConstraints() > 0;
-        }
-
-        /**
-         * @deprecated v50 You have to have an objective function.
-         */
-        @Deprecated
-        public boolean hasObjective() {
-            return myData.getObjective() != null;
+        protected OptimisationData getOptimisationData() {
+            return myData;
         }
 
         public void reset() {
@@ -160,22 +125,8 @@ public abstract class GenericSolver implements Optimisation.Solver {
             myNumberOfVariables = -1;
         }
 
-        public Optimisation.Result solve() {
+        public final Optimisation.Result solve() {
             return this.build().solve();
-        }
-
-        /**
-         * Will replace each equality constraint with two inequality constraints
-         */
-        public void splitEqualities() {
-
-            if (this.hasEqualityConstraints()) {
-
-                myData.addInequalities(myData.getAE(), myData.getBE());
-                myData.addInequalities(myData.getAE().negate(), myData.getBE().negate());
-
-                myData.clearEqualities();
-            }
         }
 
         @Override
@@ -216,6 +167,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected abstract S doBuild(Optimisation.Options options);
 
+        /**
+         * [AE][X] == [BE]
+         */
+        protected MatrixStore<Double> getAE() {
+            return myData.getAE();
+        }
+
         protected SparseArray<Double> getAE(final int row) {
             return myData.getAE(row);
         }
@@ -239,6 +197,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getAI(rows);
         }
 
+        /**
+         * [AE][X] == [BE]
+         */
+        protected MatrixStore<Double> getBE() {
+            return myData.getBE();
+        }
+
         protected double getBE(final int row) {
             return myData.getBE(row);
         }
@@ -254,12 +219,20 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getBI(row);
         }
 
+        protected MatrixStore<Double> getC() {
+            return myData.getObjective().getLinearFactors(false);
+        }
+
         protected double[] getLowerBounds(final double defaultValue) {
             return myData.getLowerBounds(defaultValue).data;
         }
 
         protected <T extends TwiceDifferentiable<Double>> T getObjective() {
             return myData.getObjective();
+        }
+
+        protected RowView<Double> getRowsAE() {
+            return myData.getRowsAE();
         }
 
         protected RowView<Double> getRowsAI() {

@@ -77,7 +77,7 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
     @Test
     public void testEnergyApp() {
 
-        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(5));
+        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(4));
 
         IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, strategy);
     }

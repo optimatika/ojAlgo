@@ -144,14 +144,14 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
     }
 
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getLinearFactors();
+        return this.getLinearFactors(false);
     }
 
     public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myFactory.makeZero(myArity, myArity);
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myFactory.makeZero(myArity, 1);
     }
 

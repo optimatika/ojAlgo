@@ -50,6 +50,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -57,7 +58,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
@@ -153,71 +153,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             if (matrices.length >= 6 && matrices[4] != null && matrices[5] != null) {
                 this.inequalities(matrices[4], matrices[5]);
             }
-        }
-
-        @Override
-        public SparseArray<Double> getAE(final int row) {
-            return super.getAE(row);
-        }
-
-        @Override
-        public RowsSupplier<Double> getAE(final int... rows) {
-            return super.getAE(rows);
-        }
-
-        @Override
-        public MatrixStore<Double> getAI() {
-            return super.getAI();
-        }
-
-        @Override
-        public SparseArray<Double> getAI(final int row) {
-            return super.getAI(row);
-        }
-
-        @Override
-        public RowsSupplier<Double> getAI(final int... rows) {
-            return super.getAI(rows);
-        }
-
-        @Override
-        public MatrixStore<Double> getBI() {
-            return super.getBI();
-        }
-
-        @Override
-        public double getBI(final int row) {
-            return super.getBI(row);
-        }
-
-        @Override
-        public double getBE(final int row) {
-            return super.getBE(row);
-        }
-
-        /**
-         * Linear objective: [C]
-         */
-        @Override
-        public PhysicalStore<Double> getC() {
-            return this.getObjective().linear();
-        }
-
-        /**
-         * Quadratic objective: [Q]
-         */
-        public PhysicalStore<Double> getQ() {
-            return this.getObjective().quadratic();
-        }
-
-        @Override
-        public RowView<Double> getRowsAI() {
-            return super.getRowsAI();
-        }
-
-        @Override
-        public RowView<Double> getRowsAE() {
-            return super.getRowsAE();
         }
 
         @Override
@@ -356,7 +291,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          */
         public LinearSolver.GeneralBuilder toLinearApproximation(final Access1D<Double> point) {
 
-            MatrixStore<Double> mtrxC = this.getObjective().toFirstOrderApproximation(point).getLinearFactors();
+            MatrixStore<Double> mtrxC = this.getObjective().toFirstOrderApproximation(point).getLinearFactors(false);
 
             MatrixStore<Double> mtrxAE = this.getAE();
             MatrixStore<Double> mtrxBE = this.getBE();
@@ -380,6 +315,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
+        protected OptimisationData getOptimisationData() {
+            return super.getOptimisationData();
+        }
+
+        @Override
         protected void append(final StringBuilder builder) {
 
             super.append(builder);
@@ -390,18 +330,25 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         @Override
         protected ConvexSolver doBuild(final Optimisation.Options options) {
 
-            if (this.hasInequalityConstraints()) {
+            if (this.countInequalityConstraints() > 0) {
                 if (options.sparse == null || options.sparse.booleanValue()) {
                     return new IterativeASS(this, options);
+                } else {
+                    return new DirectASS(this, options);
                 }
-                return new DirectASS(this, options);
-            }
-
-            if (this.hasEqualityConstraints()) {
+            } else if (this.countEqualityConstraints() > 0) {
                 return new QPESolver(this, options);
+            } else {
+                return new UnconstrainedSolver(this, options);
             }
+        }
 
-            return new UnconstrainedSolver(this, options);
+        /**
+         * Linear objective: [C]
+         */
+        @Override
+        protected PhysicalStore<Double> getC() {
+            return this.getObjective().linear();
         }
 
         @Override
@@ -414,6 +361,13 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 super.setObjective(myObjective);
             }
             return myObjective;
+        }
+
+        /**
+         * Quadratic objective: [Q]
+         */
+        protected PhysicalStore<Double> getQ() {
+            return this.getObjective().quadratic();
         }
 
         protected void setObjective(final ConvexObjectiveFunction objective) {
@@ -716,23 +670,23 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return new ConvexObjectiveFunction(tmpQ, tmpC);
     }
 
-    private final ConvexSolver.Builder myMatrices;
+    private final OptimisationData myMatrices;
     private boolean myPatchedQ = false;
     private final Primitive64Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final MatrixDecomposition.Solver<Double> mySolverQ;
     private boolean myZeroQ = false;
 
-    protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    ConvexSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(solverOptions);
+        super(optimisationOptions);
 
-        myMatrices = matrices;
+        myMatrices = convexSolverBuilder.getOptimisationData();
 
         mySolutionX = MATRIX_FACTORY.make(this.countVariables(), 1L);
 
         PhysicalStore<Double> mtrxQ = this.getMatrixQ();
-        Configuration convexOptions = solverOptions.convex();
+        Configuration convexOptions = optimisationOptions.convex();
         mySolverQ = convexOptions.newSolverSPD(mtrxQ);
         mySolverGeneral = convexOptions.newSolverGeneral(mtrxQ);
     }
@@ -853,11 +807,13 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected MatrixStore<Double> getMatrixC() {
-        return myMatrices.getC();
+        ConvexObjectiveFunction objective = myMatrices.getObjective();
+        return objective.linear();
     }
 
     protected PhysicalStore<Double> getMatrixQ() {
-        return myMatrices.getQ();
+        ConvexObjectiveFunction objective = myMatrices.getObjective();
+        return objective.quadratic();
     }
 
     protected int getRankGeneral() {
@@ -894,15 +850,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected boolean hasEqualityConstraints() {
-        return myMatrices.hasEqualityConstraints();
+        return myMatrices.countEqualityConstraints() > 0;
     }
 
     protected boolean hasInequalityConstraints() {
-        return myMatrices.hasInequalityConstraints();
-    }
-
-    protected boolean hasObjective() {
-        return myMatrices.hasObjective();
+        return myMatrices.countInequalityConstraints() > 0;
     }
 
     /**

@@ -215,7 +215,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        int tmpNumberOfVariables = (int) matrices[3].count(); // c
+        int tmpNumberOfVariables = matrices[3].size(); // c
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             Variable tmpVariable = Variable.make("X" + v);
@@ -1398,12 +1398,6 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // Solution given in the original bug report
         Optimisation.Result expectedResult = Optimisation.Result.of(61.519484, State.OPTIMAL, -0.4, 0.12, -0.0196, -2.45785);
-
-        Access2D<?>[] matrices = { null, null, builder.getQ(), builder.getC(), builder.getAI(), builder.getBI() };
-        ExpressionsBasedModel model = ConvexProblems.buildModel(matrices, null);
-        Optimisation.Result modelResult = model.minimise();
-
-        TestUtils.assertStateAndSolution(expectedResult, modelResult);
 
         ConvexSolver solver = builder.build();
 

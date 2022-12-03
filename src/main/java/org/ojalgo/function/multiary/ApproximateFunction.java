@@ -55,16 +55,22 @@ abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryF
         return true;
     }
 
-    public MatrixStore<N> getLinearFactors() {
-        return this.getGradient(this.factory().makeZero(this.arity(), 1));
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+
+        MatrixStore<N> retVal = this.getGradient(this.factory().makeZero(this.arity(), 1));
+
+        if (negated) {
+            retVal = retVal.negate();
+        }
+
+        return retVal;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (myPoint == null ? 0 : myPoint.hashCode());
-        return result;
+        return prime * result + (myPoint == null ? 0 : myPoint.hashCode());
     }
 
     public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {

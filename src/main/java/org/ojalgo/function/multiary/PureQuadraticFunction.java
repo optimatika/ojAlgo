@@ -163,7 +163,7 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
         return myCoefficients.add(myCoefficients.conjugate());
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myCoefficients.physical().makeZero(this.arity(), 1L);
     }
 

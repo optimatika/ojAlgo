@@ -43,8 +43,8 @@ import org.ojalgo.optimisation.Optimisation;
  */
 final class DirectASS extends ActiveSetSolver {
 
-    DirectASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
-        super(matrices, solverOptions);
+    DirectASS(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+        super(convexSolverBuilder, optimisationOptions);
     }
 
     @Override

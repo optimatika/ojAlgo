@@ -52,9 +52,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private boolean myShrinkSwitch = true;
     private final Primitive64Store mySlackI;
 
-    ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
+    ActiveSetSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(matrices, solverOptions);
+        super(convexSolverBuilder, optimisationOptions);
 
         int nbVars = this.countVariables();
         int nbEqus = this.countEqualityConstraints();

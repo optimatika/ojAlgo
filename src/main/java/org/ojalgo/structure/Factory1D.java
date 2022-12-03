@@ -36,7 +36,7 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
         I copy(Access1D<?> source);
 
-        I copy(Comparable<?>... source);
+        I copy(Comparable<?>[] source);
 
         I copy(double... source);
 

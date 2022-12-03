@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -72,7 +73,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
-            SimplexTableau tableau = SimplexTableau.make(this, options);
+            SimplexTableau tableau = SimplexTableau.make(this.getOptimisationData(), options);
 
             return new PrimalSimplex(tableau, options);
         }
@@ -84,6 +85,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 super.setObjective(myObjective);
             }
             return myObjective;
+        }
+
+        @Override
+        protected OptimisationData getOptimisationData() {
+            return super.getOptimisationData();
         }
 
         protected void setObjective(final LinearFunction<Double> objective) {
@@ -327,6 +333,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return myObjective;
         }
 
+        @Override
+        protected OptimisationData getOptimisationData() {
+            return super.getOptimisationData();
+        }
+
         protected void setObjective(final LinearFunction<Double> objective) {
             myObjective = objective;
             super.setObjective(objective);
@@ -356,18 +367,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return modelVariableValues;
         }
 
-        public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
-
-            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
-
-            return new PrimalSimplex(tableau, options);
-        }
-
         public LinearSolver build(final ExpressionsBasedModel model) {
 
             SimplexTableau tableau = PrimalSimplex.build(model);
 
             return new PrimalSimplex(tableau, model.options);
+        }
+
+        public LinearSolver build(final OptimisationData convexBuilder, final Optimisation.Options options) {
+
+            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
+
+            return new PrimalSimplex(tableau, options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
@@ -517,6 +528,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
+        @Override
+        protected OptimisationData getOptimisationData() {
+            return super.getOptimisationData();
+        }
+
     }
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
@@ -544,7 +560,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearSolver.newStandardBuilder().objective(objective);
     }
 
-    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+    public static Optimisation.Result solve(final OptimisationData convex, final Optimisation.Options options, final boolean zeroC) {
 
         int dualSize = DualSimplex.size(convex);
         int primSize = PrimalSimplex.size(convex);

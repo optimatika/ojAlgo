@@ -198,9 +198,9 @@ final class IterativeASS extends ActiveSetSolver {
      */
     private final SchurComplementSolver myS;
 
-    IterativeASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    IterativeASS(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(matrices, solverOptions);
+        super(convexSolverBuilder, optimisationOptions);
 
         myS = new SchurComplementSolver();
         myColumnInvQAt = MATRIX_FACTORY.make(this.countVariables(), 1);

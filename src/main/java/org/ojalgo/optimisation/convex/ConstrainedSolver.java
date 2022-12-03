@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends ConvexSolver {
@@ -31,9 +32,9 @@ abstract class ConstrainedSolver extends ConvexSolver {
     private final Primitive64Store mySlackE;
     private final Primitive64Store mySolutionL;
 
-    protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
+    protected ConstrainedSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(matrices, solverOptions);
+        super(convexSolverBuilder, optimisationOptions);
 
         int numberOfEqualityConstraints = this.countEqualityConstraints();
         int numberOfInequalityConstraints = this.countInequalityConstraints();
