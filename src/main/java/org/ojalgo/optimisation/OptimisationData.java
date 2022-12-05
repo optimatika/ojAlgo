@@ -204,7 +204,11 @@ public final class OptimisationData {
         return myBI.doubleValue(row);
     }
 
-    public <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
+    public MultiaryFunction.TwiceDifferentiable<Double> getObjective() {
+        return myObjective;
+    }
+
+    public <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective(final Class<T> type) {
         return (T) myObjective;
     }
 

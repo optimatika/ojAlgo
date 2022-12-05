@@ -227,8 +227,8 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getLowerBounds(defaultValue).data;
         }
 
-        protected <T extends TwiceDifferentiable<Double>> T getObjective() {
-            return myData.getObjective();
+        protected <T extends TwiceDifferentiable<Double>> T getObjective(final Class<T> type) {
+            return myData.getObjective(type);
         }
 
         protected RowView<Double> getRowsAE() {

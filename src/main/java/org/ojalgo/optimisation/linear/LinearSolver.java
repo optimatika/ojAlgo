@@ -53,8 +53,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     @Deprecated
     public static abstract class Builder extends GenericSolver.Builder<LinearSolver.StandardBuilder, LinearSolver> {
 
-        private LinearFunction<Double> myObjective = null;
-
         Builder() {
             super();
         }
@@ -65,12 +63,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        public void reset() {
-            super.reset();
-            myObjective = null;
-        }
-
-        @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
             SimplexTableau tableau = SimplexTableau.make(this.getOptimisationData(), options);
@@ -78,13 +70,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return new PrimalSimplex(tableau, options);
         }
 
-        @Override
         protected LinearFunction<Double> getObjective() {
-            if (myObjective == null) {
-                myObjective = LinearFunction.makePrimitive(this.countVariables());
-                super.setObjective(myObjective);
+            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
+            if (retVal == null) {
+                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
+                super.setObjective(retVal);
             }
-            return myObjective;
+            return retVal;
         }
 
         @Override
@@ -92,10 +84,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.getOptimisationData();
         }
 
-        protected void setObjective(final LinearFunction<Double> objective) {
-            myObjective = objective;
-            super.setObjective(objective);
-        }
     }
 
     public static final class Configuration {
@@ -115,8 +103,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      * @author apete
      */
     public static final class GeneralBuilder extends GenericSolver.Builder<LinearSolver.GeneralBuilder, LinearSolver> {
-
-        private LinearFunction<Double> myObjective = null;
 
         GeneralBuilder() {
             super();
@@ -153,12 +139,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         public GeneralBuilder objective(final MatrixStore<Double> mtrxC) {
             this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
             return this;
-        }
-
-        @Override
-        public void reset() {
-            super.reset();
-            myObjective = null;
         }
 
         /**
@@ -324,23 +304,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return new PrimalSimplex(tableau, options);
         }
 
-        @Override
         protected LinearFunction<Double> getObjective() {
-            if (myObjective == null) {
-                myObjective = LinearFunction.makePrimitive(this.countVariables());
-                super.setObjective(myObjective);
+            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
+            if (retVal == null) {
+                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
+                super.setObjective(retVal);
             }
-            return myObjective;
+            return retVal;
         }
 
         @Override
         protected OptimisationData getOptimisationData() {
             return super.getOptimisationData();
-        }
-
-        protected void setObjective(final LinearFunction<Double> objective) {
-            myObjective = objective;
-            super.setObjective(objective);
         }
 
     }

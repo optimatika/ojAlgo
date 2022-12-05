@@ -97,8 +97,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
-        private ConvexObjectiveFunction myObjective = null;
-
         /**
          * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
          */
@@ -220,12 +218,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
-        @Override
-        public void reset() {
-            super.reset();
-            myObjective = null;
-        }
-
         /**
          * Disregard the objective function (set it to zero) and form the dual LP.
          */
@@ -315,11 +307,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        protected OptimisationData getOptimisationData() {
-            return super.getOptimisationData();
-        }
-
-        @Override
         protected void append(final StringBuilder builder) {
 
             super.append(builder);
@@ -351,16 +338,21 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return this.getObjective().linear();
         }
 
-        @Override
         protected ConvexObjectiveFunction getObjective() {
-            if (myObjective == null) {
+            ConvexObjectiveFunction retVal = this.getObjective(ConvexObjectiveFunction.class);
+            if (retVal == null) {
                 int nbVariables = this.countVariables();
                 Primitive64Store mtrxQ = FACTORY.make(nbVariables, nbVariables);
                 Primitive64Store mtrxC = FACTORY.make(nbVariables, 1);
-                myObjective = new ConvexObjectiveFunction(mtrxQ, mtrxC);
-                super.setObjective(myObjective);
+                retVal = new ConvexObjectiveFunction(mtrxQ, mtrxC);
+                super.setObjective(retVal);
             }
-            return myObjective;
+            return retVal;
+        }
+
+        @Override
+        protected OptimisationData getOptimisationData() {
+            return super.getOptimisationData();
         }
 
         /**
@@ -368,11 +360,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          */
         protected PhysicalStore<Double> getQ() {
             return this.getObjective().quadratic();
-        }
-
-        protected void setObjective(final ConvexObjectiveFunction objective) {
-            myObjective = objective;
-            super.setObjective(objective);
         }
 
     }
@@ -807,13 +794,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected MatrixStore<Double> getMatrixC() {
-        ConvexObjectiveFunction objective = myMatrices.getObjective();
-        return objective.linear();
+        return myMatrices.getObjective(ConvexObjectiveFunction.class).linear();
     }
 
     protected PhysicalStore<Double> getMatrixQ() {
-        ConvexObjectiveFunction objective = myMatrices.getObjective();
-        return objective.quadratic();
+        return myMatrices.getObjective(ConvexObjectiveFunction.class).quadratic();
     }
 
     protected int getRankGeneral() {
