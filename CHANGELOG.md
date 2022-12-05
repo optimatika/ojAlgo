@@ -35,6 +35,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
 - New structure in `Optimisation.Options`. Options for the LP- and QP-solversare are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
+- `OptimisationData`: This class existed before but was package private. It used as the underlying data of the solver builders, and as solver data interchange format.
 
 #### org.ojalgo.scalar
 
