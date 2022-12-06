@@ -42,8 +42,8 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Test
     public void testAddingVariableToExpression() {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        Variable x1 = model.addVariable("x1").lower(0).upper(20).weight(1);
-        Expression expr = model.addExpression("10 * x1 = 100").lower(100).upper(100);
+        Variable x1 = model.newVariable("x1").lower(0).upper(20).weight(1);
+        Expression expr = model.newExpression("10 * x1 = 100").lower(100).upper(100);
         expr.add(x1, 4); // add term (4 * x1) to expression
         expr.add(x1, 6); // add term (6 * x1) to expression which now becomes (10 * x1)
         Optimisation.Result result = model.minimise();
@@ -63,7 +63,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         model.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
         model.addVariable(Variable.make("X3").level(4).weight(1));
 
-        Expression expression = model.addExpression("MAX5").upper(5);
+        Expression expression = model.newExpression("MAX5").upper(5);
         expression.set(0, 1).set(1, 1).set(2, 1);
 
         Optimisation.Result result = model.maximise();
@@ -116,7 +116,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         test.addVariable(Variable.make("V1").level(0.5));
         test.addVariable(Variable.make("V2").lower(0).upper(5).weight(2));
         test.addVariable(Variable.make("V3").lower(0).upper(1).weight(1));
-        Expression expressions = test.addExpression("E1").lower(0).upper(2);
+        Expression expressions = test.newExpression("E1").lower(0).upper(2);
         expressions.set(1, 1).set(2, 1);
 
         Optimisation.Result minResult = test.minimise();
@@ -150,11 +150,11 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
 
-        model.addExpression("C1").set(0, 1).set(2, 1).set(4, 1).level(23);
-        model.addExpression("C2").set(1, 1).set(3, 1).set(5, 1).level(23);
-        model.addExpression("C3").set(0, 1).lower(10);
-        model.addExpression("C4").set(2, 1).lower(8);
-        model.addExpression("C5").set(4, 1).lower(5);
+        model.newExpression("C1").set(0, 1).set(2, 1).set(4, 1).level(23);
+        model.newExpression("C2").set(1, 1).set(3, 1).set(5, 1).level(23);
+        model.newExpression("C3").set(0, 1).lower(10);
+        model.newExpression("C4").set(2, 1).lower(8);
+        model.newExpression("C5").set(4, 1).lower(5);
 
         Optimisation.Result result = model.maximise();
 
@@ -167,34 +167,34 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testIntegerRounding() {
 
         ExpressionsBasedModel ebm = new ExpressionsBasedModel();
-        Variable var1 = ebm.addVariable("X1").integer();
-        Variable var2 = ebm.addVariable("X2").integer();
+        Variable var1 = ebm.newVariable("X1").integer();
+        Variable var2 = ebm.newVariable("X2").integer();
 
-        Expression exp1 = ebm.addExpression("Exp1").set(var1, 3).set(var2, 6).upper(13.5);
+        Expression exp1 = ebm.newExpression("Exp1").set(var1, 3).set(var2, 6).upper(13.5);
         exp1.doIntegerRounding();
         TestUtils.assertEquals(BigMath.THREE, exp1.get(var1));
         TestUtils.assertEquals(BigMath.SIX, exp1.get(var2));
         TestUtils.assertEquals(BigMath.TWELVE, exp1.getUpperLimit());
 
-        Expression exp2 = ebm.addExpression("Exp2").set(var1, 30).set(var2, 60).upper(135);
+        Expression exp2 = ebm.newExpression("Exp2").set(var1, 30).set(var2, 60).upper(135);
         exp2.doIntegerRounding();
         TestUtils.assertEquals(BigMath.THREE.multiply(BigMath.TEN), exp2.get(var1));
         TestUtils.assertEquals(BigMath.SIX.multiply(BigMath.TEN), exp2.get(var2));
         TestUtils.assertEquals(BigMath.TWELVE.multiply(BigMath.TEN), exp2.getUpperLimit());
 
-        Expression exp3 = ebm.addExpression("Exp3").set(var1, 0.3).set(var2, 0.6).upper(1.35);
+        Expression exp3 = ebm.newExpression("Exp3").set(var1, 0.3).set(var2, 0.6).upper(1.35);
         exp3.doIntegerRounding();
         TestUtils.assertEquals(BigMath.THREE.divide(BigMath.TEN), exp3.get(var1));
         TestUtils.assertEquals(BigMath.SIX.divide(BigMath.TEN), exp3.get(var2));
         TestUtils.assertEquals(BigMath.TWELVE.divide(BigMath.TEN), exp3.getUpperLimit());
 
-        Expression exp4 = ebm.addExpression("Exp4").set(var1, 0.3).set(var2, 60).upper(1.35);
+        Expression exp4 = ebm.newExpression("Exp4").set(var1, 0.3).set(var2, 60).upper(1.35);
         exp4.doIntegerRounding();
         TestUtils.assertEquals(BigMath.THREE.divide(BigMath.TEN), exp4.get(var1));
         TestUtils.assertEquals(BigMath.SIX.multiply(BigMath.TEN), exp4.get(var2));
         TestUtils.assertEquals(BigDecimal.valueOf(1.2), exp4.getUpperLimit());
 
-        Expression exp5 = ebm.addExpression("Exp5").set(var1, 30).set(var2, 0.6).upper(1.35);
+        Expression exp5 = ebm.newExpression("Exp5").set(var1, 30).set(var2, 0.6).upper(1.35);
         exp5.doIntegerRounding(); // How to get 50, 1 and 2?
         TestUtils.assertEquals(BigMath.THREE.multiply(BigMath.TEN), exp5.get(var1)); // 50
         TestUtils.assertEquals(BigMath.SIX.divide(BigMath.TEN), exp5.get(var2)); // 1
@@ -213,21 +213,21 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         BigDecimal[] tmpFactorsLIM1 = { ONE, ONE, ZERO };
-        Expression tmpLIM1 = tmpModel.addExpression("LIM1");
+        Expression tmpLIM1 = tmpModel.newExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, tmpFactorsLIM1[v]);
         }
         tmpLIM1.upper(FIVE.add(TENTH));
 
         BigDecimal[] tmpFactorsLIM2 = { ONE, ZERO, ONE };
-        Expression tmpLIM2 = tmpModel.addExpression("LIM2");
+        Expression tmpLIM2 = tmpModel.newExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, tmpFactorsLIM2[v]);
         }
         tmpLIM2.lower(TEN.add(TENTH));
 
         BigDecimal[] tmpFactorsMYEQN = { ZERO, ONE.negate(), ONE };
-        Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
+        Expression tmpMYEQN = tmpModel.newExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, tmpFactorsMYEQN[v]);
         }
@@ -270,12 +270,12 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         Collections.emptySet();
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable varX = model.addVariable("X").lower(ONE);
-        Variable varY = model.addVariable("Y");
-        Variable varZ = model.addVariable("Z").lower(ZERO);
-        Variable varA = model.addVariable("A").upper(THREE);
+        Variable varX = model.newVariable("X").lower(ONE);
+        Variable varY = model.newVariable("Y");
+        Variable varZ = model.newVariable("Z").lower(ZERO);
+        Variable varA = model.newVariable("A").upper(THREE);
 
-        Expression expr3 = model.addExpression("Test3").lower(ZERO);
+        Expression expr3 = model.newExpression("Test3").lower(ZERO);
 
         expr3.set(varX, TWO.negate());
         expr3.set(varA, NEG);
@@ -284,7 +284,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(TWO.negate(), varA.getUpperLimit(), precision);
 
-        Expression expr2 = model.addExpression("Test2").lower(ZERO);
+        Expression expr2 = model.newExpression("Test2").lower(ZERO);
 
         expr2.set(varX, TWO.negate());
         expr2.set(varY, NEG);
@@ -293,7 +293,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         TestUtils.assertEquals(TWO.negate(), varY.getUpperLimit(), precision);
 
-        Expression expr1 = model.addExpression("Test1").lower(ZERO);
+        Expression expr1 = model.newExpression("Test1").lower(ZERO);
 
         expr1.set(varX, TWO.negate());
         expr1.set(varZ, ONE);
@@ -314,12 +314,12 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         ExpressionsBasedModel original1 = new ExpressionsBasedModel();
 
-        Variable x1 = original1.addVariable("x").weight(1.0);
+        Variable x1 = original1.newVariable("x").weight(1.0);
 
-        Expression c01 = original1.addExpression("c0").upper(1);
+        Expression c01 = original1.newExpression("c0").upper(1);
         c01.set(x1, 1);
 
-        Expression c11 = original1.addExpression("c1").lower(2);
+        Expression c11 = original1.newExpression("c1").lower(2);
         c11.set(x1, 1);
 
         ExpressionsBasedModel simplified1 = original1.simplify();
@@ -331,12 +331,12 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
 
         ExpressionsBasedModel original2 = new ExpressionsBasedModel();
 
-        Variable x2 = original2.addVariable("x").weight(1.0);
+        Variable x2 = original2.newVariable("x").weight(1.0);
 
-        Expression c02 = original2.addExpression("c0").level(1);
+        Expression c02 = original2.newExpression("c0").level(1);
         c02.set(x2, 1);
 
-        Expression c12 = original2.addExpression("c1").level(2);
+        Expression c12 = original2.newExpression("c1").level(2);
         c12.set(x2, 1);
 
         ExpressionsBasedModel simplified2 = original2.simplify();
@@ -354,7 +354,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         model.addVariable(Variable.make("A").level(2).weight(3));
         model.addVariable(Variable.make("B").lower(1).upper(3).weight(2));
         model.addVariable(Variable.make("C").lower(0).upper(4).weight(1));
-        model.addExpression("SUM").set(0, 1).set(1, 1).set(2, 1).level(6);
+        model.newExpression("SUM").set(0, 1).set(1, 1).set(2, 1).level(6);
 
         Optimisation.Result minResult = model.minimise();
         TestUtils.assertTrue(model.validate(minResult));

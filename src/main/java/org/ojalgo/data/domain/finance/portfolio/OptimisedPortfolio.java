@@ -219,7 +219,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
 
         retVal.addVariables(tmpVariables);
 
-        final Expression myOptimisationVariance = retVal.addExpression(VARIANCE);
+        final Expression myOptimisationVariance = retVal.newExpression(VARIANCE);
         final MatrixR064 tmpCovariances = this.getCovariances();
         for (int j = 0; j < tmpLength; j++) {
             for (int i = 0; i < tmpLength; i++) {
@@ -227,7 +227,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
             }
         }
 
-        final Expression tmpBalanceExpression = retVal.addExpression(BALANCE);
+        final Expression tmpBalanceExpression = retVal.newExpression(BALANCE);
         for (int i = 0; i < tmpLength; i++) {
             tmpBalanceExpression.set(i, ONE);
         }
@@ -238,7 +238,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
             final int[] tmpKey = tmpEntry.getKey();
             final LowerUpper tmpValue = tmpEntry.getValue();
 
-            final Expression tmpExpression = retVal.addExpression(Arrays.toString(tmpKey));
+            final Expression tmpExpression = retVal.newExpression(Arrays.toString(tmpKey));
             for (int i = 0; i < tmpKey.length; i++) {
                 tmpExpression.set(tmpKey[i], ONE);
             }

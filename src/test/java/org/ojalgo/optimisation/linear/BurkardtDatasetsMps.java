@@ -172,19 +172,19 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpLIM1 = reimplementedModel.addExpression("LIM1");
+        Expression tmpLIM1 = reimplementedModel.newExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
-        Expression tmpLIM2 = reimplementedModel.addExpression("LIM2");
+        Expression tmpLIM2 = reimplementedModel.newExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
-        Expression tmpMYEQN = reimplementedModel.addExpression("MYEQN");
+        Expression tmpMYEQN = reimplementedModel.newExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }

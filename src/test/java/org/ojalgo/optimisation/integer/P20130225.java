@@ -125,7 +125,7 @@ class P20130225 {
         final ExpressionsBasedModel tmpIntegerModel = new ExpressionsBasedModel(allVariables);
 
         // Exp_total_bikes = sum(j*X_i_j) <= 91;
-        final Expression expresion1 = tmpIntegerModel.addExpression("Exp_total_bikes");
+        final Expression expresion1 = tmpIntegerModel.newExpression("Exp_total_bikes");
         for (int i = 0; i < tmpIntegerModel.countVariables(); i++) {
             final Variable v = tmpIntegerModel.getVariable(i);
             final String name = v.getName();
@@ -140,14 +140,14 @@ class P20130225 {
             // Exp_i = sum(X_i_j) = 1
             final ArrayList varsStation = (ArrayList) variablesStation.get(i);
 
-            final Expression expresion2 = tmpIntegerModel.addExpression("Exp_" + i);
+            final Expression expresion2 = tmpIntegerModel.newExpression("Exp_" + i);
             expresion2.setLinearFactorsSimple(varsStation);
             expresion2.level(BigDecimal.valueOf(1));
         }
 
         for (int i = 0; i < preCalculateCosts.size(); i++) {
             // Exp_UV_i = Ui - Vi + sum(j*X_i_j) = 5
-            final Expression expresion3 = tmpIntegerModel.addExpression("Exp_UV_" + i);
+            final Expression expresion3 = tmpIntegerModel.newExpression("Exp_UV_" + i);
             final ArrayList varsStation = (ArrayList) variablesStation.get(i);
             for (int j = 0; j < varsStation.size(); j++) {
                 final Variable v = (Variable) varsStation.get(j);
@@ -208,7 +208,7 @@ class P20130225 {
             final ExpressionsBasedModel model = new ExpressionsBasedModel(allVariables);
 
             // Exp_total_bikes = sum(j*X_i_j) <= 91;
-            final Expression expresion1 = model.addExpression("Exp_total_bikes");
+            final Expression expresion1 = model.newExpression("Exp_total_bikes");
             for (int i = 0; i < model.countVariables(); i++) {
                 final Variable v = model.getVariable(i);
                 final String name = v.getName();
@@ -223,14 +223,14 @@ class P20130225 {
                 // Exp_i = sum(X_i_j) = 1
                 final ArrayList varsStation = (ArrayList) variablesStation.get(i);
 
-                final Expression expresion2 = model.addExpression("Exp_" + i);
+                final Expression expresion2 = model.newExpression("Exp_" + i);
                 expresion2.setLinearFactorsSimple(varsStation);
                 expresion2.level(BigDecimal.valueOf(1));
             }
 
             for (int i = 0; i < preCalculateCosts.size(); i++) {
                 // Exp_UV_i = Ui - Vi + sum(j*X_i_j) = 5
-                final Expression expresion3 = model.addExpression("Exp_UV_" + i);
+                final Expression expresion3 = model.newExpression("Exp_UV_" + i);
                 final ArrayList varsStation = (ArrayList) variablesStation.get(i);
                 for (int j = 0; j < varsStation.size(); j++) {
                     final Variable v = (Variable) varsStation.get(j);

@@ -139,19 +139,19 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         ExpressionsBasedModel originalModel = new ExpressionsBasedModel(variables);
 
-        Expression expr1 = originalModel.addExpression("Expr1");
+        Expression expr1 = originalModel.newExpression("Expr1");
         expr1.set(0, -1);
         expr1.set(1, 5100);
         expr1.set(2, -5000);
         expr1.upper(BigMath.ZERO);
 
-        Expression expr2 = originalModel.addExpression("Expr2");
+        Expression expr2 = originalModel.newExpression("Expr2");
         expr2.set(0, 1);
         expr2.set(1, 5100);
         expr2.set(2, -5000);
         expr2.lower(BigMath.ZERO);
 
-        Expression expr3 = originalModel.addExpression("Expr3");
+        Expression expr3 = originalModel.newExpression("Expr3");
         expr3.set(1, 5000);
         expr3.set(2, 5000);
         expr3.level(new BigDecimal(19105000));
@@ -176,10 +176,10 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         slackedModel.relax();
         slackedModel.getVariable(1).upper(3821);
         slackedModel.getVariable(2).upper(3821);
-        Variable expr2_L = slackedModel.addVariable("Expr2_L_slack").lower(0);
-        Variable expr1_U = slackedModel.addVariable("Expr1_U_slack").lower(0);
-        Variable x2013_U = slackedModel.addVariable("x2013_U_slack").lower(0);
-        Variable x2014_U = slackedModel.addVariable("x2014_U_slack").lower(0);
+        Variable expr2_L = slackedModel.newVariable("Expr2_L_slack").lower(0);
+        Variable expr1_U = slackedModel.newVariable("Expr1_U_slack").lower(0);
+        Variable x2013_U = slackedModel.newVariable("x2013_U_slack").lower(0);
+        Variable x2014_U = slackedModel.newVariable("x2014_U_slack").lower(0);
 
     }
 

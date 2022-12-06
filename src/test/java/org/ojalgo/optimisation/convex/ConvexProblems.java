@@ -106,11 +106,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -226,7 +226,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
         if (matrices[0] != null && matrices[1] != null) {
             for (int e = 0; e < matrices[0].countRows(); e++) {
-                Expression tmpExpression = retVal.addExpression("E" + e);
+                Expression tmpExpression = retVal.newExpression("E" + e);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
                     tmpExpression.set(v, matrices[0].get(e, v));
                 }
@@ -235,21 +235,21 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
         if (matrices[4] != null && matrices[5] != null) {
             for (int i = 0; i < matrices[4].countRows(); i++) {
-                Expression tmpExpression = retVal.addExpression("I" + i);
+                Expression tmpExpression = retVal.newExpression("I" + i);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
                     tmpExpression.set(v, matrices[4].get(i, v));
                 }
                 tmpExpression.upper(matrices[5].doubleValue(i));
             }
         }
-        Expression tmpObjQ = retVal.addExpression("Q");
+        Expression tmpObjQ = retVal.newExpression("Q");
         for (int r = 0; r < tmpNumberOfVariables; r++) {
             for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpObjQ.set(r, v, matrices[2].doubleValue(r, v));
             }
         }
         tmpObjQ.weight(HALF);
-        Expression tmpObjC = retVal.addExpression("C");
+        Expression tmpObjC = retVal.newExpression("C");
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             tmpObjC.set(v, matrices[3].doubleValue(v));
         }
@@ -270,7 +270,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprQ = tmpModel.addExpression("Q1");
+        Expression tmpExprQ = tmpModel.newExpression("Q1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             for (int j = 0; j < tmpModel.countVariables(); j++) {
                 tmpExprQ.set(i, i, Math.random());
@@ -280,7 +280,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // tmpModel.options.debug(ConvexSolver.class);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, ONE);
         }
@@ -310,10 +310,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable x = model.addVariable("x").lower(100).upper(200);
-        Variable y = model.addVariable("y").lower(80).upper(170);
+        Variable x = model.newVariable("x").lower(100).upper(200);
+        Variable y = model.newVariable("y").lower(80).upper(170);
 
-        model.addExpression("obj").set(x, y, 1).weight(-1);
+        model.newExpression("obj").set(x, y, 1).weight(-1);
 
         // model.options.debug(ConvexSolver.class);
         // model.options.validate = false;
@@ -463,11 +463,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -568,11 +568,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -650,11 +650,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -733,11 +733,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -1202,7 +1202,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         Variable[] tmpVariables = { x1, x2, x3, x4 };
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpObjExpr = model.addExpression("Objective");
+        Expression tmpObjExpr = model.newExpression("Objective");
 
         tmpObjExpr.set(2, 2, BigMath.HALF);
         tmpObjExpr.set(3, 3, BigMath.TWO);
@@ -1215,22 +1215,22 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Expression tmpConstrExpr;
 
-        tmpConstrExpr = model.addExpression("C1").lower(BigMath.FOUR);
+        tmpConstrExpr = model.newExpression("C1").lower(BigMath.FOUR);
         tmpConstrExpr.set(0, BigMath.ONE);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.FOUR.negate());
         tmpConstrExpr.set(3, BigMath.TWO);
 
-        tmpConstrExpr = model.addExpression("C2").upper(BigMath.SIX);
+        tmpConstrExpr = model.newExpression("C2").upper(BigMath.SIX);
         tmpConstrExpr.set(0, BigMath.THREE.negate());
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.TWO.negate());
 
-        tmpConstrExpr = model.addExpression("C3").level(BigMath.NEG);
+        tmpConstrExpr = model.newExpression("C3").level(BigMath.NEG);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(3, BigMath.NEG);
 
-        tmpConstrExpr = model.addExpression("C4").level(BigMath.ZERO);
+        tmpConstrExpr = model.newExpression("C4").level(BigMath.ZERO);
         tmpConstrExpr.set(0, BigMath.ONE);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.NEG);

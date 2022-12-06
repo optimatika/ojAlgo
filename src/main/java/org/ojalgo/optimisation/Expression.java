@@ -1213,7 +1213,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
         BigDecimal cmpFracLevel = BigMath.ONE.subtract(posFracLevel);
 
-        Expression retVal = myModel.addExpression(this.getName() + "(MIR)");
+        Expression retVal = myModel.newExpression(this.getName() + "(MIR)");
 
         for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
             Variable variable = this.resolve(entry.getKey());

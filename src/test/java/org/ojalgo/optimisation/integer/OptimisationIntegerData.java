@@ -40,7 +40,7 @@ public abstract class OptimisationIntegerData {
         }
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-        final Expression tmpTotalWeightExpr = retVal.addExpression("Total Weight");
+        final Expression tmpTotalWeightExpr = retVal.newExpression("Total Weight");
         for (int i = 0; i < tmpItems.length; i++) {
             tmpTotalWeightExpr.set(i, tmpItems[i].weight);
         }

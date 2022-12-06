@@ -209,13 +209,13 @@ public class TuneSparseOrDenseSolver extends OptimisationTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
 
-        Expression exp100P = retVal.addExpression("Balance");
+        Expression exp100P = retVal.newExpression("Balance");
         for (Variable tmpVariable : variables) {
             exp100P.set(tmpVariable, ONE);
         }
         exp100P.level(ONE);
 
-        Expression expVar = retVal.addExpression("Variance");
+        Expression expVar = retVal.newExpression("Variance");
         for (Variable tmpVariable : variables) {
             expVar.set(tmpVariable, tmpVariable, UNIFORM_20.get());
         }

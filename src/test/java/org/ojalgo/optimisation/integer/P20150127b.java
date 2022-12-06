@@ -29,7 +29,7 @@ public class P20150127b {
         final List<int[]> coefficients = P20150127b.getCoefficients();
         int counter = 0;
         for (final int[] coeff : coefficients) {
-            final Expression c = retVal.addExpression("inequality_" + ++counter);
+            final Expression c = retVal.newExpression("inequality_" + ++counter);
             // We want coeff[0] * x + coeff[1] * y < 0. Since our
             // solutions are integer, we can do "<= -1".
             c.upper(BigDecimal.ONE.negate());
