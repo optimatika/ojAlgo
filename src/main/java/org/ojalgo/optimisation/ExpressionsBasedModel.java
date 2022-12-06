@@ -631,10 +631,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
     }
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
     public ExpressionsBasedModel(final Optimisation.Options optimisationOptions) {
 
         super();
@@ -647,6 +643,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myRelaxed = false;
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public ExpressionsBasedModel(final Variable... variables) {
 
         this();
