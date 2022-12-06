@@ -55,21 +55,21 @@ public class LinearProblems extends OptimisationLinearTests {
     public void precisionTestDoubleRunInfeasible() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        Variable d35 = model.addVariable("d35");
-        Variable d56 = model.addVariable("d56");
-        Variable d57 = model.addVariable("d57");
+        Variable d35 = model.newVariable("d35");
+        Variable d56 = model.newVariable("d56");
+        Variable d57 = model.newVariable("d57");
 
         // d35 = 0.0;
         d35.level(0.0);
 
         // d56 - d35 = -2000.0400000000002;
-        Expression expression1 = model.addExpression("d56 - d35");
+        Expression expression1 = model.newExpression("d56 - d35");
         expression1.set(d56, 1.0);
         expression1.set(d35, -1.0);
         expression1.level(-2000.0400000000002);
 
         // d57 - d56 = 0.0;
-        Expression expression2 = model.addExpression("d57 - d56");
+        Expression expression2 = model.newExpression("d57 - d56");
         expression2.set(d57, 1.0);
         expression2.set(d56, -1.0);
         expression2.level(0.0);
@@ -110,25 +110,25 @@ public class LinearProblems extends OptimisationLinearTests {
 
         BigDecimal tmpRHS = new BigDecimal("23.0");
 
-        Expression constr1Full = modFull.addExpression("C1");
+        Expression constr1Full = modFull.newExpression("C1");
         for (int i = 0; i < modFull.countVariables(); i++) {
             constr1Full.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
         }
         constr1Full.level(tmpRHS);
 
-        Expression constr1Odd = modOdd.addExpression("C1");
+        Expression constr1Odd = modOdd.newExpression("C1");
         for (int i = 0; i < modOdd.countVariables(); i++) {
             constr1Odd.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
         constr1Odd.level(tmpRHS);
 
-        Expression constr2Full = modFull.addExpression("C2");
+        Expression constr2Full = modFull.newExpression("C2");
         for (int i = 0; i < modFull.countVariables(); i++) {
             constr2Full.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
         }
         constr2Full.level(tmpRHS);
 
-        Expression constr2Even = modEven.addExpression("C2");
+        Expression constr2Even = modEven.newExpression("C2");
         for (int i = 0; i < modEven.countVariables(); i++) {
             constr2Even.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
@@ -211,16 +211,16 @@ public class LinearProblems extends OptimisationLinearTests {
                 new Variable("Z").lower(ZERO).weight(ZERO) };
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         tmpExprC1.level(ZERO);
         tmpExprC1.set(0, ONE);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
+        Expression tmpExprC2 = tmpModel.newExpression("C2");
         tmpExprC2.level(ZERO);
         tmpExprC2.set(0, ONE);
         tmpExprC2.set(1, NEG);
 
-        Expression tmpExprC3 = tmpModel.addExpression("C3");
+        Expression tmpExprC3 = tmpModel.newExpression("C3");
         tmpExprC3.level(ZERO);
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
@@ -299,8 +299,8 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addVariable(x);
         model.addVariable(y);
 
-        model.addExpression("first").set(x, 2).set(y, 3).upper(1);
-        model.addExpression("second").set(x, -2).set(y, 3).lower(1);
+        model.newExpression("first").set(x, 2).set(y, 3).upper(1);
+        model.newExpression("second").set(x, -2).set(y, 3).lower(1);
 
         ArrayR256 expected = ArrayR256.wrap(BigMath.ZERO, BigMath.THIRD);
 
@@ -323,8 +323,8 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addVariable(x);
         model.addVariable(y);
 
-        model.addExpression("first").set(x, 0).set(y, 1).lower(1);
-        model.addExpression("second").set(x, 0).set(y, 1).upper(-1);
+        model.newExpression("first").set(x, 0).set(y, 1).lower(1);
+        model.newExpression("second").set(x, 0).set(y, 1).upper(-1);
 
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
 

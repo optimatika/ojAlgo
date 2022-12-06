@@ -42,14 +42,26 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class Variable extends ModelEntity<Variable> {
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable make(final String name) {
         return new Variable(name);
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable makeBinary(final String name) {
         return Variable.make(name).binary();
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable makeInteger(final String name) {
         return Variable.make(name).integer();
     }
@@ -59,6 +71,10 @@ public final class Variable extends ModelEntity<Variable> {
     private transient boolean myUnbounded = false;
     private BigDecimal myValue = null;
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public Variable(final String name) {
         super(name);
     }

@@ -154,7 +154,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         {
             int tmpLength = model.countVariables();
 
-            Expression retVal = model.addExpression("objective");
+            Expression retVal = model.newExpression("objective");
 
             for (int ij = 0; ij < tmpLength; ij++) {
                 retVal.set(ij, ij, ONE);
@@ -173,7 +173,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         {
             int tmpLength = model.countVariables();
 
-            Expression retVal = model.addExpression("sum(xi) = 100.0");
+            Expression retVal = model.newExpression("sum(xi) = 100.0");
 
             for (int i = 0; i < tmpLength; i++) {
                 retVal.set(i, ONE);
@@ -185,7 +185,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         // x1 + x2 <= 45
         //
         {
-            Expression e = model.addExpression("x1 + x2 <= 45.0");
+            Expression e = model.newExpression("x1 + x2 <= 45.0");
             e.set(1, BigMath.ONE);
             e.set(2, BigMath.ONE);
             e.lower(BigMath.ZERO).upper(new BigDecimal(45.0));
@@ -194,7 +194,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         // x4 - 2*x5 = 0
         //
         {
-            Expression e = model.addExpression("x4 - 2*x5 = 0");
+            Expression e = model.newExpression("x4 - 2*x5 = 0");
             e.set(4, BigMath.ONE);
             e.set(5, BigMath.TWO.negate());
             e.level(BigMath.ZERO);

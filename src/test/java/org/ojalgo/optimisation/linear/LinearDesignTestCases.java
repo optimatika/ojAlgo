@@ -103,7 +103,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
         int tmpLength = retVal.countVariables();
 
-        Expression retVal2 = retVal.addExpression("100%");
+        Expression retVal2 = retVal.newExpression("100%");
 
         for (int i = 0; i < tmpLength; i++) {
             retVal2.set(i, ONE);
@@ -127,19 +127,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
-        Expression exprC1 = model.addExpression("C1");
+        Expression exprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC1.set(i, new BigDecimal[] { TWO, ONE, ONE }[i]);
         }
         exprC1.upper(new BigDecimal("14.0"));
 
-        Expression exprC2 = model.addExpression("C2");
+        Expression exprC2 = model.newExpression("C2");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC2.set(i, new BigDecimal[] { FOUR, TWO, THREE }[i]);
         }
         exprC2.upper(new BigDecimal("28.0"));
 
-        Expression exprC3 = model.addExpression("C3");
+        Expression exprC3 = model.newExpression("C3");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC3.set(i, new BigDecimal[] { TWO, FIVE, FIVE }[i]);
         }
@@ -167,13 +167,13 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { ONE, TWO, ONE }[i]);
         }
         tmpExprC1.level(TEN);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
+        Expression tmpExprC2 = tmpModel.newExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ONE, TWO.negate(), TWO }[i]);
         }
@@ -198,19 +198,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { ONE, ZERO }[i]);
         }
         tmpExprC1.upper(TWO);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
+        Expression tmpExprC2 = tmpModel.newExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ZERO, ONE }[i]);
         }
         tmpExprC2.upper(THREE);
 
-        Expression tmpExprC3 = tmpModel.addExpression("C3");
+        Expression tmpExprC3 = tmpModel.newExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
@@ -236,19 +236,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { SIX, ONE.negate(), ZERO }[i]);
         }
         tmpExprC1.upper(TEN);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
+        Expression tmpExprC2 = tmpModel.newExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ONE, FIVE, ZERO }[i]);
         }
         tmpExprC2.lower(FOUR);
 
-        Expression tmpExprC3 = tmpModel.addExpression("C3");
+        Expression tmpExprC3 = tmpModel.newExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC3.set(i, new BigDecimal[] { ONE, FIVE, ONE }[i]);
         }
@@ -274,19 +274,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { HALF, QUARTER }[i]);
         }
         tmpExprC1.upper(FOUR);
 
-        Expression tmpExprC2 = tmpModel.addExpression("C2");
+        Expression tmpExprC2 = tmpModel.newExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ONE, THREE }[i]);
         }
         tmpExprC2.lower(TEN.add(TEN));
 
-        Expression tmpExprC3 = tmpModel.addExpression("C3");
+        Expression tmpExprC3 = tmpModel.newExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
@@ -328,21 +328,21 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
         BigDecimal[] paramC1 = { ONE, ONE };
-        Expression exprC1 = model.addExpression("C1");
+        Expression exprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC1.set(i, paramC1[i]);
         }
         exprC1.upper(TEN);
 
         BigDecimal[] paramC2 = { ONE, TWO };
-        Expression exprC2 = model.addExpression("C2");
+        Expression exprC2 = model.newExpression("C2");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC2.set(i, paramC2[i]);
         }
         exprC2.lower(TWELVE);
 
         BigDecimal[] paramC3 = { TWO, ONE };
-        Expression exprC3 = model.addExpression("C3");
+        Expression exprC3 = model.newExpression("C3");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC3.set(i, paramC3[i]);
         }
@@ -370,21 +370,21 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
         BigDecimal[] valsC1 = { THREE, ONE, NEG };
-        Expression exprC1 = model.addExpression("C1");
+        Expression exprC1 = model.newExpression("C1");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC1.set(i, valsC1[i]);
         }
         exprC1.level(TEN.add(FIVE));
 
         BigDecimal[] valsC2 = { EIGHT, FOUR, NEG };
-        Expression exprC2 = model.addExpression("C2");
+        Expression exprC2 = model.newExpression("C2");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC2.set(i, valsC2[i]);
         }
         exprC2.level(FIVE.multiply(TEN));
 
         BigDecimal[] valsC3 = { TWO, TWO, ONE };
-        Expression exprC3 = model.addExpression("C3");
+        Expression exprC3 = model.newExpression("C3");
         for (int i = 0; i < model.countVariables(); i++) {
             exprC3.set(i, valsC3[i]);
         }
@@ -512,7 +512,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, ONE);
         }
@@ -580,41 +580,41 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         model.addVariable(x2014);
         model.addVariable(x2015);
 
-        Expression obj = model.addExpression("obj");
+        Expression obj = model.newExpression("obj");
         obj.set(x1, 1);
         obj.weight(BigDecimal.valueOf(1));
 
-        Expression c1 = model.addExpression("c1");
+        Expression c1 = model.newExpression("c1");
         c1.set(x1, 1);
         c1.lower(BigDecimal.valueOf(0));
 
-        Expression c2 = model.addExpression("c2");
+        Expression c2 = model.newExpression("c2");
         c2.set(x2014, -5000);
         c2.set(x2013, 5100);
         c2.set(x1, -1);
         c2.upper(BigDecimal.valueOf(0));
 
-        Expression c3 = model.addExpression("c3");
+        Expression c3 = model.newExpression("c3");
         c3.set(x2014, -5000);
         c3.set(x2013, 5100);
         c3.set(x1, 1);
         c3.lower(BigDecimal.valueOf(0));
 
-        Expression c4 = model.addExpression("c4");
+        Expression c4 = model.newExpression("c4");
         c4.set(x2014, 150);
         c4.set(x2013, 5100);
         c4.set(x2015, -5000);
         c4.set(x1, -1);
         c4.upper(BigDecimal.valueOf(0));
 
-        Expression c5 = model.addExpression("c5");
+        Expression c5 = model.newExpression("c5");
         c5.set(x2014, 150);
         c5.set(x2013, 5100);
         c5.set(x2015, -5000);
         c5.set(x1, 1);
         c5.lower(BigDecimal.valueOf(0));
 
-        Expression c6 = model.addExpression("c6");
+        Expression c6 = model.newExpression("c6");
         c6.set(x2015, 5000);
         c6.set(x2014, 5000);
         c6.set(x2013, 5000);
@@ -649,7 +649,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, ONE);
         }

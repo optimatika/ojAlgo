@@ -229,7 +229,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public Expression addExpression(final String aName) {
-            return myModel.addExpression(aName);
+            return myModel.newExpression(aName);
         }
 
         public double getConstant() {

@@ -74,7 +74,7 @@ public class StrategyMixer {
         // tmpModel.options.debug(IntegerSolver.class);
         // tmpModel.options.validate = false;
 
-        final Expression tmpQuadObj = tmpModel.addExpression("Quadratic Objective Part");
+        final Expression tmpQuadObj = tmpModel.newExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);
         for (int row = 0; row < 3; row++) {
 
@@ -90,7 +90,7 @@ public class StrategyMixer {
                 tmpQuadObj.set(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
             }
 
-            final Expression tmpActive = tmpModel.addExpression(tmpVars[row].getName() + " Active");
+            final Expression tmpActive = tmpModel.newExpression(tmpVars[row].getName() + " Active");
             tmpActive.set(3 + row, ONE);
             tmpActive.set(row, NEG);
             tmpActive.lower(ZERO);
@@ -99,7 +99,7 @@ public class StrategyMixer {
             }
         }
 
-        final Expression tmpHundredPercent = tmpModel.addExpression("100%");
+        final Expression tmpHundredPercent = tmpModel.newExpression("100%");
         tmpHundredPercent.level(ONE);
         tmpHundredPercent.set(0, ONE);
         tmpHundredPercent.set(1, ONE);
@@ -108,7 +108,7 @@ public class StrategyMixer {
             BasicLogger.debug(tmpHundredPercent.toString());
         }
 
-        final Expression tmpStrategyCount = tmpModel.addExpression("Strategy Count");
+        final Expression tmpStrategyCount = tmpModel.newExpression("Strategy Count");
         tmpStrategyCount.upper(TWO);
         tmpStrategyCount.set(3, ONE);
         tmpStrategyCount.set(4, ONE);

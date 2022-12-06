@@ -18,9 +18,9 @@ public class TestMcNuggetsChallenge extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable numberOfPack6 = model.addVariable("#6-packs").lower(0).integer(true);
-        Variable numberOfPack9 = model.addVariable("#9-packs").lower(0).integer(true);
-        Variable numberOfPack20 = model.addVariable("#20-packs").lower(0).integer(true);
+        Variable numberOfPack6 = model.newVariable("#6-packs").lower(0).integer(true);
+        Variable numberOfPack9 = model.newVariable("#9-packs").lower(0).integer(true);
+        Variable numberOfPack20 = model.newVariable("#20-packs").lower(0).integer(true);
 
         Expression totalNuggetsOrdered = model.addExpression().weight(1);
         totalNuggetsOrdered.set(numberOfPack6, 6);

@@ -111,7 +111,7 @@ public final class NodeSolver extends IntermediateSolver {
                         BasicLogger.debug("{} {}", name, equation.toString());
                     }
 
-                    Expression cut = target.addExpression(name);
+                    Expression cut = target.newExpression(name);
 
                     cut.lower(BigMath.ONE);
 

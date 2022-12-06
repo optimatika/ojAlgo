@@ -618,6 +618,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this(new Optimisation.Options());
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
 
         this();
@@ -639,6 +643,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myRelaxed = false;
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public ExpressionsBasedModel(final Variable... variables) {
 
         this();
@@ -688,16 +696,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Expression addExpression() {
-        return this.addExpression("EXPR" + myExpressions.size());
+        return this.newExpression("EXPR" + myExpressions.size());
     }
 
     public Expression addExpression(final String name) {
-
-        final Expression retVal = new Expression(name, this);
-
-        myExpressions.put(name, retVal);
-
-        return retVal;
+        return this.newExpression(name);
     }
 
     /**
@@ -751,7 +754,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         final String name = "SOS" + max + "-" + orderedSet.toString();
 
-        final Expression expression = this.addExpression(name);
+        final Expression expression = this.newExpression(name);
 
         for (final Variable variable : orderedSet) {
             if (variable == null || variable.getIndex() == null || !variable.isBinary()) {
@@ -769,15 +772,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Variable addVariable() {
-        return this.addVariable("X" + myVariables.size());
+        return this.newVariable("X" + myVariables.size());
     }
 
     public Variable addVariable(final String name) {
-        final Variable retVal = new Variable(name);
-        this.addVariable(retVal);
-        return retVal;
+        return this.newVariable(name);
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariable(final Variable variable) {
         if (myShallowCopy) {
             throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
@@ -786,12 +791,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         variable.setIndex(new IntIndex(myVariables.size() - 1));
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariables(final Collection<? extends Variable> variables) {
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariables(final Variable[] variables) {
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
@@ -1189,6 +1202,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this.setOptimisationSense(Optimisation.Sense.MIN);
 
         return this.optimise();
+    }
+
+    public Expression newExpression(final String name) {
+
+        final Expression retVal = new Expression(name, this);
+
+        myExpressions.put(name, retVal);
+
+        return retVal;
+    }
+
+    public Variable newVariable(final String name) {
+        final Variable retVal = new Variable(name);
+        this.addVariable(retVal);
+        return retVal;
     }
 
     /**

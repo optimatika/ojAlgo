@@ -41,7 +41,7 @@ abstract class FileFormatEBM {
 
     private static Expression readExpression(final ExpressionsBasedModel model, final String[] fields) {
 
-        Expression expression = model.addExpression(fields[1]);
+        Expression expression = model.newExpression(fields[1]);
 
         FileFormatEBM.readModelEntity(expression, fields);
 
@@ -87,7 +87,7 @@ abstract class FileFormatEBM {
 
     private static void readVariable(final ExpressionsBasedModel model, final String[] fields) {
 
-        Variable variable = model.addVariable(fields[1]);
+        Variable variable = model.newVariable(fields[1]);
 
         FileFormatEBM.readModelEntity(variable, fields);
 

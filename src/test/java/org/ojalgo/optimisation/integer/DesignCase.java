@@ -59,11 +59,11 @@ public class DesignCase extends OptimisationIntegerTests {
     public void testBadMixedIntegerCutExample() {
 
         ExpressionsBasedModel mMIP = new ExpressionsBasedModel();
-        Variable x = mMIP.addVariable("x").integer(false).lower(0).weight(1);
-        Variable y = mMIP.addVariable("y").integer(true).lower(0).weight(-4);
-        mMIP.addExpression("C1").upper(14).set(x, -2).set(y, 7);
-        mMIP.addExpression("C2").upper(3).set(x, 1);
-        mMIP.addExpression("C3").upper(3).set(x, -2).set(y, 2);
+        Variable x = mMIP.newVariable("x").integer(false).lower(0).weight(1);
+        Variable y = mMIP.newVariable("y").integer(true).lower(0).weight(-4);
+        mMIP.newExpression("C1").upper(14).set(x, -2).set(y, 7);
+        mMIP.newExpression("C2").upper(3).set(x, 1);
+        mMIP.newExpression("C3").upper(3).set(x, -2).set(y, 2);
 
         ExpressionsBasedModel mLP = mMIP.snapshot();
         mLP.relax(false);
@@ -92,8 +92,8 @@ public class DesignCase extends OptimisationIntegerTests {
 
         // Eg0
         ExpressionsBasedModel mEg0 = new ExpressionsBasedModel();
-        Variable x1 = mEg0.addVariable("x1").integer(true).lower(0).weight(-6);
-        Variable x2 = mEg0.addVariable("x2").integer(true).lower(0).weight(-5);
+        Variable x1 = mEg0.newVariable("x1").integer(true).lower(0).weight(-6);
+        Variable x2 = mEg0.newVariable("x2").integer(true).lower(0).weight(-5);
         mEg0.addExpression().upper(11).set(x1, 3).set(x2, 1);
         mEg0.addExpression().upper(5).set(x1, -1).set(x2, 2);
 
@@ -149,14 +149,14 @@ public class DesignCase extends OptimisationIntegerTests {
     public void testExpressingTheCutInTheOriginalVariables() {
 
         ExpressionsBasedModel orgModel = new ExpressionsBasedModel();
-        Variable x1 = orgModel.addVariable("x1").lower(0).weight(-1);
-        Variable x2 = orgModel.addVariable("x2").lower(0).weight(-1);
-        Expression c3 = orgModel.addExpression("C3").upper(20).set(x1, 2).set(x2, 5);
-        Expression c4 = orgModel.addExpression("C4").upper(17).set(x1, 4).set(x2, 3);
+        Variable x1 = orgModel.newVariable("x1").lower(0).weight(-1);
+        Variable x2 = orgModel.newVariable("x2").lower(0).weight(-1);
+        Expression c3 = orgModel.newExpression("C3").upper(20).set(x1, 2).set(x2, 5);
+        Expression c4 = orgModel.newExpression("C4").upper(17).set(x1, 4).set(x2, 3);
 
         ExpressionsBasedModel slackModel = orgModel.copy();
-        Variable x3 = slackModel.addVariable("x3").lower(0);
-        Variable x4 = slackModel.addVariable("x4").lower(0);
+        Variable x3 = slackModel.newVariable("x3").lower(0);
+        Variable x4 = slackModel.newVariable("x4").lower(0);
         slackModel.getExpression("C3").lower(20).set(x3, 1);
         slackModel.getExpression("C4").lower(17).set(x4, 1);
 
@@ -166,15 +166,15 @@ public class DesignCase extends OptimisationIntegerTests {
         TestUtils.assertEquals(orgResult.doubleValue(0), slackResult.doubleValue(0));
         TestUtils.assertEquals(orgResult.doubleValue(1), slackResult.doubleValue(1));
 
-        slackModel.addExpression("CUT_A").lower(2.0 / 7.0).set(x3, 2.0 / 7.0).set(x4, 6.0 / 7.0);
-        slackModel.addExpression("CUT_B").lower(11.0 / 14.0).set(x3, 11.0 / 14.0).set(x4, 5.0 / 14.0);
+        slackModel.newExpression("CUT_A").lower(2.0 / 7.0).set(x3, 2.0 / 7.0).set(x4, 6.0 / 7.0);
+        slackModel.newExpression("CUT_B").lower(11.0 / 14.0).set(x3, 11.0 / 14.0).set(x4, 5.0 / 14.0);
 
         slackResult = slackModel.minimise();
 
         TestUtils.assertEquals(2.0, slackResult.doubleValue(0));
         TestUtils.assertEquals(3.0, slackResult.doubleValue(1));
 
-        Expression cutA = orgModel.addExpression("CUT_A").lower(2.0 / 7.0);
+        Expression cutA = orgModel.newExpression("CUT_A").lower(2.0 / 7.0);
 
         BigDecimal factor = BigDecimal.valueOf(2.0 / 7.0).negate();
         BigDecimal limit = c3.getUpperLimit();
@@ -195,7 +195,7 @@ public class DesignCase extends OptimisationIntegerTests {
         TestUtils.assertEquals(-4, cutA.get(x1));
         TestUtils.assertEquals(-4, cutA.get(x2));
 
-        Expression cutB = orgModel.addExpression("CUT_B").lower(11.0 / 14.0);
+        Expression cutB = orgModel.newExpression("CUT_B").lower(11.0 / 14.0);
 
         BigDecimal factor5 = BigDecimal.valueOf(11.0 / 14.0).negate();
         BigDecimal limit5 = c3.getUpperLimit();
@@ -239,7 +239,7 @@ public class DesignCase extends OptimisationIntegerTests {
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         model.addVariables(variables);
 
-        Expression budgetCost = model.addExpression("Budget").upper(10);
+        Expression budgetCost = model.newExpression("Budget").upper(10);
         budgetCost.set(variables.get(0), 6);
         budgetCost.set(variables.get(1), 3);
         budgetCost.set(variables.get(2), 5);
@@ -330,7 +330,7 @@ public class DesignCase extends OptimisationIntegerTests {
         //flow_out:
         //sum(j in cities : i!=j) x[i][j]==1;
         for (int i = 0; i < n; i++) {
-            Expression constraint_line = model.addExpression("constraint_line" + i).lower(1).upper(1);
+            Expression constraint_line = model.newExpression("constraint_line" + i).lower(1).upper(1);
             for (int j = 0; j < n; j++) {
                 if (i != j) {
                     constraint_line.set(x[i][j], 1);
@@ -342,7 +342,7 @@ public class DesignCase extends OptimisationIntegerTests {
         //flow_in:
         //sum(i in cities : i!=j) x[i][j]==1;
         for (int j = 0; j < n; j++) {
-            Expression constraint_column = model.addExpression("constraint_column" + j).lower(1).upper(1);
+            Expression constraint_column = model.newExpression("constraint_column" + j).lower(1).upper(1);
             for (int i = 0; i < n; i++) {
                 if (i != j) {
                     constraint_column.set(x[i][j], 1);
@@ -356,7 +356,7 @@ public class DesignCase extends OptimisationIntegerTests {
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < n; j++) {
                 if (i != j) {
-                    Expression constraint_subroute = model.addExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
+                    Expression constraint_subroute = model.newExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
                     constraint_subroute.set(u[i], 1);
                     constraint_subroute.set(u[j], -1);
                     constraint_subroute.set(x[i][j], n);
@@ -391,23 +391,23 @@ public class DesignCase extends OptimisationIntegerTests {
 
         for (int h = 0; h < 24; h++) {
 
-            Variable start1 = model.addVariable("Start activity A at " + h).binary();
+            Variable start1 = model.newVariable("Start activity A at " + h).binary();
             starts1.add(start1);
 
-            Variable start2 = model.addVariable("Start activity B at " + h).binary();
+            Variable start2 = model.newVariable("Start activity B at " + h).binary();
             starts2.add(start2);
 
-            Variable work1 = model.addVariable("Activity A ongoing at " + h).binary().weight(Math.random());
+            Variable work1 = model.newVariable("Activity A ongoing at " + h).binary().weight(Math.random());
             works1.add(work1);
 
             orderedSet1.add(work1);
 
-            Variable work2 = model.addVariable("Activity B ongoing at " + h).binary().weight(Math.random());
+            Variable work2 = model.newVariable("Activity B ongoing at " + h).binary().weight(Math.random());
             works2.add(work2);
 
             orderedSet2.add(work2);
 
-            model.addExpression("Maximum one ongoing activity at " + h).upper(1).set(work1, 1).set(work2, 1);
+            model.newExpression("Maximum one ongoing activity at " + h).upper(1).set(work1, 1).set(work2, 1);
         }
 
         model.addSpecialOrderedSet(orderedSet1, 3, 3);
@@ -415,7 +415,7 @@ public class DesignCase extends OptimisationIntegerTests {
 
         for (int h = 0; h < 21; h++) {
 
-            Expression expr1 = model.addExpression("Finish A when started at " + h);
+            Expression expr1 = model.newExpression("Finish A when started at " + h);
             expr1.upper(0);
 
             expr1.set(starts1.get(h), 3);
@@ -424,7 +424,7 @@ public class DesignCase extends OptimisationIntegerTests {
             expr1.set(works1.get(h + 1), -1);
             expr1.set(works1.get(h + 2), -1);
 
-            Expression expr2 = model.addExpression("Finish B when started at " + h);
+            Expression expr2 = model.newExpression("Finish B when started at " + h);
             expr2.upper(0);
 
             expr2.set(starts2.get(h), 3);
@@ -439,8 +439,8 @@ public class DesignCase extends OptimisationIntegerTests {
             starts2.get(h).level(0);
         }
 
-        model.addExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
-        model.addExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
+        model.newExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
+        model.newExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
 
         Result resultMin = model.minimise();
 

@@ -45,19 +45,19 @@ public class TestOjAlgo {
         final ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
 
         // c1: X =0
-        final Expression c1 = model.addExpression("c1");
+        final Expression c1 = model.newExpression("c1");
         c1.level(ZERO);
         c1.set(0, ONE);
 
         // c2: -X +5Y =0
-        final Expression c2 = model.addExpression("c2");
+        final Expression c2 = model.newExpression("c2");
         c2.level(ZERO);
 
         c2.set(0, new BigDecimal(-1));
         c2.set(1, ONE);
 
         // c3: X -Z =0
-        final Expression c3 = model.addExpression("c3");
+        final Expression c3 = model.newExpression("c3");
         c3.level(ZERO);
         // bugs with this constraint
         c3.set(0, ONE);

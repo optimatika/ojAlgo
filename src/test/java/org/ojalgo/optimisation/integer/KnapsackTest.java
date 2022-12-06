@@ -67,7 +67,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
             }
 
             ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
-            Expression totalWeightExpr = retVal.addExpression("Total Weight");
+            Expression totalWeightExpr = retVal.newExpression("Total Weight");
             for (int i = 0; i < items.size(); i++) {
                 totalWeightExpr.set(i, items.get(i).weight);
             }

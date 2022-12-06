@@ -130,7 +130,7 @@ public class P20140819 extends OptimisationIntegerTests {
         factors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
 
         for (int c = 0; c < factors.length; c++) {
-            Expression tmpExpr = retVal.addExpression("C" + c);
+            Expression tmpExpr = retVal.newExpression("C" + c);
             tmpExpr.lower(lower[c]).upper(upper[c]);
             for (int v = 0; v < factors[c].length; v++) {
                 tmpExpr.set(v, factors[c][v]);

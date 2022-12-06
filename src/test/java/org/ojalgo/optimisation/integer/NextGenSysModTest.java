@@ -1263,15 +1263,15 @@ public class NextGenSysModTest {
         double marginLimit = marginSamples.getQuartile1();
         double betaLimit = betaSamples.getQuartile3();
 
-        Expression marginExpr = retVal.addExpression("Margin").lower(marginLimit);
-        Expression betaExpr = retVal.addExpression("Beta").upper(betaLimit);
-        Expression totalExpr = retVal.addExpression("100%").level(BigMath.ONE);
-        Expression budgetExpr = retVal.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
-        Expression varianceExpr = retVal.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression marginExpr = retVal.newExpression("Margin").lower(marginLimit);
+        Expression betaExpr = retVal.newExpression("Beta").upper(betaLimit);
+        Expression totalExpr = retVal.newExpression("100%").level(BigMath.ONE);
+        Expression budgetExpr = retVal.newExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        Expression varianceExpr = retVal.newExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
 
         for (int j = 0; j < numberOfAssets; j++) {
 
-            Variable weightVar = retVal.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+            Variable weightVar = retVal.newVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
 
             marginExpr.set(weightVar, marginVctr[j]);
             betaExpr.set(weightVar, betaVctr[j]);
@@ -1285,13 +1285,13 @@ public class NextGenSysModTest {
         for (int j = 0; j < numberOfAssets; j++) {
 
             Variable weightVar = retVal.getVariable(j);
-            Variable activationVar = retVal.addVariable(weightVar.getName() + "_Activator").binary();
+            Variable activationVar = retVal.newVariable(weightVar.getName() + "_Activator").binary();
 
             budgetExpr.set(activationVar, BigMath.ONE);
 
-            retVal.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+            retVal.newExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
                     .lower(BigMath.ZERO);
-            retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+            retVal.newExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
         }
 
         // retVal.options.debug(ConvexSolver.class);
@@ -1320,13 +1320,13 @@ public class NextGenSysModTest {
         double marginLimit = marginSamples.getQuartile1();
         double betaLimit = betaSamples.getQuartile3();
 
-        Expression marginExpr = model.addExpression("Margin").lower(marginLimit);
-        Expression betaExpr = model.addExpression("Beta").upper(betaLimit);
-        Expression totalExpr = model.addExpression("100%").level(BigMath.ONE);
+        Expression marginExpr = model.newExpression("Margin").lower(marginLimit);
+        Expression betaExpr = model.newExpression("Beta").upper(betaLimit);
+        Expression totalExpr = model.newExpression("100%").level(BigMath.ONE);
 
         for (int j = 0; j < numberOfAssets; j++) {
 
-            Variable weightVar = model.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+            Variable weightVar = model.newVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
 
             marginExpr.set(weightVar, marginVctr[j]);
             betaExpr.set(weightVar, betaVctr[j]);
@@ -1338,7 +1338,7 @@ public class NextGenSysModTest {
             return linRes;
         }
 
-        Expression varianceExpr = model.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression varianceExpr = model.newExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
         for (int j = 0; j < numberOfAssets; j++) {
             for (int i = 0; i < numberOfAssets; i++) {
                 varianceExpr.set(i, j, covar.get(i, j));
@@ -1351,7 +1351,7 @@ public class NextGenSysModTest {
             return linRes;
         }
 
-        Expression budgetExpr = model.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        Expression budgetExpr = model.newExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
         for (int j = 0; j < numberOfAssets; j++) {
 
             Variable weightVar = model.getVariable(j);
@@ -1362,13 +1362,13 @@ public class NextGenSysModTest {
 
             } else {
 
-                Variable activationVar = model.addVariable(weightVar.getName() + "_Activator").binary();
+                Variable activationVar = model.newVariable(weightVar.getName() + "_Activator").binary();
 
                 budgetExpr.set(activationVar, BigMath.ONE);
 
-                model.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+                model.newExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
                         .lower(BigMath.ZERO);
-                model.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+                model.newExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
             }
         }
 

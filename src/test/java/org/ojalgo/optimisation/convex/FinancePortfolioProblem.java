@@ -78,13 +78,13 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
 
-        final Expression tmp100P = retVal.addExpression("Balance");
+        final Expression tmp100P = retVal.newExpression("Balance");
         for (int i = 0; i < numberOfVariables; i++) {
             tmp100P.set(i, ONE);
         }
         tmp100P.level(ONE);
 
-        final Expression tmpVar = retVal.addExpression("Variance");
+        final Expression tmpVar = retVal.newExpression("Variance");
         for (int i = 0; i < numberOfVariables; i++) {
             for (int j = 0; j < numberOfVariables; j++) {
                 tmpVar.set(i, j, covariances.doubleValue(i, j));
