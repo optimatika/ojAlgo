@@ -35,7 +35,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
 - New structure in `Optimisation.Options`. Options for the LP- and QP-solversare are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
-- `OptimisationData`: This class existed before but was package private. It used as the underlying data of the solver builders, and as solver data interchange format.
+- `OptimisationData`: This class existed before but was package private. It is used as the underlying data of the solver builders, and as a solver data interchange format.
 
 #### org.ojalgo.scalar
 
@@ -69,11 +69,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renmed copies of the old.
 
+#### org.ojalgo.optimisation
+
+- Any/all ways to create `Variable` or `Expression` instances separate from (and then add them to) an `ExpressionsBasedModel` is deprecated. You should first create the model, and then use that as factory for the variables and expressions.
+
 ### Fixed
 
 #### org.ojalgo.matrix
 
-- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered althought the decomposition instance reported they should be.
+- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered (correctly) althought the decomposition instance reported they should be.
 - The `reconstruct()` methods of the `LU` and `LDL` decompositions did not correctly handle pivoting, resulting in incorrect reconstructed matrices.
 
 ## [52.0.1] – 2022-10-20
