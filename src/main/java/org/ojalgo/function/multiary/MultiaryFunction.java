@@ -102,9 +102,18 @@ public interface MultiaryFunction<N extends Comparable<N>> extends BasicFunction
         MatrixStore<N> getHessian(Access1D<N> point);
 
         /**
-         * @return The gradient at 0 (0-vector)
+         * @return The gradient at origin (0-vector), negated or not
+         * @deprecated v53 Use {@link #getLinearFactors(boolean)} instead.
          */
-        MatrixStore<N> getLinearFactors();
+        @Deprecated
+        default MatrixStore<N> getLinearFactors() {
+            return this.getLinearFactors(false);
+        }
+
+        /**
+         * @return The gradient at origin (0-vector), negated or not
+         */
+        MatrixStore<N> getLinearFactors(boolean negated);
 
         default MultiaryFunction.TwiceDifferentiable<N> toFirstOrderApproximation(final Access1D<N> arg) {
             return new FirstOrderApproximation<>(this, arg);
@@ -118,7 +127,7 @@ public interface MultiaryFunction<N extends Comparable<N>> extends BasicFunction
 
     default MultiaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);
-        return new MultiaryFunction<N>() {
+        return new MultiaryFunction<>() {
 
             public int arity() {
                 return MultiaryFunction.this.arity();

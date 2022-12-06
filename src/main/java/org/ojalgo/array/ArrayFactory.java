@@ -43,7 +43,7 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         return retVal;
     }
 
-    public I copy(final Comparable<?>... source) {
+    public I copy(final Comparable<?>[] source) {
         int length = source.length;
         I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {

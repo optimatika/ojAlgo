@@ -62,6 +62,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
 
     public boolean add(final Equation row) {
         if (row.count() != mySize) {
+            BasicLogger.error("row.count(): {} != mySize: {}", row.count(), mySize);
             throw new IllegalArgumentException();
         }
         boolean retVal = myRows.add(row);

@@ -41,6 +41,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ConstraintType;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
@@ -1050,7 +1051,7 @@ abstract class SimplexTableau extends Primitive2D {
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
     static final DenseArray.Factory<Double> DENSE_FACTORY = ArrayR064.FACTORY;
 
-    static void copy(final LinearSolver.Builder builder, final SimplexTableau tableau) {
+    static void copy(final OptimisationData builder, final SimplexTableau tableau) {
 
         Mutate2D body = tableau.constraintsBody();
         for (RowView<Double> row : builder.getRowsAE()) {
@@ -1067,7 +1068,7 @@ abstract class SimplexTableau extends Primitive2D {
         }
 
         Mutate1D obj = tableau.objective();
-        MatrixStore<Double> mtrxC = builder.getC();
+        MatrixStore<Double> mtrxC = builder.getObjective().getLinearFactors(false);
         for (int i = 0; i < mtrxC.size(); i++) {
             obj.set(i, mtrxC.doubleValue(i));
         }
@@ -1088,7 +1089,7 @@ abstract class SimplexTableau extends Primitive2D {
         return new DenseRawTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
     }
 
-    static SimplexTableau make(final LinearSolver.Builder builder, final Optimisation.Options options) {
+    static SimplexTableau make(final OptimisationData builder, final Optimisation.Options options) {
 
         int nbConstraints = builder.countConstraints();
         int nbProblemVariables = builder.countVariables();
@@ -1101,7 +1102,7 @@ abstract class SimplexTableau extends Primitive2D {
         return tableau;
     }
 
-    static SimplexTableau newDense(final LinearSolver.Builder matrices) {
+    static SimplexTableau newDense(final OptimisationData matrices) {
 
         SimplexTableau tableau = new DenseTransposedTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
 
@@ -1110,7 +1111,7 @@ abstract class SimplexTableau extends Primitive2D {
         return tableau;
     }
 
-    static SparseTableau newSparse(final LinearSolver.Builder matrices) {
+    static SparseTableau newSparse(final OptimisationData matrices) {
 
         SparseTableau tableau = new SparseTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
 

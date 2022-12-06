@@ -66,8 +66,8 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
         return myPureQuadratic.getHessian(point);
     }
 
-    public MatrixStore<Double> getLinearFactors() {
-        return myLinear.getLinearFactors();
+    public MatrixStore<Double> getLinearFactors(final boolean negated) {
+        return myLinear.getLinearFactors(!negated);
     }
 
     @Override

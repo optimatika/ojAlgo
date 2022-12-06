@@ -357,7 +357,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         ComplexNumber tmp33 = ComplexNumber.ZERO;
         ComplexNumber tmp44 = tmp33;
 
-        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.C128.copy(tmp00, tmp11, tmp22, tmp33, tmp44);
+        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.C128.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
         NumberContext accuracyContext = NumberContext.of(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;

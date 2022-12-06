@@ -21,12 +21,13 @@
  */
 package org.ojalgo.optimisation;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -46,7 +47,7 @@ import org.ojalgo.structure.Access2D.RowView;
  *
  * @author apete
  */
-final class OptimisationData {
+public final class OptimisationData {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
@@ -72,7 +73,7 @@ final class OptimisationData {
                 SparseArray<Double> tmpRow = baseA.getRow(baseRowDim + i);
                 for (int j = 0; j < addColDim; j++) {
                     value = addA.doubleValue(i, j);
-                    if (value != PrimitiveMath.ZERO) {
+                    if (value != ZERO) {
                         tmpRow.set(j, value);
                     }
                 }
@@ -89,17 +90,150 @@ final class OptimisationData {
     /**
      * Assumed constrained to be <= 0.0
      */
-    private Map<String, MultiaryFunction.TwiceDifferentiable<Double>> myAdditionalConstraints;
+    private Map<String, MultiaryFunction.TwiceDifferentiable<Double>> myAdditionalConstraints = null;
     private RowsSupplier<Double> myAE = null;
     private RowsSupplier<Double> myAI = null;
     private MatrixStore<Double> myBE = null;
     private MatrixStore<Double> myBI = null;
     private Primitive64Store myLowerBounds = null;
-    private MultiaryFunction.TwiceDifferentiable<Double> myObjective;
+    private MultiaryFunction.TwiceDifferentiable<Double> myObjective = null;
     private Primitive64Store myUpperBounds = null;
 
     OptimisationData() {
         super();
+    }
+
+    public int countAdditionalConstraints() {
+        return myAdditionalConstraints != null ? myAdditionalConstraints.size() : 0;
+    }
+
+    public int countConstraints() {
+        return this.countEqualityConstraints() + this.countInequalityConstraints() + this.countAdditionalConstraints();
+    }
+
+    public int countEqualityConstraints() {
+        return myAE != null ? myAE.getRowDim() : 0;
+    }
+
+    public int countInequalityConstraints() {
+        return myAI != null ? myAI.getRowDim() : 0;
+    }
+
+    public int countVariables() {
+
+        if (myAE != null) {
+            return myAE.getColDim();
+        }
+
+        if (myAI != null) {
+            return myAI.getColDim();
+        }
+
+        if (myObjective != null) {
+            return myObjective.arity();
+        }
+
+        throw new ProgrammingError("Cannot deduce the number of variables!");
+    }
+
+    /**
+     * Equality constraints body: [AE][X] == [BE]
+     */
+    public MatrixStore<Double> getAE() {
+        if (myAE != null) {
+            return myAE.get();
+        } else {
+            return FACTORY.makeZero(0, this.countVariables());
+        }
+    }
+
+    public SparseArray<Double> getAE(final int row) {
+        return myAE.getRow(row);
+    }
+
+    public RowsSupplier<Double> getAE(final int... rows) {
+        return myAE.selectRows(rows);
+    }
+
+    /**
+     * Inequality constraints body: [AI][X] <= [BI]
+     */
+    public MatrixStore<Double> getAI() {
+        if (myAI != null) {
+            return myAI.get();
+        } else {
+            return FACTORY.makeZero(0, this.countVariables());
+        }
+    }
+
+    public SparseArray<Double> getAI(final int row) {
+        return myAI.getRow(row);
+    }
+
+    public RowsSupplier<Double> getAI(final int... rows) {
+        return myAI.selectRows(rows);
+    }
+
+    /**
+     * Equality constraints RHS: [AE][X] == [BE]
+     */
+    public MatrixStore<Double> getBE() {
+        if (myBE != null) {
+            return myBE;
+        } else {
+            return FACTORY.makeZero(0, 1);
+        }
+    }
+
+    public double getBE(final int row) {
+        return myBE.doubleValue(row);
+    }
+
+    /**
+     * Inequality constraints RHS: [AI][X] <= [BI]
+     */
+    public MatrixStore<Double> getBI() {
+        if (myBI != null) {
+            return myBI;
+        } else {
+            return FACTORY.makeZero(0, 1);
+        }
+    }
+
+    public double getBI(final int row) {
+        return myBI.doubleValue(row);
+    }
+
+    public MultiaryFunction.TwiceDifferentiable<Double> getObjective() {
+        return myObjective;
+    }
+
+    public <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective(final Class<T> type) {
+        return (T) myObjective;
+    }
+
+    public RowView<Double> getRowsAE() {
+        return myAE.rows();
+    }
+
+    public RowView<Double> getRowsAI() {
+        return myAI.rows();
+    }
+
+    public void reset() {
+
+        if (myAdditionalConstraints != null) {
+            myAdditionalConstraints.clear();
+        }
+
+        myAdditionalConstraints = null;
+        myAE = null;
+        myAI = null;
+        myBE = null;
+        myBI = null;
+        myLowerBounds = null;
+        myObjective = null;
+        myUpperBounds = null;
     }
 
     @Override
@@ -154,108 +288,6 @@ final class OptimisationData {
         myBI = OptimisationData.add(myAI, myBI, mtrxAI, mtrxBI);
     }
 
-    void clearEqualities() {
-        myAE = null;
-        myBE = null;
-    }
-
-    int countAdditionalConstraints() {
-        return myAdditionalConstraints != null ? myAdditionalConstraints.size() : 0;
-    }
-
-    int countEqualityConstraints() {
-        return myAE != null ? myAE.getRowDim() : 0;
-    }
-
-    int countInequalityConstraints() {
-        return myAI != null ? myAI.getRowDim() : 0;
-    }
-
-    int countVariables() {
-
-        if (myAE != null) {
-            return myAE.getColDim();
-        }
-
-        if (myAI != null) {
-            return myAI.getColDim();
-        }
-
-        if (myObjective != null) {
-            return myObjective.arity();
-        }
-
-        throw new ProgrammingError("Cannot deduce the number of variables!");
-    }
-
-    /**
-     * Equality constraints body: [AE][X] == [BE]
-     */
-    MatrixStore<Double> getAE() {
-        if (myAE != null) {
-            return myAE.get();
-        } else {
-            return FACTORY.makeZero(0, this.countVariables());
-        }
-    }
-
-    SparseArray<Double> getAE(final int row) {
-        return myAE.getRow(row);
-    }
-
-    RowsSupplier<Double> getAE(final int... rows) {
-        return myAE.selectRows(rows);
-    }
-
-    /**
-     * Inequality constraints body: [AI][X] <= [BI]
-     */
-    MatrixStore<Double> getAI() {
-        if (myAI != null) {
-            return myAI.get();
-        } else {
-            return FACTORY.makeZero(0, this.countVariables());
-        }
-    }
-
-    SparseArray<Double> getAI(final int row) {
-        return myAI.getRow(row);
-    }
-
-    RowsSupplier<Double> getAI(final int... rows) {
-        return myAI.selectRows(rows);
-    }
-
-    /**
-     * Equality constraints RHS: [AE][X] == [BE]
-     */
-    MatrixStore<Double> getBE() {
-        if (myBE != null) {
-            return myBE;
-        } else {
-            return FACTORY.makeZero(0, 1);
-        }
-    }
-
-    /**
-     * Inequality constraints RHS: [AI][X] <= [BI]
-     */
-    MatrixStore<Double> getBI() {
-        if (myBI != null) {
-            return myBI;
-        } else {
-            return FACTORY.makeZero(0, 1);
-        }
-    }
-
-    double getBI(final int row) {
-        return myBI.doubleValue(row);
-    }
-
-    double getBE(final int row) {
-        return myBE.doubleValue(row);
-    }
-
     Primitive64Store getLowerBounds() {
         return myLowerBounds;
     }
@@ -268,18 +300,6 @@ final class OptimisationData {
         return myLowerBounds;
     }
 
-    <T extends MultiaryFunction.TwiceDifferentiable<Double>> T getObjective() {
-        return (T) myObjective;
-    }
-
-    RowView<Double> getRowsAI() {
-        return myAI.rows();
-    }
-
-    RowView<Double> getRowsAE() {
-        return myAE.rows();
-    }
-
     Primitive64Store getUpperBounds() {
         return myUpperBounds;
     }
@@ -290,22 +310,6 @@ final class OptimisationData {
             myUpperBounds.fillAll(defaultValue);
         }
         return myUpperBounds;
-    }
-
-    boolean hasAdditionalConstraints() {
-        return this.countAdditionalConstraints() > 0;
-    }
-
-    boolean hasEqualityConstraints() {
-        return this.countEqualityConstraints() > 0;
-    }
-
-    boolean hasInequalityConstraints() {
-        return this.countInequalityConstraints() > 0;
-    }
-
-    boolean isObjectiveSet() {
-        return myObjective != null;
     }
 
     void newEqualities(final int nbEqualities, final int nbVariables) {
@@ -323,14 +327,6 @@ final class OptimisationData {
         MatrixStore<Double> mtrxBI = FACTORY.make(nbInequalities, 1);
 
         this.setInequalities(mtrxAI, mtrxBI);
-    }
-
-    void reset() {
-        myAE = null;
-        myAI = null;
-        myBE = null;
-        myBI = null;
-        myObjective = null;
     }
 
     void setBounds(final Access1D<Double> lower, final Access1D<Double> upper) {
@@ -381,19 +377,19 @@ final class OptimisationData {
 
     void validate() {
 
-        // Reset to trigger input validation
+        ProgrammingError.throwIfNull(myObjective);
 
         if (((myAE != null) || (myBE != null))) {
-            this.setEqualities(myAE, myBE);
+            ProgrammingError.throwIfNull(myAE, myBE);
+            ProgrammingError.throwIfNotEqualRowDimensions(myAE, myBE);
         }
 
         if (((myAI != null) || (myBI != null))) {
-            this.setInequalities(myAI, myBI);
+            ProgrammingError.throwIfNull(myAI, myBI);
+            ProgrammingError.throwIfNotEqualRowDimensions(myAI, myBI);
         }
 
-        this.setObjective(myObjective);
-
-        // Check number of variables
+        // Check number of variables/columns
 
         int nbVariables = this.countVariables();
 

@@ -149,7 +149,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getLinearFactors();
+        return this.getLinearFactors(false);
     }
 
     @Override
@@ -157,11 +157,19 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         return myCoefficients.physical().makeZero(this.arity(), this.arity());
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+
+        MatrixStore<N> retVal = myCoefficients;
+
         if (myCoefficients.countRows() == 1L) {
-            return myCoefficients.transpose();
+            retVal = retVal.transpose();
         }
-        return myCoefficients;
+
+        if (negated) {
+            retVal = retVal.negate();
+        }
+
+        return retVal;
     }
 
     @Override

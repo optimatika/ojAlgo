@@ -42,9 +42,9 @@ final class QPESolver extends ConstrainedSolver {
     private boolean myFeasible = false;
     private final Primitive64Store myIterationX;
 
-    QPESolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    QPESolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(matrices, solverOptions);
+        super(convexSolverBuilder, optimisationOptions);
 
         myIterationX = MATRIX_FACTORY.make(this.countVariables(), 1L);
     }

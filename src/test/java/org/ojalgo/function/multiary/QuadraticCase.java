@@ -75,7 +75,9 @@ public class QuadraticCase extends MultiaryFunctionTests {
     @Test
     public void testGetLinearFactors() {
 
-        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(), myQuadraticFunction.getLinearFactors());
+        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(false), myQuadraticFunction.getLinearFactors(false));
+
+        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(true), myQuadraticFunction.getLinearFactors(true));
     }
 
     @Test
