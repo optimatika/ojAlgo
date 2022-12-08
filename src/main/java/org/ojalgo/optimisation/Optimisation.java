@@ -193,8 +193,11 @@ public interface Optimisation {
     public static final class Options implements Optimisation {
 
         /**
-         * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
-         * values integer or not?
+         * Used to determine/validate feasibility. Are the variables within their bounds or not, are the
+         * constraints violated or not? are the variable values integer or not?
+         * <p>
+         * Primarily used in {@link ExpressionsBasedModel}. Not used (should not be) as part of solver logic,
+         * but ouside the solvers to validate their results.
          */
         public NumberContext feasibility = NumberContext.of(12, 8);
 
