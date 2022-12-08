@@ -193,8 +193,11 @@ public interface Optimisation {
     public static final class Options implements Optimisation {
 
         /**
-         * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
-         * values integer or not?
+         * Used to determine/validate feasibility. Are the variables within their bounds or not, are the
+         * constraints violated or not? are the variable values integer or not?
+         * <p>
+         * Primarily used in {@link ExpressionsBasedModel}. Not used (should not be) as part of solver logic,
+         * but ouside the solvers to validate their results.
          */
         public NumberContext feasibility = NumberContext.of(12, 8);
 
@@ -229,15 +232,15 @@ public interface Optimisation {
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * For display only!
+         * For display only! {@link #toString()} and log message formatting.
          */
-        public NumberContext print = NumberContext.of(8, 10);
+        public NumberContext print = ModelEntity.PRINT;
 
         /**
          * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
          * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
-         * corresponding to full double precision.
+         * corresponding to full double precision – but with no more than 14 decimals.
          */
         public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 

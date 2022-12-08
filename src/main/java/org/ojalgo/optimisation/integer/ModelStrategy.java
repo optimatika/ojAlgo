@@ -219,6 +219,10 @@ public abstract class ModelStrategy implements IntegerStrategy {
         return myStrategy.getGMICutConfiguration();
     }
 
+    public NumberContext getIntegralityTolerance() {
+        return myStrategy.getIntegralityTolerance();
+    }
+
     public List<Comparator<NodeKey>> getWorkerPriorities() {
         return myWorkerPriorities;
     }

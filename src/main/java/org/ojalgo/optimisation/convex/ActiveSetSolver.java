@@ -42,6 +42,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SOLUTION = NumberContext.of(6, 4).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext FEASIBILITY = NumberContext.of(12, 8);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -89,7 +90,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (includedChange.count() > 0) {
                 this.log("Included-change: {}", includedChange.asList());
                 double introducedError = includedChange.aggregateAll(Aggregator.LARGEST);
-                if (!options.feasibility.isZero(introducedError)) {
+                if (!FEASIBILITY.isZero(introducedError)) {
                     this.log("Nonzero Included-change! {}", introducedError);
                 }
             }
@@ -488,7 +489,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.log("E-slack: {}", slackE.asList());
             }
             double largestE = slackE.aggregateAll(Aggregator.LARGEST);
-            if (!options.feasibility.isZero(largestE)) {
+            if (!FEASIBILITY.isZero(largestE)) {
                 retVal = false;
                 if (this.isLogDebug()) {
                     this.log("Nonzero E-slack! {}", largestE);
@@ -501,7 +502,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.log("I-slack: {}", slackI.asList());
             }
             double minimumI = slackI.aggregateAll(Aggregator.MINIMUM);
-            if (minimumI < ZERO && !options.feasibility.isZero(minimumI)) {
+            if (minimumI < ZERO && !FEASIBILITY.isZero(minimumI)) {
                 retVal = false;
                 if (this.isLogDebug()) {
                     this.log("Negative I-slack! {}", minimumI);

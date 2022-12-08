@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -384,10 +384,10 @@ public final class IntegerSolver extends GenericSolver {
             double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
 
             if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
-                BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
+                BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, strategy.getIntegralityTolerance());
                 myIntegerModel.limitObjective(null, upper);
             } else {
-                BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
+                BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, strategy.getIntegralityTolerance());
                 myIntegerModel.limitObjective(lower, null);
             }
         }
@@ -585,7 +585,7 @@ public final class IntegerSolver extends GenericSolver {
             displacement = nodeKey.getMinimumDisplacement(i, nodeResult.doubleValue(globalIndex));
             // [0, 0.5]
 
-            if (!options.feasibility.isZero(displacement)) {
+            if (!strategy.getIntegralityTolerance().isZero(displacement)) {
                 // This variable not integer
 
                 comparableDisplacement = strategy.toComparable(i, displacement, myBestResultSoFar != null);

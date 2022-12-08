@@ -1361,13 +1361,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         StringBuilder retVal = new StringBuilder(START_END);
 
-        for (Variable tmpVariable : myVariables) {
-            tmpVariable.appendToString(retVal);
+        for (Variable variable : myVariables) {
+            variable.appendToString(retVal, options.print);
             retVal.append(NEW_LINE);
         }
 
-        for (Expression tmpExpression : myExpressions.values()) {
-            tmpExpression.appendToString(retVal, this.getVariableValues());
+        Result solution = this.getVariableValues();
+        for (Expression expression : myExpressions.values()) {
+            expression.appendToString(retVal, solution, options.print);
             retVal.append(NEW_LINE);
         }
 

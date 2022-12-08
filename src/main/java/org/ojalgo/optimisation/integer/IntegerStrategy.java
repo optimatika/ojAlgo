@@ -42,16 +42,18 @@ public interface IntegerStrategy {
         private final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> myFactory;
         private final NumberContext myGapTolerance;
         private final GMICutConfiguration myGMICutConfiguration;
+        private final NumberContext myIntegralityTolerance;
         private final IntSupplier myParallelism;
         private final Comparator<NodeKey>[] myPriorityDefinitions;
 
-        ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext gap,
+        ConfigurableStrategy(final IntSupplier parallelism, final Comparator<NodeKey>[] definitions, final NumberContext integrality, final NumberContext gap,
                 final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> factory, final GMICutConfiguration configuration) {
 
             super();
 
             myParallelism = parallelism;
             myPriorityDefinitions = definitions;
+            myIntegralityTolerance = integrality;
             myGapTolerance = gap;
             myFactory = factory;
             myGMICutConfiguration = configuration;
@@ -73,7 +75,7 @@ public interface IntegerStrategy {
                 totalDefinitions[additionalDefinitions.length + i] = myPriorityDefinitions[i];
             }
 
-            return new ConfigurableStrategy(myParallelism, totalDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
         public NumberContext getGapTolerance() {
@@ -82,6 +84,10 @@ public interface IntegerStrategy {
 
         public GMICutConfiguration getGMICutConfiguration() {
             return myGMICutConfiguration;
+        }
+
+        public NumberContext getIntegralityTolerance() {
+            return myIntegralityTolerance;
         }
 
         public List<Comparator<NodeKey>> getWorkerPriorities() {
@@ -101,29 +107,29 @@ public interface IntegerStrategy {
          * Change the MIP gap
          */
         public ConfigurableStrategy withGapTolerance(final NumberContext newTolerance) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, newTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, newTolerance, myFactory, myGMICutConfiguration);
         }
 
         public ConfigurableStrategy withGMICutConfiguration(final GMICutConfiguration newConfiguration) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myGapTolerance, myFactory, newConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
         }
 
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
-            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myGapTolerance, newFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
         }
 
         /**
          * How many threads will be used? Perhaps use {@link Parallelism} to obtain a suitable value.
          */
         public ConfigurableStrategy withParallelism(final IntSupplier newParallelism) {
-            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(newParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
         /**
          * Replace the priority definitions with these ones.
          */
         public ConfigurableStrategy withPriorityDefinitions(final Comparator<NodeKey>... newDefinitions) {
-            return new ConfigurableStrategy(myParallelism, newDefinitions, myGapTolerance, myFactory, myGMICutConfiguration);
+            return new ConfigurableStrategy(myParallelism, newDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
     }
@@ -179,7 +185,8 @@ public interface IntegerStrategy {
         Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
                 NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
 
-        return new ConfigurableStrategy(Parallelism.CORES.require(4), definitions, NumberContext.of(7, 8), DefaultStrategy::new, new GMICutConfiguration());
+        return new ConfigurableStrategy(Parallelism.CORES.require(4), definitions, NumberContext.of(12, 8), NumberContext.of(7, 8), DefaultStrategy::new,
+                new GMICutConfiguration());
     }
 
     /**
@@ -194,6 +201,11 @@ public interface IntegerStrategy {
     NumberContext getGapTolerance();
 
     GMICutConfiguration getGMICutConfiguration();
+
+    /**
+     * Used to determine if a variable value is integer or not
+     */
+    NumberContext getIntegralityTolerance();
 
     /**
      * There will be 1 worker thread per item in the returned {@link List}. The {@link Comparator} instances

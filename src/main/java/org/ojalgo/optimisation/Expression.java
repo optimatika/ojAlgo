@@ -53,6 +53,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -1006,15 +1007,15 @@ public final class Expression extends ModelEntity<Expression> {
         return noninteger.subtract(intPart);
     }
 
-    protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> currentSolution) {
+    protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
         builder.append(this.getName());
         builder.append(": ");
-        builder.append(ModelEntity.DISPLAY.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(currentSolution))));
+        builder.append(display.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(solution))));
 
         if (this.isObjective()) {
             builder.append(" (");
-            builder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()));
+            builder.append(display.enforce(this.getContributionWeight()));
             builder.append(")");
         }
     }
@@ -1041,15 +1042,15 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
+    void appendToString(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
-        this.appendLeftPart(aStringBuilder);
-        if (aCurrentState != null) {
-            this.appendMiddlePart(aStringBuilder, aCurrentState);
+        this.appendLeftPart(builder, display);
+        if (solution != null) {
+            this.appendMiddlePart(builder, solution, display);
         } else {
-            this.appendMiddlePart(aStringBuilder);
+            this.appendMiddlePart(builder, display);
         }
-        this.appendRightPart(aStringBuilder);
+        this.appendRightPart(builder, display);
     }
 
     /**
