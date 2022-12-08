@@ -58,6 +58,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - When constructing convex (QP) solver, simple variable bounds are no longer scaled.
 - Modified the EBM file format to also include known variable values. Format (reader/writer) compatible with both old and new variants.
 - Refactoring of the `ConvexSolver` class hierarchy. In particular with the `ActiveSetSolver` there should now be a lot less copying of data.
+- There used to be 2 different `NumberContext`:s used for print/display/toString formatting in `ExpressionsBasesModel`. Now there is only one. The configurable `Optimisation.Options.print` value, and the default value is `NumberContext.of(8)`.
+- Usage of the `Optimisation.Options.print` configurable value is any solver has been removed. This option still remains but is only used in `ExpressionsBasesModel`. The various solvers that made use of it now have their own definitions, that may or may not be configurable.
+- The `IntegerStrategy` interface gained a new method – `getIntegralityTolerance()`. It returns a `NumberContext` used to check variable integrality.
 
 #### org.ojalgo.type
 
