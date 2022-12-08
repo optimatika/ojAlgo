@@ -229,15 +229,15 @@ public interface Optimisation {
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * For display only!
+         * For display only! {@link #toString()} and log message formatting.
          */
-        public NumberContext print = NumberContext.of(8, 10);
+        public NumberContext print = ModelEntity.PRINT;
 
         /**
          * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
          * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
-         * corresponding to full double precision.
+         * corresponding to full double precision – but with no more than 14 decimals.
          */
         public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 

@@ -268,19 +268,19 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected void appendMiddlePart(final StringBuilder aStringBuilder) {
+    protected void appendMiddlePart(final StringBuilder builder, final NumberContext display) {
 
-        aStringBuilder.append(this.getName());
+        builder.append(this.getName());
 
         if (myValue != null) {
-            aStringBuilder.append(": ");
-            aStringBuilder.append(ModelEntity.DISPLAY.enforce(myValue).toPlainString());
+            builder.append(": ");
+            builder.append(display.enforce(myValue).toPlainString());
         }
 
         if (this.isObjective()) {
-            aStringBuilder.append(" (");
-            aStringBuilder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
-            aStringBuilder.append(")");
+            builder.append(" (");
+            builder.append(display.enforce(this.getContributionWeight()).toPlainString());
+            builder.append(")");
         }
     }
 
