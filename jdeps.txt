@@ -1034,10 +1034,10 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-53.0.0-SNAPSHOT.jar
-   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.decomposition                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.integer                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-53.0.0-SNAPSHOT.jar

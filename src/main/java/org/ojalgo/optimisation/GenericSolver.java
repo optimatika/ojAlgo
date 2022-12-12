@@ -116,10 +116,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return (B) this;
         }
 
-        protected OptimisationData getOptimisationData() {
-            return myData;
-        }
-
         public void reset() {
             myData.reset();
             myNumberOfVariables = -1;
@@ -231,6 +227,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getObjective(type);
         }
 
+        protected OptimisationData getOptimisationData() {
+            return myData;
+        }
+
         protected RowView<Double> getRowsAE() {
             return myData.getRowsAE();
         }
@@ -263,6 +263,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         protected void setNumberOfVariables(final int numberOfVariables) {
+            if (numberOfVariables < 0) {
+                throw new IllegalArgumentException();
+            }
+            if (myNumberOfVariables >= 0 && myNumberOfVariables != numberOfVariables) {
+                throw new IllegalStateException();
+            }
             myNumberOfVariables = numberOfVariables;
         }
 

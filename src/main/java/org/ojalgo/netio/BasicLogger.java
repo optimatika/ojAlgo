@@ -257,13 +257,26 @@ public interface BasicLogger {
             if (plain) {
                 if (number instanceof Scalar<?>) {
                     return ((Scalar<?>) number).toPlainString(context);
+                } else {
+                    double doubleValue = NumberDefinition.doubleValue(number);
+                    if (Double.isFinite(doubleValue)) {
+                        return context.enforce(BigDecimal.valueOf(doubleValue)).toPlainString();
+                    } else {
+                        return Double.toString(doubleValue);
+                    }
                 }
-                return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toPlainString();
+            } else {
+                if (number instanceof Scalar<?>) {
+                    return ((Scalar<?>) number).toString(context);
+                } else {
+                    double doubleValue = NumberDefinition.doubleValue(number);
+                    if (Double.isFinite(doubleValue)) {
+                        return context.enforce(BigDecimal.valueOf(doubleValue)).toString();
+                    } else {
+                        return Double.toString(doubleValue);
+                    }
+                }
             }
-            if (number instanceof Scalar<?>) {
-                return ((Scalar<?>) number).toString(context);
-            }
-            return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toString();
         }
 
         static void printmtrx(final BasicLogger appender, final String message, final Access2D<?> matrix, final NumberContext context) {

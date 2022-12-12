@@ -96,9 +96,9 @@ public class LinearProblems extends OptimisationLinearTests {
         Variable tmpX5 = new Variable("X5").weight(TENTH.multiply(SIX)).lower(FIVE);
         Variable tmpX6 = new Variable("X6").weight(TENTH.multiply(FOUR)).lower(ZERO);
 
-        Variable[] varsFull = new Variable[] { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
-        Variable[] varsOdd = new Variable[] { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
-        Variable[] varsEven = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
+        Variable[] varsFull = { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
+        Variable[] varsOdd = { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
+        Variable[] varsEven = { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
 
         ExpressionsBasedModel modFull = new ExpressionsBasedModel(varsFull);
         ExpressionsBasedModel modOdd = new ExpressionsBasedModel(varsOdd);
@@ -143,9 +143,10 @@ public class LinearProblems extends OptimisationLinearTests {
         solutionBuilder.set(2, 0, 8);
         solutionBuilder.set(4, 0, 5);
         solutionBuilder.set(5, 0, 23);
+
         MatrixR064 claimedSolutionFull = solutionBuilder.get();
-        MatrixR064 claimedSolutionOdd = claimedSolutionFull.rows(new int[] { 0, 2, 4 });
-        MatrixR064 claimedSolutionEven = claimedSolutionFull.rows(new int[] { 1, 3, 5 });
+        MatrixR064 claimedSolutionOdd = claimedSolutionFull.rows(0, 2, 4);
+        MatrixR064 claimedSolutionEven = claimedSolutionFull.rows(1, 3, 5);
 
         TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(ArrayR256.FACTORY.copy(claimedSolutionFull), ACCURACY));
 
@@ -207,7 +208,7 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20111010() {
 
-        Variable[] tmpVariables = new Variable[] { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
+        Variable[] tmpVariables = { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
                 new Variable("Z").lower(ZERO).weight(ZERO) };
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 

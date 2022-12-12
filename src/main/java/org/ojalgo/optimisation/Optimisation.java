@@ -61,7 +61,7 @@ public interface Optimisation {
 
         /**
          * The Constraint has a lower or an upper limit actually set (possibly both) - it actually is
-         * constained.
+         * constrained.
          */
         boolean isConstraint();
 
