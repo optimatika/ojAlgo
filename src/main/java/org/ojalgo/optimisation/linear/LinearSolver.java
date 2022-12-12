@@ -47,62 +47,24 @@ import org.ojalgo.type.IndexSelector;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
-    /**
-     * @deprecated v50 Use {@link StandardBuilder} instead
-     */
-    @Deprecated
-    public static abstract class Builder extends GenericSolver.Builder<LinearSolver.StandardBuilder, LinearSolver> {
-
-        Builder() {
-            super();
-        }
-
-        public StandardBuilder objective(final MatrixStore<Double> mtrxC) {
-            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
-            return (StandardBuilder) this;
-        }
-
-        @Override
-        protected LinearSolver doBuild(final Optimisation.Options options) {
-
-            SimplexTableau tableau = SimplexTableau.make(this.getOptimisationData(), options);
-
-            return new PrimalSimplex(tableau, options);
-        }
-
-        protected LinearFunction<Double> getObjective() {
-            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
-            if (retVal == null) {
-                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
-                super.setObjective(retVal);
-            }
-            return retVal;
-        }
-
-        @Override
-        protected OptimisationData getOptimisationData() {
-            return super.getOptimisationData();
-        }
-
-    }
-
     public static final class Configuration {
 
     }
 
     /**
+     * <p>
      * Compared to {@link LinearSolver.StandardBuilder} this builder: <br>
      * 1) Accepts inequality constraints <br>
      * 2) Has relaxed the requiremnt on the RHS to be non-negative (both equalities and inequalities) <br>
-     * <br>
+     * <p>
      * Compared to {@link ConvexSolver.Builder} this builder: <br>
      * 1) Requires the objective function to be linear (or only the linear factors will be concidered) <br>
      * 2) Assumes (requires) variables to be non-negative <br>
-     * <br>
+     * <p>
      *
      * @author apete
      */
-    public static final class GeneralBuilder extends GenericSolver.Builder<LinearSolver.GeneralBuilder, LinearSolver> {
+    public static final class GeneralBuilder extends LinearSolver.Builder<LinearSolver.GeneralBuilder> {
 
         GeneralBuilder() {
             super();
@@ -116,29 +78,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public LinearSolver.GeneralBuilder inequality(final double rhs, final double... factors) {
             return super.inequality(rhs, factors);
-        }
-
-        public GeneralBuilder lower(final double... bounds) {
-            double[] lowerBounds = this.getLowerBounds(ZERO);
-            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
-                lowerBounds[i] = bounds[i];
-            }
-            return this;
-        }
-
-        public GeneralBuilder objective(final double... factors) {
-            this.getObjective().linear().fillMatching(FACTORY.column(factors));
-            return this;
-        }
-
-        public GeneralBuilder objective(final int index, final double value) {
-            this.getObjective().linear().set(index, value);
-            return this;
-        }
-
-        public GeneralBuilder objective(final MatrixStore<Double> mtrxC) {
-            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
-            return this;
         }
 
         /**
@@ -204,14 +143,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             retVal.equalities(mtrxAE, mtrxBE);
 
             return retVal;
-        }
-
-        public GeneralBuilder upper(final double... bounds) {
-            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY);
-            for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
-                upperBounds[i] = bounds[i];
-            }
-            return this;
         }
 
         @Override
@@ -302,20 +233,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }
 
             return new PrimalSimplex(tableau, options);
-        }
-
-        protected LinearFunction<Double> getObjective() {
-            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
-            if (retVal == null) {
-                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
-                super.setObjective(retVal);
-            }
-            return retVal;
-        }
-
-        @Override
-        protected OptimisationData getOptimisationData() {
-            return super.getOptimisationData();
         }
 
     }
@@ -427,31 +344,31 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     }
 
     /**
-     * Defines optimisation problems on the (LP standard) form:
      * <p>
-     * min [C]<sup>T</sup>[X]<br>
-     * when [AE][X] == [BE]<br>
-     * and 0 &lt;= [X]<br>
-     * and 0 &lt;= [BE]
-     * </p>
+     * Defines optimisation problems on the LP standard form:
+     * <p>
+     * min [C]<sup>T</sup>[X] <br>
+     * when [AE][X] == [BE] <br>
+     * and 0 <= [X] <br>
+     * and 0 <= [BE] <br>
+     * <p>
      * A Linear Program is in Standard Form if:
      * <ul>
-     * <li>All constraints are equality constraints.</li>
-     * <li>All variables have a nonnegativity sign restriction.</li>
+     * <li>All constraints are equality constraints.
+     * <li>All variables have a nonnegativity sign restriction.
      * </ul>
      * <p>
      * Further it is required that the constraint right hand sides are nonnegative (nonnegative elements in
      * [BE]). Don't think that's an actual LP standard form requirement, but it is commonly required, and also
      * here.
-     * </p>
      * <p>
      * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
      * be a minimisation.
-     * </p>
+     * <p>
      *
      * @author apete
      */
-    public static final class StandardBuilder extends LinearSolver.Builder {
+    public static final class StandardBuilder extends LinearSolver.Builder<StandardBuilder> {
 
         /**
          * @deprecated v50 Use {@link LinearSolver#newBuilder()} instead.
@@ -472,40 +389,74 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             this.objective(mtrxC);
         }
 
-        public StandardBuilder lower(final double... bounds) {
+        @Override
+        protected LinearSolver doBuild(final Optimisation.Options options) {
+
+            SimplexTableau tableau = SimplexTableau.make(this.getOptimisationData(), options);
+
+            return new PrimalSimplex(tableau, options);
+        }
+
+    }
+
+    static abstract class Builder<B extends LinearSolver.Builder<?>> extends GenericSolver.Builder<B, LinearSolver> {
+
+        Builder() {
+            super();
+        }
+
+        public final B lower(final double... bounds) {
             double[] lowerBounds = this.getLowerBounds(ZERO);
             for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
                 lowerBounds[i] = bounds[i];
             }
-            return this;
+            return (B) this;
         }
 
-        public StandardBuilder objective(final double... factors) {
+        public final B objective(final double... factors) {
+            this.setNumberOfVariables(factors.length);
             this.getObjective().linear().fillMatching(FACTORY.column(factors));
-            return this;
+            return (B) this;
         }
 
-        public StandardBuilder objective(final int index, final double value) {
+        public final B objective(final int index, final double value) {
             this.getObjective().linear().set(index, value);
-            return this;
+            return (B) this;
         }
 
-        @Override
-        public StandardBuilder objective(final MatrixStore<Double> mtrxC) {
-            return super.objective(mtrxC);
+        public final B objective(final MatrixStore<Double> mtrxC) {
+            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
+            return (B) this;
         }
 
-        public StandardBuilder upper(final double... bounds) {
+        public final B upper(final double... bounds) {
             double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY);
             for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
                 upperBounds[i] = bounds[i];
             }
-            return this;
+            return (B) this;
+        }
+
+        protected final double[] getLowerBounds() {
+            return super.getLowerBounds(ZERO);
+        }
+
+        protected final LinearFunction<Double> getObjective() {
+            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
+            if (retVal == null) {
+                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
+                super.setObjective(retVal);
+            }
+            return retVal;
         }
 
         @Override
-        protected OptimisationData getOptimisationData() {
+        protected final OptimisationData getOptimisationData() {
             return super.getOptimisationData();
+        }
+
+        protected final double[] getUpperBounds() {
+            return super.getUpperBounds(POSITIVE_INFINITY);
         }
 
     }

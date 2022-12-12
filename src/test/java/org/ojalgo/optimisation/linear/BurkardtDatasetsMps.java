@@ -66,12 +66,17 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
      * also provides the solution.
      * <a href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html" >
-     * adlittle@netlib</a> Found this info somewhere on the net: "With 56 constraints and 97 variables
-     * adlittle is one of its smaller members. While being in fact feasible, adlittle suffers from
-     * ill--posedness. Perturbing the right hand side of the equality constraints by subtracting a tiny
-     * multiple of the 96th column of the equation matrix renders the linear program infeasible. Running this
-     * problem through CPLEX and lp_solve does again return a solution without any warnings." FAIL: Hittar
-     * bara en lösning 0.0, oavsett om jag minimerrar eller maximerar. 2010-04-19 lp_solve => 225494.96316238
+     * adlittle@netlib</a>
+     * <p>
+     * Found this info somewhere on the net: "With 56 constraints and 97 variables adlittle is one of its
+     * smaller members. While being in fact feasible, adlittle suffers from ill--posedness. Perturbing the
+     * right hand side of the equality constraints by subtracting a tiny multiple of the 96th column of the
+     * equation matrix renders the linear program infeasible.
+     * <p>
+     * Running this problem through CPLEX and lp_solve does again return a solution without any warnings."
+     * FAIL: Hittar bara en lösning 0.0, oavsett om jag minimerrar eller maximerar.
+     * <p>
+     * 2010-04-19 lp_solve => 225494.96316238
      */
     @Test
     public void testMPSadlittle() {
