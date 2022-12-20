@@ -45,7 +45,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
-    static final NumberContext PRINT = NumberContext.of(8);
+    static final NumberContext PRINT = NumberContext.of(6);
     static final int RANGE = 8;
 
     static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, final int range) {
