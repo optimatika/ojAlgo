@@ -21,7 +21,6 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
@@ -31,7 +30,6 @@ import org.ojalgo.TestUtils;
  * @see IEXTradingFetcher
  * @author stefanvanegmond
  */
-@Disabled
 public class IEXTradingDataSourceTest extends FinanceSeriesTests {
 
     public IEXTradingDataSourceTest() {

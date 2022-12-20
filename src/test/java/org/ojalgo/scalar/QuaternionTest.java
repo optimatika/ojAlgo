@@ -21,7 +21,6 @@
  */
 package org.ojalgo.scalar;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -33,10 +32,9 @@ import org.ojalgo.matrix.store.Primitive64Store;
 public class QuaternionTest extends ScalarTests {
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void cosAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -60,10 +58,9 @@ public class QuaternionTest extends ScalarTests {
     }
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void coshAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -87,10 +84,9 @@ public class QuaternionTest extends ScalarTests {
     }
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void sinAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -114,10 +110,9 @@ public class QuaternionTest extends ScalarTests {
     }
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void sinhAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -141,10 +136,9 @@ public class QuaternionTest extends ScalarTests {
     }
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void tanAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -168,10 +162,9 @@ public class QuaternionTest extends ScalarTests {
     }
 
     @Test
-    @Disabled("Was underscored before JUnit 5 transition")
     public void tanhAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -197,7 +190,7 @@ public class QuaternionTest extends ScalarTests {
     @Test
     public void testLogExpAndBackAgain() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {
@@ -223,7 +216,7 @@ public class QuaternionTest extends ScalarTests {
     @Test
     public void testPolarForm() {
 
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+        final double[] tmpArguments = { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
         for (double s : tmpArguments) {
             for (double i : tmpArguments) {

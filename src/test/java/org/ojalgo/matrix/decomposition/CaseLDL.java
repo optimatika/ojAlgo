@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -227,7 +226,6 @@ public class CaseLDL extends MatrixDecompositionTests {
     }
 
     @Test
-    @Disabled
     public void testQuadOptKTHPivot() {
 
         RawStore mtrxA = RawStore.wrap(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
