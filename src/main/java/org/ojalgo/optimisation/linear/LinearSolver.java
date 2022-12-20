@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -413,6 +414,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return (B) this;
         }
 
+        public final B lower(final double bound) {
+            double[] lowerBounds = this.getLowerBounds(ZERO);
+            Arrays.fill(lowerBounds, bound);
+            return (B) this;
+        }
+
         public final B objective(final double... factors) {
             this.setNumberOfVariables(factors.length);
             this.getObjective().linear().fillMatching(FACTORY.column(factors));
@@ -434,6 +441,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
                 upperBounds[i] = bounds[i];
             }
+            return (B) this;
+        }
+
+        public final B upper(final double bound) {
+            double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY);
+            Arrays.fill(upperBounds, bound);
             return (B) this;
         }
 
