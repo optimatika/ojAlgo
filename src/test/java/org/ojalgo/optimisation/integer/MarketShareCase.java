@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -117,7 +116,6 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testFullMIP() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -137,7 +135,6 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testMipButLinearConstrainedToOptimal() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -264,7 +261,6 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testSpecificBranch_20_25() {
 
         final Primitive64Store tmpAE = Primitive64Store.FACTORY.rows(new double[][] {

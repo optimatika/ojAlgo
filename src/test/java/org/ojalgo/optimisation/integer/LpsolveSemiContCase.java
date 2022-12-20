@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.integer;
 import java.io.File;
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -49,7 +48,6 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testSemiContNot() {
 
         File file = new File(PATH + "lpsolve_sc_not.mps");
@@ -70,7 +68,6 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     }
 
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testSemiContOrg() {
 
         File file = new File(PATH + "lpsolve_sc_org.mps");
