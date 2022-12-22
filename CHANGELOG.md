@@ -71,6 +71,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renmed copies of the old.
+- Various factories have been renamed.
 
 #### org.ojalgo.optimisation
 
