@@ -67,8 +67,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -96,8 +96,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -120,7 +120,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 
         Primitive64Store ones = Primitive64Store.FACTORY.make(n, 1);
         ones.fillAll(ONE);
@@ -151,7 +151,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         Primitive64Store vctr = Primitive64Store.FACTORY.make(1, n);
 
         Stopwatch clock = new Stopwatch();
@@ -176,7 +176,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         Primitive64Store vctr = Primitive64Store.FACTORY.make(n, 1);
 
         Stopwatch clock = new Stopwatch();
@@ -201,7 +201,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
         mtrx.reset();

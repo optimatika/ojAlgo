@@ -480,7 +480,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         if (nbEqExpr > 0) {
 
-            SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE64.make(nbEqExpr, nbVariables);
+            SparseStore<Double> mtrxAE = SparseStore.R064.make(nbEqExpr, nbVariables);
             PhysicalStore<Double> mtrxBE = Primitive64Store.FACTORY.make(nbEqExpr, 1);
 
             for (int i = 0; i < nbEqExpr; i++) {

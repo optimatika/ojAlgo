@@ -65,9 +65,9 @@ public class SparseCase extends NonPhysicalTest {
 
         int dim = Uniform.randomInteger(1, 9);
 
-        rationalStore = SparseStore.RATIONAL.make(dim, dim);
-        complexStore = SparseStore.COMPLEX.make(dim, dim);
-        primitiveStore = SparseStore.PRIMITIVE64.make(dim, dim);
+        rationalStore = SparseStore.Q128.make(dim, dim);
+        complexStore = SparseStore.C128.make(dim, dim);
+        primitiveStore = SparseStore.R064.make(dim, dim);
 
         for (int ij = 0; ij < dim; ij++) {
             ((SparseStore<?>) rationalStore).set(ij, ij, 1.0);
@@ -82,7 +82,7 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testIndexOfLargest() {
 
-        SparseStore<Double> sparseStore = SparseStore.PRIMITIVE64.make(1_000L, 1_000L);
+        SparseStore<Double> sparseStore = SparseStore.R064.make(1_000L, 1_000L);
 
         for (int i = 0; i < 100; i++) {
             long row = Uniform.randomInteger(1_000L);
@@ -144,7 +144,7 @@ public class SparseCase extends NonPhysicalTest {
 
         int ind = Uniform.randomInteger(0, 10);
 
-        SparseStore<Double> store = SparseStore.PRIMITIVE64.make(10, 10);
+        SparseStore<Double> store = SparseStore.R064.make(10, 10);
         store.fillColumn(ind, 1.0);
 
         for (int i = 0; i < 10; i++) {
@@ -172,7 +172,7 @@ public class SparseCase extends NonPhysicalTest {
 
         int ind = Uniform.randomInteger(0, 10);
 
-        SparseStore<Double> store = SparseStore.PRIMITIVE64.make(10, 10);
+        SparseStore<Double> store = SparseStore.R064.make(10, 10);
         store.fillRow(ind, 1.0);
 
         for (int i = 0; i < 10; i++) {

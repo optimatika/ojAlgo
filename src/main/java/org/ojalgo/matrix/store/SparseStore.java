@@ -29,18 +29,21 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
@@ -49,38 +52,102 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
 
-    public interface Factory<N extends Comparable<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory2D<SparseStore<N>> {
 
-        SparseStore<N> make(long rowsCount, long columnsCount);
+        private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
 
-        default SparseStore<N> make(final Structure2D shape) {
-            return this.make(shape.countRows(), shape.countColumns());
+        Factory(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> physicalFactory) {
+            super();
+            myPhysicalFactory = physicalFactory;
+        }
+
+        public FunctionSet<?> function() {
+            return myPhysicalFactory.function();
+        }
+
+        public SparseStore<N> make(final long rows, final long columns) {
+            return SparseStore.makeSparse(myPhysicalFactory, rows, columns);
+        }
+
+        public Scalar.Factory<?> scalar() {
+            return myPhysicalFactory.scalar();
         }
 
     }
 
-    public static final SparseStore.Factory<ComplexNumber> COMPLEX = SparseStore::makeComplex;
-    public static final SparseStore.Factory<Double> PRIMITIVE32 = SparseStore::makePrimitive32;
-    public static final SparseStore.Factory<Double> PRIMITIVE64 = SparseStore::makePrimitive;
-    public static final SparseStore.Factory<Quaternion> QUATERNION = SparseStore::makeQuaternion;
-    public static final SparseStore.Factory<RationalNumber> RATIONAL = SparseStore::makeRational;
+    public static final SparseStore.Factory<ComplexNumber> C128 = SparseStore.factory(GenericStore.C128);
+    public static final SparseStore.Factory<Quaternion> H256 = SparseStore.factory(GenericStore.H256);
+    public static final SparseStore.Factory<Double> R032 = SparseStore.factory(Primitive32Store.FACTORY);
+    public static final SparseStore.Factory<Double> R064 = SparseStore.factory(Primitive64Store.FACTORY);
+    public static final SparseStore.Factory<Quadruple> R128 = SparseStore.factory(GenericStore.R128);
+    public static final SparseStore.Factory<RationalNumber> Q128 = SparseStore.factory(GenericStore.Q128);
 
+    /**
+     * @deprecated v53 Use {@link #C128} instead
+     */
+    @Deprecated
+    public static final SparseStore.Factory<ComplexNumber> COMPLEX = C128;
+    /**
+     * @deprecated v53 Use {@link #R032} instead
+     */
+    @Deprecated
+    public static final SparseStore.Factory<Double> PRIMITIVE32 = R032;
+    /**
+     * @deprecated v53 Use {@link #R064} instead
+     */
+    @Deprecated
+    public static final SparseStore.Factory<Double> PRIMITIVE64 = R064;
+    /**
+     * @deprecated v53 Use {@link #H256} instead
+     */
+    @Deprecated
+    public static final SparseStore.Factory<Quaternion> QUATERNION = H256;
+    /**
+     * @deprecated v53 Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final SparseStore.Factory<RationalNumber> RATIONAL = Q128;
+
+    public static <N extends Comparable<N>> SparseStore.Factory<N> factory(final PhysicalStore.Factory<N, ?> physicalFactory) {
+        return new SparseStore.Factory<>(physicalFactory);
+    }
+
+    /**
+     * @deprecated v53 Use {@link #C128} instead
+     */
+    @Deprecated
     public static SparseStore<ComplexNumber> makeComplex(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.C128, rowsCount, columnsCount);
     }
 
+    /**
+     * @deprecated v53 Use {@link #R064} instead
+     */
+    @Deprecated
     public static SparseStore<Double> makePrimitive(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(Primitive64Store.FACTORY, rowsCount, columnsCount);
     }
 
+    /**
+     * @deprecated v53 Use {@link #R032} instead
+     */
+    @Deprecated
     public static SparseStore<Double> makePrimitive32(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(Primitive32Store.FACTORY, rowsCount, columnsCount);
     }
 
+    /**
+     * @deprecated v53 Use {@link #H256} instead
+     */
+    @Deprecated
     public static SparseStore<Quaternion> makeQuaternion(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.H256, rowsCount, columnsCount);
     }
 
+    /**
+     * @deprecated v53 Use {@link #Q128} instead
+     */
+    @Deprecated
     public static SparseStore<RationalNumber> makeRational(final long rowsCount, final long columnsCount) {
         return SparseStore.makeSparse(GenericStore.Q128, rowsCount, columnsCount);
     }
