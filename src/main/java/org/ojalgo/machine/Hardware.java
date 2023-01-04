@@ -71,6 +71,23 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
 
     /**
      * <ul>
+     * <li>Apple M1 Pro (Mainly modelled after the performance cores since there are more of those. Also did
+     * not separate between L2 and L3/SLC cache since there are 2 of each and they are the same size per
+     * thread.)
+     * <ul>
+     * <li>L1 Cache the high-perf cores have a large 192 KB of L1 instruction cache and 128 KB of L1 data
+     * cache The energy-efficient cores have a 128 KB L1 instruction cache, 64 KB L1 data cache.
+     * <li>L2 Cache (28MB all together) The 6 high-perf cores are split in two clusters, each cluster has 12MB
+     * of shared L2 cache (so 24MB total) The 2 high-efficiency cores have 4MB of shared L2 cache
+     * <li>L3 / SLC (24MB all together) The SLC is 12MB per memory controller, so 24MB total.
+     * </ul>
+     * </ul>
+     */
+    static final Hardware AARCH64__08 = new Hardware("aarch64",
+            new BasicMachine[] { new BasicMachine(16L * K * K * K, 8), new BasicMachine(12L * K * K, 4), new BasicMachine(128L * K, 1) });
+
+    /**
+     * <ul>
      * <li>CLAM / PowerBook6,5
      * <ul>
      * <li>1 processor
@@ -404,6 +421,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     static {
+        PREDEFINED.add(AARCH64__08);
         PREDEFINED.add(PPC__01);
         PREDEFINED.add(X86__01);
         PREDEFINED.add(X86__02);

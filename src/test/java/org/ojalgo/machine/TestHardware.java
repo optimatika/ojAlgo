@@ -12,6 +12,18 @@ public class TestHardware extends MachineTests {
     }
 
     @Test
+    public void testAARCH64__08() {
+
+        Hardware hardware = Hardware.AARCH64__08;
+
+        int threads = 8;
+        int cores = 8;
+        int units = 2;
+
+        TestHardware.doTest(hardware, threads, cores, units);
+    }
+
+    @Test
     public void testCompare() {
         TestUtils.assertTrue(Hardware.X86_64__04_2.compareTo(Hardware.X86_64__04_1_L2) < 0);
         TestUtils.assertTrue(Hardware.X86_64__04_1_L3.compareTo(Hardware.X86_64__04_1_L2) > 0);
