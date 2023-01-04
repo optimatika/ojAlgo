@@ -19,17 +19,12 @@ public class BasicMachine {
     public final long memory;
     public final int threads;
 
-    public BasicMachine(final long memory, final int threads) {
+    public BasicMachine(final long memoryBytes, final int nbThreads) {
 
         super();
 
-        this.memory = memory;
-        this.threads = threads;
-    }
-
-    @SuppressWarnings("unused")
-    private BasicMachine() {
-        this(0L, 0);
+        memory = memoryBytes;
+        threads = nbThreads;
     }
 
     @Override
@@ -37,17 +32,11 @@ public class BasicMachine {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof BasicMachine)) {
             return false;
         }
-        final BasicMachine other = (BasicMachine) obj;
-        if (memory != other.memory) {
-            return false;
-        }
-        if (threads != other.threads) {
+        BasicMachine other = (BasicMachine) obj;
+        if ((memory != other.memory) || (threads != other.threads)) {
             return false;
         }
         return true;
@@ -57,9 +46,8 @@ public class BasicMachine {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (memory ^ (memory >>> 32));
-        result = (prime * result) + threads;
-        return result;
+        result = prime * result + (int) (memory ^ (memory >>> 32));
+        return prime * result + threads;
     }
 
     @Override
