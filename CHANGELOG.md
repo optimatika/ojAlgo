@@ -25,6 +25,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implemenations. Proper `Quadruple` implementations can be done later.
 
+#### org.ojalgo.machine
+
+- Support for AARCH64 and Apple M1 Pro
+
 #### org.ojalgo.matrix
 
 - All sorts of additions – many many – to fully support the new `Quadruple` element type.
@@ -75,7 +79,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
-- Any/all ways to create `Variable` or `Expression` instances separate from (and then add them to) an `ExpressionsBasedModel` is deprecated. You should first create the model, and then use that as factory for the variables and expressions.
+- Any/all ways to create `Variable` or `Expression` instances separate from (and then add them to) an `ExpressionsBasedModel` is deprecated. You should first create the model, and then use that as a factory for the variables and expressions.
+
+#### org.ojalgo.type
+
+- `IntCount`
+- A few methods in `Hardware` and `VirtualMachine` (actually in `CommonMachine`)
 
 ### Fixed
 

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.machine;
 
+import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.type.IntCount;
 
 /**
@@ -47,8 +48,8 @@ public abstract class CommonMachine extends BasicMachine {
      */
     public final int cores;
     /**
-     * The number of top level (L3 or L2) cache units. With L3 cache defined this corresponds to the number of
-     * CPU:s.
+     * The number of top level (L3 or L2) cache units. If there is a a L3 cache this usually corresponds to
+     * the number of CPU:s.
      */
     public final int units;
 
@@ -69,11 +70,11 @@ public abstract class CommonMachine extends BasicMachine {
      * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or in worst case
      * <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
-    protected CommonMachine(final String architecture, final BasicMachine[] levels) {
+    protected CommonMachine(final String arch, final BasicMachine[] levels) {
 
         super(levels[0].memory, levels[0].threads);
 
-        this.architecture = architecture;
+        architecture = arch;
 
         cores = threads / levels[levels.length - 1].threads;
         cache = levels[1].memory;
@@ -88,14 +89,26 @@ public abstract class CommonMachine extends BasicMachine {
         units = modUnits;
     }
 
+    /**
+     * @deprecated v53 Use {@link Parallelism#CORES} instead.
+     */
+    @Deprecated
     public final IntCount countCores() {
         return new IntCount(cores);
     }
 
+    /**
+     * @deprecated v53 Use {@link Parallelism#THREADS} instead.
+     */
+    @Deprecated
     public final IntCount countThreads() {
         return new IntCount(threads);
     }
 
+    /**
+     * @deprecated v53 Use {@link Parallelism#UNITS} instead.
+     */
+    @Deprecated
     public final IntCount countUnits() {
         return new IntCount(units);
     }
@@ -105,10 +118,7 @@ public abstract class CommonMachine extends BasicMachine {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof CommonMachine)) {
+        if (!super.equals(obj) || !(obj instanceof CommonMachine)) {
             return false;
         }
         CommonMachine other = (CommonMachine) obj;
@@ -119,22 +129,24 @@ public abstract class CommonMachine extends BasicMachine {
         } else if (!architecture.equals(other.architecture)) {
             return false;
         }
-        if (cache != other.cache) {
-            return false;
-        }
-        if (cores != other.cores) {
-            return false;
-        }
-        if (units != other.units) {
+        if ((cache != other.cache) || (cores != other.cores) || (units != other.units)) {
             return false;
         }
         return true;
     }
 
+    /**
+     * @deprecated v53
+     */
+    @Deprecated
     public final long getCacheElements(final long elementSize) {
         return CommonMachine.elements(cache, elementSize);
     }
 
+    /**
+     * @deprecated v53
+     */
+    @Deprecated
     public final long getMemoryElements(final long elementSize) {
         return CommonMachine.elements(memory, elementSize);
     }
@@ -143,11 +155,10 @@ public abstract class CommonMachine extends BasicMachine {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((architecture == null) ? 0 : architecture.hashCode());
-        result = (prime * result) + (int) (cache ^ (cache >>> 32));
-        result = (prime * result) + cores;
-        result = (prime * result) + units;
-        return result;
+        result = prime * result + ((architecture == null) ? 0 : architecture.hashCode());
+        result = prime * result + (int) (cache ^ (cache >>> 32));
+        result = prime * result + cores;
+        return prime * result + units;
     }
 
     public final boolean isMultiCore() {
