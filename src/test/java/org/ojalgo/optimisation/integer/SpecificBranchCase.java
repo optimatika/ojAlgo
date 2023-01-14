@@ -108,24 +108,6 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     /**
-     * ojAlgo (at some point) had problems with this node – returning an infeasible node solution marked as
-     * OPTIMAL. CPLEX finds an integer solution.
-     */
-    @Test
-    public void testNoswotN1() {
-
-        int[] lower = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0 };
-        int[] upper = { 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
-                100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
-                100000 };
-
-        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
-    }
-
-    /**
      * <pre>
     Branch&Bound Node
     7 (5) 2=0.20399305555555447 1168080.295138889 [0=3<18, 1=57<72, 2=0<5, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
@@ -148,6 +130,24 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
         int[] upper = { 18, 72, 5, 75, 18, 75, 18, 67, 18, 75, 18 };
 
         SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.INFEASIBLE);
+    }
+
+    /**
+     * ojAlgo (at some point) had problems with this node – returning an infeasible node solution marked as
+     * OPTIMAL. CPLEX finds an integer solution.
+     */
+    @Test
+    public void testNoswotN1() {
+
+        int[] lower = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
+                100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
+                100000 };
+
+        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
     }
 
     /**

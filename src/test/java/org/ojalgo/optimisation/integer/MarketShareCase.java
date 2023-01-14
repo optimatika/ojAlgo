@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -114,49 +113,6 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         //        return tmpMPS.getExpressionsBasedModel();
 
         return ModelFileTest.makeModel("miplib", "markshare_5_0.mps", false);
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void testFullMIP() {
-
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
-
-        //        tmpModel.options.debug_stream = BasicLogger.DEBUG;
-        //        tmpModel.options.debug_solver = IntegerSolver.class;
-        //        tmpModel.options.validate = true;
-
-        final Result tmpResult = tmpModel.minimise();
-
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
-
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    1E-14 / PrimitiveMath.THREE);
-        }
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void testMipButLinearConstrainedToOptimal() {
-
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
-
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            final String tmpName = tmpVariable.getName();
-            if (tmpName.startsWith("s")) {
-                tmpVariable.level(SOLUTION.get(tmpName));
-            }
-        }
-
-        final Result tmpResult = tmpModel.minimise();
-
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
-
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    1E-14 / PrimitiveMath.THREE);
-        }
     }
 
     @Test
@@ -261,85 +217,6 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
                     1E-14 / PrimitiveMath.THREE);
         }
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void testSpecificBranch_20_25() {
-
-        final Primitive64Store tmpAE = Primitive64Store.FACTORY.rows(new double[][] {
-                { 0.88, 0.59, 1.0, 0.16, 0.7, 0.7, 0.12, 0.66, 0.85, 0.68, 0.97, 0.33, 0.87, 0.01, 0.6, 0.5, 0.85, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 3.0, 0.7, 3.6, 7.3, 1.9, 1.5, 8.1, 5.5, 3.2, 5.3, 4.3, 2.1, 5.9, 5.7, 4.8, 2.8, 9.7, 4.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 7.5, 9.6, 0.7, 5.4, 3.8, 0.0, 8.7, 0.2, 7.6, 6.3, 9.4, 5.5, 1.9, 4.6, 3.1, 2.4, 8.5, 7.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.13, 0.97, 0.45, 0.32, 0.96, 0.36, 0.43, 0.96, 0.99, 0.58, 0.87, 0.15, 0.06, 0.26, 0.96, 0.31, 0.77, 0.77, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 5.5, 3.9, 9.6, 8.7, 1.6, 2.7, 0.9, 4.4, 7.9, 1.2, 0.8, 9.5, 3.8, 8.7, 1.5, 5.8, 7.9, 3.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
-
-        final Primitive64Store tmpBE = Primitive64Store.FACTORY
-                .rows(new double[][] { { 4.49 }, { 18.5 }, { 41.5 }, { 3.44 }, { 33.2 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 },
-                        { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
-
-        final Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-
-        LinearSolver.StandardBuilder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
-        tmpBuilder.equalities(tmpAE, tmpBE);
-
-        final Optimisation.Options tmpOptions = new Optimisation.Options();
-        //tmpOptions.debug(LinearSolver.class);
-
-        final LinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
-
-        final Optimisation.Result tmpResult = tmpSolver.solve();
-
-        TestUtils.assertTrue(tmpResult.getState().isOptimal());
-
-        for (int i = 0; i < tmpResult.size(); i++) {
-            final double tmpValue = tmpResult.doubleValue(i);
-            TestUtils.assertTrue(!tmpOptions.feasibility.isDifferent(0.0, tmpValue) || !tmpOptions.feasibility.isDifferent(1.0, tmpValue));
-        }
-
     }
 
     @Test

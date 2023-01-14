@@ -645,35 +645,25 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testUnboundedCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").weight(ONE), new Variable("X2").weight(TWO), new Variable("X3").weight(THREE) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable x1 = model.newVariable("X1").weight(ONE);
+        Variable x2 = model.newVariable("X2").weight(TWO);
+        Variable x3 = model.newVariable("X3").weight(THREE);
 
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.set(i, ONE);
+        model.newExpression("C1").set(x1, ONE).set(x2, ONE).set(x3, ONE).level(ONE);
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
         }
-        tmpExprC1.level(ONE);
 
-        Optimisation.Result tmpMinResult = tmpModel.maximise();
+        Optimisation.Result expected = Optimisation.Result.of(1, State.UNBOUNDED, 1, 0, 0);
 
-        // TestUtils.assertTrue(tmpMinResult.getState().isFeasible());
-        TestUtils.assertFalse(tmpMinResult.getState().isOptimal());
-        TestUtils.assertTrue(tmpMinResult.getState().isFailure());
-        if (tmpMinResult.getState().isFeasible()) {
-            TestUtils.assertTrue(tmpModel.validate(tmpMinResult));
-        }
-        // TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpMinResult.getState());
+        Optimisation.Result actualMin = model.minimise();
+        TestUtils.assertEquals(expected.getState(), actualMin.getState());
 
-        Optimisation.Result tmpMaxResult = tmpModel.maximise();
-
-        // TestUtils.assertTrue(tmpMaxResult.getState().isFeasible());
-        TestUtils.assertFalse(tmpMaxResult.getState().isOptimal());
-        TestUtils.assertTrue(tmpMaxResult.getState().isFailure());
-        if (tmpMaxResult.getState().isFeasible()) {
-            TestUtils.assertTrue(tmpModel.validate(tmpMaxResult));
-        }
-        // TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpMaxResult.getState());
+        Optimisation.Result actualMax = model.maximise();
+        TestUtils.assertEquals(expected.getState(), actualMax.getState());
     }
 
 }

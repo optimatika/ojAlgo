@@ -2,7 +2,6 @@ package org.ojalgo.data.domain.finance.portfolio;
 
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixR064;
@@ -251,7 +250,6 @@ public class GitHubIssue24 extends FinancePortfolioTests {
     }
 
     @Test
-    @Disabled("Google Finance stopped working")
     public void testHanging() throws Exception {
 
         MarkowitzModel markowitzModel = GitHubIssue24.buildMarkowitzModel(2.5E-5, false, false, false);

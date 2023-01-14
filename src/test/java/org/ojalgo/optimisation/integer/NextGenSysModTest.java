@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -1519,36 +1518,6 @@ public class NextGenSysModTest {
         }
 
         return retVal.get();
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase010A() {
-        this.doTestAllInOne(CASE_010A);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase020A() {
-        this.doTestAllInOne(CASE_020A);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase030B() {
-        this.doTestAllInOne(CASE_030B);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase040B() {
-        this.doTestAllInOne(CASE_040B);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase050B() {
-        this.doTestAllInOne(CASE_050B);
     }
 
     @Test
