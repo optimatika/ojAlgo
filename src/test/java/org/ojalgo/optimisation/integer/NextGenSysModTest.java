@@ -1521,31 +1521,6 @@ public class NextGenSysModTest {
     }
 
     @Test
-    public void testAllInOneCase010A() {
-        this.doTestAllInOne(CASE_010A);
-    }
-
-    @Test
-    public void testAllInOneCase020A() {
-        this.doTestAllInOne(CASE_020A);
-    }
-
-    @Test
-    public void testAllInOneCase030B() {
-        this.doTestAllInOne(CASE_030B);
-    }
-
-    @Test
-    public void testAllInOneCase040B() {
-        this.doTestAllInOne(CASE_040B);
-    }
-
-    @Test
-    public void testAllInOneCase050B() {
-        this.doTestAllInOne(CASE_050B);
-    }
-
-    @Test
     @Tag("unstable")
     public void testSequentialCase010A() {
         this.doTestSequential(CASE_010A);

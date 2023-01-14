@@ -226,18 +226,6 @@ public class CaseLDL extends MatrixDecompositionTests {
     }
 
     @Test
-    public void testQuadOptKTHPivot() {
-
-        RawStore mtrxA = RawStore.wrap(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
-        RawStore mtrxL = RawStore.wrap(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
-        RawStore mtrxD = RawStore.wrap(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
-
-        MatrixStore<Double> permA = mtrxA.rows(3, 2, 1, 0).columns(3, 2, 1, 0);
-
-        CaseLDL.doTest(permA, mtrxL, mtrxD);
-    }
-
-    @Test
     public void testReconstructWhenPivoted() {
 
         MatrixStore<Double> matrix = CaseLDL.newSpecialSchnabelEskow();

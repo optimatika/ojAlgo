@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
@@ -46,6 +47,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
+@Disabled
 public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     /**

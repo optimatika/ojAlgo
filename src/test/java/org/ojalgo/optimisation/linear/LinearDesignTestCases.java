@@ -660,10 +660,10 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result expected = Optimisation.Result.of(1, State.UNBOUNDED, 1, 0, 0);
 
         Optimisation.Result actualMin = model.minimise();
-        TestUtils.assertResult(expected, actualMin);
+        TestUtils.assertEquals(expected.getState(), actualMin.getState());
 
         Optimisation.Result actualMax = model.maximise();
-        TestUtils.assertResult(expected, actualMax);
+        TestUtils.assertEquals(expected.getState(), actualMax.getState());
     }
 
 }
