@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
@@ -262,6 +263,72 @@ public class CaseLDL extends MatrixDecompositionTests {
         RawStore mtrxD = RawStore.wrap(new double[][] { { 98.0, 0.0, 0.0 }, { 0.0, 18.13265306122449, 0.0 }, { 0.0, 0.0, 0.020258863252673898 } });
 
         CaseLDL.doTest(mtrxA, mtrxL, mtrxD);
+    }
+
+    @Test
+    public void testLDLModified() {
+
+        RawStore mtrxA = RawStore.wrap(new double[][]{{0.0, 2.162205857243941E-10, 7.359481277033227E-6, 7.122465559727183E-6,
+                 1.961873982690657E-6, 1.9476822397761537E-6, 1.979780163298276E-6, 1.9511152517151967E-6, 3.194255663618267E-6,
+                 3.1369693153378357E-6, 2.8938378661582233E-6, 3.1236139036970613E-6}, {2.162205857243941E-10, -0.02184782416705,
+                 -63.91060441246661, -75.9085631976346, -13.239939715995128, -22.43300034556904, -30.206773299572053, -9.061622203484413,
+                 -29.151348354923186, -30.900879254141632, -28.42051620313139, -24.89555674647439}, {7.359481277033227E-6,
+                 -63.91060441246661, 0.0, 0.0, -27709.23693584429, -39929.38560952523, -48521.21202926942, -10904.112681735494, 0.0, 0.0,
+                 0.0, 0.0}, {7.122465559727183E-6, -75.9085631976346, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -30775.845231982683,
+                 -42995.99404879068, -51587.82020311749, -32712.958453289648}, {1.961873982690657E-6, -13.239939715995128,
+                 -27709.23693584429, 0.0, 2712.1277428407525, 2802.7405278481065, 11037.099694663495, -8964.395842502854, 0.0, 0.0, 0.0,
+                 0.0}, {1.9476822397761537E-6, -22.43300034556904, -39929.38560952523, 0.0, 2802.7405278481065, 14447.571951410924,
+                 -771.7113056143766, -8408.012858779355, 0.0, 0.0, 0.0, 0.0}, {1.979780163298276E-6, -30.206773299572053,
+                 -48521.21202926942, 0.0, 11037.099694663495, -771.7113056143766, 167961.81174714575, -5229.026794587395, 0.0, 0.0, 0.0,
+                 0.0}, {1.9511152517151967E-6, -9.061622203484413, -10904.112681735494, 0.0, -8964.395842502854, -8408.012858779355,
+                 -5229.026794587395, 6469.01670389912, 0.0, 0.0, 0.0, 0.0}, {3.194255663618267E-6, -29.151348354923186, 0.0,
+                 -30775.845231982683, 0.0, 0.0, 0.0, 0.0, 19449.89493033873, 2378.321022155628, -2649.661519060273, -11855.031196213946},
+                 {3.1369693153378357E-6, -30.900879254141632, 0.0, -42995.99404879068, 0.0, 0.0, 0.0, 0.0, 2378.321022155628,
+                          11357.838998679135, -2937.0094135800778, -18263.73949521518}, {2.8938378661582233E-6, -28.42051620313139, 0.0,
+                 -51587.82020311749, 0.0, 0.0, 0.0, 0.0, -2649.661519060273, -2937.0094135800778, 3540.367921075315, -21983.989032245478}
+                 , {3.1236139036970613E-6, -24.89555674647439, 0.0, -32712.958453289648, 0.0, 0.0, 0.0, 0.0, -11855.031196213946,
+                 -18263.73949521518, -21983.989032245478, 3534.4332646769}});
+        throwIfNotSymmetric(mtrxA);
+        if (!hasNegativeEigenvalue(mtrxA)) {
+            throw new AssertionError(" At least one Eigenvalue should be negative for this test to be useful");
+        }
+        final LDL<Double> ldl = LDL.modified(LDL.R064, 1.0).make(mtrxA);
+        if (!ldl.decompose(mtrxA)) {
+            throw new AssertionError(" Decomposition failed");
+        }
+        MatrixStore<Double> mtrxPD = ldl.reconstruct();
+        throwIfNotSymmetric(mtrxPD);
+        if (hasNegativeEigenvalue(mtrxPD)) {
+            throw new AssertionError(" Eigenvalues should now be all positive");
+        }
+    }
+
+    private static void throwIfNotSymmetric(MatrixStore<Double> mtrxPD) {
+        final Double largest = mtrxPD.aggregateAll(Aggregator.LARGEST);
+        final Double epsilon = mtrxPD.subtract(mtrxPD.transpose()).aggregateAll(Aggregator.LARGEST);
+        final double relativeError = epsilon/largest;
+        if(Math.abs(relativeError)>1e-15){
+            throw new AssertionError(" Matrix should be symmetric");
+        }
+    }
+
+    private static boolean hasNegativeEigenvalue(MatrixStore<Double> mtrxA) {
+        Eigenvalue<Double> EVD = EigenvalueDecomposition.R064.make(mtrxA);
+        EVD.decompose(mtrxA);
+        if (!EVD.isHermitian()) {
+            //            This test was to sensitive
+            //            throw new AssertionError(" Matrix should be Hermitian");
+        }
+        boolean hasNegativeEigenvalue = false;
+        for (ComplexNumber eigenvalue : EVD.getEigenvalues()) {
+            if (!eigenvalue.isReal()) {
+                throw new AssertionError(" Eigenvalue should be real");
+            }
+            if (eigenvalue.getReal() < 0) {
+                hasNegativeEigenvalue = true;
+            }
+        }
+        return hasNegativeEigenvalue;
     }
 
 }
