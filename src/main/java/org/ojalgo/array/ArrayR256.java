@@ -62,7 +62,7 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.R128;
         }
 

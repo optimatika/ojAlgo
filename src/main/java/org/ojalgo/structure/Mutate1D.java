@@ -28,6 +28,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -60,15 +61,21 @@ public interface Mutate1D extends Structure1D {
          * <code>this(i) = values(i)</code>
          */
         default void fillMatching(final Access1D<?> values) {
-            Structure1D.loopMatching(this, values, i -> this.fillOne(i, values, i));
+            for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {
+                this.fillOne(i, values, i);
+            }
         }
 
         default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-            Structure1D.loopMatching(left, right, i -> this.fillOne(i, function.invoke(left.get(i), right.get(i))));
+            for (long i = 0L, limit = Math.min(left.count(), right.count()); i < limit; i++) {
+                this.fillOne(i, function.invoke(left.get(i), right.get(i)));
+            }
         }
 
         default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-            Structure1D.loopMatching(this, arguments, i -> this.fillOne(i, function.invoke(arguments.get(i))));
+            for (long i = 0L, limit = Math.min(this.count(), arguments.count()); i < limit; i++) {
+                this.fillOne(i, function.invoke(arguments.get(i)));
+            }
         }
 
         /**
@@ -96,11 +103,15 @@ public interface Mutate1D extends Structure1D {
         }
 
         default void fillRange(final long first, final long limit, final N value) {
-            Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, value);
+            }
         }
 
         default void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
-            Structure1D.loopRange(first, limit, i -> this.fillOne(i, supplier));
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, supplier);
+            }
         }
     }
 
@@ -153,17 +164,23 @@ public interface Mutate1D extends Structure1D {
         }
 
         default void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-            Structure1D.loopMatching(left, this, i -> this.modifyOne(i, function.first(left.get(i))));
+            for (long i = 0L, limit = Math.min(left.count(), this.count()); i < limit; i++) {
+                this.modifyOne(i, function.first(left.get(i)));
+            }
         }
 
         default void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-            Structure1D.loopMatching(this, right, i -> this.modifyOne(i, function.second(right.get(i))));
+            for (long i = 0L, limit = Math.min(this.count(), right.count()); i < limit; i++) {
+                this.modifyOne(i, function.second(right.get(i)));
+            }
         }
 
         void modifyOne(long index, UnaryFunction<N> modifier);
 
         default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
-            Structure1D.loopRange(first, limit, i -> this.modifyOne(i, modifier));
+            for (long i = first; i < limit; i++) {
+                this.modifyOne(i, modifier);
+            }
         }
 
     }
@@ -190,7 +207,9 @@ public interface Mutate1D extends Structure1D {
             if (!this.isAcceptable(supplied)) {
                 throw new ProgrammingError("Not acceptable!");
             }
-            supplied.loopAll(i -> this.set(i, supplied.get(i)));
+            for (long i = 0L, limit = Math.min(this.count(), supplied.count()); i < limit; i++) {
+                this.set(i, supplied.get(i));
+            }
         }
 
         default boolean isAcceptable(final Structure1D supplier) {
@@ -211,50 +230,58 @@ public interface Mutate1D extends Structure1D {
      * Copies the argument of the ComplexNumber elements to the destination.
      */
     static void copyComplexArgument(final Access1D<ComplexNumber> source, final Mutate1D destination) {
-        source.loopAll(i -> destination.set(i, source.get(i).getArgument()));
+        for (long i = 0L, limit = Math.min(source.count(), destination.count()); i < limit; i++) {
+            destination.set(i, source.get(i).getArgument());
+        }
     }
 
     /**
      * Copies the imaginary part of the ComplexNumber elements to the destination.
      */
     static void copyComplexImaginary(final Access1D<ComplexNumber> source, final Mutate1D destination) {
-        source.loopAll(i -> destination.set(i, source.get(i).getImaginary()));
+        for (long i = 0L, limit = Math.min(source.count(), destination.count()); i < limit; i++) {
+            destination.set(i, source.get(i).getImaginary());
+        }
     }
 
     /**
      * Copies the modulus of the ComplexNumber elements to the destination.
      */
     static void copyComplexModulus(final Access1D<ComplexNumber> source, final Mutate1D destination) {
-        source.loopAll(i -> destination.set(i, source.get(i).getModulus()));
+        for (long i = 0L, limit = Math.min(source.count(), destination.count()); i < limit; i++) {
+            destination.set(i, source.get(i).getModulus());
+        }
     }
 
     /**
      * Simultaneously copies the modulus and argument of the ComplexNumber elements to the destinations.
      */
     static void copyComplexModulusAndArgument(final Access1D<ComplexNumber> source, final Mutate1D modDest, final Mutate1D argDest) {
-        source.loopAll(i -> {
+        for (long i = 0L, limit = MissingMath.min(source.count(), modDest.count(), argDest.count()); i < limit; i++) {
             ComplexNumber cmplx = source.get(i);
             modDest.set(i, cmplx.getModulus());
             argDest.set(i, cmplx.getArgument());
-        });
+        }
     }
 
     /**
      * Copies the real part of the ComplexNumber elements to the destination.
      */
     static void copyComplexReal(final Access1D<ComplexNumber> source, final Mutate1D destination) {
-        source.loopAll(i -> destination.set(i, source.get(i).getReal()));
+        for (long i = 0L, limit = Math.min(source.count(), destination.count()); i < limit; i++) {
+            destination.set(i, source.get(i).getReal());
+        }
     }
 
     /**
      * Simultaneously copies the real and imaginary parts of the ComplexNumber elements to the destinations.
      */
     static void copyComplexRealAndImaginary(final Access1D<ComplexNumber> source, final Mutate1D realDest, final Mutate1D imagDest) {
-        source.loopAll(i -> {
+        for (long i = 0L, limit = MissingMath.min(source.count(), realDest.count(), imagDest.count()); i < limit; i++) {
             ComplexNumber cmplx = source.get(i);
             realDest.set(i, cmplx.getReal());
             imagDest.set(i, cmplx.getImaginary());
-        });
+        }
     }
 
     /**
@@ -262,7 +289,9 @@ public interface Mutate1D extends Structure1D {
      * this call, and the structure/size/shape must not change.
      */
     default void reset() {
-        this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));
+        for (long i = 0L, limit = this.count(); i < limit; i++) {
+            this.set(i, PrimitiveMath.ZERO);
+        }
     }
 
     default void set(final long index, final byte value) {

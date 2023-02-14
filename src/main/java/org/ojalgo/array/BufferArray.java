@@ -113,7 +113,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myMathType;
         }
 
@@ -210,7 +210,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myTypeFactory.getMathType();
         }
 

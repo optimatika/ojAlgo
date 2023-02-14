@@ -28,6 +28,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.math.MathType;
 
 public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> implements Factory2D<T> {
 
@@ -82,8 +83,7 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
     public T identity(final int dimensions) {
@@ -200,6 +200,10 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         }
 
         return retVal;
+    }
+
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
 }

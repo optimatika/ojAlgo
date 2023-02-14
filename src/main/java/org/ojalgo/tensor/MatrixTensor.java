@@ -26,6 +26,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.math.MathType;
 
 public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTensor<N, MatrixTensor<N>> implements Access2D<N>, Mutate2D.Receiver<N> {
 
@@ -71,6 +72,10 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
                 throw new IllegalArgumentException();
             }
             return new MatrixTensor<>(myFactory, Math.toIntExact(rows));
+        }
+
+        public MathType getMathType() {
+            return myFactory.getMathType();
         }
 
     }

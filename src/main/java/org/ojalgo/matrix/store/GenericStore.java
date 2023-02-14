@@ -52,6 +52,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A generic implementation of {@linkplain PhysicalStore}.
@@ -327,6 +328,10 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             }
 
             return retVal;
+        }
+
+        public MathType getMathType() {
+            return myDenseArrayFactory.getMathType();
         }
 
     }

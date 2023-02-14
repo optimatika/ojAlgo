@@ -26,6 +26,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTensor<N, VectorTensor<N>> implements Access1D<N>, Mutate1D.Receiver<N> {
 
@@ -68,6 +69,10 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
 
         public VectorTensor<N> make(final long count) {
             return new VectorTensor<>(myFactory, Math.toIntExact(count));
+        }
+
+        public MathType getMathType() {
+            return myFactory.getMathType();
         }
 
     }

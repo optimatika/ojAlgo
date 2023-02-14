@@ -21,11 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -104,6 +107,54 @@ public class CaseLU extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals(matrix, decomp.reconstruct());
+    }
+
+    @Test
+    public void testSolveBothWays() {
+
+        MatrixR064 body = SimpleEquationCase.getBody();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
+        MatrixR064 solution = SimpleEquationCase.getSolution();
+
+        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+
+        for (LU<Double> decomp : MatrixDecompositionTests.getPrimitiveLU()) {
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.ftran(rhs, actual);
+
+            TestUtils.assertEquals(solution, actual);
+
+            decomp.decompose(body.transpose());
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.ftran(rhs, expected);
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
 }

@@ -45,6 +45,7 @@ import org.ojalgo.structure.MutateAnyD;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.structure.TransformationAnyD;
 import org.ojalgo.tensor.TensorFactoryAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * ArrayAnyD
@@ -103,6 +104,10 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
         public TensorFactoryAnyD<N, ArrayAnyD<N>> tensor() {
             return TensorFactoryAnyD.of(this);
+        }
+
+        public MathType getMathType() {
+            return myDelegate.getMathType();
         }
 
     }

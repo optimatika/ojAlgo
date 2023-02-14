@@ -49,6 +49,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.math.MathType;
 
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
 
@@ -71,6 +72,10 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         public Scalar.Factory<?> scalar() {
             return myPhysicalFactory.scalar();
+        }
+
+        public MathType getMathType() {
+            return myPhysicalFactory.getMathType();
         }
 
     }

@@ -54,7 +54,7 @@ public class ArrayQ128 extends ScalarArray<RationalNumber> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.Q128;
         }
 

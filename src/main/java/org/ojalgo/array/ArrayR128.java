@@ -54,7 +54,7 @@ public class ArrayR128 extends ScalarArray<Quadruple> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.R128;
         }
 

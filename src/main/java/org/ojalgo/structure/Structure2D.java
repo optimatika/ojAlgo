@@ -361,6 +361,10 @@ public interface Structure2D extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     @FunctionalInterface
     public interface RowColumnCallback {
 
@@ -525,9 +529,13 @@ public interface Structure2D extends Structure1D {
         return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
-        final long tmpCountRows = Math.min(structureA.countRows(), structureB.countRows());
-        final long tmpCountColumns = Math.min(structureA.countColumns(), structureB.countColumns());
+        long tmpCountRows = Math.min(structureA.countRows(), structureB.countRows());
+        long tmpCountColumns = Math.min(structureA.countColumns(), structureB.countColumns());
         for (long j = 0L; j < tmpCountColumns; j++) {
             for (long i = 0L; i < tmpCountRows; i++) {
                 callback.call(i, j);
@@ -703,6 +711,10 @@ public interface Structure2D extends Structure1D {
         return this.getColDim();
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopAll(final RowColumnCallback callback) {
         final long tmpCountRows = this.countRows();
         final long tmpCountColumns = this.countColumns();
@@ -713,32 +725,50 @@ public interface Structure2D extends Structure1D {
         }
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopColumn(final long row, final long col, final RowColumnCallback callback) {
-        final long tmpCountRows = this.countRows();
-        for (long i = row; i < tmpCountRows; i++) {
+        for (long i = row, limit = this.countRows(); i < limit; i++) {
             callback.call(i, col);
         }
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopColumn(final long col, final RowColumnCallback callback) {
         this.loopColumn(0L, col, callback);
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopDiagonal(final long row, final long col, final RowColumnCallback callback) {
-        final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
-        for (long ij = 0L; ij < tmpLimit; ij++) {
+        for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
             callback.call(row + ij, col + ij);
         }
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopRow(final long row, final long col, final RowColumnCallback callback) {
-        final long tmpCountColumns = this.countColumns();
-        for (long j = col; j < tmpCountColumns; j++) {
+        for (long j = col, limit = this.countColumns(); j < limit; j++) {
             callback.call(row, j);
         }
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopRow(final long row, final RowColumnCallback callback) {
         this.loopRow(row, 0L, callback);
     }
+
 }

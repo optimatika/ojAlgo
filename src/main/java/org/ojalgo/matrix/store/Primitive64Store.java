@@ -59,6 +59,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A {@linkplain double} implementation of {@linkplain PhysicalStore}.
@@ -271,6 +272,10 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
             }
 
             return retVal;
+        }
+
+        public MathType getMathType() {
+            return MathType.R064;
         }
 
     };

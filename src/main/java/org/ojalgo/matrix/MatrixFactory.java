@@ -44,6 +44,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.tensor.TensorFactory1D;
 import org.ojalgo.tensor.TensorFactory2D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -199,6 +200,10 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
                 return MatrixFactory.this.scalar();
             }
 
+            public MathType getMathType() {
+                return MatrixFactory.this.getMathType();
+            }
+
         });
     }
 
@@ -215,6 +220,10 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
             public Factory<N> scalar() {
                 return MatrixFactory.this.scalar();
+            }
+
+            public MathType getMathType() {
+                return MatrixFactory.this.getMathType();
             }
 
         });
@@ -238,5 +247,9 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     abstract SR sparse(final SparseStore<N> store);
+
+    public MathType getMathType() {
+        return myPhysicalFactory.getMathType();
+    }
 
 }

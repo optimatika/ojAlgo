@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -197,12 +198,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return this.decompose(matrix);
         }
 
-        int[] getReversePivotOrder();
-
         /**
          * @return The pivot (row and/or columnn) order
          */
         int[] getPivotOrder();
+
+        int[] getReversePivotOrder();
 
         /**
          * @return true if any pivoting was actually done
@@ -260,7 +261,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     }
 
     interface Solver<N extends Comparable<N>> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N>, Provider2D.Inverse<Optional<MatrixStore<N>>>,
-            Provider2D.Solution<Optional<MatrixStore<N>>> {
+            Provider2D.Solution<Optional<MatrixStore<N>>>, InvertibleFactor<N> {
 
         /**
          * @param matrix A matrix to decompose
@@ -268,6 +269,14 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          */
         default boolean compute(final Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix) && this.isSolvable();
+        }
+
+        default void ftran(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
+            this.getSolution(rhs, solution);
+        }
+
+        default void ftran(final PhysicalStore<N> arg) {
+            this.ftran(arg, arg);
         }
 
         /**
@@ -326,8 +335,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         default Optional<MatrixStore<N>> invert() {
             if (this.isSolvable()) {
                 return Optional.of(this.getInverse());
+            } else {
+                return Optional.empty();
             }
-            return Optional.empty();
         }
 
         /**
@@ -344,8 +354,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         default Optional<MatrixStore<N>> solve(final Access2D<?> rhs) {
             if (this.isSolvable()) {
                 return Optional.of(this.getSolution(rhs.asCollectable2D()));
+            } else {
+                return Optional.empty();
             }
-            return Optional.empty();
         }
 
         default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final ElementsSupplier<N> original,
@@ -353,8 +364,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             boolean ok = this.decompose(original);
             if (ok && this.isSolvable()) {
                 return this;
+            } else {
+                return Optional::empty;
             }
-            return Optional::empty;
         }
 
         default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final ElementsSupplier<N> body,
@@ -362,8 +374,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             boolean ok = this.decompose(body);
             if (ok && this.isSolvable()) {
                 return this;
+            } else {
+                return r -> Optional.empty();
             }
-            return r -> Optional.empty();
         }
 
     }

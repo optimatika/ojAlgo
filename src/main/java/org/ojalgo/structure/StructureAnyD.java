@@ -352,11 +352,17 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final IndexCallback callback) {
         if (!Arrays.equals(structureA.shape(), structureB.shape())) {
             throw new ProgrammingError("The 2 structures must have the same shape!");
         }
-        Structure1D.loopMatching(structureA, structureB, callback);
+        for (long i = 0L, limit = Math.min(structureA.count(), structureB.count()); i < limit; i++) {
+            callback.call(i);
+        }
     }
 
     static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {

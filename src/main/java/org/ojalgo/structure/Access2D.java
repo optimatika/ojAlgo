@@ -518,7 +518,9 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     public interface Visitable<N extends Comparable<N>> extends Structure2D, Access1D.Visitable<N> {
 
         default void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
-            this.loopColumn(row, col, (r, c) -> this.visitOne(r, c, visitor));
+            for (long i = row, limit = this.countRows(); i < limit; i++) {
+                this.visitOne(i, col, visitor);
+            }
         }
 
         default void visitColumn(final long col, final VoidFunction<N> visitor) {
@@ -526,7 +528,9 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         }
 
         default void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
-            this.loopDiagonal(row, col, (r, c) -> this.visitOne(r, c, visitor));
+            for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
+                this.visitOne(row + ij, col + ij, visitor);
+            }
         }
 
         default void visitDiagonal(final VoidFunction<N> visitor) {
@@ -541,7 +545,9 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         }
 
         default void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
-            this.loopRow(row, col, (r, c) -> this.visitOne(r, c, visitor));
+            for (long j = col, limit = this.countColumns(); j < limit; j++) {
+                this.visitOne(row, j, visitor);
+            }
         }
 
         default void visitRow(final long row, final VoidFunction<N> visitor) {

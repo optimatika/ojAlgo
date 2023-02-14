@@ -32,7 +32,6 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
-import org.ojalgo.type.math.MathType;
 
 abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D.Dense<I> {
 
@@ -95,8 +94,6 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
     abstract AggregatorSet<N> aggregator();
 
     abstract long getCapacityLimit();
-
-    abstract MathType getMathType();
 
     SegmentedArray<N> makeSegmented(final long... structure) {
 

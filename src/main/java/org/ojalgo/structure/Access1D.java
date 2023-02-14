@@ -22,7 +22,6 @@
 package org.ojalgo.structure;
 
 import java.util.List;
-import java.util.concurrent.atomic.DoubleAdder;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -207,7 +206,9 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         void visitOne(long index, VoidFunction<N> visitor);
 
         default void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
-            Structure1D.loopRange(first, limit, i -> this.visitOne(i, visitor));
+            for (long i = first; i < limit; i++) {
+                this.visitOne(i, visitor);
+            }
         }
 
     }
@@ -389,7 +390,9 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * @param y The "vector" to update
      */
     default void axpy(final double a, final Mutate1D.Modifiable<?> y) {
-        Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
+        for (ElementView1D<N, ?> element : this.nonzeros()) {
+            y.add(element.index(), a * element.doubleValue());
+        }
     }
 
     default byte byteValue(final long index) {
@@ -403,9 +406,14 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * @return The dot product
      */
     default double dot(final Access1D<?> vector) {
-        DoubleAdder retVal = new DoubleAdder();
-        Structure1D.loopMatching(this, vector, i -> retVal.add(this.doubleValue(i) * vector.doubleValue(i)));
-        return retVal.doubleValue();
+
+        double retVal = 0D;
+
+        for (ElementView1D<N, ?> element : this.nonzeros()) {
+            retVal += element.doubleValue() * vector.doubleValue(element.index());
+        }
+
+        return retVal;
     }
 
     double doubleValue(long index);

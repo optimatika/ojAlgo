@@ -92,6 +92,30 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         super(factory);
     }
 
+    public final void btran(final PhysicalStore<N> arg) {
+
+        int[] order = myPivot.getOrder();
+
+        if (myPivot.isModified()) {
+            arg.rows(order).copy().supplyTo(arg);
+        }
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, true, false, false);
+
+        BinaryFunction<N> divide = this.function().divide();
+        for (int i = 0; i < order.length; i++) {
+            arg.modifyRow(i, divide.by(body.get(i, i)));
+        }
+
+        arg.substituteBackwards(body, true, true, false);
+
+        if (myPivot.isModified()) {
+            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
+        }
+    }
+
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
@@ -172,16 +196,16 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         return myPivot.getOrder();
     }
 
-    public int[] getReversePivotOrder() {
-        return myPivot.reverseOrder();
-    }
-
     public double getRankThreshold() {
 
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

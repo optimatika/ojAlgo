@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.array.operation.NRM2;
 import org.ojalgo.array.operation.NRMINF;
 import org.ojalgo.array.operation.VisitAll;
@@ -65,6 +66,50 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     RawQR() {
         super();
+    }
+
+    public void btran(final PhysicalStore<Double> arg) {
+
+        Primitive64Store preallocated = (Primitive64Store) arg;
+
+        double[] dataRHS = preallocated.data;
+
+        int m = this.getRowDim();
+        int n = this.getColDim();
+
+        if (m != n) {
+            throw new IllegalArgumentException("Only square matrices!");
+        }
+        if (preallocated.getRowDim() != m) {
+            throw new IllegalArgumentException("Row dimensions must agree!");
+        }
+        if (!this.isFullRank()) {
+            throw new RuntimeException("Rank deficient!");
+        }
+
+        double[][] dataInternal = this.getInternalData();
+
+        double[] colK;
+        double beta;
+
+        // Solve Rt*y = b;
+        for (int k = 0; k < n; k++) {
+
+            colK = dataInternal[k];
+            double tmpDiagK = myDiagonalR[k];
+
+            dataRHS[k] -= DOT.invoke(dataRHS, 0, colK, 0, 0, k);
+            dataRHS[k] /= tmpDiagK;
+        }
+
+        // Compute Y = transpose(Q)*B
+        for (int k = n - 1; k >= 0; k--) {
+
+            colK = dataInternal[k];
+            beta = ONE / colK[k];
+
+            HouseholderLeft.call(dataRHS, m, 0, colK, k, beta);
+        }
     }
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
@@ -374,7 +419,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
                 dataRHS[k + j * m] /= tmpDiagK;
                 AXPY.invoke(dataRHS, j * m, -dataRHS[k + j * m], colK, 0, 0, k);
             }
-
         }
 
         return preallocated.limits(n, s);

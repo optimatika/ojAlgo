@@ -48,6 +48,26 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         super();
     }
 
+    public void btran(final Collectable<Double, ? super PhysicalStore<Double>> lhs, final PhysicalStore<Double> solution) {
+
+        lhs.supplyTo(solution);
+
+        this.btran(solution);
+    }
+
+    public void btran(final PhysicalStore<Double> arg) {
+
+        MatrixStore<Double> body = this.getInternalStore();
+
+        arg.substituteForwards(body, false, true, false);
+
+        arg.substituteBackwards(body, true, true, false);
+
+        if (myPivot.isModified()) {
+            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
+        }
+    }
+
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -91,6 +111,14 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(data, false);
     }
 
+    public void ftran(final PhysicalStore<Double> arg) {
+
+        PhysicalStore<Double> rhs = myPivot.isModified() ? arg.copy() : arg;
+        PhysicalStore<Double> sol = arg;
+
+        this.getSolution(rhs, sol);
+    }
+
     public Double getDeterminant() {
         final int m = this.getRowDim();
         final int n = this.getColDim();
@@ -127,16 +155,16 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.getOrder();
     }
 
-    public int[] getReversePivotOrder() {
-        return myPivot.reverseOrder();
-    }
-
     public double getRankThreshold() {
 
         double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, largest);
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {

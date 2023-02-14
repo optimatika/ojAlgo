@@ -44,6 +44,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.tensor.TensorFactory2D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Array2D
@@ -265,6 +266,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
 
         public TensorFactory2D<N, Array2D<N>> tensor() {
             return TensorFactory2D.of(this);
+        }
+
+        public MathType getMathType() {
+            return myDelegate.getMathType();
         }
 
     }

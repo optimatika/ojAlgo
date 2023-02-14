@@ -47,6 +47,7 @@ import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Transformation1D;
 import org.ojalgo.tensor.TensorFactory1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Array1D
@@ -115,6 +116,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
+        }
+
+        public MathType getMathType() {
+            return myDelegate.getMathType();
         }
 
     }
