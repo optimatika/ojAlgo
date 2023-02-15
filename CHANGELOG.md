@@ -34,6 +34,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - All sorts of additions – many many – to fully support the new `Quadruple` element type.
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renamed copies of the old.
 - Modified LDL (Cholesky) decomposition – set a threshold value on the diagonal elements while decomposing.
+- New interface `InvertibleFactor` that represent chainable and reversible in-place (equation system) solvers. Suitable for product form representation. The `MatrixDecomposition.Solver` interface now extends this new interface. That means it is now also possible to solve the transposed system (or solve from the left).
+- New `MatrixStore` named `SparseColumnsStore` – it stores sparse columns.
 
 #### org.ojalgo.optimisation
 
@@ -44,6 +46,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.scalar
 
 - New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s
+
+#### org.ojalgo.structure
+
+- `Factory1D`, `Factory2D` and `FactoryAnyD` instances now have to declare what MathType the structures they create contains. The factory implementations noew have a `getMathType` method.
 
 ### Changed
 
@@ -85,6 +91,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - `IntCount`
 - A few methods in `Hardware` and `VirtualMachine` (actually in `CommonMachine`)
+
+#### org.ojalgo.structure
+
+- All the various "loop" methods in `Structure1D`, `Structure2D` and `StructureAnyD` are deprecated. They performed terribly bad. Everything in ojAlgo that made use of them have already been refactored to perform better.
 
 ### Fixed
 
