@@ -89,6 +89,14 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         super(aFactory);
     }
 
+    public final void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, false, false);
+        arg.substituteBackwards(body, false, true, false);
+    }
+
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();

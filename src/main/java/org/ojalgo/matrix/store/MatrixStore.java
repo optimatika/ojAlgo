@@ -266,15 +266,17 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     default MatrixStore<N> hermitian(final boolean upper) {
         if (upper) {
             return new UpperSymmetricStore<>(this, true);
+        } else {
+            return new LowerSymmetricStore<>(this, true);
         }
-        return new LowerSymmetricStore<>(this, true);
     }
 
     default MatrixStore<N> hessenberg(final boolean upper) {
         if (upper) {
             return new UpperHessenbergStore<>(this);
+        } else {
+            return new LowerHessenbergStore<>(this);
         }
-        return new LowerHessenbergStore<>(this);
     }
 
     default long indexOfLargest() {
@@ -584,7 +586,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default Access1D<N> sliceColumn(final long row, final long col) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return MatrixStore.this.countRows() - row;
@@ -607,7 +609,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default Access1D<N> sliceDiagonal(final long row, final long col) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return Math.min(MatrixStore.this.countRows() - row, MatrixStore.this.countColumns() - col);
@@ -630,7 +632,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default Access1D<N> sliceRange(final long first, final long limit) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return limit - first;
@@ -653,7 +655,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default Access1D<N> sliceRow(final long row, final long col) {
-        return new Access1D<N>() {
+        return new Access1D<>() {
 
             public long count() {
                 return MatrixStore.this.countColumns() - col;

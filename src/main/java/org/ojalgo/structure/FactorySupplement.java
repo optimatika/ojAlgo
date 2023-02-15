@@ -23,10 +23,13 @@ package org.ojalgo.structure;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.math.MathType;
 
 interface FactorySupplement {
 
     FunctionSet<?> function();
+
+    MathType getMathType();
 
     Scalar.Factory<?> scalar();
 

@@ -357,17 +357,19 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected final boolean isIterationAllowed() {
 
-        if (myState.isFailure() || Thread.currentThread().isInterrupted()) {
+        if (myState.isFailure() || Thread.currentThread().isInterrupted() || myState.isOptimal()) {
             return false;
         }
 
-        if (myState.isOptimal()) {
+        if (myState.isFeasible() && (this.countTime() >= options.time_suffice || this.countIterations() >= options.iterations_suffice)) {
             return false;
-        } else if (myState.isFeasible()) {
-            return this.countTime() < options.time_suffice && this.countIterations() < options.iterations_suffice;
-        } else {
-            return this.countTime() < options.time_abort && this.countIterations() < options.iterations_abort;
         }
+
+        if (this.countTime() >= options.time_abort || this.countIterations() >= options.iterations_abort) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

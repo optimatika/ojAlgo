@@ -54,7 +54,7 @@ public class ArrayC128 extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.C128;
         }
 

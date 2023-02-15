@@ -46,6 +46,10 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         super();
     }
 
+    public void btran(final PhysicalStore<Double> arg) {
+        this.doSolve(arg);
+    }
+
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         double[][] retVal = this.reset(matrix, false);

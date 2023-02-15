@@ -55,15 +55,21 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillColumn(final long row, final long col, final Access1D<N> values) {
-            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
+            for (long i = row, limit = this.countRows(); i < limit; i++) {
+                this.fillOne(i, col, values.get(i - row));
+            }
         }
 
         default void fillColumn(final long row, final long col, final N value) {
-            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, value));
+            for (long i = row, limit = this.countRows(); i < limit; i++) {
+                this.fillOne(i, col, value);
+            }
         }
 
         default void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
-            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, supplier));
+            for (long i = row, limit = this.countRows(); i < limit; i++) {
+                this.fillOne(i, col, supplier);
+            }
         }
 
         default void fillColumn(final long col, final N value) {
@@ -79,15 +85,21 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
-            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
+            for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
+                this.fillOne(row + ij, col + ij, values.get(ij));
+            }
         }
 
         default void fillDiagonal(final long row, final long col, final N value) {
-            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, value));
+            for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
+                this.fillOne(row + ij, col + ij, value);
+            }
         }
 
         default void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
-            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, supplier));
+            for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
+                this.fillOne(row + ij, col + ij, supplier);
+            }
         }
 
         default void fillDiagonal(final N value) {
@@ -157,15 +169,21 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillRow(final long row, final long col, final Access1D<N> values) {
-            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, values.get(c - col)));
+            for (long j = col, limit = this.countColumns(); j < limit; j++) {
+                this.fillOne(row, j, values.get(j - col));
+            }
         }
 
         default void fillRow(final long row, final long col, final N value) {
-            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, value));
+            for (long j = col, limit = this.countColumns(); j < limit; j++) {
+                this.fillOne(row, j, value);
+            }
         }
 
         default void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
-            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, supplier));
+            for (long j = col, limit = this.countColumns(); j < limit; j++) {
+                this.fillOne(row, j, supplier);
+            }
         }
 
         default void fillRow(final long row, final N value) {
@@ -266,7 +284,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
-            this.loopColumn(row, col, (r, c) -> this.modifyOne(r, c, modifier));
+            for (long i = row, limit = this.countRows(); i < limit; i++) {
+                this.modifyOne(i, col, modifier);
+            }
         }
 
         default void modifyColumn(final long col, final UnaryFunction<N> modifier) {
@@ -274,7 +294,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
-            this.loopDiagonal(row, col, (r, c) -> this.modifyOne(r, c, modifier));
+            for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
+                this.modifyOne(row + ij, col + ij, modifier);
+            }
         }
 
         default void modifyDiagonal(final UnaryFunction<N> modifier) {
@@ -282,19 +304,27 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
-            left.loopAll(r -> this.modifyRow(r, function.first(left.get(r))));
+            for (long r = 0L; r < left.count(); r++) {
+                this.modifyRow(r, function.first(left.get(r)));
+            }
         }
 
         default void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
-            right.loopAll(r -> this.modifyRow(r, function.second(right.get(r))));
+            for (long r = 0L; r < right.count(); r++) {
+                this.modifyRow(r, function.second(right.get(r)));
+            }
         }
 
         default void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
-            left.loopAll(c -> this.modifyColumn(c, function.first(left.get(c))));
+            for (long c = 0L; c < left.count(); c++) {
+                this.modifyColumn(c, function.first(left.get(c)));
+            }
         }
 
         default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
-            right.loopAll(c -> this.modifyColumn(c, function.second(right.get(c))));
+            for (long c = 0L; c < right.count(); c++) {
+                this.modifyColumn(c, function.second(right.get(c)));
+            }
         }
 
         void modifyOne(long row, long col, UnaryFunction<N> modifier);
@@ -306,7 +336,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
-            this.loopRow(row, col, (r, c) -> this.modifyOne(r, c, modifier));
+            for (long j = col, limit = this.countColumns(); j < limit; j++) {
+                this.modifyOne(row, j, modifier);
+            }
         }
 
         default void modifyRow(final long row, final UnaryFunction<N> modifier) {
@@ -332,8 +364,17 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         @Override
         default void accept(final Access2D<?> supplied) {
+
             if (this.isAcceptable(supplied)) {
-                supplied.loopAll((r, c) -> this.set(r, c, supplied.get(r, c)));
+
+                long limitRows = Math.min(this.countRows(), supplied.countRows());
+                long limitCols = Math.min(this.countColumns(), supplied.countColumns());
+                for (long j = 0L; j < limitCols; j++) {
+                    for (long i = 0L; i < limitRows; i++) {
+                        this.set(i, j, supplied.get(i, j));
+                    }
+                }
+
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }

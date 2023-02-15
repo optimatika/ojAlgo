@@ -363,6 +363,10 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         myFullSize = fullSize;
     }
 
+    public final void btran(final PhysicalStore<N> arg) {
+        arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
+    }
+
     public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true, false);
     }
@@ -454,6 +458,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
             }
 
             preallocated.fillByMultiplying(tmpMtrx, this.getU().limits(-1, rank).conjugate());
+
             myInverse = preallocated;
         }
 
@@ -551,8 +556,9 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
+        } else {
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isFullRank() {

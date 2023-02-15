@@ -69,7 +69,7 @@ public class ArrayZ008 extends PrimitiveArray {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.Z008;
         }
 

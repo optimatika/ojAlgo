@@ -26,6 +26,7 @@ import java.util.List;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.scalar.Scalar.Factory;
+import org.ojalgo.type.math.MathType;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
@@ -106,6 +107,10 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
             public Factory<?> scalar() {
                 return Factory2D.this.scalar();
+            }
+
+            public MathType getMathType() {
+                return Factory2D.this.getMathType();
             }
 
         };

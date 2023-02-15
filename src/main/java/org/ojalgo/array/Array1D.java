@@ -47,6 +47,7 @@ import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Transformation1D;
 import org.ojalgo.tensor.TensorFactory1D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Array1D
@@ -115,6 +116,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
+        }
+
+        public MathType getMathType() {
+            return myDelegate.getMathType();
         }
 
     }
@@ -263,7 +268,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Deprecated
     public static final Factory<RationalNumber> RATIONAL = Q128;
     /**
-     * @deprecated v52 Use {@link #R128} instead
+     * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;

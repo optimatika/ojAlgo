@@ -30,6 +30,8 @@ import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.MatrixR064.DenseReceiver;
 import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.SimpleCholeskyCase;
+import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -256,6 +258,88 @@ public class CaseQR extends MatrixDecompositionTests {
         TestUtils.assertEquals(GenericStore.Q128.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));
         TestUtils.assertEquals(GenericStore.C128.copy(tmpOriginal), tmpComplexDecomp, NumberContext.of(7, 14));
         TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
+    }
+
+    @Test
+    public void testSolveBothWays() {
+
+        MatrixR064 body = SimpleEquationCase.getBody();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
+        MatrixR064 solution = SimpleEquationCase.getSolution();
+
+        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+
+        for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+
+            if (decomp instanceof RawQR) {
+                continue;
+            }
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("Q", decomp.getQ());
+                BasicLogger.debugMatrix("R", decomp.getR());
+            }
+
+            decomp.ftran(rhs, actual);
+
+            TestUtils.assertEquals(solution, actual);
+
+            decomp.decompose(body.transpose());
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("Q", decomp.getQ());
+                BasicLogger.debugMatrix("R", decomp.getR());
+            }
+
+            decomp.ftran(rhs, expected);
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("Q", decomp.getQ());
+                BasicLogger.debugMatrix("R", decomp.getR());
+            }
+
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(expected, actual);
+        }
+
+    }
+
+    @Test
+    public void testSolveBothWaysSymmetric() {
+
+        MatrixR064 body = SimpleCholeskyCase.getOriginal();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
+
+        Primitive64Store expected = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
+        Primitive64Store actual = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
+
+        for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
+
+            if (decomp instanceof RawQR) {
+                continue;
+            }
+
+            decomp.decompose(body);
+
+            MatrixStore<Double> mtrxQ = decomp.getQ();
+            MatrixStore<Double> mtrxR = decomp.getR();
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("Q", mtrxQ);
+                BasicLogger.debugMatrix("R", mtrxR);
+            }
+
+            decomp.ftran(rhs, expected);
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
 }

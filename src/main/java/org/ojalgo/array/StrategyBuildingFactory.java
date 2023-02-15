@@ -1,6 +1,7 @@
 package org.ojalgo.array;
 
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.math.MathType;
 
 public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuildingFactory<N, I, SB>> {
 
@@ -53,6 +54,10 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
 
     DenseCapacityStrategy<N> getStrategy() {
         return myStrategy;
+    }
+
+    public final MathType getMathType() {
+        return myStrategy.getMathType();
     }
 
 }

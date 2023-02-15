@@ -58,6 +58,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A {@linkplain float} implementation of {@linkplain PhysicalStore}.
@@ -280,6 +281,10 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
             }
 
             return retVal;
+        }
+
+        public MathType getMathType() {
+            return MathType.R032;
         }
 
     };

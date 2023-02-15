@@ -29,6 +29,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
+import org.ojalgo.type.math.MathType;
 
 public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N, AnyTensor<N>> implements AccessAnyD<N>, MutateAnyD.Receiver<N> {
 
@@ -84,6 +85,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             }
 
             return new AnyTensor<>(myFactory, rank, Math.toIntExact(dimensions));
+        }
+
+        public MathType getMathType() {
+            return myFactory.getMathType();
         }
 
     }

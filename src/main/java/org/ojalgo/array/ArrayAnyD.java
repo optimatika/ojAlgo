@@ -45,6 +45,7 @@ import org.ojalgo.structure.MutateAnyD;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.structure.TransformationAnyD;
 import org.ojalgo.tensor.TensorFactoryAnyD;
+import org.ojalgo.type.math.MathType;
 
 /**
  * ArrayAnyD
@@ -105,6 +106,10 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
             return TensorFactoryAnyD.of(this);
         }
 
+        public MathType getMathType() {
+            return myDelegate.getMathType();
+        }
+
     }
 
     public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
@@ -120,7 +125,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
 
     /**
-     * @deprecated v52 Use {@link #R128} instead
+     * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;

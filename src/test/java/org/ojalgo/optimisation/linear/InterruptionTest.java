@@ -11,7 +11,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 
-public class InterruptionTest implements ModelFileTest {
+public class InterruptionTest extends OptimisationLinearTests implements ModelFileTest {
 
     private static class ThreadInterrupter implements Runnable {
 

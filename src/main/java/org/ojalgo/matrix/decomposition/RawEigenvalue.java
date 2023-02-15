@@ -125,6 +125,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
+        public void btran(final PhysicalStore<Double> arg) {
+            arg.fillByMultiplying(this.getInverse(), arg.copy());
+        }
+
         public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
             long numberOfEquations = rhs.countRows();
             DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);

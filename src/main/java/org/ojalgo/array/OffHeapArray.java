@@ -85,7 +85,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myMathType;
         }
 

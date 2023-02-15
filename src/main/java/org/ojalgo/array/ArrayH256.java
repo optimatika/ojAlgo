@@ -54,7 +54,7 @@ public class ArrayH256 extends ScalarArray<Quaternion> {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.H256;
         }
 

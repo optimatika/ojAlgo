@@ -71,7 +71,7 @@ public class ArrayR064 extends PrimitiveArray {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.R064;
         }
 
@@ -170,8 +170,8 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    public void reset() {
-        Arrays.fill(data, 0.0);
+    public final void reset() {
+        Arrays.fill(data, ZERO);
     }
 
     @Override

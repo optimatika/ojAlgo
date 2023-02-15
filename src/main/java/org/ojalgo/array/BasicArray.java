@@ -88,7 +88,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myDenseFactory.getMathType();
         }
 

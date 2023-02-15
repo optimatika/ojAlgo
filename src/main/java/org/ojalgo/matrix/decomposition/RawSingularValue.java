@@ -83,6 +83,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         super();
     }
 
+    public void btran(final PhysicalStore<Double> arg) {
+        arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
+    }
+
     public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
         return this.doDecompose(matrix, false);
     }

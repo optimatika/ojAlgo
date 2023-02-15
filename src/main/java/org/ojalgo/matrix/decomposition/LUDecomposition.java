@@ -90,6 +90,19 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         super(aFactory);
     }
 
+    public void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, true, false);
+
+        arg.substituteBackwards(body, true, true, false);
+
+        if (myPivot.isModified()) {
+            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
+        }
+    }
+
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
@@ -115,6 +128,14 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
+    }
+
+    public void ftran(final PhysicalStore<N> arg) {
+
+        PhysicalStore<N> rhs = myPivot.isModified() ? arg.copy() : arg;
+        PhysicalStore<N> sol = arg;
+
+        this.getSolution(rhs, sol);
     }
 
     public N getDeterminant() {
@@ -164,16 +185,16 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return myPivot.getOrder();
     }
 
-    public int[] getReversePivotOrder() {
-        return myPivot.reverseOrder();
-    }
-
     public double getRankThreshold() {
 
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

@@ -219,23 +219,35 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
         consumer.reset();
         if (this.isPrimitive()) {
             if (myMainDiagonal != null) {
-                myMainDiagonal.loopAll(i -> consumer.set(i, i, myMainDiagonal.doubleValue(i)));
+                for (long i = 0L; i < myMainDiagonal.count(); i++) {
+                    consumer.set(i, i, myMainDiagonal.doubleValue(i));
+                }
             }
             if (mySubdiagonal != null) {
-                mySubdiagonal.loopAll(i -> consumer.set(i + 1, i, mySubdiagonal.doubleValue(i)));
+                for (long i = 0L; i < mySubdiagonal.count(); i++) {
+                    consumer.set(i + 1, i, mySubdiagonal.doubleValue(i));
+                }
             }
             if (mySuperdiagonal != null) {
-                mySuperdiagonal.loopAll(i -> consumer.set(i, i + 1, mySuperdiagonal.doubleValue(i)));
+                for (long i = 0L; i < mySuperdiagonal.count(); i++) {
+                    consumer.set(i, i + 1, mySuperdiagonal.doubleValue(i));
+                }
             }
         } else {
             if (myMainDiagonal != null) {
-                myMainDiagonal.loopAll(i -> consumer.set(i, i, myMainDiagonal.get(i)));
+                for (long i = 0L; i < myMainDiagonal.count(); i++) {
+                    consumer.set(i, i, myMainDiagonal.get(i));
+                }
             }
             if (mySubdiagonal != null) {
-                mySubdiagonal.loopAll(i -> consumer.set(i + 1, i, mySubdiagonal.get(i)));
+                for (long i = 0L; i < mySubdiagonal.count(); i++) {
+                    consumer.set(i + 1, i, mySubdiagonal.get(i));
+                }
             }
             if (mySuperdiagonal != null) {
-                mySuperdiagonal.loopAll(i -> consumer.set(i, i + 1, mySuperdiagonal.get(i)));
+                for (long i = 0L; i < mySuperdiagonal.count(); i++) {
+                    consumer.set(i, i + 1, mySuperdiagonal.get(i));
+                }
             }
         }
     }

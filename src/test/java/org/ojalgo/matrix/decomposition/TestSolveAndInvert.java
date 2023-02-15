@@ -24,6 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.MatrixR064;
+import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -36,10 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class TestSolveAndInvert extends MatrixDecompositionTests {
 
-    static MatrixDecomposition.Solver<Double>[] getAllSquare() {
-        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.PRIMITIVE.make(), new RawLU(), QR.PRIMITIVE.make(), new RawQR(),
-                SingularValue.PRIMITIVE.make(), new RawSingularValue()/* , new SVDold30.Primitive() */ };
-    }
+    private static final NumberContext ACCURACY = NumberContext.of(7, 6);
 
     @Override
     @BeforeEach
@@ -48,64 +47,133 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
     }
 
     @Test
-    public void testInverseOfRandomCase() {
+    public void testInverseOfRandomSPD() {
 
-        final NumberContext tmpEqualsNumberContext = NumberContext.of(7, 10);
+        int dim = 99;
 
-        final int tmpDim = 99;
-        final PhysicalStore<Double> tmpRandom = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpIdentity = Primitive64Store.FACTORY.makeEye(tmpDim, tmpDim);
+        PhysicalStore<Double> random = Primitive64Store.FACTORY.makeSPD(dim);
+        PhysicalStore<Double> identity = Primitive64Store.FACTORY.makeEye(dim, dim);
 
-        final MatrixDecomposition.Solver<Double>[] tmpAllDecomps = TestSolveAndInvert.getAllSquare();
+        LU<Double> refDecomp = new RawLU();
+        refDecomp.decompose(random); // Just pick one to use as a reference
+        MatrixStore<Double> expected = refDecomp.getInverse();
 
-        final LU<Double> tmpRefDecomps = new RawLU();
-        tmpRefDecomps.decompose(tmpRandom);
-        final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
-
-        for (final MatrixDecomposition.Solver<Double> tmpDecomp : tmpAllDecomps) {
-            final String tmpName = tmpDecomp.getClass().getName();
+        for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
+            String name = decomp.getClass().getName();
 
             if (MatrixDecompositionTests.DEBUG) {
-                BasicLogger.debug(tmpName);
+                BasicLogger.debug(name);
             }
 
-            tmpDecomp.decompose(tmpRandom);
+            decomp.decompose(random);
 
-            final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
+            MatrixStore<Double> actual = decomp.getInverse();
 
-            TestUtils.assertEquals(tmpName, tmpExpected, tmpActual, tmpEqualsNumberContext);
-            TestUtils.assertEquals(tmpName, tmpIdentity, tmpActual.multiply(tmpRandom), tmpEqualsNumberContext);
-            TestUtils.assertEquals(tmpName, tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
+            TestUtils.assertEquals(name, expected, actual, ACCURACY);
+            TestUtils.assertEquals(name, identity, actual.multiply(random), ACCURACY);
+            TestUtils.assertEquals(name, identity, random.multiply(actual), ACCURACY);
         }
     }
 
     @Test
     public void testSimpleEquationCase() {
 
-        final MatrixStore<Double> tmpBody = Primitive64Store.FACTORY.copy(SimpleEquationCase.getBody());
-        final MatrixStore<Double> tmpRHS = Primitive64Store.FACTORY.copy(SimpleEquationCase.getRHS());
-        final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.copy(SimpleEquationCase.getSolution());
+        MatrixStore<Double> body = Primitive64Store.FACTORY.copy(SimpleEquationCase.getBody());
+        MatrixStore<Double> rhs = Primitive64Store.FACTORY.copy(SimpleEquationCase.getRHS());
+        MatrixStore<Double> solution = Primitive64Store.FACTORY.copy(SimpleEquationCase.getSolution());
 
-        for (final MatrixDecomposition.Solver<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
-            this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution, NumberContext.of(7, 6));
+        for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
+            String name = decomp.getClass().getName();
+
+            if (DEBUG) {
+                BasicLogger.debug(name);
+            }
+
+            if (decomp instanceof Cholesky || decomp instanceof LDL || decomp instanceof Eigenvalue) {
+                continue;
+            }
+
+            decomp.decompose(body);
+
+            TestUtils.assertEquals(name, solution, decomp.getSolution(rhs), ACCURACY);
+
+            MatrixStore<Double> mtrxI = body.physical().makeEye(body.countRows(), body.countColumns());
+
+            MatrixStore<Double> expectedInverse = decomp.getSolution(mtrxI);
+
+            TestUtils.assertEquals(name, expectedInverse, decomp.getInverse(), ACCURACY);
+
+            TestUtils.assertEquals(name, mtrxI, expectedInverse.multiply(body), ACCURACY);
+            TestUtils.assertEquals(name, mtrxI, body.multiply(expectedInverse), ACCURACY);
         }
     }
 
-    private void doTest(final MatrixDecomposition.Solver<Double> decomposition, final MatrixStore<Double> body, final MatrixStore<Double> rhs,
-            final MatrixStore<Double> solution, final NumberContext accuracy) {
+    @Test
+    public void testSolveBothWaysSimpleCholeskyCase() {
 
-        decomposition.decompose(body);
+        MatrixR064 body = SimpleCholeskyCase.getOriginal();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
 
-        TestUtils.assertEquals(solution, decomposition.getSolution(rhs), accuracy);
+        Primitive64Store expected = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
+        Primitive64Store actual = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
 
-        final MatrixStore<Double> tmpI = body.physical().makeEye(body.countRows(), body.countColumns());
+        for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
+            String name = decomp.getClass().getName();
 
-        final MatrixStore<Double> tmpExpectedInverse = decomposition.getSolution(tmpI);
-        decomposition.reset();
-        decomposition.decompose(body);
-        TestUtils.assertEquals(tmpExpectedInverse, decomposition.getInverse(), accuracy);
+            if (DEBUG) {
+                BasicLogger.debug(name);
+            }
 
-        TestUtils.assertEquals(tmpI, tmpExpectedInverse.multiply(body), accuracy);
-        TestUtils.assertEquals(tmpI, body.multiply(tmpExpectedInverse), accuracy);
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debugMatrix("inverse", decomp.getInverse());
+            }
+
+            decomp.ftran(rhs, expected);
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(name, expected, actual);
+        }
     }
+
+    @Test
+    public void testSolveBothWaysSimpleEquationCase() {
+
+        MatrixR064 body = SimpleEquationCase.getBody();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
+        MatrixR064 solution = SimpleEquationCase.getSolution();
+
+        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+
+        for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
+            String name = decomp.getClass().getName();
+
+            if (DEBUG) {
+                BasicLogger.debug(name);
+            }
+
+            if (decomp instanceof Cholesky || decomp instanceof LDL || decomp instanceof Eigenvalue) {
+                continue;
+            }
+
+            decomp.decompose(body);
+
+            decomp.ftran(rhs, actual);
+
+            TestUtils.assertEquals(name, solution, actual);
+
+            decomp.decompose(body.transpose());
+
+            decomp.ftran(rhs, expected);
+
+            decomp.decompose(body);
+
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(name, expected, actual);
+        }
+    }
+
 }

@@ -124,6 +124,10 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new RowsSupplier<>(this, numberOfColumns);
         }
 
+        default SparseColumnsStore<N> makeSparseColumns(final int nbRows, final int nbCols) {
+            return new SparseColumnsStore<>(this, nbRows, nbCols);
+        }
+
         default MatrixStore<N> makeSingle(final N element) {
             return new SingleStore<>(this, element);
         }
@@ -137,8 +141,8 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
          */
         default I makeSPD(final int dim) {
 
-            final double[] random = new double[dim];
-            final I retVal = this.make(dim, dim);
+            double[] random = new double[dim];
+            I retVal = this.make(dim, dim);
 
             for (int i = 0; i < dim; i++) {
                 random[i] = Math.random();

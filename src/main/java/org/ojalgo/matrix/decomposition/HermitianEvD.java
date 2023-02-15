@@ -79,14 +79,6 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     }
 
-    static final class R064 extends HermitianEvD<Double> {
-
-        R064() {
-            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
-        }
-
-    }
-
     static final class H256 extends HermitianEvD<Quaternion> {
 
         H256() {
@@ -99,6 +91,14 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
         Q128() {
             super(GenericStore.Q128, new DeferredTridiagonal.Q128());
+        }
+
+    }
+
+    static final class R064 extends HermitianEvD<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }
@@ -215,6 +215,10 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
         myTridiagonal = tridiagonal;
     }
 
+    public final void btran(final PhysicalStore<N> arg) {
+        arg.fillByMultiplying(this.getInverse(), arg.copy());
+    }
+
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         if (matrix.isHermitian()) {
             return this.decompose(matrix);
@@ -306,7 +310,8 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
+        rhs.supplyTo(preallocated);
+        preallocated.fillByMultiplying(this.getInverse(), preallocated.copy());
         return preallocated;
     }
 

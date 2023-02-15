@@ -29,14 +29,14 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
      */
     static int capacity(final long count) {
 
-        double tmpInitialCapacity = count;
+        double capacity = count;
 
-        while (tmpInitialCapacity > PlainArray.MAX_SIZE) {
-            tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
+        while (capacity > PlainArray.MAX_SIZE) {
+            capacity = PrimitiveMath.SQRT.invoke(capacity);
         }
 
-        tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
-        return 2 * (int) tmpInitialCapacity;
+        capacity = PrimitiveMath.SQRT.invoke(capacity);
+        return 2 * (int) capacity;
     }
 
     private long myChunk = CHUNK;
@@ -177,6 +177,10 @@ final class DenseCapacityStrategy<N extends Comparable<N>> {
         final int power = PowerOf2.powerOf2Smaller(Math.max(myChunk, segment));
         mySegment = 1L << power;
         return this;
+    }
+
+    MathType getMathType() {
+        return myDenseFactory.getMathType();
     }
 
 }

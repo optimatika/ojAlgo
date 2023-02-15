@@ -111,6 +111,24 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         myFullSize = fullSize;
     }
 
+    public void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, true, false);
+
+        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
+
+        for (int j = this.getMinDim() - 1; j >= 0; j--) {
+
+            reference.point(j, j);
+
+            if (!reference.isZero()) {
+                arg.transformLeft(reference, 0);
+            }
+        }
+    }
+
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
@@ -226,31 +244,30 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         rhs.supplyTo(preallocated);
 
-        DecompositionStore<N> tmpStore = this.getInPlace();
-        int tmpRowDim = this.getRowDim();
-        int tmpColDim = this.getColDim();
+        DecompositionStore<N> body = this.getInPlace();
+        int m = this.getRowDim();
+        int n = this.getColDim();
 
-        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
+        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
 
-        int tmpLimit = this.getMinDim();
-        for (int j = 0; j < tmpLimit; j++) {
+        for (int j = 0, limit = this.getMinDim(); j < limit; j++) {
 
-            tmpReference.point(j, j);
+            reference.point(j, j);
 
-            if (!tmpReference.isZero()) {
-                preallocated.transformLeft(tmpReference, 0);
+            if (!reference.isZero()) {
+                preallocated.transformLeft(reference, 0);
             }
         }
 
-        preallocated.substituteBackwards(tmpStore, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
-        if (tmpColDim < tmpRowDim) {
-            return preallocated.limits(tmpColDim, preallocated.getColDim());
+        if (n < m) {
+            return preallocated.limits(n, preallocated.getColDim());
+        } else if (n > m) {
+            return preallocated.below(n - m);
+        } else {
+            return preallocated;
         }
-        if (tmpColDim > tmpRowDim) {
-            return preallocated.below(tmpColDim - tmpRowDim);
-        }
-        return preallocated;
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

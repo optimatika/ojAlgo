@@ -238,7 +238,7 @@ public class DataProcessors {
     }
 
     public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
-        return new Transformation2D<Double>() {
+        return new Transformation2D<>() {
 
             public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {
                 SampleSet sampleSet = SampleSet.make();
