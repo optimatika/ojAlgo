@@ -52,7 +52,7 @@ public final class SparseColumnsStore<N extends Comparable<N>> extends FactorySt
 
     private final SparseArray<N>[] myColumns;
 
-    SparseColumnsStore(final Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
+    SparseColumnsStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
         super(factory, rowsCount, columnsCount);
 
