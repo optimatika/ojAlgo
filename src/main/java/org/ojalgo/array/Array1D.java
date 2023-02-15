@@ -268,7 +268,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Deprecated
     public static final Factory<RationalNumber> RATIONAL = Q128;
     /**
-     * @deprecated v52 Use {@link #R128} instead
+     * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;

@@ -287,7 +287,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     public static final Factory<Double> Z064 = Array2D.factory(ArrayZ064.FACTORY);
 
     /**
-     * @deprecated v52 Use {@link #R128} instead
+     * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;

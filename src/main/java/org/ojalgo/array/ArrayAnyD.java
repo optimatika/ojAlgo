@@ -125,7 +125,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
 
     /**
-     * @deprecated v52 Use {@link #R128} instead
+     * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;
