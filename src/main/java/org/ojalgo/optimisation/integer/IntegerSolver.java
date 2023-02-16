@@ -58,21 +58,6 @@ public final class IntegerSolver extends GenericSolver {
             return !model.isAnyConstraintQuadratic();
         }
 
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return solverState;
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            return modelState;
-        }
-
-        @Override
-        protected boolean isSolutionMapped() {
-            return false;
-        }
-
     }
 
     /**

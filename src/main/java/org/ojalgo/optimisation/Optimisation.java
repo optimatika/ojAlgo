@@ -136,6 +136,9 @@ public interface Optimisation {
          * Convert solver state to model state. Transforming the solution (set of variable values) is the main
          * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
          * required here.
+         * <p>
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
+         * is the reverse mapping of {@link #toSolverState(Optimisation.Result, Optimisation.Model)}.
          */
         Optimisation.Result toModelState(Optimisation.Result solverState, M model);
 
@@ -143,6 +146,9 @@ public interface Optimisation {
          * Convert model state to solver state. Transforming the solution (set of variable values) is the main
          * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
          * required here.
+         * <p>
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
+         * is the reverse mapping of {@link #toModelState(Result, Optimisation.Model)}.
          */
         Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
 

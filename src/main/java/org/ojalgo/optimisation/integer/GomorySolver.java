@@ -48,21 +48,6 @@ public final class GomorySolver extends GenericSolver {
             return model.isAnyVariableInteger() && !model.isAnyConstraintQuadratic();
         }
 
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return solverState;
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            return modelState;
-        }
-
-        @Override
-        protected boolean isSolutionMapped() {
-            return false;
-        }
-
     }
 
     public static final ExpressionsBasedModel.Integration<GomorySolver> INTEGRATION = new GomorySolver.ModelIntegration();

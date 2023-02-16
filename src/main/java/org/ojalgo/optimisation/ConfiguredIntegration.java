@@ -59,9 +59,4 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
         return myDelegate.toSolverState(modelState, model);
     }
 
-    @Override
-    protected boolean isSolutionMapped() {
-        return myDelegate.isSolutionMapped();
-    }
-
 }

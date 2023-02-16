@@ -337,11 +337,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return -1;
         }
 
-        @Override
-        protected boolean isSolutionMapped() {
-            return true;
-        }
-
     }
 
     /**

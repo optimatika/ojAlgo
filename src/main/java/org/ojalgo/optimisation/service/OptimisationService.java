@@ -75,11 +75,6 @@ public abstract class OptimisationService {
             return myCapable.booleanValue();
         }
 
-        @Override
-        protected boolean isSolutionMapped() {
-            return false;
-        }
-
     }
 
     public static final class Solver implements Optimisation.Solver {

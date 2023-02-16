@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
@@ -194,72 +193,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return this.toSolverState(model.getVariableValues(), model);
         }
 
-        /**
-         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
-         * is the reverse mapping of {@link #toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
-         *
-         * @see Optimisation.Integration#toModelState(Optimisation.Result, Optimisation.Model)
-         * @see #toSolverState(Optimisation.Result, ExpressionsBasedModel)
-         */
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-
-            if (!this.isSolutionMapped()) {
-                return solverState;
-            }
-
-            List<Variable> freeVariables = model.getFreeVariables();
-            Set<IntIndex> fixedVariables = model.getFixedVariables();
-            int nbFreeVars = freeVariables.size();
-            int nbModelVars = model.countVariables();
-
-            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
-            }
-
-            for (IntIndex fixed : fixedVariables) {
-                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
-            }
-
-            return new Result(solverState.getState(), modelSolution);
+            return solverState;
         }
 
-        /**
-         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented!
-         * <p>
-         * If {@link #isSolutionMapped()} returns false this implementation does nothing – the input model
-         * state is returned as the solver state.
-         * <p>
-         * If {@link #isSolutionMapped()} returns true the standard mapping is applied - just accounting for
-         * that not all model variables are present in the solver. Variables that are fixed, by the presolver
-         * in the model, are typically not present in the solver.
-         * <p>
-         * If mapping needs to be performed, but it is not the standard mapping, then this method needs to be
-         * overridden for the specific implementation. For instance an LP simplex solver that separates
-         * between the positive and negative parts of variables need to do that. In that case
-         * {@link #isSolutionMapped()} is irrelevant, but should return true for good measure.
-         *
-         * @see Optimisation.Integration#toSolverState(Optimisation.Result, Optimisation.Model)
-         */
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-
-            if (!this.isSolutionMapped()) {
-                return modelState;
-            }
-
-            List<Variable> freeVariables = model.getFreeVariables();
-            int nbFreeVars = freeVariables.size();
-
-            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                Variable variable = freeVariables.get(i);
-                int modelIndex = model.indexOf(variable);
-                solverSolution.set(i, modelState.doubleValue(modelIndex));
-            }
-
-            return new Result(modelState.getState(), solverSolution);
+            return modelState;
         }
 
         /**
@@ -285,13 +224,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
             return model.indexOfFreeVariable(variable);
         }
-
-        /**
-         * @return true if the set of variables present in the solver is not precisely the same as in the
-         *         model. If fixed variables are omitted or if variables are split into a positive and
-         *         negative part, then this method must return true
-         */
-        protected abstract boolean isSolutionMapped();
 
     }
 

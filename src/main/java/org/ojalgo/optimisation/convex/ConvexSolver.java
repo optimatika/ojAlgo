@@ -450,8 +450,41 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        protected boolean isSolutionMapped() {
-            return true;
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            List<Variable> freeVariables = model.getFreeVariables();
+            Set<IntIndex> fixedVariables = model.getFixedVariables();
+            int nbFreeVars = freeVariables.size();
+            int nbModelVars = model.countVariables();
+
+            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
+            }
+
+            for (IntIndex fixed : fixedVariables) {
+                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
+            }
+
+            return new Result(solverState.getState(), modelSolution);
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+            List<Variable> freeVariables = model.getFreeVariables();
+            int nbFreeVars = freeVariables.size();
+
+            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
+
+            for (int i = 0; i < nbFreeVars; i++) {
+                Variable variable = freeVariables.get(i);
+                int modelIndex = model.indexOf(variable);
+                solverSolution.set(i, modelState.doubleValue(modelIndex));
+            }
+
+            return new Result(modelState.getState(), solverSolution);
         }
 
     }
