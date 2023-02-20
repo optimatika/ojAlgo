@@ -1,7 +1,6 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.matrix.store.Primitive64Store.FACTORY;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -16,7 +15,7 @@ import org.ojalgo.type.context.NumberContext;
 
 
 
-public class testQPWithIterativeRefinement {
+public class IterativelyRefinedQuadruplePrecisionQP extends OptimisationConvexTests{
 
    @Test
    void testQP1(){
@@ -149,7 +148,7 @@ public class testQPWithIterativeRefinement {
       while (x_y_double.getState().isFeasible()) {
 /*  If set of active inequalities do not change between iterations.
     Then one can try to solve the system of linear equations (KKT) using high precision.
-    and return this answer if it is a success after checking inequality multipliers.
+    and return this answer if it is a success, after checking inequality multipliers.
 */
          iteration++;
 // Compute residuals in Quadruple precision
