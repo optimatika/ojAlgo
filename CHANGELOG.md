@@ -35,7 +35,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renamed copies of the old.
 - Modified LDL (Cholesky) decomposition – set a threshold value on the diagonal elements while decomposing.
 - New interface `InvertibleFactor` that represent chainable and reversible in-place (equation system) solvers. Suitable for product form representation. The `MatrixDecomposition.Solver` interface now extends this new interface. That means it is now also possible to solve the transposed system (or solve from the left).
-- New `MatrixStore` named `SparseColumnsStore` – it stores sparse columns.
+- `RowsSupplier` and `ColumnsSupplier` now implements `MatrixStore` and `Mutate2D` rather than just `Access2D` and `ElementsSupplier`.
 
 #### org.ojalgo.optimisation
 

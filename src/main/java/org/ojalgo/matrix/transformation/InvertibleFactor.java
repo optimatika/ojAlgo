@@ -26,6 +26,8 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 
 /**
+ * A chainable and reversible in-place (equation system) solver.
+ * <p>
  * Matrix decompositions produce factorisations like [A] = [L][U], [A] = [Q][R] or [A] =
  * [U][D][V]<sup>T</sup>. When solving equation systems the factors are used in sequence:
  * <p>
@@ -34,9 +36,17 @@ import org.ojalgo.structure.Structure2D;
  * <li>[L][y] = [b] or [y] = [L]<sup>-1</sup>[b]
  * <li>[U][x] = [y] or [x] = [U]<sup>-1</sup>[y]
  * </ol>
- * That was forward transformation using the [L] and [U] (invertible) factors of [A].
+ * That's forward transformation (ftran) using the [L] and [U] (invertible) factors of [A].
  * <p>
- * Implementing this interface can be useful whenever a matrix can be constructed using a sequence of factors.
+ * If we instead want to solve [x]<sup>T</sup>[A] = [b]<sup>T</sup> or [A]<sup>T</sup>[x] = [b] the steps are:
+ * <ol>
+ * <li>[U]<sup>T</sup>[y] = [b] or [y] = [U]<sup>-T</sup>[b]
+ * <li>[L]<sup>T</sup>[x] = [y] or [x] = [L]<sup>-T</sup>[y]
+ * </ol>
+ * That's backwards transformation (btran).
+ * <p>
+ * Implementing this interface can be useful whenever a matrix (or its inverse) can be constructed using a
+ * sequence of factors.
  * <p>
  * An invertible factor needs to be square.
  *
