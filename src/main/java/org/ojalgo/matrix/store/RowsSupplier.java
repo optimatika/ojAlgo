@@ -2,7 +2,6 @@ package org.ojalgo.matrix.store;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
@@ -12,7 +11,12 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
 
-public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, Supplier<PhysicalStore<N>> {
+/**
+ * Sparse rows – rows can be added and removed.
+ *
+ * @author apete
+ */
+public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D {
 
     public static final class SingleView<N extends Comparable<N>> extends RowView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -147,6 +151,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
                         receiver.set(nz.index(), i, nz.get());
                     }
                 }
+            }
+
+            @Override
+            public String toString() {
+                return Access2D.toString(this);
             }
         };
     }

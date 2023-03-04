@@ -54,6 +54,37 @@ import org.ojalgo.structure.Structure2D;
  */
 public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
 
+    static final class IdentityFactor<N extends Comparable<N>> implements InvertibleFactor<N> {
+
+        private final int myDim;
+
+        IdentityFactor(final int dim) {
+            super();
+            myDim = dim;
+        }
+
+        public void btran(final PhysicalStore<N> arg) {
+            // No-op
+        }
+
+        public long countColumns() {
+            return myDim;
+        }
+
+        public long countRows() {
+            return myDim;
+        }
+
+        public void ftran(final PhysicalStore<N> arg) {
+            // No-op
+        }
+
+    }
+
+    static <N extends Comparable<N>> InvertibleFactor<N> identity(final int dim) {
+        return new IdentityFactor<>(dim);
+    }
+
     default void btran(final Collectable<N, ? super PhysicalStore<N>> lhs, final PhysicalStore<N> solution) {
         lhs.supplyTo(solution);
         this.btran(solution);
