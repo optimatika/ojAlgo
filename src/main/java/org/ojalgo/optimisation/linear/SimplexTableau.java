@@ -1051,7 +1051,7 @@ abstract class SimplexTableau extends Primitive2D {
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
     static final DenseArray.Factory<Double> DENSE_FACTORY = ArrayR064.FACTORY;
 
-    static void copy(final OptimisationData builder, final SimplexTableau tableau) {
+    static void copy(final OptimisationData<Double> builder, final SimplexTableau tableau) {
 
         Mutate2D body = tableau.constraintsBody();
         for (RowView<Double> row : builder.getRowsAE()) {

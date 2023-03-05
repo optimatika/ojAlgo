@@ -39,7 +39,7 @@ final class DualSimplex extends SimplexTableauSolver {
      * {@link #build(org.ojalgo.optimisation.convex.ConvexSolver.Builder, org.ojalgo.optimisation.Optimisation.Options, boolean)}
      * that sets a RHS to correspond to the phase 1 objective of the primal.
      */
-    private static SimplexTableau buildAlt(final OptimisationData convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    private static SimplexTableau buildAlt(final OptimisationData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
@@ -102,7 +102,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return retVal;
     }
 
-    static SimplexTableau build(final OptimisationData convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    static SimplexTableau build(final OptimisationData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();

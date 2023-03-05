@@ -56,7 +56,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             }
         }
 
-        private final OptimisationData myData = new OptimisationData();
+        private final OptimisationDataImpl myData = new OptimisationDataImpl();
         private transient int myNumberOfVariables = -1;
 
         protected Builder() {

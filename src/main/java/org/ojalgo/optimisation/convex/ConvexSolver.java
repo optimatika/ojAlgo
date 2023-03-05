@@ -690,7 +690,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return new ConvexObjectiveFunction(tmpQ, tmpC);
     }
 
-    private final OptimisationData myMatrices;
+    private final OptimisationData<Double> myMatrices;
     private boolean myPatchedQ = false;
     private final Primitive64Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
