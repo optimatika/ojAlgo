@@ -405,9 +405,11 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo                                         ojalgo-53.0.0-SNAPSHOT-tests.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.array                                   ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.function                                ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.function.aggregator                     ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.function.constant                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.function.multiary                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix                                  ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.decomposition                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.store                            ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.matrix.task                             ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.convex                     -> org.ojalgo.netio                                   ojalgo-53.0.0-SNAPSHOT.jar
@@ -465,6 +467,7 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix                                  ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.decomposition                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-53.0.0-SNAPSHOT.jar
@@ -472,6 +475,7 @@ ojalgo-53.0.0-SNAPSHOT-tests.jar -> ./target/ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-53.0.0-SNAPSHOT-tests.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.convex                     ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.integer                    ojalgo-53.0.0-SNAPSHOT-tests.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.random                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.structure                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.type.context                            ojalgo-53.0.0-SNAPSHOT.jar
@@ -818,6 +822,7 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.matrix                                  -> org.ojalgo.tensor                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix                                  -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix                                  -> org.ojalgo.type.context                            ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix                                  -> org.ojalgo.type.math                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.decomposition                    -> java.lang                                          java.base
    org.ojalgo.matrix.decomposition                    -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.decomposition                    -> java.util                                          java.base
@@ -880,6 +885,7 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.matrix.store                            -> org.ojalgo.tensor                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.store                            -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.store                            -> org.ojalgo.type.context                            ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.store                            -> org.ojalgo.type.math                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.matrix.task                             -> java.lang                                          java.base
    org.ojalgo.matrix.task                             -> java.lang.invoke                                   java.base
    org.ojalgo.matrix.task                             -> java.util                                          java.base
@@ -1034,7 +1040,9 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function                                ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.constant                       ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.function.multiary                       ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.decomposition                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.store                            ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear                     -> org.ojalgo.matrix.transformation                   ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.netio                                   ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation                            ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.optimisation.linear                     -> org.ojalgo.optimisation.integer                    ojalgo-53.0.0-SNAPSHOT.jar
@@ -1139,7 +1147,6 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.structure                               -> java.lang                                          java.base
    org.ojalgo.structure                               -> java.lang.invoke                                   java.base
    org.ojalgo.structure                               -> java.util                                          java.base
-   org.ojalgo.structure                               -> java.util.concurrent.atomic                        java.base
    org.ojalgo.structure                               -> java.util.function                                 java.base
    org.ojalgo.structure                               -> java.util.stream                                   java.base
    org.ojalgo.structure                               -> org.ojalgo                                         ojalgo-53.0.0-SNAPSHOT.jar
@@ -1150,6 +1157,7 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.structure                               -> org.ojalgo.scalar                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.structure                               -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.structure                               -> org.ojalgo.type.context                            ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.structure                               -> org.ojalgo.type.math                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.tensor                                  -> java.lang                                          java.base
    org.ojalgo.tensor                                  -> java.lang.invoke                                   java.base
    org.ojalgo.tensor                                  -> java.util                                          java.base
@@ -1161,6 +1169,7 @@ ojalgo-53.0.0-SNAPSHOT.jar -> jdk.unsupported
    org.ojalgo.tensor                                  -> org.ojalgo.scalar                                  ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.tensor                                  -> org.ojalgo.structure                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.tensor                                  -> org.ojalgo.type                                    ojalgo-53.0.0-SNAPSHOT.jar
+   org.ojalgo.tensor                                  -> org.ojalgo.type.math                               ojalgo-53.0.0-SNAPSHOT.jar
    org.ojalgo.type                                    -> java.lang                                          java.base
    org.ojalgo.type                                    -> java.lang.invoke                                   java.base
    org.ojalgo.type                                    -> java.lang.ref                                      java.base

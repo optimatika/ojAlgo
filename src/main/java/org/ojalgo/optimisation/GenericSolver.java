@@ -29,6 +29,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
@@ -43,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 
-    public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
+    public static abstract class Builder<B extends Builder<B, S>, S extends GenericSolver> {
 
         protected static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
@@ -219,8 +220,16 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myData.getObjective().getLinearFactors(false);
         }
 
+        protected PhysicalStore.Factory<Double, Primitive64Store> getFactory() {
+            return FACTORY;
+        }
+
         protected double[] getLowerBounds(final double defaultValue) {
             return myData.getLowerBounds(defaultValue).data;
+        }
+
+        protected TwiceDifferentiable<Double> getObjective() {
+            return myData.getObjective(TwiceDifferentiable.class);
         }
 
         protected <T extends TwiceDifferentiable<Double>> T getObjective(final Class<T> type) {

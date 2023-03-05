@@ -32,7 +32,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class OptimisationConvexTests {
 
-    static boolean DEBUG = false;
+    static boolean DEBUG = true;
 
     protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, Optimisation.Options options) {
 

@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -1678,6 +1679,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Primitive64Store expectedDual = R064.column(-3, 2);
         TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
+    }
+
+    @BeforeEach
+    void setup() {
+        ExpressionsBasedModel.addIntegration(IterativeRefinementSolver.INTEGRATION);
     }
 
 }

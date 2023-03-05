@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -35,7 +34,6 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -103,31 +101,31 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
                 if (nbInequalites > 0) {
 
-                    mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
+                    mtrxC = this.getC().below(nbInequalites).collect(this.getFactory());
 
-                    mtrxAE = this.getAE().below(this.getAI()).right(nbInequalites).collect(FACTORY);
+                    mtrxAE = this.getAE().below(this.getAI()).right(nbInequalites).collect(this.getFactory());
                     mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
-                    mtrxBE = this.getBE().below(this.getBI()).collect(FACTORY);
+                    mtrxBE = this.getBE().below(this.getBI()).collect(this.getFactory());
 
                 } else {
 
-                    mtrxC = this.getC().collect(FACTORY);
+                    mtrxC = this.getC().collect(this.getFactory());
 
-                    mtrxAE = this.getAE().collect(FACTORY);
+                    mtrxAE = this.getAE().collect(this.getFactory());
 
-                    mtrxBE = this.getBE().collect(FACTORY);
+                    mtrxBE = this.getBE().collect(this.getFactory());
 
                 }
 
             } else if (nbInequalites > 0) {
 
-                mtrxC = this.getC().below(nbInequalites).collect(FACTORY);
+                mtrxC = this.getC().below(nbInequalites).collect(this.getFactory());
 
-                mtrxAE = this.getAI().right(nbInequalites).collect(FACTORY);
+                mtrxAE = this.getAI().right(nbInequalites).collect(this.getFactory());
                 mtrxAE.fillDiagonal(nbEqualites, nbVariables, ONE);
 
-                mtrxBE = this.getBI().collect(FACTORY);
+                mtrxBE = this.getBI().collect(this.getFactory());
 
             } else {
 
@@ -397,7 +395,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    static abstract class Builder<B extends LinearSolver.Builder<?>> extends GenericSolver.Builder<B, LinearSolver> {
+    static abstract class Builder<B extends LinearSolver.Builder<B>> extends GenericSolver.Builder<B, LinearSolver> {
 
         Builder() {
             super();
@@ -419,7 +417,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public final B objective(final double... factors) {
             this.setNumberOfVariables(factors.length);
-            this.getObjective().linear().fillMatching(FACTORY.column(factors));
+            this.getObjective().linear().fillMatching(this.getFactory().column(factors));
             return (B) this;
         }
 
@@ -451,10 +449,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.getLowerBounds(ZERO);
         }
 
-        protected final LinearFunction<Double> getObjective() {
-            LinearFunction<Double> retVal = super.getObjective(LinearFunction.class);
+        @Override
+        public final LinearFunction<Double> getObjective() {
+            LinearFunction<Double> retVal = this.getObjective(LinearFunction.class);
             if (retVal == null) {
-                retVal = LinearFunction.factory(FACTORY).make(this.countVariables());
+                retVal = LinearFunction.factory(this.getFactory()).make(this.countVariables());
                 super.setObjective(retVal);
             }
             return retVal;
