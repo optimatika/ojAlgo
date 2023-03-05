@@ -55,7 +55,7 @@ public enum NumberSet {
     Q,
 
     /**
-     * Natural Numbers (Whole Numbers, as we include 0 here)
+     * Natural Numbers (Whole Numbers, if we include 0)
      */
     N;
 

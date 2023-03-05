@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,48 +21,39 @@
  */
 package org.ojalgo.function.constant;
 
-import static org.ojalgo.function.constant.ComplexMath.*;
-import static org.ojalgo.scalar.ComplexNumber.*;
+import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
-/**
- * Tests that {@linkplain org.ojalgo.function.ComplexFunction} functions work correctly with complex valued
- * arguments and results (complex part is not zero).
- *
- * @author apete
- */
-public class ComplexMathTest extends FunctionConstantTests {
+public class BigMathTest extends FunctionConstantTests {
 
     @Test
-    public void testDIVIDE() {
-        TestUtils.assertEquals(ONE, DIVIDE.invoke(I, I));
+    public void testInfinitySum() {
+
+        BigDecimal actual = BigMath.SMALLEST_POSITIVE_INFINITY.add(BigMath.SMALLEST_NEGATIVE_INFINITY);
+
+        TestUtils.assertTrue(actual.compareTo(BigMath.ZERO) == 0);
     }
 
     @Test
-    public void testMULTIPLY() {
-        TestUtils.assertEquals(NEG, MULTIPLY.invoke(I, I));
+    public void testNegativeInfinity() {
+
+        double actual = BigMath.SMALLEST_NEGATIVE_INFINITY.doubleValue();
+
+        TestUtils.assertTrue(Double.isInfinite(actual));
+
+        TestUtils.assertLessThan(0.0, actual);
     }
 
     @Test
-    public void testPOWER() {
-        TestUtils.assertEquals(NEG, POWER.invoke(I, 2));
-    }
+    public void testPositiveInfinity() {
 
-    @Test
-    public void testROOT() {
-        TestUtils.assertEquals(I, ROOT.invoke(NEG, 2));
-    }
+        double actual = BigMath.SMALLEST_POSITIVE_INFINITY.doubleValue();
 
-    @Test
-    public void testSQRT() {
-        TestUtils.assertEquals(I, SQRT.invoke(NEG));
-    }
+        TestUtils.assertTrue(Double.isInfinite(actual));
 
-    @Test
-    public void testSUBTRACT() {
-        TestUtils.assertEquals(ZERO, SUBTRACT.invoke(I, I));
+        TestUtils.assertMoreThan(0.0, actual);
     }
 
 }

@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class CompareImplementations {
+public class CompareImplementations extends FunctionConstantTests {
 
     private static final Uniform AROUND_ZERO = new Uniform(NEG, TWO);
     private static final NumberContext CONTEXT = NumberContext.of(7, 14);

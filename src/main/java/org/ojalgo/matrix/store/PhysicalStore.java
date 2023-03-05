@@ -128,6 +128,10 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new SingleStore<>(this, element);
         }
 
+        default MatrixStore<N> makeSingle(final double element) {
+            return this.makeSingle(this.scalar().cast(element));
+        }
+
         default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
             return SparseStore.makeSparse(this, rowsCount, columnsCount);
         }

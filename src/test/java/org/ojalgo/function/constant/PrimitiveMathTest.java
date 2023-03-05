@@ -28,7 +28,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath.Prefix;
 import org.ojalgo.type.context.NumberContext;
 
-public class PrimitiveMathTest {
+public class PrimitiveMathTest extends FunctionConstantTests {
 
     private static final double TOLERANCE = MACHINE_EPSILON;
 
@@ -120,6 +120,8 @@ public class PrimitiveMathTest {
     public void testPrefixes() {
 
         double expected = Double.NaN;
+
+        TestUtils.assertFalse(Double.isFinite(expected));
 
         expected = POWER.invoke(TEN, -24);
         TestUtils.assertEquals("yocto, y", expected, Prefix.YOCTO, TOLERANCE);

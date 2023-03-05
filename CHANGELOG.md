@@ -24,6 +24,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.function
 
 - Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implemenations. Proper `Quadruple` implementations can be done later.
+- New `BigMath` constants `SMALLEST_POSITIVE_INFINITY` and `SMALLEST_NEGATIVE_INFINITY`.
 
 #### org.ojalgo.machine
 

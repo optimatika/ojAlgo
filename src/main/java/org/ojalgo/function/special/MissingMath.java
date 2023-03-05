@@ -27,6 +27,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+import org.ojalgo.function.constant.BigMath;
+
 /**
  * Math utilities missing from {@link Math}.
  *
@@ -528,6 +530,27 @@ public abstract class MissingMath {
 
     public static double sqrt1px2(final double arg) {
         return Math.sqrt(1.0 + arg * arg);
+    }
+
+    public static BigDecimal tanh(final BigDecimal arg) {
+
+        BigDecimal retVal;
+
+        BigDecimal tmpPlus = BigMath.EXP.invoke(arg);
+        BigDecimal tmpMinus = BigMath.EXP.invoke(arg.negate());
+
+        BigDecimal tmpDividend = tmpPlus.subtract(tmpMinus);
+        BigDecimal tmpDivisor = tmpPlus.add(tmpMinus);
+
+        if (tmpDividend.equals(tmpDivisor)) {
+            retVal = BigDecimal.ONE;
+        } else if (tmpDividend.equals(tmpDivisor.negate())) {
+            retVal = BigDecimal.ONE.negate();
+        } else {
+            retVal = BigMath.DIVIDE.apply(tmpDividend, tmpDivisor);
+        }
+
+        return retVal;
     }
 
     public static int toMinIntExact(final long... values) {

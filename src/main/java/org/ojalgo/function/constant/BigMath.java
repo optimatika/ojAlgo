@@ -100,8 +100,25 @@ public abstract class BigMath {
     public static final BigDecimal SQRT_PI = MissingMath.root(PI, 2);
     public static final BigDecimal SQRT_TWO_PI = MissingMath.root(TWO_PI, 2);
 
+    /**
+     * Corresponding to {@link Long#MIN_VALUE}.
+     */
     public static final BigDecimal VERY_NEGATIVE = new BigDecimal(Long.MIN_VALUE);
+    /**
+     * Corresponding to {@link Long#MAX_VALUE}.
+     */
     public static final BigDecimal VERY_POSITIVE = new BigDecimal(Long.MAX_VALUE);
+
+    /**
+     * The smallest possible number that will be translated to positive infinity when converted to a primitive
+     * double (something close to that at least). The key feature is that it is translated to
+     * {@link Double#POSITIVE_INFINITY}.
+     */
+    public static final BigDecimal SMALLEST_POSITIVE_INFINITY = new BigDecimal(Double.MAX_VALUE).add(new BigDecimal(Double.MAX_VALUE).movePointLeft(16));
+    /**
+     * {@link #SMALLEST_POSITIVE_INFINITY} negated – is translated to {@link Double#NEGATIVE_INFINITY}.
+     */
+    public static final BigDecimal SMALLEST_NEGATIVE_INFINITY = SMALLEST_POSITIVE_INFINITY.negate();
 
     /*
      * The lambdas below should not (cannot) reference each other. Delegate to some other 'type' or code in
@@ -150,26 +167,7 @@ public abstract class BigMath {
     public static final BigFunction.Unary SQRT1PX2 = arg -> MissingMath.root(ONE.add(arg.multiply(arg)), 2);
     public static final BigFunction.Binary SUBTRACT = BigDecimal::subtract;
     public static final BigFunction.Unary TAN = arg -> BigDecimal.valueOf(Math.tan(arg.doubleValue()));
-    public static final BigFunction.Unary TANH = arg -> {
-
-        BigDecimal retVal;
-
-        BigDecimal tmpPlus = EXP.invoke(arg);
-        BigDecimal tmpMinus = EXP.invoke(arg.negate());
-
-        BigDecimal tmpDividend = tmpPlus.subtract(tmpMinus);
-        BigDecimal tmpDivisor = tmpPlus.add(tmpMinus);
-
-        if (tmpDividend.equals(tmpDivisor)) {
-            retVal = BigDecimal.ONE;
-        } else if (tmpDividend.equals(tmpDivisor.negate())) {
-            retVal = BigDecimal.ONE.negate();
-        } else {
-            retVal = DIVIDE.apply(tmpDividend, tmpDivisor);
-        }
-
-        return retVal;
-    };
+    public static final BigFunction.Unary TANH = MissingMath::tanh;
     public static final BigFunction.Unary VALUE = arg -> arg;
 
 }

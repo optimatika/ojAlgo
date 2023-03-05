@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,48 +21,8 @@
  */
 package org.ojalgo.function.constant;
 
-import static org.ojalgo.function.constant.ComplexMath.*;
-import static org.ojalgo.scalar.ComplexNumber.*;
+abstract class FunctionConstantTests {
 
-import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-
-/**
- * Tests that {@linkplain org.ojalgo.function.ComplexFunction} functions work correctly with complex valued
- * arguments and results (complex part is not zero).
- *
- * @author apete
- */
-public class ComplexMathTest extends FunctionConstantTests {
-
-    @Test
-    public void testDIVIDE() {
-        TestUtils.assertEquals(ONE, DIVIDE.invoke(I, I));
-    }
-
-    @Test
-    public void testMULTIPLY() {
-        TestUtils.assertEquals(NEG, MULTIPLY.invoke(I, I));
-    }
-
-    @Test
-    public void testPOWER() {
-        TestUtils.assertEquals(NEG, POWER.invoke(I, 2));
-    }
-
-    @Test
-    public void testROOT() {
-        TestUtils.assertEquals(I, ROOT.invoke(NEG, 2));
-    }
-
-    @Test
-    public void testSQRT() {
-        TestUtils.assertEquals(I, SQRT.invoke(NEG));
-    }
-
-    @Test
-    public void testSUBTRACT() {
-        TestUtils.assertEquals(ZERO, SUBTRACT.invoke(I, I));
-    }
+    static final boolean DEBUG = false;
 
 }
