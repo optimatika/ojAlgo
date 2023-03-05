@@ -67,6 +67,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Changes to how parameter scaling is done.
 - When constructing convex (QP) solver, simple variable bounds are no longer scaled.
+- It is now possible to extract both adjusted and unadjusted model parameters as `BigDecimal`. This is to allow individual solver integrations to do type convertion to different types without intermediate loss of precision.
 - Modified the EBM file format to also include known variable values. Format (reader/writer) compatible with both old and new variants.
 - Refactoring of the `ConvexSolver` class hierarchy. In particular with the `ActiveSetSolver` there should now be a lot less copying of data.
 - There used to be 2 different `NumberContext`:s used for print/display/toString formatting in `ExpressionsBasesModel`. Now there is only one. The configurable `Optimisation.Options.print` value, and the default value is `NumberContext.of(8)`.

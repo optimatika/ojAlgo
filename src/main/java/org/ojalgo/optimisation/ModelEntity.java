@@ -169,25 +169,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myLowerLimit;
     }
 
+    public final BigDecimal getLowerLimit(final boolean adjusted, final BigDecimal defaultValue) {
+
+        BigDecimal limit = this.getLower(adjusted);
+
+        if (limit != null) {
+            return limit;
+        } else {
+            return defaultValue;
+        }
+    }
+
     public final double getLowerLimit(final boolean adjusted, final double defaultValue) {
 
-        BigDecimal limit = null;
-        if (adjusted && myLowerLimit != null) {
-            int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myLowerLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myLowerLimit;
-            }
-        } else {
-            limit = myLowerLimit;
-        }
+        BigDecimal limit = this.getLower(adjusted);
 
         if (limit != null) {
             return limit.doubleValue();
+        } else {
+            return defaultValue;
         }
-
-        return defaultValue;
     }
 
     public final String getName() {
@@ -214,25 +215,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myUpperLimit;
     }
 
+    public final BigDecimal getUpperLimit(final boolean adjusted, final BigDecimal defaultValue) {
+
+        BigDecimal limit = this.getUpper(adjusted);
+
+        if (limit != null) {
+            return limit;
+        } else {
+            return defaultValue;
+        }
+    }
+
     public final double getUpperLimit(final boolean adjusted, final double defaultValue) {
 
-        BigDecimal limit = null;
-        if (adjusted && myUpperLimit != null) {
-            int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myUpperLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myUpperLimit;
-            }
-        } else {
-            limit = myUpperLimit;
-        }
+        BigDecimal limit = this.getUpper(adjusted);
 
         if (limit != null) {
             return limit.doubleValue();
+        } else {
+            return defaultValue;
         }
-
-        return defaultValue;
     }
 
     @Override
@@ -432,6 +434,36 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     public final ME weight(final long weight) {
         return this.weight(BigDecimal.valueOf(weight));
+    }
+
+    private BigDecimal getLower(final boolean adjusted) {
+        BigDecimal limit = null;
+        if (adjusted && myLowerLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myLowerLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myLowerLimit;
+            }
+        } else {
+            limit = myLowerLimit;
+        }
+        return limit;
+    }
+
+    private BigDecimal getUpper(final boolean adjusted) {
+        BigDecimal limit = null;
+        if (adjusted && myUpperLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myUpperLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myUpperLimit;
+            }
+        } else {
+            limit = myUpperLimit;
+        }
+        return limit;
     }
 
     protected void appendLeftPart(final StringBuilder builder, final NumberContext display) {

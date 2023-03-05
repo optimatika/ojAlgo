@@ -438,11 +438,11 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     public double doubleValue(final IntIndex key, final boolean adjusted) {
-        return this.getLinearFactor(key, adjusted).doubleValue();
+        return this.get(key, adjusted).doubleValue();
     }
 
     public double doubleValue(final IntRowColumn key, final boolean adjusted) {
-        return this.getQuadraticFactor(key, adjusted).doubleValue();
+        return this.get(key, adjusted).doubleValue();
     }
 
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
@@ -465,19 +465,28 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     public BigDecimal get(final IntIndex key) {
-        return this.getLinearFactor(key, false);
+        return this.get(key, false);
+    }
+
+    public BigDecimal get(final IntIndex key, final boolean adjusted) {
+        return this.convert(myLinear.get(key), adjusted);
     }
 
     public BigDecimal get(final IntRowColumn key) {
-        return this.getQuadraticFactor(key, false);
+        return this.get(key, false);
+    }
+
+    public BigDecimal get(final IntRowColumn key, final boolean adjusted) {
+        return this.convert(myQuadratic.get(key), adjusted);
     }
 
     public BigDecimal get(final Variable variable) {
-        IntIndex tmpIndex = variable.getIndex();
-        if (tmpIndex != null) {
-            return this.get(tmpIndex);
+        IntIndex index = variable.getIndex();
+        if (index != null) {
+            return this.get(index);
+        } else {
+            throw new IllegalStateException("Variable not part of (this) model!");
         }
-        throw new IllegalStateException("Variable not part of (this) model!");
     }
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
@@ -533,7 +542,7 @@ public final class Expression extends ModelEntity<Expression> {
      */
     @Deprecated
     public double getAdjustedLinearFactor(final IntIndex key) {
-        return this.getLinearFactor(key, true).doubleValue();
+        return this.get(key, true).doubleValue();
     }
 
     /**
@@ -557,7 +566,7 @@ public final class Expression extends ModelEntity<Expression> {
      */
     @Deprecated
     public double getAdjustedQuadraticFactor(final IntRowColumn key) {
-        return this.getQuadraticFactor(key, true).doubleValue();
+        return this.get(key, true).doubleValue();
     }
 
     /**
@@ -1267,20 +1276,12 @@ public final class Expression extends ModelEntity<Expression> {
         return myLinear;
     }
 
-    BigDecimal getLinearFactor(final IntIndex key, final boolean adjusted) {
-        return this.convert(myLinear.get(key), adjusted);
-    }
-
     ExpressionsBasedModel getModel() {
         return myModel;
     }
 
     Map<IntRowColumn, BigDecimal> getQuadratic() {
         return myQuadratic;
-    }
-
-    BigDecimal getQuadraticFactor(final IntRowColumn key, final boolean adjusted) {
-        return this.convert(myQuadratic.get(key), adjusted);
     }
 
     boolean includes(final Variable variable) {

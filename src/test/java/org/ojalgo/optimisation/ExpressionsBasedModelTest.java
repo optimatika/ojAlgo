@@ -96,13 +96,13 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         expr.add(1, BigMath.THREE);
         expr.add(var2, BigMath.FOUR);
 
-        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(IntIndex.of(0), false));
-        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(IntIndex.of(1), false));
-        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(IntIndex.of(2), false));
+        TestUtils.assertEquals(BigMath.TWO, expr.get(IntIndex.of(0), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.get(IntIndex.of(1), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.get(IntIndex.of(2), false));
 
-        TestUtils.assertEquals(BigMath.TWO, expr.getLinearFactor(var0.getIndex(), false));
-        TestUtils.assertEquals(BigMath.FOUR, expr.getLinearFactor(var1.getIndex(), false));
-        TestUtils.assertEquals(BigMath.SIX, expr.getLinearFactor(var2.getIndex(), false));
+        TestUtils.assertEquals(BigMath.TWO, expr.get(var0.getIndex(), false));
+        TestUtils.assertEquals(BigMath.FOUR, expr.get(var1.getIndex(), false));
+        TestUtils.assertEquals(BigMath.SIX, expr.get(var2.getIndex(), false));
     }
 
     /**
