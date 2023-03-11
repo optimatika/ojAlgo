@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -34,6 +35,7 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;

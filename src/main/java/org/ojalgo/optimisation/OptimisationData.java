@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.structure.Access2D.RowView;
 
 /**
- * Should be able to define data for any problem solvable ojAlgo solvers.
+ * Should be able to provide data for any problem solvable by ojAlgo solvers.
  *
  * @author apete
  */

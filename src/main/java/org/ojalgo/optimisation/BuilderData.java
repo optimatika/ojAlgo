@@ -49,7 +49,7 @@ import org.ojalgo.structure.Access2D.RowView;
  * @deprecated Use {@link OptimisationData} or some other implementation of that interfce instead.
  */
 @Deprecated
-public final class OptimisationDataImpl implements OptimisationData<Double> {
+final class BuilderData implements OptimisationData<Double> {
 
     private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
@@ -101,7 +101,7 @@ public final class OptimisationDataImpl implements OptimisationData<Double> {
     private MultiaryFunction.TwiceDifferentiable<Double> myObjective = null;
     private Primitive64Store myUpperBounds = null;
 
-    OptimisationDataImpl() {
+    BuilderData() {
         super();
     }
 
@@ -293,7 +293,7 @@ public final class OptimisationDataImpl implements OptimisationData<Double> {
             myBE = FACTORY.makeZero(0, 1);
         }
 
-        myBE = OptimisationDataImpl.add(myAE, myBE, mtrxAE, mtrxBE);
+        myBE = BuilderData.add(myAE, myBE, mtrxAE, mtrxBE);
     }
 
     void addInequalities(final MatrixStore<?> mtrxAI, final MatrixStore<?> mtrxBI) {
@@ -306,7 +306,7 @@ public final class OptimisationDataImpl implements OptimisationData<Double> {
             myBI = FACTORY.makeZero(0, 0);
         }
 
-        myBI = OptimisationDataImpl.add(myAI, myBI, mtrxAI, mtrxBI);
+        myBI = BuilderData.add(myAI, myBI, mtrxAI, mtrxBI);
     }
 
     Primitive64Store getLowerBounds() {
@@ -375,7 +375,7 @@ public final class OptimisationDataImpl implements OptimisationData<Double> {
         myAE = FACTORY.makeRowsSupplier(mtrxAE.getColDim());
         myBE = FACTORY.makeZero(0, 0);
 
-        myBE = OptimisationDataImpl.add(myAE, myBE, mtrxAE, mtrxBE);
+        myBE = BuilderData.add(myAE, myBE, mtrxAE, mtrxBE);
     }
 
     void setInequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
@@ -386,7 +386,7 @@ public final class OptimisationDataImpl implements OptimisationData<Double> {
         myAI = FACTORY.makeRowsSupplier(mtrxAI.getColDim());
         myBI = FACTORY.makeZero(0, 0);
 
-        myBI = OptimisationDataImpl.add(myAI, myBI, mtrxAI, mtrxBI);
+        myBI = BuilderData.add(myAI, myBI, mtrxAI, mtrxBI);
     }
 
     void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
