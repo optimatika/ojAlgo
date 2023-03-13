@@ -152,6 +152,7 @@ public final class IterativeRefinementSolver extends GenericSolver {
         double be_Size = be_in.aggregateAll(Aggregator.LARGEST).doubleValue();
         be_Size = be_Size > 1E-15 ? be_Size : 1;
         double C_Size = C_in.aggregateAll(Aggregator.LARGEST).doubleValue();
+        C_Size = C_Size > 1.0 ? C_Size : 1;
         double Q_Size = Q_in.aggregateAll(Aggregator.LARGEST).doubleValue();
 
         MatrixStore<Quadruple> Q0 = Q_in;
@@ -222,12 +223,7 @@ public final class IterativeRefinementSolver extends GenericSolver {
                     //  solution not that bad. I use it in SQP where we will probably do another iteration anyway.
                     break;
                 }
-                Quadruple objectiveValue = Q0.multiplyBoth(x0).divide(2).subtract(x0.transpose().multiply(C0).get(0));
-                Optimisation.State state = x_y_double.getState() == Optimisation.State.OPTIMAL ? Optimisation.State.APPROXIMATE : Optimisation.State.FAILED;
-                Optimisation.Result result = Optimisation.Result.of(objectiveValue.doubleValue(), state, x0.toRawCopy1D());
-                result.multipliers(y0);
-                double v = (initialSolutionValue - objectiveValue.doubleValue()) / initialSolutionValue;
-                return result;
+                break;
             }
             // Prepare approximate model
             int noTries = 0;
@@ -241,7 +237,7 @@ public final class IterativeRefinementSolver extends GenericSolver {
                 MatrixStore<Quadruple> bi1_ = bi1.multiply(scaleP1);
                 //solve updated QP
                 x_y_double = IterativeRefinementSolver.doIteration(Q1_, C1_, ae1_, be1_, ai1_, bi1_, options);
-                if (x_y_double.getState().isFailure()) {
+                if (!x_y_double.getState().isOptimal()) {
                     // on failure try a smaller zoom factor
                     double increaseP = scaleP1 / scaleP0;
                     double newIncreaseP = Math.sqrt(increaseP);
@@ -250,20 +246,32 @@ public final class IterativeRefinementSolver extends GenericSolver {
                     double newIncreaseD = Math.sqrt(increaseD);
                     scaleD1 = scaleD0 * newIncreaseD;
                 }
-            } while (x_y_double.getState().isFailure() && noTries < maxTriesOnFailure);
-
+            } while (!x_y_double.getState().isOptimal() && noTries < maxTriesOnFailure);
+            if (noTries == maxTriesOnFailure) {
+                //  Cant solve this sub problem. Abort.
+                break;
+            }
             MatrixStore<Quadruple> x1 = GenericStore.R128.columns(x_y_double);
             MatrixStore<Quadruple> y1 = GenericStore.R128.columns(x_y_double.getMultipliers().get());
+            if(x1.aggregateAll(Aggregator.LARGEST).compareTo(Quadruple.ZERO)==0 && y1.aggregateAll(Aggregator.LARGEST).compareTo(Quadruple.ZERO)==0){
+// No progress if x1 and y1 = 0, abort.
+                break;
+            }
             //  update tentative solution in high precision
             x0 = x0.add(x1.divide(scaleP1));
             y0 = y0.add(y1.divide(scaleD1));
             scaleP0 = scaleP1;
             scaleD0 = scaleD1;
         }
+        Result result = buildResult(Q0, C0, x0, y0, State.OPTIMAL);
+        double improvement = (initialSolutionValue - result.getValue()) / initialSolutionValue;
+        return result;
+    }
+
+    private static Result buildResult(MatrixStore<Quadruple> Q0, MatrixStore<Quadruple> C0, MatrixStore<Quadruple> x0, MatrixStore<Quadruple> y0, State state) {
         Quadruple objectiveValue = Q0.multiplyBoth(x0).divide(2).subtract(x0.transpose().multiply(C0).get(0));
-        Optimisation.Result result = Optimisation.Result.of(objectiveValue.doubleValue(), x_y_double.getState(), x0.toRawCopy1D());
+        Result  result = new Result(state,objectiveValue.doubleValue(), x0);
         result.multipliers(y0);
-        double improvement = (initialSolutionValue - objectiveValue.doubleValue()) / initialSolutionValue;
         return result;
     }
 
