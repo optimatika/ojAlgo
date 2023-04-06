@@ -51,6 +51,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - `Factory1D`, `Factory2D` and `FactoryAnyD` instances now have to declare what MathType the structures they create contains. The factory implementations noew have a `getMathType` method.
+- Added the ability to get/set values of 1D- and 2D-data structure using `Keyed1D` and `Keyed2D`. Using `IndexMapper` to map back and forth between an index and a key of any type.
 
 ### Changed
 

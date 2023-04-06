@@ -760,6 +760,10 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         };
     }
 
+    default <R, C> Keyed2D<R, C, N> asKeyed2D(final IndexMapper<R> rowMapper, final IndexMapper<C> columnMapper) {
+        return new Keyed2D<>(this, Structure2D.mapperOf(this, rowMapper, columnMapper));
+    }
+
     default byte byteValue(final long index) {
         long structure = this.countRows();
         return this.byteValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
@@ -889,4 +893,5 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
         return retVal;
     }
+
 }
