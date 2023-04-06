@@ -383,6 +383,10 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         };
     }
 
+    default <K> Keyed1D<K, N> asKeyed1D(final IndexMapper<K> indexMapper) {
+        return new Keyed1D<>(this, indexMapper);
+    }
+
     /**
      * Will calculate y = y + a x, will add "a" times "this" to "y"
      *

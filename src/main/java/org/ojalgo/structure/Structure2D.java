@@ -387,8 +387,8 @@ public interface Structure2D extends Structure1D {
 
         public RowColumnKey(final R theRow, final C theCol) {
             super();
-            this.row = theRow;
-            this.column = theCol;
+            row = theRow;
+            column = theCol;
         }
 
         @SuppressWarnings("rawtypes")
@@ -441,15 +441,19 @@ public interface Structure2D extends Structure1D {
             myColumnMapper = columnMapper;
         }
 
+        public long toColumnIndex(final C columnKey) {
+            return myColumnMapper.toIndex(columnKey);
+        }
+
         public C toColumnKey(final long index) {
-            final long col = Structure2D.column(index, myStructure);
+            long col = Structure2D.column(index, myStructure);
             return myColumnMapper.toKey(col);
         }
 
         public long toIndex(final R rowKey, final C colKey) {
 
-            final long row = myRowMapper.toIndex(rowKey);
-            final long col = myColumnMapper.toIndex(colKey);
+            long row = myRowMapper.toIndex(rowKey);
+            long col = myColumnMapper.toIndex(colKey);
 
             return Structure2D.index(myStructure, row, col);
         }
@@ -462,8 +466,12 @@ public interface Structure2D extends Structure1D {
             return RowColumnKey.of(this.toRowKey(index), this.toColumnKey(index));
         }
 
+        public long toRowIndex(final R rowKey) {
+            return myRowMapper.toIndex(rowKey);
+        }
+
         public R toRowKey(final long index) {
-            final long row = Structure2D.row(index, myStructure);
+            long row = Structure2D.row(index, myStructure);
             return myRowMapper.toKey(row);
         }
 
