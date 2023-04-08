@@ -389,6 +389,25 @@ public interface Optimisation {
 
     }
 
+    /**
+     * Basic description of the size/structure of an optimisation problem (model or solver).
+     *
+     * @author apete
+     */
+    public interface ProblemStructure extends Optimisation {
+
+        int countAdditionalConstraints();
+
+        int countConstraints();
+
+        int countEqualityConstraints();
+
+        int countInequalityConstraints();
+
+        int countVariables();
+
+    }
+
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
         public static Result of(final double value, final Optimisation.State state, final double... solution) {
@@ -445,14 +464,17 @@ public interface Optimisation {
             this(state, result.getValue(), result);
         }
 
+        @Override
         public int compareTo(final Result reference) {
             return NumberContext.compare(myValue, reference.getValue());
         }
 
+        @Override
         public long count() {
             return mySolution.count();
         }
 
+        @Override
         public double doubleValue(final long index) {
             return mySolution.doubleValue(index);
         }
@@ -472,6 +494,7 @@ public interface Optimisation {
             return true;
         }
 
+        @Override
         public BigDecimal get(final long index) {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
@@ -522,6 +545,7 @@ public interface Optimisation {
             return this;
         }
 
+        @Override
         public int size() {
             return (int) this.count();
         }
@@ -571,6 +595,14 @@ public interface Optimisation {
         }
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
+
+    }
+
+    /**
+     * Intended as a solver data transfer type (if one solver needs to delegate to some other solver). Should
+     * be able to provide data for any problem solvable by ojAlgo solvers.
+     */
+    public interface SolverData<N extends Comparable<N>> extends ProblemStructure {
 
     }
 

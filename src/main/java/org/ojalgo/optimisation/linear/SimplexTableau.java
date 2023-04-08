@@ -40,7 +40,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.structure.Access1D;
@@ -52,7 +51,7 @@ import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
-abstract class SimplexTableau extends Primitive2D {
+abstract class SimplexTableau extends Primitive2D implements Optimisation.SolverData<Double> {
 
     static final class DenseRawTableau extends DenseTableau {
 
@@ -680,6 +679,13 @@ abstract class SimplexTableau extends Primitive2D {
 
     }
 
+    @FunctionalInterface
+    interface SimplexTableauFactory<T extends SimplexTableau> {
+
+        T make(int nbConstraints, int nbPosVars, int nbNegVars, int nbSlackVars, int nbIdentityVars, boolean needDual);
+
+    }
+
     static final class SparseTableau extends SimplexTableau {
 
         private double myInfeasibility = ZERO;
@@ -1102,6 +1108,10 @@ abstract class SimplexTableau extends Primitive2D {
         return tableau;
     }
 
+    static DenseTransposedTableau newDense(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(DenseTransposedTableau::new);
+    }
+
     static SimplexTableau newDense(final OptimisationData matrices) {
 
         SimplexTableau tableau = new DenseTransposedTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
@@ -1109,6 +1119,14 @@ abstract class SimplexTableau extends Primitive2D {
         SimplexTableau.copy(matrices, tableau);
 
         return tableau;
+    }
+
+    static DenseRawTableau newRaw(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(DenseRawTableau::new);
+    }
+
+    static SparseTableau newSparse(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(SparseTableau::new);
     }
 
     static SparseTableau newSparse(final OptimisationData matrices) {
@@ -1144,34 +1162,55 @@ abstract class SimplexTableau extends Primitive2D {
 
     /**
      * @param nbConstraints The number of constraints.
-     * @param nbPositiveProblemVariables The number of positive problem variables.
-     * @param nbNegativeProblemVariables The number of negative problem variables.
-     * @param nbSlackVariables The number of slack variables (the number of inequality constraints). The
+     * @param nbPosVars The number of positive problem variables.
+     * @param nbNegVars The number of negative problem variables.
+     * @param nbSlackVars The number of slack variables (the number of inequality constraints). The
      *        actual/full set of slack variables is nbSlackVariables + nbIdentitySlackVariables
-     * @param nbIdentitySlackVariables The number of slack variables that form an identity matrix and can
-     *        reduce the need for artificial variables. If this is != 0 the nbSlackVariables must be reduced
-     *        and the constraints corresponding to these slack variables must be the top/first rows in the
-     *        tableau.
+     * @param nbIdentityVars The number of slack variables that form an identity matrix and can reduce the
+     *        need for artificial variables. If this is != 0 the nbSlackVariables must be reduced and the
+     *        constraints corresponding to these slack variables must be the top/first rows in the tableau.
      * @param needDual Should there be an explicit full set of artificial variables? (to extract the dual). If
      *        this is set to true and nbIdentitySlackVariables > 0 then special care needs to taken when
      *        constructing the tableau. In that case the identity slack variables and the artificial variables
      *        must form an identity matrix in the initial tableau (towards the right hand side).
      */
-    SimplexTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-            final int nbIdentitySlackVariables, final boolean needDual) {
+    SimplexTableau(final int nbConstraints, final int nbPosVars, final int nbNegVars, final int nbSlackVars, final int nbIdentityVars, final boolean needDual) {
 
         super();
 
         myNumberOfConstraints = nbConstraints;
-        myNumberOfProblemVariables = nbPositiveProblemVariables + nbNegativeProblemVariables;
-        myNumberOfSlackVariables = nbSlackVariables;
-        myNumberOfIdentitySlackVariables = nbIdentitySlackVariables;
-        myNumberOfArtificialVariables = needDual ? nbConstraints - nbIdentitySlackVariables : 0;
+        myNumberOfProblemVariables = nbPosVars + nbNegVars;
+        myNumberOfSlackVariables = nbSlackVars;
+        myNumberOfIdentitySlackVariables = nbIdentityVars;
+        myNumberOfArtificialVariables = needDual ? nbConstraints - nbIdentityVars : 0;
 
         mySelector = new IndexSelector(this.countVariables());
         myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
 
-        meta = new MetaData(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables + nbIdentitySlackVariables);
+        meta = new MetaData(nbConstraints, nbPosVars, nbNegVars, nbSlackVars + nbIdentityVars);
+    }
+
+    public int countAdditionalConstraints() {
+        return 0;
+    }
+
+    public int countConstraints() {
+        return myNumberOfConstraints;
+    }
+
+    public int countEqualityConstraints() {
+        return myNumberOfConstraints;
+    }
+
+    public int countInequalityConstraints() {
+        return 0;
+    }
+
+    /**
+     * problem + slack
+     */
+    public int countVariables() {
+        return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
     }
 
     /**
@@ -1223,10 +1262,6 @@ abstract class SimplexTableau extends Primitive2D {
         return myNumberOfConstraints - mySelector.countIncluded();
     }
 
-    int countConstraints() {
-        return myNumberOfConstraints;
-    }
-
     int countIdentitySlackVariables() {
         return myNumberOfIdentitySlackVariables;
     }
@@ -1237,13 +1272,6 @@ abstract class SimplexTableau extends Primitive2D {
 
     int countSlackVariables() {
         return myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
-    }
-
-    /**
-     * problem + slack
-     */
-    int countVariables() {
-        return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
     }
 
     /**

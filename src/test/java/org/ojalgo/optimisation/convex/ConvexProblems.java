@@ -1325,16 +1325,14 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     /**
      * <p>
-     * I tried to use ojAlgo to implement a norm minimization problem, but the solver fails even for very
-     * simple instances. The following example is one particular simple instance. Q is the identity matrix, C
-     * the zero vector. The constraints express that the solution is a probability function (AE for
-     * normalization and AI for non-negativity). Q is positive definite and the solution should be (0.5, 0.5),
-     * but qSolver fails.
-     * </p>
+     * Original problem report: I tried to use ojAlgo to implement a norm minimization problem, but the solver
+     * fails even for very simple instances. The following example is one particular simple instance. Q is the
+     * identity matrix, C the zero vector. The constraints express that the solution is a probability function
+     * (AE for normalization and AI for non-negativity). Q is positive definite and the solution should be
+     * (0.5, 0.5), but qSolver fails.
      * <p>
-     * apete: The problem was incorrectly specified with a transposed "C" vector. Modified the builder to
-     * actually throw an exception.
-     * </p>
+     * apete: The way things are currently implemented, transposing C or not doesn't matter. This test
+     * verifies that.
      */
     @Test
     public void testP20140109() {
@@ -1348,31 +1346,23 @@ public class ConvexProblems extends OptimisationConvexTests {
         Primitive64Store tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { -1, 0 }, { 0, -1 } });
         Primitive64Store tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0 }, { 0 } });
 
-        try {
+        ConvexSolver transposedSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
-            ConvexSolver qSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        ArrayR064 expected = ArrayR064.wrap(0.5, 0.5);
 
-            // qSolver.options.debug(ConvexSolver.class);
+        Optimisation.Result actual = transposedSolver.solve();
 
-            Optimisation.Result tmpResult = qSolver.solve();
-
-            // Shouldn't get this far. There should be an exception
-            TestUtils.assertStateLessThanFeasible(tmpResult);
-            TestUtils.fail();
-
-        } catch (Exception exception) {
-            TestUtils.assertTrue("Yes!", true);
-        }
+        TestUtils.assertStateNotLessThanOptimal(actual);
+        TestUtils.assertEquals(expected, actual);
 
         // ... and check that the correctly defined problem does solve.
 
-        ConvexSolver tmpCorrectSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        ConvexSolver correctSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
-        Optimisation.Result tmpResult = tmpCorrectSolver.solve();
+        actual = correctSolver.solve();
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(ArrayR064.wrap(0.5, 0.5), tmpResult);
-
+        TestUtils.assertStateNotLessThanOptimal(actual);
+        TestUtils.assertEquals(expected, actual);
     }
 
     /**

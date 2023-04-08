@@ -23,7 +23,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.function
 
-- Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implemenations. Proper `Quadruple` implementations can be done later.
+- Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implementations. Proper `Quadruple` implementations can be done later.
 - New `BigMath` constants `SMALLEST_POSITIVE_INFINITY` and `SMALLEST_NEGATIVE_INFINITY`.
 
 #### org.ojalgo.machine
@@ -33,7 +33,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - All sorts of additions – many many – to fully support the new `Quadruple` element type.
-- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renamed copies of the old.
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
 - Modified LDL (Cholesky) decomposition – set a threshold value on the diagonal elements while decomposing.
 - New interface `InvertibleFactor` that represent chainable and reversible in-place (equation system) solvers. Suitable for product form representation. The `MatrixDecomposition.Solver` interface now extends this new interface. That means it is now also possible to solve the transposed system (or solve from the left).
 - `RowsSupplier` and `ColumnsSupplier` now implements `MatrixStore` and `Mutate2D` rather than just `Access2D` and `ElementsSupplier`.
@@ -41,16 +41,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
-- New structure in `Optimisation.Options`. Options for the LP- and QP-solversare are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
+- New structure in `Optimisation.Options`. Options for the LP- and QP-solvers are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
 - `OptimisationData`: This class existed before but was package private. It is used as the underlying data of the solver builders, and as a solver data interchange format.
+- New exprimental extended precision `ConvexSolver`. It's implemented using the `Quadruple` and iteratively solves a sequence of refined (zoomed and scaled) QP problems. This enables to correctly/exactly solve problems with very detailed/accurate constraints.
+- New set of `LinearSolver` implementations meant to replace the existing ones. This already works better than the old/existing ones in many ways, but does not yet have all the features required to replace them. For now add the `LinearSolver#NEW_INTEGRATION` if yo want o to use this. (For pure LP this new solver scales better, but as a subsolver for MIP it lacks features.)
 
 #### org.ojalgo.scalar
 
-- New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s
+- New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s.
 
 #### org.ojalgo.structure
 
-- `Factory1D`, `Factory2D` and `FactoryAnyD` instances now have to declare what MathType the structures they create contains. The factory implementations noew have a `getMathType` method.
+- `Factory1D`, `Factory2D` and `FactoryAnyD` instances now have to declare what MathType the structures they create contains. The factory implementations now have a `getMathType` method.
 - Added the ability to get/set values of 1D- and 2D-data structure using `Keyed1D` and `Keyed2D`. Using `IndexMapper` to map back and forth between an index and a key of any type.
 
 ### Changed
@@ -68,7 +70,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Changes to how parameter scaling is done.
 - When constructing convex (QP) solver, simple variable bounds are no longer scaled.
-- It is now possible to extract both adjusted and unadjusted model parameters as `BigDecimal`. This is to allow individual solver integrations to do type convertion to different types without intermediate loss of precision.
+- It is now possible to extract both adjusted and unadjusted model parameters as `BigDecimal`. This is to allow individual solver integrations to do type conversion to different types without intermediate loss of precision.
 - Modified the EBM file format to also include known variable values. Format (reader/writer) compatible with both old and new variants.
 - Refactoring of the `ConvexSolver` class hierarchy. In particular with the `ActiveSetSolver` there should now be a lot less copying of data.
 - There used to be 2 different `NumberContext`:s used for print/display/toString formatting in `ExpressionsBasesModel`. Now there is only one. The configurable `Optimisation.Options.print` value, and the default value is `NumberContext.of(8)`.
@@ -83,7 +85,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprected. The new ones are purely renmed copies of the old.
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
 - Various factories have been renamed.
 
 #### org.ojalgo.optimisation
@@ -103,7 +105,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
-- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered (correctly) althought the decomposition instance reported they should be.
+- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered (correctly) although the decomposition instance reported they should be.
 - The `reconstruct()` methods of the `LU` and `LDL` decompositions did not correctly handle pivoting, resulting in incorrect reconstructed matrices.
 
 ## [52.0.1] – 2022-10-20

@@ -198,7 +198,7 @@ final class IterativeASS extends ActiveSetSolver {
      */
     private final SchurComplementSolver myS;
 
-    IterativeASS(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    IterativeASS(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
         super(convexSolverBuilder, optimisationOptions);
 

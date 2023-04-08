@@ -108,7 +108,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      *
      * @author apete
      */
-    public static final class Description {
+    public static final class Description implements ProblemStructure {
 
         public final int nbEqualityBounds;
         public final int nbEqualityConstraints;
@@ -140,11 +140,24 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             nbVariables = varTotal;
         }
 
-        /**
-         * The total number of constraints
-         */
-        public int constraints() {
+        public int countAdditionalConstraints() {
+            return 0;
+        }
+
+        public int countConstraints() {
             return nbEqualityConstraints + nbLowerConstraints + nbUpperConstraints;
+        }
+
+        public int countEqualityConstraints() {
+            return nbEqualityBounds;
+        }
+
+        public int countInequalityConstraints() {
+            return nbLowerConstraints + nbUpperConstraints;
+        }
+
+        public int countVariables() {
+            return nbVariables;
         }
 
     }

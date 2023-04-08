@@ -42,7 +42,7 @@ final class QPESolver extends ConstrainedSolver {
     private boolean myFeasible = false;
     private final Primitive64Store myIterationX;
 
-    QPESolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    QPESolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
         super(convexSolverBuilder, optimisationOptions);
 

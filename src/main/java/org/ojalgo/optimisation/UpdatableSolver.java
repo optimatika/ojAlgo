@@ -87,4 +87,17 @@ public interface UpdatableSolver extends Optimisation.Solver {
 
     UpdatableSolver.EntityMap getEntityMap();
 
+    /**
+     * A generalisation of {@link #fixVariable(int, double)} where the new/updated lower and upper bounds do
+     * not need to be equal.
+     *
+     * @param index The, solver specific, variable index
+     * @param lower New lower bound
+     * @param upper New upper bound
+     * @return true if updating the range is supported and was successful, otherwise false
+     */
+    default boolean updateRange(final int index, final double lower, double upper) {
+        return false;
+    }
+
 }

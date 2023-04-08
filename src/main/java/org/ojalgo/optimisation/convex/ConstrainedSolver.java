@@ -27,12 +27,12 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+abstract class ConstrainedSolver extends BasePrimitiveSolver {
 
     private final Primitive64Store mySlackE;
     private final Primitive64Store mySolutionL;
 
-    protected ConstrainedSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    protected ConstrainedSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
         super(convexSolverBuilder, optimisationOptions);
 

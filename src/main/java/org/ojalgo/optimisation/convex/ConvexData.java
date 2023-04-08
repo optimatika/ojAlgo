@@ -31,6 +31,13 @@ import org.ojalgo.structure.Access2D.RowView;
 
 final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
 
+    @FunctionalInterface
+    interface ConvexDataFactory<N extends Comparable<N>> {
+
+        ConvexData<N> newInstance(int nbVars, int nbEqus, int nbIneq);
+
+    }
+
     private final RowsSupplier<N> myAE;
     private final RowsSupplier<N> myAI;
     private final PhysicalStore<N> myBE;
@@ -53,7 +60,6 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
     }
 
     public int countAdditionalConstraints() {
-        // TODO Auto-generated method stub
         return 0;
     }
 

@@ -41,7 +41,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
-    private static final NumberContext SOLUTION = NumberContext.of(6, 4).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext SOLUTION = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext FEASIBILITY = NumberContext.of(12, 8);
 
     private final IndexSelector myActivator;
@@ -53,7 +53,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private boolean myShrinkSwitch = true;
     private final Primitive64Store mySlackI;
 
-    ActiveSetSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    ActiveSetSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
         super(convexSolverBuilder, optimisationOptions);
 

@@ -28,21 +28,13 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.structure.Access2D.RowView;
 
 /**
- * Should be able to define data for any problem solvable ojAlgo solvers.
+ * Should be able to provide data for any problem solvable by ojAlgo solvers.
  *
  * @author apete
+ * @deprecated Use {@link Optimisation.SolverData} instead.
  */
-public interface OptimisationData<N extends Comparable<N>> extends Optimisation {
-
-    int countAdditionalConstraints();
-
-    int countConstraints();
-
-    int countEqualityConstraints();
-
-    int countInequalityConstraints();
-
-    int countVariables();
+@Deprecated
+public interface OptimisationData<N extends Comparable<N>> extends Optimisation.SolverData<N> {
 
     /**
      * Equality constraints body: [AE][X] == [BE]

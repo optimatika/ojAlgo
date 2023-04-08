@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
@@ -30,18 +31,16 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
@@ -50,14 +49,11 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.OptimisationData;
-import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
@@ -93,7 +89,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
+public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
@@ -154,6 +150,29 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
+        public Builder equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
+            return super.equalities(mtrxAE, mtrxBE);
+        }
+
+        @Override
+        public Builder equality(final double rhs, final double... factors) {
+            return super.equality(rhs, factors);
+        }
+
+        @Override
+        public ConvexObjectiveFunction<Double> getObjective() {
+            ConvexObjectiveFunction<Double> retVal = this.getObjective(ConvexObjectiveFunction.class);
+            if (retVal == null) {
+                int nbVariables = this.countVariables();
+                PhysicalStore<Double> mtrxQ = this.getFactory().make(nbVariables, nbVariables);
+                PhysicalStore<Double> mtrxC = this.getFactory().make(nbVariables, 1);
+                retVal = new ConvexObjectiveFunction<>(mtrxQ, mtrxC);
+                super.setObjective(retVal);
+            }
+            return retVal;
+        }
+
+        @Override
         public Builder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
             return super.inequalities(mtrxAI, mtrxBI);
         }
@@ -175,7 +194,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          * Set the linear part of the objective function
          */
         public Builder linear(final double... factors) {
-            this.getObjective().linear().fillMatching(FACTORY.column(factors));
+            this.getObjective().linear().fillMatching(this.getFactory().column(factors));
             return this;
         }
 
@@ -200,13 +219,13 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
          *             {@link LinearSolver}.
          */
         @Deprecated
-        public Builder objective(final MatrixStore<Double> mtrxC) {
-            this.setObjective(ConvexSolver.toObjectiveFunction(null, mtrxC));
+        public Builder objective(final MatrixStore<?> mtrxC) {
+            this.setObjective(BasePrimitiveSolver.toObjectiveFunction(null, mtrxC));
             return this;
         }
 
-        public Builder objective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
-            this.setObjective(ConvexSolver.toObjectiveFunction(mtrxQ, mtrxC));
+        public Builder objective(final MatrixStore<?> mtrxQ, final MatrixStore<?> mtrxC) {
+            this.setObjective(BasePrimitiveSolver.toObjectiveFunction(mtrxQ, mtrxC));
             return this;
         }
 
@@ -317,16 +336,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         @Override
         protected ConvexSolver doBuild(final Optimisation.Options options) {
 
-            if (this.countInequalityConstraints() > 0) {
-                if (options.sparse == null || options.sparse.booleanValue()) {
-                    return new IterativeASS(this, options);
-                } else {
-                    return new DirectASS(this, options);
-                }
-            } else if (this.countEqualityConstraints() > 0) {
-                return new QPESolver(this, options);
+            if (options.convex().isExtendedPrecision()) {
+
+                ConvexData<Quadruple> data = this.getConvexData(GenericStore.R128);
+                return new IterativeRefinementSolver(options, data);
+
             } else {
-                return new UnconstrainedSolver(this, options);
+
+                ConvexData<Double> data = this.getConvexData(Primitive64Store.FACTORY);
+                return BasePrimitiveSolver.newSolver(data, options);
             }
         }
 
@@ -338,21 +356,32 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return this.getObjective().linear();
         }
 
-        protected ConvexObjectiveFunction getObjective() {
-            ConvexObjectiveFunction retVal = this.getObjective(ConvexObjectiveFunction.class);
-            if (retVal == null) {
-                int nbVariables = this.countVariables();
-                Primitive64Store mtrxQ = FACTORY.make(nbVariables, nbVariables);
-                Primitive64Store mtrxC = FACTORY.make(nbVariables, 1);
-                retVal = new ConvexObjectiveFunction(mtrxQ, mtrxC);
-                super.setObjective(retVal);
-            }
-            return retVal;
-        }
+        protected <N extends Comparable<N>> ConvexData<N> getConvexData(final PhysicalStore.Factory<N, ?> factory) {
 
-        @Override
-        protected OptimisationData getOptimisationData() {
-            return super.getOptimisationData();
+            int nbVars = this.countVariables();
+            int nbEqus = this.countEqualityConstraints();
+            int nbIneq = this.countInequalityConstraints();
+
+            ConvexData<N> retVal = new ConvexData<>(factory, nbVars, nbEqus, nbIneq);
+
+            retVal.getObjective().linear().fillMatching(this.getObjective().linear());
+            retVal.getObjective().quadratic().fillMatching(this.getObjective().quadratic());
+
+            for (int i = 0; i < nbEqus; i++) {
+                for (NonzeroView<Double> nz : this.getAE(i).nonzeros()) {
+                    retVal.setAE(i, (int) nz.index(), nz.doubleValue());
+                }
+                retVal.setBE(i, this.getBE(i));
+            }
+
+            for (int i = 0; i < nbIneq; i++) {
+                for (NonzeroView<Double> nz : this.getAI(i).nonzeros()) {
+                    retVal.setAI(i, (int) nz.index(), nz.doubleValue());
+                }
+                retVal.setBI(i, this.getBI(i));
+            }
+
+            return retVal;
         }
 
         /**
@@ -366,10 +395,30 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static final class Configuration {
 
+        private boolean myExtendedPrecision = false;
         private NumberContext myIterative = NumberContext.of(10, 14).withMode(RoundingMode.HALF_DOWN);
         private double mySmallDiagonal = RELATIVELY_SMALL + MACHINE_EPSILON;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverGeneral = LU.R064::make;
         private Function<Structure2D, MatrixDecomposition.Solver<Double>> mySolverSPD = Cholesky.R064::make;
+
+        /**
+         * With extended precision the usual solver is wrapped by a master algorithm, implemented in
+         * {@link Quadruple} precision, that iteratively refines (zoom and shift) the problem to be solved by
+         * the delegate solver. This enables to handle constraints with very high accuracy.
+         * <p>
+         * The iterative refinement solver cannot handle general inequality constraints, only simple variable
+         * bounds (modelled as inequality constraints).
+         * <p>
+         * This is an experimental feature!
+         */
+        public Configuration extendedPrecision(final boolean extendedPrecision) {
+            myExtendedPrecision = extendedPrecision;
+            return this;
+        }
+
+        public boolean isExtendedPrecision() {
+            return myExtendedPrecision;
+        }
 
         public NumberContext iterative() {
             return myIterative;
@@ -436,15 +485,24 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<ConvexSolver> {
 
+        @Override
         public ConvexSolver build(final ExpressionsBasedModel model) {
 
-            ConvexSolver.Builder builder = ConvexSolver.newBuilder();
+            Options options = model.options;
 
-            ConvexSolver.copy(model, builder);
+            if (options.convex().isExtendedPrecision()) {
 
-            return builder.build(model.options);
+                ConvexData<Quadruple> data = ConvexSolver.copy(model, GenericStore.R128);
+                return new IterativeRefinementSolver(options, data);
+
+            } else {
+
+                ConvexData<Double> data = ConvexSolver.copy(model, Primitive64Store.FACTORY);
+                return BasePrimitiveSolver.newSolver(data, options);
+            }
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
         }
@@ -491,12 +549,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
-    private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
-    private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
-
-    static final Factory<Double, Primitive64Store> MATRIX_FACTORY = Primitive64Store.FACTORY;
-
-    public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
+    public static void copy(final ExpressionsBasedModel sourceModel, final Builder destinationBuilder) {
 
         destinationBuilder.reset();
 
@@ -521,7 +574,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 Expression expression = tmpEqExpr.get(i).compensate(fixedVariables);
 
                 for (IntIndex key : expression.getLinearKeySet()) {
-                    mtrxAE.set(i, sourceModel.indexOfFreeVariable(key.index), expression.doubleValue(key, true));
+                    mtrxAE.set(i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
                 }
 
                 mtrxBE.set(i, 0, expression.getUpperLimit(true, Double.POSITIVE_INFINITY));
@@ -543,7 +596,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 int row = sourceModel.indexOfFreeVariable(key.row);
                 int col = sourceModel.indexOfFreeVariable(key.column);
 
-                double factor = max ? -tmpObjExpr.doubleValue(key, true) : tmpObjExpr.doubleValue(key, true);
+                BigDecimal factor = max ? tmpObjExpr.get(key, true).negate() : tmpObjExpr.get(key, true);
 
                 mtrxQ.add(row, col, factor);
                 mtrxQ.add(col, row, factor);
@@ -555,11 +608,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             mtrxC = Primitive64Store.FACTORY.make(nbVariables, 1);
             if (max) {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.doubleValue(key, true));
+                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.get(key, true));
                 }
             } else {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, -tmpObjExpr.doubleValue(key, true));
+                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.get(key, true).negate());
                 }
             }
         }
@@ -640,357 +693,152 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
     }
 
+    public static <N extends Comparable<N>> ConvexData<N> copy(final ExpressionsBasedModel sourceModel, final PhysicalStore.Factory<N, ?> factory) {
+
+        List<Variable> freeVariables = sourceModel.getFreeVariables();
+        Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
+
+        int nbVariables = freeVariables.size();
+
+        List<Expression> tmpEqExpr = sourceModel.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        int nbEqExpr = tmpEqExpr.size();
+
+        List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        int nbUpExpr = tmpUpExpr.size();
+
+        List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
+        int nbUpVar = tmpUpVar.size();
+
+        List<Expression> tmpLoExpr = sourceModel.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        int nbLoExpr = tmpLoExpr.size();
+
+        List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
+        int nbLoVar = tmpLoVar.size();
+
+        // ConvexData<N> retVal = dataFactory.newInstance(nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
+        ConvexData<N> retVal = new ConvexData<>(factory, nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
+
+        // Q & C
+
+        Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
+        boolean max = sourceModel.getOptimisationSense() == Optimisation.Sense.MAX;
+        boolean didSet = false;
+
+        if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
+
+            for (IntRowColumn key : tmpObjExpr.getQuadraticKeySet()) {
+                int row = sourceModel.indexOfFreeVariable(key.row);
+                int col = sourceModel.indexOfFreeVariable(key.column);
+
+                BigDecimal factor = max ? tmpObjExpr.get(key, true).negate() : tmpObjExpr.get(key, true);
+
+                retVal.addObjective(row, col, factor);
+                retVal.addObjective(col, row, factor);
+                didSet = true;
+            }
+        }
+
+        if (tmpObjExpr.isAnyLinearFactorNonZero()) {
+
+            if (max) {
+                for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
+                    retVal.setObjective(sourceModel.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true));
+                    didSet = true;
+                }
+            } else {
+                for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
+                    retVal.setObjective(sourceModel.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true).negate());
+                    didSet = true;
+                }
+            }
+        }
+
+        if (!didSet) {
+            // In some very rare case the model was verified to be a quadratic
+            // problem, but then the presolver eliminated/fixed all variables
+            // part of the objective function - then we would end up here.
+            // Rather than always having to do very expensive checks we simply
+            // generate a well-behaved objective function here.
+            for (int ij = 0; ij < nbVariables; ij++) {
+                retVal.setObjective(ij, ij, BigMath.ONE);
+            }
+        }
+
+        // AE & BE
+
+        for (int i = 0; i < nbEqExpr; i++) {
+
+            Expression expression = tmpEqExpr.get(i).compensate(fixedVariables);
+
+            for (IntIndex key : expression.getLinearKeySet()) {
+                retVal.setAE(i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
+            }
+
+            retVal.setBE(i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
+        }
+
+        // AI & BI
+
+        int base = 0;
+
+        for (int i = 0; i < nbUpExpr; i++) {
+            Expression expression = tmpUpExpr.get(i).compensate(fixedVariables);
+            for (IntIndex key : expression.getLinearKeySet()) {
+                retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
+            }
+            retVal.setBI(base + i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
+        }
+
+        base += nbUpExpr;
+
+        for (int i = 0; i < nbUpVar; i++) {
+            Variable variable = tmpUpVar.get(i);
+            retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), ONE);
+            retVal.setBI(base + i, variable.getUpperLimit(false, BigMath.SMALLEST_POSITIVE_INFINITY));
+        }
+
+        base += nbUpVar;
+
+        for (int i = 0; i < nbLoExpr; i++) {
+            Expression expression = tmpLoExpr.get(i).compensate(fixedVariables);
+            for (IntIndex key : expression.getLinearKeySet()) {
+                retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true).negate());
+            }
+            retVal.setBI(base + i, expression.getLowerLimit(true, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
+        }
+
+        base += nbLoExpr;
+
+        for (int i = 0; i < nbLoVar; i++) {
+            Variable variable = tmpLoVar.get(i);
+            retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), NEG);
+            retVal.setBI(base + i, variable.getLowerLimit(false, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
+        }
+
+        base += nbLoVar;
+
+        return retVal;
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }
 
     public static Builder newBuilder(final Access2D<?> quadratic) {
-        ConvexSolver.Builder retVal = new ConvexSolver.Builder(quadratic.getMinDim());
+        Builder retVal = new Builder(quadratic.getMinDim());
         retVal.quadratic(quadratic);
         return retVal;
     }
 
     public static Builder newBuilder(final int nbVariables) {
-        return new ConvexSolver.Builder(nbVariables);
+        return new Builder(nbVariables);
     }
 
-    static ConvexSolver.Builder builder(final MatrixStore<Double>[] matrices) {
-        return new ConvexSolver.Builder(matrices);
-    }
-
-    static ConvexSolver of(final MatrixStore<Double>[] matrices) {
-        return ConvexSolver.builder(matrices).build();
-    }
-
-    static ConvexObjectiveFunction toObjectiveFunction(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
-
-        if (mtrxQ == null && mtrxC == null) {
-            ProgrammingError.throwWithMessage("Both parameters can't be null!");
-        }
-
-        PhysicalStore<Double> tmpQ = null;
-        PhysicalStore<Double> tmpC = null;
-
-        if (mtrxQ == null) {
-            tmpQ = Primitive64Store.FACTORY.make(mtrxC.count(), mtrxC.count());
-        } else if (mtrxQ instanceof PhysicalStore) {
-            tmpQ = (PhysicalStore<Double>) mtrxQ;
-        } else {
-            tmpQ = mtrxQ.copy();
-        }
-
-        if (mtrxC == null) {
-            tmpC = Primitive64Store.FACTORY.make(tmpQ.countRows(), 1L);
-        } else if (mtrxC instanceof PhysicalStore) {
-            tmpC = (PhysicalStore<Double>) mtrxC;
-        } else {
-            tmpC = mtrxC.copy();
-        }
-
-        return new ConvexObjectiveFunction(tmpQ, tmpC);
-    }
-
-    private final OptimisationData<Double> myMatrices;
-    private boolean myPatchedQ = false;
-    private final Primitive64Store mySolutionX;
-    private final MatrixDecomposition.Solver<Double> mySolverGeneral;
-    private final MatrixDecomposition.Solver<Double> mySolverQ;
-    private boolean myZeroQ = false;
-
-    ConvexSolver(final ConvexSolver.Builder convexSolverBuilder, final Optimisation.Options optimisationOptions) {
-
-        super(optimisationOptions);
-
-        myMatrices = convexSolverBuilder.getOptimisationData();
-
-        mySolutionX = MATRIX_FACTORY.make(this.countVariables(), 1L);
-
-        PhysicalStore<Double> mtrxQ = this.getMatrixQ();
-        Configuration convexOptions = optimisationOptions.convex();
-        mySolverQ = convexOptions.newSolverSPD(mtrxQ);
-        mySolverGeneral = convexOptions.newSolverGeneral(mtrxQ);
-    }
-
-    public void dispose() {
-
-        super.dispose();
-
-        myMatrices.reset();
-    }
-
-    public UpdatableSolver.EntityMap getEntityMap() {
-        return null;
-    }
-
-    public Optimisation.Result solve(final Optimisation.Result kickStarter) {
-
-        if (this.initialise(kickStarter)) {
-
-            this.resetIterationsCount();
-
-            if (this.isIteratingPossible()) {
-
-                do {
-
-                    this.performIteration();
-
-                } while (this.isIterationAllowed() && this.needsAnotherIteration());
-            }
-        }
-
-        return this.buildResult();
-    }
-
-    @Override
-    public String toString() {
-        return myMatrices.toString();
-    }
-
-    protected Optimisation.Result buildResult() {
-
-        Access1D<?> solution = this.extractSolution();
-        double value = this.evaluateFunction(solution);
-        Optimisation.State state = this.getState();
-
-        return new Optimisation.Result(state, value, solution);
-    }
-
-    protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        return mySolverGeneral.compute(matrix);
-    }
-
-    protected int countEqualityConstraints() {
-        return myMatrices.countEqualityConstraints();
-    }
-
-    protected int countInequalityConstraints() {
-        return myMatrices.countInequalityConstraints();
-    }
-
-    protected int countVariables() {
-        return myMatrices.countVariables();
-    }
-
-    protected double evaluateFunction(final Access1D<?> solution) {
-
-        MatrixStore<Double> tmpX = this.getSolutionX();
-
-        return tmpX.transpose().multiply(this.getMatrixQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getMatrixC())).doubleValue(0L);
-    }
-
-    protected MatrixStore<Double> extractSolution() {
-        return this.getSolutionX().copy();
-    }
-
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT();
-
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS();
-
-    protected MatrixStore<Double> getMatrixAE() {
-        return myMatrices.getAE();
-    }
-
-    protected SparseArray<Double> getMatrixAE(final int row) {
-        return myMatrices.getAE(row);
-    }
-
-    protected RowsSupplier<Double> getMatrixAE(final int[] rows) {
-        return myMatrices.getAE(rows);
-    }
-
-    protected MatrixStore<Double> getMatrixAI() {
-        return myMatrices.getAI();
-    }
-
-    protected SparseArray<Double> getMatrixAI(final int row) {
-        return myMatrices.getAI(row);
-    }
-
-    protected RowsSupplier<Double> getMatrixAI(final int[] rows) {
-        return myMatrices.getAI(rows);
-    }
-
-    protected MatrixStore<Double> getMatrixBE() {
-        return myMatrices.getBE();
-    }
-
-    protected MatrixStore<Double> getMatrixBI() {
-        return myMatrices.getBI();
-    }
-
-    protected double getMatrixBI(final int row) {
-        return myMatrices.getBI().doubleValue(row);
-    }
-
-    protected MatrixStore<Double> getMatrixBI(final int[] selector) {
-        return myMatrices.getBI().rows(selector);
-    }
-
-    protected MatrixStore<Double> getMatrixC() {
-        return myMatrices.getObjective(ConvexObjectiveFunction.class).linear();
-    }
-
-    protected PhysicalStore<Double> getMatrixQ() {
-        return myMatrices.getObjective(ConvexObjectiveFunction.class).quadratic();
-    }
-
-    protected int getRankGeneral() {
-        if (mySolverGeneral instanceof MatrixDecomposition.RankRevealing) {
-            return ((MatrixDecomposition.RankRevealing<?>) mySolverGeneral).getRank();
-        } else if (mySolverGeneral.isSolvable()) {
-            return mySolverGeneral.getColDim();
-        } else {
-            return 0;
-        }
-    }
-
-    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        return mySolverGeneral.getSolution(rhs);
-    }
-
-    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return mySolverGeneral.getSolution(rhs, preallocated);
-    }
-
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        return mySolverQ.getSolution(rhs);
-    }
-
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return mySolverQ.getSolution(rhs, preallocated);
-    }
-
-    /**
-     * Solution / Variables: [X]
-     */
-    protected PhysicalStore<Double> getSolutionX() {
-        return mySolutionX;
-    }
-
-    protected boolean hasEqualityConstraints() {
-        return myMatrices.countEqualityConstraints() > 0;
-    }
-
-    protected boolean hasInequalityConstraints() {
-        return myMatrices.countInequalityConstraints() > 0;
-    }
-
-    /**
-     * @return true/false if the main algorithm may start or not
-     */
-    protected boolean initialise(final Result kickStarter) {
-
-        PhysicalStore<Double> matrixQ = this.getMatrixQ();
-        this.setState(State.VALID);
-
-        boolean symmetric = true;
-        if (options.validate && !matrixQ.isHermitian()) {
-
-            symmetric = false;
-            this.setState(State.INVALID);
-
-            if (!this.isLogDebug()) {
-                throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
-            }
-            this.log(Q_NOT_SYMMETRIC, matrixQ);
-        }
-
-        myPatchedQ = false;
-        myZeroQ = false;
-        if (!mySolverQ.compute(matrixQ)) {
-            double largest = matrixQ.aggregateAll(Aggregator.LARGEST).doubleValue();
-            double small = options.convex().smallDiagonal();
-            if (largest > small) {
-                matrixQ.modifyDiagonal(ADD.by(small * largest));
-                mySolverQ.compute(matrixQ);
-                myPatchedQ = true;
-            } else {
-                myZeroQ = true;
-            }
-        }
-
-        boolean semidefinite = true;
-        if (options.validate && !mySolverQ.isSolvable()) {
-            // Not symmetric positive definite. Check if at least positive semidefinite.
-
-            Eigenvalue<Double> decompEvD = Eigenvalue.PRIMITIVE.make(matrixQ, true);
-            decompEvD.computeValuesOnly(matrixQ);
-            Array1D<ComplexNumber> eigenvalues = decompEvD.getEigenvalues();
-            decompEvD.reset();
-
-            for (ComplexNumber eigval : eigenvalues) {
-                if (eigval.doubleValue() < ZERO && !eigval.isSmall(TEN) || !eigval.isReal()) {
-
-                    semidefinite = false;
-                    this.setState(State.INVALID);
-
-                    if (!this.isLogDebug()) {
-                        throw new IllegalArgumentException(Q_NOT_POSITIVE_SEMIDEFINITE);
-                    }
-                    this.log(Q_NOT_POSITIVE_SEMIDEFINITE);
-                    this.log("The eigenvalues are: {}", eigenvalues);
-                }
-            }
-        }
-
-        return symmetric && semidefinite;
-    }
-
-    protected boolean isIteratingPossible() {
-        return true;
-    }
-
-    protected boolean isSolvableGeneral() {
-        return mySolverGeneral.isSolvable();
-    }
-
-    protected boolean isSolvableQ() {
-        //        double max = Math.max(RELATIVELY_SMALL, mySolverQ.getRankThreshold());
-        //        int countVariables = this.countVariables();
-        //        int countSignificant = mySolverQ.countSignificant(max);
-        //        return countVariables == countSignificant;
-        return mySolverQ.isSolvable();
-    }
-
-    protected abstract boolean needsAnotherIteration();
-
-    abstract protected void performIteration();
-
-    protected boolean solveFullKKT(final PhysicalStore<Double> preallocated) {
-        if (this.computeGeneral(this.getIterationKKT())) {
-            this.getSolutionGeneral(this.getIterationRHS(), preallocated);
-            return true;
-        }
-        if (this.isLogDebug()) {
-            this.log("KKT system unsolvable!");
-            this.log("KKT", this.getIterationKKT().collect(Primitive64Store.FACTORY));
-            this.log("RHS", this.getIterationRHS().collect(Primitive64Store.FACTORY));
-        }
-        return false;
-    }
-
-    /**
-     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}. IF
-     * the LP was solved to optimality but the Q matrix (or the entire objective function) was disregarded
-     * then the returned state will just be {@link State#FEASIBLE}.
-     */
-    protected Optimisation.Result solveLP() {
-
-        Result resultLP = LinearSolver.solve(myMatrices, options, !myZeroQ);
-
-        if (!myZeroQ && resultLP.getState().isFeasible()) {
-            return resultLP.withState(State.FEASIBLE);
-        }
-
-        return resultLP;
-    }
-
-    boolean isPatchedQ() {
-        return myPatchedQ;
-    }
-
-    boolean isZeroQ() {
-        return myZeroQ;
+    protected ConvexSolver(final Options solverOptions) {
+        super(solverOptions);
     }
 
 }
