@@ -61,10 +61,12 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         private static final long SPARSE_SEGMENTATION_LIMIT = PowerOf2.powerOfLong2(46);
 
         private final DenseArray.Factory<N> myDenseFactory;
+        private final GrowthStrategy myGrowthStrategy;
 
         Factory(final org.ojalgo.array.DenseArray.Factory<N> denseFactory) {
             super();
             myDenseFactory = denseFactory;
+            myGrowthStrategy = GrowthStrategy.newInstance(denseFactory);
         }
 
         @Override
@@ -97,19 +99,18 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             long total = StructureAnyD.count(structure);
 
-            DenseCapacityStrategy<N> strategy = this.strategy();
-
             if (total > SPARSE_SEGMENTATION_LIMIT) {
 
                 return this.makeSegmented(structure);
 
-            }
-            if (strategy.isChunked(total)) {
+            } else if (myGrowthStrategy.isChunked(total)) {
 
-                return new SparseArray<>(strategy.limit(total));
+                return new SparseArray<>(myDenseFactory, myGrowthStrategy, total);
 
+            } else {
+
+                return myDenseFactory.make(total);
             }
-            return strategy.make(total);
         }
 
         @Override
@@ -117,18 +118,11 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
 
             long total = StructureAnyD.count(structure);
 
-            DenseCapacityStrategy<N> strategy = this.strategy();
-
-            if (strategy.isSegmented(total)) {
-
-                return strategy.makeSegmented(total);
-
+            if (myGrowthStrategy.isSegmented(total)) {
+                return myDenseFactory.makeSegmented(total);
+            } else {
+                return myDenseFactory.make(total);
             }
-            return strategy.make(total);
-        }
-
-        DenseCapacityStrategy<N> strategy() {
-            return new DenseCapacityStrategy<>(myDenseFactory);
         }
 
     }

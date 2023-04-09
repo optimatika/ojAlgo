@@ -83,6 +83,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Deprecated
 
+#### org.ojalgo.array
+
+- The `limit` and `fixed` methods of `ListFactory`, `MapFactory` and `SparseFactory` is deprecated. There's been, primarily internal, refactoring of how these factories work. This is the only change to the public API.
+
 #### org.ojalgo.matrix
 
 - New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.

@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 
 /**
@@ -41,6 +42,21 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
             INDICES[i] = Uniform.randomInteger(COUNT);
         }
         Arrays.sort(INDICES);
+    }
+
+    /**
+     * Will suggest an initial capacity (for a SparseArray) given the total count.
+     */
+    static int capacity(final long count) {
+
+        double capacity = count;
+
+        while (capacity > PlainArray.MAX_SIZE) {
+            capacity = PrimitiveMath.SQRT.invoke(capacity);
+        }
+
+        capacity = PrimitiveMath.SQRT.invoke(capacity);
+        return 2 * (int) capacity;
     }
 
     static void setMultiple(final BasicArray<Double> array, final long[] indices) {
@@ -110,7 +126,7 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testSparse() {
-        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(COUNT).initial(DenseCapacityStrategy.capacity(COUNT)).make());
+        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(COUNT).initial(PrimitiveBasicArrayTest.capacity(COUNT)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);

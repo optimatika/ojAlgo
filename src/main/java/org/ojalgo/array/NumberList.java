@@ -57,9 +57,8 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
             super(denseFactory);
         }
 
-        @Override
         public NumberList<N> make() {
-            return new NumberList<>(this.getStrategy());
+            return new NumberList<>(this.getDenseFactory(), this.getGrowthStrategy());
         }
 
     }
@@ -80,27 +79,23 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     private long myActualCount;
+    private final DenseArray.Factory<N> myDenseFactory;
+    private final GrowthStrategy myGrowthStrategy;
     private BasicArray<N> myStorage;
-    private final DenseCapacityStrategy<N> myStrategy;
 
-    NumberList(final BasicArray<N> storage, final DenseCapacityStrategy<N> strategy, final long actualCount) {
+    NumberList(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy) {
+        this(denseFactory, growthStrategy, growthStrategy.makeInitial(denseFactory), 0L);
+    }
+
+    NumberList(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy, final BasicArray<N> storage, final long actualCount) {
 
         super();
 
-        myStrategy = strategy;
+        myDenseFactory = denseFactory;
+        myGrowthStrategy = growthStrategy;
 
         myStorage = storage;
         myActualCount = actualCount;
-    }
-
-    NumberList(final DenseCapacityStrategy<N> strategy) {
-
-        super();
-
-        myStrategy = strategy;
-
-        myStorage = strategy.makeInitial();
-        myActualCount = 0L;
     }
 
     public boolean add(final double element) {
@@ -409,7 +404,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     @Override
     public NumberList<N> subList(final int fromIndex, final int toIndex) {
-        final NumberList<N> retVal = new NumberList<>(myStrategy);
+        final NumberList<N> retVal = new NumberList<>(myDenseFactory, myGrowthStrategy);
         if (myStorage instanceof ArrayR064) {
             for (int i = 0; i < toIndex; i++) {
                 retVal.add(this.doubleValue(i));
@@ -455,22 +450,23 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         if (myStorage.count() > myActualCount) {
             // It fits, just add to the end
 
-        } else if (myStrategy.isSegmented(myActualCount + 1L)) {
+        } else if (myGrowthStrategy.isSegmented(myActualCount + 1L)) {
             // Doesn't fit, create or grow segment, then add
 
             if (myStorage instanceof SegmentedArray) {
                 myStorage = ((SegmentedArray<N>) myStorage).grow();
             } else {
-                myStorage = myStrategy.makeSegmented(myStorage);
+                myStorage = myDenseFactory.wrapAsSegments(myStorage, myGrowthStrategy.makeChunk(myDenseFactory));
             }
+
         } else {
             // Doesn't fit, grow, then add
 
-            final long tmoNewTotalCount = myStrategy.grow(myActualCount);
+            long newTotalCount = myGrowthStrategy.grow(myActualCount);
 
-            final BasicArray<N> tmpStorage = myStrategy.make(tmoNewTotalCount);
-            tmpStorage.fillMatching(myStorage);
-            myStorage = tmpStorage;
+            BasicArray<N> newStorage = myDenseFactory.make(newTotalCount);
+            newStorage.fillMatching(myStorage);
+            myStorage = newStorage;
         }
     }
 
