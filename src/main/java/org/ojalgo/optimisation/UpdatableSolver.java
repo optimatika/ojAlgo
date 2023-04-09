@@ -41,7 +41,7 @@ public interface UpdatableSolver extends Optimisation.Solver {
          * artificial variables.) This defines the range of the indices that can be used with the indexOf
          * method.
          */
-        int countVariables();
+        int countModelVariables();
 
         /**
          * Returns which model entity, and constraint type, that corresponsf to the slack variable at the

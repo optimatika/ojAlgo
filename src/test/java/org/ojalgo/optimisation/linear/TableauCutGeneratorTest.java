@@ -101,7 +101,7 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     @Test
     public void testCompareMixedIntegerWithStandard() {
 
-        double[] body = new double[] { 1.0, 0.3, 0.8 };
+        double[] body = { 1.0, 0.3, 0.8 };
         double rhs = 3.4;
 
         Equation gomory = TableauCutGeneratorTest.generateGomory(rhs, body);
@@ -134,7 +134,7 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         NumberContext accuracy = NumberContext.of(7);
 
-        Variable[] variables = new Variable[] { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
+        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
                 new Variable("x2014").lower(BigMath.ZERO).integer() };
 
         ExpressionsBasedModel originalModel = new ExpressionsBasedModel(variables);

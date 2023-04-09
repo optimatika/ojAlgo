@@ -25,7 +25,9 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.Collection;
 
+import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Access2D;
@@ -295,12 +297,11 @@ abstract class SimplexSolver extends LinearSolver {
         super(solverOptions);
         mySimplex = simplexStore;
         mySolutionShift = new double[simplexStore.n];
-        n = simplexStore.n - simplexStore.structure().nbArtiVars;
+        n = simplexStore.n - simplexStore.structure().nbVarsArt;
     }
 
     public EntityMap getEntityMap() {
-        // TODO Auto-generated method stub
-        return null;
+        return mySimplex.meta;
     }
 
     private double[] extractSolution() {
@@ -1031,6 +1032,10 @@ abstract class SimplexSolver extends LinearSolver {
     void switchToPhase2() {
         mySimplex.restoreObjective();
         mySimplex.calculateIteration();
+    }
+
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+        return mySimplex.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
 }

@@ -38,10 +38,8 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.OptimisationData;
-import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
@@ -49,7 +47,6 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.EntryPair;
 
 abstract class SimplexTableau extends Primitive2D implements Optimisation.SolverData<Double> {
 
@@ -615,70 +612,6 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
     }
 
-    static final class MetaData implements UpdatableSolver.EntityMap {
-
-        final boolean[] negatedDual;
-        final int[] negativePartVariables;
-        final int[] positivePartVariables;
-        final EntryPair<ModelEntity<?>, ConstraintType>[] slack;
-
-        MetaData(final int nbConstr, final int nbPos, final int nbNeg, final int nbSlack) {
-            positivePartVariables = new int[nbPos];
-            negativePartVariables = new int[nbNeg];
-            slack = (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbSlack];
-            negatedDual = new boolean[nbConstr];
-        }
-
-        public int countSlackVariables() {
-            return slack.length;
-        }
-
-        public int countVariables() {
-            return positivePartVariables.length + negativePartVariables.length;
-        }
-
-        public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
-            return slack[idx];
-        }
-
-        public int indexOf(final int idx) {
-
-            if (idx < 0) {
-                throw new IllegalArgumentException();
-            }
-
-            if (idx < positivePartVariables.length) {
-                return positivePartVariables[idx];
-            }
-
-            int negIdx = idx - positivePartVariables.length;
-
-            if (negIdx < negativePartVariables.length) {
-                return negativePartVariables[negIdx];
-            }
-
-            return -1;
-        }
-
-        public boolean isNegated(final int idx) {
-
-            if (idx < 0) {
-                throw new IllegalArgumentException();
-            }
-
-            if (idx < positivePartVariables.length) {
-                return false;
-            }
-
-            if (idx - positivePartVariables.length < negativePartVariables.length) {
-                return true;
-            }
-
-            return false;
-        }
-
-    }
-
     @FunctionalInterface
     interface SimplexTableauFactory<T extends SimplexTableau> {
 
@@ -1158,7 +1091,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
     private transient Primitive1D myObjective = null;
     private final IndexSelector mySelector;
 
-    final MetaData meta;
+    final LinearStructure meta;
 
     /**
      * @param nbConstraints The number of constraints.
@@ -1187,7 +1120,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         mySelector = new IndexSelector(this.countVariables());
         myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
 
-        meta = new MetaData(nbConstraints, nbPosVars, nbNegVars, nbSlackVars + nbIdentityVars);
+        meta = new LinearStructure(0, 0, nbConstraints, nbPosVars, nbNegVars, nbSlackVars + nbIdentityVars, myNumberOfArtificialVariables);
     }
 
     public int countAdditionalConstraints() {
@@ -1307,12 +1240,16 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
     abstract boolean fixVariable(final int index, final double value);
 
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+
+        // BasicLogger.debug("{} {} {}", Arrays.toString(integer), accuracy, fractionality);
 
         int nbConstraints = this.countConstraints();
         int nbProblemVariables = this.countProblemVariables();
 
-        Primitive1D constraintsRHS = this.sliceConstraintsRHS();
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
+        // BasicLogger.debug("{}x{}: {}", nbConstraints, nbProblemVariables, constraintsRHS);
 
         List<Equation> retVal = new ArrayList<>();
 

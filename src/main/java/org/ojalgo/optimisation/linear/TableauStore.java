@@ -23,15 +23,20 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.context.NumberContext;
 
 final class TableauStore extends SimplexStore implements Access2D<Double> {
 
@@ -58,10 +63,10 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     private final double[][] myTableau;
 
     TableauStore(final int mm, final int nn) {
-        this(new SimplexStructure(mm, nn));
+        this(new LinearStructure(mm, nn));
     }
 
-    TableauStore(final SimplexStructure structure) {
+    TableauStore(final LinearStructure structure) {
 
         super(structure);
 
@@ -165,7 +170,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public int size() {
-                return TableauStore.this.structure().nbProbVars;
+                return TableauStore.this.structure().countModelVariables();
             }
 
         };
@@ -372,6 +377,66 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
     void set(final int row, final int col, final double value) {
         myTableau[row][col] = value;
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+
+        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+
+        // BasicLogger.debug("{} {} {}", Arrays.toString(integer), accuracy, fractionality);
+
+        int nbConstraints = this.countConstraints();
+        int nbProblemVariables = meta.countModelVariables();
+
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
+        // BasicLogger.debug("{}x{}: {}", nbConstraints, nbProblemVariables, constraintsRHS);
+
+        List<Equation> retVal = new ArrayList<>();
+
+        for (int i = 0; i < nbConstraints; i++) {
+            int variableIndex = this.getBasisColumnIndex(i);
+
+            double rhs = constraintsRHS.doubleValue(i);
+
+            if (variableIndex >= 0 && variableIndex < nbProblemVariables && integer[variableIndex] && !accuracy.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), variableIndex, rhs, integer, fractionality);
+
+                if (maybe != null) {
+                    retVal.add(maybe);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    int getBasisColumnIndex(final int basisRowIndex) {
+        return included[basisRowIndex];
+    }
+
+    Primitive1D sliceBodyRow(final int row) {
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return TableauStore.this.doubleValue(row, index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                TableauStore.this.set(row, index, value);
+            }
+
+            @Override
+            public int size() {
+                return TableauStore.this.countVariables();
+            }
+
+        };
     }
 
 }

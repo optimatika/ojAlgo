@@ -44,7 +44,6 @@ import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.SimplexStore.SimplexStructure;
 import org.ojalgo.optimisation.linear.SimplexTableau.SimplexTableauFactory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -371,7 +370,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.getUpperBounds(POSITIVE_INFINITY).data;
         }
 
-        <S extends SimplexStore> S newSimplexStore(final Function<SimplexStructure, S> storeFactory, final int... basis) {
+        <S extends SimplexStore> S newSimplexStore(final Function<LinearStructure, S> storeFactory, final int... basis) {
 
             MatrixStore<Double> builderC = this.getObjective().getLinearFactors(false);
             MatrixStore<Double> builderAE = this.getAE();
@@ -390,7 +389,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbSlckVars = nbUpConstr + nbLoConstr;
             int nbArtiVars = (basis.length == (nbUpConstr + nbLoConstr + nbEqConstr)) ? 0 : nbEqConstr;
 
-            SimplexStructure structure = new SimplexStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, nbSlckVars, nbArtiVars);
+            LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
 
             S simplex = storeFactory.apply(structure);
 

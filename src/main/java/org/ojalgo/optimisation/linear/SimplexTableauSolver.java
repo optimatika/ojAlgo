@@ -136,11 +136,11 @@ abstract class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
-    public Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
         return myTableau.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
-    public SimplexTableau.MetaData getEntityMap() {
+    public LinearStructure getEntityMap() {
         return myTableau.meta;
     }
 

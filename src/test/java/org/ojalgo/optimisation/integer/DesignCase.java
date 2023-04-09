@@ -40,6 +40,15 @@ import org.ojalgo.type.context.NumberContext;
 
 public class DesignCase extends OptimisationIntegerTests {
 
+    public static ExpressionsBasedModel makeBranchAndCutSimpleExampleModel() {
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable x1 = model.newVariable("x1").integer(true).lower(0).weight(-6);
+        Variable x2 = model.newVariable("x2").integer(true).lower(0).weight(-5);
+        model.addExpression().upper(11).set(x1, 3).set(x2, 1);
+        model.addExpression().upper(5).set(x1, -1).set(x2, 2);
+        return model;
+    }
+
     /**
      * Test based on exaple from IE 511: Integer Programming, Spring 2021 22 Apr, 2021 Lecture 25: Mixed
      * Integer Cuts Lecturer: Karthik Chandrasekaran Scribe: Karthik
@@ -82,7 +91,7 @@ public class DesignCase extends OptimisationIntegerTests {
 
     /**
      * Test based on a simple example in Branch-and-Cut Algorithms for Combinatorial Optimization Problems1
-     * John E. Mitchell2 Mathematical Sciences Rensselaer Polytechnic Institute Troy, NY, USA email:
+     * John E. Mitchell Mathematical Sciences Rensselaer Polytechnic Institute Troy, NY, USA email:
      * mitchj@rpi.edu http://www.math.rpi.edu/ ̃mitchj April 19, 1999, revised September 7, 1999.
      * <p>
      * bc_hao.pdf
@@ -91,18 +100,14 @@ public class DesignCase extends OptimisationIntegerTests {
     public void testBranchAndCutSimpleExample() {
 
         // Eg0
-        ExpressionsBasedModel mEg0 = new ExpressionsBasedModel();
-        Variable x1 = mEg0.newVariable("x1").integer(true).lower(0).weight(-6);
-        Variable x2 = mEg0.newVariable("x2").integer(true).lower(0).weight(-5);
-        mEg0.addExpression().upper(11).set(x1, 3).set(x2, 1);
-        mEg0.addExpression().upper(5).set(x1, -1).set(x2, 2);
+        ExpressionsBasedModel mEg0 = DesignCase.makeBranchAndCutSimpleExampleModel();
 
         Result expEg0 = Result.of(-28, State.OPTIMAL, 3.0, 2.0);
 
         // First test if the GomorySolver can solve this
         GomorySolver sEg0 = new GomorySolver(mEg0);
         if (DEBUG) {
-            sEg0.options.debug(Optimisation.Solver.class);
+            sEg0.options.debug(GomorySolver.class);
         }
         Result actEg0 = sEg0.solve();
         TestUtils.assertStateAndSolution(expEg0, actEg0, NumberContext.of(11));

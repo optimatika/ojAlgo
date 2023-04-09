@@ -74,6 +74,10 @@ abstract class TableauCutGenerator {
     static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer,
             final double fractionality) {
 
+        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+
+        // BasicLogger.debug(1, "{} {} -> {} {} {}", body, variableIndex, rhs, Arrays.toString(integer), fractionality);
+
         int nbVariables = body.size();
 
         double f0 = TableauCutGenerator.fraction(rhs);
