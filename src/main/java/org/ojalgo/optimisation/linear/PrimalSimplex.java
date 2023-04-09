@@ -36,7 +36,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
@@ -56,7 +55,7 @@ final class PrimalSimplex extends SimplexTableauSolver {
         int nbInes = convex.countInequalityConstraints();
 
         SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars, 0, nbInes, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -491,7 +490,7 @@ final class PrimalSimplex extends SimplexTableauSolver {
         int nbInes = convex.countInequalityConstraints();
 
         SimplexTableau retVal = SimplexTableau.make(nbEqus + nbInes, nbVars + nbVars, 0, nbInes, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -631,7 +630,7 @@ final class PrimalSimplex extends SimplexTableauSolver {
 
         SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars, needDuals,
                 model.options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
         Primitive1D retObjective = retVal.objective();

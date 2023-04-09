@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.OptimisationData;
-import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
@@ -49,7 +48,7 @@ final class DualSimplex extends SimplexTableauSolver {
         int nbConstraints = nbVars;
 
         SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, 0, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
@@ -109,7 +108,7 @@ final class DualSimplex extends SimplexTableauSolver {
         int nbInes = convex.countInequalityConstraints();
 
         SimplexTableau retVal = SimplexTableau.make(nbVars, nbEqus + nbEqus + nbInes, 0, 0, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();

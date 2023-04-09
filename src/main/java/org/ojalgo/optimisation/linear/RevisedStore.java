@@ -23,7 +23,11 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -34,6 +38,7 @@ import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.context.NumberContext;
 
 final class RevisedStore extends SimplexStore {
 
@@ -90,10 +95,10 @@ final class RevisedStore extends SimplexStore {
     private final PhysicalStore<Double> z;
 
     RevisedStore(final int mm, final int nn) {
-        this(new SimplexStructure(mm, nn));
+        this(new LinearStructure(mm, nn));
     }
 
-    RevisedStore(final SimplexStructure structure) {
+    RevisedStore(final LinearStructure structure) {
 
         super(structure);
 
@@ -313,6 +318,11 @@ final class RevisedStore extends SimplexStore {
     void restoreObjective() {
         myObjective.fillMatching(myCopiedObjective);
         myCopiedObjective = null;
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+        return Collections.emptySet();
     }
 
 }
