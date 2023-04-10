@@ -23,5 +23,5 @@ package org.ojalgo.optimisation;
 
 public abstract class OptimisationTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 }

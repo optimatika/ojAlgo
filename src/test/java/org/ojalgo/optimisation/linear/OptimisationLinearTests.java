@@ -28,6 +28,6 @@ package org.ojalgo.optimisation.linear;
  */
 abstract class OptimisationLinearTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
 }
