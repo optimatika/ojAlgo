@@ -1023,9 +1023,10 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         if (SimplexTableau.isSparse(options)) {
             return new SparseTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables,
                     needDual);
+        } else {
+            return new DenseRawTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables,
+                    needDual);
         }
-
-        return new DenseRawTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
     }
 
     static SimplexTableau make(final OptimisationData builder, final Optimisation.Options options) {
