@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.QuadrupleMath;
@@ -12,6 +13,7 @@ import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.SolverTask;
@@ -350,16 +352,12 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         options.sparse = false;
         options.convex().solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(16));
 
-        GenericStore<Quadruple> AE = GenericStore.R128.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 } });
-        GenericStore<Quadruple> BE = GenericStore.R128.rows(new double[][] { { 0 } });
-        GenericStore<Quadruple> AI = GenericStore.R128.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, -1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, -1.0 } });
-        GenericStore<Quadruple> BI = GenericStore.R128
-                .rows(new double[][] { { 0.199999999999 }, { 0.199999999999 }, { 0.199999999999 }, { 0.199999999999 }, { 0.199999999999 } });
-        GenericStore<Quadruple> C = GenericStore.R128.rows(
-                new double[][] { { -539445.3637318831 }, { -600689.6904218349 }, { -564117.362709679 }, { -729659.0017039739 }, { -1438811.2570210383 } });
-        GenericStore<Quadruple> Q = GenericStore.R128.rows(new double[][] { { 41572.55, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 41572.55, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 41572.55, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 41572.55, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 41572.55 } });
+        GenericStore<Quadruple> AE = GenericStore.R128.rows(new double[][]{{1.0, 1.0, 1.0, 1.0, 1.0}});
+        GenericStore<Quadruple> BE = GenericStore.R128.rows(new double[][]{{0}});
+        GenericStore<Quadruple> AI = GenericStore.R128.rows(new double[][]{{-1.0, 0.0, 0.0, 0.0, 0.0}, {0.0, -1.0, 0.0, 0.0, 0.0}, {0.0, 0.0, -1.0, 0.0, 0.0}, {0.0, 0.0, 0.0, -1.0, 0.0}, {0.0, 0.0, 0.0, 0.0, -1.0}});
+        GenericStore<Quadruple> BI = GenericStore.R128.rows(new double[][]{{0.199999999999}, {0.199999999999}, {0.199999999999}, {0.199999999999}, {0.199999999999}});
+        GenericStore<Quadruple> C = GenericStore.R128.rows(new double[][]{{-539445.3637318831}, {-600689.6904218349}, {-564117.362709679}, {-729659.0017039739}, {-1438811.2570210383}});
+        GenericStore<Quadruple> Q = GenericStore.R128.rows(new double[][]{{41572.55, 0.0, 0.0, 0.0, 0.0}, {0.0, 41572.55, 0.0, 0.0, 0.0}, {0.0, 0.0, 41572.55, 0.0, 0.0}, {0.0, 0.0, 0.0, 41572.55, 0.0}, {0.0, 0.0, 0.0, 0.0, 41572.55}});
 
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
@@ -394,4 +392,109 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         TestUtils.assertLessThan(1e-12, precision);
     }
 
+    @Test
+    void testQP4() {
+        /**
+         *  A case where Quadruple solver and Double solver differ.
+         *  Compare object function values, absolute/relative primal end dual variable values.
+         * */
+
+
+        GenericStore<Quadruple> AE = GenericStore.R128.rows(new double[][]{
+                 {0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                 {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                 {0.0, 0.0, 8.352297391034406E-10, 0.8576273045259193, 1.4176006647997381, 0.0, 0.582399335200262, 0.0},
+                 {0.0, 0.0, 0.9999999991647702, 0.1423726954740807, 0.0, 1.4176006647997381, 0.0, 0.582399335200262},
+                 {0.0, 0.0, 0.0, 0.0, -1.0, -1.0, 0.0, 0.0},
+                 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -1.0}
+        });
+
+        GenericStore<Quadruple> BE = GenericStore.R128.rows(new double[][] {
+                 { -0.0 },
+                 { -0.0 },
+                 { 5.184268104897471E-4 },
+                 { -5.184268104898582E-4 },
+                 { -0.0 },
+                 { -0.0 }
+        });
+
+        GenericStore<Quadruple> AI = GenericStore.R128.rows(new double[][]{
+                 { -1.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0 },
+                 { -0.0,	-1.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0 },
+                 { -0.0,	-0.0,	-1.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0 },
+                 { -0.0,	-0.0,	-0.0,	-1.0,	-0.0,	-0.0,	-0.0,	-0.0 },
+                 { -0.0,	-0.0,	-0.0,	-0.0,	-1.0,	-0.0,	-0.0,	-0.0 },
+                 { -0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-1.0,	-0.0,	-0.0 },
+                 { -0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-1.0,	-0.0 },
+                 { -0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-0.0,	-1.0 }
+        });
+        GenericStore<Quadruple> BI = GenericStore.R128.rows(new double[][] {
+                 { 99999.999 },
+                 { 999.999 },
+                 { 1.4176006647997381 },
+                 { 0.582399335200262 },
+                 { 8.342297391034407E-10 },
+                 { 0.9999999991637702 },
+                 { 0.8576273045249193 },
+                 { 0.1423726954730807 }
+        });
+
+        GenericStore<Quadruple> C = GenericStore.R128.rows(new double[][] {
+                 { -1.0507334266932648E-5 },
+                 { 111.76733530105174 },
+                 { 35972.35323772494 },
+                 { 3402.691149823142 },
+                 { 241369.47835246887 },
+                 { 39207.7768435451 },
+                 { -4098.6473014047 },
+                 { 4596.891294076649 }
+        });
+
+        GenericStore<Quadruple> Q = GenericStore.R128.rows(new double[][] {
+                 { 0.001000000000015139,	-1.3922723188263615E-7,	-1.260916429481889E-5,	1.1365393461671568E-10,	3.833998314967881E-6,	-4.89115589330624E-6,	-6.213978880671885E-11,	1.3194143917892373E-11 },
+                 { -1.3922723188263615E-7,	1.2914061800397567,	111.98124430594436,	6.247515358606731,	-290.69228055360566,	55.317474119999154,	-1.801267486375081,	-2.6866831798306836 },
+                 { -1.260916429481889E-5,	111.98124430594436,	27050.45850812185,	-0.010225003292636911,	-170266.19960553516,	-5763.903555279987,	-0.0036948253353555976,	0.010559458763784344 },
+                 { 1.136539346167157E-10,	6.247515358606731,	-0.010225003292636918,	8301.539598682974,	-2.495849052310504E-6,	2.367969836412835E-4,	1962.2096944694779,	-6249.852185851846 },
+                 { 3.833998314967881E-6,	-290.69228055360566,	-170266.19960553516,	-2.495849052310504E-6,	1.411187156545144E13,	-61864.09308016598,	-5.160496246346226E-7,	8.324777613205293E-6 },
+                 { -4.89115589330624E-6,	55.317474119999154,	-5763.903555279987,	2.367969836412835E-4,	-61864.093080165985,	29507.042005253876,	-0.008194872881962646,	0.010231508973073053 },
+                 { -6.213978880671885E-11,	-1.8012674863750813,	-0.0036948253353555976,	1962.2096944694779,	-5.160496246346225E-7,	-0.008194872881962646,	8749.126719131198,	-1004.5850092088822 },
+                 { 1.3194143917892375E-11,	-2.686683179830683,	0.01055945876378435,	-6249.852185851845,	8.324777613205291E-6,	0.010231508973073046,	-1004.5850092088823,	34337.13657031502 }
+        });
+
+        Optimisation.Options options = new Optimisation.Options();
+        options.sparse = false;
+        options.convex().extendedPrecision(true);
+        options.convex().solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(16));
+        Optimisation.Result resultQuadruple = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
+
+        MatrixStore<Double> xQ = Primitive64Store.FACTORY.columns(resultQuadruple);
+        MatrixStore<Double> yQ = Primitive64Store.FACTORY.columns(resultQuadruple.getMultipliers().get());
+
+        double precisionQuadruple = IterativeRefinementTest.getResidualQuadruplePrecision(xQ, yQ, Q, C, AE, BE, AI, BI);
+//        TestUtils.assertLessThan(1e-15, precision);
+
+        options.convex().extendedPrecision(false);
+        ConvexSolver model = ConvexSolver.newBuilder().objective(Q, C).equalities(AE, BE).inequalities(AI, BI).build(options);
+        Result resultDouble = model.solve();
+        MatrixStore<Double> xD = Primitive64Store.FACTORY.columns(resultDouble);
+        MatrixStore<Double> yD = Primitive64Store.FACTORY.columns(resultDouble.getMultipliers().get());
+        double precisionDouble = IterativeRefinementTest.getResidualQuadruplePrecision(xD, yD, Q, C, AE, BE, AI, BI);
+        double improvement = (resultDouble.getValue() - resultQuadruple.getValue()) / resultDouble.getValue();
+
+        MatrixStore<Double> xAbsolute = xD.subtract(xQ);
+        double largestAbsolutePrimalDiff = xAbsolute.aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        PhysicalStore<Double> xRelative = xQ.copy();
+        xAbsolute.onMatching(DIVIDE_SAFE, xQ).supplyTo(xRelative);
+        double largestRelativePrimalDiff = xRelative.aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        MatrixStore<Double> yAbsolute = yD.subtract(yQ);
+        double largestAbsoluteDualDiff = yAbsolute.aggregateAll(Aggregator.LARGEST).doubleValue();
+
+        PhysicalStore<Double> yRelative = yQ.copy();
+        yAbsolute.onMatching(DIVIDE_SAFE, yQ).supplyTo(yRelative);
+        double largestRelativeDualDiff = yRelative.aggregateAll(Aggregator.LARGEST).doubleValue();
+    }
+
+    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> ((arg2 < 1e-6 || arg2 < 1e-6)) ? 0 : arg1/arg2;
 }
