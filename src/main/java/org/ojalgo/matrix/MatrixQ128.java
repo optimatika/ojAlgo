@@ -109,17 +109,17 @@ public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
 
     @Override
     Cholesky<RationalNumber> newCholesky(final Structure2D typical) {
-        return Cholesky.RATIONAL.make(typical);
+        return Cholesky.Q128.make(typical);
     }
 
     @Override
     DeterminantTask<RationalNumber> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
+        return DeterminantTask.Q128.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<RationalNumber> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+        return Eigenvalue.Q128.make(typical, this.isHermitian());
     }
 
     @Override
@@ -129,32 +129,32 @@ public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
 
     @Override
     InverterTask<RationalNumber> newInverterTask(final Structure2D template) {
-        return InverterTask.RATIONAL.make(template, this.isHermitian(), false);
+        return InverterTask.Q128.make(template, this.isHermitian(), false);
     }
 
     @Override
     LDL<RationalNumber> newLDL(final Structure2D typical) {
-        return LDL.RATIONAL.make(typical);
+        return LDL.Q128.make(typical);
     }
 
     @Override
     LU<RationalNumber> newLU(final Structure2D typical) {
-        return LU.RATIONAL.make(typical);
+        return LU.Q128.make(typical);
     }
 
     @Override
     QR<RationalNumber> newQR(final Structure2D typical) {
-        return QR.RATIONAL.make(typical);
+        return QR.Q128.make(typical);
     }
 
     @Override
     SingularValue<RationalNumber> newSingularValue(final Structure2D typical) {
-        return SingularValue.RATIONAL.make(typical);
+        return SingularValue.Q128.make(typical);
     }
 
     @Override
     SolverTask<RationalNumber> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
-        return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
+        return SolverTask.Q128.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
 }

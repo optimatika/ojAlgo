@@ -106,17 +106,17 @@ public final class MatrixR064 extends BasicMatrix<Double, MatrixR064> {
 
     @Override
     Cholesky<Double> newCholesky(final Structure2D typical) {
-        return Cholesky.PRIMITIVE.make(typical);
+        return Cholesky.R064.make(typical);
     }
 
     @Override
     DeterminantTask<Double> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
+        return DeterminantTask.R064.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<Double> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+        return Eigenvalue.R064.make(typical, this.isHermitian());
     }
 
     @Override
@@ -126,32 +126,32 @@ public final class MatrixR064 extends BasicMatrix<Double, MatrixR064> {
 
     @Override
     InverterTask<Double> newInverterTask(final Structure2D base) {
-        return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
+        return InverterTask.R064.make(base, this.isHermitian(), false);
     }
 
     @Override
     LDL<Double> newLDL(final Structure2D typical) {
-        return LDL.PRIMITIVE.make(typical);
+        return LDL.R064.make(typical);
     }
 
     @Override
     LU<Double> newLU(final Structure2D typical) {
-        return LU.PRIMITIVE.make(typical);
+        return LU.R064.make(typical);
     }
 
     @Override
     QR<Double> newQR(final Structure2D typical) {
-        return QR.PRIMITIVE.make(typical);
+        return QR.R064.make(typical);
     }
 
     @Override
     SingularValue<Double> newSingularValue(final Structure2D typical) {
-        return SingularValue.PRIMITIVE.make(typical);
+        return SingularValue.R064.make(typical);
     }
 
     @Override
     SolverTask<Double> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
-        return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
+        return SolverTask.R064.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
 }

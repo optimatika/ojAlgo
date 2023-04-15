@@ -138,17 +138,17 @@ public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
 
     @Override
     Cholesky<ComplexNumber> newCholesky(final Structure2D typical) {
-        return Cholesky.COMPLEX.make(typical);
+        return Cholesky.C128.make(typical);
     }
 
     @Override
     DeterminantTask<ComplexNumber> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
+        return DeterminantTask.C128.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<ComplexNumber> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
+        return Eigenvalue.C128.make(typical, this.isHermitian());
     }
 
     @Override
@@ -158,32 +158,32 @@ public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
 
     @Override
     InverterTask<ComplexNumber> newInverterTask(final Structure2D base) {
-        return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
+        return InverterTask.C128.make(base, this.isHermitian(), false);
     }
 
     @Override
     LDL<ComplexNumber> newLDL(final Structure2D typical) {
-        return LDL.COMPLEX.make(typical);
+        return LDL.C128.make(typical);
     }
 
     @Override
     LU<ComplexNumber> newLU(final Structure2D typical) {
-        return LU.COMPLEX.make(typical);
+        return LU.C128.make(typical);
     }
 
     @Override
     QR<ComplexNumber> newQR(final Structure2D typical) {
-        return QR.COMPLEX.make(typical);
+        return QR.C128.make(typical);
     }
 
     @Override
     SingularValue<ComplexNumber> newSingularValue(final Structure2D typical) {
-        return SingularValue.COMPLEX.make(typical);
+        return SingularValue.C128.make(typical);
     }
 
     @Override
     SolverTask<ComplexNumber> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
-        return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
+        return SolverTask.C128.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
 }

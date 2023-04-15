@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [53.0.0] – 2023-04-16
+
 ### Added
 
 #### org.ojalgo.array
@@ -66,6 +68,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - New set of factory methods for `MultiaryFunction`:s. The old ones are deprecated.
 - Renamed the existing `PolynomialFunction` implementations. The old classes are still there, but deprecated. Also added a few new subclasses/element types.
 
+#### org.ojalgo.matrix
+
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
+- Various factories have been renamed to match the `MathType` enum constants, and the old one deprecetd. This relates to matrices, matrix "stores", decompositions, tasks...
+
 #### org.ojalgo.optimisation
 
 - Changes to how parameter scaling is done.
@@ -86,11 +93,6 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.array
 
 - The `limit` and `fixed` methods of `ListFactory`, `MapFactory` and `SparseFactory` is deprecated. There's been, primarily internal, refactoring of how these factories work. This is the only change to the public API.
-
-#### org.ojalgo.matrix
-
-- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
-- Various factories have been renamed.
 
 #### org.ojalgo.optimisation
 

@@ -109,17 +109,17 @@ public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
 
     @Override
     Cholesky<Quaternion> newCholesky(final Structure2D typical) {
-        return Cholesky.QUATERNION.make(typical);
+        return Cholesky.H256.make(typical);
     }
 
     @Override
     DeterminantTask<Quaternion> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
+        return DeterminantTask.H256.make(template, this.isHermitian(), false);
     }
 
     @Override
     Eigenvalue<Quaternion> newEigenvalue(final Structure2D typical) {
-        return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+        return Eigenvalue.H256.make(typical, this.isHermitian());
     }
 
     @Override
@@ -129,32 +129,32 @@ public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
 
     @Override
     InverterTask<Quaternion> newInverterTask(final Structure2D template) {
-        return InverterTask.QUATERNION.make(template, this.isHermitian(), false);
+        return InverterTask.H256.make(template, this.isHermitian(), false);
     }
 
     @Override
     LDL<Quaternion> newLDL(final Structure2D typical) {
-        return LDL.QUATERNION.make(typical);
+        return LDL.H256.make(typical);
     }
 
     @Override
     LU<Quaternion> newLU(final Structure2D typical) {
-        return LU.QUATERNION.make(typical);
+        return LU.H256.make(typical);
     }
 
     @Override
     QR<Quaternion> newQR(final Structure2D typical) {
-        return QR.QUATERNION.make(typical);
+        return QR.H256.make(typical);
     }
 
     @Override
     SingularValue<Quaternion> newSingularValue(final Structure2D typical) {
-        return SingularValue.QUATERNION.make(typical);
+        return SingularValue.H256.make(typical);
     }
 
     @Override
     SolverTask<Quaternion> newSolverTask(final Structure2D templateBody, final Structure2D templateRHS) {
-        return SolverTask.QUATERNION.make(templateBody, templateRHS, this.isHermitian(), false);
+        return SolverTask.H256.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
 }

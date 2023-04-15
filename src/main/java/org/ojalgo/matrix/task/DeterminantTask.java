@@ -63,93 +63,127 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<>() {
+    Factory<ComplexNumber> C128 = new Factory<>() {
 
         @Override
         public DeterminantTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
-                return Cholesky.COMPLEX.make(template);
+                return Cholesky.C128.make(template);
+            } else {
+                return LU.C128.make(template);
             }
-            return LU.COMPLEX.make(template);
         }
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<>() {
+    /**
+     * @deprecated Use {@link #C128} instead.
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    Factory<Double> R064 = new Factory<>() {
 
         @Override
         public DeterminantTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
-            final long tmpDim = template.countRows();
-            if (tmpDim == 1L) {
+
+            long nbRows = template.countRows();
+
+            if (nbRows == 1L) {
                 return AbstractDeterminator.FULL_1X1;
-            }
-            if (symmetric) {
-                if (tmpDim == 2L) {
-                    return AbstractDeterminator.SYMMETRIC_2X2;
-                }
-                if (tmpDim == 3L) {
-                    return AbstractDeterminator.SYMMETRIC_3X3;
-                }
-                if (tmpDim == 4L) {
-                    return AbstractDeterminator.SYMMETRIC_4X4;
-                } else if (tmpDim == 5L) {
-                    return AbstractDeterminator.SYMMETRIC_5X5;
-                } else {
-                    return positiveDefinite ? Cholesky.PRIMITIVE.make(template) : LU.PRIMITIVE.make(template);
-                }
-            }
-            if (tmpDim == 2L) {
-                return AbstractDeterminator.FULL_2X2;
-            }
-            if (tmpDim == 3L) {
-                return AbstractDeterminator.FULL_3X3;
-            }
-            if (tmpDim == 4L) {
-                return AbstractDeterminator.FULL_4X4;
-            } else if (tmpDim == 5L) {
-                return AbstractDeterminator.FULL_5X5;
             } else {
-                return LU.PRIMITIVE.make(template);
+                if (symmetric) {
+                    if (nbRows == 2L) {
+                        return AbstractDeterminator.SYMMETRIC_2X2;
+                    } else if (nbRows == 3L) {
+                        return AbstractDeterminator.SYMMETRIC_3X3;
+                    } else if (nbRows == 4L) {
+                        return AbstractDeterminator.SYMMETRIC_4X4;
+                    } else if (nbRows == 5L) {
+                        return AbstractDeterminator.SYMMETRIC_5X5;
+                    } else {
+                        return positiveDefinite ? Cholesky.R064.make(template) : LU.R064.make(template);
+                    }
+                } else {
+                    if (nbRows == 2L) {
+                        return AbstractDeterminator.FULL_2X2;
+                    } else if (nbRows == 3L) {
+                        return AbstractDeterminator.FULL_3X3;
+                    } else if (nbRows == 4L) {
+                        return AbstractDeterminator.FULL_4X4;
+                    } else if (nbRows == 5L) {
+                        return AbstractDeterminator.FULL_5X5;
+                    } else {
+                        return LU.R064.make(template);
+                    }
+                }
             }
         }
 
     };
 
-    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+    /**
+     * @deprecated Use {@link #R064} instead.
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    Factory<Quadruple> R128 = new Factory<>() {
 
         @Override
         public DeterminantTask<Quadruple> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
-                return Cholesky.QUADRUPLE.make(template);
+                return Cholesky.R128.make(template);
+            } else {
+                return LU.R128.make(template);
             }
-            return LU.QUADRUPLE.make(template);
         }
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<>() {
+    /**
+     * @deprecated Use {@link #R128} instead.
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    Factory<Quaternion> H256 = new Factory<>() {
 
         @Override
         public DeterminantTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
-                return Cholesky.QUATERNION.make(template);
+                return Cholesky.H256.make(template);
+            } else {
+                return LU.H256.make(template);
             }
-            return LU.QUATERNION.make(template);
         }
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<>() {
+    /**
+     * @deprecated Use {@link #H256} instead.
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
 
         @Override
         public DeterminantTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
-                return Cholesky.RATIONAL.make(template);
+                return Cholesky.Q128.make(template);
+            } else {
+                return LU.Q128.make(template);
             }
-            return LU.RATIONAL.make(template);
         }
 
     };
+
+    /**
+     * @deprecated Use {@link #Q128} instead.
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     N calculateDeterminant(Access2D<?> matrix);
 

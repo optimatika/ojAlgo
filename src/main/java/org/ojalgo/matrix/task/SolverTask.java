@@ -87,144 +87,169 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<>() {
+    Factory<ComplexNumber> C128 = new Factory<>() {
 
         @Override
         public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.COMPLEX.make(templateBody);
+                    return Cholesky.C128.make(templateBody);
+                } else {
+                    return LU.C128.make(templateBody);
                 }
-                return LU.COMPLEX.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.C128.make(templateBody);
+            } else {
+                return SingularValue.C128.make(templateBody);
             }
-            if (templateBody.isTall()) {
-                return QR.COMPLEX.make(templateBody);
-            }
-            return SingularValue.COMPLEX.make(templateBody);
         }
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<>() {
+    /**
+     * @deprecated Use {@link #C128} instead.
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    Factory<Double> R064 = new Factory<>() {
 
         @Override
         public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric, final boolean positiveDefinite) {
 
-            boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
+            boolean vectorRHS = templateRHS.countColumns() == 1L;
 
-            long tmpColDim = templateBody.countColumns();
+            long nbCols = templateBody.countColumns();
 
             if (templateBody.isSquare()) {
-
                 if (symmetric) {
-
-                    if (!tmpVectorRHS) {
-                        return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
-                    }
-                    if (tmpColDim == 1L) {
+                    if (!vectorRHS) {
+                        return positiveDefinite ? Cholesky.R064.make(templateBody) : LU.R064.make(templateBody);
+                    } else if (nbCols == 1L) {
                         return AbstractSolver.FULL_1X1;
-                    }
-                    if (tmpColDim == 2L) {
+                    } else if (nbCols == 2L) {
                         return AbstractSolver.SYMMETRIC_2X2;
-                    } else if (tmpColDim == 3L) {
+                    } else if (nbCols == 3L) {
                         return AbstractSolver.SYMMETRIC_3X3;
-                    } else if (tmpColDim == 4L) {
+                    } else if (nbCols == 4L) {
                         return AbstractSolver.SYMMETRIC_4X4;
-                    } else if (tmpColDim == 5L) {
+                    } else if (nbCols == 5L) {
                         return AbstractSolver.SYMMETRIC_5X5;
                     } else {
-                        return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
+                        return positiveDefinite ? Cholesky.R064.make(templateBody) : LU.R064.make(templateBody);
                     }
-
-                }
-                if (!tmpVectorRHS) {
-                    return LU.PRIMITIVE.make(templateBody);
-                }
-                if (tmpColDim == 1L) {
-                    return AbstractSolver.FULL_1X1;
-                }
-                if (tmpColDim == 2L) {
-                    return AbstractSolver.FULL_2X2;
-                } else if (tmpColDim == 3L) {
-                    return AbstractSolver.FULL_3X3;
-                } else if (tmpColDim == 4L) {
-                    return AbstractSolver.FULL_4X4;
-                } else if (tmpColDim == 5L) {
-                    return AbstractSolver.FULL_5X5;
                 } else {
-                    return LU.PRIMITIVE.make(templateBody);
+                    if (!vectorRHS) {
+                        return LU.R064.make(templateBody);
+                    } else if (nbCols == 1L) {
+                        return AbstractSolver.FULL_1X1;
+                    } else if (nbCols == 2L) {
+                        return AbstractSolver.FULL_2X2;
+                    } else if (nbCols == 3L) {
+                        return AbstractSolver.FULL_3X3;
+                    } else if (nbCols == 4L) {
+                        return AbstractSolver.FULL_4X4;
+                    } else if (nbCols == 5L) {
+                        return AbstractSolver.FULL_5X5;
+                    } else {
+                        return LU.R064.make(templateBody);
+                    }
                 }
-
-            }
-            if (!templateBody.isTall()) {
-
-                return SingularValue.PRIMITIVE.make(templateBody);
-            }
-            if (tmpVectorRHS && tmpColDim <= 5) {
+            } else if (!templateBody.isTall()) {
+                return SingularValue.R064.make(templateBody);
+            } else if (vectorRHS && nbCols <= 5) {
                 return AbstractSolver.LEAST_SQUARES;
+            } else {
+                return QR.R064.make(templateBody);
             }
-            return QR.PRIMITIVE.make(templateBody);
         }
 
     };
 
-    Factory<Quadruple> QUADRUPLE = new Factory<>() {
+    /**
+     * @deprecated Use {@link #R064} instead.
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    Factory<Quadruple> R128 = new Factory<>() {
 
         @Override
         public SolverTask<Quadruple> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.QUADRUPLE.make(templateBody);
+                    return Cholesky.R128.make(templateBody);
+                } else {
+                    return LU.R128.make(templateBody);
                 }
-                return LU.QUADRUPLE.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.R128.make(templateBody);
+            } else {
+                return SingularValue.R128.make(templateBody);
             }
-            if (templateBody.isTall()) {
-                return QR.QUADRUPLE.make(templateBody);
-            }
-            return SingularValue.QUADRUPLE.make(templateBody);
         }
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<>() {
+    /**
+     * @deprecated Use {@link #R128} instead.
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    Factory<Quaternion> H256 = new Factory<>() {
 
         @Override
         public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.QUATERNION.make(templateBody);
+                    return Cholesky.H256.make(templateBody);
+                } else {
+                    return LU.H256.make(templateBody);
                 }
-                return LU.QUATERNION.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.H256.make(templateBody);
+            } else {
+                return SingularValue.H256.make(templateBody);
             }
-            if (templateBody.isTall()) {
-                return QR.QUATERNION.make(templateBody);
-            }
-            return SingularValue.QUATERNION.make(templateBody);
         }
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<>() {
+    /**
+     * @deprecated Use {@link #H256} instead.
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
 
         @Override
         public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.RATIONAL.make(templateBody);
+                    return Cholesky.Q128.make(templateBody);
+                } else {
+                    return LU.Q128.make(templateBody);
                 }
-                return LU.RATIONAL.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.Q128.make(templateBody);
+            } else {
+                return SingularValue.Q128.make(templateBody);
             }
-            if (templateBody.isTall()) {
-                return QR.RATIONAL.make(templateBody);
-            }
-            return SingularValue.RATIONAL.make(templateBody);
         }
 
     };
+
+    /**
+     * @deprecated Use {@link #Q128} instead.
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
 

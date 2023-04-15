@@ -138,7 +138,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
 
     @Override
     DeterminantTask<ComplexNumber> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
+        return DeterminantTask.C128.make(template, this.isHermitian(), false);
     }
 
     @Override
