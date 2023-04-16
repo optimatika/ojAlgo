@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,26 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class Variable extends ModelEntity<Variable> {
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable make(final String name) {
         return new Variable(name);
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable makeBinary(final String name) {
         return Variable.make(name).binary();
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public static Variable makeInteger(final String name) {
         return Variable.make(name).integer();
     }
@@ -59,6 +71,10 @@ public final class Variable extends ModelEntity<Variable> {
     private transient boolean myUnbounded = false;
     private BigDecimal myValue = null;
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public Variable(final String name) {
         super(name);
     }
@@ -252,19 +268,19 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected void appendMiddlePart(final StringBuilder aStringBuilder) {
+    protected void appendMiddlePart(final StringBuilder builder, final NumberContext display) {
 
-        aStringBuilder.append(this.getName());
+        builder.append(this.getName());
 
         if (myValue != null) {
-            aStringBuilder.append(": ");
-            aStringBuilder.append(ModelEntity.DISPLAY.enforce(myValue).toPlainString());
+            builder.append(": ");
+            builder.append(display.enforce(myValue).toPlainString());
         }
 
         if (this.isObjective()) {
-            aStringBuilder.append(" (");
-            aStringBuilder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
-            aStringBuilder.append(")");
+            builder.append(" (");
+            builder.append(display.enforce(this.getContributionWeight()).toPlainString());
+            builder.append(")");
         }
     }
 
@@ -329,7 +345,7 @@ public final class Variable extends ModelEntity<Variable> {
             }
         }
 
-        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
+        return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
     }
 
     @Override

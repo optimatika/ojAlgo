@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     @Test
     public void testCompareMixedIntegerWithStandard() {
 
-        double[] body = new double[] { 1.0, 0.3, 0.8 };
+        double[] body = { 1.0, 0.3, 0.8 };
         double rhs = 3.4;
 
         Equation gomory = TableauCutGeneratorTest.generateGomory(rhs, body);
@@ -134,24 +134,24 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         NumberContext accuracy = NumberContext.of(7);
 
-        Variable[] variables = new Variable[] { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
+        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
                 new Variable("x2014").lower(BigMath.ZERO).integer() };
 
         ExpressionsBasedModel originalModel = new ExpressionsBasedModel(variables);
 
-        Expression expr1 = originalModel.addExpression("Expr1");
+        Expression expr1 = originalModel.newExpression("Expr1");
         expr1.set(0, -1);
         expr1.set(1, 5100);
         expr1.set(2, -5000);
         expr1.upper(BigMath.ZERO);
 
-        Expression expr2 = originalModel.addExpression("Expr2");
+        Expression expr2 = originalModel.newExpression("Expr2");
         expr2.set(0, 1);
         expr2.set(1, 5100);
         expr2.set(2, -5000);
         expr2.lower(BigMath.ZERO);
 
-        Expression expr3 = originalModel.addExpression("Expr3");
+        Expression expr3 = originalModel.newExpression("Expr3");
         expr3.set(1, 5000);
         expr3.set(2, 5000);
         expr3.level(new BigDecimal(19105000));
@@ -176,10 +176,10 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         slackedModel.relax();
         slackedModel.getVariable(1).upper(3821);
         slackedModel.getVariable(2).upper(3821);
-        Variable expr2_L = slackedModel.addVariable("Expr2_L_slack").lower(0);
-        Variable expr1_U = slackedModel.addVariable("Expr1_U_slack").lower(0);
-        Variable x2013_U = slackedModel.addVariable("x2013_U_slack").lower(0);
-        Variable x2014_U = slackedModel.addVariable("x2014_U_slack").lower(0);
+        Variable expr2_L = slackedModel.newVariable("Expr2_L_slack").lower(0);
+        Variable expr1_U = slackedModel.newVariable("Expr1_U_slack").lower(0);
+        Variable x2013_U = slackedModel.newVariable("x2013_U_slack").lower(0);
+        Variable x2014_U = slackedModel.newVariable("x2014_U_slack").lower(0);
 
     }
 

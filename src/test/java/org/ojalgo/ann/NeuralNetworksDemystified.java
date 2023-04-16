@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SIGMOID;
 
 import java.util.ArrayList;
 import java.util.List;

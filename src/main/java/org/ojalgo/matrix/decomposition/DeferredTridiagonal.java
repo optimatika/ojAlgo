@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -41,10 +42,10 @@ import org.ojalgo.structure.Access2D;
  */
 abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalDecomposition<N> {
 
-    static final class Complex extends DeferredTridiagonal<ComplexNumber> {
+    static final class C128 extends DeferredTridiagonal<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX);
+        C128() {
+            super(GenericStore.C128);
         }
 
         @Override
@@ -77,23 +78,10 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
     }
 
-    static final class Primitive extends DeferredTridiagonal<Double> {
+    static final class H256 extends DeferredTridiagonal<Quaternion> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY);
-        }
-
-        @Override
-        Array1D<Double> makeReal(final BasicArray<Double> offDiagonal) {
-            return null;
-        }
-
-    }
-
-    static final class Quat extends DeferredTridiagonal<Quaternion> {
-
-        Quat() {
-            super(GenericStore.QUATERNION);
+        H256() {
+            super(GenericStore.H256);
         }
 
         @Override
@@ -126,14 +114,39 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
 
     }
 
-    static final class Rational extends DeferredTridiagonal<RationalNumber> {
+    static final class Q128 extends DeferredTridiagonal<RationalNumber> {
 
-        Rational() {
-            super(GenericStore.RATIONAL);
+        Q128() {
+            super(GenericStore.Q128);
         }
 
         @Override
         Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
+            return null;
+        }
+    }
+
+    static final class R064 extends DeferredTridiagonal<Double> {
+
+        R064() {
+            super(Primitive64Store.FACTORY);
+        }
+
+        @Override
+        Array1D<Double> makeReal(final BasicArray<Double> offDiagonal) {
+            return null;
+        }
+
+    }
+
+    static final class R128 extends DeferredTridiagonal<Quadruple> {
+
+        R128() {
+            super(GenericStore.R128);
+        }
+
+        @Override
+        Array1D<Quadruple> makeReal(final BasicArray<Quadruple> offDiagonal) {
             return null;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -132,6 +132,10 @@ public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunctio
 
     AggregatorFunction<N> reset();
 
+    /**
+     * @deprecated v53 Will be removed
+     */
+    @Deprecated
     Scalar<N> toScalar();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,9 +62,10 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
 
     public boolean add(final Equation row) {
         if (row.count() != mySize) {
+            BasicLogger.error("row.count(): {} != mySize: {}", row.count(), mySize);
             throw new IllegalArgumentException();
         }
-        final boolean retVal = myRows.add(row);
+        boolean retVal = myRows.add(row);
         Collections.sort(myRows);
         return retVal;
     }
@@ -97,9 +98,8 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         return myDelegate.solve(body, rhs, current);
     }
 
-    protected double doubleValue(final int row, final int column) {
-        final Equation tmpRow = myRows.get(row);
-        return tmpRow.doubleValue(column);
+    protected double doubleValue(final int row, final int col) {
+        return myRows.get(row).doubleValue(col);
     }
 
     protected final D getDelegate() {

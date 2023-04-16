@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -67,8 +67,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -96,8 +96,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.R064.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -120,7 +120,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 
         Primitive64Store ones = Primitive64Store.FACTORY.make(n, 1);
         ones.fillAll(ONE);
@@ -151,7 +151,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         Primitive64Store vctr = Primitive64Store.FACTORY.make(1, n);
 
         Stopwatch clock = new Stopwatch();
@@ -176,7 +176,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
         Primitive64Store vctr = Primitive64Store.FACTORY.make(n, 1);
 
         Stopwatch clock = new Stopwatch();
@@ -201,7 +201,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.R064.make(n, n);
 
         Stopwatch clock = new Stopwatch();
         mtrx.reset();

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -117,6 +117,12 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
         } else {
             return new RationalNumber(numerator, denominator);
         }
+    }
+
+    public static RationalNumber parse(final CharSequence plainNumberString) {
+        String string = plainNumberString.toString();
+        BigDecimal number = new BigDecimal(string);
+        return RationalNumber.valueOf(number);
     }
 
     public static RationalNumber rational(final double d) {
@@ -391,11 +397,6 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     }
 
     @Override
-    public RationalNumber add(final float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
     public RationalNumber add(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -462,11 +463,6 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     @Override
     public RationalNumber divide(final double arg) {
         return this.divide(RationalNumber.valueOf(arg));
-    }
-
-    @Override
-    public RationalNumber divide(final float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -580,11 +576,6 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     }
 
     @Override
-    public RationalNumber multiply(final float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
     public RationalNumber multiply(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -643,11 +634,6 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     @Override
     public RationalNumber subtract(final double arg) {
         return this.subtract(RationalNumber.valueOf(arg));
-    }
-
-    @Override
-    public RationalNumber subtract(final float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override

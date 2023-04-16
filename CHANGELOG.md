@@ -11,6 +11,109 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [53.0.0] – 2023-04-16
+
+### Added
+
+#### org.ojalgo.array
+
+- Implementations to support the new `Quadruple` element type.
+
+#### org.ojalgo.equation
+
+- It is now possible to wrap an existing `BasicArray` instance in an `Equation`, as the equation body, and then later retrieve that instance to be recycled/reused.
+
+#### org.ojalgo.function
+
+- Implementations to support the new `Quadruple` type. In most cases these delegate to BigDecimal implementations. Proper `Quadruple` implementations can be done later.
+- New `BigMath` constants `SMALLEST_POSITIVE_INFINITY` and `SMALLEST_NEGATIVE_INFINITY`.
+
+#### org.ojalgo.machine
+
+- Support for AARCH64 and Apple M1 Pro
+
+#### org.ojalgo.matrix
+
+- All sorts of additions – many many – to fully support the new `Quadruple` element type.
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
+- Modified LDL (Cholesky) decomposition – set a threshold value on the diagonal elements while decomposing.
+- New interface `InvertibleFactor` that represent chainable and reversible in-place (equation system) solvers. Suitable for product form representation. The `MatrixDecomposition.Solver` interface now extends this new interface. That means it is now also possible to solve the transposed system (or solve from the left).
+- `RowsSupplier` and `ColumnsSupplier` now implements `MatrixStore` and `Mutate2D` rather than just `Access2D` and `ElementsSupplier`.
+
+#### org.ojalgo.optimisation
+
+- New alternatives for the various solver builders to simplify building small test case models - just cleaner api. Now also possible to specify matrices of any element type.
+- New structure in `Optimisation.Options`. Options for the LP- and QP-solvers are now clearly separated. Some important parts/parameters of the ConvexSolver (QP) are now configurable.
+- `OptimisationData`: This class existed before but was package private. It is used as the underlying data of the solver builders, and as a solver data interchange format.
+- New set of `LinearSolver` implementations meant to replace the existing ones. This already works better than the old/existing ones in many ways, but does not yet have all the features required to replace them. For now add the `LinearSolver#NEW_INTEGRATION` if yo want o to use this. (For pure LP this new solver scales better, but as a subsolver for MIP it lacks necessary features.)
+- New exprimental extended precision `ConvexSolver`. It's implemented using the `Quadruple` and iteratively solves a sequence of refined (zoomed and scaled) QP problems. This enables to correctly/exactly solve problems with very detailed/accurate constraints. This new solver is contributed by Magnus Jansson (@Programmer-Magnus).
+
+#### org.ojalgo.scalar
+
+- New `Scalar` type `Quadruple` emulating quadruple precision using 2 `double`s.
+
+#### org.ojalgo.structure
+
+- `Factory1D`, `Factory2D` and `FactoryAnyD` instances now have to declare what MathType the structures they create contains. The factory implementations now have a `getMathType` method.
+- Added the ability to get/set values of 1D- and 2D-data structure using `Keyed1D` and `Keyed2D`. Using `IndexMapper` to map back and forth between an index and a key of any type.
+
+### Changed
+
+#### org.ojalgo.array
+
+- The `ArrayR128` class changed from being `BigDecimal` based to `Quadruple` based. Instead there is a new `ArrayR256` class that is `BigDecimal` based.
+
+#### org.ojalgo.function
+
+- New set of factory methods for `MultiaryFunction`:s. The old ones are deprecated.
+- Renamed the existing `PolynomialFunction` implementations. The old classes are still there, but deprecated. Also added a few new subclasses/element types.
+
+#### org.ojalgo.matrix
+
+- New names for the top-level (immutable) BasicMatrix classes. The old ones are still there, but deprecated. The new ones are purely renamed copies of the old.
+- Various factories have been renamed to match the `MathType` enum constants, and the old one deprecetd. This relates to matrices, matrix "stores", decompositions, tasks...
+
+#### org.ojalgo.optimisation
+
+- Changes to how parameter scaling is done.
+- When constructing convex (QP) solver, simple variable bounds are no longer scaled.
+- It is now possible to extract both adjusted and unadjusted model parameters as `BigDecimal`. This is to allow individual solver integrations to do type conversion to different types without intermediate loss of precision.
+- Modified the EBM file format to also include known variable values. Format (reader/writer) compatible with both old and new variants.
+- Refactoring of the `ConvexSolver` class hierarchy. In particular with the `ActiveSetSolver` there should now be a lot less copying of data.
+- There used to be 2 different `NumberContext`:s used for print/display/toString formatting in `ExpressionsBasesModel`. Now there is only one. The configurable `Optimisation.Options.print` value, and the default value is `NumberContext.of(8)`.
+- Usage of the `Optimisation.Options.print` configurable value is any solver has been removed. This option still remains but is only used in `ExpressionsBasesModel`. The various solvers that made use of it now have their own definitions, that may or may not be configurable.
+- The `IntegerStrategy` interface gained a new method – `getIntegralityTolerance()`. It returns a `NumberContext` used to check variable integrality.
+
+#### org.ojalgo.type
+
+- The definition of `MathType.R128` changed. It used to refer to a `BigDecimal` based Real number. Now `MathType.R128` refers to implementations using the new `Quadruple` class, and the `BigDecimal` based stuff is referred to as `R256`.
+
+### Deprecated
+
+#### org.ojalgo.array
+
+- The `limit` and `fixed` methods of `ListFactory`, `MapFactory` and `SparseFactory` is deprecated. There's been, primarily internal, refactoring of how these factories work. This is the only change to the public API.
+
+#### org.ojalgo.optimisation
+
+- Any/all ways to create `Variable` or `Expression` instances separate from (and then add them to) an `ExpressionsBasedModel` is deprecated. You should first create the model, and then use that as a factory for the variables and expressions.
+
+#### org.ojalgo.type
+
+- `IntCount`
+- A few methods in `Hardware` and `VirtualMachine` (actually in `CommonMachine`)
+
+#### org.ojalgo.structure
+
+- All the various "loop" methods in `Structure1D`, `Structure2D` and `StructureAnyD` are deprecated. They performed terribly bad. Everything in ojAlgo that made use of them have already been refactored to perform better.
+
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Ordering of eigenvalues. Sometimes, with real negative eigenvalues, the eigenvalues/vectors where not ordered (correctly) although the decomposition instance reported they should be.
+- The `reconstruct()` methods of the `LU` and `LDL` decompositions did not correctly handle pivoting, resulting in incorrect reconstructed matrices.
+
 ## [52.0.1] – 2022-10-20
 
 ### Added

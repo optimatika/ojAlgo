@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -40,34 +41,42 @@ import org.ojalgo.structure.Structure2D;
 
 abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
-    static final class Complex extends CholeskyDecomposition<ComplexNumber> {
+    static final class C128 extends CholeskyDecomposition<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX);
+        C128() {
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class Primitive extends CholeskyDecomposition<Double> {
+    static final class H256 extends CholeskyDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
+            super(GenericStore.H256);
+        }
+
+    }
+
+    static final class Q128 extends CholeskyDecomposition<RationalNumber> {
+
+        Q128() {
+            super(GenericStore.Q128);
+        }
+
+    }
+
+    static final class R064 extends CholeskyDecomposition<Double> {
+
+        R064() {
             super(Primitive64Store.FACTORY);
         }
 
     }
 
-    static final class Quat extends CholeskyDecomposition<Quaternion> {
+    static final class R128 extends CholeskyDecomposition<Quadruple> {
 
-        Quat() {
-            super(GenericStore.QUATERNION);
-        }
-
-    }
-
-    static final class Rational extends CholeskyDecomposition<RationalNumber> {
-
-        Rational() {
-            super(GenericStore.RATIONAL);
+        R128() {
+            super(GenericStore.R128);
         }
 
     }
@@ -78,6 +87,14 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
     protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
+    }
+
+    public final void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, false, false);
+        arg.substituteBackwards(body, false, true, false);
     }
 
     public N calculateDeterminant(final Access2D<?> matrix) {

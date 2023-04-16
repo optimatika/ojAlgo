@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,19 +45,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
-    static final NumberContext DISPLAY = NumberContext.ofScale(6);
+    static final NumberContext PRINT = NumberContext.of(6);
+    static final int RANGE = 8;
 
     static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, final int range) {
 
         double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
 
-        int doubleRange = 2 * range;
-
-        if (expL > doubleRange) {
-            return 0;
-        }
-
-        double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
+        double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -range), expL - range);
 
         double negatedAverage = (expL + expS) / -PrimitiveMath.TWO;
 
@@ -174,25 +169,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myLowerLimit;
     }
 
+    public final BigDecimal getLowerLimit(final boolean adjusted, final BigDecimal defaultValue) {
+
+        BigDecimal limit = this.getLower(adjusted);
+
+        if (limit != null) {
+            return limit;
+        } else {
+            return defaultValue;
+        }
+    }
+
     public final double getLowerLimit(final boolean adjusted, final double defaultValue) {
 
-        BigDecimal limit = null;
-        if (adjusted && myLowerLimit != null) {
-            int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myLowerLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myLowerLimit;
-            }
-        } else {
-            limit = myLowerLimit;
-        }
+        BigDecimal limit = this.getLower(adjusted);
 
         if (limit != null) {
             return limit.doubleValue();
+        } else {
+            return defaultValue;
         }
-
-        return defaultValue;
     }
 
     public final String getName() {
@@ -219,25 +215,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myUpperLimit;
     }
 
+    public final BigDecimal getUpperLimit(final boolean adjusted, final BigDecimal defaultValue) {
+
+        BigDecimal limit = this.getUpper(adjusted);
+
+        if (limit != null) {
+            return limit;
+        } else {
+            return defaultValue;
+        }
+    }
+
     public final double getUpperLimit(final boolean adjusted, final double defaultValue) {
 
-        BigDecimal limit = null;
-        if (adjusted && myUpperLimit != null) {
-            int adjustmentExponent = this.getAdjustmentExponent();
-            if (adjustmentExponent != 0) {
-                limit = myUpperLimit.movePointRight(adjustmentExponent);
-            } else {
-                limit = myUpperLimit;
-            }
-        } else {
-            limit = myUpperLimit;
-        }
+        BigDecimal limit = this.getUpper(adjusted);
 
         if (limit != null) {
             return limit.doubleValue();
+        } else {
+            return defaultValue;
         }
-
-        return defaultValue;
     }
 
     @Override
@@ -369,9 +366,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     @Override
     public final String toString() {
 
-        final StringBuilder retVal = new StringBuilder();
+        StringBuilder retVal = new StringBuilder();
 
-        this.appendToString(retVal);
+        this.appendToString(retVal, PRINT);
 
         return retVal.toString();
     }
@@ -439,28 +436,58 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return this.weight(BigDecimal.valueOf(weight));
     }
 
-    protected void appendLeftPart(final StringBuilder builder) {
+    private BigDecimal getLower(final boolean adjusted) {
+        BigDecimal limit = null;
+        if (adjusted && myLowerLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myLowerLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myLowerLimit;
+            }
+        } else {
+            limit = myLowerLimit;
+        }
+        return limit;
+    }
+
+    private BigDecimal getUpper(final boolean adjusted) {
+        BigDecimal limit = null;
+        if (adjusted && myUpperLimit != null) {
+            int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myUpperLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myUpperLimit;
+            }
+        } else {
+            limit = myUpperLimit;
+        }
+        return limit;
+    }
+
+    protected void appendLeftPart(final StringBuilder builder, final NumberContext display) {
         if (this.isLowerConstraint() || this.isEqualityConstraint()) {
-            builder.append(ModelEntity.DISPLAY.enforce(this.getLowerLimit()).toPlainString());
+            builder.append(display.enforce(this.getLowerLimit()).toPlainString());
             builder.append(" <= ");
         }
     }
 
-    protected void appendMiddlePart(final StringBuilder builder) {
+    protected void appendMiddlePart(final StringBuilder builder, final NumberContext display) {
 
         builder.append(this.getName());
 
         if (this.isObjective()) {
             builder.append(" (");
-            builder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
+            builder.append(display.enforce(this.getContributionWeight()).toPlainString());
             builder.append(")");
         }
     }
 
-    protected void appendRightPart(final StringBuilder builder) {
+    protected void appendRightPart(final StringBuilder builder, final NumberContext display) {
         if (this.isUpperConstraint() || this.isEqualityConstraint()) {
             builder.append(" <= ");
-            builder.append(ModelEntity.DISPLAY.enforce(this.getUpperLimit()).toPlainString());
+            builder.append(display.enforce(this.getUpperLimit()).toPlainString());
         }
     }
 
@@ -526,10 +553,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return retVal;
     }
 
-    final void appendToString(final StringBuilder builder) {
-        this.appendLeftPart(builder);
-        this.appendMiddlePart(builder);
-        this.appendRightPart(builder);
+    final void appendToString(final StringBuilder builder, final NumberContext display) {
+        this.appendLeftPart(builder, display);
+        this.appendMiddlePart(builder, display);
+        this.appendRightPart(builder, display);
     }
 
     abstract int deriveAdjustmentExponent();

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,10 @@ public interface Structure1D {
 
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     @FunctionalInterface
     public interface IndexCallback {
 
@@ -235,11 +239,21 @@ public interface Structure1D {
         return Math.toIntExact(index);
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
-        final long limit = Math.min(structureA.count(), structureB.count());
-        Structure1D.loopRange(0L, limit, callback);
+        long limit = Math.min(structureA.count(), structureB.count());
+        for (long i = 0L; i < limit; i++) {
+            callback.call(i);
+        }
     }
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     static void loopRange(final long first, final long limit, final IndexCallback callback) {
         for (long i = first; i < limit; i++) {
             callback.call(i);
@@ -314,8 +328,14 @@ public interface Structure1D {
      */
     long count();
 
+    /**
+     * @deprecated v53 Will be removed!
+     */
+    @Deprecated
     default void loopAll(final IndexCallback callback) {
-        Structure1D.loopRange(0L, this.count(), callback);
+        for (long i = 0L; i < this.count(); i++) {
+            callback.call(i);
+        }
     }
 
     default int size() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,11 @@ package org.ojalgo.data.domain.finance.portfolio;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 
 public final class FixedReturnsPortfolio extends EquilibriumModel {
 
-    private final Primitive64Matrix myReturns;
+    private final MatrixR064 myReturns;
 
     public FixedReturnsPortfolio(final Context aContext) {
 
@@ -37,7 +37,7 @@ public final class FixedReturnsPortfolio extends EquilibriumModel {
         myReturns = aContext.getAssetReturns();
     }
 
-    public FixedReturnsPortfolio(final MarketEquilibrium aMarketEquilibrium, final Primitive64Matrix returnsVector) {
+    public FixedReturnsPortfolio(final MarketEquilibrium aMarketEquilibrium, final MatrixR064 returnsVector) {
 
         super(aMarketEquilibrium);
 
@@ -63,12 +63,12 @@ public final class FixedReturnsPortfolio extends EquilibriumModel {
     }
 
     @Override
-    protected Primitive64Matrix calculateAssetReturns() {
+    protected MatrixR064 calculateAssetReturns() {
         return myReturns;
     }
 
     @Override
-    protected Primitive64Matrix calculateAssetWeights() {
+    protected MatrixR064 calculateAssetWeights() {
         return this.calculateAssetWeights(myReturns);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ public class NormTest extends MatrixTests {
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);
 
-        Primitive64Matrix copied = Primitive64Matrix.FACTORY.copy(cmplx);
+        MatrixR064 copied = MatrixR064.FACTORY.copy(cmplx);
         final double actual2 = copied.norm();
         TestUtils.assertEquals(expected, actual2);
     }
@@ -62,7 +62,7 @@ public class NormTest extends MatrixTests {
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);
 
-        Primitive64Matrix copied = Primitive64Matrix.FACTORY.copy(quat);
+        MatrixR064 copied = MatrixR064.FACTORY.copy(quat);
         final double actual2 = copied.norm();
         TestUtils.assertEquals(expected, actual2);
     }

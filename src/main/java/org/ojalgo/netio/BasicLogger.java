@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.ojalgo.matrix.ComplexMatrix;
+import org.ojalgo.matrix.MatrixC128;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
@@ -257,19 +257,32 @@ public interface BasicLogger {
             if (plain) {
                 if (number instanceof Scalar<?>) {
                     return ((Scalar<?>) number).toPlainString(context);
+                } else {
+                    double doubleValue = NumberDefinition.doubleValue(number);
+                    if (Double.isFinite(doubleValue)) {
+                        return context.enforce(BigDecimal.valueOf(doubleValue)).toPlainString();
+                    } else {
+                        return Double.toString(doubleValue);
+                    }
                 }
-                return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toPlainString();
+            } else {
+                if (number instanceof Scalar<?>) {
+                    return ((Scalar<?>) number).toString(context);
+                } else {
+                    double doubleValue = NumberDefinition.doubleValue(number);
+                    if (Double.isFinite(doubleValue)) {
+                        return context.enforce(BigDecimal.valueOf(doubleValue)).toString();
+                    } else {
+                        return Double.toString(doubleValue);
+                    }
+                }
             }
-            if (number instanceof Scalar<?>) {
-                return ((Scalar<?>) number).toString(context);
-            }
-            return context.enforce(BigDecimal.valueOf(NumberDefinition.doubleValue(number))).toString();
         }
 
         static void printmtrx(final BasicLogger appender, final String message, final Access2D<?> matrix, final NumberContext context) {
             appender.println(message);
             if (matrix.count() > 0L) {
-                if (matrix instanceof ComplexMatrix || matrix.get(0, 0) instanceof ComplexNumber) {
+                if (matrix instanceof MatrixC128 || matrix.get(0, 0) instanceof ComplexNumber) {
                     PrivateDetails.printmtrx(appender, matrix, context, false);
                 } else {
                     PrivateDetails.printmtrx(appender, matrix, context, true);

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,23 +39,23 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
-    public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
+    public static MatrixR064 getOriginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMatrixD() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
+    private static MatrixR064 getMatrixD() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMatrixQ1() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+    private static MatrixR064 getMatrixQ1() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getMatrixQ2() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
+    private static MatrixR064 getMatrixQ2() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -63,14 +63,12 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = new NumberContext(7, 9);
+        mtrxA = SimpleSingularValueCase.getMatrixQ1();
+        mtrxX = SimpleSingularValueCase.getMatrixD();
+        mtrxB = SimpleSingularValueCase.getOriginal();
 
-        rAA = SimpleSingularValueCase.getMatrixQ1();
-        rAX = SimpleSingularValueCase.getMatrixD();
-        rAB = SimpleSingularValueCase.getOriginal();
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -78,10 +76,10 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final PhysicalStore<Double> tmpExp = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal())
+        PhysicalStore<Double> tmpExp = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal())
                 .multiply(Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
 
-        final PhysicalStore<Double> tmpAct = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
+        PhysicalStore<Double> tmpAct = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
                 .multiply(Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
 
         TestUtils.assertEquals(tmpExp, tmpAct, ACCURACY);
@@ -90,9 +88,9 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
+        MatrixStore<Double> tmpA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
-        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
+        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         //tmpSVD.equals(tmpA, EVALUATION);

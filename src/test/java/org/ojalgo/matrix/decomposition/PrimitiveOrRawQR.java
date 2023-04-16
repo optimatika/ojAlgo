@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -100,7 +100,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
         }
 
         public static QR<Double> newPrimitive() {
-            return new QRDecomposition.Primitive();
+            return new QRDecomposition.R064();
         }
 
         public static QR<Double> newRaw() {
@@ -161,7 +161,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
 
     @Override
     protected QR<Double> makePrimitive() {
-        return new QRDecomposition.Primitive();
+        return new QRDecomposition.R064();
     }
 
     @Override

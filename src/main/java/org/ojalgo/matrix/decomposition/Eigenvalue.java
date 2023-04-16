@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -218,19 +219,112 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<>() {
+    Factory<ComplexNumber> C128 = new Factory<>() {
 
         @Override
         public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Complex() : null;
+            return hermitian ? new HermitianEvD.C128() : null;
         }
 
         @Override
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.COMPLEX;
+            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.C128;
             Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<Double> R064 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<Double> make(final Structure2D typical) {
+            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                return new DynamicEvD.R064();
+            }
+            return new RawEigenvalue.Dynamic();
+        }
+
+        @Override
+        public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
+            if (hermitian) {
+                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                    return new HermitianEvD.R064();
+                }
+                return new RawEigenvalue.Symmetric();
+            }
+            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+                return new GeneralEvD.R064();
+            }
+            return new RawEigenvalue.General();
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
+            Eigenvalue<Double> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<Quaternion> H256 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.H256() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.H256;
+            Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
+            Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Q128() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.Q128;
+            Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
+            Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<Quadruple> R128 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<Quadruple> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.R128() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Quadruple> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> factory = GenericStore.R128;
+            Cholesky<Quadruple> cholesky = Cholesky.QUADRUPLE.make(typical);
+            Eigenvalue<Quadruple> eigenvalue = this.make(typical, true);
 
             return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
@@ -249,79 +343,35 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         return retVal;
     };
 
-    Factory<Double> PRIMITIVE = new Factory<>() {
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
 
-        @Override
-        public Eigenvalue<Double> make(final Structure2D typical) {
-            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                return new DynamicEvD.Primitive();
-            }
-            return new RawEigenvalue.Dynamic();
-        }
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
 
-        @Override
-        public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
-            if (hermitian) {
-                if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                    return new HermitianEvD.Primitive();
-                }
-                return new RawEigenvalue.Symmetric();
-            }
-            if (8192L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-                return new GeneralEvD.Primitive();
-            }
-            return new RawEigenvalue.General();
-        }
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
 
-        @Override
-        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
-            PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
-            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
-            Eigenvalue<Double> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
-        }
-
-    };
-
-    Factory<Quaternion> QUATERNION = new Factory<>() {
-
-        @Override
-        public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Quat() : null;
-        }
-
-        @Override
-        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
-
-            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.QUATERNION;
-            Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
-            Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
-        }
-
-    };
-
-    Factory<RationalNumber> RATIONAL = new Factory<>() {
-
-        @Override
-        public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Rational() : null;
-        }
-
-        @Override
-        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
-
-            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.RATIONAL;
-            Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
-            Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
-        }
-
-    };
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
 
@@ -484,7 +534,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
 
         final long tmpDimension = this.getV().countColumns();
 
-        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(tmpDimension, tmpDimension);
+        final GenericStore<ComplexNumber> retVal = GenericStore.C128.make(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

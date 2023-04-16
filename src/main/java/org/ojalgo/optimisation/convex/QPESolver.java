@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -43,25 +42,11 @@ final class QPESolver extends ConstrainedSolver {
     private boolean myFeasible = false;
     private final Primitive64Store myIterationX;
 
-    QPESolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    QPESolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
-        super(matrices, solverOptions);
+        super(convexSolverBuilder, optimisationOptions);
 
-        myIterationX = Primitive64Store.FACTORY.make(this.countVariables(), 1L);
-    }
-
-    private boolean isFeasible() {
-
-        boolean retVal = true;
-
-        final MatrixStore<Double> tmpSE = this.getSlackE();
-        for (int i = 0; retVal && i < tmpSE.countRows(); i++) {
-            if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
-                retVal = false;
-            }
-        }
-
-        return retVal;
+        myIterationX = MATRIX_FACTORY.make(this.countVariables(), 1L);
     }
 
     @Override
@@ -72,12 +57,9 @@ final class QPESolver extends ConstrainedSolver {
         if (kickStarter != null && kickStarter.getState().isFeasible()) {
 
             this.getSolutionX().fillMatching(kickStarter);
+            myFeasible = true;
 
-            if (!(myFeasible = this.isFeasible())) {
-                this.getSolutionX().fillAll(ZERO);
-            } else {
-                this.setState(State.FEASIBLE);
-            }
+            this.setState(State.FEASIBLE);
 
         } else {
 
@@ -96,45 +78,42 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     protected void performIteration() {
 
-        final MatrixStore<Double> tmpIterC = this.getIterationC();
-        final MatrixStore<Double> tmpIterA = this.getIterationA();
-        final MatrixStore<Double> tmpIterB = this.getIterationB();
+        MatrixStore<Double> iterA = this.getIterationA();
+        MatrixStore<Double> iterB = this.getIterationB();
+        MatrixStore<Double> iterC = this.getIterationC();
 
         boolean solved = false;
 
-        final Primitive64Store tmpIterX = myIterationX;
-        // final Primitive64Store tmpIterL = Primitive64Store.FACTORY.make(tmpIterA.countRows(), 1L);
-        final Primitive64Store tmpIterL = this.getSolutionL();
+        Primitive64Store iterX = myIterationX;
+        Primitive64Store iterL = this.getSolutionL();
 
-        if (tmpIterA.countRows() < tmpIterA.countColumns() && (solved = this.isSolvableQ())) {
+        if (iterA.countRows() < iterA.countColumns() && (solved = this.isSolvableQ())) {
             // Q is SPD
             // Actual/normal optimisation problem
 
-            final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(tmpIterA.transpose());
-            // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
+            MatrixStore<Double> invQAt = this.getSolutionQ(iterA.transpose());
 
             // Negated Schur complement
-            final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
+            MatrixStore<Double> negS = iterA.multiply(invQAt);
             // TODO Symmetric, only need to calculate halv the Schur complement
-            if (solved = this.computeGeneral(tmpS)) {
+            if (solved = this.computeGeneral(negS)) {
 
-                // tmpX temporarely used to store tmpInvQC
-                final MatrixStore<Double> tmpInvQC = this.getSolutionQ(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
+                // iterX temporarely used to store tmpInvQC
+                MatrixStore<Double> invQC = this.getSolutionQ(iterC, iterX);
 
-                this.getSolutionGeneral(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
-                this.getSolutionQ(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
+                this.getSolutionGeneral(iterA.multiply(invQC).subtract(iterB), iterL);
+                this.getSolutionQ(iterC.subtract(iterA.transpose().multiply(iterL)), iterX);
             }
-
         }
 
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
+            Primitive64Store tmpXL = MATRIX_FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
-                tmpIterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
-                tmpIterL.fillMatching(tmpXL.offsets(this.countVariables(), 0));
+                iterX.fillMatching(tmpXL.limits(this.countVariables(), 1));
+                iterL.fillMatching(tmpXL.offsets(this.countVariables(), 0));
             }
         }
 
@@ -143,12 +122,10 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-                this.getSolutionX().modifyMatching(ADD, tmpIterX);
+                this.getSolutionX().modifyMatching(ADD, iterX);
             } else {
-                this.getSolutionX().fillMatching(tmpIterX);
+                this.getSolutionX().fillMatching(iterX);
             }
-
-            // this.getSolutionL().fillMatching(tmpIterL);
 
         } else if (myFeasible) {
 
@@ -165,7 +142,7 @@ final class QPESolver extends ConstrainedSolver {
 
     @Override
     int countIterationConstraints() {
-        return (int) this.getIterationA().countRows();
+        return this.countEqualityConstraints();
     }
 
     @Override
@@ -176,20 +153,22 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationB() {
         if (myFeasible) {
-            return Primitive64Store.FACTORY.makeZero(this.countEqualityConstraints(), 1);
+            return MATRIX_FACTORY.makeZero(this.countEqualityConstraints(), 1);
+        } else {
+            return this.getMatrixBE();
         }
-        return this.getMatrixBE();
     }
 
     @Override
     MatrixStore<Double> getIterationC() {
         if (myFeasible) {
-            final MatrixStore<Double> mtrxQ = this.getMatrixQ();
-            final MatrixStore<Double> mtrxC = this.getMatrixC();
-            final PhysicalStore<Double> solX = this.getSolutionX();
+            MatrixStore<Double> mtrxQ = this.getMatrixQ();
+            MatrixStore<Double> mtrxC = this.getMatrixC();
+            PhysicalStore<Double> solX = this.getSolutionX();
             return mtrxC.subtract(mtrxQ.multiply(solX));
+        } else {
+            return this.getMatrixC();
         }
-        return this.getMatrixC();
     }
 
 }

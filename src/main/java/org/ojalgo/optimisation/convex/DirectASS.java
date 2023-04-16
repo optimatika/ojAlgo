@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ import org.ojalgo.optimisation.Optimisation;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and [AI][X] &lt;= [BI]
+ * and [AI][X] <= [BI]
  * </p>
  * Where [AE] and [BE] are optional.
  *
@@ -43,71 +43,78 @@ import org.ojalgo.optimisation.Optimisation;
  */
 final class DirectASS extends ActiveSetSolver {
 
-    DirectASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
-        super(matrices, solverOptions);
+    DirectASS(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+        super(convexSolverBuilder, optimisationOptions);
     }
 
     @Override
     protected void performIteration() {
 
         if (this.isLogDebug()) {
-            this.log("\nPerformIteration {}", 1 + this.countIterations());
+            this.log();
+            this.log("PerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
 
         this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
-        final int[] incl = this.getIncluded();
-        final int[] excl = this.getExcluded();
+        int[] incl = this.getIncluded();
+        int[] excl = this.getExcluded();
 
         boolean solved = false;
 
-        final int numbConstr = this.countIterationConstraints();
-        final int numbVars = this.countVariables();
+        int numbConstr = this.countIterationConstraints();
+        int numbVars = this.countVariables();
 
-        final Primitive64Store iterX = this.getIterationX();
-        final Primitive64Store iterL = Primitive64Store.FACTORY.make(numbConstr, 1L);
-        final Primitive64Store soluL = this.getSolutionL();
+        Primitive64Store iterX = this.getIterationX();
+        Primitive64Store iterL = MATRIX_FACTORY.make(numbConstr, 1L);
+        Primitive64Store soluL = this.getSolutionL();
 
         if (numbConstr <= numbVars && (solved = this.isSolvableQ())) {
             // Q is SPD
 
+            MatrixStore<Double> invQC = this.getInvQC();
+
             if (numbConstr == 0L) {
                 // Unconstrained - can happen when there are no equality constraints and all inequalities are inactive
 
-                iterX.fillMatching(this.getInvQC());
+                iterX.fillMatching(invQC);
 
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> iterA = this.getIterationA();
-                final MatrixStore<Double> iterB = this.getIterationB();
-                final MatrixStore<Double> iterC = this.getIterationC();
+                MatrixStore<Double> iterA = this.getIterationA();
+                MatrixStore<Double> iterB = this.getIterationB();
+                MatrixStore<Double> iterC = this.getIterationC();
 
-                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(iterA.transpose());
+                MatrixStore<Double> invQAt = this.getSolutionQ(iterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
-                // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
+                if (this.isLogDebug()) {
+                    this.log("invQAt", invQAt);
+                }
 
                 // Negated Schur complement
-                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(iterA);
+                ElementsSupplier<Double> tmpS = invQAt.premultiply(iterA);
                 // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
                 if (this.isLogDebug()) {
-                    // BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
+                    this.log("Negated Schur complement: " + Arrays.toString(incl), tmpS.collect(MATRIX_FACTORY));
                 }
 
                 if (solved = this.computeGeneral(tmpS)) {
 
-                    ElementsSupplier<Double> rhs = this.getInvQC().premultiply(iterA).onMatching(SUBTRACT, iterB);
-                    this.getSolutionGeneral(rhs, iterL);
+                    ElementsSupplier<Double> rhsL = invQC.premultiply(iterA).onMatching(SUBTRACT, iterB);
+                    this.getSolutionGeneral(rhsL, iterL);
 
                     if (this.isLogDebug()) {
-                        this.log("RHS={}", rhs.collect(Primitive64Store.FACTORY).toRawCopy1D());
+                        this.log("RHS={}", rhsL.collect(MATRIX_FACTORY).toRawCopy1D());
                         this.log("Relative error {} in solution for L={}", NaN, Arrays.toString(iterL.toRawCopy1D()));
                     }
 
-                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).onMatching(iterC, SUBTRACT);
-                    this.getSolutionQ(tmpRHS, iterX);
+                    // ElementsSupplier<Double> rhsX = iterL.premultiply(iterA.transpose()).onMatching(iterC, SUBTRACT);
+                    // this.getSolutionQ(rhsX, iterX);
+
+                    iterL.premultiply(invQAt).onMatching(invQC, SUBTRACT).supplyTo(iterX);
                 }
             }
         }
@@ -115,7 +122,7 @@ final class DirectASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(numbVars + numbConstr, 1L);
+            Primitive64Store tmpXL = MATRIX_FACTORY.make(numbVars + numbConstr, 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 
@@ -124,7 +131,7 @@ final class DirectASS extends ActiveSetSolver {
             }
         }
 
-        soluL.fillAll(0.0);
+        soluL.fillAll(ZERO);
         if (solved) {
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
                 soluL.set(i, iterL.doubleValue(i));

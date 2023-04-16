@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,20 +76,20 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpC1 = tmpModel.addExpression("C1");
+        Expression tmpC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpC1.set(i, ONE);
         }
 
         tmpC1.level(ONE);
 
-        Expression tmpC2 = tmpModel.addExpression("C2");
+        Expression tmpC2 = tmpModel.newExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpC2.set(i, ONE);
         }
         tmpC2.level(TWO);
 
-        Expression tmpC3 = tmpModel.addExpression("C3");
+        Expression tmpC3 = tmpModel.newExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpC3.set(i, ONE);
         }
@@ -134,19 +134,19 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
-        Expression expr1 = model.addExpression("Expr1");
+        Expression expr1 = model.newExpression("Expr1");
         expr1.set(0, -1);
         expr1.set(1, 5100);
         expr1.set(2, -5000);
         expr1.upper(BigMath.ZERO);
 
-        Expression expr2 = model.addExpression("Expr2");
+        Expression expr2 = model.newExpression("Expr2");
         expr2.set(0, 1);
         expr2.set(1, 5100);
         expr2.set(2, -5000);
         expr2.lower(BigMath.ZERO);
 
-        Expression expr3 = model.addExpression("Expr3");
+        Expression expr3 = model.newExpression("Expr3");
         expr3.set(1, 5000);
         expr3.set(2, 5000);
         expr3.level(new BigDecimal(19105000));
@@ -180,41 +180,41 @@ public class IntegerProblems extends OptimisationIntegerTests {
         model.addVariable(x2014);
         model.addVariable(x2015);
 
-        Expression obj = model.addExpression("obj");
+        Expression obj = model.newExpression("obj");
         obj.set(x1, 1);
         obj.weight(1);
 
-        Expression c1 = model.addExpression("c1");
+        Expression c1 = model.newExpression("c1");
         c1.set(x1, 1);
         c1.lower(0);
 
-        Expression c2 = model.addExpression("c2");
+        Expression c2 = model.newExpression("c2");
         c2.set(x2014, -5000);
         c2.set(x2013, 5100);
         c2.set(x1, -1);
         c2.upper(0);
 
-        Expression c3 = model.addExpression("c3");
+        Expression c3 = model.newExpression("c3");
         c3.set(x2014, -5000);
         c3.set(x2013, 5100);
         c3.set(x1, 1);
         c3.lower(0);
 
-        Expression c4 = model.addExpression("c4");
+        Expression c4 = model.newExpression("c4");
         c4.set(x2014, 150);
         c4.set(x2013, 5100);
         c4.set(x2015, -5000);
         c4.set(x1, -1);
         c4.upper(0);
 
-        Expression c5 = model.addExpression("c5");
+        Expression c5 = model.newExpression("c5");
         c5.set(x2014, 150);
         c5.set(x2013, 5100);
         c5.set(x2015, -5000);
         c5.set(x1, 1);
         c5.lower(0);
 
-        Expression c6 = model.addExpression("c6");
+        Expression c6 = model.newExpression("c6");
         c6.set(x2015, 5000);
         c6.set(x2014, 5000);
         c6.set(x2013, 5000);
@@ -371,7 +371,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         //flow_out:
         //sum(j in cities : i!=j) x[i][j]==1;
         for (int i = 0; i < n; i++) {
-            Expression constraint_line = model.addExpression("constraint_line" + i).lower(1).upper(1);
+            Expression constraint_line = model.newExpression("constraint_line" + i).lower(1).upper(1);
             for (int j = 0; j < n; j++) {
                 if (i != j) {
                     constraint_line.set(x[i][j], 1);
@@ -383,7 +383,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         //flow_in:
         //sum(i in cities : i!=j) x[i][j]==1;
         for (int j = 0; j < n; j++) {
-            Expression constraint_column = model.addExpression("constraint_column" + j).lower(1).upper(1);
+            Expression constraint_column = model.newExpression("constraint_column" + j).lower(1).upper(1);
             for (int i = 0; i < n; i++) {
                 if (i != j) {
                     constraint_column.set(x[i][j], 1);
@@ -397,7 +397,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < n; j++) {
                 if (i != j) {
-                    Expression constraint_subroute = model.addExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
+                    Expression constraint_subroute = model.newExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
                     constraint_subroute.set(u[i], 1);
                     constraint_subroute.set(u[j], -1);
                     constraint_subroute.set(x[i][j], n);
@@ -442,14 +442,14 @@ public class IntegerProblems extends OptimisationIntegerTests {
         NumberContext precision = NumberContext.of(14, 12);
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable varX = model.addVariable("X").binary();
-        Variable varY = model.addVariable("Y").binary();
+        Variable varX = model.newVariable("X").binary();
+        Variable varY = model.newVariable("Y").binary();
 
         // (X <= Y * 0.5)  equivalent to  (0 <= Y * 0.5 - X)
         // only one solution: X = 0, Y = 1
-        model.addExpression("X < Y * 0.5").lower(ZERO).set(varX, NEG).set(varY, HALF);
+        model.newExpression("X < Y * 0.5").lower(ZERO).set(varX, NEG).set(varY, HALF);
         // objective function
-        model.addExpression("sum").weight(ONE).set(varX, ONE).set(varY, ONE);
+        model.newExpression("sum").weight(ONE).set(varX, ONE).set(varY, ONE);
 
         if (DEBUG) {
             BasicLogger.debug("Original 1 model");
@@ -492,14 +492,14 @@ public class IntegerProblems extends OptimisationIntegerTests {
         // model.options.debug(Optimisation.Solver.class);
         model.options.iterations_abort = 2;
 
-        Variable varX = model.addVariable("X").binary();
-        Variable varY = model.addVariable("Y").binary();
+        Variable varX = model.newVariable("X").binary();
+        Variable varY = model.newVariable("Y").binary();
 
         // two possible solutions: X = 0, Y = 1 or X = 1, Y = 0
-        Expression constraint = model.addExpression("X + Y <= 1").upper(ONE).set(varX, ONE).set(varY, ONE);
+        Expression constraint = model.newExpression("X + Y <= 1").upper(ONE).set(varX, ONE).set(varY, ONE);
 
         // function maximized by X = 1
-        Expression objectiveFunction = model.addExpression("X").weight(ONE).set(varX, ONE);
+        Expression objectiveFunction = model.newExpression("X").weight(ONE).set(varX, ONE);
 
         Result result = model.maximise();
 

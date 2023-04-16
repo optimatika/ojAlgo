@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -138,7 +138,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
 
     @Override
     protected Eigenvalue<Double> makePrimitive() {
-        return new HermitianEvD.Primitive();
+        return new HermitianEvD.R064();
     }
 
     @Override
@@ -147,7 +147,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
     }
 
     protected Eigenvalue<Double> makeSimultaneousPrimitive() {
-        return new HermitianEvD.Primitive();
+        return new HermitianEvD.R064();
     }
 
 }

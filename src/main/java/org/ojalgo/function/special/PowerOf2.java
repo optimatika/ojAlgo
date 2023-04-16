@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,9 @@ public abstract class PowerOf2 {
         public final int value;
         private final int myModuloMask;
 
-        IntPower(final int exponent, final int value) {
-            super(exponent);
-            this.value = value;
+        IntPower(final int exp) {
+            super(exp);
+            value = INT_POWERS[exp];
             myModuloMask = value - 1;
         }
 
@@ -57,9 +57,9 @@ public abstract class PowerOf2 {
         public final long value;
         private final long myModuloMask;
 
-        LongPower(final int exponent, final long value) {
-            super(exponent);
-            this.value = value;
+        LongPower(final int exp) {
+            super(exp);
+            value = LONG_POWERS[exp];
             myModuloMask = value - 1L;
         }
 
@@ -127,11 +127,11 @@ public abstract class PowerOf2 {
     }
 
     public static IntPower getIntPower(final int exponent) {
-        return new IntPower(exponent, INT_POWERS[exponent]);
+        return new IntPower(exponent);
     }
 
     public static LongPower getLongPower(final int exponent) {
-        return new LongPower(exponent, LONG_POWERS[exponent]);
+        return new LongPower(exponent);
     }
 
     public static boolean isPowerOf2(final int value) {
@@ -213,9 +213,9 @@ public abstract class PowerOf2 {
 
     public final int exponent;
 
-    PowerOf2(final int exponent) {
+    PowerOf2(final int exp) {
         super();
-        this.exponent = exponent;
+        exponent = exp;
     }
 
 }

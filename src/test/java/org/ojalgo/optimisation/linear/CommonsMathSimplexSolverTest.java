@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,16 +46,16 @@ import org.ojalgo.structure.Access1D;
  */
 public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
-    private final class LargeModelFactory {
+    private class LargeModelFactory {
 
-        final double[] objective = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+        double[] objective = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
         Collection<LinearConstraint> generateConstraints() {
-            final Collection<LinearConstraint> constraints = new ArrayList<>();
+            Collection<LinearConstraint> constraints = new ArrayList<>();
             constraints.add(CommonsMathSimplexSolverTest.this.equationFromString(objective.length, "x0 + x1 + x2 + x3 - x12 = 0"));
             constraints.add(CommonsMathSimplexSolverTest.this.equationFromString(objective.length, "x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 - x13 = 0"));
             constraints.add(CommonsMathSimplexSolverTest.this.equationFromString(objective.length, "x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 >= 49"));
@@ -181,7 +181,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
-    static final class LinearConstraint {
+    static class LinearConstraint {
 
         private final double[] myFactors;
 
@@ -209,7 +209,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
-    static final class LinearObjectiveFunction {
+    static class LinearObjectiveFunction {
 
         private final double myConstant;
         private final ExpressionsBasedModel myModel;
@@ -218,7 +218,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
             super();
 
-            final Variable[] tmpVariables = new Variable[weights.length];
+            Variable[] tmpVariables = new Variable[weights.length];
             for (int v = 0; v < tmpVariables.length; v++) {
                 tmpVariables[v] = new Variable("VAR" + v);
                 tmpVariables[v].weight(new BigDecimal(weights[v]));
@@ -229,7 +229,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public Expression addExpression(final String aName) {
-            return myModel.addExpression(aName);
+            return myModel.newExpression(aName);
         }
 
         public double getConstant() {
@@ -258,7 +258,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
-    static final class PointValuePair {
+    static class PointValuePair {
 
         private final LinearObjectiveFunction myObjFunc;
         private final Optimisation.Result myResult;
@@ -274,13 +274,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public double getValue() {
-            final Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
+            Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
             return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
         }
 
         double[] getPoint() {
 
-            final double[] retVal = new double[myResult.size()];
+            double[] retVal = new double[myResult.size()];
             for (int i = 0; i < retVal.length; i++) {
                 retVal[i] = myResult.doubleValue(i);
             }
@@ -289,25 +289,25 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
     }
 
-    static final class Precision {
+    static class Precision {
 
         /**
          * Smallest positive number such that {@code 1 - EPSILON} is not numerically equal to 1: {@value} .
          */
-        public static final double EPSILON = 0x1.0p-53;
+        public static double EPSILON = 0x1.0p-53;
         /**
          * Safe minimum, such that {@code 1 / SAFE_MIN} does not overflow. In IEEE 754 arithmetic, this is
          * also the smallest normalized number 2<sup>-1022</sup>: {@value} .
          */
-        public static final double SAFE_MIN = 0x1.0p-1022;
+        public static double SAFE_MIN = 0x1.0p-1022;
         /**
          * Offset to order signed double numbers lexicographically.
          */
-        private static final long SGN_MASK = 0x8000000000000000L;
+        private static long SGN_MASK = 0x8000000000000000L;
         /**
          * Offset to order signed double numbers lexicographically.
          */
-        private static final int SGN_MASK_FLOAT = 0x80000000;
+        private static int SGN_MASK_FLOAT = 0x80000000;
 
         /**
          * Compares two numbers given some amount of allowed error.
@@ -411,7 +411,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 yInt = SGN_MASK - yInt;
             }
 
-            final boolean isEqual = PrimitiveMath.ABS.invoke(xInt - yInt) <= maxUlps;
+            boolean isEqual = PrimitiveMath.ABS.invoke(xInt - yInt) <= maxUlps;
 
             return isEqual && !Double.isNaN(x) && !Double.isNaN(y);
         }
@@ -467,7 +467,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 yInt = SGN_MASK_FLOAT - yInt;
             }
 
-            final boolean isEqual = PrimitiveMath.ABS.invoke(xInt - yInt) <= maxUlps;
+            boolean isEqual = PrimitiveMath.ABS.invoke(xInt - yInt) <= maxUlps;
 
             return isEqual && !Float.isNaN(x) && !Float.isNaN(y);
         }
@@ -611,7 +611,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         public static double round(final double x, final int scale, final int roundingMethod) {
             try {
                 return (new BigDecimal(Double.toString(x)).setScale(scale, roundingMethod)).doubleValue();
-            } catch (final NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 if (Double.isInfinite(x)) {
                     return x;
                 } else {
@@ -644,8 +644,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
          */
         public static float round(final float x, final int scale, final int roundingMethod) {
-            final float sign = Math.copySign(1f, x);
-            final float factor = PrimitiveMath.POW.invoke(10.0f, scale) * sign;
+            float sign = Math.copySign(1f, x);
+            float factor = PrimitiveMath.POW.invoke(10.0f, scale) * sign;
             return (float) Precision.roundUnscaled(x * factor, sign, roundingMethod) / factor;
         }
 
@@ -681,7 +681,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 break;
             case BigDecimal.ROUND_HALF_DOWN: {
                 unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
-                final double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
                 if (fraction > 0.5) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
                 } else {
@@ -690,7 +690,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 break;
             }
             case BigDecimal.ROUND_HALF_EVEN: {
-                final double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
                 if ((fraction > 0.5) || ((fraction >= 0.5)
                         && ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)))) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
@@ -701,7 +701,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             }
             case BigDecimal.ROUND_HALF_UP: {
                 unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
-                final double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
                 if (fraction >= 0.5) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
                 } else {
@@ -760,7 +760,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          *
          * @param stringValue display string for the relationship
          */
-        private Relationship(final String stringValue) {
+        Relationship(final String stringValue) {
             this.stringValue = stringValue;
         }
 
@@ -790,20 +790,20 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
-    static final class SimplexSolver {
+    static class SimplexSolver {
 
         PointValuePair optimize(final LinearObjectiveFunction model, final Collection<LinearConstraint> constraints, final GoalType minOrMax,
                 final boolean positiveOnlyVariables) {
 
             if (positiveOnlyVariables) {
-                for (final Variable tmpVariable : model.getVariables()) {
+                for (Variable tmpVariable : model.getVariables()) {
                     tmpVariable.lower(BigMath.ZERO);
                 }
             }
 
-            for (final LinearConstraint tmpLinearConstraint : constraints) {
-                final Expression tmpExpression = model.addExpression(tmpLinearConstraint.toString());
-                final double[] tmpFactors = tmpLinearConstraint.getFactors();
+            for (LinearConstraint tmpLinearConstraint : constraints) {
+                Expression tmpExpression = model.addExpression(tmpLinearConstraint.toString());
+                double[] tmpFactors = tmpLinearConstraint.getFactors();
                 for (int i = 0; i < tmpFactors.length; i++) {
                     tmpExpression.set(i, tmpFactors[i]);
                 }
@@ -820,7 +820,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 }
             }
 
-            //model.myModel.options.debug(LinearSolver.class);
+            if (DEBUG) {
+                model.myModel.options.debug(LinearSolver.class);
+            }
 
             Optimisation.Result tmpResult = null;
             if (minOrMax == GoalType.MINIMIZE) {
@@ -836,42 +838,42 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testAbortAfterIterationWithLargeModel() {
-        final LargeModelFactory lmf = new LargeModelFactory();
+        LargeModelFactory lmf = new LargeModelFactory();
 
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(lmf.objective, 0);
+        LinearObjectiveFunction f = new LinearObjectiveFunction(lmf.objective, 0);
         f.getOptions().iterations_abort = 5;
 
-        final Collection<LinearConstraint> constraints = lmf.generateConstraints();
+        Collection<LinearConstraint> constraints = lmf.generateConstraints();
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(State.UNEXPLORED, solution.getState());
     }
 
     @Test
     public void testDegeneracy() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.7 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.7 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 18.0));
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 10.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 8.0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(13.6, solution.getValue(), .0000001);
     }
 
     @Test
     public void testEpsilon() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 10, 5, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 10, 5, 1 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 9, 8, 0 }, Relationship.EQ, 17));
         constraints.add(new LinearConstraint(new double[] { 0, 7, 8 }, Relationship.LEQ, 7));
         constraints.add(new LinearConstraint(new double[] { 10, 0, 2 }, Relationship.LEQ, 10));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        final double tmpError = 1E-14 / PrimitiveMath.THREE;
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        double tmpError = 1E-14 / PrimitiveMath.THREE;
         TestUtils.assertEquals(1.0, solution.getPoint()[0], tmpError);
         TestUtils.assertEquals(1.0, solution.getPoint()[1], tmpError);
         TestUtils.assertEquals(0.0, solution.getPoint()[2], tmpError);
@@ -881,38 +883,38 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = NoFeasibleSolutionException.class)
     @Test
     public void testInfeasibleSolution() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.GEQ, 3));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
 
     @Test
     public void testLargeModel() {
-        final LargeModelFactory lmf = new LargeModelFactory();
+        LargeModelFactory lmf = new LargeModelFactory();
 
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(lmf.objective, 0);
-        final Collection<LinearConstraint> constraints = lmf.generateConstraints();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(lmf.objective, 0);
+        Collection<LinearConstraint> constraints = lmf.generateConstraints();
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(7518.0, solution.getValue(), .0000001);
     }
 
     @Test
     public void testMath272() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 2, 2, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 2, 2, 1 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0 }, Relationship.GEQ, 1));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
 
         TestUtils.assertEquals(0.0, solution.getPoint()[0], .0000001);
         TestUtils.assertEquals(1.0, solution.getPoint()[1], .0000001);
@@ -922,16 +924,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testMath286() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.6, 0.4 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.6, 0.4 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 23.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 23.0));
         constraints.add(new LinearConstraint(new double[] { 1, 0, 0, 0, 0, 0 }, Relationship.GEQ, 10.0));
         constraints.add(new LinearConstraint(new double[] { 0, 0, 1, 0, 0, 0 }, Relationship.GEQ, 8.0));
         constraints.add(new LinearConstraint(new double[] { 0, 0, 0, 0, 1, 0 }, Relationship.GEQ, 5.0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
 
         TestUtils.assertEquals(25.8, solution.getValue(), .0000001);
         TestUtils.assertEquals(23.0, solution.getPoint()[0] + solution.getPoint()[2] + solution.getPoint()[4], 0.0000001);
@@ -943,26 +945,26 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testMath288() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 7, 3, 0, 0 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 7, 3, 0, 0 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 3, 0, -5, 0 }, Relationship.LEQ, 0.0));
         constraints.add(new LinearConstraint(new double[] { 2, 0, 0, -5 }, Relationship.LEQ, 0.0));
         constraints.add(new LinearConstraint(new double[] { 0, 3, 0, -5 }, Relationship.LEQ, 0.0));
         constraints.add(new LinearConstraint(new double[] { 1, 0, 0, 0 }, Relationship.LEQ, 1.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 0 }, Relationship.LEQ, 1.0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(10.0, solution.getValue(), .0000001);
     }
 
     @Test
     public void testMath290GEQ() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.GEQ, -1.0));
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(0, solution.getValue(), .0000001);
         TestUtils.assertEquals(0, solution.getPoint()[0], .0000001);
         TestUtils.assertEquals(0, solution.getPoint()[1], .0000001);
@@ -971,11 +973,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = NoFeasibleSolutionException.class)
     @Test
     public void testMath290LEQ() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.LEQ, -1.0));
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
 
@@ -992,8 +994,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.7, 0.3, 0.0, 0.0 }, Relationship.GEQ, 10.0));
         constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.0, 0.0, 0.4, 0.6 }, Relationship.GEQ, 10.0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution1 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution1 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
 
         TestUtils.assertEquals(15.7143, solution1.getPoint()[0], .0001);
         TestUtils.assertEquals(0.0, solution1.getPoint()[1], .0001);
@@ -1003,9 +1005,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(30.0, solution1.getPoint()[5], .0001);
         TestUtils.assertEquals(40.57143, solution1.getValue(), .0001);
 
-        final double valA = (0.8 * solution1.getPoint()[0]) + (0.2 * solution1.getPoint()[1]);
-        final double valB = (0.7 * solution1.getPoint()[2]) + (0.3 * solution1.getPoint()[3]);
-        final double valC = (0.4 * solution1.getPoint()[4]) + (0.6 * solution1.getPoint()[5]);
+        double valA = (0.8 * solution1.getPoint()[0]) + (0.2 * solution1.getPoint()[1]);
+        double valB = (0.7 * solution1.getPoint()[2]) + (0.3 * solution1.getPoint()[3]);
+        double valC = (0.4 * solution1.getPoint()[4]) + (0.6 * solution1.getPoint()[5]);
 
         f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
         constraints = new ArrayList<>();
@@ -1015,20 +1017,20 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.7, 0.3, 0.0, 0.0 }, Relationship.GEQ, valB));
         constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.0, 0.0, 0.4, 0.6 }, Relationship.GEQ, valC));
 
-        final PointValuePair solution2 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        PointValuePair solution2 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(40.57143, solution2.getValue(), .0001);
     }
 
     @Test
     public void testMath434NegativeVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0, 0.0, 1.0 }, 0.0d);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0, 0.0, 1.0 }, 0.0d);
+        ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.EQ, 5));
         constraints.add(new LinearConstraint(new double[] { 0, 0, 1 }, Relationship.GEQ, -10));
 
-        final double epsilon = 1e-6;
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
+        double epsilon = 1e-6;
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
 
         TestUtils.assertEquals(5.0, solution.getPoint()[0] + solution.getPoint()[1], epsilon);
         TestUtils.assertEquals(-10.0, solution.getPoint()[2], epsilon);
@@ -1038,15 +1040,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testMath434PivotRowSelection() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0 }, 0.0);
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0 }, 0.0);
 
-        final double epsilon = 1e-6;
-        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
+        double epsilon = 1e-6;
+        ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 200 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 100 }, Relationship.GEQ, 0.499900001));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
 
         TestUtils.assertTrue(Precision.compareTo(solution.getPoint()[0] * 200.d, 1.d, epsilon) >= 0);
         TestUtils.assertEquals(0.0050, solution.getValue(), epsilon);
@@ -1054,9 +1056,10 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testMath434PivotRowSelection2() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d }, 0.0d);
 
-        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d }, 0.0d);
+
+        ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1.0d, -0.1d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.EQ, -0.1d));
         constraints.add(new LinearConstraint(new double[] { 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, -1e-18d));
         constraints.add(new LinearConstraint(new double[] { 0.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
@@ -1067,9 +1070,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, 0.0d, -1.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
         constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, 0.0d, 1.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
 
-        final double epsilon = 1e-7;
-        final SimplexSolver simplex = new SimplexSolver();
-        final PointValuePair solution = simplex.optimize(f, constraints, GoalType.MINIMIZE, false);
+        double epsilon = 1e-7;
+        SimplexSolver simplex = new SimplexSolver();
+        PointValuePair solution = simplex.optimize(f, constraints, GoalType.MINIMIZE, false);
 
         TestUtils.assertTrue(Precision.compareTo(solution.getPoint()[0], -1e-18d, epsilon) >= 0);
         TestUtils.assertEquals(1.0d, solution.getPoint()[1], epsilon);
@@ -1080,28 +1083,28 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = NoFeasibleSolutionException.class)
     @Test
     public void testMath434UnfeasibleSolution() {
-        final double epsilon = 1e-6;
+        double epsilon = 1e-6;
 
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 0.0 }, 0.0);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 0.0 }, 0.0);
+        ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { epsilon / 2, 0.5 }, Relationship.EQ, 0));
         constraints.add(new LinearConstraint(new double[] { 1e-3, 0.1 }, Relationship.EQ, 10));
 
-        final SimplexSolver solver = new SimplexSolver();
+        SimplexSolver solver = new SimplexSolver();
         // allowing only non-negative values, no feasible solution shall be found
-        final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
 
     @Test
     public void testMath713NegativeVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 1.0 }, 0.0d);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 1.0 }, 0.0d);
+        ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 1));
 
-        final double epsilon = 1e-6;
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
+        double epsilon = 1e-6;
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
 
         TestUtils.assertTrue(Precision.compareTo(solution.getPoint()[0], 0.0d, epsilon) >= 0);
         TestUtils.assertTrue(Precision.compareTo(solution.getPoint()[1], 0.0d, epsilon) >= 0);
@@ -1109,14 +1112,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testMinimization() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, -5);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, -5);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 6));
         constraints.add(new LinearConstraint(new double[] { 3, 2 }, Relationship.LEQ, 12));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
         TestUtils.assertEquals(4.0, solution.getPoint()[0]);
         TestUtils.assertEquals(0.0, solution.getPoint()[1]);
         TestUtils.assertEquals(-13.0, solution.getValue());
@@ -1128,14 +1131,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     @Test
     public void testModelWithNoArtificialVars() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 4));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(2.0, solution.getPoint()[0]);
         TestUtils.assertEquals(2.0, solution.getPoint()[1]);
         TestUtils.assertEquals(50.0, solution.getValue());
@@ -1143,16 +1146,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testRestrictVariablesToNonNegative() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 409, 523, 70, 204, 339 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 409, 523, 70, 204, 339 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 43, 56, 345, 56, 5 }, Relationship.LEQ, 4567456));
         constraints.add(new LinearConstraint(new double[] { 12, 45, 7, 56, 23 }, Relationship.LEQ, 56454));
         constraints.add(new LinearConstraint(new double[] { 8, 768, 0, 34, 7456 }, Relationship.LEQ, 1923421));
         constraints.add(new LinearConstraint(new double[] { 12342, 2342, 34, 678, 2342 }, Relationship.GEQ, 4356));
         constraints.add(new LinearConstraint(new double[] { 45, 678, 76, 52, 23 }, Relationship.EQ, 456356));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(2902.92783505155, solution.getPoint()[0], .0000001);
         TestUtils.assertEquals(480.419243986254, solution.getPoint()[1], .0000001);
         TestUtils.assertEquals(0.0, solution.getPoint()[2], .0000001);
@@ -1163,14 +1166,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testSimplexSolver() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 7);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 7);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 4));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(2.0, solution.getPoint()[0]);
         TestUtils.assertEquals(2.0, solution.getPoint()[1]);
         TestUtils.assertEquals(57.0, solution.getValue());
@@ -1178,51 +1181,52 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     @Test
     public void testSingleVariableAndConstraint() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 3 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 3 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 10));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(10.0, solution.getPoint()[0]);
         TestUtils.assertEquals(30.0, solution.getValue());
     }
 
     @Test
     public void testSolutionWithNegativeDecisionVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.GEQ, 6));
         constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 14));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        final double tmpError = 10.0 * (1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals(-2.0, solution.getPoint()[0], tmpError);
-        TestUtils.assertEquals(8.0, solution.getPoint()[1], tmpError);
-        TestUtils.assertEquals(12.0, solution.getValue(), tmpError);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        double error = 10.0 * (1E-14 / PrimitiveMath.THREE);
+        double[] point = solution.getPoint();
+        TestUtils.assertEquals(-2.0, point[0], error);
+        TestUtils.assertEquals(8.0, point[1], error);
+        TestUtils.assertEquals(12.0, solution.getValue(), error);
     }
 
     @Test
     public void testTrivialModel() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 1 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 0));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(0, solution.getValue(), .0000001);
     }
 
     //@Test(expected = UnboundedSolutionException.class)
     @Test
     public void testUnboundedSolution() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<>();
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 2));
 
-        final SimplexSolver solver = new SimplexSolver();
-        final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
+        SimplexSolver solver = new SimplexSolver();
+        PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(State.UNBOUNDED, tmpResult.getState());
     }
 
@@ -1241,15 +1245,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             throw new IllegalArgumentException();
         }
 
-        final String[] equationParts = s.split("[>|<]?=");
-        final double rhs = Double.parseDouble(equationParts[1].trim());
+        String[] equationParts = s.split("[>|<]?=");
+        double rhs = Double.parseDouble(equationParts[1].trim());
 
-        final double[] lhs = new double[numCoefficients];
-        final String left = equationParts[0].replaceAll(" ?x", "");
-        final String[] coefficients = left.split(" ");
-        for (final String coefficient : coefficients) {
-            final double value = coefficient.charAt(0) == '-' ? -1 : 1;
-            final int index = Integer.parseInt(coefficient.replaceFirst("[+|-]", "").trim());
+        double[] lhs = new double[numCoefficients];
+        String left = equationParts[0].replaceAll(" ?x", "");
+        String[] coefficients = left.split(" ");
+        for (String coefficient : coefficients) {
+            double value = coefficient.charAt(0) == '-' ? -1 : 1;
+            int index = Integer.parseInt(coefficient.replaceFirst("[+|-]", "").trim());
             lhs[index] = value;
         }
         return new LinearConstraint(lhs, relationship, rhs);

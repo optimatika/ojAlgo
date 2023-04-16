@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -212,21 +211,17 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             super(denseFactory);
         }
 
-        public FunctionSet<N> function() {
-            return this.getStrategy().function();
-        }
-
-        @Override
+        /**
+         * @deprecated v53 This will create an array of maximum/infinite length. That's probably not what you
+         *             want. Use {@link #make(long)} instead.
+         */
+        @Deprecated
         public SparseArray<N> make() {
-            return new SparseArray<>(this.getStrategy());
+            return this.make(Long.MAX_VALUE);
         }
 
         public SparseArray<N> make(final long count) {
-            return this.limit(count).make();
-        }
-
-        public Scalar.Factory<N> scalar() {
-            return this.getStrategy().scalar();
+            return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), count);
         }
 
     }
@@ -243,24 +238,26 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     private int myActualLength = 0;
     private final long myCount;
     private long[] myIndices;
-    private final DenseCapacityStrategy<N> myStrategy;
+    private final DenseArray.Factory<N> myDenseFactory;
+    private final GrowthStrategy myGrowthStrategy;
     private DenseArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final DenseCapacityStrategy<N> strategy) {
+    SparseArray(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy, final long count) {
 
-        super(strategy.getDenseFactory());
+        super(denseFactory);
 
-        myCount = strategy.limit();
+        myCount = count;
 
-        myStrategy = strategy;
+        myDenseFactory = denseFactory;
+        myGrowthStrategy = growthStrategy;
 
-        myIndices = new long[strategy.initial()];
-        myValues = strategy.makeInitial();
+        myIndices = new long[growthStrategy.initial()];
+        myValues = growthStrategy.makeInitial(denseFactory);
 
-        myZeroScalar = strategy.scalar().zero();
+        myZeroScalar = denseFactory.scalar().zero();
         myZeroNumber = myZeroScalar.get();
         myZeroValue = myZeroScalar.doubleValue();
     }
@@ -352,7 +349,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
             if (tmpSize != myIndices.length) {
                 myIndices = Structure1D.newIncreasingRange(0L, tmpSize);
-                myValues = myStrategy.make(tmpSize);
+                myValues = myDenseFactory.make(tmpSize);
                 myActualLength = tmpSize;
             }
 
@@ -369,7 +366,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         if (tmpSize != myIndices.length) {
             myIndices = Structure1D.newIncreasingRange(0L, tmpSize);
-            myValues = myStrategy.make(tmpSize);
+            myValues = myDenseFactory.make(tmpSize);
             myActualLength = tmpSize;
         }
 
@@ -595,9 +592,9 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = myStrategy.grow(myIndices.length);
+                final int tmpCapacity = myGrowthStrategy.grow(myIndices.length);
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
+                final DenseArray<N> tmpValues = myDenseFactory.make(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];
@@ -647,9 +644,9 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = myStrategy.grow(myIndices.length);
+                final int tmpCapacity = myGrowthStrategy.grow(myIndices.length);
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
+                final DenseArray<N> tmpValues = myDenseFactory.make(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];
@@ -817,7 +814,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     DenseArray<N> densify() {
 
-        final DenseArray<N> retVal = myStrategy.make((int) this.count());
+        final DenseArray<N> retVal = myDenseFactory.make((int) this.count());
 
         if (this.isPrimitive()) {
             for (int i = 0; i < myActualLength; i++) {

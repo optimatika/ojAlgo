@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,11 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.SimplexTableau.MetaData;
+import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
@@ -39,7 +38,7 @@ final class DualSimplex extends SimplexTableauSolver {
      * {@link #build(org.ojalgo.optimisation.convex.ConvexSolver.Builder, org.ojalgo.optimisation.Optimisation.Options, boolean)}
      * that sets a RHS to correspond to the phase 1 objective of the primal.
      */
-    private static SimplexTableau buildAlt(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    private static SimplexTableau buildAlt(final OptimisationData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
@@ -49,12 +48,12 @@ final class DualSimplex extends SimplexTableauSolver {
         int nbConstraints = nbVars;
 
         SimplexTableau retVal = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, 0, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC();
+        MatrixStore<Double> convexC = convex.getObjective().getLinearFactors(true);
         MatrixStore<Double> convexAE = convex.getAE();
         MatrixStore<Double> convexBE = convex.getBE();
 
@@ -102,46 +101,58 @@ final class DualSimplex extends SimplexTableauSolver {
         return retVal;
     }
 
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    static SimplexTableau build(final OptimisationData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
 
         int nbVars = convex.countVariables();
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();
 
         SimplexTableau retVal = SimplexTableau.make(nbVars, nbEqus + nbEqus + nbInes, 0, 0, 0, true, options);
-        MetaData meta = retVal.meta;
+        LinearStructure meta = retVal.meta;
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = convex.getC();
-        MatrixStore<Double> convexAE = convex.getAE();
-        MatrixStore<Double> convexBE = convex.getBE();
+        MatrixStore<Double> convexC = convex.getObjective().getLinearFactors(true);
 
         for (int i = 0; i < nbVars; i++) {
             double rhs = checkFeasibility ? ZERO : convexC.doubleValue(i);
             boolean neg = meta.negatedDual[i] = NumberContext.compare(rhs, ZERO) < 0;
-            for (int j = 0; j < nbEqus; j++) {
-                double valE = convexAE.doubleValue(j, i);
-                constraintsBody.set(i, j, neg ? -valE : valE);
-                constraintsBody.set(i, nbEqus + j, neg ? valE : -valE);
-            }
             constraintsRHS.set(i, neg ? -rhs : rhs);
         }
 
-        for (RowView<Double> rowAI : convex.getRowsAI()) {
-            int tabJ = Math.toIntExact(rowAI.row());
+        if (nbEqus > 0) {
+            for (RowView<Double> rowAE : convex.getRowsAE()) {
+                int j = Math.toIntExact(rowAE.row());
 
-            for (ElementView1D<Double, ?> element : rowAI.nonzeros()) {
-                int tabI = Math.toIntExact(element.index());
+                for (ElementView1D<Double, ?> element : rowAE.nonzeros()) {
+                    int i = Math.toIntExact(element.index());
 
-                double tabVal = element.doubleValue();
-                constraintsBody.set(tabI, nbEqus + nbEqus + tabJ, meta.negatedDual[tabI] ? -tabVal : tabVal);
+                    boolean neg = meta.negatedDual[i];
+
+                    double valE = element.doubleValue();
+                    constraintsBody.set(i, j, neg ? -valE : valE);
+                    constraintsBody.set(i, nbEqus + j, neg ? valE : -valE);
+
+                }
+            }
+        }
+
+        if (nbInes > 0) {
+            for (RowView<Double> rowAI : convex.getRowsAI()) {
+                int j = Math.toIntExact(rowAI.row());
+
+                for (ElementView1D<Double, ?> element : rowAI.nonzeros()) {
+                    int i = Math.toIntExact(element.index());
+
+                    double valI = element.doubleValue();
+                    constraintsBody.set(i, nbEqus + nbEqus + j, meta.negatedDual[i] ? -valI : valI);
+                }
             }
         }
 
         for (int j = 0; j < nbEqus; j++) {
-            double valBE = convexBE.doubleValue(j);
+            double valBE = convex.getBE(j);
             objective.set(j, valBE);
             objective.set(nbEqus + j, -valBE);
         }
@@ -153,7 +164,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return retVal;
     }
 
-    static Optimisation.Result doSolve(final ConvexSolver.Builder convex, final Optimisation.Options options, final boolean zeroC) {
+    static Optimisation.Result doSolve(final OptimisationData convex, final Optimisation.Options options, final boolean zeroC) {
 
         SimplexTableau tableau = DualSimplex.build(convex, options, zeroC);
 
@@ -164,7 +175,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return DualSimplex.toConvexState(result, convex);
     }
 
-    static int size(final ConvexSolver.Builder convex) {
+    static int size(final OptimisationData convex) {
 
         int numbVars = convex.countVariables();
         int numbEqus = convex.countEqualityConstraints();
@@ -173,7 +184,7 @@ final class DualSimplex extends SimplexTableauSolver {
         return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0, 0, true);
     }
 
-    static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
+    static Optimisation.Result toConvexState(final Result result, final OptimisationData convex) {
 
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();

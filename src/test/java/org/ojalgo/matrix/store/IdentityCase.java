@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ public class IdentityCase extends NonPhysicalTest {
 
         int dim = Uniform.randomInteger(1, 9);
 
-        rationalStore = new IdentityStore<>(GenericStore.RATIONAL, dim);
-        complexStore = new IdentityStore<>(GenericStore.COMPLEX, dim);
+        rationalStore = new IdentityStore<>(GenericStore.Q128, dim);
+        complexStore = new IdentityStore<>(GenericStore.C128, dim);
         primitiveStore = new IdentityStore<>(Primitive64Store.FACTORY, dim);
 
         numberOfRows = dim;

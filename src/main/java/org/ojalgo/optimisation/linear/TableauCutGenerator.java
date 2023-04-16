@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,6 +73,10 @@ abstract class TableauCutGenerator {
 
     static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer,
             final double fractionality) {
+
+        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+
+        // BasicLogger.debug(1, "{} {} -> {} {} {}", body, variableIndex, rhs, Arrays.toString(integer), fractionality);
 
         int nbVariables = body.size();
 

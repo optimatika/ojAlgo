@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ public interface UpdatableSolver extends Optimisation.Solver {
          * artificial variables.) This defines the range of the indices that can be used with the indexOf
          * method.
          */
-        int countVariables();
+        int countModelVariables();
 
         /**
          * Returns which model entity, and constraint type, that corresponsf to the slack variable at the
@@ -86,5 +86,18 @@ public interface UpdatableSolver extends Optimisation.Solver {
     }
 
     UpdatableSolver.EntityMap getEntityMap();
+
+    /**
+     * A generalisation of {@link #fixVariable(int, double)} where the new/updated lower and upper bounds do
+     * not need to be equal.
+     *
+     * @param index The, solver specific, variable index
+     * @param lower New lower bound
+     * @param upper New upper bound
+     * @return true if updating the range is supported and was successful, otherwise false
+     */
+    default boolean updateRange(final int index, final double lower, double upper) {
+        return false;
+    }
 
 }

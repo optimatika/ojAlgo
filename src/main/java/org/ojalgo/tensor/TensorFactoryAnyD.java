@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
+import org.ojalgo.type.math.MathType;
 
 public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAnyD> implements FactoryAnyD<T> {
 
@@ -216,6 +217,10 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
         }
 
         return retVal;
+    }
+
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
 }

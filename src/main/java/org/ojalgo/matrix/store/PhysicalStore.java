@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -128,6 +128,10 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new SingleStore<>(this, element);
         }
 
+        default MatrixStore<N> makeSingle(final double element) {
+            return this.makeSingle(this.scalar().cast(element));
+        }
+
         default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
             return SparseStore.makeSparse(this, rowsCount, columnsCount);
         }
@@ -137,8 +141,8 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
          */
         default I makeSPD(final int dim) {
 
-            final double[] random = new double[dim];
-            final I retVal = this.make(dim, dim);
+            double[] random = new double[dim];
+            I retVal = this.make(dim, dim);
 
             for (int i = 0; i < dim; i++) {
                 random[i] = Math.random();

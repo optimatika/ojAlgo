@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -541,7 +541,7 @@ public abstract class TestUtils /* extends Assertions */ {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericStore.COMPLEX.make(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.make(numberOfRows, numberOfColumns);
 
         Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 

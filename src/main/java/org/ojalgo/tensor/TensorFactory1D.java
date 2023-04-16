@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.math.MathType;
 
 public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> implements Factory1D<T> {
 
@@ -81,8 +82,7 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (myFactory == null ? 0 : myFactory.hashCode());
-        return result;
+        return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
     public T make(final long count) {
@@ -139,6 +139,10 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         }
 
         return retVal;
+    }
+
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
 }

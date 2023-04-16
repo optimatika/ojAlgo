@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -108,7 +108,7 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        double[] weights = new double[] { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835, 2602.194912040238,
+        double[] weights = { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835, 2602.194912040238,
                 2606.0069468717575, 2609.0385816244316, 2750.0520522057927, 2602.048261785581, 2600.507229973181, 2602.046307869504, 2721.343937605796,
                 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
 
@@ -121,8 +121,8 @@ public class P20140819 extends OptimisationIntegerTests {
         // 341 <= 0 0 8 0 0 0 8 0 68 68 68 68 0 0 0 5 <= 140833
         // 413 <= 0 0 0 8 0 0 0 9 0 0 0 6 59 59 59 59 <= 48321
 
-        int[] lower = new int[] { 117, 36, 341, 413 };
-        int[] upper = new int[] { 14868, 170569, 140833, 48321 };
+        int[] lower = { 117, 36, 341, 413 };
+        int[] upper = { 14868, 170569, 140833, 48321 };
         int[][] factors = new int[4][];
         factors[0] = new int[] { 30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0 };
         factors[1] = new int[] { 0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0 };
@@ -130,7 +130,7 @@ public class P20140819 extends OptimisationIntegerTests {
         factors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
 
         for (int c = 0; c < factors.length; c++) {
-            Expression tmpExpr = retVal.addExpression("C" + c);
+            Expression tmpExpr = retVal.newExpression("C" + c);
             tmpExpr.lower(lower[c]).upper(upper[c]);
             for (int v = 0; v < factors[c].length; v++) {
                 tmpExpr.set(v, factors[c][v]);
@@ -153,8 +153,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel integerModel = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 414, 414, 414, 414, 414, 414, 414, 414, 5, 0, 0, 414, 414, 414, 414 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 414, 414, 414, 414, 414, 414, 414, 414, 5, 0, 0, 414, 414, 414, 414 };
 
         ExpressionsBasedModel parentModel = integerModel.copy(true);
         P20140819.doTestRelaxedAtSpecificNode(parentModel, lower, upper);
@@ -227,8 +227,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 414, 0, 414, 414, 414, 0, 414, 0, 5, 0, 0, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 414, 0, 414, 414, 414, 0, 414, 0, 5, 0, 0, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -244,8 +244,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 0, 0, 0, 2, 414, 0, 414, 414, 414, 6, 414, 414, 414, 8, 414, 414 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 0, 0, 0, 2, 414, 0, 414, 414, 414, 6, 414, 414, 414, 8, 414, 414 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -261,8 +261,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 414, 0, 414, 414, 414, 0, 414, 0, 4, 0, 1, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 };
+        int[] upper = { 414, 414, 0, 414, 414, 414, 0, 414, 0, 4, 0, 1, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -278,8 +278,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 414, 0, 414, 414, 414, 0, 414, 0, 4, 1, 0, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 414, 0, 414, 414, 414, 0, 414, 0, 4, 1, 0, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -295,8 +295,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 0, 0, 2, 414, 414, 0, 0, 0, 5, 0, 0, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 0, 0, 2, 414, 414, 0, 0, 0, 5, 0, 0, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -312,8 +312,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 1, 0, 0, 0, 0, 1, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] upper = new int[] { 0, 1, 1, 0, 414, 0, 414, 414, 414, 5, 0, 0, 414, 9, 414, 414 };
+        int[] lower = { 0, 0, 1, 0, 0, 0, 0, 1, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upper = { 0, 1, 1, 0, 414, 0, 414, 414, 414, 5, 0, 0, 414, 9, 414, 414 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -329,8 +329,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 414, 0, 414, 414, 414, 0, 414, 1, 4, 0, 0, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 414, 0, 414, 414, 414, 0, 414, 1, 4, 0, 0, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -346,8 +346,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 0, 0, 0, 6, 0, 1 };
-        int[] upper = new int[] { 0, 2, 0, 0, 414, 0, 414, 414, 0, 5, 0, 0, 414, 9, 414, 414 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 0, 0, 0, 6, 0, 1 };
+        int[] upper = { 0, 2, 0, 0, 414, 0, 414, 414, 0, 5, 0, 0, 414, 9, 414, 414 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -363,8 +363,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 1, 1, 0, 5, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 0, 0, 0, 2, 414, 0, 414, 414, 0, 5, 0, 0, 414, 9, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 1, 1, 0, 5, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 0, 0, 0, 2, 414, 0, 414, 414, 0, 5, 0, 0, 414, 9, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -385,8 +385,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel expModel = P20140819.makeModel();
 
-        int[] lowerBoundsExp = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] upperBoundsExp = new int[] { 0, 2, 0, 0, 414, 1, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        int[] lowerBoundsExp = { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsExp = { 0, 2, 0, 0, 414, 1, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
         for (int v = 0; v < upperBoundsExp.length; v++) {
             expModel.getVariable(v).integer(false).lower(lowerBoundsExp[v]).upper(upperBoundsExp[v]);
         }
@@ -398,8 +398,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel actModel = P20140819.makeModel();
 
-        int[] lowerBoundsAct = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] upperBoundsAct = new int[] { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        int[] lowerBoundsAct = { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsAct = { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
         for (int v = 0; v < upperBoundsAct.length; v++) {
             actModel.getVariable(v).integer(false).lower(lowerBoundsAct[v]).upper(upperBoundsAct[v]);
         }
@@ -425,8 +425,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel nodeModel = P20140819.makeModel();
 
-        int[] nodeLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] nodeUpperBounds = new int[] { 1, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        int[] nodeLowerBounds = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] nodeUpperBounds = { 1, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
         for (int v = 0; v < nodeUpperBounds.length; v++) {
             nodeModel.getVariable(v).integer(false).lower(nodeLowerBounds[v]).upper(nodeUpperBounds[v]);
         }
@@ -438,8 +438,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel parentModel = P20140819.makeModel();
 
-        int[] parentLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] parentUpperBounds = new int[] { 414, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        int[] parentLowerBounds = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] parentUpperBounds = { 414, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
         for (int v = 0; v < parentUpperBounds.length; v++) {
             parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
         }
@@ -476,8 +476,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel nodeModel = P20140819.makeModel();
 
-        int[] nodeLowerBounds = new int[] { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
-        int[] nodeUpperBounds = new int[] { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 7, 414, 414 };
+        int[] nodeLowerBounds = { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
+        int[] nodeUpperBounds = { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 7, 414, 414 };
         for (int v = 0; v < nodeUpperBounds.length; v++) {
             nodeModel.getVariable(v).integer(false).lower(nodeLowerBounds[v]).upper(nodeUpperBounds[v]);
         }
@@ -489,8 +489,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel parentModel = P20140819.makeModel();
 
-        int[] parentLowerBounds = new int[] { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
-        int[] parentUpperBounds = new int[] { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 8, 414, 414 };
+        int[] parentLowerBounds = { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
+        int[] parentUpperBounds = { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 8, 414, 414 };
         for (int v = 0; v < parentUpperBounds.length; v++) {
             parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
         }
@@ -531,8 +531,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 414, 0, 0, 2, 414, 414, 0, 0, 0, 5, 0, 0, 414, 414, 414, 0 };
+        int[] lower = { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 414, 0, 0, 2, 414, 414, 0, 0, 0, 5, 0, 0, 414, 414, 414, 0 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }
@@ -542,8 +542,8 @@ public class P20140819 extends OptimisationIntegerTests {
 
         ExpressionsBasedModel model = P20140819.makeModel();
 
-        int[] lower = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0 };
-        int[] upper = new int[] { 0, 0, 0, 2, 414, 0, 414, 414, 414, 6, 414, 414, 414, 8, 414, 414 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0 };
+        int[] upper = { 0, 0, 0, 2, 414, 0, 414, 414, 414, 6, 414, 414, 414, 8, 414, 414 };
 
         P20140819.doTestInfeasibleNode(model, lower, upper);
     }

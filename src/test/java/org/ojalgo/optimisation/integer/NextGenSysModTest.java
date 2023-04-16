@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,13 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -1209,16 +1208,16 @@ public class NextGenSysModTest {
             return myCovarianceMtrx.length;
         }
 
-        public Primitive64Matrix toCleanedCovariances() {
+        public MatrixR064 toCleanedCovariances() {
             return NextGenSysModTest.toCovariances(this.toVolatilities(), this.toCorrelations());
         }
 
-        public Primitive64Matrix toCorrelations() {
-            return NextGenSysModTest.toCorrelations(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
+        public MatrixR064 toCorrelations() {
+            return NextGenSysModTest.toCorrelations(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
         }
 
-        public Primitive64Matrix toVolatilities() {
-            return NextGenSysModTest.toVolatilities(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
+        public MatrixR064 toVolatilities() {
+            return NextGenSysModTest.toVolatilities(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
         }
 
     }
@@ -1247,7 +1246,7 @@ public class NextGenSysModTest {
 
     public static ExpressionsBasedModel buildModel(final CaseData data) {
 
-        Primitive64Matrix covar = data.toCleanedCovariances();
+        MatrixR064 covar = data.toCleanedCovariances();
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1263,15 +1262,15 @@ public class NextGenSysModTest {
         double marginLimit = marginSamples.getQuartile1();
         double betaLimit = betaSamples.getQuartile3();
 
-        Expression marginExpr = retVal.addExpression("Margin").lower(marginLimit);
-        Expression betaExpr = retVal.addExpression("Beta").upper(betaLimit);
-        Expression totalExpr = retVal.addExpression("100%").level(BigMath.ONE);
-        Expression budgetExpr = retVal.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
-        Expression varianceExpr = retVal.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression marginExpr = retVal.newExpression("Margin").lower(marginLimit);
+        Expression betaExpr = retVal.newExpression("Beta").upper(betaLimit);
+        Expression totalExpr = retVal.newExpression("100%").level(BigMath.ONE);
+        Expression budgetExpr = retVal.newExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        Expression varianceExpr = retVal.newExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
 
         for (int j = 0; j < numberOfAssets; j++) {
 
-            Variable weightVar = retVal.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+            Variable weightVar = retVal.newVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
 
             marginExpr.set(weightVar, marginVctr[j]);
             betaExpr.set(weightVar, betaVctr[j]);
@@ -1285,13 +1284,13 @@ public class NextGenSysModTest {
         for (int j = 0; j < numberOfAssets; j++) {
 
             Variable weightVar = retVal.getVariable(j);
-            Variable activationVar = retVal.addVariable(weightVar.getName() + "_Activator").binary();
+            Variable activationVar = retVal.newVariable(weightVar.getName() + "_Activator").binary();
 
             budgetExpr.set(activationVar, BigMath.ONE);
 
-            retVal.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+            retVal.newExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
                     .lower(BigMath.ZERO);
-            retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+            retVal.newExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
         }
 
         // retVal.options.debug(ConvexSolver.class);
@@ -1302,7 +1301,7 @@ public class NextGenSysModTest {
 
     public static Optimisation.Result solveSequentially(final CaseData data) {
 
-        Primitive64Matrix covar = data.toCleanedCovariances();
+        MatrixR064 covar = data.toCleanedCovariances();
 
         int numberOfAssets = data.numberOfAssets();
 
@@ -1320,13 +1319,13 @@ public class NextGenSysModTest {
         double marginLimit = marginSamples.getQuartile1();
         double betaLimit = betaSamples.getQuartile3();
 
-        Expression marginExpr = model.addExpression("Margin").lower(marginLimit);
-        Expression betaExpr = model.addExpression("Beta").upper(betaLimit);
-        Expression totalExpr = model.addExpression("100%").level(BigMath.ONE);
+        Expression marginExpr = model.newExpression("Margin").lower(marginLimit);
+        Expression betaExpr = model.newExpression("Beta").upper(betaLimit);
+        Expression totalExpr = model.newExpression("100%").level(BigMath.ONE);
 
         for (int j = 0; j < numberOfAssets; j++) {
 
-            Variable weightVar = model.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+            Variable weightVar = model.newVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
 
             marginExpr.set(weightVar, marginVctr[j]);
             betaExpr.set(weightVar, betaVctr[j]);
@@ -1338,7 +1337,7 @@ public class NextGenSysModTest {
             return linRes;
         }
 
-        Expression varianceExpr = model.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression varianceExpr = model.newExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
         for (int j = 0; j < numberOfAssets; j++) {
             for (int i = 0; i < numberOfAssets; i++) {
                 varianceExpr.set(i, j, covar.get(i, j));
@@ -1351,7 +1350,7 @@ public class NextGenSysModTest {
             return linRes;
         }
 
-        Expression budgetExpr = model.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        Expression budgetExpr = model.newExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
         for (int j = 0; j < numberOfAssets; j++) {
 
             Variable weightVar = model.getVariable(j);
@@ -1362,13 +1361,13 @@ public class NextGenSysModTest {
 
             } else {
 
-                Variable activationVar = model.addVariable(weightVar.getName() + "_Activator").binary();
+                Variable activationVar = model.newVariable(weightVar.getName() + "_Activator").binary();
 
                 budgetExpr.set(activationVar, BigMath.ONE);
 
-                model.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+                model.newExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
                         .lower(BigMath.ZERO);
-                model.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+                model.newExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
             }
         }
 
@@ -1384,7 +1383,7 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
+    static MatrixR064 toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
@@ -1410,7 +1409,7 @@ public class NextGenSysModTest {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size, size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -1453,11 +1452,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
+    static MatrixR064 toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
         int tmpSize = (int) volatilities.count();
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);
@@ -1481,11 +1480,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static Primitive64Matrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+    static MatrixR064 toVolatilities(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size);
 
         if (clean) {
 
@@ -1519,36 +1518,6 @@ public class NextGenSysModTest {
         }
 
         return retVal.get();
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase010A() {
-        this.doTestAllInOne(CASE_010A);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase020A() {
-        this.doTestAllInOne(CASE_020A);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase030B() {
-        this.doTestAllInOne(CASE_030B);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase040B() {
-        this.doTestAllInOne(CASE_040B);
-    }
-
-    @Test
-    @Disabled
-    public void testAllInOneCase050B() {
-        this.doTestAllInOne(CASE_050B);
     }
 
     @Test

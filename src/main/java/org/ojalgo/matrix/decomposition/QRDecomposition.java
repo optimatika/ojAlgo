@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -42,50 +43,62 @@ import org.ojalgo.type.NumberDefinition;
 
 abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
 
-    static final class Complex extends QRDecomposition<ComplexNumber> {
+    static final class C128 extends QRDecomposition<ComplexNumber> {
 
-        Complex() {
+        C128() {
             this(false);
         }
 
-        Complex(final boolean fullSize) {
-            super(GenericStore.COMPLEX, fullSize);
+        C128(final boolean fullSize) {
+            super(GenericStore.C128, fullSize);
         }
 
     }
 
-    static final class Primitive extends QRDecomposition<Double> {
+    static final class H256 extends QRDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
             this(false);
         }
 
-        Primitive(final boolean fullSize) {
+        H256(final boolean fullSize) {
+            super(GenericStore.H256, fullSize);
+        }
+
+    }
+
+    static final class Q128 extends QRDecomposition<RationalNumber> {
+
+        Q128() {
+            this(false);
+        }
+
+        Q128(final boolean fullSize) {
+            super(GenericStore.Q128, fullSize);
+        }
+
+    }
+
+    static final class R064 extends QRDecomposition<Double> {
+
+        R064() {
+            this(false);
+        }
+
+        R064(final boolean fullSize) {
             super(Primitive64Store.FACTORY, fullSize);
         }
 
     }
 
-    static final class Quat extends QRDecomposition<Quaternion> {
+    static final class R128 extends QRDecomposition<Quadruple> {
 
-        Quat() {
+        R128() {
             this(false);
         }
 
-        Quat(final boolean fullSize) {
-            super(GenericStore.QUATERNION, fullSize);
-        }
-
-    }
-
-    static final class Rational extends QRDecomposition<RationalNumber> {
-
-        Rational() {
-            this(false);
-        }
-
-        Rational(final boolean fullSize) {
-            super(GenericStore.RATIONAL, fullSize);
+        R128(final boolean fullSize) {
+            super(GenericStore.R128, fullSize);
         }
 
     }
@@ -96,6 +109,24 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
+    }
+
+    public void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, true, false);
+
+        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
+
+        for (int j = this.getMinDim() - 1; j >= 0; j--) {
+
+            reference.point(j, j);
+
+            if (!reference.isZero()) {
+                arg.transformLeft(reference, 0);
+            }
+        }
     }
 
     public N calculateDeterminant(final Access2D<?> matrix) {
@@ -213,31 +244,30 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         rhs.supplyTo(preallocated);
 
-        DecompositionStore<N> tmpStore = this.getInPlace();
-        int tmpRowDim = this.getRowDim();
-        int tmpColDim = this.getColDim();
+        DecompositionStore<N> body = this.getInPlace();
+        int m = this.getRowDim();
+        int n = this.getColDim();
 
-        HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
+        HouseholderReference<N> reference = HouseholderReference.makeColumn(body);
 
-        int tmpLimit = this.getMinDim();
-        for (int j = 0; j < tmpLimit; j++) {
+        for (int j = 0, limit = this.getMinDim(); j < limit; j++) {
 
-            tmpReference.point(j, j);
+            reference.point(j, j);
 
-            if (!tmpReference.isZero()) {
-                preallocated.transformLeft(tmpReference, 0);
+            if (!reference.isZero()) {
+                preallocated.transformLeft(reference, 0);
             }
         }
 
-        preallocated.substituteBackwards(tmpStore, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
-        if (tmpColDim < tmpRowDim) {
-            return preallocated.limits(tmpColDim, preallocated.getColDim());
+        if (n < m) {
+            return preallocated.limits(n, preallocated.getColDim());
+        } else if (n > m) {
+            return preallocated.below(n - m);
+        } else {
+            return preallocated;
         }
-        if (tmpColDim > tmpRowDim) {
-            return preallocated.below(tmpColDim - tmpRowDim);
-        }
-        return preallocated;
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

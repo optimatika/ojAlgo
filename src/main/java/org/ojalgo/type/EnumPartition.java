@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -120,6 +120,10 @@ public final class EnumPartition<E extends Enum<E>> {
 
     public boolean is(final int index, final E value) {
         return myValues[index] == value.ordinal();
+    }
+
+    public int size() {
+        return myValues.length;
     }
 
     public void update(final int index, final E value) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,9 +65,9 @@ public class SparseCase extends NonPhysicalTest {
 
         int dim = Uniform.randomInteger(1, 9);
 
-        rationalStore = SparseStore.RATIONAL.make(dim, dim);
-        complexStore = SparseStore.COMPLEX.make(dim, dim);
-        primitiveStore = SparseStore.PRIMITIVE64.make(dim, dim);
+        rationalStore = SparseStore.Q128.make(dim, dim);
+        complexStore = SparseStore.C128.make(dim, dim);
+        primitiveStore = SparseStore.R064.make(dim, dim);
 
         for (int ij = 0; ij < dim; ij++) {
             ((SparseStore<?>) rationalStore).set(ij, ij, 1.0);
@@ -82,7 +82,7 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testIndexOfLargest() {
 
-        SparseStore<Double> sparseStore = SparseStore.PRIMITIVE64.make(1_000L, 1_000L);
+        SparseStore<Double> sparseStore = SparseStore.R064.make(1_000L, 1_000L);
 
         for (int i = 0; i < 100; i++) {
             long row = Uniform.randomInteger(1_000L);
@@ -106,7 +106,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<ComplexNumber> sparseB = SparseStore.makeComplex(8, 9);
         SparseStore<ComplexNumber> sparseC = SparseStore.makeComplex(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.COMPLEX);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.C128);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<Quaternion> sparseB = SparseStore.makeQuaternion(8, 9);
         SparseStore<Quaternion> sparseC = SparseStore.makeQuaternion(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.QUATERNION);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.H256);
     }
 
     @Test
@@ -136,7 +136,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<RationalNumber> sparseB = SparseStore.makeRational(8, 9);
         SparseStore<RationalNumber> sparseC = SparseStore.makeRational(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.RATIONAL);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.Q128);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class SparseCase extends NonPhysicalTest {
 
         int ind = Uniform.randomInteger(0, 10);
 
-        SparseStore<Double> store = SparseStore.PRIMITIVE64.make(10, 10);
+        SparseStore<Double> store = SparseStore.R064.make(10, 10);
         store.fillColumn(ind, 1.0);
 
         for (int i = 0; i < 10; i++) {
@@ -172,7 +172,7 @@ public class SparseCase extends NonPhysicalTest {
 
         int ind = Uniform.randomInteger(0, 10);
 
-        SparseStore<Double> store = SparseStore.PRIMITIVE64.make(10, 10);
+        SparseStore<Double> store = SparseStore.R064.make(10, 10);
         store.fillRow(ind, 1.0);
 
         for (int i = 0; i < 10; i++) {

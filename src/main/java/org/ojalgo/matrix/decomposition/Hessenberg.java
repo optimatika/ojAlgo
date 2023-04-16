@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -45,13 +46,39 @@ public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
+    Factory<ComplexNumber> C128 = typical -> new HessenbergDecomposition.C128();
 
-    Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
+    Factory<Quadruple> R128 = typical -> new HessenbergDecomposition.R128();
 
-    Factory<Quaternion> QUATERNION = typical -> new HessenbergDecomposition.Quat();
+    Factory<Double> R064 = typical -> new HessenbergDecomposition.R064();
 
-    Factory<RationalNumber> RATIONAL = typical -> new HessenbergDecomposition.Rational();
+    Factory<Quaternion> H256 = typical -> new HessenbergDecomposition.H256();
+
+    Factory<RationalNumber> Q128 = typical -> new HessenbergDecomposition.Q128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
 

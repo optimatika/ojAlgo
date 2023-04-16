@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,14 +40,14 @@ public class SuperimposedElementCase extends NonPhysicalTest {
         int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
         int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
         RationalNumber tmpElement = RationalNumber.valueOf(BigMath.PI);
-        MatrixStore<RationalNumber> aBase = GenericStore.RATIONAL.copy(tmpBase);
+        MatrixStore<RationalNumber> aBase = GenericStore.Q128.copy(tmpBase);
 
         //        myBigStore = new SuperimposedMatrixStore<BigDecimal>(BigDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement);
         //        myComplexStore = new SuperimposedMatrixStore<ComplexNumber>(ComplexDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, ComplexNumber.makeReal(tmpElement.doubleValue()));
         //        myPrimitiveStore = new SuperimposedMatrixStore<Double>(PrimitiveDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement.doubleValue());
 
         rationalStore = new SuperimposedStore<>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase.physical(), tmpElement));
-        MatrixStore<ComplexNumber> aBase1 = GenericStore.COMPLEX.copy(tmpBase);
+        MatrixStore<ComplexNumber> aBase1 = GenericStore.C128.copy(tmpBase);
         complexStore = new SuperimposedStore<>(aBase1, tmpRowIndex, tmpColumnIndex,
                 new SingleStore<>(aBase1.physical(), ComplexNumber.valueOf(tmpElement.doubleValue())));
         MatrixStore<Double> aBase2 = Primitive64Store.FACTORY.copy(tmpBase);

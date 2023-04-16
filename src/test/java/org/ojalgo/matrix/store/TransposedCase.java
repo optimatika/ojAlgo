@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@ public class TransposedCase extends NonPhysicalTest {
 
         MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new TransposedStore<>(GenericStore.RATIONAL.copy(tmpBase));
-        complexStore = new TransposedStore<>(GenericStore.COMPLEX.copy(tmpBase));
+        rationalStore = new TransposedStore<>(GenericStore.Q128.copy(tmpBase));
+        complexStore = new TransposedStore<>(GenericStore.C128.copy(tmpBase));
         primitiveStore = new TransposedStore<>(Primitive64Store.FACTORY.copy(tmpBase));
 
         numberOfRows = tmpColDim;

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -238,7 +238,7 @@ public class DataProcessors {
     }
 
     public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
-        return new Transformation2D<Double>() {
+        return new Transformation2D<>() {
 
             public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {
                 SampleSet sampleSet = SampleSet.make();

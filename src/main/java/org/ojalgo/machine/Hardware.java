@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,21 +32,21 @@ import org.ojalgo.netio.ASCII;
  * <ul>
  * <li>The first element in the array should correspond to total system resources; the total amount of RAM and
  * the total number of threads (Typically the same as what is returned by
- * {@linkplain Runtime#availableProcessors()}).</li>
+ * {@linkplain Runtime#availableProcessors()}).
  * <li>The last element in the array should describe the L1 cache. Typically Intel processors have 32k L1
- * cache and AMD 64k. 1 or maybe 2 threads use/share this cache.</li>
+ * cache and AMD 64k. 1 or maybe 2 threads use/share this cache.
  * <li>Caches, all levels except L1, are described between the first and last elements in descending order (L3
  * cache comes before L2 cache). Specify the size of the cache and the number of threads using/sharing the
- * cache. (Do not worry about how many cache units there are - describe one unit.)</li>
+ * cache. (Do not worry about how many cache units there are - describe one unit.)
  * <li>The array must have at least 2 elements. You must describe the total system resources and the L1 cache.
  * It is strongly recommended to also describe the L2 cache. The L3 cache, if it exists, is less important to
  * describe. The derived attributes <code>processors</code>, <code>cores</code> and <code>units</code> may be
  * incorrectly calculated if you fail to specify the caches. Known issue: If you have more than one processor,
  * nut no L3 cache; the <code>processors</code> attribute will be incorrectly set 1. A workaround that
  * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
- * workoround may stop working in the future.</li>
+ * workoround may stop working in the future.
  * <li><code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
- * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
+ * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code>
  * </ul>
  *
  * @author apete
@@ -57,11 +57,13 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * Cache-line size is (typically) 64 bytes
      */
     public static final long CPU_CACHE_LINE_SIZE = 64L;
+
     /**
      * Practically all architectures/OS:s have a page size of 4k (one notable exception is Solaris/SPARC that
      * have 8k)
      */
     public static final long OS_MEMORY_PAGE_SIZE = 4L * K;
+
     /**
      * Should contain all available hardware in ascending "power" order.
      */
@@ -69,17 +71,33 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
 
     /**
      * <ul>
+     * <li>Apple M1 Pro (Mainly modelled after the performance cores since there are more of those. Also did
+     * not separate between L2 and L3/SLC cache since there are 2 of each and they are the same size per
+     * thread.)
+     * <ul>
+     * <li>L1 Cache the high-perf cores have a large 192 KB of L1 instruction cache and 128 KB of L1 data
+     * cache The energy-efficient cores have a 128 KB L1 instruction cache, 64 KB L1 data cache.
+     * <li>L2 Cache (28MB all together) The 6 high-perf cores are split in two clusters, each cluster has 12MB
+     * of shared L2 cache (so 24MB total) The 2 high-efficiency cores have 4MB of shared L2 cache
+     * <li>L3 / SLC (24MB all together) The SLC is 12MB per memory controller, so 24MB total.
+     * </ul>
+     * </ul>
+     */
+    static final Hardware AARCH64__08 = new Hardware("aarch64",
+            new BasicMachine[] { new BasicMachine(16L * K * K * K, 8), new BasicMachine(12L * K * K, 4), new BasicMachine(128L * K, 1) });
+
+    /**
+     * <ul>
      * <li>CLAM / PowerBook6,5
      * <ul>
-     * <li>1 processor</li>
-     * <li>1 core per processor</li>
-     * <li>1 thread per core</li>
-     * <li>===</li>
-     * <li>1.25GB system RAM</li>
-     * <li>512kB L2 cache per processor</li>
-     * <li>64kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>1 core per processor
+     * <li>1 thread per core
+     * <li>===
+     * <li>1.25GB system RAM
+     * <li>512kB L2 cache per processor
+     * <li>64kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware PPC__01 = new Hardware("ppc",
@@ -89,15 +107,14 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>INTEL1
      * <ul>
-     * <li>1 processor</li>
-     * <li>1 core per processor</li>
-     * <li>1 thread per core</li>
-     * <li>===</li>
-     * <li>1GB system RAM</li>
-     * <li>1MB L2 cache per processor</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>1 core per processor
+     * <li>1 thread per core
+     * <li>===
+     * <li>1GB system RAM
+     * <li>1MB L2 cache per processor
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86__01 = new Hardware("x86",
@@ -107,15 +124,14 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>B5950053
      * <ul>
-     * <li>1 processor</li>
-     * <li>2 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>===</li>
-     * <li>3.5GB system RAM</li>
-     * <li>6MB L2 cache per processor (2 cores)</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>2 cores per processor
+     * <li>1 thread per core
+     * <li>===
+     * <li>3.5GB system RAM
+     * <li>6MB L2 cache per processor (2 cores)
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86__02 = new Hardware("x86",
@@ -125,15 +141,14 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>MANTA / iMac7,1
      * <ul>
-     * <li>1 processor</li>
-     * <li>2 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>===</li>
-     * <li>3GB system RAM</li>
-     * <li>4MB L2 cache per processor (2 cores)</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>2 cores per processor
+     * <li>1 thread per core
+     * <li>===
+     * <li>3GB system RAM
+     * <li>4MB L2 cache per processor (2 cores)
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__02 = new Hardware("x86_64",
@@ -149,26 +164,24 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>PA's Q9400
      * <ul>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>3GB system RAM</li>
-     * <li>3MB L2 cache per 2 cores</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>4 cores per processor
+     * <li>1 thread per core (4 threads in total)
+     * <li>===
+     * <li>3GB system RAM
+     * <li>3MB L2 cache per 2 cores
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>PA's Q6600
      * <ul>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>8GB system RAM</li>
-     * <li>4MB L2 cache per 2 cores</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>4 cores per processor
+     * <li>1 thread per core (4 threads in total)
+     * <li>===
+     * <li>8GB system RAM
+     * <li>4MB L2 cache per 2 cores
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__04_1_L2 = new Hardware("x86_64",
@@ -178,28 +191,26 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>Intel i5-4670K with 16GB of RAM
      * <ul>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>16GB system RAM</li>
-     * <li>6MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>4 cores per processor
+     * <li>1 thread per core (4 threads in total)
+     * <li>===
+     * <li>16GB system RAM
+     * <li>6MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>Intel Core i5-3570K with 32GB of RAM (from Java Matrix Benchmark)
      * <ul>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>32GB system RAM</li>
-     * <li>6MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>4 cores per processor
+     * <li>1 thread per core (4 threads in total)
+     * <li>===
+     * <li>32GB system RAM
+     * <li>6MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__04_1_L3 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 4), new BasicMachine(6L * K * K, 4),
@@ -209,40 +220,37 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>BUBBLE / MacBookAir4,2
      * <ul>
-     * <li>1 processors</li>
-     * <li>2 cores per processor</li>
-     * <li>2 threads per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>4GB system RAM</li>
-     * <li>3MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>2 cores per processor
+     * <li>2 threads per core (4 threads in total)
+     * <li>===
+     * <li>4GB system RAM
+     * <li>3MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>PA's Intel Core i7-620M laptop
      * <ul>
-     * <li>1 processors</li>
-     * <li>2 cores per processor</li>
-     * <li>2 threads per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>8GB system RAM</li>
-     * <li>4MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>2 cores per processor
+     * <li>2 threads per core (4 threads in total)
+     * <li>===
+     * <li>8GB system RAM
+     * <li>4MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>MacBookPro14,2 (oyster)
      * <ul>
-     * <li>1 processors</li>
-     * <li>2 cores per processor</li>
-     * <li>2 threads per core (4 threads in total)</li>
-     * <li>===</li>
-     * <li>8GB system RAM</li>
-     * <li>4MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>2 cores per processor
+     * <li>2 threads per core (4 threads in total)
+     * <li>===
+     * <li>8GB system RAM
+     * <li>4MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
@@ -252,64 +260,59 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>HA's Intel Core i7-920 server
      * <ul>
-     * <li>1 processor</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core (8 threads in total)</li>
-     * <li>===</li>
-     * <li>8GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>4 cores per processor
+     * <li>2 threads per core (8 threads in total)
+     * <li>===
+     * <li>8GB system RAM
+     * <li>8MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads from Java Matrix Benchmark
      * <ul>
-     * <li>1 processor</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core (8 threads in total)</li>
-     * <li>===</li>
-     * <li>11GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>4 cores per processor
+     * <li>2 threads per core (8 threads in total)
+     * <li>===
+     * <li>11GB system RAM
+     * <li>8MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>Core i7-3770 3.4 GHz - 4 cores - 8 threads (whale @ MSC/MSB)
      * <ul>
-     * <li>1 processor</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core (8 threads in total)</li>
-     * <li>===</li>
-     * <li>8GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>4 cores per processor
+     * <li>2 threads per core (8 threads in total)
+     * <li>===
+     * <li>8GB system RAM
+     * <li>8MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads (Vostro-460 @ Scila)
      * <ul>
-     * <li>1 processor</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core (8 threads in total)</li>
-     * <li>===</li>
-     * <li>32GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>4 cores per processor
+     * <li>2 threads per core (8 threads in total)
+     * <li>===
+     * <li>32GB system RAM
+     * <li>8MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>Google Cloud Platform Compute Engine n1-standard-8 (8 vCPUs, 30 GB memory, Skylake)
      * <ul>
-     * <li>1 processor</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core (8 threads in total)</li>
-     * <li>===</li>
-     * <li>30GB system RAM</li>
-     * <li>8.25MB L3 cache per processor</li>
-     * <li>1MB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processor
+     * <li>4 cores per processor
+     * <li>2 threads per core (8 threads in total)
+     * <li>===
+     * <li>30GB system RAM
+     * <li>8.25MB L3 cache per processor
+     * <li>1MB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
@@ -327,16 +330,15 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>Intel Core i7-980
      * <ul>
-     * <li>1 processor</li>
-     * <li>6 cores per processor</li>
-     * <li>2 threads per core (12 threads in total)</li>
-     * <li>===</li>
-     * <li>12GB system RAM</li>
-     * <li>12MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core (x6)</li>
-     * <li>32kB L1 cache per core (x6)</li>
+     * <li>1 processor
+     * <li>6 cores per processor
+     * <li>2 threads per core (12 threads in total)
+     * <li>===
+     * <li>12GB system RAM
+     * <li>12MB L3 cache per processor
+     * <li>256kB L2 cache per core (x6)
+     * <li>32kB L1 cache per core (x6)
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__12 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(12L * K * K * K, 12), new BasicMachine(12L * K * K, 12),
@@ -346,28 +348,26 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>SAILFISH / MacPro4,1
      * <ul>
-     * <li>2 processors</li>
-     * <li>4 cores per processor (8 cores in total)</li>
-     * <li>2 threads per core (16 threads in total)</li>
-     * <li>===</li>
-     * <li>12GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>2 processors
+     * <li>4 cores per processor (8 cores in total)
+     * <li>2 threads per core (16 threads in total)
+     * <li>===
+     * <li>12GB system RAM
+     * <li>8MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>OCTOPUS / MacBookPro16,1
      * <ul>
-     * <li>1 processors</li>
-     * <li>8 cores per processor (8 cores in total)</li>
-     * <li>2 threads per core (16 threads in total)</li>
-     * <li>===</li>
-     * <li>64GB system RAM</li>
-     * <li>16MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>1 processors
+     * <li>8 cores per processor (8 cores in total)
+     * <li>2 threads per core (16 threads in total)
+     * <li>===
+     * <li>64GB system RAM
+     * <li>16MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(64L * K * K * K, 16), new BasicMachine(8L * K * K, 16),
@@ -377,28 +377,26 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>CBL (prod & test) 2 x Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
      * <ul>
-     * <li>2 processors</li>
-     * <li>16 cores per processor (32 cores in total)</li>
-     * <li>2 threads per core (64 threads in total)</li>
-     * <li>===</li>
-     * <li>512GB system RAM</li>
-     * <li>40MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>2 processors
+     * <li>16 cores per processor (32 cores in total)
+     * <li>2 threads per core (64 threads in total)
+     * <li>===
+     * <li>512GB system RAM
+     * <li>40MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * <li>CBF (simu) 4 x Intel(R) Xeon(R) CPU E7-4809 v3 @ 2.00GHz
      * <ul>
-     * <li>4 processors</li>
-     * <li>8 cores per processor (32 cores in total)</li>
-     * <li>2 threads per core (64 threads in total)</li>
-     * <li>===</li>
-     * <li>512GB system RAM</li>
-     * <li>20MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>4 processors
+     * <li>8 cores per processor (32 cores in total)
+     * <li>2 threads per core (64 threads in total)
+     * <li>===
+     * <li>512GB system RAM
+     * <li>20MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(20L * K * K, 32),
@@ -408,30 +406,30 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <ul>
      * <li>CBF (prod) 4 x Intel(R) Xeon(R) CPU E7-4830 v3 @ 2.10GHz
      * <ul>
-     * <li>4 processors</li>
-     * <li>12 cores per processor (48 cores in total)</li>
-     * <li>2 threads per core (96 threads in total)</li>
-     * <li>===</li>
-     * <li>512GB system RAM</li>
-     * <li>30MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
+     * <li>4 processors
+     * <li>12 cores per processor (48 cores in total)
+     * <li>2 threads per core (96 threads in total)
+     * <li>===
+     * <li>512GB system RAM
+     * <li>30MB L3 cache per processor
+     * <li>256kB L2 cache per core
+     * <li>32kB L1 cache per core
      * </ul>
-     * </li>
      * </ul>
      */
     static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 96), new BasicMachine(30L * K * K, 24),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     static {
+        PREDEFINED.add(AARCH64__08);
         PREDEFINED.add(PPC__01);
         PREDEFINED.add(X86__01);
         PREDEFINED.add(X86__02);
         PREDEFINED.add(X86_64__02);
         PREDEFINED.add(X86_64__04);
-        //        PREDEFINED.add(X86_64__04_2);
-        //        PREDEFINED.add(X86_64__04_1_L2);
-        //        PREDEFINED.add(X86_64__04_1_L3);
+        //        PREDEFINED.add(X86_64.X86_64__04_2);
+        //        PREDEFINED.add(X86_64.X86_64__04_1_L2);
+        //        PREDEFINED.add(X86_64.X86_64__04_1_L3);
         PREDEFINED.add(X86_64__08);
         PREDEFINED.add(X86_64__12);
         PREDEFINED.add(X86_64__16);
@@ -448,37 +446,37 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         if (systemThreads > 8) {
             // Assume hyperthreading, L3 cache and more than 1 CPU
 
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
+            BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
 
-            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
+            BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
 
-            final BasicMachine tmpL3Machine = new BasicMachine(4L * K * K, systemThreads / ((systemThreads + 7) / 8)); //More than 1 CPU
+            BasicMachine tmpL3Machine = new BasicMachine(4L * K * K, systemThreads / ((systemThreads + 7) / 8)); //More than 1 CPU
 
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+            BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
 
             return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
 
         } else if (systemThreads >= 4) {
             // Assume hyperthreading, L3 cache but only 1 CPU
 
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
+            BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
 
-            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
+            BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
 
-            final BasicMachine tmpL3Machine = new BasicMachine(3L * K * K, systemThreads);
+            BasicMachine tmpL3Machine = new BasicMachine(3L * K * K, systemThreads);
 
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+            BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
 
             return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
 
         } else {
             // No hyperthreading, no L3 cache and 1 CPU
 
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 1); //No hyperthreading
+            BasicMachine tmpL1Machine = new BasicMachine(32L * K, 1); //No hyperthreading
 
-            final BasicMachine tmpL2Machine = new BasicMachine(2L * K * K, tmpL1Machine.threads);
+            BasicMachine tmpL2Machine = new BasicMachine(2L * K * K, tmpL1Machine.threads);
 
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+            BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
 
             return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL2Machine, tmpL1Machine });
         }
@@ -491,9 +489,9 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <code>new BasicMachine[] { SYSTEM, L2, L1 }</code> or in worst case
      * <code>new BasicMachine[] { SYSTEM, L1 }</code>
      */
-    public Hardware(final String architecture, final BasicMachine[] levels) {
+    public Hardware(final String arch, final BasicMachine[] levels) {
 
-        super(architecture, levels);
+        super(arch, levels);
 
         if (levels.length < 2) {
             throw new IllegalArgumentException();
@@ -523,13 +521,10 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj) || !(obj instanceof Hardware)) {
             return false;
         }
-        if (!(obj instanceof Hardware)) {
-            return false;
-        }
-        final Hardware other = (Hardware) obj;
+        Hardware other = (Hardware) obj;
         if (!Arrays.equals(myLevels, other.myLevels)) {
             return false;
         }
@@ -540,8 +535,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + Arrays.hashCode(myLevels);
-        return result;
+        return prime * result + Arrays.hashCode(myLevels);
     }
 
     public boolean isL2Specified() {
@@ -555,7 +549,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     @Override
     public String toString() {
 
-        final StringBuilder retVal = new StringBuilder("HW=");
+        StringBuilder retVal = new StringBuilder("HW=");
 
         retVal.append(myLevels[0].toString());
         if (this.isL3Specified()) {

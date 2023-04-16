@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,9 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with 64-bit primitive double elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixR064} instead.
  */
+@Deprecated
 public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matrix> {
 
     public static final class DenseReceiver extends Mutator2D<Double, Primitive64Matrix, PhysicalStore<Double>> {

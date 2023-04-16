@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ public class ReportedProblem extends FunctionAggregatorTests {
             prim64Arr.set(i, i - 100.0);
         }
 
-        Array1D<BigDecimal> bigArr = Array1D.R128.copy((Access1D<?>) prim64Arr);
+        Array1D<BigDecimal> bigArr = Array1D.R256.copy((Access1D<?>) prim64Arr);
         Array1D<RationalNumber> rtnlArray = Array1D.Q128.copy((Access1D<?>) prim64Arr);
         Array1D<Double> prim32Arr = Array1D.R032.copy((Access1D<?>) prim64Arr);
 

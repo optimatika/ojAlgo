@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,13 +58,13 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
 
-        Expression exprC1 = retVal.addExpression("C1");
+        Expression exprC1 = retVal.newExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
             exprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
         }
         exprC1.upper(ONE);
 
-        Expression exprC2 = retVal.addExpression("C2");
+        Expression exprC2 = retVal.newExpression("C2");
         for (int i = 0; i < retVal.countVariables(); i++) {
             exprC2.set(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
         }

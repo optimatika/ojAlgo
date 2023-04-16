@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,14 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.AMAX;
-import org.ojalgo.array.operation.COPY;
-import org.ojalgo.array.operation.FillMatchingDual;
-import org.ojalgo.array.operation.ModifyAll;
-import org.ojalgo.array.operation.SWAP;
-import org.ojalgo.array.operation.SubstituteBackwards;
-import org.ojalgo.array.operation.SubstituteForwards;
-import org.ojalgo.array.operation.VisitAll;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -53,6 +46,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * Uses double[][] internally.
@@ -254,6 +248,10 @@ public final class RawStore implements PhysicalStore<Double> {
             return retVal;
         }
 
+        public MathType getMathType() {
+            return MathType.R064;
+        }
+
     };
 
     /**
@@ -410,7 +408,7 @@ public final class RawStore implements PhysicalStore<Double> {
 
         int tmpStructure = data.length;
 
-        return new AbstractList<Double>() {
+        return new AbstractList<>() {
 
             @Override
             public Double get(final int index) {
@@ -647,8 +645,7 @@ public final class RawStore implements PhysicalStore<Double> {
         int prime = 31;
         int result = 1;
         result = prime * result + Arrays.deepHashCode(data);
-        result = prime * result + myNumberOfColumns;
-        return result;
+        return prime * result + myNumberOfColumns;
     }
 
     public long indexOfLargest() {
@@ -780,6 +777,12 @@ public final class RawStore implements PhysicalStore<Double> {
         return new Subregion2D.TransposedRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns));
     }
 
+    public void reset() {
+        for (int i = 0; i < data.length; i++) {
+            FillAll.fill(data[i], 0, myNumberOfColumns, 1, ZERO);
+        }
+    }
+
     public void set(final long row, final long col, final Comparable<?> value) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = NumberDefinition.doubleValue(value);
     }
@@ -798,6 +801,15 @@ public final class RawStore implements PhysicalStore<Double> {
 
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
         SubstituteForwards.invoke(data, body, unitDiagonal, conjugated, identity);
+    }
+
+    public void supplyTo(final TransformableRegion<Double> receiver) {
+        for (int i = 0; i < data.length; i++) {
+            double[] row = data[i];
+            for (int j = 0; j < myNumberOfColumns; j++) {
+                receiver.set(i, j, row[j]);
+            }
+        }
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

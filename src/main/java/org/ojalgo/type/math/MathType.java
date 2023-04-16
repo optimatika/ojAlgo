@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 package org.ojalgo.type.math;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 
 import org.ojalgo.algebra.NumberSet;
 import org.ojalgo.machine.JavaType;
@@ -30,7 +29,7 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * The number sets supported by ojAlgo, paired with a declaration of how they are implemented/approximated.
- * The naming scheme is the {@link NumberSet} symbol paired with the total number of bits used to represent
+ * The naming scheme is the {@link NumberSet} symbol combined with the total number of bits used to represent
  * the components.
  * <p>
  * For instance: C128 referns to C = {@link ComplexNumber} which is implemeted as two double:s each of 64
@@ -63,11 +62,18 @@ public enum MathType {
      */
     R064(NumberSet.R, 1, JavaType.DOUBLE),
     /**
+     * Real Number: 2 * double
+     * <p>
+     * Quadruple precision emulated using a pair of double precision numbers
+     */
+    R128(NumberSet.R, 2, JavaType.DOUBLE),
+    /**
      * Real Number: {@link BigDecimal}
      * <p>
-     * Refer to it as "128" since the {@link MathContext#DECIMAL128} is used by default (when necessary).
+     * Refer to it as "256" since (the way it's used in ojAlgo) it roughly corresponds to binary 256 octuple
+     * precision.
      */
-    R128(NumberSet.R, 1, JavaType.REFERENCE),
+    R256(NumberSet.R, 1, JavaType.REFERENCE),
     /**
      * Integer: byte
      */
@@ -85,6 +91,10 @@ public enum MathType {
      */
     Z064(NumberSet.Z, 1, JavaType.LONG);
 
+    public static boolean isPrimitive(final MathType type1, final MathType type2) {
+        return type1.isPrimitive() || type2.isPrimitive();
+    }
+
     private final int myComponents;
     private final JavaType myJavaType;
     private final NumberSet myNumberSet;
@@ -93,6 +103,176 @@ public enum MathType {
         myNumberSet = numberSet;
         myJavaType = javaType;
         myComponents = components;
+    }
+
+    public MathType common(final MathType other) {
+
+        switch (this) {
+        case Z008:
+            return Z008;
+        case Z016:
+            switch (other) {
+            case Z008:
+                return Z008;
+            default:
+                return Z016;
+            }
+        case Z032:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            default:
+                return Z032;
+            }
+        case Z064:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            default:
+                return Z064;
+            }
+        case Q128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            default:
+                return Q128;
+            }
+        case R032:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            default:
+                return R032;
+            }
+        case R064:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            default:
+                return R064;
+            }
+        case R128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            default:
+                return R128;
+            }
+        case R256:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            default:
+                return R256;
+            }
+        case C128:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            case R256:
+                return R256;
+            default:
+                return C128;
+            }
+        case H256:
+            switch (other) {
+            case Z008:
+                return Z008;
+            case Z016:
+                return Z016;
+            case Z032:
+                return Z032;
+            case Z064:
+                return Z064;
+            case Q128:
+                return Q128;
+            case R032:
+                return R032;
+            case R064:
+                return R064;
+            case R128:
+                return R128;
+            case R256:
+                return R256;
+            case C128:
+                return C128;
+            default:
+                return H256;
+            }
+        default:
+            return R064;
+        }
     }
 
     public int getComponents() {

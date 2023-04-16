@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.P20030512Case;
 import org.ojalgo.matrix.P20030528Case;
@@ -36,7 +37,6 @@ import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20050827Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.P20071019Case;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -52,12 +52,12 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     private static final SingularValue<RationalNumber> IMPL_BIG = SingularValue.RATIONAL.make();
     private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
-    private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
+    private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.R064();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));
-    private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
-    private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
+    private static final MatrixQ128 MTRX_FAT = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));
+    private static final MatrixQ128 MTRX_SQUARE = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
+    private static final MatrixQ128 MTRX_TALL = MatrixQ128.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = NumberContext.of(3, 2);
     static final NumberContext CNTXT_CPLX_VALUES = NumberContext.of(7, 7);
@@ -72,42 +72,42 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     @Test
     public void testBasicMatrixP20030422Case() {
-        this.doTestTypes(P20030422Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030422Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20030512Case() {
-        this.doTestTypes(P20030512Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030512Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20030528Case() {
-        this.doTestTypes(P20030528Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20030528Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20050125Case() {
-        this.doTestTypes(P20050125Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20050125Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20050827Case() {
-        this.doTestTypes(RationalMatrix.FACTORY.copy(P20050827Case.getProblematic()));
+        CaseSingularValue.doTestTypes(MatrixQ128.FACTORY.copy(P20050827Case.getProblematic()));
     }
 
     @Test
     public void testBasicMatrixP20061119Case() {
-        this.doTestTypes(P20061119Case.getProblematic());
+        CaseSingularValue.doTestTypes(P20061119Case.getProblematic());
     }
 
     @Test
     public void testBasicMatrixP20071019FatCase() {
-        this.doTestTypes(P20071019Case.getFatProblematic());
+        CaseSingularValue.doTestTypes(P20071019Case.getFatProblematic());
     }
 
     @Test
     public void testBasicMatrixP20071019TallCase() {
-        this.doTestTypes(P20071019Case.getTallProblematic());
+        CaseSingularValue.doTestTypes(P20071019Case.getTallProblematic());
     }
 
     /**
@@ -119,9 +119,10 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        double[] data = { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 };
+        Array1D<Double> tmpExpectedSingularValues = Array1D.R064.copy(data);
 
-        ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
+        ComplexNumber[] tmpScales = { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };
 
         Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
@@ -129,7 +130,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         for (ComplexNumber tmpScale : tmpScales) {
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.transpose(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.C128.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
@@ -153,7 +154,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 BasicLogger.debugMatrix("Scale = {}", tmpScale);
             }
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.copy(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.C128.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
@@ -300,17 +301,17 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
     @Test
     public void testRandomFatCase() {
-        this.doTestTypes(MTRX_FAT);
+        CaseSingularValue.doTestTypes(MTRX_FAT);
     }
 
     @Test
     public void testRandomSquareCase() {
-        this.doTestTypes(MTRX_SQUARE);
+        CaseSingularValue.doTestTypes(MTRX_SQUARE);
     }
 
     @Test
     public void testRandomTallCase() {
-        this.doTestTypes(MTRX_TALL);
+        CaseSingularValue.doTestTypes(MTRX_TALL);
     }
 
     @Test
@@ -337,14 +338,14 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final RationalMatrix original) {
+    private static void doTestTypes(final Access2D<?> original) {
 
-        PhysicalStore<RationalNumber> tmpBigStore = GenericStore.RATIONAL.copy(original);
-        PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.COMPLEX.copy(original);
+        PhysicalStore<RationalNumber> tmpBigStore = GenericStore.Q128.copy(original);
+        PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.C128.copy(original);
         PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(original);
 
-        IMPL_BIG.decompose(GenericStore.RATIONAL.copy(original));
-        IMPL_COMPLEX.decompose(GenericStore.COMPLEX.copy(original));
+        IMPL_BIG.decompose(GenericStore.Q128.copy(original));
+        IMPL_COMPLEX.decompose(GenericStore.C128.copy(original));
         IMPL_RAW.decompose(Primitive64Store.FACTORY.copy(original));
         IMPL_PRIMITIVE.decompose(Primitive64Store.FACTORY.copy(original));
 

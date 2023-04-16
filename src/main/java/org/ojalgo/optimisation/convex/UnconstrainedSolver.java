@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -34,10 +34,10 @@ import org.ojalgo.optimisation.Optimisation;
  *
  * @author apete
  */
-final class UnconstrainedSolver extends ConvexSolver {
+final class UnconstrainedSolver extends BasePrimitiveSolver {
 
-    UnconstrainedSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
-        super(matrices, solverOptions);
+    UnconstrainedSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+        super(convexSolverBuilder, optimisationOptions);
     }
 
     @Override

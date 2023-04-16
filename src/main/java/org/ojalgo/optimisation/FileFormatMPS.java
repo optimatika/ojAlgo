@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -263,7 +263,7 @@ final class FileFormatMPS {
 
             super();
 
-            myExpression = myModel.addExpression(name);
+            myExpression = myModel.newExpression(name);
 
             myType = rowType;
 
@@ -715,7 +715,7 @@ final class FileFormatMPS {
             this.extractFields(line, myVerifierQ);
 
             if (myQuadObjExpr == null) {
-                myQuadObjExpr = myModel.addExpression(section.name()).weight(HALF);
+                myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
             }
 
             Variable var1 = myColumns.get(myFields[1]).getVariable();
@@ -734,7 +734,7 @@ final class FileFormatMPS {
             this.extractFields(line, myVerifierQ);
 
             if (myQuadObjExpr == null) {
-                myQuadObjExpr = myModel.addExpression(section.name()).weight(HALF);
+                myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
             }
 
             Variable varA = myColumns.get(myFields[1]).getVariable();

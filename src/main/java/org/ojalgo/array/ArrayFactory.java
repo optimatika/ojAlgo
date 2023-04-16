@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
-import org.ojalgo.type.math.MathType;
 
 abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D.Dense<I> {
 
@@ -43,7 +42,7 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         return retVal;
     }
 
-    public I copy(final Comparable<?>... source) {
+    public I copy(final Comparable<?>[] source) {
         int length = source.length;
         I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {
@@ -95,8 +94,6 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
     abstract AggregatorSet<N> aggregator();
 
     abstract long getCapacityLimit();
-
-    abstract MathType getMathType();
 
     SegmentedArray<N> makeSegmented(final long... structure) {
 

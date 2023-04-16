@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,20 +37,23 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
      */
     static void sort(final double[] d, final ExchangeColumns mtrxV) {
 
-        final int size = d.length;
+        int size = d.length;
 
-        final int length = size - 1;
-        for (int i = 0; i < length; i++) {
+        for (int i = 0, limit = size - 1; i < limit; i++) {
 
             int k = i;
             double p = Math.abs(d[i]);
+
             for (int j = i + 1; j < size; j++) {
-                if (Math.abs(d[j]) > p) {
+                double m = Math.abs(d[j]);
+                if (m > p) {
                     k = j;
-                    p = d[j];
+                    p = m;
                 }
             }
+
             if (k != i) {
+                p = d[k];
                 d[k] = d[i];
                 d[i] = p;
                 mtrxV.exchangeColumns(i, k);

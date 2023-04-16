@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class ComplexMathTest {
+public class ComplexMathTest extends FunctionConstantTests {
 
     @Test
     public void testDIVIDE() {

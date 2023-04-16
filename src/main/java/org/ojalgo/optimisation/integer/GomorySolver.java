@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,21 +46,6 @@ public final class GomorySolver extends GenericSolver {
 
         public boolean isCapable(final ExpressionsBasedModel model) {
             return model.isAnyVariableInteger() && !model.isAnyConstraintQuadratic();
-        }
-
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            return solverState;
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            return modelState;
-        }
-
-        @Override
-        protected boolean isSolutionMapped() {
-            return false;
         }
 
     }

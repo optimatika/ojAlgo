@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 
 /**
  * @author apete
@@ -29,24 +29,24 @@ import org.ojalgo.matrix.RationalMatrix;
 public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
 
     @Override
-    protected RationalMatrix[] getMatrices() {
+    protected MatrixQ128[] getMatrices() {
 
-        final RationalMatrix[] retVal = new RationalMatrix[8];
+        final MatrixQ128[] retVal = new MatrixQ128[8];
 
         // Equations/Equalities
-        retVal[0] = RationalMatrix.FACTORY
+        retVal[0] = MatrixQ128.FACTORY
                 .rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.069575, 0.0738, 0.1288 }, { 1.0, 0.0, 0.0, 0.0, 0.0 },
                         { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
         // Levels/Values
-        retVal[1] = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[1] = MatrixQ128.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         // Quadratic
-        retVal[2] = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 2.0, 0.0, 0.0 },
+        retVal[2] = MatrixQ128.FACTORY.rows(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 2.0, 0.0, 0.0 },
                 { -0.0, 0.0, 0.0, 2.0, 0.0 }, { -0.0, 0.0, 0.0, 0.0, 2.0 } });
 
         // Linear
-        retVal[3] = RationalMatrix.FACTORY.rows(new double[][] { { -0.5 }, { -0.5 }, { -0.0 }, { -0.5 }, { -0.5 } });
+        retVal[3] = MatrixQ128.FACTORY.rows(new double[][] { { -0.5 }, { -0.5 }, { -0.0 }, { -0.5 }, { -0.5 } });
 
         // Inequalities/Differences
         retVal[4] = null;
@@ -55,10 +55,10 @@ public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
         retVal[5] = null;
 
         // LagrangeSolver
-        retVal[6] = RationalMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[6] = MatrixQ128.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         // ActiveSetSolver
-        retVal[7] = RationalMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[7] = MatrixQ128.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         return retVal;
     }

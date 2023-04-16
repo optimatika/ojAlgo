@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public class PolynomialImplTest {
             }
 
             final int tmpDegree = tmpSamples - 1;
-            final PrimitivePolynomial tmpPoly = new PrimitivePolynomial(tmpDegree);
+            final PolynomialR064 tmpPoly = new PolynomialR064(tmpDegree);
 
             tmpPoly.estimate(Access1D.wrap(x), Access1D.wrap(y));
 
@@ -64,7 +64,7 @@ public class PolynomialImplTest {
 
         final int tmpDegree = 10;
 
-        final PrimitivePolynomial tmpPoly = new PrimitivePolynomial(tmpDegree);
+        final PolynomialR064 tmpPoly = new PolynomialR064(tmpDegree);
 
         tmpPoly.set(0, 5.0);
 

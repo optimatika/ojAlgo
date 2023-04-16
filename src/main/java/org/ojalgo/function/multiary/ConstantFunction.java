@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -38,28 +37,83 @@ import org.ojalgo.structure.Access1D;
  */
 public final class ConstantFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Constant<N> {
 
+    public static final class Factory<N extends Comparable<N>> {
+
+        private Comparable<?> myConstant = null;
+        private final PhysicalStore.Factory<N, ?> myFactory;
+
+        Factory(final PhysicalStore.Factory<N, ?> factory) {
+            super();
+            myFactory = factory;
+        }
+
+        public Factory<N> constant(final Comparable<?> constant) {
+            myConstant = constant;
+            return this;
+        }
+
+        public ConstantFunction<N> make(final int arity) {
+            return new ConstantFunction<>(arity, myFactory, myConstant);
+        }
+
+    }
+
+    public static <N extends Comparable<N>> Factory<N> factory(final PhysicalStore.Factory<N, ?> factory) {
+        return new Factory<>(factory);
+    }
+
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        return new ConstantFunction<>(arity, GenericStore.COMPLEX);
+        // return new ConstantFunction<>(arity, GenericStore.C128);
+        return ConstantFunction.factory(GenericStore.C128).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericStore.COMPLEX, constant);
+        // return new ConstantFunction<>(arity, GenericStore.C128, constant);
+        return ConstantFunction.factory(GenericStore.C128).constant(constant).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<Double> makePrimitive(final int arity) {
-        return new ConstantFunction<>(arity, Primitive64Store.FACTORY);
+        // return new ConstantFunction<>(arity, Primitive64Store.FACTORY);
+        return ConstantFunction.factory(Primitive64Store.FACTORY).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<Double> makePrimitive(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, Primitive64Store.FACTORY, constant);
+        // return new ConstantFunction<>(arity, Primitive64Store.FACTORY, constant);
+        return ConstantFunction.factory(Primitive64Store.FACTORY).constant(constant).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<RationalNumber> makeRational(final int arity) {
-        return new ConstantFunction<>(arity, GenericStore.RATIONAL);
+        // return new ConstantFunction<>(arity, GenericStore.Q128);
+        return ConstantFunction.factory(GenericStore.Q128).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static ConstantFunction<RationalNumber> makeRational(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericStore.RATIONAL, constant);
+        // return new ConstantFunction<>(arity, GenericStore.Q128, constant);
+        return ConstantFunction.factory(GenericStore.Q128).constant(constant).make(arity);
     }
 
     private final int myArity;
@@ -90,14 +144,14 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
     }
 
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getLinearFactors();
+        return this.getLinearFactors(false);
     }
 
     public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myFactory.makeZero(myArity, myArity);
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myFactory.makeZero(myArity, 1);
     }
 
@@ -109,7 +163,7 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
         myConstant = constant != null ? myFactory.scalar().convert(constant) : null;
     }
 
-    Factory<N, ?> factory() {
+    PhysicalStore.Factory<N, ?> factory() {
         return myFactory;
     }
 

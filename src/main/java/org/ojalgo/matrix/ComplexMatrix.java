@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,11 +40,9 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * A matrix (linear algebra) with {@link ComplexNumber} elements.
- *
- * @see BasicMatrix
- * @author apete
+ * @deprecated v53 Use {@link MatrixC128} instead.
  */
+@Deprecated
 public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
     public static final class DenseReceiver extends Mutator2D<ComplexNumber, ComplexMatrix, PhysicalStore<ComplexNumber>> {
@@ -63,7 +61,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class Factory extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
 
         Factory() {
-            super(ComplexMatrix.class, GenericStore.COMPLEX);
+            super(ComplexMatrix.class, GenericStore.C128);
         }
 
         @Override
@@ -140,7 +138,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
 
     @Override
     DeterminantTask<ComplexNumber> newDeterminantTask(final Structure2D template) {
-        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
+        return DeterminantTask.C128.make(template, this.isHermitian(), false);
     }
 
     @Override

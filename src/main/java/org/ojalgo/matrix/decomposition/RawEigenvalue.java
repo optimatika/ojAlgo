@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -123,6 +123,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         Symmetric() {
             super();
+        }
+
+        public void btran(final PhysicalStore<Double> arg) {
+            arg.fillByMultiplying(this.getInverse(), arg.copy());
         }
 
         public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {

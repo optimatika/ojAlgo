@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,11 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -52,18 +54,91 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<LDL<N>> {
 
+        /**
+         * @see LDL#modified(Factory, Comparable)
+         */
+        default Factory<N> modified(final N threshold) {
+            return new ModifiedFactory<>(this, threshold);
+        }
+
     }
 
-    Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
+    final class ModifiedFactory<N extends Comparable<N>> implements Factory<N> {
 
-    Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.Primitive();
+        private final Factory<N> myDelegate;
+        private final N myThreshold;
 
-    Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
+        ModifiedFactory(final Factory<N> delegate, final N threshold) {
+            super();
+            myDelegate = delegate;
+            myThreshold = threshold;
+        }
 
-    Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+        public LDL<N> make(final Structure2D typical) {
+            LDL<N> retVal = myDelegate.make(typical);
+            if (myThreshold != null && retVal instanceof LDLDecomposition) {
+                ((LDLDecomposition<N>) retVal).setThreshold(myThreshold);
+            }
+            return retVal;
+        }
+
+    }
+
+    Factory<ComplexNumber> C128 = typical -> new LDLDecomposition.C128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    Factory<Quaternion> H256 = typical -> new LDLDecomposition.H256();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    Factory<Double> R064 = typical -> new LDLDecomposition.R064();
+
+    Factory<Quadruple> R128 = typical -> new LDLDecomposition.R128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    Factory<RationalNumber> Q128 = typical -> new LDLDecomposition.Q128();
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
+    }
+
+    /**
+     * Will return a modified LDL decomposition algoritm. It's the Gill, Murray and Wright (GMW) algorithm.
+     * <p>
+     * The input threshold is the bound on the diagonal values.
+     * <p>
+     * The second parameter of the GMW algorithm, that is supposed to cap the magnitude of the elements in the
+     * triangular (Cholesky) matrices, is set to something very large. More correctly, it is assumed to be
+     * very large and therefore resulting in a negligible contribution to the algorithm.
+     */
+    static <N extends Comparable<N>> Factory<N> modified(final Factory<N> delegate, final N threshold) {
+        return new ModifiedFactory<>(delegate, threshold);
     }
 
     MatrixStore<N> getD();
@@ -88,8 +163,8 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
         MatrixStore<N> mtrxD = this.getD();
         MatrixStore<N> mtrxR = this.getR();
 
-        int[] pivotOrder = this.getPivotOrder();
+        int[] reverseOrder = this.getReversePivotOrder();
 
-        return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(pivotOrder).columns(pivotOrder);
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).rows(reverseOrder).columns(reverseOrder);
     }
 }

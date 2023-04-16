@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
+import org.ojalgo.type.math.MathType;
 
 public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N, AnyTensor<N>> implements AccessAnyD<N>, MutateAnyD.Receiver<N> {
 
@@ -84,6 +85,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             }
 
             return new AnyTensor<>(myFactory, rank, Math.toIntExact(dimensions));
+        }
+
+        public MathType getMathType() {
+            return myFactory.getMathType();
         }
 
     }

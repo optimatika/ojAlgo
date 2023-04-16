@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
         I copy(Access1D<?> source);
 
-        I copy(Comparable<?>... source);
+        I copy(Comparable<?>[] source);
 
         I copy(double... source);
 

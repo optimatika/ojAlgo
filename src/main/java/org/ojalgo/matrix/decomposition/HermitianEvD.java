@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -62,10 +63,10 @@ import org.ojalgo.structure.Structure2D;
  **/
 abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
-    static final class Complex extends HermitianEvD<ComplexNumber> {
+    static final class C128 extends HermitianEvD<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX, new DeferredTridiagonal.Complex());
+        C128() {
+            super(GenericStore.C128, new DeferredTridiagonal.C128());
         }
 
         public Eigenpair getEigenpair(final int index) {
@@ -78,26 +79,34 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
 
     }
 
-    static final class Primitive extends HermitianEvD<Double> {
+    static final class H256 extends HermitianEvD<Quaternion> {
 
-        Primitive() {
+        H256() {
+            super(GenericStore.H256, new DeferredTridiagonal.H256());
+        }
+
+    }
+
+    static final class Q128 extends HermitianEvD<RationalNumber> {
+
+        Q128() {
+            super(GenericStore.Q128, new DeferredTridiagonal.Q128());
+        }
+
+    }
+
+    static final class R064 extends HermitianEvD<Double> {
+
+        R064() {
             super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }
 
-    static final class Quat extends HermitianEvD<Quaternion> {
+    static final class R128 extends HermitianEvD<Quadruple> {
 
-        Quat() {
-            super(GenericStore.QUATERNION, new DeferredTridiagonal.Quat());
-        }
-
-    }
-
-    static final class Rational extends HermitianEvD<RationalNumber> {
-
-        Rational() {
-            super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
+        R128() {
+            super(GenericStore.R128, new DeferredTridiagonal.R128());
         }
 
     }
@@ -206,6 +215,10 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
         myTridiagonal = tridiagonal;
     }
 
+    public final void btran(final PhysicalStore<N> arg) {
+        arg.fillByMultiplying(this.getInverse(), arg.copy());
+    }
+
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         if (matrix.isHermitian()) {
             return this.decompose(matrix);
@@ -297,7 +310,8 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
+        rhs.supplyTo(preallocated);
+        preallocated.fillByMultiplying(this.getInverse(), preallocated.copy());
         return preallocated;
     }
 

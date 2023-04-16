@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,15 @@ import java.util.List;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 abstract class EquilibriumModel extends FinancePortfolio implements FinancePortfolio.Context {
 
-    private transient Primitive64Matrix myAssetReturns;
-    private transient Primitive64Matrix myAssetVolatilities;
-    private transient Primitive64Matrix myAssetWeights;
+    private transient MatrixR064 myAssetReturns;
+    private transient MatrixR064 myAssetVolatilities;
+    private transient MatrixR064 myAssetWeights;
     private final MarketEquilibrium myMarketEquilibrium;
     private transient Scalar<?> myMeanReturn;
     private transient Scalar<?> myReturnVariance;
@@ -56,43 +56,43 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     public final double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final Primitive64Matrix tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
-        final Primitive64Matrix tmpAssetReturns = this.getAssetReturns();
+        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetReturns = this.getAssetReturns();
         return this.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns).doubleValue();
     }
 
     public final double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final Primitive64Matrix tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
         return this.calculatePortfolioVariance(tmpAssetWeights).doubleValue();
     }
 
-    public final Primitive64Matrix getAssetReturns() {
+    public final MatrixR064 getAssetReturns() {
         if (myAssetReturns == null) {
             myAssetReturns = this.calculateAssetReturns();
         }
         return myAssetReturns;
     }
 
-    public final Primitive64Matrix getAssetVolatilities() {
+    public final MatrixR064 getAssetVolatilities() {
         if (myAssetVolatilities == null) {
             myAssetVolatilities = myMarketEquilibrium.toCorrelations();
         }
         return myAssetVolatilities;
     }
 
-    public final Primitive64Matrix getAssetWeights() {
+    public final MatrixR064 getAssetWeights() {
         if (myAssetWeights == null) {
             myAssetWeights = this.calculateAssetWeights();
         }
         return myAssetWeights;
     }
 
-    public final Primitive64Matrix getCorrelations() {
+    public final MatrixR064 getCorrelations() {
         return myMarketEquilibrium.toCorrelations();
     }
 
-    public final Primitive64Matrix getCovariances() {
+    public final MatrixR064 getCovariances() {
         return myMarketEquilibrium.getCovariances();
     }
 
@@ -103,8 +103,8 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     @Override
     public final double getMeanReturn() {
         if (myMeanReturn == null) {
-            final Primitive64Matrix tmpAssetWeights = this.getAssetWeights();
-            final Primitive64Matrix tmpAssetReturns = this.getAssetReturns();
+            final MatrixR064 tmpAssetWeights = this.getAssetWeights();
+            final MatrixR064 tmpAssetReturns = this.getAssetReturns();
             if ((tmpAssetWeights != null) && (tmpAssetReturns != null)) {
                 myMeanReturn = this.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns);
             }
@@ -131,11 +131,11 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     @Override
     public final List<BigDecimal> getWeights() {
 
-        final Primitive64Matrix tmpAssetWeights = this.getAssetWeights();
+        final MatrixR064 tmpAssetWeights = this.getAssetWeights();
 
         if (tmpAssetWeights != null) {
 
-            return Array1D.R128.copy(tmpAssetWeights);
+            return Array1D.R256.copy(tmpAssetWeights);
 
         } else {
 
@@ -156,8 +156,8 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     public final List<SimpleAsset> toSimpleAssets() {
 
-        final Primitive64Matrix tmpReturns = this.getAssetReturns();
-        final Primitive64Matrix tmpCovariances = this.getCovariances();
+        final MatrixR064 tmpReturns = this.getAssetReturns();
+        final MatrixR064 tmpCovariances = this.getCovariances();
         final List<BigDecimal> tmpWeights = this.getWeights();
 
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(tmpWeights.size());
@@ -181,27 +181,27 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         return TypeUtils.format("RAF={} {}", this.getRiskAversion().toString(), super.toString());
     }
 
-    protected abstract Primitive64Matrix calculateAssetReturns();
+    protected abstract MatrixR064 calculateAssetReturns();
 
-    protected final Primitive64Matrix calculateAssetReturns(final Primitive64Matrix aWeightsVctr) {
+    protected final MatrixR064 calculateAssetReturns(final MatrixR064 aWeightsVctr) {
         return myMarketEquilibrium.calculateAssetReturns(aWeightsVctr);
     }
 
-    protected abstract Primitive64Matrix calculateAssetWeights();
+    protected abstract MatrixR064 calculateAssetWeights();
 
-    protected final Primitive64Matrix calculateAssetWeights(final Primitive64Matrix aReturnsVctr) {
+    protected final MatrixR064 calculateAssetWeights(final MatrixR064 aReturnsVctr) {
         return myMarketEquilibrium.calculateAssetWeights(aReturnsVctr);
     }
 
-    protected final Scalar<?> calculatePortfolioReturn(final Primitive64Matrix aWeightsVctr, final Primitive64Matrix aReturnsVctr) {
+    protected final Scalar<?> calculatePortfolioReturn(final MatrixR064 aWeightsVctr, final MatrixR064 aReturnsVctr) {
         return MarketEquilibrium.calculatePortfolioReturn(aWeightsVctr, aReturnsVctr);
     }
 
-    protected final Scalar<?> calculatePortfolioVariance(final Primitive64Matrix aWeightsVctr) {
+    protected final Scalar<?> calculatePortfolioVariance(final MatrixR064 aWeightsVctr) {
         return myMarketEquilibrium.calculatePortfolioVariance(aWeightsVctr);
     }
 
-    protected final void calibrate(final Primitive64Matrix aWeightsVctr, final Primitive64Matrix aReturnsVctr) {
+    protected final void calibrate(final MatrixR064 aWeightsVctr, final MatrixR064 aReturnsVctr) {
 
         final Scalar<?> tmpRiskAvesrion = myMarketEquilibrium.calculateImpliedRiskAversion(aWeightsVctr, aReturnsVctr);
 

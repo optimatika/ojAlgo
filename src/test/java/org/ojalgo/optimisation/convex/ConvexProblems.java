@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,15 +30,17 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.Primitive64Matrix;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
@@ -57,15 +59,17 @@ import org.ojalgo.type.context.NumberContext;
 
 public class ConvexProblems extends OptimisationConvexTests {
 
+    private static final Factory<Double, Primitive64Store> R064 = Primitive64Store.FACTORY;
+
     public static ExpressionsBasedModel buildP20080117() {
 
         // create expected returns matrix
-        Primitive64Matrix tmpReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 },
-                { -0.004130184341000032 }, { -0.005639860515211043 }, { 0.0007211966666666817 }, { 0.0003258225000000077 }, { -0.005754291666666666 },
-                { -0.004264291666666667 }, { -0.0017500000000000003 } });
+        MatrixR064 tmpReturns = MatrixR064.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 }, { -0.004130184341000032 },
+                { -0.005639860515211043 }, { 0.0007211966666666817 }, { 0.0003258225000000077 }, { -0.005754291666666666 }, { -0.004264291666666667 },
+                { -0.0017500000000000003 } });
 
         // create covariance matrix
-        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
+        MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.001561410465201063, 0.00006366128201274021, -0.0001323096896759724, 0.0000909074052724909, 0.00003172000033558704, 0.00001955483223848944,
                         -0.00013771504482647386, -0.00004858457275314645, -0.000012954723060403266 },
                 { 0.00006366128201274021, 0.00016419786524761803, -0.00001566288911558343, -0.00008688646089751923, 0.0000027349925543017186,
@@ -102,11 +106,11 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -120,18 +124,18 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     public static ConvexSolver.Builder getDataP20140522() {
 
-        double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
+        double[][] q = { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
         RawStore mtrxQ = RawStore.FACTORY.rows(q);
 
-        double[] c = new double[] { 195.0, 59.0, -1.8, -11.7 };
+        double[] c = { 195.0, 59.0, -1.8, -11.7 };
         RawStore mtrxC = RawStore.FACTORY.columns(c);
 
-        double[][] ai = new double[][] { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 },
-                { 1.0, 1.0, 1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 },
-                { -0.01, 0.0, 0.0, 0.0 }, { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
+        double[][] ai = { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 }, { 1.0, 1.0, 1.0, 0.0 },
+                { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 }, { -0.01, 0.0, 0.0, 0.0 },
+                { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
         RawStore mtrxAI = RawStore.FACTORY.rows(ai);
 
-        double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
+        double[] bi = { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
         RawStore mtrxBI = RawStore.FACTORY.columns(bi);
 
         return ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI);
@@ -211,7 +215,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        int tmpNumberOfVariables = (int) matrices[3].count(); // c
+        int tmpNumberOfVariables = matrices[3].size(); // c
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             Variable tmpVariable = Variable.make("X" + v);
@@ -222,7 +226,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
         if (matrices[0] != null && matrices[1] != null) {
             for (int e = 0; e < matrices[0].countRows(); e++) {
-                Expression tmpExpression = retVal.addExpression("E" + e);
+                Expression tmpExpression = retVal.newExpression("E" + e);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
                     tmpExpression.set(v, matrices[0].get(e, v));
                 }
@@ -231,21 +235,21 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
         if (matrices[4] != null && matrices[5] != null) {
             for (int i = 0; i < matrices[4].countRows(); i++) {
-                Expression tmpExpression = retVal.addExpression("I" + i);
+                Expression tmpExpression = retVal.newExpression("I" + i);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
                     tmpExpression.set(v, matrices[4].get(i, v));
                 }
                 tmpExpression.upper(matrices[5].doubleValue(i));
             }
         }
-        Expression tmpObjQ = retVal.addExpression("Q");
+        Expression tmpObjQ = retVal.newExpression("Q");
         for (int r = 0; r < tmpNumberOfVariables; r++) {
             for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpObjQ.set(r, v, matrices[2].doubleValue(r, v));
             }
         }
         tmpObjQ.weight(HALF);
-        Expression tmpObjC = retVal.addExpression("C");
+        Expression tmpObjC = retVal.newExpression("C");
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             tmpObjC.set(v, matrices[3].doubleValue(v));
         }
@@ -261,12 +265,12 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testInfeasibleCase() {
 
-        Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ONE).upper(TWO).weight(ONE), new Variable("X2").lower(ONE).upper(TWO).weight(TWO),
+        Variable[] tmpVariables = { new Variable("X1").lower(ONE).upper(TWO).weight(ONE), new Variable("X2").lower(ONE).upper(TWO).weight(TWO),
                 new Variable("X3").lower(ONE).upper(TWO).weight(THREE) };
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpExprQ = tmpModel.addExpression("Q1");
+        Expression tmpExprQ = tmpModel.newExpression("Q1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             for (int j = 0; j < tmpModel.countVariables(); j++) {
                 tmpExprQ.set(i, i, Math.random());
@@ -276,7 +280,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // tmpModel.options.debug(ConvexSolver.class);
 
-        Expression tmpExprC1 = tmpModel.addExpression("C1");
+        Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             tmpExprC1.set(i, ONE);
         }
@@ -306,10 +310,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable x = model.addVariable("x").lower(100).upper(200);
-        Variable y = model.addVariable("y").lower(80).upper(170);
+        Variable x = model.newVariable("x").lower(100).upper(200);
+        Variable y = model.newVariable("y").lower(80).upper(170);
 
-        model.addExpression("obj").set(x, y, 1).weight(-1);
+        model.newExpression("obj").set(x, y, 1).weight(-1);
 
         // model.options.debug(ConvexSolver.class);
         // model.options.validate = false;
@@ -317,7 +321,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         Optimisation.Result result = model.minimise();
 
         if (result.getState().isOptimal()) {
-            TestUtils.assertEquals(Access1D.wrap(new double[] { 200, 170 }), result);
+            TestUtils.assertEquals(Access1D.wrap(200, 170), result);
         } else if (result.getState().isFeasible()) {
             TestUtils.assertTrue(model.validate(result));
         }
@@ -390,7 +394,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         NumberContext accuracy = StandardType.PERCENT.withPrecision(5);
 
-        Access1D<BigDecimal> expected = ArrayR128.FACTORY.copy(new double[] { 0.02, 0.02, 0.02, 0.02, 0.80, 0.06, 0.02, 0.02, 0.02 });
+        double[] source = { 0.02, 0.02, 0.02, 0.02, 0.80, 0.06, 0.02, 0.02, 0.02 };
+        Access1D<BigDecimal> expected = ArrayR256.FACTORY.copy(source);
 
         TestUtils.assertTrue(model.validate(expected, accuracy));
         TestUtils.assertTrue(model.validate(actual, accuracy));
@@ -413,11 +418,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080118() {
 
         // create expected returns matrix
-        Primitive64Matrix expectedReturnsMatrix = Primitive64Matrix.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 },
-                { 9.996579 }, { 9.990690 }, { 9.994904 }, { 9.994514 }, { 9.984064 }, { 9.987534 } });
+        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 }, { 9.996579 },
+                { 9.990690 }, { 9.994904 }, { 9.994514 }, { 9.984064 }, { 9.987534 } });
 
         // create covariance matrix
-        Primitive64Matrix covarianceMatrix = Primitive64Matrix.FACTORY.rows(new double[][] {
+        MatrixR064 covarianceMatrix = MatrixR064.FACTORY.rows(new double[][] {
                 { 6.483565230120298E-4, -1.3344603795915894E-4, -4.610345510893708E-4, -7.334405624030001E-4, 1.1551383115707195E-5, -0.00104145662863434,
                         -1.0725896685568462E-4, -1.221384153392056E-4, -4.173413644389791E-4, -2.4861043894946935E-4 },
                 { -1.3344603795915894E-4, 0.0026045957224784455, 0.0012394355327235707, 9.243919166568456E-4, -8.653805945112411E-5, 8.100239312410631E-4,
@@ -452,17 +457,17 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.35"));
         }
 
-        DenseArray<BigDecimal> tmpExpected = ArrayR128.FACTORY.copy(RationalMatrix.FACTORY
-                .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
+        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(
+                MatrixQ128.FACTORY.rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -494,10 +499,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080124() {
         // create expected returns matrix
-        Primitive64Matrix expectedReturnsMatrix = Primitive64Matrix.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
-                { 9.998392 }, { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
+        MatrixR064 expectedReturnsMatrix = MatrixR064.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 }, { 9.998392 },
+                { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
         // create covariance matrix
-        Primitive64Matrix covarianceMatrix = Primitive64Matrix.FACTORY.rows(new double[][] {
+        MatrixR064 covarianceMatrix = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.0013191354374342357, 7.786471466322114E-5, -3.810886655309235E-5, -2.28102405899103E-4, -1.2589115740653127E-4, -1.3247692268411991E-5,
                         1.422624656557158E-4, -2.7176361887359125E-5, 8.675127894495302E-5, -8.116577287090551E-5, -8.468380774247271E-6, 4.930080166695193E-5,
                         -2.774138231533918E-4, -3.148322898570031E-5 },
@@ -555,19 +560,19 @@ public class ConvexProblems extends OptimisationConvexTests {
             // tmpVariables[i].setUpperLimit(new BigDecimal("1.00"));
         }
 
-        DenseArray<BigDecimal> tmpExpected = ArrayR128.FACTORY.copy(
-                RationalMatrix.FACTORY.rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
+        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(
+                MatrixQ128.FACTORY.rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
                         { 0.049999999999891145 }, { 0.049999999997416125 }, { 0.08338832846287945 }, { 0.05000000000178943 }, { 0.05000000000085164 },
                         { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -600,10 +605,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080204() {
 
         // create expected returns matrix
-        Primitive64Matrix tmpExpectedReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 },
-                { 10.056851 }, { 9.997920 }, { 9.999011 }, { 10.050971 }, { 9.989124 }, { 9.989912 } });
+        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 }, { 10.056851 },
+                { 9.997920 }, { 9.999011 }, { 10.050971 }, { 9.989124 }, { 9.989912 } });
         // create covariance matrix
-        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
+        MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.014531344652473037, 4.444675045533674E-4, 0.007234717654072837, -9.455312097865225E-4, 0.0016345464996349748, 1.5256808879495097E-4,
                         0.00226325818749439, 0.003534367267672946, -4.2669306842991344E-5, 6.902267133060073E-5 },
                 { 4.444675045533674E-4, 0.008511422662647488, 0.0039821105759899845, 5.543408872612397E-4, -0.0015797828516888929, 1.3505400134130176E-4,
@@ -638,18 +643,18 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.12"));
         }
 
-        DenseArray<BigDecimal> tmpExpected = ArrayR128.FACTORY.copy(RationalMatrix.FACTORY.rows(
+        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(MatrixQ128.FACTORY.rows(
                 new double[][] { { 0.08000000000000602 }, { 0.12000000000002384 }, { 0.08000000000000054 }, { 0.10643232489190736 }, { 0.12000000000002252 },
                         { 0.11999999999979595 }, { 0.09356767510776097 }, { 0.11999999999998154 }, { 0.07999999999999653 }, { 0.08000000000000498 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -682,11 +687,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080208() {
 
         // create expected returns matrix
-        Primitive64Matrix tmpExpectedReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 },
-                { 10.055549 }, { 9.999127 }, { 9.999720 }, { 10.049002 }, { 9.988769 }, { 9.990095 } });
+        MatrixR064 tmpExpectedReturns = MatrixR064.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 }, { 10.055549 },
+                { 9.999127 }, { 9.999720 }, { 10.049002 }, { 9.988769 }, { 9.990095 } });
 
         // create covariance matrix
-        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
+        MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] {
                 { 0.014661954677318977, 3.459112088561122E-4, 0.007798752920910871, 0.0020921425081866503, 0.001846944297640248, 1.0531906931335766E-4,
                         -2.7515614291198E-4, 0.0034083900074454894, 1.1859491261103433E-4, -0.0027421673864628264 },
                 { 3.459112088561122E-4, 0.008695862475003915, 0.004154360841751649, -2.661685231819661E-4, -0.0015999007544258263, 3.590680217774603E-4,
@@ -721,18 +726,18 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.12"));
         }
 
-        DenseArray<BigDecimal> tmpExpected = ArrayR128.FACTORY.copy(RationalMatrix.FACTORY.rows(
+        DenseArray<BigDecimal> tmpExpected = ArrayR256.FACTORY.copy(MatrixQ128.FACTORY.rows(
                 new double[][] { { 0.07999999999998897 }, { 0.1199999999999636 }, { 0.07999999999999526 }, { 0.08000000000004488 }, { 0.11999999999999084 },
                         { 0.12000000000018606 }, { 0.11999999999996151 }, { 0.12000000000000167 }, { 0.08000000000001738 }, { 0.08000000000005617 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpVariance = model.addExpression("Variance");
+        Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        Expression tmpBalance = model.addExpression("Balance");
+        Expression tmpBalance = model.newExpression("Balance");
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
@@ -769,10 +774,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        Primitive64Matrix.Factory tmpMtrxFact = Primitive64Matrix.FACTORY;
+        MatrixR064.Factory tmpMtrxFact = MatrixR064.FACTORY;
         NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
-        Primitive64Matrix[] tmpMatrices = new Primitive64Matrix[8];
+        MatrixR064[] tmpMatrices = new MatrixR064[8];
 
         tmpMatrices[0] = tmpMtrxFact.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0 } });
         tmpMatrices[1] = tmpMtrxFact.rows(new double[][] { { 1.0 } });
@@ -821,7 +826,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Optimisation.Result tmpResult = tmpSolver.solve();
 
-        TestUtils.assertEquals(tmpMatrices[6], RationalMatrix.FACTORY.columns(tmpResult), tmpEvalCntxt);
+        TestUtils.assertEquals(tmpMatrices[6], MatrixQ128.FACTORY.columns(tmpResult), tmpEvalCntxt);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
     }
@@ -1069,10 +1074,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        Array1D<BigDecimal> tmpSolution = Array1D.R128.copy(tmpResult);
+        Array1D<BigDecimal> tmpSolution = Array1D.R256.copy(tmpResult);
         tmpSolution.modifyAll(NumberContext.of(7, 6).getFunction(BigFunction.getSet()));
         for (BigDecimal tmpBigDecimal : tmpSolution) {
-            if (tmpBigDecimal.compareTo(BigMath.ZERO) == -1 || tmpBigDecimal.compareTo(BigMath.ONE) == 1) {
+            if (tmpBigDecimal.compareTo(BigMath.ZERO) < 0 || tmpBigDecimal.compareTo(BigMath.ONE) > 0) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }
         }
@@ -1148,8 +1153,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-            TestUtils.assertEquals(Primitive64Matrix.FACTORY.rows(new double[][] { { 0.68888888888888888 }, { 0.311111111111111111 }, { 0.0 } }),
-                    RationalMatrix.FACTORY.columns(tmpResult));
+            TestUtils.assertEquals(MatrixR064.FACTORY.rows(new double[][] { { 0.68888888888888888 }, { 0.311111111111111111 }, { 0.0 } }),
+                    MatrixQ128.FACTORY.columns(tmpResult));
         }
     }
 
@@ -1194,10 +1199,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         Variable x3 = new Variable("X3").lower(BigMath.ZERO);
         Variable x4 = new Variable("X4").lower(BigMath.ZERO);
 
-        Variable[] tmpVariables = new Variable[] { x1, x2, x3, x4 };
+        Variable[] tmpVariables = { x1, x2, x3, x4 };
         ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpObjExpr = model.addExpression("Objective");
+        Expression tmpObjExpr = model.newExpression("Objective");
 
         tmpObjExpr.set(2, 2, BigMath.HALF);
         tmpObjExpr.set(3, 3, BigMath.TWO);
@@ -1210,22 +1215,22 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Expression tmpConstrExpr;
 
-        tmpConstrExpr = model.addExpression("C1").lower(BigMath.FOUR);
+        tmpConstrExpr = model.newExpression("C1").lower(BigMath.FOUR);
         tmpConstrExpr.set(0, BigMath.ONE);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.FOUR.negate());
         tmpConstrExpr.set(3, BigMath.TWO);
 
-        tmpConstrExpr = model.addExpression("C2").upper(BigMath.SIX);
+        tmpConstrExpr = model.newExpression("C2").upper(BigMath.SIX);
         tmpConstrExpr.set(0, BigMath.THREE.negate());
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.TWO.negate());
 
-        tmpConstrExpr = model.addExpression("C3").level(BigMath.NEG);
+        tmpConstrExpr = model.newExpression("C3").level(BigMath.NEG);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(3, BigMath.NEG);
 
-        tmpConstrExpr = model.addExpression("C4").level(BigMath.ZERO);
+        tmpConstrExpr = model.newExpression("C4").level(BigMath.ZERO);
         tmpConstrExpr.set(0, BigMath.ONE);
         tmpConstrExpr.set(1, BigMath.ONE);
         tmpConstrExpr.set(2, BigMath.NEG);
@@ -1236,7 +1241,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, NumberContext.of(7, 6));
 
-        double[] tmpExpected = new double[] { -1.1875, 1.5625, 0.375, 2.5625 };
+        double[] tmpExpected = { -1.1875, 1.5625, 0.375, 2.5625 };
         for (int i = 0; i < tmpExpected.length; i++) {
             TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), NumberContext.of(5, 4));
         }
@@ -1301,8 +1306,8 @@ public class ConvexProblems extends OptimisationConvexTests {
                 .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
         // Optimisation.Result from CPLEX (via ExpressionsBasedModel)
-        double[] tmpExpected = new double[] { 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433,
-                1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6 };
+        double[] tmpExpected = { 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433, 1.239483719E-5,
+                8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6 };
 
         Primitive64Store[] tmpMatrices = new Primitive64Store[6];
         tmpMatrices[0] = tmpAE;
@@ -1320,16 +1325,14 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     /**
      * <p>
-     * I tried to use ojAlgo to implement a norm minimization problem, but the solver fails even for very
-     * simple instances. The following example is one particular simple instance. Q is the identity matrix, C
-     * the zero vector. The constraints express that the solution is a probability function (AE for
-     * normalization and AI for non-negativity). Q is positive definite and the solution should be (0.5, 0.5),
-     * but qSolver fails.
-     * </p>
+     * Original problem report: I tried to use ojAlgo to implement a norm minimization problem, but the solver
+     * fails even for very simple instances. The following example is one particular simple instance. Q is the
+     * identity matrix, C the zero vector. The constraints express that the solution is a probability function
+     * (AE for normalization and AI for non-negativity). Q is positive definite and the solution should be
+     * (0.5, 0.5), but qSolver fails.
      * <p>
-     * apete: The problem was incorrectly specified with a transposed "C" vector. Modified the builder to
-     * actually throw an exception.
-     * </p>
+     * apete: The way things are currently implemented, transposing C or not doesn't matter. This test
+     * verifies that.
      */
     @Test
     public void testP20140109() {
@@ -1343,31 +1346,23 @@ public class ConvexProblems extends OptimisationConvexTests {
         Primitive64Store tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { -1, 0 }, { 0, -1 } });
         Primitive64Store tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0 }, { 0 } });
 
-        try {
+        ConvexSolver transposedSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
-            ConvexSolver qSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        ArrayR064 expected = ArrayR064.wrap(0.5, 0.5);
 
-            // qSolver.options.debug(ConvexSolver.class);
+        Optimisation.Result actual = transposedSolver.solve();
 
-            Optimisation.Result tmpResult = qSolver.solve();
-
-            // Shouldn't get this far. There should be an exception
-            TestUtils.assertStateLessThanFeasible(tmpResult);
-            TestUtils.fail();
-
-        } catch (Exception exception) {
-            TestUtils.assertTrue("Yes!", true);
-        }
+        TestUtils.assertStateNotLessThanOptimal(actual);
+        TestUtils.assertEquals(expected, actual);
 
         // ... and check that the correctly defined problem does solve.
 
-        ConvexSolver tmpCorrectSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        ConvexSolver correctSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
-        Optimisation.Result tmpResult = tmpCorrectSolver.solve();
+        actual = correctSolver.solve();
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(ArrayR064.wrap(new double[] { 0.5, 0.5 }), tmpResult);
-
+        TestUtils.assertStateNotLessThanOptimal(actual);
+        TestUtils.assertEquals(expected, actual);
     }
 
     /**
@@ -1393,12 +1388,6 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // Solution given in the original bug report
         Optimisation.Result expectedResult = Optimisation.Result.of(61.519484, State.OPTIMAL, -0.4, 0.12, -0.0196, -2.45785);
-
-        Access2D<?>[] matrices = new Access2D<?>[] { null, null, builder.getQ(), builder.getC(), builder.getAI(), builder.getBI() };
-        ExpressionsBasedModel model = ConvexProblems.buildModel(matrices, null);
-        Optimisation.Result modelResult = model.minimise();
-
-        TestUtils.assertStateAndSolution(expectedResult, modelResult);
 
         ConvexSolver solver = builder.build();
 
@@ -1513,12 +1502,13 @@ public class ConvexProblems extends OptimisationConvexTests {
         /*
          * Same as the "c" vector
          */
-        ArrayR064 centeredSolution = ArrayR064.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
+        ArrayR064 centeredSolution = ArrayR064.wrap(0.12, -0.05, 0.08, 0.07);
 
         /*
          * Magnitude 99999 and same the sign as the elements of the centered solution
          */
-        ArrayR064 boundedSolution = ArrayR064.wrap(new double[] { 99999, -99999, 99999, 99999 });
+        double[] data = { 99999, -99999, 99999, 99999 };
+        ArrayR064 boundedSolution = (ArrayR064) PrimitiveArray.wrap(data);
 
         ConvexSolver solver = P20150809.buildModel(true, false);
         Result result = solver.solve();
@@ -1650,6 +1640,33 @@ public class ConvexProblems extends OptimisationConvexTests {
         MatrixStore<Double> computedB = AE.multiply(expectedX);
         TestUtils.assertEquals(BE, computedB, accuracy);
 
+        TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
+    }
+
+    /**
+     * Copy/variant of {@link #testP20200924()} demonstrating how to use new builder api.
+     */
+    @Test
+    public void testP20200924NG() {
+
+        // Nog enklast att fortfarande skapa en Q-matris
+        Primitive64Store Q = R064.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+
+        Result result = ConvexSolver.newBuilder(Q) //
+                .linear(8, 3, 3) // Finns olika sätt att bygga målfunktionen
+                .equality(3, 1, 0, 1) // 1x + 0y + 1z = 3
+                .equality(0, 0, 1, 1) // 0x + 1y + 1z = 0
+                .build().solve();
+
+        NumberContext accuracy = NumberContext.of(12);
+
+        Primitive64Store expectedX = R064.column(2, -1, 1);
+        TestUtils.assertEquals(expectedX, result, accuracy);
+
+        Optional<Access1D<?>> multipliers = result.getMultipliers();
+        TestUtils.assertTrue(" No multipliers present", multipliers.isPresent());
+
+        Primitive64Store expectedDual = R064.column(-3, 2);
         TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
     }
 

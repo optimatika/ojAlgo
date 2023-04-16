@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,8 @@ public class SuperimposedRowCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> tmpRow = NonPhysicalTest.makeRandomMatrix(1, tmpColDim);
         int tmpIndex = Uniform.randomInteger(tmpRowDim);
 
-        rationalStore = new SuperimposedStore<>(GenericStore.RATIONAL.copy(tmpBase), tmpIndex, 0, GenericStore.RATIONAL.copy(tmpRow));
-        complexStore = new SuperimposedStore<>(GenericStore.COMPLEX.copy(tmpBase), tmpIndex, 0, GenericStore.COMPLEX.copy(tmpRow));
+        rationalStore = new SuperimposedStore<>(GenericStore.Q128.copy(tmpBase), tmpIndex, 0, GenericStore.Q128.copy(tmpRow));
+        complexStore = new SuperimposedStore<>(GenericStore.C128.copy(tmpBase), tmpIndex, 0, GenericStore.C128.copy(tmpRow));
         primitiveStore = new SuperimposedStore<>(Primitive64Store.FACTORY.copy(tmpBase), tmpIndex, 0, Primitive64Store.FACTORY.copy(tmpRow));
 
         numberOfRows = tmpRowDim;

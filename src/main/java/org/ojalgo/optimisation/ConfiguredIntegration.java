@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,11 +57,6 @@ final class ConfiguredIntegration<S extends Optimisation.Solver> extends Express
     @Override
     public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
         return myDelegate.toSolverState(modelState, model);
-    }
-
-    @Override
-    protected boolean isSolutionMapped() {
-        return myDelegate.isSolutionMapped();
     }
 
 }

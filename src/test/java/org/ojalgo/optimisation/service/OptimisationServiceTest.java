@@ -16,7 +16,7 @@ public class OptimisationServiceTest {
     private static final String HOST = "http://test-service.optimatika.se";
     // private static final String HOST = "http://localhost:8080";
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     @AfterEach
     public void clearIntegrations() {
@@ -28,10 +28,10 @@ public class OptimisationServiceTest {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        model.addVariable("A").weight(10).lower(0);
-        model.addVariable("B").weight(-10).lower(0);
+        model.newVariable("A").weight(10).lower(0);
+        model.newVariable("B").weight(-10).lower(0);
 
-        model.addExpression("UM2").set(0, 1).set(1, 1).level(2);
+        model.newExpression("UM2").set(0, 1).set(1, 1).level(2);
 
         Result expMax = model.maximise();
         Result expMin = model.minimise();

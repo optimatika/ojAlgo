@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myMathType;
         }
 
@@ -210,7 +210,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return myTypeFactory.getMathType();
         }
 

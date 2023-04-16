@@ -33,9 +33,8 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
             super(denseFactory);
         }
 
-        @Override
         public LongToNumberMap<N> make() {
-            return new LongToNumberMap<>(this.getStrategy());
+            return new LongToNumberMap<>(this.getDenseFactory(), this.getGrowthStrategy());
         }
 
     }
@@ -45,15 +44,17 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     private final SparseArray<N> myStorage;
-    private final DenseCapacityStrategy<N> myStrategy;
+    private final DenseArray.Factory<N> myDenseFactory;
+    private final GrowthStrategy myGrowthStrategy;
 
-    LongToNumberMap(final DenseCapacityStrategy<N> strategy) {
+    LongToNumberMap(final DenseArray.Factory<N> denseFactory, final GrowthStrategy growthStrategy) {
 
         super();
 
-        myStrategy = strategy.limit(Long.MAX_VALUE);
+        myDenseFactory = denseFactory;
+        myGrowthStrategy = growthStrategy;
 
-        myStorage = new SparseArray<>(myStrategy);
+        myStorage = new SparseArray<>(denseFactory, growthStrategy, Long.MAX_VALUE);
     }
 
     /**
@@ -118,11 +119,11 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public Set<Map.Entry<Long, N>> entrySet() {
-        return new AbstractSet<Map.Entry<Long, N>>() {
+        return new AbstractSet<>() {
 
             @Override
             public Iterator<Map.Entry<Long, N>> iterator() {
-                return new Iterator<Map.Entry<Long, N>>() {
+                return new Iterator<>() {
 
                     NonzeroView<N> tmpNonzeros = myStorage.nonzeros();
 
@@ -134,7 +135,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
                         tmpNonzeros.next();
 
-                        return new Map.Entry<Long, N>() {
+                        return new Map.Entry<>() {
 
                             public Long getKey() {
                                 return tmpNonzeros.index();
@@ -192,7 +193,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public Set<Long> keySet() {
-        return new AbstractSet<Long>() {
+        return new AbstractSet<>() {
 
             @Override
             public Iterator<Long> iterator() {
@@ -294,7 +295,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
 
     public LongToNumberMap<N> subMap(final long fromKey, final long toKey) {
 
-        final LongToNumberMap<N> retVal = new LongToNumberMap<>(myStrategy);
+        final LongToNumberMap<N> retVal = new LongToNumberMap<>(myDenseFactory, myGrowthStrategy);
 
         long tmpKey;
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
@@ -346,7 +347,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public NumberList<N> values() {
-        return new NumberList<>(myStorage.getValues(), myStrategy, myStorage.getActualLength());
+        return new NumberList<>(myDenseFactory, myGrowthStrategy, myStorage.getValues(), myStorage.getActualLength());
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,49 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.data.domain.finance.series;
+package org.ojalgo.optimisation.linear;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.optimisation.Optimisation;
 
 /**
- * Tests are disabled since {@link IEXTradingFetcher} no longer works.
+ * Requires all variables to have both lower and upper bounds.
  *
- * @see IEXTradingFetcher
- * @author stefanvanegmond
+ * @author apete
  */
-@Disabled
-public class IEXTradingDataSourceTest extends FinanceSeriesTests {
+final class DualSimplexSolver extends SimplexSolver {
 
-    public IEXTradingDataSourceTest() {
-        super();
+    DualSimplexSolver(final Options solverOptions, final SimplexStore simplexStore) {
+        super(solverOptions, simplexStore);
     }
 
-    @Test
-    public void testDeriveDistributions() {
+    public Result solve(final Result kickStarter) {
 
-        DataSource dataSource = DataSource.newIEXTrading("AAPL");
+        IterDescr iteration = this.prepareToIterate(false, false);
 
-        FinanceSeriesTests.doTestDeriveDistribution(dataSource);
-    }
+        this.doDualIterations(iteration);
 
-    @Test
-    public void testFetchDaily() {
-
-        DataSource dataSource = DataSource.newIEXTrading("AAPL");
-
-        if (dataSource.getHistoricalPrices().size() <= 1) {
-            TestUtils.fail("No data!");
+        if (this.getState().isFeasible() && this.isDualFeasible()) {
+            this.setState(Optimisation.State.OPTIMAL);
         }
-    }
 
-    @Test
-    public void testIEXTradingDailyMSFT() {
-
-        DataSource dataSource = DataSource.newIEXTrading("MSFT");
-
-        FinanceSeriesTests.assertAtLeastExpectedItems(dataSource, 1258);
+        return this.extractResult();
     }
 
 }

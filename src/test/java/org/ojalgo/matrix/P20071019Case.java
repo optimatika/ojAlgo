@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,11 +39,11 @@ public class P20071019Case extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.ofScale(9);
 
-    public static RationalMatrix getFatProblematic() {
+    public static MatrixR064 getFatProblematic() {
         return SimpleLeastSquaresCase.getBody().transpose();
     }
 
-    public static RationalMatrix getTallProblematic() {
+    public static MatrixR064 getTallProblematic() {
         return SimpleLeastSquaresCase.getBody();
     }
 
@@ -51,14 +51,12 @@ public class P20071019Case extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = ACCURACY.withPrecision(14);
+        mtrxA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
+        mtrxX = BasicMatrixTest.getIdentity(mtrxA.countColumns(), mtrxA.countColumns(), DEFINITION);
+        mtrxB = mtrxA;
 
-        rAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
-        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
-        rAB = rAA;
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), DEFINITION);
 
         super.doBeforeEach();
     }
@@ -74,8 +72,8 @@ public class P20071019Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
-        final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
+        LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
+        LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
 
         MatrixStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getFatProblematic());
 

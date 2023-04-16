@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,8 +51,8 @@ public abstract class ObjectPool<T> {
         if (myLimited) {
             try {
                 retVal = myObjects.take();
-            } catch (InterruptedException exception) {
-                throw new RuntimeException(exception);
+            } catch (InterruptedException cause) {
+                throw new RuntimeException(cause);
             }
         } else if ((retVal = myObjects.poll()) == null) {
             retVal = this.newObject();
@@ -66,8 +66,8 @@ public abstract class ObjectPool<T> {
         if (myLimited) {
             try {
                 myObjects.put(object);
-            } catch (InterruptedException exception) {
-                throw new RuntimeException(exception);
+            } catch (InterruptedException cause) {
+                throw new RuntimeException(cause);
             }
         } else {
             myObjects.offer(object);

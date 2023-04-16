@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,9 @@ public class QuadraticCase extends MultiaryFunctionTests {
     @Test
     public void testGetLinearFactors() {
 
-        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(), myQuadraticFunction.getLinearFactors());
+        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(false), myQuadraticFunction.getLinearFactors(false));
+
+        TestUtils.assertEquals(myPureQuadraticFunction.getLinearFactors(true), myQuadraticFunction.getLinearFactors(true));
     }
 
     @Test

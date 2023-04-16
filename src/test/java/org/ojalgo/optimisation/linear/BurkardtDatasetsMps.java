@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,12 +66,17 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
      * also provides the solution.
      * <a href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html" >
-     * adlittle@netlib</a> Found this info somewhere on the net: "With 56 constraints and 97 variables
-     * adlittle is one of its smaller members. While being in fact feasible, adlittle suffers from
-     * ill--posedness. Perturbing the right hand side of the equality constraints by subtracting a tiny
-     * multiple of the 96th column of the equation matrix renders the linear program infeasible. Running this
-     * problem through CPLEX and lp_solve does again return a solution without any warnings." FAIL: Hittar
-     * bara en lösning 0.0, oavsett om jag minimerrar eller maximerar. 2010-04-19 lp_solve => 225494.96316238
+     * adlittle@netlib</a>
+     * <p>
+     * Found this info somewhere on the net: "With 56 constraints and 97 variables adlittle is one of its
+     * smaller members. While being in fact feasible, adlittle suffers from ill--posedness. Perturbing the
+     * right hand side of the equality constraints by subtracting a tiny multiple of the 96th column of the
+     * equation matrix renders the linear program infeasible.
+     * <p>
+     * Running this problem through CPLEX and lp_solve does again return a solution without any warnings."
+     * FAIL: Hittar bara en lösning 0.0, oavsett om jag minimerrar eller maximerar.
+     * <p>
+     * 2010-04-19 lp_solve => 225494.96316238
      */
     @Test
     public void testMPSadlittle() {
@@ -172,19 +177,19 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 
-        Expression tmpLIM1 = reimplementedModel.addExpression("LIM1");
+        Expression tmpLIM1 = reimplementedModel.newExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
-        Expression tmpLIM2 = reimplementedModel.addExpression("LIM2");
+        Expression tmpLIM2 = reimplementedModel.newExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
-        Expression tmpMYEQN = reimplementedModel.addExpression("MYEQN");
+        Expression tmpMYEQN = reimplementedModel.newExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }

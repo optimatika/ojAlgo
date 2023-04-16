@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,8 @@ public class SpecialTest extends MatrixTests {
     @Test
     public void testDenseReceiver() {
 
-        RationalMatrix.DenseReceiver rDR = RationalMatrix.FACTORY.makeDense(5, 7);
-        Primitive32Matrix.DenseReceiver p32DR = Primitive32Matrix.FACTORY.makeDense(5, 7);
+        MatrixQ128.DenseReceiver rDR = MatrixQ128.FACTORY.makeDense(5, 7);
+        MatrixR032.DenseReceiver p32DR = MatrixR032.FACTORY.makeDense(5, 7);
 
         rDR.set(1, 1, 1D);
         p32DR.set(1, 1, 1D);
@@ -47,8 +47,8 @@ public class SpecialTest extends MatrixTests {
     @Test
     public void testSparseReceiver() {
 
-        RationalMatrix.SparseReceiver rSR = RationalMatrix.FACTORY.makeSparse(5, 7);
-        Primitive32Matrix.SparseReceiver p32SR = Primitive32Matrix.FACTORY.makeSparse(5, 7);
+        MatrixQ128.SparseReceiver rSR = MatrixQ128.FACTORY.makeSparse(5, 7);
+        MatrixR032.SparseReceiver p32SR = MatrixR032.FACTORY.makeSparse(5, 7);
 
         rSR.set(1, 1, 1D);
         p32SR.set(1, 1, 1D);

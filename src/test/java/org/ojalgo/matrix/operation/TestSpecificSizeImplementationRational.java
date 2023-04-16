@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MultiplyBoth.fillMxN_G(expected, left, c, right);
                     MultiplyBoth.Generic<RationalNumber> generic = MultiplyBoth.newGeneric(m, n);
@@ -74,10 +74,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MatrixStore<RationalNumber> l = left.tridiagonal();
                     MatrixStore<RationalNumber> r = right.tridiagonal();
@@ -99,10 +99,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MultiplyLeft.fillMxN(expected.data, left, c, right.data, RationalNumber.FACTORY);
                     MultiplyLeft.Generic<RationalNumber> generic = MultiplyLeft.newGeneric(m, n);
@@ -121,10 +121,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MatrixStore<RationalNumber> l = left.tridiagonal();
 
@@ -145,10 +145,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MultiplyNeither.fillMxN(expected.data, left.data, c, right.data, RationalNumber.FACTORY);
                     MultiplyNeither.Generic<RationalNumber> generic = MultiplyNeither.newGeneric(m, n);
@@ -167,10 +167,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MultiplyRight.fillMxN(expected.data, left.data, c, right, RationalNumber.FACTORY);
                     MultiplyRight.Generic<RationalNumber> generic = MultiplyRight.newGeneric(m, n);
@@ -189,10 +189,10 @@ public class TestSpecificSizeImplementationRational {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    GenericStore<RationalNumber> left = GenericStore.RATIONAL.makeFilled(m, c, Normal.standard());
-                    GenericStore<RationalNumber> right = GenericStore.RATIONAL.makeFilled(c, n, Normal.standard());
-                    GenericStore<RationalNumber> expected = GenericStore.RATIONAL.make(m, n);
-                    GenericStore<RationalNumber> actual = GenericStore.RATIONAL.make(m, n);
+                    GenericStore<RationalNumber> left = GenericStore.Q128.makeFilled(m, c, Normal.standard());
+                    GenericStore<RationalNumber> right = GenericStore.Q128.makeFilled(c, n, Normal.standard());
+                    GenericStore<RationalNumber> expected = GenericStore.Q128.make(m, n);
+                    GenericStore<RationalNumber> actual = GenericStore.Q128.make(m, n);
 
                     MatrixStore<RationalNumber> r = right.tridiagonal();
 

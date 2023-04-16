@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,26 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         super();
     }
 
+    public void btran(final Collectable<Double, ? super PhysicalStore<Double>> lhs, final PhysicalStore<Double> solution) {
+
+        lhs.supplyTo(solution);
+
+        this.btran(solution);
+    }
+
+    public void btran(final PhysicalStore<Double> arg) {
+
+        MatrixStore<Double> body = this.getInternalStore();
+
+        arg.substituteForwards(body, false, true, false);
+
+        arg.substituteBackwards(body, true, true, false);
+
+        if (myPivot.isModified()) {
+            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
+        }
+    }
+
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -89,6 +109,14 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, false);
+    }
+
+    public void ftran(final PhysicalStore<Double> arg) {
+
+        PhysicalStore<Double> rhs = myPivot.isModified() ? arg.copy() : arg;
+        PhysicalStore<Double> sol = arg;
+
+        this.getSolution(rhs, sol);
     }
 
     public Double getDeterminant() {
@@ -133,6 +161,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, largest);
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -262,13 +294,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final int[] pivotOrder = myPivot.getOrder();
-        final int numbRows = this.getRowDim();
+        int[] pivotOrder = myPivot.getOrder();
+        int numbRows = this.getRowDim();
         for (int i = 0; i < numbRows; i++) {
             preallocated.set(i, pivotOrder[i], ONE);
         }
 
-        final RawStore body = this.getInternalStore();
+        RawStore body = this.getInternalStore();
 
         preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
@@ -279,7 +311,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final MatrixStore<Double> body = this.getInternalStore();
+        MatrixStore<Double> body = this.getInternalStore();
 
         preallocated.substituteForwards(body, true, false, false);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SIGMOID;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+import static org.ojalgo.function.constant.PrimitiveMath.HALF;
 
 import java.util.Collections;
 import java.util.List;

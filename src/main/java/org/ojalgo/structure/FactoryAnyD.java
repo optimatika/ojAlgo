@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package org.ojalgo.structure;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.scalar.Scalar.Factory;
+import org.ojalgo.type.math.MathType;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
@@ -78,6 +79,10 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
 
             public Factory<?> scalar() {
                 return FactoryAnyD.this.scalar();
+            }
+
+            public MathType getMathType() {
+                return FactoryAnyD.this.getMathType();
             }
 
         };

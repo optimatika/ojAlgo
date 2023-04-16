@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,29 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
- * [x]<sup>T</sup>[Q][x] - [l]<sup>T</sup>[x]
+ * 1/2 [x]<sup>T</sup>[Q][x] - [l]<sup>T</sup>[x]
  *
  * @author apete
  */
-public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDifferentiable<Double>, MultiaryFunction.Quadratic<Double> {
+public final class ConvexObjectiveFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Quadratic<N> {
 
-    private final LinearFunction<Double> myLinear;
-    private final PureQuadraticFunction<Double> myPureQuadratic;
+    private final LinearFunction<N> myLinear;
+    private final PureQuadraticFunction<N> myPureQuadratic;
+    private final Scalar.Factory<N> myScalarFactory;
 
-    ConvexObjectiveFunction(final PhysicalStore<Double> quadratic, final PhysicalStore<Double> linear) {
+    ConvexObjectiveFunction(final PhysicalStore.Factory<N, ?> factory, final int nbVars) {
+        this(factory.make(nbVars, nbVars), factory.make(nbVars, 1));
+    }
+
+    ConvexObjectiveFunction(final PhysicalStore<N> quadratic, final PhysicalStore<N> linear) {
 
         super();
+
+        myScalarFactory = quadratic.physical().scalar();
 
         myPureQuadratic = PureQuadraticFunction.wrap(quadratic);
         myLinear = LinearFunction.wrap(linear);
@@ -54,34 +62,40 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
         return myLinear.arity();
     }
 
-    public Double getConstant() {
+    public N getConstant() {
         return myPureQuadratic.getConstant();
     }
 
-    public MatrixStore<Double> getGradient(final Access1D<Double> point) {
+    public MatrixStore<N> getGradient(final Access1D<N> point) {
         return myPureQuadratic.getGradient(point).subtract(myLinear.getGradient(point));
     }
 
-    public MatrixStore<Double> getHessian(final Access1D<Double> point) {
+    public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myPureQuadratic.getHessian(point);
     }
 
-    public MatrixStore<Double> getLinearFactors() {
-        return myLinear.getLinearFactors();
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+        return myLinear.getLinearFactors(!negated);
     }
 
     @Override
-    public Double invoke(final Access1D<Double> arg) {
-        double quadratic = myPureQuadratic.invoke(arg).doubleValue();
-        double linear = myLinear.invoke(arg).doubleValue();
-        return Double.valueOf(quadratic - linear);
+    public N invoke(final Access1D<N> arg) {
+
+        Scalar<N> zero = myScalarFactory.zero();
+        Scalar<N> one = myScalarFactory.one();
+        Scalar<N> two = one.add(one);
+
+        Scalar<N> retVal = zero.add(myPureQuadratic.invoke(arg)).divide(two);
+        retVal = retVal.subtract(myLinear.invoke(arg));
+        retVal.add(this.getConstant());
+        return retVal.get();
     }
 
-    public PhysicalStore<Double> linear() {
+    public PhysicalStore<N> linear() {
         return myLinear.linear();
     }
 
-    public PhysicalStore<Double> quadratic() {
+    public PhysicalStore<N> quadratic() {
         return myPureQuadratic.quadratic();
     }
 

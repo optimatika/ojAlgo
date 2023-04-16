@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,11 @@ public final class VirtualMachine extends CommonMachine {
 
     public static String getArchitecture() {
 
-        // http://fantom.org/sidewalk/topic/756
+        String tmpProperty = System.getProperty("os.arch").toLowerCase();
 
-        final String tmpProperty = System.getProperty("os.arch").toLowerCase();
-
-        if (tmpProperty.equals(I386)) {
+        if (I386.equals(tmpProperty)) {
             return X86;
-        } else if (tmpProperty.equals(AMD64)) {
+        } else if (AMD64.equals(tmpProperty)) {
             return X86_64;
         } else {
             return tmpProperty;
@@ -85,7 +83,7 @@ public final class VirtualMachine extends CommonMachine {
             myRuntime.gc();
             try {
                 Thread.sleep(8L);
-            } catch (final InterruptedException exception) {
+            } catch (InterruptedException exception) {
                 BasicLogger.error(exception.getMessage());
             }
             tmpIsFree = myRuntime.freeMemory();
@@ -99,18 +97,22 @@ public final class VirtualMachine extends CommonMachine {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj) || !(obj instanceof VirtualMachine)) {
             return false;
         }
-        if (!(obj instanceof VirtualMachine)) {
-            return false;
-        }
-        final VirtualMachine other = (VirtualMachine) obj;
+        VirtualMachine other = (VirtualMachine) obj;
         if (myHardware == null) {
             if (other.myHardware != null) {
                 return false;
             }
         } else if (!myHardware.equals(other.myHardware)) {
+            return false;
+        }
+        if (myRuntime == null) {
+            if (other.myRuntime != null) {
+                return false;
+            }
+        } else if (!myRuntime.equals(other.myRuntime)) {
             return false;
         }
         return true;
@@ -126,21 +128,19 @@ public final class VirtualMachine extends CommonMachine {
 
     public long getAvailableMemory() {
 
-        final long tmpMax = myRuntime.maxMemory();
-        final long tmpTotal = myRuntime.totalMemory();
-        final long tmpFree = myRuntime.freeMemory();
+        long tmpMax = myRuntime.maxMemory();
+        long tmpTotal = myRuntime.totalMemory();
+        long tmpFree = myRuntime.freeMemory();
 
-        final long tmpAvailable = (tmpMax - tmpTotal) + tmpFree;
-
-        return tmpAvailable;
+        return (tmpMax - tmpTotal) + tmpFree;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myHardware == null) ? 0 : myHardware.hashCode());
-        return result;
+        result = prime * result + ((myHardware == null) ? 0 : myHardware.hashCode());
+        return prime * result + ((myRuntime == null) ? 0 : myRuntime.hashCode());
     }
 
     /**

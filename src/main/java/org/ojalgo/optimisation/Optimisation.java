@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,12 @@ import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.ArrayR128;
+import org.ojalgo.array.ArrayR256;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.integer.IntegerStrategy;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
@@ -59,7 +61,7 @@ public interface Optimisation {
 
         /**
          * The Constraint has a lower or an upper limit actually set (possibly both) - it actually is
-         * constained.
+         * constrained.
          */
         boolean isConstraint();
 
@@ -134,6 +136,9 @@ public interface Optimisation {
          * Convert solver state to model state. Transforming the solution (set of variable values) is the main
          * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
          * required here.
+         * <p>
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
+         * is the reverse mapping of {@link #toSolverState(Optimisation.Result, Optimisation.Model)}.
          */
         Optimisation.Result toModelState(Optimisation.Result solverState, M model);
 
@@ -141,6 +146,9 @@ public interface Optimisation {
          * Convert model state to solver state. Transforming the solution (set of variable values) is the main
          * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
          * required here.
+         * <p>
+         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
+         * is the reverse mapping of {@link #toModelState(Result, Optimisation.Model)}.
          */
         Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
 
@@ -191,8 +199,11 @@ public interface Optimisation {
     public static final class Options implements Optimisation {
 
         /**
-         * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
-         * values integer or not?
+         * Used to determine/validate feasibility. Are the variables within their bounds or not, are the
+         * constraints violated or not? are the variable values integer or not?
+         * <p>
+         * Primarily used in {@link ExpressionsBasedModel}. Not used (should not be) as part of solver logic,
+         * but ouside the solvers to validate their results.
          */
         public NumberContext feasibility = NumberContext.of(12, 8);
 
@@ -227,28 +238,15 @@ public interface Optimisation {
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * @deprecated v51.1.0 No longer used for anything! Instead it is possible to specify an
-         *             {@link IntegerStrategy} that offers much more control.
+         * For display only! {@link #toString()} and log message formatting.
          */
-        @Deprecated
-        public double mip_defer = 0.99;
-
-        /**
-         * @deprecated v51.1.0 No longer used! Use {@link IntegerStrategy#getGapTolerance()} instead.
-         */
-        @Deprecated
-        public double mip_gap = 1.0E-6;
-
-        /**
-         * For display only!
-         */
-        public NumberContext print = NumberContext.of(8, 10);
+        public NumberContext print = ModelEntity.PRINT;
 
         /**
          * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
          * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
-         * corresponding to full double precision.
+         * corresponding to full double precision – but with no more than 14 decimals.
          */
         public NumberContext solution = NumberContext.ofScale(14).withMode(RoundingMode.HALF_DOWN);
 
@@ -291,7 +289,9 @@ public interface Optimisation {
         public boolean validate = false;
 
         private Object myConfigurator = null;
+        private ConvexSolver.Configuration myConvexConfiguration = new ConvexSolver.Configuration();
         private IntegerStrategy myIntegerStrategy = IntegerStrategy.DEFAULT;
+        private LinearSolver.Configuration myLinearConfiguration = new LinearSolver.Configuration();
 
         public Options() {
             super();
@@ -304,13 +304,27 @@ public interface Optimisation {
         }
 
         /**
+         * Configurations specific to ojAlgo's built-in {@link ConvexSolver}.
+         */
+        public ConvexSolver.Configuration convex() {
+            return myConvexConfiguration;
+        }
+
+        public Options convex(final ConvexSolver.Configuration configuration) {
+            Objects.requireNonNull(configuration);
+            myConvexConfiguration = configuration;
+            return this;
+        }
+
+        /**
          * Will configure detailed debug logging and validation
          */
-        public void debug(final Class<? extends Optimisation.Solver> solver) {
+        public Options debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
             logger_detailed = (solver != null);
             validate = (solver != null);
+            return this;
         }
 
         public <T> Optional<T> getConfigurator(final Class<T> type) {
@@ -335,16 +349,33 @@ public interface Optimisation {
             return this;
         }
 
+        public LinearSolver.Configuration linear() {
+            return myLinearConfiguration;
+        }
+
+        /**
+         * Configurations specific to ojAlgo's built-in {@link LinearSolver}.
+         */
+        public Options linear(final LinearSolver.Configuration configuration) {
+            Objects.requireNonNull(configuration);
+            myLinearConfiguration = configuration;
+            return this;
+        }
+
         /**
          * Will configure high level (low volume) progress logging
          */
-        public void progress(final Class<? extends Optimisation.Solver> solver) {
+        public Options progress(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
             logger_detailed = false;
             validate = false;
+            return this;
         }
 
+        /**
+         * A configurator for 3:d party solvers. Each such solver may define its own configurator type.
+         */
         public void setConfigurator(final Object configurator) {
             ProgrammingError.throwIfNull(configurator);
             myConfigurator = configurator;
@@ -355,6 +386,25 @@ public interface Optimisation {
             time_suffice = duration.toDurationInMillis();
             return this;
         }
+
+    }
+
+    /**
+     * Basic description of the size/structure of an optimisation problem (model or solver).
+     *
+     * @author apete
+     */
+    public interface ProblemStructure extends Optimisation {
+
+        int countAdditionalConstraints();
+
+        int countConstraints();
+
+        int countEqualityConstraints();
+
+        int countInequalityConstraints();
+
+        int countVariables();
 
     }
 
@@ -382,7 +432,7 @@ public interface Optimisation {
 
             State state = Optimisation.State.valueOf(strState);
             double value = Double.parseDouble(strValue);
-            ArrayR128 solution = ArrayR128.make(strSolution.length);
+            ArrayR256 solution = ArrayR256.make(strSolution.length);
             for (int i = 0; i < strSolution.length; i++) {
                 solution.set(i, new BigDecimal(strSolution[i]));
             }
@@ -414,14 +464,17 @@ public interface Optimisation {
             this(state, result.getValue(), result);
         }
 
+        @Override
         public int compareTo(final Result reference) {
             return NumberContext.compare(myValue, reference.getValue());
         }
 
+        @Override
         public long count() {
             return mySolution.count();
         }
 
+        @Override
         public double doubleValue(final long index) {
             return mySolution.doubleValue(index);
         }
@@ -441,6 +494,7 @@ public interface Optimisation {
             return true;
         }
 
+        @Override
         public BigDecimal get(final long index) {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
@@ -458,7 +512,7 @@ public interface Optimisation {
         public Optimisation.Result getSolution(final NumberContext precision) {
             Optimisation.State state = this.getState();
             double value = this.getValue();
-            ArrayR128 solution = ArrayR128.make(this.size());
+            ArrayR256 solution = ArrayR256.make(this.size());
             for (int i = 0, limit = solution.data.length; i < limit; i++) {
                 solution.set(i, precision.enforce(this.get(i)));
             }
@@ -491,6 +545,7 @@ public interface Optimisation {
             return this;
         }
 
+        @Override
         public int size() {
             return (int) this.count();
         }
@@ -540,6 +595,14 @@ public interface Optimisation {
         }
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
+
+    }
+
+    /**
+     * Intended as a solver data transfer type (if one solver needs to delegate to some other solver). Should
+     * be able to provide data for any problem solvable by ojAlgo solvers.
+     */
+    public interface SolverData<N extends Comparable<N>> extends ProblemStructure {
 
     }
 

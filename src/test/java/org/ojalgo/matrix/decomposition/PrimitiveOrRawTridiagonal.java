@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -152,7 +152,7 @@ public class PrimitiveOrRawTridiagonal extends AbstractPrimitiveOrRaw<Tridiagona
 
     @Override
     protected Tridiagonal<Double> makePrimitive() {
-        return new DeferredTridiagonal.Primitive();
+        return new DeferredTridiagonal.R064();
     }
 
     @Override

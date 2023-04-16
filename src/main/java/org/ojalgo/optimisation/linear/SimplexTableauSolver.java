@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -33,7 +34,6 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -81,11 +81,12 @@ abstract class SimplexTableauSolver extends LinearSolver {
 
     }
 
-    private static final NumberContext DEGENERATE = ACCURACY.withScale(8);
-    private static final NumberContext PHASE1 = ACCURACY.withScale(7);
-    private static final NumberContext PIVOT = ACCURACY.withScale(8);
-    private static final NumberContext RATIO = ACCURACY.withScale(8);
-    private static final NumberContext WEIGHT = ACCURACY.withPrecision(8).withScale(10);
+    private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext DEGENERATE = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext PHASE1 = NumberContext.of(12, 7).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext PIVOT = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext RATIO = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext WEIGHT = NumberContext.of(8, 10).withMode(RoundingMode.HALF_DOWN);
 
     private LongToNumberMap<Double> myFixedVariables = null;
     private final SimplexTableauSolver.IterationPoint myPoint;
@@ -135,11 +136,11 @@ abstract class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
-    public Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
-        return myTableau.generateCutCandidates(integer, options.feasibility, fractionality);
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+        return myTableau.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
-    public SimplexTableau.MetaData getEntityMap() {
+    public LinearStructure getEntityMap() {
         return myTableau.meta;
     }
 
@@ -418,7 +419,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
         int retVal = -1;
 
         double tmpVal;
-        double minVal = phase2 ? -GenericSolver.ACCURACY.epsilon() : ZERO;
+        double minVal = phase2 ? -ACC.epsilon() : ZERO;
 
         // for (int e = 0; e < excluded.length; e++) {
         for (int j = 0; j < nbVariables; j++) {
@@ -532,7 +533,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
                 }
             }
 
-            if ((minRHS < ZERO && !GenericSolver.ACCURACY.isZero(minRHS)) && this.isLogDebug()) {
+            if ((minRHS < ZERO && !ACC.isZero(minRHS)) && this.isLogDebug()) {
                 this.log("Entire RHS columns: {}", colRHS);
                 this.log();
             }

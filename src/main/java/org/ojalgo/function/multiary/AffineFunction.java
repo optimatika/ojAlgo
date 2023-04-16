@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -38,28 +37,87 @@ import org.ojalgo.structure.Access1D;
  */
 public final class AffineFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
 
+    public static final class Factory<N extends Comparable<N>> {
+
+        private Access1D<?> myCoefficients = null;
+        private final PhysicalStore.Factory<N, ?> myFactory;
+
+        Factory(final PhysicalStore.Factory<N, ?> factory) {
+            super();
+            myFactory = factory;
+        }
+
+        public Factory<N> coefficients(final Access1D<?> coefficients) {
+            myCoefficients = coefficients;
+            return this;
+        }
+
+        public AffineFunction<N> make(final int arity) {
+            if (myCoefficients != null) {
+                return new AffineFunction<>(myFactory.rows(myCoefficients));
+            } else {
+                return new AffineFunction<>(myFactory.make(1, arity));
+            }
+        }
+
+    }
+
+    public static <N extends Comparable<N>> Factory<N> factory(final PhysicalStore.Factory<N, ?> factory) {
+        return new Factory<>(factory);
+    }
+
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericStore.COMPLEX.rows(coefficients));
+        // return new AffineFunction<>(GenericStore.C128.rows(coefficients));
+        return AffineFunction.factory(GenericStore.C128).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<ComplexNumber> makeComplex(final int arity) {
-        return new AffineFunction<>(GenericStore.COMPLEX.make(1, arity));
+        // return new AffineFunction<>(GenericStore.C128.make(1, arity));
+        return AffineFunction.factory(GenericStore.C128).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        return new AffineFunction<>(Primitive64Store.FACTORY.rows(coefficients));
+        // return new AffineFunction<>(Primitive64Store.FACTORY.rows(coefficients));
+        return AffineFunction.factory(Primitive64Store.FACTORY).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<Double> makePrimitive(final int arity) {
-        return new AffineFunction<>(Primitive64Store.FACTORY.make(1, arity));
+        // return new AffineFunction<>(Primitive64Store.FACTORY.make(1, arity));
+        return AffineFunction.factory(Primitive64Store.FACTORY).make(arity);
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericStore.RATIONAL.rows(coefficients));
+        // return new AffineFunction<>(GenericStore.Q128.rows(coefficients));
+        return AffineFunction.factory(GenericStore.Q128).coefficients(coefficients).make(coefficients.size());
     }
 
+    /**
+     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
+     */
+    @Deprecated
     public static AffineFunction<RationalNumber> makeRational(final int arity) {
-        return new AffineFunction<>(GenericStore.RATIONAL.make(1, arity));
+        // return new AffineFunction<>(GenericStore.Q128.make(1, arity));
+        return AffineFunction.factory(GenericStore.Q128).make(arity);
     }
 
     public static <N extends Comparable<N>> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
@@ -91,7 +149,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getLinearFactors();
+        return this.getLinearFactors(false);
     }
 
     @Override
@@ -99,11 +157,19 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         return myCoefficients.physical().makeZero(this.arity(), this.arity());
     }
 
-    public MatrixStore<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors(final boolean negated) {
+
+        MatrixStore<N> retVal = myCoefficients;
+
         if (myCoefficients.countRows() == 1L) {
-            return myCoefficients.transpose();
+            retVal = retVal.transpose();
         }
-        return myCoefficients;
+
+        if (negated) {
+            retVal = retVal.negate();
+        }
+
+        return retVal;
     }
 
     @Override
@@ -119,7 +185,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         myConstant.setConstant(constant);
     }
 
-    Factory<N, ?> factory() {
+    PhysicalStore.Factory<N, ?> factory() {
         return myCoefficients.physical();
     }
 
@@ -131,9 +197,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
 
         myCoefficients.multiply(arg, preallocated);
 
-        retVal = retVal.add(preallocated.get(0, 0));
-
-        return retVal;
+        return retVal.add(preallocated.get(0, 0));
     }
 
 }

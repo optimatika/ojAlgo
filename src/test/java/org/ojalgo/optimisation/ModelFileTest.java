@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,22 +49,22 @@ public interface ModelFileTest {
 
             Result result = model.minimise();
 
+            TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+
             TestUtils.assertEquals(expMinVal, result.getValue(), accuracy);
 
             TestUtils.assertStateNotLessThanOptimal(result);
-
-            TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
         }
 
         if (expMaxVal != null) {
 
             Result result = model.maximise();
 
+            TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+
             TestUtils.assertEquals(expMaxVal, result.getValue(), accuracy);
 
             TestUtils.assertStateNotLessThanOptimal(result);
-
-            TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
         }
     }
 

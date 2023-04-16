@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import org.ojalgo.array.operation.COPY;
 import org.ojalgo.data.domain.finance.FinanceUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -50,8 +50,8 @@ import org.ojalgo.type.TypeUtils;
  * can/will describe the weights/returns equilibrium for any investor.
  * </p>
  *
- * @see #calculateAssetReturns(Primitive64Matrix)
- * @see #calculateAssetWeights(Primitive64Matrix)
+ * @see #calculateAssetReturns(MatrixR064)
+ * @see #calculateAssetWeights(MatrixR064)
  * @author apete
  */
 public class MarketEquilibrium {
@@ -63,7 +63,7 @@ public class MarketEquilibrium {
     /**
      * Calculates the portfolio return using the input asset weights and returns.
      */
-    public static Scalar<?> calculatePortfolioReturn(final Primitive64Matrix assetWeights, final Primitive64Matrix assetReturns) {
+    public static Scalar<?> calculatePortfolioReturn(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
         return PrimitiveScalar.valueOf(assetWeights.dot(assetReturns));
     }
 
@@ -86,7 +86,7 @@ public class MarketEquilibrium {
     }
 
     private final String[] myAssetKeys;
-    private final Primitive64Matrix myCovariances;
+    private final MatrixR064 myCovariances;
     private BigDecimal myRiskAversion;
 
     public MarketEquilibrium(final Access2D<?> covarianceMatrix) {
@@ -106,10 +106,10 @@ public class MarketEquilibrium {
         super();
 
         myAssetKeys = COPY.copyOf(assetNamesOrKeys);
-        if (covarianceMatrix instanceof Primitive64Matrix) {
-            myCovariances = (Primitive64Matrix) covarianceMatrix;
+        if (covarianceMatrix instanceof MatrixR064) {
+            myCovariances = (MatrixR064) covarianceMatrix;
         } else {
-            myCovariances = Primitive64Matrix.FACTORY.copy(covarianceMatrix);
+            myCovariances = MatrixR064.FACTORY.copy(covarianceMatrix);
         }
 
         myRiskAversion = TypeUtils.toBigDecimal(riskAversionFactor);
@@ -123,8 +123,8 @@ public class MarketEquilibrium {
      * If the input vector of asset weights are the weights of the market portfolio, then the ouput is the
      * equilibrium excess returns.
      */
-    public Primitive64Matrix calculateAssetReturns(final Primitive64Matrix assetWeights) {
-        final Primitive64Matrix tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights
+    public MatrixR064 calculateAssetReturns(final MatrixR064 assetWeights) {
+        final MatrixR064 tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights
                 : assetWeights.multiply(myRiskAversion.doubleValue());
         return myCovariances.multiply(tmpAssetWeights);
     }
@@ -134,8 +134,8 @@ public class MarketEquilibrium {
      * portfolio weights. This is unconstrained optimisation - there are no constraints on the resulting
      * instrument weights.
      */
-    public Primitive64Matrix calculateAssetWeights(final Primitive64Matrix assetReturns) {
-        final Primitive64Matrix tmpAssetWeights = myCovariances.solve(assetReturns);
+    public MatrixR064 calculateAssetWeights(final MatrixR064 assetReturns) {
+        final MatrixR064 tmpAssetWeights = myCovariances.solve(assetReturns);
         if (myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0) {
             return tmpAssetWeights;
         } else {
@@ -146,10 +146,10 @@ public class MarketEquilibrium {
     /**
      * Calculates the portfolio variance using the input instrument weights.
      */
-    public Scalar<?> calculatePortfolioVariance(final Primitive64Matrix assetWeights) {
+    public Scalar<?> calculatePortfolioVariance(final MatrixR064 assetWeights) {
 
-        Primitive64Matrix tmpLeft;
-        Primitive64Matrix tmpRight;
+        MatrixR064 tmpLeft;
+        MatrixR064 tmpRight;
 
         if (assetWeights.countColumns() == 1L) {
             tmpLeft = assetWeights.transpose();
@@ -166,7 +166,7 @@ public class MarketEquilibrium {
      * Will set the risk aversion factor to the best fit for an observed pair of market portfolio asset
      * weights and equilibrium/historical excess returns.
      */
-    public void calibrate(final Primitive64Matrix assetWeights, final Primitive64Matrix assetReturns) {
+    public void calibrate(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
 
         final Scalar<?> tmpImpliedRiskAversion = this.calculateImpliedRiskAversion(assetWeights, assetReturns);
 
@@ -179,10 +179,10 @@ public class MarketEquilibrium {
      */
     public MarketEquilibrium clean() {
 
-        final Primitive64Matrix tmpAssetVolatilities = FinanceUtils.toVolatilities(myCovariances, true);
-        final Primitive64Matrix tmpCleanedCorrelations = FinanceUtils.toCorrelations(myCovariances, true);
+        final MatrixR064 tmpAssetVolatilities = FinanceUtils.toVolatilities(myCovariances, true);
+        final MatrixR064 tmpCleanedCorrelations = FinanceUtils.toCorrelations(myCovariances, true);
 
-        final Primitive64Matrix tmpCovariances = FinanceUtils.toCovariances(tmpAssetVolatilities, tmpCleanedCorrelations);
+        final MatrixR064 tmpCovariances = FinanceUtils.toCovariances(tmpAssetVolatilities, tmpCleanedCorrelations);
 
         return new MarketEquilibrium(myAssetKeys, tmpCovariances, myRiskAversion);
     }
@@ -199,7 +199,7 @@ public class MarketEquilibrium {
         return COPY.copyOf(myAssetKeys);
     }
 
-    public Primitive64Matrix getCovariances() {
+    public MatrixR064 getCovariances() {
         return myCovariances;
     }
 
@@ -224,7 +224,7 @@ public class MarketEquilibrium {
         return (int) Math.min(myCovariances.countRows(), myCovariances.countColumns());
     }
 
-    public Primitive64Matrix toCorrelations() {
+    public MatrixR064 toCorrelations() {
         return FinanceUtils.toCorrelations(myCovariances, false);
     }
 
@@ -232,7 +232,7 @@ public class MarketEquilibrium {
      * Will calculate the risk aversion factor that is the best fit for an observed pair of market portfolio
      * weights and equilibrium/historical excess returns.
      */
-    Scalar<?> calculateImpliedRiskAversion(final Primitive64Matrix assetWeights, final Primitive64Matrix assetReturns) {
+    Scalar<?> calculateImpliedRiskAversion(final MatrixR064 assetWeights, final MatrixR064 assetReturns) {
 
         Scalar<?> retVal = myCovariances.multiply(assetWeights).solve(assetReturns).toScalar(0, 0);
 

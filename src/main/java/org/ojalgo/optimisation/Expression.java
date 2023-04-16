@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -437,11 +438,11 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     public double doubleValue(final IntIndex key, final boolean adjusted) {
-        return this.getLinearFactor(key, adjusted).doubleValue();
+        return this.get(key, adjusted).doubleValue();
     }
 
     public double doubleValue(final IntRowColumn key, final boolean adjusted) {
-        return this.getQuadraticFactor(key, adjusted).doubleValue();
+        return this.get(key, adjusted).doubleValue();
     }
 
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
@@ -464,19 +465,28 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     public BigDecimal get(final IntIndex key) {
-        return this.getLinearFactor(key, false);
+        return this.get(key, false);
+    }
+
+    public BigDecimal get(final IntIndex key, final boolean adjusted) {
+        return this.convert(myLinear.get(key), adjusted);
     }
 
     public BigDecimal get(final IntRowColumn key) {
-        return this.getQuadraticFactor(key, false);
+        return this.get(key, false);
+    }
+
+    public BigDecimal get(final IntRowColumn key, final boolean adjusted) {
+        return this.convert(myQuadratic.get(key), adjusted);
     }
 
     public BigDecimal get(final Variable variable) {
-        IntIndex tmpIndex = variable.getIndex();
-        if (tmpIndex != null) {
-            return this.get(tmpIndex);
+        IntIndex index = variable.getIndex();
+        if (index != null) {
+            return this.get(index);
+        } else {
+            throw new IllegalStateException("Variable not part of (this) model!");
         }
-        throw new IllegalStateException("Variable not part of (this) model!");
     }
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
@@ -532,7 +542,7 @@ public final class Expression extends ModelEntity<Expression> {
      */
     @Deprecated
     public double getAdjustedLinearFactor(final IntIndex key) {
-        return this.getLinearFactor(key, true).doubleValue();
+        return this.get(key, true).doubleValue();
     }
 
     /**
@@ -556,7 +566,7 @@ public final class Expression extends ModelEntity<Expression> {
      */
     @Deprecated
     public double getAdjustedQuadraticFactor(final IntRowColumn key) {
-        return this.getQuadraticFactor(key, true).doubleValue();
+        return this.get(key, true).doubleValue();
     }
 
     /**
@@ -1006,15 +1016,15 @@ public final class Expression extends ModelEntity<Expression> {
         return noninteger.subtract(intPart);
     }
 
-    protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> currentSolution) {
+    protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
         builder.append(this.getName());
         builder.append(": ");
-        builder.append(ModelEntity.DISPLAY.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(currentSolution))));
+        builder.append(display.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(solution))));
 
         if (this.isObjective()) {
             builder.append(" (");
-            builder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()));
+            builder.append(display.enforce(this.getContributionWeight()));
             builder.append(")");
         }
     }
@@ -1041,15 +1051,15 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
+    void appendToString(final StringBuilder builder, final Access1D<BigDecimal> solution, final NumberContext display) {
 
-        this.appendLeftPart(aStringBuilder);
-        if (aCurrentState != null) {
-            this.appendMiddlePart(aStringBuilder, aCurrentState);
+        this.appendLeftPart(builder, display);
+        if (solution != null) {
+            this.appendMiddlePart(builder, solution, display);
         } else {
-            this.appendMiddlePart(aStringBuilder);
+            this.appendMiddlePart(builder, display);
         }
-        this.appendRightPart(aStringBuilder);
+        this.appendRightPart(builder, display);
     }
 
     /**
@@ -1107,7 +1117,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
-
         AggregatorFunction<BigDecimal> largest = aggregators.largest();
         AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
 
@@ -1118,19 +1127,21 @@ public final class Expression extends ModelEntity<Expression> {
                 smallest.invoke(quadraticFactor);
             }
 
-            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 6);
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
 
-        }
-        if (!this.isAnyLinearFactorNonZero()) {
+        } else if (this.isAnyLinearFactorNonZero()) {
+
+            for (BigDecimal linearFactor : myLinear.values()) {
+                largest.invoke(linearFactor);
+                smallest.invoke(linearFactor);
+            }
+
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, RANGE);
+
+        } else {
 
             return 0;
         }
-        for (BigDecimal linearFactor : myLinear.values()) {
-            largest.invoke(linearFactor);
-            smallest.invoke(linearFactor);
-        }
-
-        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
     }
 
     /**
@@ -1212,7 +1223,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
         BigDecimal cmpFracLevel = BigMath.ONE.subtract(posFracLevel);
 
-        Expression retVal = myModel.addExpression(this.getName() + "(MIR)");
+        Expression retVal = myModel.newExpression(this.getName() + "(MIR)");
 
         for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
             Variable variable = this.resolve(entry.getKey());
@@ -1265,20 +1276,12 @@ public final class Expression extends ModelEntity<Expression> {
         return myLinear;
     }
 
-    BigDecimal getLinearFactor(final IntIndex key, final boolean adjusted) {
-        return this.convert(myLinear.get(key), adjusted);
-    }
-
     ExpressionsBasedModel getModel() {
         return myModel;
     }
 
     Map<IntRowColumn, BigDecimal> getQuadratic() {
         return myQuadratic;
-    }
-
-    BigDecimal getQuadraticFactor(final IntRowColumn key, final boolean adjusted) {
-        return this.convert(myQuadratic.get(key), adjusted);
     }
 
     boolean includes(final Variable variable) {

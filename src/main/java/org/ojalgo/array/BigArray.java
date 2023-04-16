@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ import java.math.BigDecimal;
  * @author apete
  */
 @Deprecated
-public class BigArray extends ArrayR128 {
+public class BigArray extends ArrayR256 {
 
     public static BigArray make(final int size) {
         return new BigArray(size);

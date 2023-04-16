@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.data.domain.finance.portfolio;
 
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 
 class P20090115 {
 
@@ -46,11 +46,11 @@ class P20090115 {
         return sum / (numbSamples - 1);
     }
 
-    Primitive64Matrix getCovariances(final double[][] returns) {
+    MatrixR064 getCovariances(final double[][] returns) {
 
         int numbAssets = returns.length;
 
-        Primitive64Matrix.DenseReceiver builder = Primitive64Matrix.FACTORY.makeDense(numbAssets, numbAssets);
+        MatrixR064.DenseReceiver builder = MatrixR064.FACTORY.makeDense(numbAssets, numbAssets);
 
         for (int i = 0; i < numbAssets; i++) {
             for (int j = i; j < numbAssets; j++) {
@@ -63,12 +63,12 @@ class P20090115 {
         return builder.get();
     }
 
-    Primitive64Matrix getExpectedExcessReturns(final double[][] returns) {
+    MatrixR064 getExpectedExcessReturns(final double[][] returns) {
 
         int numbAssets = returns.length;
         int numbSamples = returns[0].length;
 
-        Primitive64Matrix.DenseReceiver builder = Primitive64Matrix.FACTORY.makeDense(numbAssets);
+        MatrixR064.DenseReceiver builder = MatrixR064.FACTORY.makeDense(numbAssets);
 
         double riskFreeReturn = 0;
         for (int j = 0; j < numbSamples; j++) {

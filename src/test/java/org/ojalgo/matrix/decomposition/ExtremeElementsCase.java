@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.decomposition.HermitianEvD.Primitive;
+import org.ojalgo.matrix.decomposition.HermitianEvD.R064;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -278,8 +278,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
 
-        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
@@ -350,7 +350,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
-        Primitive tmpAlgorithm = new HermitianEvD.Primitive();
+        R064 tmpAlgorithm = new HermitianEvD.R064();
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -389,7 +389,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                         1.6929815829013701 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 307)));
 
-        SingularValueDecomposition.Primitive tmpAlgorithm = new SingularValueDecomposition.Primitive();
+        SingularValueDecomposition.R064 tmpAlgorithm = new SingularValueDecomposition.R064();
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -416,8 +416,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         LU<Double> tmpRaw = new RawLU();
 
-        TestUtils.assertTrue("Rational.compute()", tmpRational.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpRational.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpRaw.decompose(tmpProblematic));
 
@@ -475,8 +475,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
         QR<Double> tmpJama = new RawQR();
 
-        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.RATIONAL.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(GenericStore.C128.makeWrapper(tmpProblematic)));
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
@@ -511,7 +511,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         tmpBody.modifyAll(tmpSecond);
         tmpRHS.modifyAll(tmpSecond);
 
-        SolverTask<Double> tmpAlgorithm = new LUDecomposition.Primitive();
+        SolverTask<Double> tmpAlgorithm = new LUDecomposition.R064();
 
         ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }

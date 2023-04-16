@@ -165,7 +165,7 @@ public class OJAlgoTest3 {
         constraintsCustomer.entrySet().stream().filter(e -> !e.getKey().startsWith("CUSTOMER_A")) //CUSTOMER_A of Demand constraint because managed by user constraints.
                 .forEach(entry -> {
                     final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-                    final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+                    final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
                     constraint.upper(entry.getValue().doubleValue());
                     constraint.setLinearFactorsSimple(linked);
                     BasicLogger.debug(constraint);
@@ -174,7 +174,7 @@ public class OJAlgoTest3 {
         BasicLogger.debug("---- User Constraints Customers ------");
         //Apply Product Type constraints.
         final List<Variable> userLinked = variables.stream().filter(v -> userConstraint.contains(v.getName())).collect(Collectors.toList());
-        final Expression constraintUser = model.addExpression("CONSTRAINTS_USER_CUSTOMER_A");
+        final Expression constraintUser = model.newExpression("CONSTRAINTS_USER_CUSTOMER_A");
         constraintUser.level(userConstraintQty);
         constraintUser.setLinearFactorsSimple(userLinked);
         BasicLogger.debug(constraintUser);
@@ -183,7 +183,7 @@ public class OJAlgoTest3 {
         //Apply Product Type constraints.
         constraintsProduct.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().endsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             BasicLogger.debug(constraint);
@@ -194,7 +194,7 @@ public class OJAlgoTest3 {
          * proportionality.
          */
         BasicLogger.debug("---- Objective  ------");
-        final Expression objective = model.addExpression("OBJECTIVE").weight(-1.0);
+        final Expression objective = model.newExpression("OBJECTIVE").weight(-1.0);
 
         // - Maximize the Sum of all variables
         //objective.setLinearFactorsSimple(variables);

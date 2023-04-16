@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,8 @@ public class LeftRightCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> left = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         MatrixStore<ComplexNumber> right = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new LeftRightStore<>(GenericStore.RATIONAL.copy(left), GenericStore.RATIONAL.copy(right));
-        complexStore = new LeftRightStore<>(GenericStore.COMPLEX.copy(left), GenericStore.COMPLEX.copy(right));
+        rationalStore = new LeftRightStore<>(GenericStore.Q128.copy(left), GenericStore.Q128.copy(right));
+        complexStore = new LeftRightStore<>(GenericStore.C128.copy(left), GenericStore.C128.copy(right));
         primitiveStore = new LeftRightStore<>(Primitive64Store.FACTORY.copy(left), Primitive64Store.FACTORY.copy(right));
 
         numberOfRows = tmpRowDim;

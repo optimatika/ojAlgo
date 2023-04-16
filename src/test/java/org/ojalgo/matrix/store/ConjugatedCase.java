@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@ public class ConjugatedCase extends NonPhysicalTest {
 
         MatrixStore<ComplexNumber> base = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new ConjugatedStore<>(GenericStore.RATIONAL.copy(base));
-        complexStore = new ConjugatedStore<>(GenericStore.COMPLEX.copy(base));
+        rationalStore = new ConjugatedStore<>(GenericStore.Q128.copy(base));
+        complexStore = new ConjugatedStore<>(GenericStore.C128.copy(base));
         primitiveStore = new ConjugatedStore<>(Primitive64Store.FACTORY.copy(base));
 
         numberOfRows = tmpColDim;

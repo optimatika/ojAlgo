@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,10 +31,10 @@ import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
 
-    static final class Primitive extends DynamicEvD<Double> {
+    static final class R064 extends DynamicEvD<Double> {
 
-        Primitive() {
-            super(Primitive64Store.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
+        R064() {
+            super(Primitive64Store.FACTORY, new HermitianEvD.R064(), new GeneralEvD.R064());
         }
 
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
@@ -78,7 +78,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             //
             // x0 = 2*x1, i.e. x0 - 2*x1 = 0
             //
-            final Expression e = linearModel.addExpression("x0 = 2*x1");
+            final Expression e = linearModel.newExpression("x0 = 2*x1");
             e.set(0, BigMath.ONE);
             e.set(1, BigMath.TWO.negate());
             e.level(BigMath.ZERO);
@@ -94,7 +94,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;
             TestUtils.assertTrue(message, validated);
             if (validated) {
-                return Primitive64Store.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
+                return Primitive64Store.FACTORY.copy(MatrixQ128.FACTORY.columns(tmpResult));
             }
         } else {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;

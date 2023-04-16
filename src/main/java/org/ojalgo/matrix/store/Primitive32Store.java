@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A {@linkplain float} implementation of {@linkplain PhysicalStore}.
@@ -280,6 +281,10 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
             }
 
             return retVal;
+        }
+
+        public MathType getMathType() {
+            return MathType.R032;
         }
 
     };

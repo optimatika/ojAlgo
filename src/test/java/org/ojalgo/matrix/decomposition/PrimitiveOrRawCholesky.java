@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -119,7 +119,7 @@ public class PrimitiveOrRawCholesky extends AbstractPrimitiveOrRaw<Cholesky<Doub
 
     @Override
     protected Cholesky<Double> makePrimitive() {
-        return new CholeskyDecomposition.Primitive();
+        return new CholeskyDecomposition.R064();
     }
 
     @Override

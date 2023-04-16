@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 
@@ -67,7 +67,7 @@ public class ArrayR032 extends PrimitiveArray {
         }
 
         @Override
-        MathType getMathType() {
+        public MathType getMathType() {
             return MathType.R032;
         }
 
@@ -166,7 +166,7 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
-    public void reset() {
+    public final void reset() {
         Arrays.fill(data, 0.0F);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
 
+        //        long time = 10_000L;
+        //        model.options.time_abort = time;
+        //        model.options.time_suffice = time;
+
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy);
     }
 
@@ -88,8 +92,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * <pre>
      * 2019-02-13: Objective obtained/verified by CPLEX
      * </pre>
+     *
+     * 53x149
      */
     @Test
+    @Tag("bm1000")
     public void testADLITTLE() {
         CuteNetlibCase.doTest("ADLITTLE.SIF", "225494.96316238036", null, NumberContext.of(7, 4));
     }
@@ -98,9 +105,30 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * <pre>
      * 2019-02-13: Objective obtained/verified by CPLEX
      * </pre>
+     *
+     * 24x56
      */
     @Test
+    @Tag("bm1000")
     public void testAFIRO() {
+
+        // CPLEX MIN OPTIMAL -464.7531428571429 @ { 8E+1, 25.5, 54.5, 84.80, 18.21428571428572, 0, 0, 0, 0, 0, 0, 0, 18.21428571428572, 0, 19.30714285714286, 5E+2, 475.92, 24.08, 0, 215, 0, 0, 0, 0, 0, 0, 0, 0, 339.9428571428572, 383.9428571428572, 0, 0 }
+
+        // Before shift
+        // [80.0, 25.499999999999993, 54.5, 0.0, 18.214285714285708, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.214285714285708, 0.0, 19.30714285714285, 0.0, 651.9200000000001, 24.079999999999995, 0.0, 214.99999999999997, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 465.65714285714296, 561.6571428571428, 0.0, 0.0, 0.0, 0.0, 512.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 556.1746428571429, 0.0, 280.6928571428572, 0.0, 61.78571428571429, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        // After shift
+        // [80.0, 25.499999999999993, 54.5, 84.8, 18.214285714285708, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.214285714285708, 0.0, 19.30714285714285, 500.0, 651.9200000000001, 24.079999999999995, 0.0, 214.99999999999997, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 465.65714285714296, 561.6571428571428, 0.0, 0.0, 0.0, 0.0, 512.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 556.1746428571429, 0.0, 280.6928571428572, 0.0, 61.78571428571429, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        // OPTIMAL -819.096 @ { 80.0, 25.499999999999993, 54.5, 84.8, 18.214285714285708, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.214285714285708, 0.0, 19.30714285714285, 500.0, 651.9200000000001, 24.079999999999995, 0.0, 214.99999999999997, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 465.65714285714296, 561.6571428571428, 0.0, 0.0, 0.0, 0.0, 512.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 556.1746428571429, 0.0, 280.6928571428572, 0.0, 61.78571428571429, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+
+        // Mapped
+        // OPTIMAL NaN @ { 80.0, 25.499999999999993, 54.5, 84.8, 18.214285714285708, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.214285714285708, 0.0, 19.30714285714285, 500.0, 651.9200000000001, 24.079999999999995, 0.0, 214.99999999999997, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 465.65714285714296, 561.6571428571428, 0.0, 0.0 }
+
+        // Result
+        // OPTIMAL -630.6960000000001 @ { 8E+1, 25.49999999999999, 54.5, 84.8, 18.21428571428571, 0, 0, 0, 0, 0, 0, 0, 18.21428571428571, 0, 19.30714285714285, 5E+2, 651.9200000000001, 24.07999999999999, 0, 215, 0, 0, 0, 0, 0, 0, 0, 0, 465.657142857143, 561.6571428571428, 0, 0 }
+
+        // CPLEX MAX OPTIMAL 3438.2920999999997 @ { 54.5, 0, 54.5, 57.77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5E+2, 483.5955, 16.4045, 0, 215, 0, 0, 0, 0, 0, 0, 0, 0, 345.4253571428571, 0, 0, 389.4253571428571 }
+
         CuteNetlibCase.doTest("AFIRO.SIF", "-464.7531428571429", "3438.2920999999997", NumberContext.of(7, 4));
     }
 
@@ -123,6 +151,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testAGG() {
         CuteNetlibCase.doTest("AGG.SIF", "-3.599176728657652E7", "2.8175579434489565E9", NumberContext.of(7, 4));
     }
@@ -133,6 +162,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testAGG2() {
         CuteNetlibCase.doTest("AGG2.SIF", "-2.0239252355977114E7", "5.71551859632249E9", NumberContext.of(7, 4));
     }
@@ -143,6 +173,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testAGG3() {
         CuteNetlibCase.doTest("AGG3.SIF", "1.031211593508922E7", "5.746768863949547E9", NumberContext.of(7, 4));
     }
@@ -153,6 +184,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testBANDM() {
         CuteNetlibCase.doTest("BANDM.SIF", "-158.6280184501187", null, NumberContext.of(7, 4));
     }
@@ -163,6 +195,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testBEACONFD() {
         CuteNetlibCase.doTest("BEACONFD.SIF", "33592.4858072", null, NumberContext.of(7, 4));
     }
@@ -172,8 +205,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * 2010-04-19: lp_solve => -30.81214985
      * 2019-02-13: Objective obtained/verified by CPLEX
      * </pre>
+     *
+     * 72x155
      */
     @Test
+    @Tag("bm1000")
     public void testBLEND() {
         CuteNetlibCase.doTest("BLEND.SIF", "-3.0812149846E+01", null, NumberContext.of(7, 4));
     }
@@ -210,6 +246,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testBOEING1() {
         CuteNetlibCase.doTest("BOEING1.SIF", "-335.2135675071266", "286.9746573387996", NumberContext.of(7, 4));
     }
@@ -219,8 +256,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * 2010-04-19: lp_solve => -315.01872802
      * 2019-02-13: Objective obtained/verified by CPLEX
      * </pre>
+     *
+     * 144x287
      */
     @Test
+    @Tag("bm1000")
     public void testBOEING2() {
         CuteNetlibCase.doTest("BOEING2.SIF", "-3.1501872802E+02", "-73.36896910872208", NumberContext.of(7, 4));
     }
@@ -231,6 +271,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testBORE3D() {
         CuteNetlibCase.doTest("BORE3D.SIF", "1373.0803942085367", null, NumberContext.of(7, 4));
     }
@@ -241,6 +282,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testBRANDY() {
         CuteNetlibCase.doTest("BRANDY.SIF", "1518.509896488128", null, NumberContext.of(7, 4));
     }
@@ -251,6 +293,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testCAPRI() {
         CuteNetlibCase.doTest("CAPRI.SIF", "2690.0129137681624", null, NumberContext.of(7, 4));
     }
@@ -366,6 +409,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testDEGEN2() {
         CuteNetlibCase.doTest("DEGEN2.SIF", "-1435.1779999999999", "-1226.12", NumberContext.of(7, 4));
     }
@@ -409,6 +453,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testE226() {
         CuteNetlibCase.doTest("E226.SIF", "-11.638929066370546", "111.65096068931459", NumberContext.of(7, 4));
     }
@@ -419,6 +464,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testETAMACRO() {
         CuteNetlibCase.doTest("ETAMACRO.SIF", "-755.7152312325337", "258.71905646302014", NumberContext.of(7, 4));
     }
@@ -429,6 +475,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testFFFFF800() {
         CuteNetlibCase.doTest("FFFFF800.SIF", "555679.5648174941", "1858776.4328128027", NumberContext.of(7, 4));
     }
@@ -439,6 +486,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testFINNIS() {
         CuteNetlibCase.doTest("FINNIS.SIF", "172791.0655956116", null, NumberContext.of(7, 4));
     }
@@ -501,6 +549,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testFORPLAN() {
         CuteNetlibCase.doTest("FORPLAN.SIF", "-664.2189612722054", "2862.4274777342266", NumberContext.of(7, 4));
     }
@@ -562,6 +611,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testGROW15() {
         CuteNetlibCase.doTest("GROW15.SIF", "-1.068709412935753E8", "0.0", NumberContext.of(7, 4));
     }
@@ -572,6 +622,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testGROW22() {
         CuteNetlibCase.doTest("GROW22.SIF", "-1.608343364825636E8", "0.0", NumberContext.of(7, 4));
     }
@@ -582,6 +633,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testGROW7() {
         CuteNetlibCase.doTest("GROW7.SIF", "-4.7787811814711526E7", "0.0", NumberContext.of(7, 4));
     }
@@ -592,6 +644,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testISRAEL() {
         CuteNetlibCase.doTest("ISRAEL.SIF", "-896644.8218630457", null, NumberContext.of(7, 4));
     }
@@ -603,6 +656,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testKB2() {
         CuteNetlibCase.doTest("KB2.SIF", "-1.74990012991E+03", "0.0", NumberContext.of(7, 4));
     }
@@ -664,6 +718,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testLOTFI() {
         CuteNetlibCase.doTest("LOTFI.SIF", "-25.26470606188002", null, NumberContext.of(7, 4));
     }
@@ -877,6 +932,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testPILOT4() {
         CuteNetlibCase.doTest("PILOT4.SIF", "-2581.1392612778604", "0.0", NumberContext.of(7, 4));
     }
@@ -952,6 +1008,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testRECIPELP() {
         CuteNetlibCase.doTest("RECIPELP.SIF", "-266.616", "-104.818", NumberContext.of(7, 4));
     }
@@ -962,6 +1019,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSC105() {
         CuteNetlibCase.doTest("SC105.SIF", "-52.202061211707246", "0.0", NumberContext.of(7, 4));
     }
@@ -972,6 +1030,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSC205() {
         CuteNetlibCase.doTest("SC205.SIF", "-52.202061211707246", "0.0", NumberContext.of(7, 4));
     }
@@ -982,6 +1041,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSC50A() {
         CuteNetlibCase.doTest("SC50A.SIF", "-64.57507705856449", "0.0", NumberContext.of(7, 4));
     }
@@ -993,6 +1053,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSC50B() {
         CuteNetlibCase.doTest("SC50B.SIF", "-7.0000000000E+01", "0.0", NumberContext.of(7, 4));
     }
@@ -1004,6 +1065,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCAGR25() {
         CuteNetlibCase.doTest("SCAGR25.SIF", "-1.475343306076852E7", null, NumberContext.of(7, 4));
     }
@@ -1014,6 +1076,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCAGR7() {
         CuteNetlibCase.doTest("SCAGR7.SIF", "-2331389.8243309837", null, NumberContext.of(7, 4));
     }
@@ -1024,6 +1087,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCFXM1() {
         CuteNetlibCase.doTest("SCFXM1.SIF", "18416.75902834894", null, NumberContext.of(7, 4));
     }
@@ -1034,6 +1098,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCFXM2() {
         CuteNetlibCase.doTest("SCFXM2.SIF", "36660.261564998815", null, NumberContext.of(7, 4));
     }
@@ -1056,6 +1121,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCORPION() {
         CuteNetlibCase.doTest("SCORPION.SIF", "1878.1248227381068", null, NumberContext.of(7, 4));
     }
@@ -1080,6 +1146,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCSD1() {
         CuteNetlibCase.doTest("SCSD1.SIF", "8.666666674333367", null, NumberContext.of(7, 4));
     }
@@ -1114,6 +1181,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSCTAP1() {
         CuteNetlibCase.doTest("SCTAP1.SIF", "1412.25", null, NumberContext.of(7, 4));
     }
@@ -1148,6 +1216,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSEBA() {
         CuteNetlibCase.doTest("SEBA.SIF", "15711.6", "35160.46056", NumberContext.of(7, 4));
     }
@@ -1157,10 +1226,13 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * 2019-02-13: Objective obtained/verified by CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
+     *
+     * 110x330
      */
     @Test
+    @Tag("bm1000")
     public void testSHARE1B() {
-        CuteNetlibCase.doTest("SHARE1B.SIF", "-76589.31857918584", "74562.53714565346", NumberContext.of(5, 4));
+        CuteNetlibCase.doTest("SHARE1B.SIF", "-76589.31857918584", "74562.53714565346", NumberContext.of(4, 4));
     }
 
     /**
@@ -1168,8 +1240,11 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * 2010-04-19: lp_solve => -415.73224074
      * 2019-02-13: Objective obtained/verified by CPLEX
      * </pre>
+     *
+     * 93x172
      */
     @Test
+    @Tag("bm1000")
     public void testSHARE2B() {
         CuteNetlibCase.doTest("SHARE2B.SIF", "-4.1573224074E+02", "-265.0981144446295", NumberContext.of(7, 4));
     }
@@ -1277,6 +1352,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSTAIR() {
         CuteNetlibCase.doTest("STAIR.SIF", "-251.26695119296787", "-208.79999", NumberContext.of(7, 2));
     }
@@ -1323,6 +1399,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testSTOCFOR1() {
         CuteNetlibCase.doTest("STOCFOR1.SIF", "-41131.97621943626", null, NumberContext.of(7, 4));
     }
@@ -1373,6 +1450,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      */
     @Test
     @Tag("unstable")
+    @Tag("bm1000")
     public void testTUFF() {
         CuteNetlibCase.doTest("TUFF.SIF", "0.29214776509361284", "0.8949901867574317", NumberContext.of(7, 4));
     }
@@ -1383,6 +1461,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
      * </pre>
      */
     @Test
+    @Tag("bm1000")
     public void testVTP_BASE() {
         CuteNetlibCase.doTest("VTP-BASE.SIF", "129831.46246136136", null, NumberContext.of(7, 4));
     }

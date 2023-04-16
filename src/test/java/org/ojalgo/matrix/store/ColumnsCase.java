@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@ public class ColumnsCase extends NonPhysicalTest {
             tmpCols[i] = Uniform.randomInteger(tmpColDim);
         }
 
-        rationalStore = new ColumnsStore<>(GenericStore.RATIONAL.copy(tmpBase), tmpCols);
-        complexStore = new ColumnsStore<>(GenericStore.COMPLEX.copy(tmpBase), tmpCols);
+        rationalStore = new ColumnsStore<>(GenericStore.Q128.copy(tmpBase), tmpCols);
+        complexStore = new ColumnsStore<>(GenericStore.C128.copy(tmpBase), tmpCols);
         primitiveStore = new ColumnsStore<>(Primitive64Store.FACTORY.copy(tmpBase), tmpCols);
 
         numberOfRows = tmpRowDim;

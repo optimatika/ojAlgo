@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -43,34 +44,42 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
 
-    static final class Complex extends LUDecomposition<ComplexNumber> {
+    static final class C128 extends LUDecomposition<ComplexNumber> {
 
-        Complex() {
-            super(GenericStore.COMPLEX);
+        C128() {
+            super(GenericStore.C128);
         }
 
     }
 
-    static final class Primitive extends LUDecomposition<Double> {
+    static final class H256 extends LUDecomposition<Quaternion> {
 
-        Primitive() {
+        H256() {
+            super(GenericStore.H256);
+        }
+
+    }
+
+    static final class Q128 extends LUDecomposition<RationalNumber> {
+
+        Q128() {
+            super(GenericStore.Q128);
+        }
+
+    }
+
+    static final class R064 extends LUDecomposition<Double> {
+
+        R064() {
             super(Primitive64Store.FACTORY);
         }
 
     }
 
-    static final class Quat extends LUDecomposition<Quaternion> {
+    static final class R128 extends LUDecomposition<Quadruple> {
 
-        Quat() {
-            super(GenericStore.QUATERNION);
-        }
-
-    }
-
-    static final class Rational extends LUDecomposition<RationalNumber> {
-
-        Rational() {
-            super(GenericStore.RATIONAL);
+        R128() {
+            super(GenericStore.R128);
         }
 
     }
@@ -79,6 +88,19 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     protected LUDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
+    }
+
+    public void btran(final PhysicalStore<N> arg) {
+
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, false, true, false);
+
+        arg.substituteBackwards(body, true, true, false);
+
+        if (myPivot.isModified()) {
+            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
+        }
     }
 
     public N calculateDeterminant(final Access2D<?> matrix) {
@@ -106,6 +128,14 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
+    }
+
+    public void ftran(final PhysicalStore<N> arg) {
+
+        PhysicalStore<N> rhs = myPivot.isModified() ? arg.copy() : arg;
+        PhysicalStore<N> sol = arg;
+
+        this.getSolution(rhs, sol);
     }
 
     public N getDeterminant() {
@@ -161,6 +191,10 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
+    }
+
+    public int[] getReversePivotOrder() {
+        return myPivot.reverseOrder();
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

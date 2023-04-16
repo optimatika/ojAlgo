@@ -92,7 +92,7 @@ public abstract class P20150720 {
         //Apply Customers constraints.
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.lower(0.0).upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             linked.forEach(v -> v.upper(entry.getValue().doubleValue()));
@@ -103,7 +103,7 @@ public abstract class P20150720 {
         //Apply Product Type constraints.
         constraintsProduct.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().endsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.lower(0.0).upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             //BasicLogger.debug(constraint);
@@ -114,7 +114,7 @@ public abstract class P20150720 {
          * proportionality.
          */
         //BasicLogger.debug("---- Objective  ------");
-        final Expression objective = model.addExpression("OBJECTIVE").weight(1.0);
+        final Expression objective = model.newExpression("OBJECTIVE").weight(1.0);
 
         // - Maximize the Sum of all variables
         objective.setLinearFactorsSimple(variables);
@@ -128,7 +128,7 @@ public abstract class P20150720 {
                 model.addVariable(error);
                 errors.add(error);
 
-                final Expression errorExp = model.addExpression("ERROR_EXP:" + entry.getKey()).level(stockTotal / demandTotal);
+                final Expression errorExp = model.newExpression("ERROR_EXP:" + entry.getKey()).level(stockTotal / demandTotal);
                 linked.forEach(v -> errorExp.set(v, 1.0 / entry.getValue().doubleValue()));
                 errorExp.set(error, -1.0);
 
@@ -205,7 +205,7 @@ public abstract class P20150720 {
         //Apply Customers constraints.
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             //BasicLogger.debug(constraint);
@@ -215,7 +215,7 @@ public abstract class P20150720 {
         //Apply Product Type constraints.
         constraintsProduct.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().endsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             //BasicLogger.debug(constraint);
@@ -226,7 +226,7 @@ public abstract class P20150720 {
          * proportionality.
          */
         //BasicLogger.debug("---- Objective  ------");
-        final Expression objective = model.addExpression("OBJECTIVE").weight(1.0);
+        final Expression objective = model.newExpression("OBJECTIVE").weight(1.0);
 
         // - Maximize the Sum of all variables
         objective.setLinearFactorsSimple(variables);
@@ -400,7 +400,7 @@ public abstract class P20150720 {
         constraintsCustomer.entrySet().stream().filter(e -> !e.getKey().startsWith("CUSTOMER_A")) //CUSTOMER_A of Demand constraint because managed by user constraints.
                 .forEach(entry -> {
                     final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-                    final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+                    final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
                     constraint.upper(entry.getValue().doubleValue());
                     constraint.setLinearFactorsSimple(linked);
                     // BasicLogger.debug(constraint);
@@ -409,7 +409,7 @@ public abstract class P20150720 {
         // BasicLogger.debug("---- User Constraints Customers ------");
         //Apply Product Type constraints.
         final List<Variable> userLinked = variables.stream().filter(v -> userConstraint.contains(v.getName())).collect(Collectors.toList());
-        final Expression constraintUser = model.addExpression("CONSTRAINTS_USER_CUSTOMER_A");
+        final Expression constraintUser = model.newExpression("CONSTRAINTS_USER_CUSTOMER_A");
         constraintUser.level(userConstraintQty);
         constraintUser.setLinearFactorsSimple(userLinked);
         // BasicLogger.debug(constraintUser);
@@ -418,7 +418,7 @@ public abstract class P20150720 {
         //Apply Product Type constraints.
         constraintsProduct.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().endsWith(entry.getKey())).collect(Collectors.toList());
-            final Expression constraint = model.addExpression("CONSTRAINTS_" + entry.getKey());
+            final Expression constraint = model.newExpression("CONSTRAINTS_" + entry.getKey());
             constraint.upper(entry.getValue().doubleValue());
             constraint.setLinearFactorsSimple(linked);
             // BasicLogger.debug(constraint);
@@ -429,7 +429,7 @@ public abstract class P20150720 {
          * proportionality.
          */
         // BasicLogger.debug("---- Objective  ------");
-        final Expression objective = model.addExpression("OBJECTIVE").weight(-1.0);
+        final Expression objective = model.newExpression("OBJECTIVE").weight(-1.0);
 
         // - Maximize the Sum of all variables
         //objective.setLinearFactorsSimple(variables);

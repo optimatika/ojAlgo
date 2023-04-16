@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -74,8 +74,8 @@ public class DesignCase extends MatrixDecompositionTests {
         MatrixStore<Double> fat = Primitive64Store.FACTORY.makeFilled(5, 7, new Uniform());
 
         @SuppressWarnings("unchecked")
-        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.Primitive(true),
-                new QRDecomposition.Primitive(true), new SingularValueDecomposition.Primitive(true) };
+        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.R064(true), new QRDecomposition.R064(true),
+                new SingularValueDecomposition.R064(true) };
         for (EconomySize<Double> decomp : all) {
 
             String className = decomp.getClass().getName();
@@ -276,7 +276,7 @@ public class DesignCase extends MatrixDecompositionTests {
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
-        SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
+        SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.R064();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getU();

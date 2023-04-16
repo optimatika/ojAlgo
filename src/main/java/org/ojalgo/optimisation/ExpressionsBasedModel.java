@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.InMemoryFile;
@@ -109,7 +108,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      *
      * @author apete
      */
-    public static final class Description {
+    public static final class Description implements ProblemStructure {
 
         public final int nbEqualityBounds;
         public final int nbEqualityConstraints;
@@ -141,11 +140,24 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             nbVariables = varTotal;
         }
 
-        /**
-         * The total number of constraints
-         */
-        public int constraints() {
+        public int countAdditionalConstraints() {
+            return 0;
+        }
+
+        public int countConstraints() {
             return nbEqualityConstraints + nbLowerConstraints + nbUpperConstraints;
+        }
+
+        public int countEqualityConstraints() {
+            return nbEqualityBounds;
+        }
+
+        public int countInequalityConstraints() {
+            return nbLowerConstraints + nbUpperConstraints;
+        }
+
+        public int countVariables() {
+            return nbVariables;
         }
 
     }
@@ -194,72 +206,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return this.toSolverState(model.getVariableValues(), model);
         }
 
-        /**
-         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented, and
-         * is the reverse mapping of {@link #toSolverState(Optimisation.Result, ExpressionsBasedModel)}.
-         *
-         * @see Optimisation.Integration#toModelState(Optimisation.Result, Optimisation.Model)
-         * @see #toSolverState(Optimisation.Result, ExpressionsBasedModel)
-         */
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-
-            if (!this.isSolutionMapped()) {
-                return solverState;
-            }
-
-            List<Variable> freeVariables = model.getFreeVariables();
-            Set<IntIndex> fixedVariables = model.getFixedVariables();
-            int nbFreeVars = freeVariables.size();
-            int nbModelVars = model.countVariables();
-
-            ArrayR064 modelSolution = ArrayR064.make(nbModelVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                modelSolution.set(model.indexOf(freeVariables.get(i)), solverState.doubleValue(i));
-            }
-
-            for (IntIndex fixed : fixedVariables) {
-                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
-            }
-
-            return new Result(solverState.getState(), modelSolution);
+            return solverState;
         }
 
-        /**
-         * The required behaviour here depends on how {@link #build(Optimisation.Model)} is implemented!
-         * <p>
-         * If {@link #isSolutionMapped()} returns false this implementation does nothing – the input model
-         * state is returned as the solver state.
-         * <p>
-         * If {@link #isSolutionMapped()} returns true the standard mapping is applied - just accounting for
-         * that not all model variables are present in the solver. Variables that are fixed, by the presolver
-         * in the model, are typically not present in the solver.
-         * <p>
-         * If mapping needs to be performed, but it is not the standard mapping, then this method needs to be
-         * overridden for the specific implementation. For instance an LP simplex solver that separates
-         * between the positive and negative parts of variables need to do that. In that case
-         * {@link #isSolutionMapped()} is irrelevant, but should return true for good measure.
-         *
-         * @see Optimisation.Integration#toSolverState(Optimisation.Result, Optimisation.Model)
-         */
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-
-            if (!this.isSolutionMapped()) {
-                return modelState;
-            }
-
-            List<Variable> freeVariables = model.getFreeVariables();
-            int nbFreeVars = freeVariables.size();
-
-            ArrayR064 solverSolution = ArrayR064.make(nbFreeVars);
-
-            for (int i = 0; i < nbFreeVars; i++) {
-                Variable variable = freeVariables.get(i);
-                int modelIndex = model.indexOf(variable);
-                solverSolution.set(i, modelState.doubleValue(modelIndex));
-            }
-
-            return new Result(modelState.getState(), solverSolution);
+            return modelState;
         }
 
         /**
@@ -285,13 +237,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
             return model.indexOfFreeVariable(variable);
         }
-
-        /**
-         * @return true if the set of variables present in the solver is not precisely the same as in the
-         *         model. If fixed variables are omitted or if variables are split into a positive and
-         *         negative part, then this method must return true
-         */
-        protected abstract boolean isSolutionMapped();
 
     }
 
@@ -618,6 +563,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this(new Optimisation.Options());
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
 
         this();
@@ -639,6 +588,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myRelaxed = false;
     }
 
+    /**
+     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public ExpressionsBasedModel(final Variable... variables) {
 
         this();
@@ -688,16 +641,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Expression addExpression() {
-        return this.addExpression("EXPR" + myExpressions.size());
+        return this.newExpression("EXPR" + myExpressions.size());
     }
 
     public Expression addExpression(final String name) {
-
-        final Expression retVal = new Expression(name, this);
-
-        myExpressions.put(name, retVal);
-
-        return retVal;
+        return this.newExpression(name);
     }
 
     /**
@@ -751,7 +699,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         final String name = "SOS" + max + "-" + orderedSet.toString();
 
-        final Expression expression = this.addExpression(name);
+        final Expression expression = this.newExpression(name);
 
         for (final Variable variable : orderedSet) {
             if (variable == null || variable.getIndex() == null || !variable.isBinary()) {
@@ -769,15 +717,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Variable addVariable() {
-        return this.addVariable("X" + myVariables.size());
+        return this.newVariable("X" + myVariables.size());
     }
 
     public Variable addVariable(final String name) {
-        final Variable retVal = new Variable(name);
-        this.addVariable(retVal);
-        return retVal;
+        return this.newVariable(name);
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariable(final Variable variable) {
         if (myShallowCopy) {
             throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
@@ -786,12 +736,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         variable.setIndex(new IntIndex(myVariables.size() - 1));
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariables(final Collection<? extends Variable> variables) {
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
     }
 
+    /**
+     * @deprecated v53 Use {@link #newVariable(String)} instead.
+     */
+    @Deprecated
     public void addVariables(final Variable[] variables) {
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
@@ -994,7 +952,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         State retState = State.UNEXPLORED;
         double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.R128.make(numberOfVariables);
+        final Array1D<BigDecimal> retSolution = Array1D.R256.make(numberOfVariables);
 
         boolean allVarsSomeInfo = true;
 
@@ -1191,6 +1149,21 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return this.optimise();
     }
 
+    public Expression newExpression(final String name) {
+
+        final Expression retVal = new Expression(name, this);
+
+        myExpressions.put(name, retVal);
+
+        return retVal;
+    }
+
+    public Variable newVariable(final String name) {
+        final Variable retVal = new Variable(name);
+        this.addVariable(retVal);
+        return retVal;
+    }
+
     /**
      * This is generated on demand – you should not cache this. More specifically, modifications made to this
      * expression will not be part of the optimisation model. You define the objective by setting the
@@ -1333,13 +1306,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         StringBuilder retVal = new StringBuilder(START_END);
 
-        for (Variable tmpVariable : myVariables) {
-            tmpVariable.appendToString(retVal);
+        for (Variable variable : myVariables) {
+            variable.appendToString(retVal, options.print);
             retVal.append(NEW_LINE);
         }
 
-        for (Expression tmpExpression : myExpressions.values()) {
-            tmpExpression.appendToString(retVal, this.getVariableValues());
+        Result solution = this.getVariableValues();
+        for (Expression expression : myExpressions.values()) {
+            expression.appendToString(retVal, solution, options.print);
             retVal.append(NEW_LINE);
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,48 +36,49 @@ public final class MemoryEstimator {
     private static final long WORD = 8L;
     private static final long ZERO = 0L;
 
-    public static long estimateArray(final Class<?> aComponentType, final int aLength) {
+    public static long estimateArray(final Class<?> componentType, final int length) {
 
-        final MemoryEstimator tmpEstimator = MemoryEstimator.makeForClassExtendingObject();
+        MemoryEstimator estimator = MemoryEstimator.makeForClassExtendingObject();
 
-        tmpEstimator.add(JavaType.INT.memory());
+        estimator.add(JavaType.INT.memory());
 
-        tmpEstimator.add(aLength * JavaType.match(aComponentType).memory());
+        JavaType match = JavaType.match(componentType);
+        estimator.add(length * match.memory());
 
-        return tmpEstimator.estimate();
+        return estimator.estimate();
     }
 
-    public static long estimateObject(final Class<?> aType) {
-        return MemoryEstimator.make(aType).estimate();
+    public static long estimateObject(final Class<?> type) {
+        return MemoryEstimator.make(type).estimate();
     }
 
     public static MemoryEstimator makeForClassExtendingObject() {
         return new MemoryEstimator(WORD + JavaType.REFERENCE.memory());
     }
 
-    public static MemoryEstimator makeForSubclass(final MemoryEstimator aParentEstimation) {
-        return new MemoryEstimator(aParentEstimation.align(PARENT_ALIGNEMENT));
+    public static MemoryEstimator makeForSubclass(final MemoryEstimator parentEstimation) {
+        return new MemoryEstimator(parentEstimation.align(PARENT_ALIGNEMENT));
     }
 
-    static MemoryEstimator make(final Class<?> aClass) {
+    static MemoryEstimator make(final Class<?> type) {
 
         MemoryEstimator retVal = null;
 
-        final Class<?> tmpParent = aClass.getSuperclass();
+        Class<?> tmpParent = type.getSuperclass();
 
         if (Object.class.equals(tmpParent)) {
             retVal = MemoryEstimator.makeForClassExtendingObject();
         } else {
-            final MemoryEstimator tmpParentEstimation = MemoryEstimator.make(tmpParent);
+            MemoryEstimator tmpParentEstimation = MemoryEstimator.make(tmpParent);
             retVal = MemoryEstimator.makeForSubclass(tmpParentEstimation);
         }
 
-        for (final Field tmpField : aClass.getDeclaredFields()) {
+        for (Field tmpField : type.getDeclaredFields()) {
 
-            final int tmpModifier = tmpField.getModifiers();
+            int tmpModifier = tmpField.getModifiers();
             if (!Modifier.isStatic(tmpModifier)) {
 
-                final Class<?> tmpType = tmpField.getType();
+                Class<?> tmpType = tmpField.getType();
                 retVal.add(JavaType.match(tmpType));
             }
         }
@@ -99,29 +100,29 @@ public final class MemoryEstimator {
         myShallowSize = aBase;
     }
 
-    public MemoryEstimator add(final Class<?> aClass) {
-        return this.add(JavaType.match(aClass));
+    public MemoryEstimator add(final Class<?> type) {
+        return this.add(JavaType.match(type));
     }
 
-    public MemoryEstimator add(final JavaType aJavaType) {
-        return this.add(aJavaType.memory());
+    public MemoryEstimator add(final JavaType type) {
+        return this.add(type.memory());
     }
 
     public long estimate() {
         return this.align(FINAL_ALIGNEMENT);
     }
 
-    private MemoryEstimator add(final long someMemory) {
-        myShallowSize += someMemory;
+    private MemoryEstimator add(final long bytes) {
+        myShallowSize += bytes;
         return this;
     }
 
     private long align(final long alignement) {
 
-        final long tmpRemainder = myShallowSize % alignement;
+        long remainder = myShallowSize % alignement;
 
-        if (tmpRemainder != ZERO) {
-            return myShallowSize + (alignement - tmpRemainder);
+        if (remainder != ZERO) {
+            return myShallowSize + (alignement - remainder);
         } else {
             return myShallowSize;
         }

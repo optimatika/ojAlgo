@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -209,13 +209,13 @@ public class TuneSparseOrDenseSolver extends OptimisationTests {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
 
-        Expression exp100P = retVal.addExpression("Balance");
+        Expression exp100P = retVal.newExpression("Balance");
         for (Variable tmpVariable : variables) {
             exp100P.set(tmpVariable, ONE);
         }
         exp100P.level(ONE);
 
-        Expression expVar = retVal.addExpression("Variance");
+        Expression expVar = retVal.newExpression("Variance");
         for (Variable tmpVariable : variables) {
             expVar.set(tmpVariable, tmpVariable, UNIFORM_20.get());
         }

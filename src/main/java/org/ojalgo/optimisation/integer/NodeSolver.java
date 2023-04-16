@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,8 @@ public final class NodeSolver extends IntermediateSolver {
 
     boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
 
+        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+
         if (!this.isSolved()) {
             return false;
         }
@@ -81,7 +83,7 @@ public final class NodeSolver extends IntermediateSolver {
 
             if (entityMap != null) {
 
-                int nbProblVars = entityMap.countVariables();
+                int nbProblVars = entityMap.countModelVariables();
                 int nbProblInts = strategy.countIntegerVariables();
                 int nbSlackVars = entityMap.countSlackVariables();
 
@@ -108,10 +110,10 @@ public final class NodeSolver extends IntermediateSolver {
                     String name = "CUT_GMI_" + equation.index + "_" + COUNTER.incrementAndGet();
 
                     if (DEBUG) {
-                        BasicLogger.debug("{} {}", name, equation.toString());
+                        BasicLogger.debug("Eq: {} {}", name, equation.toString());
                     }
 
-                    Expression cut = target.addExpression(name);
+                    Expression cut = target.newExpression(name);
 
                     cut.lower(BigMath.ONE);
 
@@ -160,6 +162,10 @@ public final class NodeSolver extends IntermediateSolver {
                                 entity.addTo(cut, factor);
                             }
                         }
+                    }
+
+                    if (DEBUG) {
+                        BasicLogger.debug("Cut: {} := {}", cut, cut.getLinearEntrySet());
                     }
 
                     BigDecimal cRHS = cut.getLowerLimit();

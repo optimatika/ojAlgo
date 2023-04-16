@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.ojalgo.matrix.Primitive64Matrix;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -99,7 +99,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
     static final String BALANCE = "Balance";
     static final String VARIANCE = "Variance";
 
-    private final Primitive64Matrix myExpectedExcessReturns;
+    private final MatrixR064 myExpectedExcessReturns;
     private final Optimisation.Options myOptimisationOptions = new Optimisation.Options();
     private transient State myOptimisationState = State.UNEXPLORED;
     private boolean myShortingAllowed = false;
@@ -121,7 +121,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         myOptimisationOptions.solution = myOptimisationOptions.solution.withPrecision(7).withScale(6);
     }
 
-    OptimisedPortfolio(final MarketEquilibrium marketEquilibrium, final Primitive64Matrix expectedExcessReturns) {
+    OptimisedPortfolio(final MarketEquilibrium marketEquilibrium, final MatrixR064 expectedExcessReturns) {
 
         super(marketEquilibrium);
 
@@ -141,7 +141,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         myOptimisationOptions.solution = myOptimisationOptions.solution.withPrecision(7).withScale(6);
     }
 
-    OptimisedPortfolio(final Primitive64Matrix covarianceMatrix, final Primitive64Matrix expectedExcessReturns) {
+    OptimisedPortfolio(final MatrixR064 covarianceMatrix, final MatrixR064 expectedExcessReturns) {
         this(new MarketEquilibrium(covarianceMatrix), expectedExcessReturns);
     }
 
@@ -159,11 +159,11 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
     }
 
     @Override
-    protected final Primitive64Matrix calculateAssetReturns() {
+    protected final MatrixR064 calculateAssetReturns() {
         return myExpectedExcessReturns;
     }
 
-    protected final Primitive64Matrix handle(final Optimisation.Result optimisationResult) {
+    protected final MatrixR064 handle(final Optimisation.Result optimisationResult) {
 
         final int tmpLength = myVariables.length;
 
@@ -171,7 +171,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
         final boolean tmpFeasible = optimisationResult.getState().isFeasible();
         final boolean tmpShortingAllowed = this.isShortingAllowed();
 
-        final Primitive64Matrix.DenseReceiver tmpMtrxBuilder = MATRIX_FACTORY.makeDense(tmpLength);
+        final MatrixR064.DenseReceiver tmpMtrxBuilder = MATRIX_FACTORY.makeDense(tmpLength);
 
         BigDecimal tmpValue;
         for (int i = 0; i < tmpLength; i++) {
@@ -219,15 +219,15 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
 
         retVal.addVariables(tmpVariables);
 
-        final Expression myOptimisationVariance = retVal.addExpression(VARIANCE);
-        final Primitive64Matrix tmpCovariances = this.getCovariances();
+        final Expression myOptimisationVariance = retVal.newExpression(VARIANCE);
+        final MatrixR064 tmpCovariances = this.getCovariances();
         for (int j = 0; j < tmpLength; j++) {
             for (int i = 0; i < tmpLength; i++) {
                 myOptimisationVariance.set(i, j, tmpCovariances.get(i, j));
             }
         }
 
-        final Expression tmpBalanceExpression = retVal.addExpression(BALANCE);
+        final Expression tmpBalanceExpression = retVal.newExpression(BALANCE);
         for (int i = 0; i < tmpLength; i++) {
             tmpBalanceExpression.set(i, ONE);
         }
@@ -238,7 +238,7 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
             final int[] tmpKey = tmpEntry.getKey();
             final LowerUpper tmpValue = tmpEntry.getValue();
 
-            final Expression tmpExpression = retVal.addExpression(Arrays.toString(tmpKey));
+            final Expression tmpExpression = retVal.newExpression(Arrays.toString(tmpKey));
             for (int i = 0; i < tmpKey.length; i++) {
                 tmpExpression.set(tmpKey[i], ONE);
             }

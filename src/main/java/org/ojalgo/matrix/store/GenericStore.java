@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.array.ArrayC128;
-import org.ojalgo.array.ArrayH256;
-import org.ojalgo.array.ArrayQ128;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.ScalarArray;
+import org.ojalgo.array.*;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -53,11 +46,13 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.math.MathType;
 
 /**
  * A generic implementation of {@linkplain PhysicalStore}.
@@ -335,11 +330,37 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return retVal;
         }
 
+        public MathType getMathType() {
+            return myDenseArrayFactory.getMathType();
+        }
+
     }
 
-    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = new GenericStore.Factory<>(ArrayC128.FACTORY);
-    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = new GenericStore.Factory<>(ArrayH256.FACTORY);
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(ArrayQ128.FACTORY);
+    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> C128 = new GenericStore.Factory<>(ArrayC128.FACTORY);
+    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
+    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
+    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
+
+    /**
+     * @deprecated Use {@link #C128} instead
+     */
+    @Deprecated
+    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = C128;
+    /**
+     * @deprecated Use {@link #R128} instead
+     */
+    @Deprecated
+    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> QUADRUPLE = R128;
+    /**
+     * @deprecated Use {@link #H256} instead
+     */
+    @Deprecated
+    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = H256;
+    /**
+     * @deprecated Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = Q128;
 
     public static <N extends Scalar<N>> GenericStore<N> wrap(final GenericStore.Factory<N> factory, final N... data) {
         return new GenericStore<>(factory, data.length, 1, data);
@@ -515,17 +536,14 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     public void divideAndCopyColumn(final int row, final int column, final BasicArray<N> destination) {
 
-        final N[] tmpData = data;
-        final int tmpRowDim = myRowDim;
+        N[] destinationData = ((ScalarArray<N>) destination).data;
 
-        final N[] tmpDestination = ((ScalarArray<N>) destination).data;
+        int index = row + column * myRowDim;
+        N denominator = data[index];
 
-        int tmpIndex = row + column * tmpRowDim;
-        final N tmpDenominator = tmpData[tmpIndex];
-
-        for (int i = row + 1; i < tmpRowDim; i++) {
-            tmpIndex++;
-            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator).get();
+        for (int i = row + 1; i < myRowDim; i++) {
+            index++;
+            destinationData[i] = data[index] = data[index].divide(denominator).get();
         }
     }
 

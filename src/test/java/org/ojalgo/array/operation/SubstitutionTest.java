@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,11 +40,11 @@ public class SubstitutionTest extends ArrayOperationTests {
         int numbSolutions = 3;
 
         MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations);
-        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations);
+        MatrixStore<RationalNumber> rationalBody = GenericStore.Q128.makeIdentity(numbEquations);
 
         Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);
-        GenericStore<RationalNumber> rationalRHS = GenericStore.RATIONAL.copy(denseRHS);
+        GenericStore<RationalNumber> rationalRHS = GenericStore.Q128.copy(denseRHS);
 
         Primitive64Store expected = Primitive64Store.FACTORY.copy(denseRHS);
 
@@ -60,7 +60,7 @@ public class SubstitutionTest extends ArrayOperationTests {
         cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getR();
-        rationalBody = GenericStore.RATIONAL.copy(primitiveBody);
+        rationalBody = GenericStore.Q128.copy(primitiveBody);
 
         SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, true, true, false);
@@ -85,11 +85,11 @@ public class SubstitutionTest extends ArrayOperationTests {
         int numbSolutions = 3;
 
         MatrixStore<Double> primitiveBody = Primitive64Store.FACTORY.makeIdentity(numbEquations);
-        MatrixStore<RationalNumber> rationalBody = GenericStore.RATIONAL.makeIdentity(numbEquations);
+        MatrixStore<RationalNumber> rationalBody = GenericStore.Q128.makeIdentity(numbEquations);
 
         Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);
-        GenericStore<RationalNumber> rationalRHS = GenericStore.RATIONAL.copy(denseRHS);
+        GenericStore<RationalNumber> rationalRHS = GenericStore.Q128.copy(denseRHS);
 
         Primitive64Store expected = Primitive64Store.FACTORY.copy(denseRHS);
 
@@ -105,7 +105,7 @@ public class SubstitutionTest extends ArrayOperationTests {
         cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getL();
-        rationalBody = GenericStore.RATIONAL.copy(primitiveBody);
+        rationalBody = GenericStore.Q128.copy(primitiveBody);
 
         SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, true, true, false);

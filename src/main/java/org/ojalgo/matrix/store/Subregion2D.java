@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,8 +122,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             final int prime = 31;
             int result = 1;
             result = prime * result + (myBase == null ? 0 : myBase.hashCode());
-            result = prime * result + Arrays.hashCode(myColumns);
-            return result;
+            return prime * result + Arrays.hashCode(myColumns);
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -220,8 +219,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             int result = 1;
             result = prime * result + (myBase == null ? 0 : myBase.hashCode());
             result = prime * result + myColumnLimit;
-            result = prime * result + myRowLimit;
-            return result;
+            return prime * result + myRowLimit;
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -355,8 +353,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             int result = 1;
             result = prime * result + (myBase == null ? 0 : myBase.hashCode());
             result = prime * result + myColumnOffset;
-            result = prime * result + myRowOffset;
-            return result;
+            return prime * result + myRowOffset;
         }
 
         public void modifyAll(final UnaryFunction<N> modifier) {
@@ -477,8 +474,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
             final int prime = 31;
             int result = 1;
             result = prime * result + (myBase == null ? 0 : myBase.hashCode());
-            result = prime * result + Arrays.hashCode(myRows);
-            return result;
+            return prime * result + Arrays.hashCode(myRows);
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -591,8 +587,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + (myBase == null ? 0 : myBase.hashCode());
-            return result;
+            return prime * result + (myBase == null ? 0 : myBase.hashCode());
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -614,6 +609,10 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public TransformableRegion<N> regionByTransposing() {
             return myBase;
+        }
+
+        public void reset() {
+            myBase.reset();
         }
 
         public void set(final long row, final long col, final Comparable<?> value) {
@@ -655,6 +654,12 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
+    }
+
+    public void fillMatching(final Access1D<?> values) {
+        for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {
+            this.set(i, values.get(i));
+        }
     }
 
     public final TransformableRegion<N> regionByColumns(final int... columns) {

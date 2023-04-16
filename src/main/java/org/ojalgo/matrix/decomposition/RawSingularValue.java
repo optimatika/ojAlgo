@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,6 +81,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     RawSingularValue() {
         super();
+    }
+
+    public void btran(final PhysicalStore<Double> arg) {
+        arg.fillByMultiplying(this.getInverse().transpose(), arg.copy());
     }
 
     public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {

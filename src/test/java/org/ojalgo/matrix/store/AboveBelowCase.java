@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,8 @@ public class AboveBelowCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> above = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         MatrixStore<ComplexNumber> below = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new AboveBelowStore<>(GenericStore.RATIONAL.copy(above), GenericStore.RATIONAL.copy(below));
-        complexStore = new AboveBelowStore<>(GenericStore.COMPLEX.copy(above), GenericStore.COMPLEX.copy(below));
+        rationalStore = new AboveBelowStore<>(GenericStore.Q128.copy(above), GenericStore.Q128.copy(below));
+        complexStore = new AboveBelowStore<>(GenericStore.C128.copy(above), GenericStore.C128.copy(below));
         primitiveStore = new AboveBelowStore<>(Primitive64Store.FACTORY.copy(above), Primitive64Store.FACTORY.copy(below));
 
         numberOfRows = tmpRowDim + tmpRowDim;

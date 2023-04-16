@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -70,110 +71,153 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
         public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
     }
 
-    Factory<ComplexNumber> COMPLEX = new Factory<>() {
+    Factory<ComplexNumber> C128 = new Factory<>() {
 
         @Override
         public InverterTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
-                return Cholesky.COMPLEX.make(template);
+                return Cholesky.C128.make(template);
+            } else if (template.isSquare()) {
+                return LU.C128.make(template);
+            } else if (template.isTall()) {
+                return QR.C128.make(template);
+            } else {
+                return SingularValue.C128.make(template);
             }
-            if (template.isSquare()) {
-                return LU.COMPLEX.make(template);
-            }
-            if (template.isTall()) {
-                return QR.COMPLEX.make(template);
-            }
-            return SingularValue.COMPLEX.make(template);
         }
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<>() {
+    /**
+     * @deprecated Use {@link #C128} instead.
+     */
+    @Deprecated
+    Factory<ComplexNumber> COMPLEX = C128;
+
+    Factory<Double> R064 = new Factory<>() {
 
         @Override
         public InverterTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
 
-            long tmpDim = template.countRows();
+            long nbRows = template.countRows();
 
             if (symmetric) {
-                if (tmpDim == 1L) {
+                if (nbRows == 1L) {
                     return AbstractInverter.FULL_1X1;
-                }
-                if (tmpDim == 2L) {
+                } else if (nbRows == 2L) {
                     return AbstractInverter.SYMMETRIC_2X2;
-                }
-                if (tmpDim == 3L) {
+                } else if (nbRows == 3L) {
                     return AbstractInverter.SYMMETRIC_3X3;
-                }
-                if (tmpDim == 4L) {
+                } else if (nbRows == 4L) {
                     return AbstractInverter.SYMMETRIC_4X4;
-                }
-                if (tmpDim == 5L) {
+                } else if (nbRows == 5L) {
                     return AbstractInverter.SYMMETRIC_5X5;
+                } else {
+                    return positiveDefinite ? Cholesky.R064.make(template) : LU.R064.make(template);
                 }
-                return positiveDefinite ? Cholesky.PRIMITIVE.make(template) : LU.PRIMITIVE.make(template);
-            }
-            if (template.isSquare()) {
-                if (tmpDim == 1L) {
+            } else if (template.isSquare()) {
+                if (nbRows == 1L) {
                     return AbstractInverter.FULL_1X1;
-                }
-                if (tmpDim == 2L) {
+                } else if (nbRows == 2L) {
                     return AbstractInverter.FULL_2X2;
-                }
-                if (tmpDim == 3L) {
+                } else if (nbRows == 3L) {
                     return AbstractInverter.FULL_3X3;
-                }
-                if (tmpDim == 4L) {
+                } else if (nbRows == 4L) {
                     return AbstractInverter.FULL_4X4;
-                }
-                if (tmpDim == 5L) {
+                } else if (nbRows == 5L) {
                     return AbstractInverter.FULL_5X5;
+                } else {
+                    return LU.R064.make(template);
                 }
-                return LU.PRIMITIVE.make(template);
+            } else if (template.isTall()) {
+                return QR.R064.make(template);
+            } else {
+                return SingularValue.R064.make(template);
             }
-            if (template.isTall()) {
-                return QR.PRIMITIVE.make(template);
-            }
-            return SingularValue.PRIMITIVE.make(template);
         }
 
     };
 
-    Factory<Quaternion> QUATERNION = new Factory<>() {
+    /**
+     * @deprecated Use {@link #R064} instead.
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+
+    Factory<Quadruple> R128 = new Factory<>() {
+
+        @Override
+        public InverterTask<Quadruple> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
+            if (template.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.R128.make(template);
+                } else {
+                    return LU.R128.make(template);
+                }
+            } else if (template.isTall()) {
+                return QR.R128.make(template);
+            } else {
+                return SingularValue.R128.make(template);
+            }
+        }
+
+    };
+
+    /**
+     * @deprecated Use {@link #R128} instead.
+     */
+    @Deprecated
+    Factory<Quadruple> QUADRUPLE = R128;
+
+    Factory<Quaternion> H256 = new Factory<>() {
 
         @Override
         public InverterTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (template.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.QUATERNION.make(template);
+                    return Cholesky.H256.make(template);
+                } else {
+                    return LU.H256.make(template);
                 }
-                return LU.QUATERNION.make(template);
+            } else if (template.isTall()) {
+                return QR.H256.make(template);
+            } else {
+                return SingularValue.H256.make(template);
             }
-            if (template.isTall()) {
-                return QR.QUATERNION.make(template);
-            }
-            return SingularValue.QUATERNION.make(template);
         }
 
     };
 
-    Factory<RationalNumber> RATIONAL = new Factory<>() {
+    /**
+     * @deprecated Use {@link #H256} instead.
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
 
         @Override
         public InverterTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (template.isSquare()) {
                 if (symmetric && positiveDefinite) {
-                    return Cholesky.RATIONAL.make(template);
+                    return Cholesky.Q128.make(template);
+                } else {
+                    return LU.Q128.make(template);
                 }
-                return LU.RATIONAL.make(template);
+            } else if (template.isTall()) {
+                return QR.Q128.make(template);
+            } else {
+                return SingularValue.Q128.make(template);
             }
-            if (template.isTall()) {
-                return QR.RATIONAL.make(template);
-            }
-            return SingularValue.RATIONAL.make(template);
         }
 
     };
+
+    /**
+     * @deprecated Use {@link #Q128} instead.
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,16 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.P20061119Case;
-import org.ojalgo.matrix.RationalMatrix;
+import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -47,21 +51,21 @@ public class CaseLU extends MatrixDecompositionTests {
     @Test
     public void testP20061119Case() {
 
-        final RationalMatrix tmpProblematic = P20061119Case.getProblematic();
+        MatrixR064 tmpProblematic = P20061119Case.getProblematic();
 
-        final LU<RationalNumber> tmpBig = LU.RATIONAL.make();
-        tmpBig.decompose(GenericStore.RATIONAL.copy(tmpProblematic));
+        LU<RationalNumber> tmpBig = LU.RATIONAL.make();
+        tmpBig.decompose(GenericStore.Q128.copy(tmpProblematic));
 
-        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(GenericStore.COMPLEX.copy(tmpProblematic));
+        LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
+        tmpComplex.decompose(GenericStore.C128.copy(tmpProblematic));
 
-        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
+        LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
-        final LU<Double> tmpJama = new RawLU();
+        LU<Double> tmpJama = new RawLU();
         tmpJama.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
-        final NumberContext tmpPrintContext = NumberContext.ofScale(20);
+        NumberContext tmpPrintContext = NumberContext.ofScale(20);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debugMatrix("Big L", tmpBig.getL(), tmpPrintContext);
@@ -77,7 +81,7 @@ public class CaseLU extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Jama U", tmpJama.getU(), tmpPrintContext);
         }
 
-        final SingularValue<Double> tmpSVD = new RawSingularValue();
+        SingularValue<Double> tmpSVD = new RawSingularValue();
         tmpSVD.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
@@ -85,6 +89,72 @@ public class CaseLU extends MatrixDecompositionTests {
         TestUtils.assertEquals("LU.rank SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
 
+    }
+
+    @Test
+    public void testReconstructWhenPivoted() {
+
+        MatrixStore<Double> matrix = CaseLDL.newSpecialSchnabelEskow();
+
+        LU<Double> decomp = LU.R064.make(matrix);
+        decomp.decompose(matrix);
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Original", matrix);
+            BasicLogger.debugMatrix("L", decomp.getL());
+            BasicLogger.debugMatrix("U", decomp.getU());
+            BasicLogger.debugMatrix("Reconstructed", decomp.reconstruct());
+        }
+
+        TestUtils.assertEquals(matrix, decomp.reconstruct());
+    }
+
+    @Test
+    public void testSolveBothWays() {
+
+        MatrixR064 body = SimpleEquationCase.getBody();
+        MatrixR064 rhs = SimpleEquationCase.getRHS();
+        MatrixR064 solution = SimpleEquationCase.getSolution();
+
+        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+
+        for (LU<Double> decomp : MatrixDecompositionTests.getPrimitiveLU()) {
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.ftran(rhs, actual);
+
+            TestUtils.assertEquals(solution, actual);
+
+            decomp.decompose(body.transpose());
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.ftran(rhs, expected);
+
+            decomp.decompose(body);
+
+            if (DEBUG) {
+                BasicLogger.debug("P: {}", Arrays.toString(decomp.getPivotOrder()));
+                BasicLogger.debugMatrix("L", decomp.getL());
+                BasicLogger.debugMatrix("U", decomp.getU());
+            }
+
+            decomp.btran(rhs, actual);
+
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
 }

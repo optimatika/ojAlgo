@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,19 +40,19 @@ public class SimpleQRCase extends BasicMatrixTest {
 
     private static final NumberContext DEFINITION = NumberContext.ofScale(9).withScale(18);
 
-    public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+    public static MatrixR064 getOriginal() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getFactorQ() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
+    private static MatrixR064 getFactorQ() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
                 { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
+    private static MatrixR064 getFactorR() {
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -60,14 +60,12 @@ public class SimpleQRCase extends BasicMatrixTest {
     @BeforeEach
     public void doBeforeEach() {
 
-        // ACCURACY = ACCURACY.withScale(9).withPrecision(15);
+        mtrxA = SimpleQRCase.getFactorQ();
+        mtrxX = SimpleQRCase.getFactorR();
+        mtrxB = SimpleQRCase.getOriginal();
 
-        rAA = SimpleQRCase.getFactorQ();
-        rAX = SimpleQRCase.getFactorR();
-        rAB = SimpleQRCase.getOriginal();
-
-        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), ACCURACY);
-        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), ACCURACY);
+        mtrxI = BasicMatrixTest.getIdentity(mtrxA.countRows(), mtrxA.countColumns(), ACCURACY);
+        mtrxSafe = BasicMatrixTest.getSafe(mtrxA.countRows(), mtrxA.countColumns(), ACCURACY);
 
         super.doBeforeEach();
     }
@@ -79,8 +77,8 @@ public class SimpleQRCase extends BasicMatrixTest {
         BasicMatrix<?, ?> expMtrx;
 
         expMtrx = SimpleQRCase.getOriginal();
-        final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
-        final RationalMatrix tmpFactorR = SimpleQRCase.getFactorR();
+        MatrixR064 tmpFactorQ = SimpleQRCase.getFactorQ();
+        MatrixR064 tmpFactorR = SimpleQRCase.getFactorR();
         actMtrx = tmpFactorQ.multiply(tmpFactorR);
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
@@ -94,28 +92,28 @@ public class SimpleQRCase extends BasicMatrixTest {
 
         // QR
 
-        final QR<RationalNumber> tmpQR = QR.RATIONAL.make();
-        tmpQR.decompose(GenericStore.RATIONAL.copy(SimpleQRCase.getOriginal()));
+        QR<RationalNumber> tmpQR = QR.RATIONAL.make();
+        tmpQR.decompose(GenericStore.Q128.copy(SimpleQRCase.getOriginal()));
 
-        final MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
-        final MatrixStore<RationalNumber> tmpR = tmpQR.getR();
+        MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
+        MatrixStore<RationalNumber> tmpR = tmpQR.getR();
 
         expMtrx = SimpleQRCase.getOriginal();
-        actMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
+        actMtrx = MatrixR064.FACTORY.copy(tmpQ.multiply(tmpR));
 
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
         // Q
 
         expMtrx = SimpleQRCase.getFactorQ();
-        actMtrx = RationalMatrix.FACTORY.copy(tmpQ);
+        actMtrx = MatrixR064.FACTORY.copy(tmpQ);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
 
         // R
 
         expMtrx = SimpleQRCase.getFactorR();
-        actMtrx = RationalMatrix.FACTORY.copy(tmpR);
+        actMtrx = MatrixR064.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,8 +48,8 @@ public class Multiply {
     @Param({ "3", "4" })
     public int columns;
 
-    public Primitive64Matrix left;
-    public Primitive64Matrix right;
+    public MatrixR064 left;
+    public MatrixR064 right;
 
     @Benchmark
     public double hypot() {
@@ -57,7 +57,7 @@ public class Multiply {
     }
 
     @Benchmark
-    public Primitive64Matrix multiply() {
+    public MatrixR064 multiply() {
         return left.multiply(right);
     }
 
@@ -68,7 +68,7 @@ public class Multiply {
         BasicLogger.DEBUG.println("rows: " + rows);
         BasicLogger.DEBUG.println("complexity: " + complexity);
         BasicLogger.DEBUG.println("columns: " + columns);
-        left = Primitive64Matrix.FACTORY.makeFilled(rows, complexity, new Normal());
-        right = Primitive64Matrix.FACTORY.makeFilled(complexity, columns, new Normal());
+        left = MatrixR064.FACTORY.makeFilled(rows, complexity, new Normal());
+        right = MatrixR064.FACTORY.makeFilled(complexity, columns, new Normal());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,10 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
      */
     RawCholesky() {
         super();
+    }
+
+    public void btran(final PhysicalStore<Double> arg) {
+        this.doSolve(arg);
     }
 
     public Double calculateDeterminant(final Access2D<?> matrix) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,19 +37,19 @@ import org.ojalgo.TestUtils;
  */
 public class NumberListTest extends ArrayTests {
 
-    private static final Random RANDOM = new Random();
+    private static Random RANDOM = new Random();
 
     @Test
     public void testCompareWithArrayList() {
 
-        final NumberList<Double> primit64List = NumberList.factory(ArrayR064.FACTORY).make();
-        final NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
+        NumberList<Double> primit64List = NumberList.factory(ArrayR064.FACTORY).make();
+        NumberList<Double> direct64List = NumberList.factory(BufferArray.R064).make();
 
-        final List<Double> expectedList = new ArrayList<>();
+        List<Double> expectedList = new ArrayList<>();
 
         for (int c = 0; c < 10_000; c++) {
 
-            final Double value = RANDOM.nextDouble();
+            Double value = RANDOM.nextDouble();
 
             primit64List.add(value);
             direct64List.add(value);
@@ -58,8 +58,8 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            final int index = RANDOM.nextInt(10_000);
-            final Double value = RANDOM.nextDouble();
+            int index = RANDOM.nextInt(10_000);
+            Double value = RANDOM.nextDouble();
 
             primit64List.add(index, value);
             direct64List.add(index, value);
@@ -68,8 +68,8 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            final int index = RANDOM.nextInt(10_000);
-            final Double value = RANDOM.nextDouble();
+            int index = RANDOM.nextInt(10_000);
+            Double value = RANDOM.nextDouble();
 
             primit64List.set(index, value);
             direct64List.set(index, value);
@@ -78,15 +78,15 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            final int index = RANDOM.nextInt(10_000);
+            int index = RANDOM.nextInt(10_000);
 
             primit64List.remove(index);
             direct64List.remove(index);
             expectedList.remove(index);
         }
 
-        final Set<Double> toAdd = new HashSet<>();
-        final Set<Double> toRemove = new HashSet<>();
+        Set<Double> toAdd = new HashSet<>();
+        Set<Double> toRemove = new HashSet<>();
         for (int i = 0; i < 100; i++) {
             toAdd.add(RANDOM.nextDouble());
             toRemove.add(RANDOM.nextDouble());
@@ -113,11 +113,11 @@ public class NumberListTest extends ArrayTests {
     @Test
     public void testGrowCapacity() {
 
-        final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(ArrayR064.FACTORY);
-        final long initial = tmpStrategy.initial();
-        final long chunk = tmpStrategy.chunk();
+        GrowthStrategy tmpStrategy = GrowthStrategy.newInstance(ArrayR064.FACTORY);
+        long initial = tmpStrategy.initial();
+        long chunk = tmpStrategy.chunk();
 
-        final NumberList<Double> tmNumberList = NumberList.factory(ArrayR064.FACTORY).make();
+        NumberList<Double> tmNumberList = NumberList.factory(ArrayR064.FACTORY).make();
         TestUtils.assertEquals(0L, tmNumberList.count());
 
         for (long i = 0L; i <= initial; i++) {

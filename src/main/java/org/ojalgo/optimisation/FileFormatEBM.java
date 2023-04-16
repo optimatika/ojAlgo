@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2022 Optimatika
+ * Copyright 1997-2023 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ abstract class FileFormatEBM {
 
     private static Expression readExpression(final ExpressionsBasedModel model, final String[] fields) {
 
-        Expression expression = model.addExpression(fields[1]);
+        Expression expression = model.newExpression(fields[1]);
 
         FileFormatEBM.readModelEntity(expression, fields);
 
@@ -87,11 +87,15 @@ abstract class FileFormatEBM {
 
     private static void readVariable(final ExpressionsBasedModel model, final String[] fields) {
 
-        Variable variable = model.addVariable(fields[1]);
+        Variable variable = model.newVariable(fields[1]);
 
         FileFormatEBM.readModelEntity(variable, fields);
 
         variable.integer(Boolean.parseBoolean(fields[5]));
+
+        if (fields.length > 6 && fields[6].length() > 0) {
+            variable.setValue(new BigDecimal(fields[6]));
+        }
     }
 
     private static void writeExpression(final Expression expression, final BufferedWriter writer) throws IOException {
@@ -151,6 +155,11 @@ abstract class FileFormatEBM {
         FileFormatEBM.writeModelEntity(variable, writer);
         writer.write(ASCII.HT);
         writer.write(Boolean.toString(variable.isInteger()));
+        writer.write(ASCII.HT);
+        BigDecimal value = variable.getValue();
+        if (value != null) {
+            writer.write(value.toPlainString());
+        }
         writer.newLine();
     }
 
