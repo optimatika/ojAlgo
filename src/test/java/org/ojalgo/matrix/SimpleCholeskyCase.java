@@ -48,13 +48,11 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     }
 
     private static MatrixR064 getFactorL() {
-        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } })
-                .enforce(DEFINITION);
+        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
     }
 
     private static MatrixR064 getFactorR() {
-        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } })
-                .enforce(DEFINITION);
+        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
     }
 
     @Override

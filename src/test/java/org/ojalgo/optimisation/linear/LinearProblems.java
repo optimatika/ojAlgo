@@ -176,8 +176,8 @@ public class LinearProblems extends OptimisationLinearTests {
         BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
                 modEven.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpEvenResult).rows(someRows5)))));
         int[] someRows6 = { 0, 1, 2 };
-        BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
-                modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpOddResult).rows(someRows6)))));
+        BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils
+                .toBigDecimal(modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpOddResult).rows(someRows6)))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
         BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
                 modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpFullResult).rows(someRows7)))));

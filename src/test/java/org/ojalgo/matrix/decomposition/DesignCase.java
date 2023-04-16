@@ -74,8 +74,8 @@ public class DesignCase extends MatrixDecompositionTests {
         MatrixStore<Double> fat = Primitive64Store.FACTORY.makeFilled(5, 7, new Uniform());
 
         @SuppressWarnings("unchecked")
-        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.R064(true),
-                new QRDecomposition.R064(true), new SingularValueDecomposition.R064(true) };
+        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.R064(true), new QRDecomposition.R064(true),
+                new SingularValueDecomposition.R064(true) };
         for (EconomySize<Double> decomp : all) {
 
             String className = decomp.getClass().getName();

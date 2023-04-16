@@ -191,7 +191,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     static SimplexStore newInstance(final LinearStructure structure) {
-        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 1_000) {
+        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
             return new RevisedStore(structure);
         } else {
             return new TableauStore(structure);

@@ -56,8 +56,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     static MatrixFactory<?, ?, ?, ?>[] factories() {
-        return new MatrixFactory<?, ?, ?, ?>[] { MatrixR064.FACTORY, MatrixR032.FACTORY, MatrixR128.FACTORY, MatrixQ128.FACTORY,
-                MatrixC128.FACTORY, MatrixH256.FACTORY };
+        return new MatrixFactory<?, ?, ?, ?>[] { MatrixR064.FACTORY, MatrixR032.FACTORY, MatrixR128.FACTORY, MatrixQ128.FACTORY, MatrixC128.FACTORY,
+                MatrixH256.FACTORY };
     }
 
     MatrixR064 mtrxA;

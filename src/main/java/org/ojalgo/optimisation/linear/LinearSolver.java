@@ -708,9 +708,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     public static final ExpressionsBasedModel.Integration<LinearSolver> INTEGRATION = new ModelIntegration();
 
     /**
-     * An integration to a new/alternative/experimental LP-solver. That solver is intended to replace the
+     * An integration to a new/alternative/experimental LP-solver. This solver is intended to replace the
      * current solver, but is not yet ready to do that. You're welcome to try it - just add this integration
      * by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
+     * <p>
+     * With the next major release this solver/integration is expected to be the default, and there will no
+     * longer be an integration constant named "NEW_INTEGRATION". Possibly there will instead be one named
+     * "OLD_INTEGRATION".
      */
     public static final ExpressionsBasedModel.Integration<LinearSolver> NEW_INTEGRATION = new NewIntegration();
 
