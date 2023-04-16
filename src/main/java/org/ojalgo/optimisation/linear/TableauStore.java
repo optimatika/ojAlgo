@@ -386,10 +386,11 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
         List<Equation> retVal = new ArrayList<>();
 
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
         boolean[] negated = new boolean[integer.length];
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-            if (solution[j] < ZERO) {
+        for (int j = 0; j < negated.length; j++) {
+            if (this.isNegated(j)) {
                 negated[j] = true;
             }
         }
@@ -397,7 +398,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         for (int i = 0; i < m; i++) {
             int j = included[i];
 
-            double rhs = solution[j];
+            double rhs = constraintsRHS.doubleValue(i);
 
             if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
 
