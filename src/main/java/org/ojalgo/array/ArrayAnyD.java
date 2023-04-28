@@ -549,31 +549,31 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public Array2D<N> reduce(final int rowDimension, final int columnDimension, final Aggregator aggregator) {
+    public Array2D<N> reduce(final int rowDim, final int colDim, final Aggregator aggregator) {
 
         long[] structure = this.shape();
 
-        long numberOfRows = structure[rowDimension];
-        long numberOfColumns = structure[columnDimension];
+        long nbRows = structure[rowDim];
+        long nbCols = structure[colDim];
 
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
 
         boolean primitive = myDelegate.isPrimitive();
 
-        Array2D<N> retVal = myDelegate.factory().make(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
+        Array2D<N> retVal = myDelegate.factory().make(nbRows * nbCols).wrapInArray2D(nbRows);
 
-        for (long j = 0L; j < numberOfColumns; j++) {
-            long colInd = j;
+        for (long j = 0L; j < nbCols; j++) {
+            final long col = j;
 
-            for (long i = 0L; i < numberOfRows; i++) {
-                long rowInd = i;
+            for (long i = 0L; i < nbRows; i++) {
+                final long row = i;
 
                 visitor.reset();
-                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
+                this.loopReferences(reference -> reference[rowDim] == row && reference[colDim] == col, reference -> this.visitOne(reference, visitor));
                 if (primitive) {
-                    retVal.set(rowInd, colInd, visitor.doubleValue());
+                    retVal.set(row, col, visitor.doubleValue());
                 } else {
-                    retVal.set(rowInd, colInd, visitor.get());
+                    retVal.set(row, col, visitor.get());
                 }
             }
         }
@@ -783,4 +783,5 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     BasicArray<N> getDelegate() {
         return myDelegate;
     }
+
 }

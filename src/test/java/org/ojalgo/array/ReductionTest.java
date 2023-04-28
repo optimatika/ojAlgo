@@ -79,21 +79,25 @@ public class ReductionTest extends ArrayTests {
     @Test
     public void testAnyTo2D() {
 
-        final long[] structure = { 6, 5, 3, 4, 2, 1 };
+        long[] structure = { 6, 5, 3, 4, 2, 1 };
 
-        final double total = StructureAnyD.count(structure);
+        double total = StructureAnyD.count(structure);
 
-        final ArrayAnyD<Double> array = ArrayAnyD.R064.make(structure);
+        ArrayAnyD<Double> array = ArrayAnyD.R064.make(structure);
         array.fillAll(1.0);
 
         for (int rd = 0; rd < structure.length; rd++) {
             for (int cd = 0; cd < structure.length; cd++) {
                 if (rd != cd) {
-                    final Array2D<Double> reduced = array.reduce(rd, cd, Aggregator.SUM);
+
+                    Array2D<Double> reduced = array.reduce(rd, cd, Aggregator.SUM);
+
                     TestUtils.assertEquals(structure[rd], reduced.countRows());
                     TestUtils.assertEquals(structure[cd], reduced.countColumns());
                     TestUtils.assertEquals(structure[rd] * structure[cd], reduced.count());
-                    final double expected = total / (structure[rd] * structure[cd]);
+
+                    double expected = total / (structure[rd] * structure[cd]);
+
                     for (int i = 0; i < reduced.countRows(); i++) {
                         for (int j = 0; j < reduced.countColumns(); j++) {
                             TestUtils.assertEquals(expected, reduced.doubleValue(i, j));

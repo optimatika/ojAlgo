@@ -485,6 +485,30 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
+    private void loop(final int dim, final long[] reference, final Predicate<long[]> filter, final ReferenceCallback callback) {
+        for (long i = 0L, limit = this.count(dim); i < limit; i++) {
+            reference[dim] = i;
+            if (dim == 0) {
+                if (filter.test(reference)) {
+                    callback.call(reference);
+                }
+            } else {
+                this.loop(dim - 1, reference, filter, callback);
+            }
+        }
+    }
+
+    private void loop(final int dim, final long[] reference, final ReferenceCallback callback) {
+        for (long i = 0L, limit = this.count(dim); i < limit; i++) {
+            reference[dim] = i;
+            if (dim == 0) {
+                callback.call(reference);
+            } else {
+                this.loop(dim - 1, reference, callback);
+            }
+        }
+    }
+
     /**
      * count() == count(0) * count(1) * count(2) * count(3) * ...
      */
@@ -544,10 +568,14 @@ public interface StructureAnyD extends Structure1D {
         callback.call(first, limit, step);
     }
 
+    /**
+     * @deprecated v53 Use {@link #loopReferences(Predicate, ReferenceCallback)}
+     */
+    @Deprecated
     default void loop(final Predicate<long[]> filter, final IndexCallback callback) {
-        final long[] structure = this.shape();
+        long[] structure = this.shape();
         for (long i = 0L, limit = this.count(); i < limit; i++) {
-            final long[] reference = StructureAnyD.reference(i, structure);
+            long[] reference = StructureAnyD.reference(i, structure);
             if (filter.test(reference)) {
                 callback.call(i);
             }
@@ -556,19 +584,16 @@ public interface StructureAnyD extends Structure1D {
 
     default void loopAllReferences(final ReferenceCallback callback) {
 
-        long[] shape = this.shape();
+        long[] reference = new long[this.rank()];
 
-        long totalCount = this.count();
-        long firstCount = this.count(0);
-        long repetitionsCount = totalCount / firstCount;
+        this.loop(reference.length - 1, reference, callback);
+    }
 
-        for (long r = 0L; r < repetitionsCount; r++) {
-            long[] reference = StructureAnyD.reference(r * firstCount, shape);
-            for (long i = 0L; i < firstCount; i++) {
-                callback.call(reference);
-                reference[0]++;
-            }
-        }
+    default void loopReferences(final Predicate<long[]> filter, final ReferenceCallback callback) {
+
+        long[] reference = new long[this.rank()];
+
+        this.loop(reference.length - 1, reference, filter, callback);
     }
 
     /**

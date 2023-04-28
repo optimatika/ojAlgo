@@ -43,6 +43,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             return Double.valueOf(this.invoke(arg1.doubleValue(), arg2.doubleValue()));
         }
 
+        default Double invoke(final Double arg1, final double arg2) {
+            return Double.valueOf(this.invoke(arg1.doubleValue(), arg2));
+        }
+
     }
 
     @FunctionalInterface
