@@ -83,7 +83,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
 
     private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext DEGENERATE = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
-    private static final NumberContext PHASE1 = NumberContext.of(12, 7).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext PHASE1 = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext PIVOT = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext RATIO = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext WEIGHT = NumberContext.of(8, 10).withMode(RoundingMode.HALF_DOWN);

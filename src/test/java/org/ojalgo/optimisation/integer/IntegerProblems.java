@@ -36,9 +36,96 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearProblems;
 import org.ojalgo.type.context.NumberContext;
 
 public class IntegerProblems extends OptimisationIntegerTests {
+
+    /**
+     * <pre>
+     * OPTIMAL -97.59 @ { 0, 1, 0, 1, 0, 1, 1, 0 }
+     * ############################################
+     * 0 <= X0: 0 (-4836) <= 1
+     * 0 <= X1: 1 (-4824) <= 1
+     * 0 <= X2: 0 (1921) <= 1
+     * 0 <= X3: 1 (1929.9) <= 1
+     * 0 <= X4: 0 (2517) <= 1
+     * 0 <= X5: 1 (2526.51) <= 1
+     * 0 <= X6: 1 (270) <= 1
+     * 0 <= X7: 0 (267.5) <= 1
+     * 1 <= EXPR2: 1.0 <= 1
+     * 1 <= EXPR1: 1.0 <= 1
+     * 1 <= EXPR3: 1.0 <= 1
+     * 1 <= EXPR0: 1.0 <= 1
+     * ############################################
+     * </pre>
+     */
+    public static ExpressionsBasedModel makeModelGitHub513() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable varA1 = model.addVariable().weight(-4836.0).binary();
+        Variable varA2 = model.addVariable().weight(-4824.0).binary();
+        Variable varB1 = model.addVariable().weight(1921.0).binary();
+        Variable varB2 = model.addVariable().weight(1929.9).binary();
+        Variable varC1 = model.addVariable().weight(2517.0).binary();
+        Variable varC2 = model.addVariable().weight(2526.51).binary();
+        Variable varD1 = model.addVariable().weight(270.0).binary();
+        Variable varD2 = model.addVariable().weight(267.5).binary();
+
+        varA1.setValue(0);
+        varA2.setValue(1);
+        varB1.setValue(0);
+        varB2.setValue(1);
+        varC1.setValue(0);
+        varC2.setValue(1);
+        varD1.setValue(1);
+        varD2.setValue(0);
+
+        Expression constraintA = model.addExpression().level(1);
+        constraintA.set(varA1, 1);
+        constraintA.set(varA2, 1);
+        Expression constraintB = model.addExpression().level(1);
+        constraintB.set(varB1, 1);
+        constraintB.set(varB2, 1);
+        Expression constraintC = model.addExpression().level(1);
+        constraintC.set(varC1, 1);
+        constraintC.set(varC2, 1);
+        Expression constraintD = model.addExpression().level(1);
+        constraintD.set(varD1, 1);
+        constraintD.set(varD2, 1);
+
+        return model;
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/discussions/513
+     * <p>
+     * There was a case when the `IntegerSolver` returned an incorrect solution (constraint breaking) but
+     * reported it to be optimal. It was actually the `LinearSolver` that malfunctioned, but behaviour in the
+     * `IntegerSolver` that generated the problematic node model. Fixed this problem by 1) making sure the
+     * `LinearSolver` handles that case, and 2) altered the problematic behaviour in the `IntegerSolver` to be
+     * "safer".
+     *
+     * @see LinearProblems#testGitHub513()
+     */
+    @Test
+    public void testGitHub513() {
+
+        ExpressionsBasedModel model = IntegerProblems.makeModelGitHub513();
+
+        Result expected = Result.of(-97.59, State.OPTIMAL, 0, 1, 0, 1, 0, 1, 1, 0);
+
+        Result actual = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(actual);
+            BasicLogger.debug(model);
+            model.validate(actual, BasicLogger.DEBUG);
+        }
+
+        TestUtils.assertStateAndSolution(expected, actual);
+    }
 
     /**
      * 20120227: Forgot to document what the problem was. Now I just check there is an optimal solution.
@@ -71,8 +158,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20111010() {
 
-        Variable[] tmpVariables = new Variable[] { Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE),
-                Variable.makeBinary("Z").weight(ONE) };
+        Variable[] tmpVariables = { Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE), Variable.makeBinary("Z").weight(ONE) };
 
         ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
@@ -129,7 +215,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20130409a() {
 
-        Variable[] variables = new Variable[] { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
+        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
                 new Variable("x2014").lower(BigMath.ZERO).integer() };
 
         ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
