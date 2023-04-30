@@ -1,0 +1,116 @@
+
+class GomoryMixedIntegerCuts
+ojAlgo
+2023-04-30
+
+The model to solve
+############################################
+0 <= x1 (-6)
+0 <= x2 (-5)
+EXPR1: 0.0 <= 5
+EXPR0: 0.0 <= 11
+############################################
+
+
+Solve with progress output
+
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=0, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=0, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 1: { 2.428571428571429, 3.7142857142857144 }
+
+2.428571428571429 ! Integer: x1
+[true, true, true, true, true, true] NumberContext 12:8 HALF_EVEN 0.01
+4x2 Sol/RHS: { 0.5714285714285714, 3.7142857142857144, 2.428571428571429, 0.2857142857142858 }
+    { 0.0, 1.0, 0.42857142857142855, 0.1428571428571429, 0.0, 0.0 } 1 -> 3.7142857142857144 0.01 [true, true, true, true, true, true]
+    f0 <-> cf0: 0.7142857142857144 <-> 0.2857142857142856
+    => { 0.0, 0.0, 0.5999999999999999, 0.20000000000000004, 0.0, 0.0 }
+    { 1.0, 0.0, -0.14285714285714285, 0.2857142857142857, 0.0, 0.0 } 0 -> 2.428571428571429 0.01 [true, true, true, true, true, true]
+    f0 <-> cf0: 0.4285714285714288 <-> 0.5714285714285712
+    => { 0.0, 0.0, 0.25, 0.6666666666666662, 0.0, 0.0 }
+Eq: CUT_GMI_1_1 1: { 0.0, 0.0, 0.5999999999999999, 0.20000000000000004, 0.0, 0.0 } = 1.0
+Cut: -4.2 <= CUT_GMI_1_1 := [0=-2.2E-16, 1=-1.39999999999999984]
+    Largest=1.39999999999999984, Smallest=1.39999999999999984, Ratio=1: -4.2 < -5.199999999962857302857142856
+    -4.2 <= CUT_GMI_1_1
+    -4.2 < [1=-1.39999999999]
+CUT_GMI_1_1: -4.2 < [1=-1.39999999999]
+Eq: CUT_GMI_0_2 0: { 0.0, 0.0, 0.25, 0.6666666666666662, 0.0, 0.0 } = 1.0
+Cut: -7.58333 <= CUT_GMI_0_2 := [0=-1.7499999999999986, 1=-1.1666666666666662]
+    Largest=1.7499999999999986, Smallest=1.1666666666666662, Ratio=1.4999999999999993999999999999997599999999999999039999999999999616000000: -7.58333333334 < -8.583333333284286597619047614
+    -7.58333 <= CUT_GMI_0_2
+    -7.58333333334 < [0=-1.74999999999, 1=-1.16666666666]
+CUT_GMI_0_2: -7.58333333334 < [0=-1.74999999999, 1=-1.16666666666]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=2, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 2: { 2.3333333333619044, 3.0 }
+
+2.3333333333619044 ! Integer: x1
+[true, true, true, true, false, true, true] NumberContext 12:8 HALF_EVEN 0.01
+5x2 Sol/RHS: { 1.3333333333619044, 3.0, 0.6666666666380955, 2.3333333333619044, 0.9999999999142865 }
+    { 1.0, 0.0, 0.0, 0.0, 0.571428571431837, 0.0, -0.6666666666666667 } 0 -> 2.3333333333619044 0.01 [true, true, true, true, false, true, true]
+    f0 <-> cf0: 0.3333333333619044 <-> 0.6666666666380956
+    => { 0.0, 0.0, 0.0, 0.0, 1.7142857141485741, 0.0, 0.9999999999142866 }
+Eq: CUT_GMI_0_3 0: { 0.0, 0.0, 0.0, 0.0, 1.7142857141485741, 0.0, 0.9999999999142866 } = 1.0
+Cut: -15 <= CUT_GMI_0_3 := [0=-2.999999999742861817858514259, 1=-2.999999999742861145239009506]
+    Largest=2.999999999742861817858514259, Smallest=2.999999999742861145239009506, Ratio=1.0000000000000002242065016035507343507684048583709623774478530884592584: -14.9999999988 < -15.999999998699046533325904856
+    -15 <= CUT_GMI_0_3
+    -14.9999999988 < [0=-2.99999999974, 1=-2.99999999974]
+CUT_GMI_0_3: -14.9999999988 < [0=-2.99999999974, 1=-2.99999999974]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=3, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 3: { 2.9999999999833333, 2.00000000005 }
+
+OPTIMAL -28.0 @ { 3, 2 }
+
+
+Solve again with more detailed debug output
+
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=0, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=0, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 1: { 2.428571428571429, 3.7142857142857144 }
+
+2.428571428571429 ! Integer: x1
+[true, true, true, true, true, true] NumberContext 12:8 HALF_EVEN 0.01
+4x2 Sol/RHS: { 0.5714285714285714, 3.7142857142857144, 2.428571428571429, 0.2857142857142858 }
+    { 0.0, 1.0, 0.42857142857142855, 0.1428571428571429, 0.0, 0.0 } 1 -> 3.7142857142857144 0.01 [true, true, true, true, true, true]
+    f0 <-> cf0: 0.7142857142857144 <-> 0.2857142857142856
+    => { 0.0, 0.0, 0.5999999999999999, 0.20000000000000004, 0.0, 0.0 }
+    { 1.0, 0.0, -0.14285714285714285, 0.2857142857142857, 0.0, 0.0 } 0 -> 2.428571428571429 0.01 [true, true, true, true, true, true]
+    f0 <-> cf0: 0.4285714285714288 <-> 0.5714285714285712
+    => { 0.0, 0.0, 0.25, 0.6666666666666662, 0.0, 0.0 }
+Eq: CUT_GMI_1_4 1: { 0.0, 0.0, 0.5999999999999999, 0.20000000000000004, 0.0, 0.0 } = 1.0
+Cut: -4.2 <= CUT_GMI_1_4 := [0=-2.2E-16, 1=-1.39999999999999984]
+    Largest=1.39999999999999984, Smallest=1.39999999999999984, Ratio=1: -4.2 < -5.199999999962857302857142856
+    -4.2 <= CUT_GMI_1_4
+    -4.2 < [1=-1.39999999999]
+CUT_GMI_1_4: -4.2 < [1=-1.39999999999]
+Eq: CUT_GMI_0_5 0: { 0.0, 0.0, 0.25, 0.6666666666666662, 0.0, 0.0 } = 1.0
+Cut: -7.58333 <= CUT_GMI_0_5 := [0=-1.7499999999999986, 1=-1.1666666666666662]
+    Largest=1.7499999999999986, Smallest=1.1666666666666662, Ratio=1.4999999999999993999999999999997599999999999999039999999999999616000000: -7.58333333334 < -8.583333333284286597619047614
+    -7.58333 <= CUT_GMI_0_5
+    -7.58333333334 < [0=-1.74999999999, 1=-1.16666666666]
+CUT_GMI_0_5: -7.58333333334 < [0=-1.74999999999, 1=-1.16666666666]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=2, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 2: { 2.3333333333619044, 3.0 }
+
+2.3333333333619044 ! Integer: x1
+[true, true, true, true, false, true, true] NumberContext 12:8 HALF_EVEN 0.01
+5x2 Sol/RHS: { 1.3333333333619044, 3.0, 0.6666666666380955, 2.3333333333619044, 0.9999999999142865 }
+    { 1.0, 0.0, 0.0, 0.0, 0.571428571431837, 0.0, -0.6666666666666667 } 0 -> 2.3333333333619044 0.01 [true, true, true, true, false, true, true]
+    f0 <-> cf0: 0.3333333333619044 <-> 0.6666666666380956
+    => { 0.0, 0.0, 0.0, 0.0, 1.7142857141485741, 0.0, 0.9999999999142866 }
+Eq: CUT_GMI_0_6 0: { 0.0, 0.0, 0.0, 0.0, 1.7142857141485741, 0.0, 0.9999999999142866 } = 1.0
+Cut: -15 <= CUT_GMI_0_6 := [0=-2.999999999742861817858514259, 1=-2.999999999742861145239009506]
+    Largest=2.999999999742861817858514259, Smallest=2.999999999742861145239009506, Ratio=1.0000000000000002242065016035507343507684048583709623774478530884592584: -14.9999999988 < -15.999999998699046533325904856
+    -15 <= CUT_GMI_0_6
+    -14.9999999988 < [0=-2.99999999974, 1=-2.99999999974]
+CUT_GMI_0_6: -14.9999999988 < [0=-2.99999999974, 1=-2.99999999974]
+Description [nbEqualityBounds=0, nbEqualityConstraints=0, nbIntegerVariables=2, nbLowerBounds=2, nbLowerConstraints=3, nbNegativeVariables=0, nbPositiveVariables=2, nbUpperBounds=2, nbUpperConstraints=2, nbVariables=2]
+Iteration 3: { 2.9999999999833333, 2.00000000005 }
+
+OPTIMAL -28.0 @ { 3, 2 }
+
+############################################
+0 <= x1: 3 (-6) <= 3
+0 <= x2: 2 (-5) <= 4
+EXPR1: 1.0 <= 5
+EXPR0: 11.0 <= 11
+############################################
+

@@ -48,7 +48,7 @@ public final class NodeSolver extends IntermediateSolver {
     private static final NumberContext PRECISION = NumberContext.of(12);
     private static final NumberContext COEFFICIENT = PRECISION.withMode(RoundingMode.CEILING);
     private static final AtomicInteger COUNTER = new AtomicInteger();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final NumberContext DYNANISM = NumberContext.of(8);
     private static final NumberContext LIMIT = PRECISION.withMode(RoundingMode.FLOOR);
     private static final NumberContext PARAMETERS = NumberContext.of(12);

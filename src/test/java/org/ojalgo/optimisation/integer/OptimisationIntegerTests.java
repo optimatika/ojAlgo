@@ -28,6 +28,6 @@ package org.ojalgo.optimisation.integer;
  */
 public abstract class OptimisationIntegerTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
 }
