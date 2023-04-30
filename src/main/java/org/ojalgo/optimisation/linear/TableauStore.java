@@ -380,29 +380,28 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final NumberContext tolerance, final double fractionality) {
 
-        // TODO Needs to be generalised to also handle cases with negative (full range) variables
-
-        // BasicLogger.debug("{} {} {}", Arrays.toString(integer), accuracy, fractionality);
-
-        int nbConstraints = this.countConstraints();
-        int nbProblemVariables = meta.countModelVariables();
-
-        Primitive1D constraintsRHS = this.constraintsRHS();
-
-        // BasicLogger.debug("{}x{}: {}", nbConstraints, nbProblemVariables, constraintsRHS);
+        int nbModVars = meta.countModelVariables();
 
         List<Equation> retVal = new ArrayList<>();
 
-        for (int i = 0; i < nbConstraints; i++) {
-            int variableIndex = this.getBasisColumnIndex(i);
+        boolean[] negated = new boolean[integer.length];
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+            if (solution[j] < ZERO) {
+                negated[j] = true;
+            }
+        }
 
-            double rhs = constraintsRHS.doubleValue(i);
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
 
-            if (variableIndex >= 0 && variableIndex < nbProblemVariables && integer[variableIndex] && !accuracy.isInteger(rhs)) {
+            double rhs = solution[j];
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), variableIndex, rhs, integer, fractionality);
+            if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated);
 
                 if (maybe != null) {
                     retVal.add(maybe);

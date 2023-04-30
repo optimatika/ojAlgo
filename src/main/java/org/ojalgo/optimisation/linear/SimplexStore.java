@@ -218,11 +218,11 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      * The number of constraints (upper, lower and equality)
      */
     final int m;
+    final LinearStructure meta;
     /**
      * The number of variables (all kinds)
      */
     final int n;
-    final LinearStructure meta;
 
     SimplexStore(final LinearStructure structure) {
 
@@ -350,6 +350,18 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     abstract double extractValue();
+
+    /**
+     * Generate a collection of cut candidates, from the current state (of the tableau).
+     *
+     * @param solution Current (iteration) solution
+     * @param integer Are the variables defined as integer or not?
+     * @param tolerance To determine if an ineteger variable value actually is integer or not.
+     * @param fractionality How far "away" from an integer value a tableau row (variable value) must be to be
+     *        used as a potential cut
+     * @return A collection of potential cuts
+     */
+    abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, NumberContext tolerance, double fractionality);
 
     ColumnState getColumnState(final int index) {
         return myPartition.get(index);
@@ -551,7 +563,5 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }
-
-    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
 
 }

@@ -445,6 +445,21 @@ public final class Expression extends ModelEntity<Expression> {
         return this.get(key, adjusted).doubleValue();
     }
 
+    public void enforce(final NumberContext enforcer) {
+
+        myLinear.replaceAll((key, value) -> enforcer.enforce(value));
+
+        myQuadratic.replaceAll((key, value) -> enforcer.enforce(value));
+
+        if (this.isLowerLimitSet()) {
+            this.lower(enforcer.withMode(RoundingMode.FLOOR).enforce(this.getLowerLimit()));
+        }
+
+        if (this.isUpperLimitSet()) {
+            this.upper(enforcer.withMode(RoundingMode.CEILING).enforce(this.getUpperLimit()));
+        }
+    }
+
     public BigDecimal evaluate(final Access1D<BigDecimal> point) {
 
         BigDecimal retVal = this.getConstant();

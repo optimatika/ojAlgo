@@ -34,11 +34,12 @@ abstract class TableauCutGenerator {
         return value - Math.floor(value);
     }
 
-    private static boolean ifFractionalEnough(final double value, final double fraction, final double away) {
+    private static boolean isFractionalEnough(final double value, final double fraction, final double away) {
         if (ACCURACY.isSmall(value, Math.min(fraction, ONE - fraction))) {
             return false;
+        } else {
+            return away < fraction && fraction < ONE - away;
         }
-        return away < fraction && fraction < ONE - away;
     }
 
     /**
@@ -49,7 +50,7 @@ abstract class TableauCutGenerator {
         int nbVariables = body.size();
 
         double f0 = TableauCutGenerator.fraction(rhs);
-        if (!TableauCutGenerator.ifFractionalEnough(rhs, f0, fractionality)) {
+        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
 
@@ -71,17 +72,15 @@ abstract class TableauCutGenerator {
         return Equation.of(ONE, variableIndex, cut);
     }
 
-    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer,
-            final double fractionality) {
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer, final double fractionality,
+            final boolean[] negated) {
 
-        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+        // BasicLogger.debug(1, "{} {} -> {} {} {}", body, variableIndex, rhs, fractionality, Arrays.toString(integer));
 
-        // BasicLogger.debug(1, "{} {} -> {} {} {}", body, variableIndex, rhs, Arrays.toString(integer), fractionality);
-
-        int nbVariables = body.size();
+        int nbVariables = integer.length;
 
         double f0 = TableauCutGenerator.fraction(rhs);
-        if (!TableauCutGenerator.ifFractionalEnough(rhs, f0, fractionality)) {
+        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
         double cf0 = ONE - f0;
@@ -90,7 +89,7 @@ abstract class TableauCutGenerator {
 
         for (int j = 0; j < nbVariables; j++) {
 
-            double aj = body.doubleValue(j);
+            double aj = negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
 
             if (j != variableIndex && !ACCURACY.isZero(aj)) {
 

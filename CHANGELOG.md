@@ -23,6 +23,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - More efficient implementation of `reduce(int,int,Aggregator)` in `ArrayAnyD` (reduce to a 2D structure).
 
+#### org.ojalgo.optimisation
+
+- Tweaked how the MIP cut generation works.
+
 #### org.ojalgo.structure
 
 - Deprecated `loop(Predicate<long[]>,IndexCallback)` in favour of the new `loopReferences(Predicate<long[]>,ReferenceCallback)` method in `StructureAnyD`.

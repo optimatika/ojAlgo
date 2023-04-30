@@ -1035,7 +1035,10 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
-        return mySimplex.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
+
+        double[] solution = this.extractSolution();
+
+        return mySimplex.generateCutCandidates(solution, integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
 }

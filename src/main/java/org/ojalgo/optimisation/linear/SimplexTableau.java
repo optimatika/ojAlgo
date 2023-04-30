@@ -1243,25 +1243,23 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
-        // BasicLogger.debug("{} {} {}", Arrays.toString(integer), accuracy, fractionality);
-
-        int nbConstraints = this.countConstraints();
-        int nbProblemVariables = this.countProblemVariables();
+        int m = this.countConstraints();
+        int nbModVars = this.countProblemVariables();
 
         Primitive1D constraintsRHS = this.constraintsRHS();
 
-        // BasicLogger.debug("{}x{}: {}", nbConstraints, nbProblemVariables, constraintsRHS);
-
         List<Equation> retVal = new ArrayList<>();
 
-        for (int i = 0; i < nbConstraints; i++) {
-            int variableIndex = this.getBasisColumnIndex(i);
+        boolean[] negated = new boolean[integer.length];
+
+        for (int i = 0; i < m; i++) {
+            int j = this.getBasisColumnIndex(i);
 
             double rhs = constraintsRHS.doubleValue(i);
 
-            if (variableIndex >= 0 && variableIndex < nbProblemVariables && integer[variableIndex] && !accuracy.isInteger(rhs)) {
+            if (j >= 0 && j < nbModVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), variableIndex, rhs, integer, fractionality);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated);
 
                 if (maybe != null) {
                     retVal.add(maybe);

@@ -321,7 +321,7 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final NumberContext tolerance, final double fractionality) {
         return Collections.emptySet();
     }
 

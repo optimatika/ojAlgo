@@ -121,6 +121,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         public final int nbUpperConstraints;
         public final int nbVariables;
 
+        @Override
+        public String toString() {
+            return "Description [nbEqualityBounds=" + nbEqualityBounds + ", nbEqualityConstraints=" + nbEqualityConstraints + ", nbIntegerVariables="
+                    + nbIntegerVariables + ", nbLowerBounds=" + nbLowerBounds + ", nbLowerConstraints=" + nbLowerConstraints + ", nbNegativeVariables="
+                    + nbNegativeVariables + ", nbPositiveVariables=" + nbPositiveVariables + ", nbUpperBounds=" + nbUpperBounds + ", nbUpperConstraints="
+                    + nbUpperConstraints + ", nbVariables=" + nbVariables + "]";
+        }
+
         Description(final int varTotal, final int varPositive, final int varNegative, final int varInteger, final int nbLoBound, final int nbUpBound,
                 final int nbEqBound, final int nbLoCnstr, final int nbUpCnstr, final int nbEqCnstr) {
 

@@ -60,9 +60,6 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         };
 
-        boolean[] integer = new boolean[factors.length];
-        Arrays.fill(integer, true);
-
         return TableauCutGenerator.doGomory(body, 0, rhs, PrimitiveMath.ELEVENTH);
     }
 
@@ -89,8 +86,9 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
 
         boolean[] integer = new boolean[factors.length];
         Arrays.fill(integer, true);
+        boolean[] negated = new boolean[factors.length];
 
-        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH);
+        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH, negated);
     }
 
     /**
