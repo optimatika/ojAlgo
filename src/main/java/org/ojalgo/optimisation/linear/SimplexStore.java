@@ -117,8 +117,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
 
         S simplex = storeFactory.apply(structure);
-        LinearStructure meta = simplex.meta;
-
         double[] lowerBounds = simplex.getLowerBounds();
         double[] upperBounds = simplex.getUpperBounds();
 
@@ -137,7 +135,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(i, expression.getUpperLimit(true, POSITIVE_INFINITY));
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
-            meta.slack[i] = EntryPair.of(expression, ConstraintType.UPPER);
+            structure.slack[i] = EntryPair.of(expression, ConstraintType.UPPER);
         }
 
         for (int i = 0; i < nbLoConstr; i++) {
@@ -151,7 +149,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(nbUpConstr + i, expression.getLowerLimit(true, NEGATIVE_INFINITY));
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
-            meta.slack[nbUpConstr + i] = EntryPair.of(expression, ConstraintType.LOWER);
+            structure.slack[nbUpConstr + i] = EntryPair.of(expression, ConstraintType.LOWER);
         }
 
         for (int i = 0; i < nbEqConstr; i++) {
@@ -218,7 +216,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      * The number of constraints (upper, lower and equality)
      */
     final int m;
-    final LinearStructure meta;
+
     /**
      * The number of variables (all kinds)
      */
@@ -243,7 +241,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         }
 
         myStructure = structure;
-        meta = structure; // TODO Don't need both of these
     }
 
     public int countAdditionalConstraints() {
@@ -438,6 +435,10 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     abstract double getReducedCost(int je);
+
+    LinearStructure getStructure() {
+        return myStructure;
+    }
 
     abstract double getTableauElement(ExitInfo exit, int je);
 

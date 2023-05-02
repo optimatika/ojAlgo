@@ -382,7 +382,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     @Override
     Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final NumberContext tolerance, final double fractionality) {
 
-        int nbModVars = meta.countModelVariables();
+        int nbModVars = this.getStructure().countModelVariables();
 
         List<Equation> retVal = new ArrayList<>();
 

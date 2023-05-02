@@ -301,7 +301,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     public EntityMap getEntityMap() {
-        return mySimplex.meta;
+        return mySimplex.getStructure();
     }
 
     private double[] extractSolution() {

@@ -536,18 +536,18 @@ public abstract class MissingMath {
 
         BigDecimal retVal;
 
-        BigDecimal tmpPlus = BigMath.EXP.invoke(arg);
-        BigDecimal tmpMinus = BigMath.EXP.invoke(arg.negate());
+        BigDecimal plus = BigMath.EXP.invoke(arg);
+        BigDecimal minus = BigMath.EXP.invoke(arg.negate());
 
-        BigDecimal tmpDividend = tmpPlus.subtract(tmpMinus);
-        BigDecimal tmpDivisor = tmpPlus.add(tmpMinus);
+        BigDecimal dividend = plus.subtract(minus);
+        BigDecimal divisor = plus.add(minus);
 
-        if (tmpDividend.equals(tmpDivisor)) {
+        if (dividend.equals(divisor)) {
             retVal = BigDecimal.ONE;
-        } else if (tmpDividend.equals(tmpDivisor.negate())) {
+        } else if (dividend.equals(divisor.negate())) {
             retVal = BigDecimal.ONE.negate();
         } else {
-            retVal = BigMath.DIVIDE.apply(tmpDividend, tmpDivisor);
+            retVal = BigMath.DIVIDE.apply(dividend, divisor);
         }
 
         return retVal;
