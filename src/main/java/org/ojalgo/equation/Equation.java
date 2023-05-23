@@ -41,7 +41,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.dense(pivot, cols, ArrayR064.FACTORY);
     }
 
-    public static Equation dense(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
+    public static <N extends Comparable<N>> Equation dense(final int pivot, final int cols, final DenseArray.Factory<N> factory) {
         return new Equation(factory.make(cols), pivot, ZERO);
     }
 
@@ -49,7 +49,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.denseSystem(rows, cols, ArrayR064.FACTORY);
     }
 
-    public static List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
+    public static <N extends Comparable<N>> List<Equation> denseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory) {
 
         List<Equation> system = new ArrayList<>(rows);
 
@@ -68,12 +68,12 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparse(pivot, cols, ArrayR064.FACTORY);
     }
 
-    public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory) {
-        return new Equation(SparseArray.factory(factory).limit(cols).make(), pivot, ZERO);
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N> factory) {
+        return new Equation(SparseArray.factory(factory).make(cols), pivot, ZERO);
     }
 
-    public static Equation sparse(final int pivot, final int cols, final DenseArray.Factory<Double> factory, final int numberOfNonzeros) {
-        return new Equation(SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), pivot, ZERO);
+    public static <N extends Comparable<N>> Equation sparse(final int pivot, final int cols, final DenseArray.Factory<N> factory, final int numberOfNonzeros) {
+        return new Equation(SparseArray.factory(factory).initial(numberOfNonzeros).make(cols), pivot, ZERO);
     }
 
     public static Equation sparse(final int pivot, final int cols, final int numberOfNonzeros) {
@@ -84,23 +84,24 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY);
     }
 
-    public static List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory) {
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory) {
 
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(SparseArray.factory(factory).limit(cols).make(), i, ZERO));
+            system.add(new Equation(SparseArray.factory(factory).make(cols), i, ZERO));
         }
 
         return system;
     }
 
-    public static List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<Double> factory, final int numberOfNonzeros) {
+    public static <N extends Comparable<N>> List<Equation> sparseSystem(final int rows, final int cols, final DenseArray.Factory<N> factory,
+            final int numberOfNonzeros) {
 
         List<Equation> system = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            system.add(new Equation(SparseArray.factory(factory).limit(cols).initial(numberOfNonzeros).make(), i, ZERO));
+            system.add(new Equation(SparseArray.factory(factory).initial(numberOfNonzeros).make(cols), i, ZERO));
         }
 
         return system;
@@ -110,7 +111,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return Equation.sparseSystem(rows, cols, ArrayR064.FACTORY, numberOfNonzeros);
     }
 
-    public static Equation wrap(final BasicArray<Double> body, final int pivot, final double rhs) {
+    public static Equation wrap(final BasicArray<?> body, final int pivot, final double rhs) {
         return new Equation(body, pivot, rhs);
     }
 
@@ -121,7 +122,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     /**
      * The (nonzero) elements of this equation/row
      */
-    private final BasicArray<Double> myBody;
+    private final BasicArray<?> myBody;
     private double myPivot = ZERO;
     private double myRHS;
 
@@ -130,10 +131,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      */
     @Deprecated
     public Equation(final int row, final long numberOfColumns, final double rhs) {
-        this(SparseArray.factory(ArrayR064.FACTORY).limit(numberOfColumns).make(), row, rhs);
+        this(SparseArray.factory(ArrayR064.FACTORY).make(numberOfColumns), row, rhs);
     }
 
-    Equation(final BasicArray<Double> body, final int pivot, final double rhs) {
+    Equation(final BasicArray<?> body, final int pivot, final double rhs) {
 
         super();
 
@@ -141,7 +142,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         myRHS = rhs;
 
         index = pivot;
-        myPivot = ZERO;
+        myPivot = myBody.doubleValue(pivot);
     }
 
     public void add(final long ind, final Comparable<?> addend) {
@@ -198,10 +199,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     }
 
     public Double get(final long ind) {
-        return myBody.get(ind);
+        return Double.valueOf(myBody.doubleValue(ind));
     }
 
-    public BasicArray<Double> getBody() {
+    public BasicArray<?> getBody() {
         return myBody;
     }
 
@@ -231,9 +232,11 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     }
 
     public void modifyOne(final long ind, final UnaryFunction<Double> modifier) {
-        myBody.modifyOne(ind, modifier);
+        double value = myBody.doubleValue(ind);
+        value = modifier.invoke(value);
+        myBody.set(ind, value);
         if (ind == index) {
-            myPivot = myBody.doubleValue(ind);
+            myPivot = value;
         }
     }
 

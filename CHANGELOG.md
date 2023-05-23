@@ -23,6 +23,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - More efficient implementation of `reduce(int,int,Aggregator)` in `ArrayAnyD` (reduce to a 2D structure).
 
+#### org.ojalgo.equation
+
+- Changed the internal (equation body) delegate type from `BasicArray<Double>` to `BasicArray<?>`. The only resulting (breaking) API change is the return type of the `getBody()` method.
+
+#### org.ojalgo.matrix
+
+- More efficient setup of the `IterativeSolverTask.SparseDelegate` solvers when the equation system body is any kind of sparse `MatrixStore`.
+
 #### org.ojalgo.optimisation
 
 - Tweaked how the MIP cut generation works.

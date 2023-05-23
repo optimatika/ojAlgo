@@ -159,7 +159,7 @@ final class IterativeASS extends ActiveSetSolver {
             Equation rowI = myIterationRows[i];
             if (rowI != null) {
                 this.remove(rowI);
-                myEquationBodyPool.giveBack(rowI.getBody());
+                myEquationBodyPool.giveBack((BasicArray<Double>) rowI.getBody());
             }
             myIterationRows[i] = null;
 
