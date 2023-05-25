@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -116,7 +115,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                     Expression cut = target.newExpression(name);
 
-                    cut.lower(equation.getRHS() < PrimitiveMath.ZERO ? BigMath.NEG : BigMath.ONE);
+                    cut.lower(BigMath.ONE);
 
                     for (int j = 0; j < nbProblVars; j++) {
                         int mj = entityMap.indexOf(j);

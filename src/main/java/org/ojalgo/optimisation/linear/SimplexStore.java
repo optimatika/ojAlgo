@@ -169,7 +169,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             Variable variable = freeVariables.get(i);
             lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
             upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
-            structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
@@ -190,7 +189,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     static SimplexStore newInstance(final LinearStructure structure) {
-        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
+        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
             return new RevisedStore(structure);
         } else {
             return new TableauStore(structure);
@@ -467,14 +466,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             return ub - xi;
         } else {
             return ZERO;
-        }
-    }
-
-    boolean isNegated(final int j) {
-        if ((myUpperBounds[j] <= ZERO) && (myLowerBounds[j] < ZERO)) {
-            return true;
-        } else {
-            return false;
         }
     }
 

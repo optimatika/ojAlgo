@@ -79,9 +79,7 @@ abstract class TableauCutGenerator {
 
         int nbVariables = integer.length;
 
-        boolean negateRHS = negated[variableIndex];
-
-        double f0 = TableauCutGenerator.fraction(negateRHS ? rhs : rhs);
+        double f0 = TableauCutGenerator.fraction(rhs);
         if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
@@ -91,7 +89,7 @@ abstract class TableauCutGenerator {
 
         for (int j = 0; j < nbVariables; j++) {
 
-            double aj = negateRHS ^ negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
+            double aj = negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
 
             if (j != variableIndex && !ACCURACY.isZero(aj)) {
 
@@ -118,7 +116,7 @@ abstract class TableauCutGenerator {
             }
         }
 
-        return Equation.of(negateRHS ? NEG : ONE, variableIndex, cut);
+        return Equation.of(ONE, variableIndex, cut);
     }
 
 }
