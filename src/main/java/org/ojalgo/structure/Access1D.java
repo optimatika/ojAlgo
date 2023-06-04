@@ -444,6 +444,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         return Math.round(this.doubleValue(index));
     }
 
+    /**
+     * Similar to {@link #elements()} but avoids elements that are structurally known to be zero. (That does
+     * not eliminate all zero-values from this view.) With an arbitrary (dense) unstructured implementation
+     * the {@link #nonzeros()} and {@link #elements()} methods do the same thing! Only some specific
+     * implementations are able to actually exploit structure/sparsity to view fewer elements.
+     */
     default ElementView1D<N, ?> nonzeros() {
         return this.elements();
     }
