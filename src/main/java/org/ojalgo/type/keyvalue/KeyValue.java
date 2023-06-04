@@ -152,6 +152,14 @@ public interface KeyValue<K, V> {
 
     K getKey();
 
+    default K getLeft() {
+        return this.getKey();
+    }
+
+    default V getRight() {
+        return this.getValue();
+    }
+
     V getValue();
 
 }
