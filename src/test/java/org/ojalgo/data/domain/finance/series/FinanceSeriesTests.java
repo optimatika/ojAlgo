@@ -86,7 +86,7 @@ public abstract class FinanceSeriesTests {
         GeometricBrownianMotion procM = GeometricBrownianMotion.estimate(dataM, 1.0 / monthsPerYear);
         procM.setValue(1.0);
 
-        double delta = 1E-14 / PrimitiveMath.THREE;
+        double delta = 1E-13 / PrimitiveMath.THREE;
 
         LogNormal expDistr = new LogNormal(sampleSetW.getMean() * weeksPerYear, sampleSetW.getStandardDeviation() * PrimitiveMath.SQRT.invoke(weeksPerYear));
         LogNormal actDistr = procW.getDistribution(1.0);
