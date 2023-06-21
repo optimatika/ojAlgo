@@ -1,6 +1,7 @@
 package org.ojalgo.optimisation.service;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
@@ -9,6 +10,7 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 
+@Tag("network")
 public class OptimisationServiceTest {
 
     private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
