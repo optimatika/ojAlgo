@@ -18,7 +18,7 @@ public class TestHardware extends MachineTests {
 
         int threads = 8;
         int cores = 8;
-        int units = 2;
+        int units = 1;
 
         TestHardware.doTest(hardware, threads, cores, units);
     }

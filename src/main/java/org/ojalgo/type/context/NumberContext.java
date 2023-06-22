@@ -40,9 +40,9 @@ import org.ojalgo.type.format.NumberStyle;
 /**
  * <p>
  * Think of this as a {@linkplain MathContext} that specifies both precision and scale. Numeric data types
- * (non-integers) in databases are specified using precison and scale. While doing maths the precision is all
+ * (non-integers) in databases are specified using precision and scale. While doing maths the precision is all
  * that matters, but before sending a number to a database, or printing/displaying it, rounding to a specified
- * scale is desireable.
+ * scale is desirable.
  * </p>
  * <p>
  * The enforce methods first enforce the precision and then set the scale. It is possible that this will

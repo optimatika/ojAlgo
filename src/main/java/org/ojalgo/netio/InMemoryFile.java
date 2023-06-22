@@ -138,7 +138,7 @@ public class InMemoryFile {
 
     /**
      * Creates a new {@link OutputStream} with each invocation (but keeps a reference to it for later internal
-     * use). Calling this method also cleares any/all cached previous contents – you're expected to create new
+     * use). Calling this method also clears any/all cached previous contents – you're expected to create new
      * content with this.
      */
     public OutputStream newOutputStream() {

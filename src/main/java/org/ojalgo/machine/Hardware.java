@@ -44,7 +44,7 @@ import org.ojalgo.netio.ASCII;
  * incorrectly calculated if you fail to specify the caches. Known issue: If you have more than one processor,
  * nut no L3 cache; the <code>processors</code> attribute will be incorrectly set 1. A workaround that
  * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
- * workoround may stop working in the future.
+ * Workaround may stop working in the future.
  * <li><code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
  * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code>
  * </ul>
@@ -59,8 +59,15 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     public static final long CPU_CACHE_LINE_SIZE = 64L;
 
     /**
+     * Page size is usually determined by the processor architecture. Traditionally, pages in a system had
+     * uniform size, such as 4,096 bytes. However, processor designs often allow two or more, sometimes
+     * simultaneous, page sizes due to its benefits. There are several points that can factor into choosing
+     * the best page size.
+     * <p>
      * Practically all architectures/OS:s have a page size of 4k (one notable exception is Solaris/SPARC that
      * have 8k)
+     * <p>
+     * AArch64 supports three different granule sizes: 4KB, 16KB, and 64KB.
      */
     public static final long OS_MEMORY_PAGE_SIZE = 4L * K;
 
@@ -70,21 +77,35 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
     public static final Set<Hardware> PREDEFINED = new TreeSet<>();
 
     /**
+     * <p>
+     * M1 Pro Mainly modelled after the performance cores since there are more of those. Also did not separate
+     * between L2 and L3/SLC cache since there are 2 of each and they are the same size per thread.
+     * <p>
+     * Notes: M2, M2 Pro, M2 Max, M2 Ultra -> 1, 2, 4, 8 memory controllers resulting in 100GB/s, 200GB/s,
+     * 400GB/s and 800GB/s Memory Bandwidth
      * <ul>
-     * <li>Apple M1 Pro (Mainly modelled after the performance cores since there are more of those. Also did
-     * not separate between L2 and L3/SLC cache since there are 2 of each and they are the same size per
-     * thread.)
+     * <li>Apple M1 Pro
      * <ul>
      * <li>L1 Cache the high-perf cores have a large 192 KB of L1 instruction cache and 128 KB of L1 data
      * cache The energy-efficient cores have a 128 KB L1 instruction cache, 64 KB L1 data cache.
      * <li>L2 Cache (28MB all together) The 6 high-perf cores are split in two clusters, each cluster has 12MB
      * of shared L2 cache (so 24MB total) The 2 high-efficiency cores have 4MB of shared L2 cache
      * <li>L3 / SLC (24MB all together) The SLC is 12MB per memory controller, so 24MB total.
+     * <li>16 GB unified memory
+     * </ul>
+     * <li>squid / 15" MacBook Air 2023, Apple M2
+     * <ul>
+     * <li>8 cores (4 performance and 4 efficiency)
+     * <li>L1: Performance cores 192+128 KB per core / Efficiency cores 128+64 KB per core
+     * <li>L2: Performance cores 16 MB / Efficiency cores 4 MB
+     * <li>L3: 8 MB
+     * <li>24 GB unified memory
      * </ul>
      * </ul>
      */
     static final Hardware AARCH64__08 = new Hardware("aarch64",
-            new BasicMachine[] { new BasicMachine(16L * K * K * K, 8), new BasicMachine(12L * K * K, 4), new BasicMachine(128L * K, 1) });
+            new BasicMachine[] { new BasicMachine(24L * K * K * K, 8), new BasicMachine(8L * K * K, 8), new BasicMachine(4L * K * K, 4),
+                    new BasicMachine(64L * K, 1) });
 
     /**
      * <ul>
@@ -500,6 +521,7 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
         myLevels = COPY.copyOf(levels);
     }
 
+    @Override
     public int compareTo(final Hardware other) {
         if (cores != other.cores) {
             return cores - other.cores;

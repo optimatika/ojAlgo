@@ -103,7 +103,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             mutator.add(row, col, scalar);
             actual = mutator.get();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -123,7 +123,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.add(tmpSafe);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -142,7 +142,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.add(scalar);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -161,7 +161,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.conjugate();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -177,7 +177,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         for (MatrixFactory factory : BasicMatrixTest.factories()) {
             BasicMatrix tmpA = factory.copy(mtrxA);
             actual = tmpA.count();
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -193,7 +193,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         for (MatrixFactory factory : BasicMatrixTest.factories()) {
             BasicMatrix tmpA = factory.copy(mtrxA);
             actual = tmpA.countColumns();
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -209,7 +209,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         for (MatrixFactory factory : BasicMatrixTest.factories()) {
             BasicMatrix tmpA = factory.copy(mtrxA);
             actual = tmpA.countRows();
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -230,7 +230,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             mutator.modifyMatching(factory.function().divide(), tmpSafe);
             actual = mutator.get();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -249,7 +249,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.divide(scalar);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -267,7 +267,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             BasicMatrix tmpSafe = factory.copy(mtrxSafe);
 
             actual = tmpA.column(col).dot(tmpSafe.column(col));
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -289,7 +289,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.doubleValue(row, col);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -310,7 +310,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.columns(cols);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -334,7 +334,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
                 actual = Math.round(Math.log10(tmpA.getCondition()));
 
-                TestUtils.assertEquals(expected, actual);
+                TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
             }
         }
     }
@@ -356,7 +356,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
                 actual = tmpA.getDeterminant();
 
-                TestUtils.assertEquals(expected, actual, ACCURACY);
+                TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
             }
         }
     }
@@ -376,7 +376,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
                 actual = tmpA.getEigenpairs();
 
                 for (int i = 0; i < expected.size(); i++) {
-                    TestUtils.assertEquals(expected.get(i).value, actual.get(i).value, ACCURACY);
+                    TestUtils.assertEquals(factory.getClass().toString(), expected.get(i).value, actual.get(i).value, ACCURACY);
                 }
             }
         }
@@ -394,7 +394,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = BasicMatrix.calculateInfinityNorm(tmpA);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -410,7 +410,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = BasicMatrix.calculateOneNorm(tmpA);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -429,7 +429,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.getRank();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -450,7 +450,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.rows(rows);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -469,7 +469,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.getTrace();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -490,7 +490,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
                 actual = tmpA.invert();
 
-                TestUtils.assertEquals(expected, actual, ACCURACY);
+                TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
             }
         }
     }
@@ -510,7 +510,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isEmpty();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -529,7 +529,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isFat();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -548,7 +548,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isHermitian();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -567,7 +567,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isSquare();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -586,7 +586,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isSymmetric();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -605,7 +605,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isTall();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -624,7 +624,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.isVector();
 
-            TestUtils.assertEquals(expected, actual);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual);
         }
     }
 
@@ -645,7 +645,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             TestUtils.assertEquals(expected, actual, ACCURACY);
 
             actual = tmpA.onAll(sin).below(tmpSafe.onAll(sin)).repeat(1, 2).diagonal();
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -662,7 +662,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.below(tmpSafe);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -679,7 +679,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.right(tmpSafe);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -700,7 +700,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             mutator.modifyMatching(factory.function().multiply(), tmpSafe);
             actual = mutator.get();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -720,7 +720,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.multiply(tmpX);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -739,7 +739,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.multiply(scalar);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -758,7 +758,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.negate();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -777,7 +777,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.norm();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -854,7 +854,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             mutator.set(row, col, scalar);
             actual = mutator.get();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -876,7 +876,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
                 actual = tmpA.solve(tmpB);
 
-                TestUtils.assertEquals(expected, actual, ACCURACY);
+                TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
             }
         }
     }
@@ -897,7 +897,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.subtract(tmpSafe);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -916,7 +916,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.subtract(scalar);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -939,7 +939,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
                 long j = actual.column();
 
                 for (int i = 0; i < actual.size(); i++) {
-                    TestUtils.assertEquals(expected.doubleValue(i, j), actual.doubleValue(i), ACCURACY);
+                    TestUtils.assertEquals(factory.getClass().toString(), expected.doubleValue(i, j), actual.doubleValue(i), ACCURACY);
                 }
             }
         }
@@ -964,7 +964,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
                 long i = actual.row();
 
                 for (int j = 0; j < actual.size(); j++) {
-                    TestUtils.assertEquals(expected.doubleValue(i, j), actual.doubleValue(j), ACCURACY);
+                    TestUtils.assertEquals(factory.getClass().toString(), expected.doubleValue(i, j), actual.doubleValue(j), ACCURACY);
                 }
             }
         }
@@ -986,7 +986,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             actual = tmpA.toRawCopy1D();
 
             for (int i = 0; i < expected.length; i++) {
-                TestUtils.assertEquals(expected[i], actual[i], ACCURACY);
+                TestUtils.assertEquals(factory.getClass().toString(), expected[i], actual[i], ACCURACY);
             }
         }
     }
@@ -1009,7 +1009,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.toScalar(row, col);
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
@@ -1028,7 +1028,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = tmpA.transpose();
 
-            TestUtils.assertEquals(expected, actual, ACCURACY);
+            TestUtils.assertEquals(factory.getClass().toString(), expected, actual, ACCURACY);
         }
     }
 
