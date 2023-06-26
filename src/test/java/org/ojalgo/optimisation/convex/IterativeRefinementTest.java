@@ -209,7 +209,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         double relativeComplementarySlackness1 = C1.onMatching(QuadrupleMath.MULTIPLY, x).collect(GenericStore.R128).aggregateAll(Aggregator.LARGEST)
                 .doubleValue() / C_Size;
         // SUM_i ABS(y0_i * b_i) / |Be|
-        double relativeComplementarySlackness2 = y.onMatching(QuadrupleMath.MULTIPLY, (be1.below(bi1))).collect(GenericStore.R128)
+        double relativeComplementarySlackness2 = y.onMatching(QuadrupleMath.MULTIPLY, be1.below(bi1)).collect(GenericStore.R128)
                 .aggregateAll(Aggregator.LARGEST).doubleValue() / be_Size;
         double relativeComplementarySlackness = Math.max(relativeComplementarySlackness1, relativeComplementarySlackness2 * relativeComplementarySlackness2);
         Quadruple objectiveValue = Q.multiplyBoth(x).divide(2).subtract(x.transpose().multiply(C).get(0));
@@ -496,5 +496,5 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         double largestRelativeDualDiff = yRelative.aggregateAll(Aggregator.LARGEST).doubleValue();
     }
 
-    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> ((arg2 < 1e-6 || arg2 < 1e-6)) ? 0 : arg1/arg2;
+    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> Math.abs(arg2) < 1e-6 ? 0 : arg1 / arg2;
 }
