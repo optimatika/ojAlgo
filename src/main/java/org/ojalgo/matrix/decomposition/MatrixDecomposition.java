@@ -73,8 +73,10 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *
          * @return The matrix' determinant
          */
+        @Override
         N getDeterminant();
 
+        @Override
         default Provider2D.Determinant<N> toDeterminantProvider(final ElementsSupplier<N> original,
                 final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
             this.decompose(original);
@@ -109,10 +111,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         default D make(final int numberOfRows, final int numberOfColumns) {
             return this.make(new Structure2D() {
 
+                @Override
                 public long countColumns() {
                     return numberOfColumns;
                 }
 
+                @Override
                 public long countRows() {
                     return numberOfRows;
                 }
@@ -245,6 +249,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *
          * @return The effective numerical rank (best estimate)
          */
+        @Override
         default int getRank() {
             return this.countSignificant(this.getRankThreshold());
         }
@@ -271,10 +276,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return this.decompose(matrix) && this.isSolvable();
         }
 
+        @Override
         default void ftran(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
             this.getSolution(rhs, solution);
         }
 
+        @Override
         default void ftran(final PhysicalStore<N> arg) {
             this.ftran(arg, arg);
         }
@@ -286,7 +293,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
         /**
          * <p>
-         * Implementiong this method is optional.
+         * Implementing this method is optional.
          * </p>
          * <p>
          * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
@@ -312,7 +319,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
         /**
          * <p>
-         * Implementiong this method is optional.
+         * Implementing this method is optional.
          * </p>
          * <p>
          * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
@@ -332,6 +339,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          */
         MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
+        @Override
         default Optional<MatrixStore<N>> invert() {
             if (this.isSolvable()) {
                 return Optional.of(this.getInverse());
@@ -351,6 +359,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          */
         boolean isSolvable();
 
+        @Override
         default Optional<MatrixStore<N>> solve(final Access2D<?> rhs) {
             if (this.isSolvable()) {
                 return Optional.of(this.getSolution(rhs.asCollectable2D()));
@@ -359,6 +368,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             }
         }
 
+        @Override
         default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final ElementsSupplier<N> original,
                 final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {
             boolean ok = this.decompose(original);
@@ -369,6 +379,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             }
         }
 
+        @Override
         default Provider2D.Solution<Optional<MatrixStore<N>>> toSolutionProvider(final ElementsSupplier<N> body,
                 final Supplier<MatrixStore<N>> alternativeBodySupplier, final Access2D<?> rhs) {
             boolean ok = this.decompose(body);
@@ -399,10 +410,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     Structure2D TYPICAL = new Structure2D() {
 
+        @Override
         public long countColumns() {
             return 50L;
         }
 
+        @Override
         public long countRows() {
             return 50L;
         }
