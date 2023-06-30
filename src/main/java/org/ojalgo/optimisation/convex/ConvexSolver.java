@@ -525,7 +525,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }
 
-            return new Result(solverState.getState(), modelSolution);
+            return solverState.withSolution(modelSolution);
         }
 
         @Override
@@ -542,7 +542,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 solverSolution.set(i, modelState.doubleValue(modelIndex));
             }
 
-            return new Result(modelState.getState(), solverSolution);
+            return modelState.withSolution(solverSolution);
         }
 
     }

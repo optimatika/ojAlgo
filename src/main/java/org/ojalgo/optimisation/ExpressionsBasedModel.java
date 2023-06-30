@@ -148,22 +148,27 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             nbVariables = varTotal;
         }
 
+        @Override
         public int countAdditionalConstraints() {
             return 0;
         }
 
+        @Override
         public int countConstraints() {
             return nbEqualityConstraints + nbLowerConstraints + nbUpperConstraints;
         }
 
+        @Override
         public int countEqualityConstraints() {
             return nbEqualityBounds;
         }
 
+        @Override
         public int countInequalityConstraints() {
             return nbLowerConstraints + nbUpperConstraints;
         }
 
+        @Override
         public int countVariables() {
             return nbVariables;
         }
@@ -210,14 +215,17 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         /**
          * @see Optimisation.Integration#extractSolverState(Optimisation.Model)
          */
+        @Override
         public final Result extractSolverState(final ExpressionsBasedModel model) {
             return this.toSolverState(model.getVariableValues(), model);
         }
 
+        @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
             return solverState;
         }
 
+        @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
             return modelState;
         }
@@ -288,6 +296,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             myExecutionOrder = executionOrder;
         }
 
+        @Override
         public final int compareTo(final S reference) {
             return Integer.compare(myExecutionOrder, reference.getExecutionOrder());
         }
@@ -1143,6 +1152,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return constrExpr != null ? constrExpr : this.objective();
     }
 
+    @Override
     public Optimisation.Result maximise() {
 
         this.setOptimisationSense(Optimisation.Sense.MAX);
@@ -1150,6 +1160,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return this.optimise();
     }
 
+    @Override
     public Optimisation.Result minimise() {
 
         this.setOptimisationSense(Optimisation.Sense.MIN);
@@ -1334,6 +1345,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      *
      * @see Optimisation.Model#validate()
      */
+    @Override
     public boolean validate() {
 
         final BasicLogger appender = options.logger_detailed ? options.logger_appender : BasicLogger.NULL;

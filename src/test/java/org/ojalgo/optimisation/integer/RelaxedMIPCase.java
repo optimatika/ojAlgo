@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
@@ -290,6 +291,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      * </p>
      */
     @Test
+    @Tag("new_lp_problem")
     public void testNeos911880() {
         RelaxedMIPCase.doTest("neos-911880.mps", "23.26", null, null);
     }

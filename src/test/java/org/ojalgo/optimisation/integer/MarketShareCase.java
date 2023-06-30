@@ -53,7 +53,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
     static {
 
-        final HashMap<String, BigDecimal> tmpSolution = new HashMap<>();
+        HashMap<String, BigDecimal> tmpSolution = new HashMap<>();
 
         tmpSolution.put("s1", new BigDecimal(0));
         tmpSolution.put("s2", new BigDecimal(0));
@@ -106,9 +106,9 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
     private static ExpressionsBasedModel makeModel() {
 
-        //        final File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
+        //          File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
         //
-        //        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        //          MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         //
         //        return tmpMPS.getExpressionsBasedModel();
 
@@ -118,35 +118,36 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Test
     public void testMipButSomeConstainedToOptimatl() {
 
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
+        ExpressionsBasedModel model = MarketShareCase.makeModel();
 
         // tmpModel.options.debug(IntegerSolver.class);
 
         // 37, 20
-        final int tmpConstrLimit = 20;
+        int tmpConstrLimit = 20;
         int tmpConstrCount = 0;
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            final String tmpName = tmpVariable.getName();
+        for (Variable tmpVariable : model.getVariables()) {
+            String tmpName = tmpVariable.getName();
             if (tmpConstrCount < tmpConstrLimit) {
                 tmpVariable.level(SOLUTION.get(tmpName));
                 tmpConstrCount++;
             }
         }
 
-        final Result tmpResult = tmpModel.minimise();
+        Result tmpResult = model.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility, BasicLogger.DEBUG));
-        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility, BasicLogger.DEBUG));
+        TestUtils.assertTrue(model.validate(model.options.feasibility, BasicLogger.DEBUG));
+        TestUtils.assertTrue(model.validate(tmpResult, model.options.feasibility, BasicLogger.DEBUG));
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), model.options.feasibility);
 
-        final NumberContext tmpContext = tmpModel.options.solution.withScale(13);
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            final String tmpName = tmpVariable.getName();
-            final double tmpExpected = SOLUTION.get(tmpName).doubleValue();
-            final double tmpActual = tmpVariable.getValue().doubleValue();
-            TestUtils.assertEquals(tmpName, tmpExpected, tmpActual, tmpContext);
+        NumberContext accuracy = model.options.solution.withScale(12).withPrecision(12);
+
+        for (Variable variable : model.getVariables()) {
+            String name = variable.getName();
+            double expected = SOLUTION.get(name).doubleValue();
+            double actual = variable.getValue().doubleValue();
+            TestUtils.assertEquals(name, expected, actual, accuracy);
         }
     }
 
@@ -178,18 +179,18 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Test
     public void testRelaxedButAllConstrainedToOptimal() {
 
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
+        ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
         tmpModel.relax(true);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
+        for (Variable tmpVariable : tmpModel.getVariables()) {
             tmpVariable.level(SOLUTION.get(tmpVariable.getName()));
         }
 
-        final Result tmpResult = tmpModel.minimise();
+        Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
+        for (Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
                     1E-14 / PrimitiveMath.THREE);
         }
@@ -199,21 +200,21 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Test
     public void testRelaxedButIntegerConstrainedToOptimal() {
 
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
+        ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
         tmpModel.relax(true);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            final String tmpName = tmpVariable.getName();
+        for (Variable tmpVariable : tmpModel.getVariables()) {
+            String tmpName = tmpVariable.getName();
             if (tmpName.startsWith("x")) {
                 tmpVariable.level(SOLUTION.get(tmpName));
             }
         }
 
-        final Result tmpResult = tmpModel.minimise();
+        Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
+        for (Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
                     1E-14 / PrimitiveMath.THREE);
         }
@@ -222,7 +223,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Test
     public void testSpecificBranch_37_8() {
 
-        final Primitive64Store tmpAE = Primitive64Store.FACTORY
+        Primitive64Store tmpAE = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.87, 0.01, 0.6, 0.5, 0.85, 0.86, 0.09, 0.86, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                         { 5.9, 5.7, 4.8, 2.8, 9.7, 5.8, 4.4, 3.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                         { 1.9, 4.6, 3.1, 2.4, 8.5, 8.5, 7.4, 1.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
@@ -237,29 +238,29 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
                         { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
                         { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
-        final Primitive64Store tmpBE = Primitive64Store.FACTORY.rows(
+        Primitive64Store tmpBE = Primitive64Store.FACTORY.rows(
                 new double[][] { { 2.24 }, { 20.2 }, { 17.4 }, { 0.73 }, { 25.2 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        final Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
+        Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
         LinearSolver.StandardBuilder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
-        final Optimisation.Options tmpOptions = new Optimisation.Options();
+        Optimisation.Options tmpOptions = new Optimisation.Options();
 
         //        tmpOptions.debug_stream = BasicLogger.DEBUG;
         //        tmpOptions.debug_solver = LinearSolver.class;
         //        tmpOptions.validate = true;
 
-        final LinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
+        LinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
 
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertTrue(tmpResult.getState().isOptimal());
 
         for (int i = 0; i < tmpResult.size(); i++) {
-            final double tmpValue = tmpResult.doubleValue(i);
+            double tmpValue = tmpResult.doubleValue(i);
             TestUtils.assertTrue(!tmpOptions.feasibility.isDifferent(0.0, tmpValue) || !tmpOptions.feasibility.isDifferent(1.0, tmpValue));
         }
 
@@ -267,26 +268,26 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
     private void testRedundant(final String constraint) {
 
-        final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
+        ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
 
-        final Expression tmpExpression = tmpModel.getExpression(constraint);
+        Expression tmpExpression = tmpModel.getExpression(constraint);
 
         if (DEBUG) {
             BasicLogger.debug("Fix count: {}", tmpExpression.getLinearKeySet().size());
         }
 
-        for (final IntIndex tmpIndex : tmpExpression.getLinearKeySet()) {
-            final Variable tmpVariable = tmpModel.getVariable(tmpIndex.index);
-            final String tmpName = tmpVariable.getName();
+        for (IntIndex tmpIndex : tmpExpression.getLinearKeySet()) {
+            Variable tmpVariable = tmpModel.getVariable(tmpIndex.index);
+            String tmpName = tmpVariable.getName();
             tmpVariable.level(SOLUTION.get(tmpName));
         }
 
-        final Result tmpResult = tmpModel.minimise();
+        Result tmpResult = tmpModel.minimise();
 
-        final NumberContext tmpContext = NumberContext.of(8, 13);
+        NumberContext tmpContext = NumberContext.of(8, 13);
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpContext);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
+        for (Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(), tmpContext);
         }
     }

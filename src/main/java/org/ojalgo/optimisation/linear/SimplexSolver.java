@@ -28,10 +28,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Meant to replace {@link SimplexTableauSolver}. It is already better in many aspects, but still can't do
@@ -71,6 +75,10 @@ abstract class SimplexSolver extends LinearSolver {
             myExcluded = excluded;
         }
 
+        int column() {
+            return index >= 0 ? myExcluded[index] : index;
+        }
+
         @Override
         public boolean equals(final Object obj) {
             if (this == obj) {
@@ -80,7 +88,7 @@ abstract class SimplexSolver extends LinearSolver {
                 return false;
             }
             EnterInfo other = (EnterInfo) obj;
-            if ((direction != other.direction) || (from != other.from) || (index != other.index)) {
+            if (direction != other.direction || from != other.from || index != other.index) {
                 return false;
             }
             return true;
@@ -90,24 +98,20 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((direction == null) ? 0 : direction.hashCode());
-            result = prime * result + ((from == null) ? 0 : from.hashCode());
+            result = prime * result + (direction == null ? 0 : direction.hashCode());
+            result = prime * result + (from == null ? 0 : from.hashCode());
             return prime * result + index;
-        }
-
-        @Override
-        public String toString() {
-            return this.column() + "(" + index + ") " + from + " " + direction;
-        }
-
-        int column() {
-            return index >= 0 ? myExcluded[index] : index;
         }
 
         void reset() {
             index = -1;
             from = ColumnState.BASIS;
             direction = Direction.STAY;
+        }
+
+        @Override
+        public String toString() {
+            return this.column() + "(" + index + ") " + from + " " + direction;
         }
     }
     /**
@@ -134,6 +138,10 @@ abstract class SimplexSolver extends LinearSolver {
             myIncluded = included;
         }
 
+        int column() {
+            return index >= 0 ? myIncluded[index] : index;
+        }
+
         @Override
         public boolean equals(final Object obj) {
             if (this == obj) {
@@ -143,7 +151,7 @@ abstract class SimplexSolver extends LinearSolver {
                 return false;
             }
             ExitInfo other = (ExitInfo) obj;
-            if ((direction != other.direction) || (index != other.index) || (to != other.to)) {
+            if (direction != other.direction || index != other.index || to != other.to) {
                 return false;
             }
             return true;
@@ -153,18 +161,9 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((direction == null) ? 0 : direction.hashCode());
+            result = prime * result + (direction == null ? 0 : direction.hashCode());
             result = prime * result + index;
-            return prime * result + ((to == null) ? 0 : to.hashCode());
-        }
-
-        @Override
-        public String toString() {
-            return this.column() + "(" + index + ") " + direction + " " + to;
-        }
-
-        int column() {
-            return index >= 0 ? myIncluded[index] : index;
+            return prime * result + (to == null ? 0 : to.hashCode());
         }
 
         void reset() {
@@ -175,6 +174,11 @@ abstract class SimplexSolver extends LinearSolver {
 
         int row() {
             return index;
+        }
+
+        @Override
+        public String toString() {
+            return this.column() + "(" + index + ") " + direction + " " + to;
         }
 
     }
@@ -222,19 +226,8 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((enter == null) ? 0 : enter.hashCode());
-            return prime * result + ((exit == null) ? 0 : exit.hashCode());
-        }
-
-        @Override
-        public String toString() {
-            if (this.isBasisUpdate()) {
-                return exit.toString() + " -> " + enter.toString();
-            } else if (this.isBoundSwitch()) {
-                return enter.toString() + " -> " + exit.to;
-            } else {
-                return "-";
-            }
+            result = prime * result + (enter == null ? 0 : enter.hashCode());
+            return prime * result + (exit == null ? 0 : exit.hashCode());
         }
 
         /**
@@ -274,6 +267,17 @@ abstract class SimplexSolver extends LinearSolver {
             ratioDual = MACHINE_LARGEST;
         }
 
+        @Override
+        public String toString() {
+            if (this.isBasisUpdate()) {
+                return exit.toString() + " -> " + enter.toString();
+            } else if (this.isBoundSwitch()) {
+                return enter.toString() + " -> " + exit.to;
+            } else {
+                return "-";
+            }
+        }
+
     }
 
     interface Validator {
@@ -300,8 +304,116 @@ abstract class SimplexSolver extends LinearSolver {
         n = simplexStore.n - simplexStore.structure().nbVarsArt;
     }
 
-    public EntityMap getEntityMap() {
-        return mySimplex.getStructure();
+    final SimplexSolver basis(final int[] basis) {
+        mySimplex.resetBasis(basis);
+        return this;
+    }
+
+    final void doDualIterations(final IterDescr iteration) {
+
+        boolean done = false;
+        while (this.isIterationAllowed() && !done) {
+
+            iteration.reset();
+
+            if (this.getDualExitCandidate(iteration)) {
+
+                mySimplex.calculateDualDirection(iteration.exit);
+
+                if (this.testDualEnterRatio(iteration)) {
+
+                    if (iteration.isBasisUpdate()) {
+                        mySimplex.calculatePrimalDirection(iteration.enter);
+                    }
+
+                    this.update(iteration);
+
+                    this.incrementIterationsCount();
+
+                } else {
+
+                    this.setState(State.INFEASIBLE);
+                }
+
+            } else {
+
+                this.setState(State.FEASIBLE);
+                done = true;
+            }
+
+            if (this.isLogDebug()) {
+                this.logCurrentState();
+            }
+        }
+    }
+
+    final void doPrimalIterations(final IterDescr iteration) {
+
+        if (options.validate && myValidator != null) {
+            myValidator.validate(this.extractResult());
+        }
+
+        boolean done = false;
+        while (this.isIterationAllowed() && !done) {
+
+            iteration.reset();
+
+            if (this.getPrimalEnterCandidate(iteration)) {
+
+                mySimplex.calculatePrimalDirection(iteration.enter);
+
+                if (this.testPrimalExitRatio(iteration)) {
+
+                    if (iteration.isBasisUpdate()) {
+                        mySimplex.calculateDualDirection(iteration.exit);
+                    }
+
+                    this.update(iteration);
+
+                    this.incrementIterationsCount();
+
+                } else {
+
+                    this.setState(State.UNBOUNDED);
+                }
+
+            } else {
+
+                this.setState(State.OPTIMAL);
+                done = true;
+            }
+
+            if (this.isLogDebug()) {
+                this.logCurrentState();
+            }
+
+            if (options.validate && myValidator != null) {
+                myValidator.validate(this.extractResult());
+            }
+        }
+    }
+
+    final Result extractResult() {
+
+        double retValue = this.extractValue();
+
+        State retState = this.getState();
+
+        double[] retSolution = this.extractSolution();
+
+        Result result = Optimisation.Result.of(retValue, retState, retSolution);
+
+        if (this.isLogDebug()) {
+            this.log();
+            this.log("{} {} {}", retValue, retState, mySimplex.toString());
+            this.log("LB: {}", this.getLowerBounds());
+            this.log(" X: {}", retSolution);
+            this.log("UB: {}", this.getUpperBounds());
+        }
+
+        return result;
+
+        // TODO  return result.multipliers(this.extractMultipliers());
     }
 
     private double[] extractSolution() {
@@ -317,6 +429,27 @@ abstract class SimplexSolver extends LinearSolver {
 
     private double extractValue() {
         return mySimplex.extractValue() + myValueShift;
+    }
+
+    @Override
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+
+        double[] solution = this.extractSolution();
+
+        if (this.isLogDebug()) {
+            BasicLogger.debug("Sol: {}", Arrays.toString(solution));
+            BasicLogger.debug("+++: {}", Arrays.toString(mySolutionShift));
+        }
+
+        boolean[] negated = new boolean[integer.length];
+        for (int j = 0; j < negated.length; j++) {
+            //if (this.getEntityMap().isNegated(j)) {
+            if (this.isNegated(j)) {
+                negated[j] = true;
+            }
+        }
+
+        return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
     }
 
     private boolean getDualExitCandidate(final IterDescr iteration) {
@@ -376,6 +509,34 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
+    }
+
+    @Override
+    public EntityMap getEntityMap() {
+        return mySimplex.getStructure();
+    }
+
+    @Override
+    public KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
+
+        double shift = mySolutionShift[col];
+
+        if (shift != ZERO) {
+
+            ColumnState columnState = mySimplex.getColumnState(col);
+            ConstraintType constraintType = ConstraintType.EQUALITY;
+            if (columnState == ColumnState.LOWER) {
+                constraintType = ConstraintType.LOWER;
+            } else if (columnState == ColumnState.UPPER) {
+                constraintType = ConstraintType.UPPER;
+            }
+
+            return EntryPair.of(constraintType, col).asKeyTo(shift);
+
+        } else {
+
+            return null;
+        }
     }
 
     private double getLowerBound(final int index) {
@@ -483,6 +644,26 @@ abstract class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    void initiatePhase1() {
+        mySimplex.copyObjective();
+    }
+
+    final boolean isDualFeasible() {
+        return !this.getPrimalEnterCandidate(null);
+    }
+
+    private boolean isNegated(final int j) {
+        if (this.getUpperBound(j) <= ZERO && this.getLowerBound(j) < ZERO) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    final boolean isPrimalFeasible() {
+        return !this.getDualExitCandidate(null);
+    }
+
     private void logCurrentState() {
 
         this.log();
@@ -506,6 +687,29 @@ abstract class SimplexSolver extends LinearSolver {
         } else {
             this.log(Arrays.toString(mySimplex.included));
         }
+    }
+
+    final IterDescr prepareToIterate(final boolean prioritiseFeasibility, final boolean modifyObjective) {
+
+        this.shiftBounds(prioritiseFeasibility, modifyObjective);
+
+        if (mySimplex.m == 0) {
+            this.solveUnconstrained(); // TODO return?
+        }
+
+        mySimplex.calculateIteration();
+
+        this.resetIterationsCount();
+
+        if (this.isLogDebug()) {
+            this.logCurrentState();
+        }
+
+        return new IterDescr(mySimplex);
+    }
+
+    void setValidator(final Validator validator) {
+        myValidator = validator;
     }
 
     private void shift(final int column, final ColumnState state) {
@@ -626,6 +830,11 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return Result.of(retValue, retState, retSolution);
+    }
+
+    void switchToPhase2() {
+        mySimplex.restoreObjective();
+        mySimplex.calculateIteration();
     }
 
     private boolean testDualEnterRatio(final IterDescr iteration) {
@@ -881,164 +1090,4 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
     }
-
-    final SimplexSolver basis(final int[] basis) {
-        mySimplex.resetBasis(basis);
-        return this;
-    }
-
-    final void doDualIterations(final IterDescr iteration) {
-
-        boolean done = false;
-        while (this.isIterationAllowed() && !done) {
-
-            iteration.reset();
-
-            if (this.getDualExitCandidate(iteration)) {
-
-                mySimplex.calculateDualDirection(iteration.exit);
-
-                if (this.testDualEnterRatio(iteration)) {
-
-                    if (iteration.isBasisUpdate()) {
-                        mySimplex.calculatePrimalDirection(iteration.enter);
-                    }
-
-                    this.update(iteration);
-
-                    this.incrementIterationsCount();
-
-                } else {
-
-                    this.setState(State.INFEASIBLE);
-                }
-
-            } else {
-
-                this.setState(State.FEASIBLE);
-                done = true;
-            }
-
-            if (this.isLogDebug()) {
-                this.logCurrentState();
-            }
-        }
-    }
-
-    final void doPrimalIterations(final IterDescr iteration) {
-
-        if (options.validate && myValidator != null) {
-            myValidator.validate(this.extractResult());
-        }
-
-        boolean done = false;
-        while (this.isIterationAllowed() && !done) {
-
-            iteration.reset();
-
-            if (this.getPrimalEnterCandidate(iteration)) {
-
-                mySimplex.calculatePrimalDirection(iteration.enter);
-
-                if (this.testPrimalExitRatio(iteration)) {
-
-                    if (iteration.isBasisUpdate()) {
-                        mySimplex.calculateDualDirection(iteration.exit);
-                    }
-
-                    this.update(iteration);
-
-                    this.incrementIterationsCount();
-
-                } else {
-
-                    this.setState(State.UNBOUNDED);
-                }
-
-            } else {
-
-                this.setState(State.OPTIMAL);
-                done = true;
-            }
-
-            if (this.isLogDebug()) {
-                this.logCurrentState();
-            }
-
-            if (options.validate && myValidator != null) {
-                myValidator.validate(this.extractResult());
-            }
-        }
-    }
-
-    final Result extractResult() {
-
-        double retValue = this.extractValue();
-
-        State retState = this.getState();
-
-        double[] retSolution = this.extractSolution();
-
-        Result result = Optimisation.Result.of(retValue, retState, retSolution);
-
-        if (this.isLogDebug()) {
-            this.log();
-            this.log("{} {} {}", retValue, retState, mySimplex.toString());
-            this.log("LB: {}", this.getLowerBounds());
-            this.log(" X: {}", retSolution);
-            this.log("UB: {}", this.getUpperBounds());
-        }
-
-        return result;
-
-        // TODO  return result.multipliers(this.extractMultipliers());
-    }
-
-    void initiatePhase1() {
-        mySimplex.copyObjective();
-    }
-
-    final boolean isDualFeasible() {
-        return !this.getPrimalEnterCandidate(null);
-    }
-
-    final boolean isPrimalFeasible() {
-        return !this.getDualExitCandidate(null);
-    }
-
-    final IterDescr prepareToIterate(final boolean prioritiseFeasibility, final boolean modifyObjective) {
-
-        this.shiftBounds(prioritiseFeasibility, modifyObjective);
-
-        if (mySimplex.m == 0) {
-            this.solveUnconstrained(); // TODO return?
-        }
-
-        mySimplex.calculateIteration();
-
-        this.resetIterationsCount();
-
-        if (this.isLogDebug()) {
-            this.logCurrentState();
-        }
-
-        return new IterDescr(mySimplex);
-    }
-
-    void setValidator(final Validator validator) {
-        myValidator = validator;
-    }
-
-    void switchToPhase2() {
-        mySimplex.restoreObjective();
-        mySimplex.calculateIteration();
-    }
-
-    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
-
-        double[] solution = this.extractSolution();
-
-        return mySimplex.generateCutCandidates(solution, integer, options.integer().getIntegralityTolerance(), fractionality);
-    }
-
 }

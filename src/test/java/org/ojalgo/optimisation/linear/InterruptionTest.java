@@ -11,6 +11,10 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 
+/**
+ * Now and then the model used with these tests needs to be changed – ojAlgo gets better and computers faster,
+ * causing the model to solve too fast for these interruption tests.
+ */
 public class InterruptionTest extends OptimisationLinearTests implements ModelFileTest {
 
     private static class ThreadInterrupter implements Runnable {
@@ -24,15 +28,13 @@ public class InterruptionTest extends OptimisationLinearTests implements ModelFi
         @Override
         public void run() {
             try {
-                Thread.sleep(TIMEOUT_DURATION * 500);
+                Thread.sleep(4 * 500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             threadToInterrupt.interrupt();
         }
     }
-
-    public static final int TIMEOUT_DURATION = 4;
 
     private static ExpressionsBasedModel makeModel() {
         return ModelFileTest.makeModel("netlib", "D6CUBE.SIF", false);
@@ -45,20 +47,22 @@ public class InterruptionTest extends OptimisationLinearTests implements ModelFi
 
     @Test
     void slowMinimisationShouldBeSlow() throws InterruptedException {
-        final Thread minimizer = new Thread(this::launchSlowMinimization);
+
+        Thread minimizer = new Thread(this::launchSlowMinimization);
 
         minimizer.start();
-        minimizer.join(TIMEOUT_DURATION * 1_000);
+        minimizer.join(8 * 100);
         Assertions.assertTrue(minimizer.isAlive());
 
         minimizer.interrupt();
     }
 
     @Test
-    @Timeout(value = TIMEOUT_DURATION, unit = TimeUnit.SECONDS)
+    @Timeout(value = 4, unit = TimeUnit.SECONDS)
     void slowMinimizationShouldBeInterrupted() throws InterruptedException {
-        final Thread minimizer = new Thread(this::launchSlowMinimization);
-        final Thread interrupter = new Thread(new ThreadInterrupter(minimizer));
+
+        Thread minimizer = new Thread(this::launchSlowMinimization);
+        Thread interrupter = new Thread(new ThreadInterrupter(minimizer));
 
         minimizer.start();
         interrupter.start();

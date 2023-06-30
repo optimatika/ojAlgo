@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerProblems;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
 
 public class TableauCutGeneratorTest extends OptimisationLinearTests {
@@ -87,8 +88,9 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         boolean[] integer = new boolean[factors.length];
         Arrays.fill(integer, true);
         boolean[] negated = new boolean[factors.length];
+        int[] excluded = Structure1D.newIncreasingRange(0, factors.length);
 
-        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH, negated);
+        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH, negated, excluded);
     }
 
     /**

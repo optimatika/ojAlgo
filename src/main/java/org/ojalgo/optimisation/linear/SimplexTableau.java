@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.structure.Access1D;
@@ -1124,18 +1126,22 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         meta = new LinearStructure(0, 0, nbConstraints, nbPosVars, nbNegVars, nbSlackVars + nbIdentityVars, myNumberOfArtificialVariables);
     }
 
+    @Override
     public int countAdditionalConstraints() {
         return 0;
     }
 
+    @Override
     public int countConstraints() {
         return myNumberOfConstraints;
     }
 
+    @Override
     public int countEqualityConstraints() {
         return myNumberOfConstraints;
     }
 
+    @Override
     public int countInequalityConstraints() {
         return 0;
     }
@@ -1143,6 +1149,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
     /**
      * problem + slack
      */
+    @Override
     public int countVariables() {
         return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
     }
@@ -1248,6 +1255,18 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
         Primitive1D constraintsRHS = this.constraintsRHS();
 
+        double[] solRHS = new double[integer.length];
+        for (int i = 0; i < m; i++) {
+            int j = myBasis[i];
+            if (j >= 0) {
+                solRHS[j] = constraintsRHS.doubleValue(i);
+            }
+        }
+        if (DEBUG) {
+            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
+            BasicLogger.debug("Bas: {}", Arrays.toString(myBasis));
+        }
+
         List<Equation> retVal = new ArrayList<>();
 
         boolean[] negated = new boolean[integer.length];
@@ -1259,7 +1278,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
             if (j >= 0 && j < nbModVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated,
+                        mySelector.getExcluded());
 
                 if (maybe != null) {
                     retVal.add(maybe);

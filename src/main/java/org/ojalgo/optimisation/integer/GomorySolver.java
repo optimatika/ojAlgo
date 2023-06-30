@@ -40,10 +40,12 @@ public final class GomorySolver extends GenericSolver {
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<GomorySolver> {
 
+        @Override
         public GomorySolver build(final ExpressionsBasedModel model) {
             return new GomorySolver(model);
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return model.isAnyVariableInteger() && !model.isAnyConstraintQuadratic();
         }
@@ -65,6 +67,7 @@ public final class GomorySolver extends GenericSolver {
         myFunction = myIntegerModel.limitObjective(null, null).toFunction();
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
         ModelStrategy strategy = IntegerStrategy.DEFAULT.withGMICutConfiguration(GMI_CUT_CONFIGURATION).newModelStrategy(myIntegerModel);
@@ -75,20 +78,20 @@ public final class GomorySolver extends GenericSolver {
         Result retVal = iterativeSolver.solve();
         this.incrementIterationsCount();
         if (this.isLogProgress()) {
-            this.log("Iteration {}: {}", this.countIterations(), retVal);
             this.log();
+            this.log("Iteration {}: {}", this.countIterations(), retVal);
         }
         while (retVal.getState().isFeasible() && !myIntegerModel.validate(retVal)) {
             iterativeSolver.generateCuts(strategy);
             retVal = iterativeSolver.solve();
             this.incrementIterationsCount();
             if (this.isLogProgress()) {
-                this.log("Iteration {}: {}", this.countIterations(), retVal);
                 this.log();
+                this.log("Iteration {}: {}", this.countIterations(), retVal);
             }
         }
 
-        return retVal;
+        return retVal.withValue(this.evaluateFunction(retVal));
     }
 
     protected Optimisation.Result buildResult() {

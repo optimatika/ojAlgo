@@ -67,18 +67,22 @@ final class LinearStructure implements UpdatableSolver.EntityMap {
         nbVarsArt = varsArt;
     }
 
+    @Override
     public int countModelVariables() {
         return nbVarsPos + nbVarsNeg;
     }
 
+    @Override
     public int countSlackVariables() {
         return nbVarsSlk;
     }
 
+    @Override
     public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
         return slack[idx];
     }
 
+    @Override
     public int indexOf(final int idx) {
 
         if (idx < 0) {
@@ -98,6 +102,7 @@ final class LinearStructure implements UpdatableSolver.EntityMap {
         return -1;
     }
 
+    @Override
     public boolean isNegated(final int idx) {
 
         if (idx < 0) {
@@ -112,6 +117,8 @@ final class LinearStructure implements UpdatableSolver.EntityMap {
             return true;
         }
 
+        // TODO This case depends on the solver
+        // return slack[idx - positivePartVariables.length - negativePartVariables.length].getValue() == ConstraintType.LOWER;
         return false;
     }
 

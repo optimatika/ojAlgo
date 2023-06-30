@@ -322,8 +322,8 @@ public interface Optimisation {
         public Options debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
-            logger_detailed = (solver != null);
-            validate = (solver != null);
+            logger_detailed = solver != null;
+            validate = solver != null;
             return this;
         }
 
@@ -559,8 +559,16 @@ public interface Optimisation {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
+        public Result withSolution(final Access1D<?> solution) {
+            return new Result(myState, myValue, solution);
+        }
+
         public Result withState(final State state) {
             return new Result(state, myValue, mySolution);
+        }
+
+        public Result withValue(final double value) {
+            return new Result(myState, value, mySolution);
         }
 
     }
@@ -603,6 +611,8 @@ public interface Optimisation {
      * be able to provide data for any problem solvable by ojAlgo solvers.
      */
     public interface SolverData<N extends Comparable<N>> extends ProblemStructure {
+
+        static final boolean DEBUG = false;
 
     }
 

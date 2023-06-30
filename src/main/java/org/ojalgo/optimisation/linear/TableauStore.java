@@ -31,6 +31,7 @@ import java.util.List;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
@@ -75,26 +76,32 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myColDim = n + 1;
     }
 
+    @Override
     public long countColumns() {
         return this.getColDim();
     }
 
+    @Override
     public long countRows() {
         return this.getRowDim();
     }
 
+    @Override
     public double doubleValue(final long row, final long col) {
         return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
     }
 
+    @Override
     public Double get(final long row, final long col) {
         return Double.valueOf(this.doubleValue(row, col));
     }
 
+    @Override
     public int getColDim() {
         return myColDim;
     }
 
+    @Override
     public int getRowDim() {
         return myTableau.length;
     }
@@ -380,28 +387,45 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final NumberContext tolerance, final double fractionality) {
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
+            final double fractionality) {
 
         int nbModVars = this.getStructure().countModelVariables();
 
         List<Equation> retVal = new ArrayList<>();
 
-        boolean[] negated = new boolean[integer.length];
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
+        double[] solRHS = new double[solution.length];
         for (int i = 0; i < m; i++) {
             int j = included[i];
-            if (solution[j] < ZERO) {
+            solRHS[j] = constraintsRHS.doubleValue(i);
+        }
+        if (DEBUG) {
+            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
+            BasicLogger.debug("Bas: {}", Arrays.toString(included));
+        }
+        for (int j = 0; j < negated.length; j++) {
+            //if (this.getEntityMap().isNegated(j)) {
+            if (this.isNegated(j)) {
                 negated[j] = true;
+            } else {
+                negated[j] = false;
             }
         }
 
         for (int i = 0; i < m; i++) {
             int j = included[i];
 
-            double rhs = solution[j];
+            Primitive1D sliceBodyRow = this.sliceBodyRow(i);
+
+            // double rhs = sliceBodyRow.dot(Access1D.wrap(solution));
+            double rhs = constraintsRHS.doubleValue(i);
+            //double rhs = solution[j];
 
             if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(sliceBodyRow, j, rhs, integer, fractionality, negated, excluded);
 
                 if (maybe != null) {
                     retVal.add(maybe);

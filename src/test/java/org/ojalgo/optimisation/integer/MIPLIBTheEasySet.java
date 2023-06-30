@@ -77,11 +77,11 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * Mac Pro (Early 2009)
      * <ul>
-     * <li>2019-01-28: 1s finsihed with optimal solution
+     * <li>2019-01-28: 1s finished with optimal solution
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
-     * <li>2022-02-11: 0s finsihed with optimal solution
+     * <li>2022-02-11: 0s finished with optimal solution
      * </ul>
      */
     @Test
@@ -94,14 +94,15 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * Mac Pro (Early 2009)
      * <ul>
-     * <li>2019-01-28: 0s finsihed with optimal solution
+     * <li>2019-01-28: 0s finished with optimal solution
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
-     * <li>2022-02-11: 0s finsihed with optimal solution
+     * <li>2022-02-11: 0s finished with optimal solution
      * </ul>
      */
     @Test
+    @Tag("new_lp_problem")
     public void testGr4x6() {
         MIPLIBTheEasySet.doTest("gr4x6.mps", "202.35", null);
     }
@@ -111,12 +112,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <p>
      * Mac Pro (Early 2009)
      * <ul>
-     * <li>2019-01-28: 15s finsihed with optimal solution
+     * <li>2019-01-28: 15s finished with optimal solution
      * </ul>
      * MacBook Pro (16-inch, 2019)
      * <ul>
-     * <li>2022-02-11: 11s finsihed with optimal solution
-     * <li>2022-04-18: 22s finsihed with optimal solution
+     * <li>2022-02-11: 11s finished with optimal solution
+     * <li>2022-04-18: 22s finished with optimal solution
      * </ul>
      */
     @Test

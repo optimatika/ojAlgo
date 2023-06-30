@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -37,10 +38,13 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.UpdatableSolver;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
@@ -110,7 +114,9 @@ public final class NodeSolver extends IntermediateSolver {
                     String name = "CUT_GMI_" + equation.index + "_" + COUNTER.incrementAndGet();
 
                     if (DEBUG) {
-                        BasicLogger.debug("Eq: {} {}", name, equation.toString());
+                        BasicLogger.debug();
+                        BasicLogger.debug("Equat: {} {}", name, equation.toString());
+                        BasicLogger.debug();
                     }
 
                     Expression cut = target.newExpression(name);
@@ -118,19 +124,69 @@ public final class NodeSolver extends IntermediateSolver {
                     cut.lower(BigMath.ONE);
 
                     for (int j = 0; j < nbProblVars; j++) {
-                        int mj = entityMap.indexOf(j);
                         double aj = equation.doubleValue(j);
                         if (!SCALE.isZero(aj)) {
-                            BigDecimal AJ = TypeUtils.toBigDecimal(aj, SCALE);
-                            if (entityMap.isNegated(j)) {
-                                cut.add(mj, AJ.negate());
+
+                            int mj = entityMap.indexOf(j);
+
+                            KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> ibs = solver.getImpliedBoundSlack(j);
+
+                            if (ibs != null) {
+
+                                ConstraintType type = ibs.getLeft().getLeft();
+                                if (ibs.getLeft().getRight().intValue() != j || ibs.getRight().doubleValue() == PrimitiveMath.ZERO) {
+                                    throw new IllegalStateException();
+                                }
+
+                                Variable entity = model.getVariable(mj);
+
+                                BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
+                                BigDecimal adjusted = entity.adjust(coefficient);
+
+                                if (ConstraintType.LOWER.equals(type)) {
+
+                                    BigDecimal factor = adjusted;
+                                    BigDecimal limit = entity.getLowerLimit();
+
+                                    BigDecimal shift = limit.multiply(factor);
+                                    cut.shift(shift);
+
+                                    entity.addTo(cut, factor);
+                                }
+
+                                if (ConstraintType.UPPER.equals(type)) {
+
+                                    BigDecimal factor = adjusted.negate();
+                                    BigDecimal limit = entity.getUpperLimit();
+
+                                    BigDecimal shift = limit.multiply(factor);
+                                    cut.shift(shift);
+
+                                    entity.addTo(cut, factor);
+                                }
+
+                                if (DEBUG) {
+                                    BasicLogger.debug("Slack {} {} =->> Cut {}: {} < {}", type, entity, name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                                }
+
                             } else {
-                                cut.add(mj, AJ);
+
+                                BigDecimal AJ = TypeUtils.toBigDecimal(aj, SCALE);
+                                if (entityMap.isNegated(j)) {
+                                    cut.add(mj, AJ.negate());
+                                } else {
+                                    cut.add(mj, AJ);
+                                }
+
+                                if (DEBUG) {
+                                    BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", model.getVariable(mj), name, cut.getLowerLimit(),
+                                            cut.getLinearEntrySet());
+                                }
                             }
                         }
                     }
 
-                    for (int j = 0; j < entityMap.countSlackVariables(); j++) {
+                    for (int j = 0; j < nbSlackVars; j++) {
                         double aj = equation.doubleValue(nbProblVars + j);
                         if (!SCALE.isZero(aj)) {
 
@@ -162,11 +218,11 @@ public final class NodeSolver extends IntermediateSolver {
 
                                 entity.addTo(cut, factor);
                             }
-                        }
-                    }
 
-                    if (DEBUG) {
-                        BasicLogger.debug("Cut {}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                            if (DEBUG) {
+                                BasicLogger.debug("Slack {} {} =->> Cut {}: {} < {}", type, entity, name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                            }
+                        }
                     }
 
                     BigDecimal cRHS = cut.getLowerLimit();

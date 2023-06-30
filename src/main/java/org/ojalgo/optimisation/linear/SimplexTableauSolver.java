@@ -33,6 +33,7 @@ import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
@@ -117,6 +118,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
         }
     }
 
+    @Override
     public boolean fixVariable(final int index, final double value) {
 
         if (value < ZERO) {
@@ -136,14 +138,23 @@ abstract class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
+    @Override
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+
+        if (this.isLogDebug()) {
+            BasicLogger.debug("Sol: {}", Arrays.toString(this.extractSolution().toRawCopy1D()));
+            BasicLogger.debug("+++: {}", Arrays.toString(new double[integer.length]));
+        }
+
         return myTableau.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
+    @Override
     public LinearStructure getEntityMap() {
         return myTableau.meta;
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
         if (this.isLogDebug() && this.isTableauPrintable()) {
@@ -264,15 +275,18 @@ abstract class SimplexTableauSolver extends LinearSolver {
 
         return new Access1D<Double>() {
 
+            @Override
             public long count() {
                 return negative.length;
             }
 
+            @Override
             public double doubleValue(final long index) {
                 int i = Math.toIntExact(index);
                 return negative[i] ? -duals.doubleValue(index) : duals.doubleValue(index);
             }
 
+            @Override
             public Double get(final long index) {
                 return this.doubleValue(index);
             }
@@ -533,7 +547,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
                 }
             }
 
-            if ((minRHS < ZERO && !ACC.isZero(minRHS)) && this.isLogDebug()) {
+            if (minRHS < ZERO && !ACC.isZero(minRHS) && this.isLogDebug()) {
                 this.log("Entire RHS columns: {}", colRHS);
                 this.log();
             }

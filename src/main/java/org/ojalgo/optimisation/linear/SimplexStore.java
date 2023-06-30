@@ -169,6 +169,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             Variable variable = freeVariables.get(i);
             lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
             upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
+            structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
@@ -189,7 +190,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     static SimplexStore newInstance(final LinearStructure structure) {
-        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
+        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
             return new RevisedStore(structure);
         } else {
             return new TableauStore(structure);
@@ -243,54 +244,9 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         myStructure = structure;
     }
 
-    public int countAdditionalConstraints() {
-        return 0;
-    }
-
-    public int countConstraints() {
-        return m;
-    }
-
-    public int countEqualityConstraints() {
-        return m;
-    }
-
-    public int countInequalityConstraints() {
-        return 0;
-    }
-
-    public int countVariables() {
-        return n;
-    }
-
-    @Override
-    public String toString() {
-
-        myToStringList.clear();
-
-        for (int i = 0; i < myPartition.size(); i++) {
-            myToStringList.add(myPartition.get(i).key());
-        }
-
-        return myToStringList.toString();
-    }
-
     private SimplexStore basis(final int index) {
         myPartition.update(index, ColumnState.BASIS);
         return this;
-    }
-
-    protected void pivot(final SimplexSolver.IterDescr iteration) {
-
-        ExitInfo exit = iteration.exit;
-        EnterInfo enter = iteration.enter;
-
-        this.updateBasis(exit.index, exit.to, enter.index);
-    }
-
-    protected void shiftColumn(final int col, final double shift) {
-        myLowerBounds[col] -= shift;
-        myUpperBounds[col] -= shift;
     }
 
     abstract void calculateDualDirection(ExitInfo exit);
@@ -314,6 +270,31 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     abstract void copyBasicSolution(double[] solution);
 
     abstract void copyObjective();
+
+    @Override
+    public int countAdditionalConstraints() {
+        return 0;
+    }
+
+    @Override
+    public int countConstraints() {
+        return m;
+    }
+
+    @Override
+    public int countEqualityConstraints() {
+        return m;
+    }
+
+    @Override
+    public int countInequalityConstraints() {
+        return 0;
+    }
+
+    @Override
+    public int countVariables() {
+        return n;
+    }
 
     double[] extractSolution() {
 
@@ -358,7 +339,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      *        used as a potential cut
      * @return A collection of potential cuts
      */
-    abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, NumberContext tolerance, double fractionality);
+    abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, boolean[] negated, NumberContext tolerance, double fractionality);
 
     ColumnState getColumnState(final int index) {
         return myPartition.get(index);
@@ -469,6 +450,14 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         }
     }
 
+    boolean isNegated(final int j) {
+        if (myUpperBounds[j] <= ZERO && myLowerBounds[j] < ZERO) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * The problem is small enough to be explicitly printed/logged – log the entire tableau at each iteration
      * when debugging.
@@ -511,6 +500,14 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      */
     abstract Mutate1D objective();
 
+    protected void pivot(final SimplexSolver.IterDescr iteration) {
+
+        ExitInfo exit = iteration.exit;
+        EnterInfo enter = iteration.enter;
+
+        this.updateBasis(exit.index, exit.to, enter.index);
+    }
+
     /**
      * Everything that is not in the basis is set to be in at lower bound.
      */
@@ -532,8 +529,25 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
 
     abstract void restoreObjective();
 
+    protected void shiftColumn(final int col, final double shift) {
+        myLowerBounds[col] -= shift;
+        myUpperBounds[col] -= shift;
+    }
+
     final LinearStructure structure() {
         return myStructure;
+    }
+
+    @Override
+    public String toString() {
+
+        myToStringList.clear();
+
+        for (int i = 0; i < myPartition.size(); i++) {
+            myToStringList.add(myPartition.get(i).key());
+        }
+
+        return myToStringList.toString();
     }
 
     SimplexStore unbounded(final int index) {

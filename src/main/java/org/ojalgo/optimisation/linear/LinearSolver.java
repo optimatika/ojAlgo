@@ -387,7 +387,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             int nbProbVars = builderC.size();
             int nbSlckVars = nbUpConstr + nbLoConstr;
-            int nbArtiVars = (basis.length == (nbUpConstr + nbLoConstr + nbEqConstr)) ? 0 : nbEqConstr;
+            int nbArtiVars = basis.length == nbUpConstr + nbLoConstr + nbEqConstr ? 0 : nbEqConstr;
 
             LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
 
@@ -548,6 +548,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return modelVariableValues;
         }
 
+        @Override
         public LinearSolver build(final ExpressionsBasedModel model) {
 
             SimplexTableau tableau = PrimalSimplex.build(model);
@@ -562,6 +563,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return new PrimalSimplex(tableau, options);
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
         }
@@ -577,7 +579,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             ModelIntegration.toModelVariableValues(solverState, model, modelSolution);
 
-            return new Result(solverState.getState(), solverState.getValue(), modelSolution);
+            return solverState.withSolution(modelSolution);
         }
 
         @Override
@@ -589,21 +591,21 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int tmpCountPositives = tmpPositives.size();
             int tmpCountNegatives = tmpNegatives.size();
 
-            ArrayR064 tmpSolverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
+            ArrayR064 solverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
 
             for (int p = 0; p < tmpCountPositives; p++) {
                 Variable tmpVariable = tmpPositives.get(p);
                 int tmpIndex = model.indexOf(tmpVariable);
-                tmpSolverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
+                solverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
             }
 
             for (int n = 0; n < tmpCountNegatives; n++) {
                 Variable tmpVariable = tmpNegatives.get(n);
                 int tmpIndex = model.indexOf(tmpVariable);
-                tmpSolverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
+                solverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
             }
 
-            return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
+            return modelState.withSolution(solverSolution);
         }
 
         @Override
@@ -617,7 +619,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 return retVal;
             }
 
-            if (((value != null && value.signum() <= 0) || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
+            if ((value != null && value.signum() <= 0 || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
                 retVal += model.getPositiveVariables().size();
                 return retVal;
             }
@@ -634,6 +636,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      */
     static final class NewIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
 
+        @Override
         public SimplexSolver build(final ExpressionsBasedModel model) {
 
             PhasedSimplexSolver solver = SimplexStore.build(model, structure -> {
@@ -662,6 +665,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return solver;
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
         }
@@ -684,7 +688,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }
 
-            return new Result(solverState.getState(), modelSolution);
+            return solverState.withSolution(modelSolution);
         }
 
         @Override
@@ -701,7 +705,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 solverSolution.set(i, modelState.doubleValue(modelIndex));
             }
 
-            return new Result(modelState.getState(), solverSolution);
+            return modelState.withSolution(solverSolution);
         }
     }
 
