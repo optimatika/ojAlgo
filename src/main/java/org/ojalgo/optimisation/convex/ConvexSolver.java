@@ -493,12 +493,24 @@ public abstract class ConvexSolver extends GenericSolver {
             if (options.convex().isExtendedPrecision()) {
 
                 ConvexData<Quadruple> data = ConvexSolver.copy(model, GenericStore.R128);
-                return new IterativeRefinementSolver(options, data);
+                IterativeRefinementSolver solver = new IterativeRefinementSolver(options, data);
+
+                if (model.options.validate) {
+                    solver.setValidator(this.newValidator(model));
+                }
+
+                return solver;
 
             } else {
 
                 ConvexData<Double> data = ConvexSolver.copy(model, Primitive64Store.FACTORY);
-                return BasePrimitiveSolver.newSolver(data, options);
+                BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
+
+                if (model.options.validate) {
+                    solver.setValidator(this.newValidator(model));
+                }
+
+                return solver;
             }
         }
 

@@ -50,10 +50,19 @@ public final class IntegerSolver extends GenericSolver {
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<IntegerSolver> {
 
+        @Override
         public IntegerSolver build(final ExpressionsBasedModel model) {
-            return IntegerSolver.make(model);
+
+            IntegerSolver solver = IntegerSolver.make(model);
+
+            if (model.options.validate) {
+                solver.setValidator(this.newValidator(model));
+            }
+
+            return solver;
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !model.isAnyConstraintQuadratic();
         }
@@ -176,6 +185,7 @@ public final class IntegerSolver extends GenericSolver {
         myMinimisation = myIntegerModel.getOptimisationSense() == Optimisation.Sense.MIN;
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
         Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
@@ -365,7 +375,7 @@ public final class IntegerSolver extends GenericSolver {
 
         BigDecimal bestIntegerSolutionValue = BigDecimal.valueOf(myBestResultSoFar.getValue());
 
-        if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
+        if (myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX) {
             myIntegerModel.limitObjective(null, bestIntegerSolutionValue);
         } else {
             myIntegerModel.limitObjective(bestIntegerSolutionValue, null);

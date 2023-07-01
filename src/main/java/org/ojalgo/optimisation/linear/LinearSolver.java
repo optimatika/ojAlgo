@@ -36,7 +36,6 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -553,7 +552,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             SimplexTableau tableau = PrimalSimplex.build(model);
 
-            return new PrimalSimplex(tableau, model.options);
+            PrimalSimplex solver = new PrimalSimplex(tableau, model.options);
+
+            if (model.options.validate) {
+                solver.setValidator(this.newValidator(model));
+            }
+
+            return solver;
         }
 
         public LinearSolver build(final OptimisationData convexBuilder, final Optimisation.Options options) {
@@ -650,16 +655,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }).newPhasedSimplexSolver(model.options);
 
             if (model.options.validate) {
-                solver.setValidator(solvState -> {
-
-                    Result modState = this.toModelState(solvState, model);
-
-                    if (!model.validate(modState)) {
-                        BasicLogger.error();
-                        BasicLogger.error("Validation with Model Failed!");
-                        BasicLogger.error();
-                    }
-                });
+                solver.setValidator(this.newValidator(model));
             }
 
             return solver;

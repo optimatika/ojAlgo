@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -86,12 +87,12 @@ import org.ojalgo.type.context.NumberContext;
  * <li>It has a presolver that tries to simplify the problem before invoking a solver (sometimes it turns out
  * there is no need to invoke a solver at all).</li>
  * <li>When/if needed it scales problem parameters, before creating solver specific data structures, to
- * minimize numerical problems in the solvers.</li>
+ * minimise numerical problems in the solvers.</li>
  * <li>It's the only way to access the integer solver.</li>
  * </ol>
  * <p>
  * Different solvers can be used, and ojAlgo comes with collection built in. The default built-in solvers can
- * handle anythimng you can model with a couple of restrictions:
+ * handle anything you can model with a couple of restrictions:
  * </p>
  * <ul>
  * <li>No quadratic constraints (The plan is that future versions should not have this limitation.)</li>
@@ -120,14 +121,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         public final int nbUpperBounds;
         public final int nbUpperConstraints;
         public final int nbVariables;
-
-        @Override
-        public String toString() {
-            return "Description [nbEqualityBounds=" + nbEqualityBounds + ", nbEqualityConstraints=" + nbEqualityConstraints + ", nbIntegerVariables="
-                    + nbIntegerVariables + ", nbLowerBounds=" + nbLowerBounds + ", nbLowerConstraints=" + nbLowerConstraints + ", nbNegativeVariables="
-                    + nbNegativeVariables + ", nbPositiveVariables=" + nbPositiveVariables + ", nbUpperBounds=" + nbUpperBounds + ", nbUpperConstraints="
-                    + nbUpperConstraints + ", nbVariables=" + nbVariables + "]";
-        }
 
         Description(final int varTotal, final int varPositive, final int varNegative, final int varInteger, final int nbLoBound, final int nbUpBound,
                 final int nbEqBound, final int nbLoCnstr, final int nbUpCnstr, final int nbEqCnstr) {
@@ -171,6 +164,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         @Override
         public int countVariables() {
             return nbVariables;
+        }
+
+        @Override
+        public String toString() {
+            return "Description [nbEqualityBounds=" + nbEqualityBounds + ", nbEqualityConstraints=" + nbEqualityConstraints + ", nbIntegerVariables="
+                    + nbIntegerVariables + ", nbLowerBounds=" + nbLowerBounds + ", nbLowerConstraints=" + nbLowerConstraints + ", nbNegativeVariables="
+                    + nbNegativeVariables + ", nbPositiveVariables=" + nbPositiveVariables + ", nbUpperBounds=" + nbUpperBounds + ", nbUpperConstraints="
+                    + nbUpperConstraints + ", nbVariables=" + nbVariables + "]";
         }
 
     }
@@ -254,6 +255,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return model.indexOfFreeVariable(variable);
         }
 
+        protected ExpressionsBasedModel.Validator newValidator(final ExpressionsBasedModel model) {
+            return new ExpressionsBasedModel.Validator(model, this, model.getKnownSolution(), model.getValidationFailureHandler());
+        }
+
     }
 
     public static abstract class Presolver extends Simplifier<Expression, Presolver> {
@@ -274,6 +279,89 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         @Override
         boolean isApplicable(final Expression target) {
             return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && target.countQuadraticFactors() == 0;
+        }
+
+    }
+
+    public static final class Validator {
+
+        private static final NumberContext ACCURACY = NumberContext.of(8);
+
+        static final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> NULL = (m, s) -> {};
+
+        public static Validator of(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration) {
+            return Validator.of(originalModel, integration, NULL);
+        }
+
+        public static Validator of(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration,
+                final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+            Objects.requireNonNull(originalModel);
+            Objects.requireNonNull(integration);
+            return new Validator(originalModel, integration, null, handler);
+        }
+
+
+        public static Validator of(final Result knownSolution) {
+            Validator.of(knownSolution, NULL);
+            Objects.requireNonNull(knownSolution);
+            return new Validator(null, null, knownSolution, NULL);
+        }
+
+        public static Validator of(final Result knownSolution, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+            Objects.requireNonNull(knownSolution);
+            return new Validator(null, null, knownSolution, handler);
+        }
+
+        private static boolean doValidate(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution, final NumberContext accuracy,
+                final BasicLogger logger,final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+
+            if (model != null && solution != null) {
+                boolean valid = model.validate(solution, accuracy != null ? accuracy : ACCURACY, logger != null ? logger : BasicLogger.NULL);
+                if (!valid) {
+                    handler.accept(model, solution);
+                }
+                return valid;
+            } else {
+                return true;
+            }
+        }
+
+        private final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> myHandler;
+        private final Optimisation.Integration<ExpressionsBasedModel, ?> myIntegration;
+        private final Optimisation.Result myKnownSolution;
+        private final ExpressionsBasedModel myOriginalModel;
+
+        /**
+         * @param originalModel Baseline model.
+         * @param integration The integration used to translate between model and solver state.
+         * @param knownSolution Not just any feasible solution. It needs to be the optimal solution.
+         */
+        Validator(final ExpressionsBasedModel originalModel, final Optimisation.Integration<ExpressionsBasedModel, ?> integration, final Result knownSolution,
+                final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+            super();
+            myOriginalModel = originalModel;
+            myIntegration = integration;
+            myKnownSolution = knownSolution;
+            myHandler = handler;
+        }
+
+        /**
+         * Validate an (intermediate) solver solution against the original model. (Validation only performed
+         * if an original model was provided to the constructor.)
+         */
+        public boolean validate(final Access1D<?> solverSolution, final NumberContext accuracy, final BasicLogger logger) {
+            Result solverState = Optimisation.Result.wrap(solverSolution);
+            Result modelState = myIntegration.toModelState(solverState, myOriginalModel);
+            return Validator.doValidate(myOriginalModel, modelState, accuracy, logger, myHandler);
+        }
+
+        /**
+         * Validate the known solution against a (modified) model - perhaps modified during pre-solve or with
+         * cuts generation in the {@link IntegerSolver}. (Validation only performed if a known solution was
+         * provided to the constructor.)
+         */
+        public boolean validate(final ExpressionsBasedModel modifiedModel, final NumberContext accuracy, final BasicLogger logger) {
+            return Validator.doValidate(modifiedModel, myKnownSolution, accuracy, logger, myHandler);
         }
 
     }
@@ -560,6 +648,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient boolean myInfeasible = false;
+    private Optimisation.Result myKnownSolution = null;
     private BigDecimal myObjectiveConstant = BigMath.ZERO;
     private Optimisation.Sense myOptimisationSense = null;
     private final Set<IntIndex> myReferences;
@@ -570,9 +659,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     private final boolean myShallowCopy;
     /**
-     * Temporary storage for some expresssion specific subset of variables
+     * Temporary storage for some expression specific subset of variables
      */
     private final Set<IntIndex> myTemporary = new HashSet<>();
+    private BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> myValidationFailureHandler = Validator.NULL;
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final VariablesCategorisation myVariablesCategorisation = new VariablesCategorisation();
 
@@ -1299,6 +1389,33 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     /**
+     * Same as {@link #setKnownSolution(org.ojalgo.optimisation.Optimisation.Result, BiConsumer)} but with a
+     * no-op handler.
+     */
+    public void setKnownSolution(final Optimisation.Result knownSolution) {
+        this.setKnownSolution(knownSolution, Validator.NULL);
+    }
+
+    /**
+     * For test/validation during solver development.
+     * 
+     * @param knownSolution The optimal solution
+     * @param handler What to do if validation fails
+     */
+    public void setKnownSolution(final Optimisation.Result knownSolution, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+        Objects.requireNonNull(knownSolution);
+        Objects.requireNonNull(handler);
+        if (!knownSolution.getState().isOptimal()) {
+            throw new ProgrammingError("Must be an optimal solution!");
+        }
+        if (!this.validate(knownSolution)) {
+            throw new ProgrammingError("Solution not valid!");
+        }
+        myKnownSolution = knownSolution;
+        myValidationFailureHandler = handler;
+    }
+
+    /**
      * Will perform presolve and then create a copy removing redundant constraint expressions, and pruning the
      * remaining ones to no longer include fixed variables.
      */
@@ -1566,12 +1683,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return retVal;
     }
 
+    Optimisation.Result getKnownSolution() {
+        return myKnownSolution;
+    }
+
     BigDecimal getObjectiveConstant() {
         return myObjectiveConstant;
     }
 
     Set<IntIndex> getReferences() {
         return myReferences;
+    }
+
+    BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> getValidationFailureHandler() {
+        return myValidationFailureHandler != null ? myValidationFailureHandler : Validator.NULL;
     }
 
     boolean isFixed() {

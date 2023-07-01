@@ -462,6 +462,12 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
+    public static void assertSolutionValid(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution, final NumberContext accuracy) {
+        if (!model.validate(solution, accuracy, BasicLogger.ERROR)) {
+            Assertions.fail("Solution not valid!");
+        }
+    }
+
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertStateAndSolution(expected, actual, EQUALS);
     }

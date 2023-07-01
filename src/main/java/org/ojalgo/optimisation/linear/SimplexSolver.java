@@ -280,17 +280,10 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    interface Validator {
-
-        void validate(Optimisation.Result result);
-
-    }
-
     private static final NumberContext ALGORITHM = NumberContext.of(8).withMode(RoundingMode.HALF_DOWN);
 
     private final SimplexStore mySimplex;
     private final double[] mySolutionShift;
-    private Validator myValidator = null;
     private double myValueShift = ZERO;
     /**
      * Excluding the artificial variables
@@ -349,8 +342,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     final void doPrimalIterations(final IterDescr iteration) {
 
-        if (options.validate && myValidator != null) {
-            myValidator.validate(this.extractResult());
+        if (options.validate) {
+            this.validate(this.extractResult());
         }
 
         boolean done = false;
@@ -387,8 +380,8 @@ abstract class SimplexSolver extends LinearSolver {
                 this.logCurrentState();
             }
 
-            if (options.validate && myValidator != null) {
-                myValidator.validate(this.extractResult());
+            if (options.validate) {
+                this.validate(this.extractResult());
             }
         }
     }
@@ -706,10 +699,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return new IterDescr(mySimplex);
-    }
-
-    void setValidator(final Validator validator) {
-        myValidator = validator;
     }
 
     private void shift(final int column, final ColumnState state) {

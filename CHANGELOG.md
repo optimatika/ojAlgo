@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- New solver validation mechanism - a tool for solver debugging.
+
 ### Fixed
 
 #### org.ojalgo.optimisation

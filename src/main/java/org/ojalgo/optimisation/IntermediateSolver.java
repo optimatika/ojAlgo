@@ -28,7 +28,7 @@ import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.structure.Access1D;
 
 /**
- * A {@link Optimisation.Solver} implemenattion that wraps an {@link ExpressionsBasedModel}. Intended to be
+ * A {@link Optimisation.Solver} implementation that wraps an {@link ExpressionsBasedModel}. Intended to be
  * used when implementing solvers that iteratively modify a model instance and delegate to other solvers. The
  * {@link IntegerSolver} makes use of this.
  *
@@ -49,6 +49,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         mySolver = null;
     }
 
+    @Override
     public void dispose() {
 
         this.reset();
@@ -75,6 +76,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         myIntegration = null;
     }
 
+    @Override
     public Optimisation.Result solve(final Optimisation.Result candidate) {
 
         if (mySolver == null && ExpressionsBasedModel.PRESOLVERS.size() > 0) {
@@ -146,8 +148,44 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         mySolver = null;
     }
 
+    /**
+     * Using the solver's {@link ExpressionsBasedModel.Validator} instance, if set. Otherwise no validation
+     * performed.
+     */
+    public boolean validate(final Access1D<?> solution) {
+        if (mySolver != null && mySolver instanceof GenericSolver) {
+            boolean valid = ((GenericSolver) mySolver).validate(solution);
+            if (!valid) {
+                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
+            }
+            return valid;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Always performs validation directly using
+     * {@link ExpressionsBasedModel#validate(Access1D, BasicLogger)}.
+     */
     public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
         return myModel.validate(solution, appender);
+    }
+
+    /**
+     * Using the solver's {@link ExpressionsBasedModel.Validator} instance, if set. Otherwise no validation
+     * performed.
+     */
+    public boolean validate(final ExpressionsBasedModel model) {
+        if (mySolver != null && mySolver instanceof GenericSolver) {
+            boolean valid = ((GenericSolver) mySolver).validate(model);
+            if (!valid) {
+                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
+            }
+            return valid;
+        } else {
+            return true;
+        }
     }
 
     protected int getIndexInSolver(final int globalModelIndex) {

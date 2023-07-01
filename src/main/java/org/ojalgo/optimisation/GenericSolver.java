@@ -128,22 +128,27 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return this.doBuild(options);
         }
 
+        @Override
         public int countAdditionalConstraints() {
             return myAdditionalConstraints != null ? myAdditionalConstraints.size() : 0;
         }
 
+        @Override
         public int countConstraints() {
             return this.countEqualityConstraints() + this.countInequalityConstraints() + this.countAdditionalConstraints();
         }
 
+        @Override
         public int countEqualityConstraints() {
             return myAE != null ? myAE.getRowDim() : 0;
         }
 
+        @Override
         public int countInequalityConstraints() {
             return myAI != null ? myAI.getRowDim() : 0;
         }
 
+        @Override
         public int countVariables() {
             if (myNumberOfVariables < 0) {
                 myNumberOfVariables = this.doCountVariables();
@@ -479,12 +484,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
             ProgrammingError.throwIfNull(myObjective);
 
-            if (((myAE != null) || (myBE != null))) {
+            if (myAE != null || myBE != null) {
                 ProgrammingError.throwIfNull(myAE, myBE);
                 ProgrammingError.throwIfNotEqualRowDimensions(myAE, myBE);
             }
 
-            if (((myAI != null) || (myBI != null))) {
+            if (myAI != null || myBI != null) {
                 ProgrammingError.throwIfNull(myAI, myBI);
                 ProgrammingError.throwIfNotEqualRowDimensions(myAI, myBI);
             }
@@ -528,6 +533,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
     private State myState = State.UNEXPLORED;
     private final Stopwatch myStopwatch = new Stopwatch();
+    private ExpressionsBasedModel.Validator myValidator = null;
 
     @SuppressWarnings("unused")
     private GenericSolver() {
@@ -671,6 +677,41 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final void setState(final State state) {
         Objects.requireNonNull(state);
         myState = state;
+    }
+
+    /**
+     * Optionally set a validator. If set, solvers may call {@link #validate(Access1D)} or
+     * {@link #validate(ExpressionsBasedModel)} at suitable points in the code to validate its actions. This
+     * is a solver debugging tool - not to be used in production code.
+     */
+    protected final void setValidator(final ExpressionsBasedModel.Validator validator) {
+        myValidator = validator;
+    }
+
+    /**
+     * @see #setValidator(org.ojalgo.optimisation.ExpressionsBasedModel.Validator)
+     * @see org.ojalgo.optimisation.ExpressionsBasedModel.Validator#validate(Access1D, NumberContext,
+     *      BasicLogger)
+     */
+    protected final boolean validate(final Access1D<?> solverSolution) {
+        if (myValidator != null && solverSolution != null) {
+            return myValidator.validate(solverSolution, options.feasibility, options.logger_appender);
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @see #setValidator(org.ojalgo.optimisation.ExpressionsBasedModel.Validator)
+     * @see org.ojalgo.optimisation.ExpressionsBasedModel.Validator#validate(ExpressionsBasedModel,
+     *      NumberContext, BasicLogger)
+     */
+    protected final boolean validate(final ExpressionsBasedModel modifiedModel) {
+        if (myValidator != null && modifiedModel != null) {
+            return myValidator.validate(modifiedModel, options.feasibility, options.logger_appender);
+        } else {
+            return true;
+        }
     }
 
 }

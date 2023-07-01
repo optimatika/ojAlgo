@@ -48,7 +48,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
         // model.options.debug(ConvexSolver.class);
         // model.options.debug(LinearSolver.class);
         // model.options.progress(IntegerSolver.class);
-        // model.options.validate = false;
+        // model.options.validate = true;
         // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
@@ -64,6 +64,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: 300s suffice with optimal solution (actually found after less than 5s)
+     * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (new LP): 300s suffice with optimal solution.
      * </ul>
      */
     @Test
@@ -83,6 +87,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2022-02-11: 0s finished with optimal solution
      * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (new LP): Finished with optimal solution in 0.4s.
+     * </ul>
      */
     @Test
     public void testFlugpl() {
@@ -99,6 +107,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: 0s finished with optimal solution
+     * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (new LP): Finished in 0.2s, but with feasible solution only!
      * </ul>
      */
     @Test
@@ -118,6 +130,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2022-02-11: 11s finished with optimal solution
      * <li>2022-04-18: 22s finished with optimal solution
+     * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (new LP): Finished with optimal solution in 20s.
      * </ul>
      */
     @Test
@@ -139,6 +155,10 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * MacBook Pro (16-inch, 2019)
      * <ul>
      * <li>2022-02-11: 300s suffice with optimal solution found (after just a few seconds)
+     * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (new LP): Still takes more than 5min (and problem with suffice termination).
      * </ul>
      */
     @Test
@@ -167,6 +187,11 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>2022-02-11: Finished with optimal solution in 251s. (optimal solution found after about 150s)
      * <li>2022-03-17: Finished with optimal solution in 159s.
+     * </ul>
+     * MacBook Air (15-inch, M2, 2023)
+     * <ul>
+     * <li>2023-07-01 (old LP): Finished with optimal solution in 94s (773488 iterations).
+     * <li>2023-07-01 (new LP): Finished with optimal solution in 66s (815766 iterations).
      * </ul>
      */
     @Test

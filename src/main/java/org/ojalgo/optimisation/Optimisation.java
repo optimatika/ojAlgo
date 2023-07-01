@@ -440,6 +440,10 @@ public interface Optimisation {
             return new Result(state, value, solution);
         }
 
+        public static Result wrap(final Access1D<?> solution) {
+            return new Result(State.APPROXIMATE, Double.NaN, solution);
+        }
+
         private transient Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;

@@ -51,7 +51,7 @@ public class InterruptionTest extends OptimisationLinearTests implements ModelFi
         Thread minimizer = new Thread(this::launchSlowMinimization);
 
         minimizer.start();
-        minimizer.join(8 * 100);
+        minimizer.join(7 * 100); // Wait some time, but not so long that the solver finishes
         Assertions.assertTrue(minimizer.isAlive());
 
         minimizer.interrupt();

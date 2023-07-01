@@ -76,14 +76,20 @@ public final class NodeSolver extends IntermediateSolver {
         }
 
         ExpressionsBasedModel model = this.getModel();
+        Solver solver = this.getSolver();
         Result result = this.getResult();
 
-        long nbConstr = model.constraints().count();
+        long nbConstr = target.constraints().count();
 
-        if (this.getSolver() instanceof UpdatableSolver) {
-            UpdatableSolver solver = (UpdatableSolver) this.getSolver();
+        if (model.countVariables() != target.countVariables()) {
+            throw new IllegalStateException();
+        }
 
-            UpdatableSolver.EntityMap entityMap = solver.getEntityMap();
+
+        if (solver instanceof UpdatableSolver) {
+            UpdatableSolver updatable = (UpdatableSolver) solver;
+
+            UpdatableSolver.EntityMap entityMap = updatable.getEntityMap();
 
             if (entityMap != null) {
 
@@ -107,7 +113,7 @@ public final class NodeSolver extends IntermediateSolver {
                     integers[nbProblVars + i] = integer;
                 }
 
-                Collection<Equation> potentialCuts = solver.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
+                Collection<Equation> potentialCuts = updatable.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
 
                 for (Equation equation : potentialCuts) {
 
@@ -129,7 +135,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                             int mj = entityMap.indexOf(j);
 
-                            KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> ibs = solver.getImpliedBoundSlack(j);
+                            KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> ibs = updatable.getImpliedBoundSlack(j);
 
                             if (ibs != null) {
 
@@ -138,7 +144,7 @@ public final class NodeSolver extends IntermediateSolver {
                                     throw new IllegalStateException();
                                 }
 
-                                Variable entity = model.getVariable(mj);
+                                Variable entity = target.getVariable(mj);
 
                                 BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
                                 BigDecimal adjusted = entity.adjust(coefficient);
@@ -179,7 +185,7 @@ public final class NodeSolver extends IntermediateSolver {
                                 }
 
                                 if (DEBUG) {
-                                    BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", model.getVariable(mj), name, cut.getLowerLimit(),
+                                    BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", target.getVariable(mj), name, cut.getLowerLimit(),
                                             cut.getLinearEntrySet());
                                 }
                             }
@@ -274,7 +280,7 @@ public final class NodeSolver extends IntermediateSolver {
                         if (DEBUG) {
                             BasicLogger.debug(1, "Dynanism large! {} >> {}", cLargest, cSmallest);
                         }
-                    } else if (model.checkSimilarity(cut)) {
+                    } else if (target.checkSimilarity(cut)) {
                         target.removeExpression(name);
                         if (DEBUG) {
                             BasicLogger.debug(1, "Cut similar to current constraint!");
@@ -295,9 +301,19 @@ public final class NodeSolver extends IntermediateSolver {
                     }
                 }
             }
+
         }
 
-        return nbConstr != model.constraints().count();
+        boolean didGenerate = nbConstr != target.constraints().count();
+        if (didGenerate && model.options.validate) {
+            if (!this.validate(target)) {
+                BasicLogger.error("Modified target model cuts off the optimal solution!");
+            }
+            if (target.validate(result)) {
+                BasicLogger.error("Result still valid, was NOT cut off!");
+            }
+        }
+        return didGenerate;
     }
 
 }
