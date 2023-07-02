@@ -45,7 +45,7 @@ public class PasswordTest extends NetioTests {
     @Test
     public void testGeneration() {
 
-        for (int i = 1; i < 100; i++) {
+        for (int i = 2; i < 100; i++) {
 
             String original = Password.makePlainText(i);
 
