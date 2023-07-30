@@ -34,6 +34,7 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
@@ -151,7 +152,7 @@ abstract class SimplexTableauSolver extends LinearSolver {
 
     @Override
     public LinearStructure getEntityMap() {
-        return myTableau.meta;
+        return myTableau.structure();
     }
 
     @Override
@@ -257,11 +258,17 @@ abstract class SimplexTableauSolver extends LinearSolver {
         Result result = new Optimisation.Result(state, value, solution);
 
         if (myTableau.isAbleToExtractDual()) {
-            return result.multipliers(this.extractMultipliers());
+
+            ConstraintsMap constraints = this.getEntityMap().constraints;
+
+            if (constraints.isEntityMap()) {
+                return result.multipliers(constraints, this.extractMultipliers());
+            } else {
+                return result.multipliers(this.extractMultipliers());
+            }
         }
 
         return result;
-
     }
 
     protected double evaluateFunction(final Access1D<?> solution) {
@@ -271,24 +278,26 @@ abstract class SimplexTableauSolver extends LinearSolver {
     protected Access1D<?> extractMultipliers() {
 
         Access1D<Double> duals = myTableau.sliceDualVariables();
-        boolean[] negative = myTableau.meta.negatedDual;
+
+        LinearStructure structure = myTableau.structure();
 
         return new Access1D<Double>() {
 
             @Override
             public long count() {
-                return negative.length;
+                return structure.countConstraints();
             }
 
             @Override
             public double doubleValue(final long index) {
                 int i = Math.toIntExact(index);
-                return negative[i] ? -duals.doubleValue(index) : duals.doubleValue(index);
+                double dualValue = duals.doubleValue(index);
+                return structure.isConstraintNegated(i) ? -dualValue : dualValue;
             }
 
             @Override
             public Double get(final long index) {
-                return this.doubleValue(index);
+                return Double.valueOf(this.doubleValue(index));
             }
 
             @Override

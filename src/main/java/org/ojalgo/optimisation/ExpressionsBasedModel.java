@@ -51,6 +51,8 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * <p>
@@ -176,6 +178,60 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     }
 
+    /**
+     * Connects solver constraints and variables back to model entities. Used for 2 things:
+     * <ol>
+     * <li>Solvers that manipulate models (like the {@link IntegerSolver}) need this to map between model
+     * entities and solver indices.
+     * <li>Simplifies implementation of
+     * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.
+     * </ol>
+     */
+    public static interface EntityMap extends ProblemStructure {
+
+        /**
+         * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
+         * artificial variables.) This defines the range of the indices that can be used with the indexOf
+         * method.
+         */
+        int countModelVariables();
+
+        /**
+         * The number of slack variables - relates to {@link #getSlack(int)}
+         */
+        int countSlackVariables();
+
+        EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(int i);
+
+        /**
+         * Returns which model entity, and constraint type, that corresponds to the slack variable at the
+         * supplied index.
+         *
+         * @param idx Index of solver slack variable
+         */
+        EntryPair<ModelEntity<?>, ConstraintType> getSlack(int idx);
+
+        /**
+         * Converts from a solver specific variable index to the corresponding index of the variable in the
+         * model. Note that not all model variables are necessarily represented in the solver, and a model
+         * variable may result in multiple solver variables. Further, slack variables, artificial variables
+         * and such are typically not represented in the model.
+         *
+         * @param idx Index of solver variable
+         * @return Index of model variable (negative if no map)
+         */
+        int indexOf(int idx);
+
+        /**
+         * Is this solver variable negated relative to the corresponding model variable?
+         *
+         * @param idx Index of solver variable
+         * @return true if this solver variable represents a negated model variable
+         */
+        boolean isNegated(int idx);
+
+    }
+
     public enum FileFormat {
 
         EBM, MPS;
@@ -255,8 +311,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return model.indexOfFreeVariable(variable);
         }
 
-        protected ExpressionsBasedModel.Validator newValidator(final ExpressionsBasedModel model) {
+        protected final boolean isSwitch(final ExpressionsBasedModel model) {
+            return model.isIntegrationSwitch();
+        }
+
+        protected final ExpressionsBasedModel.Validator newValidator(final ExpressionsBasedModel model) {
             return new ExpressionsBasedModel.Validator(model, this, model.getKnownSolution(), model.getValidationFailureHandler());
+        }
+
+        protected final void setSwitch(final ExpressionsBasedModel model, final boolean value) {
+            model.setIntegrationSwitch(value);
         }
 
     }
@@ -300,7 +364,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return new Validator(originalModel, integration, null, handler);
         }
 
-
         public static Validator of(final Result knownSolution) {
             Validator.of(knownSolution, NULL);
             Objects.requireNonNull(knownSolution);
@@ -313,7 +376,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         private static boolean doValidate(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution, final NumberContext accuracy,
-                final BasicLogger logger,final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
+                final BasicLogger logger, final BiConsumer<ExpressionsBasedModel, Access1D<BigDecimal>> handler) {
 
             if (model != null && solution != null) {
                 boolean valid = model.validate(solution, accuracy != null ? accuracy : ACCURACY, logger != null ? logger : BasicLogger.NULL);
@@ -584,9 +647,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
 
     static {
-        ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
-        ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
-        ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
+        ExpressionsBasedModel.resetPresolvers();
     }
 
     /**
@@ -643,11 +704,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return PRESOLVERS.remove(presolver);
     }
 
+    public static void resetPresolvers() {
+        ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
+        ExpressionsBasedModel.addPresolver(Presolvers.INTEGER);
+        ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
+    }
+
     public final Optimisation.Options options;
 
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient boolean myInfeasible = false;
+    private boolean myIntegrationSwitch = false;
     private Optimisation.Result myKnownSolution = null;
     private BigDecimal myObjectiveConstant = BigMath.ZERO;
     private Optimisation.Sense myOptimisationSense = null;
@@ -1587,10 +1655,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         Result retSolution = this.getVariableValues();
         double retValue = this.objective().evaluate(retSolution).doubleValue();
         Optimisation.State retState = result.getState();
+        List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = result.getMatchedMultipliers();
 
         prepared.dispose();
 
-        return new Optimisation.Result(retState, retValue, retSolution);
+        return new Optimisation.Result(retState, retValue, retSolution).multipliers(matchedMultipliers);
     }
 
     private void scanEntities() {
@@ -1735,6 +1804,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return true;
     }
 
+    boolean isIntegrationSwitch() {
+        return myIntegrationSwitch;
+    }
+
     boolean isReferenced(final Variable variable) {
         return myReferences.contains(variable.getIndex());
     }
@@ -1818,6 +1891,10 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void setInfeasible() {
         myInfeasible = true;
+    }
+
+    void setIntegrationSwitch(final boolean value) {
+        myIntegrationSwitch = value;
     }
 
     void setOptimisationSense(final Optimisation.Sense optimisationSense) {

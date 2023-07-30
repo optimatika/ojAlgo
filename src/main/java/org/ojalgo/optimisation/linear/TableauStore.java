@@ -309,6 +309,60 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     }
 
     @Override
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
+            final double fractionality) {
+
+        int nbModVars = this.structure().countModelVariables();
+
+        List<Equation> retVal = new ArrayList<>();
+
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
+        double[] solRHS = new double[solution.length];
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+            solRHS[j] = constraintsRHS.doubleValue(i);
+        }
+        if (DEBUG) {
+            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
+            BasicLogger.debug("Bas: {}", Arrays.toString(included));
+        }
+        for (int j = 0; j < negated.length; j++) {
+            //if (this.getEntityMap().isNegated(j)) {
+            if (this.isNegated(j)) {
+                negated[j] = true;
+            } else {
+                negated[j] = false;
+            }
+        }
+
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+
+            Primitive1D sliceBodyRow = this.sliceBodyRow(i);
+
+            // double rhs = sliceBodyRow.dot(Access1D.wrap(solution));
+            double rhs = constraintsRHS.doubleValue(i);
+            //double rhs = solution[j];
+
+            if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(sliceBodyRow, j, rhs, integer, fractionality, negated, excluded);
+
+                if (maybe != null) {
+                    retVal.add(maybe);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    int getBasisColumnIndex(final int basisRowIndex) {
+        return included[basisRowIndex];
+    }
+
+    @Override
     double getCost(final int j) {
         return myTableau[m][j];
     }
@@ -386,60 +440,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myTableau[row][col] = value;
     }
 
-    @Override
-    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-            final double fractionality) {
-
-        int nbModVars = this.getStructure().countModelVariables();
-
-        List<Equation> retVal = new ArrayList<>();
-
-        Primitive1D constraintsRHS = this.constraintsRHS();
-
-        double[] solRHS = new double[solution.length];
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-            solRHS[j] = constraintsRHS.doubleValue(i);
-        }
-        if (DEBUG) {
-            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
-            BasicLogger.debug("Bas: {}", Arrays.toString(included));
-        }
-        for (int j = 0; j < negated.length; j++) {
-            //if (this.getEntityMap().isNegated(j)) {
-            if (this.isNegated(j)) {
-                negated[j] = true;
-            } else {
-                negated[j] = false;
-            }
-        }
-
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-
-            Primitive1D sliceBodyRow = this.sliceBodyRow(i);
-
-            // double rhs = sliceBodyRow.dot(Access1D.wrap(solution));
-            double rhs = constraintsRHS.doubleValue(i);
-            //double rhs = solution[j];
-
-            if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
-
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(sliceBodyRow, j, rhs, integer, fractionality, negated, excluded);
-
-                if (maybe != null) {
-                    retVal.add(maybe);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    int getBasisColumnIndex(final int basisRowIndex) {
-        return included[basisRowIndex];
-    }
-
     Primitive1D sliceBodyRow(final int row) {
 
         return new Primitive1D() {
@@ -457,6 +457,34 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
             @Override
             public int size() {
                 return TableauStore.this.countVariables();
+            }
+
+        };
+    }
+
+    /**
+     * @return An array of the dual variable values (of the original problem, never phase 1).
+     */
+    @Override
+    final Primitive1D sliceDualVariables() {
+
+        int base = n - m;
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return myObjective.doubleValue(base + index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                myObjective.set(base + index, value);
+            }
+
+            @Override
+            public int size() {
+                return n - base;
             }
 
         };

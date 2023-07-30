@@ -31,49 +31,6 @@ import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public interface UpdatableSolver extends Optimisation.Solver {
 
-    interface EntityMap {
-
-        /**
-         * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
-         * artificial variables.) This defines the range of the indices that can be used with the indexOf
-         * method.
-         */
-        int countModelVariables();
-
-        /**
-         * The number of slack variables - relates to {@link #getSlack(int)}
-         */
-        int countSlackVariables();
-
-        /**
-         * Returns which model entity, and constraint type, that corresponsf to the slack variable at the
-         * supplied index.
-         *
-         * @param idx Index of solver slack variable
-         */
-        EntryPair<ModelEntity<?>, ConstraintType> getSlack(int idx);
-
-        /**
-         * Converts from a solver specific variable index to the corresponding index of the variable in the
-         * model. Note that not all model variables are necessarily represented in the solver, and a model
-         * variable may result in multiple solver variables. Further, slack variables, artificial variables
-         * and such are typically not represented in the model.
-         *
-         * @param idx Index of solver variable
-         * @return Index of model variable (negative if no map)
-         */
-        int indexOf(int idx);
-
-        /**
-         * Is this solver variable negated relative to the corresponding model variable?
-         *
-         * @param idx Index of solver variable
-         * @return true if this solver variable represents a negated model variable
-         */
-        boolean isNegated(int idx);
-
-    }
-
     /**
      * @param index The, solver specific, variable index
      * @param value The value to fix that variable to
@@ -87,7 +44,7 @@ public interface UpdatableSolver extends Optimisation.Solver {
         return Collections.emptySet();
     }
 
-    UpdatableSolver.EntityMap getEntityMap();
+    ExpressionsBasedModel.EntityMap getEntityMap();
 
     /**
      * Some solvers deal with variable bounds implicitly – they are not expressed as constraints. If so, then
@@ -103,6 +60,10 @@ public interface UpdatableSolver extends Optimisation.Solver {
      */
     default KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
         return null;
+    }
+
+    default boolean isMapped() {
+        return this.getEntityMap() != null;
     }
 
     /**

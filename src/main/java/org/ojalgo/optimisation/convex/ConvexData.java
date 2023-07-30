@@ -22,14 +22,16 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.optimisation.OptimisationData;
+import org.ojalgo.optimisation.ConstraintsMap;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.structure.Access2D.RowView;
+import org.ojalgo.type.keyvalue.EntryPair;
 
-final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
+public final class ConvexData<N extends Comparable<N>> implements ExpressionsBasedModel.EntityMap {
 
     @FunctionalInterface
     interface ConvexDataFactory<N extends Comparable<N>> {
@@ -42,9 +44,10 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
     private final RowsSupplier<N> myAI;
     private final PhysicalStore<N> myBE;
     private final PhysicalStore<N> myBI;
+    private final ConstraintsMap myConstraintsMap;
     private final ConvexObjectiveFunction<N> myObjective;
 
-    ConvexData(final PhysicalStore.Factory<N, ?> factory, final int nbVars, final int nbEqus, final int nbIneq) {
+    ConvexData(final boolean inclMap, final PhysicalStore.Factory<N, ?> factory, final int nbVars, final int nbEqus, final int nbIneq) {
 
         super();
 
@@ -57,24 +60,41 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
         myAI = factory.makeRowsSupplier(nbVars);
         myAI.addRows(nbIneq);
         myBI = factory.make(nbIneq, 1);
+
+        myConstraintsMap = ConstraintsMap.newInstance(nbIneq + nbEqus, inclMap);
     }
 
+    @Override
     public int countAdditionalConstraints() {
         return 0;
     }
 
+    @Override
     public int countConstraints() {
         return this.countEqualityConstraints() + this.countInequalityConstraints();
     }
 
+    @Override
     public int countEqualityConstraints() {
         return myAE != null ? myAE.getRowDim() : 0;
     }
 
+    @Override
     public int countInequalityConstraints() {
         return myAI != null ? myAI.getRowDim() : 0;
     }
 
+    @Override
+    public int countModelVariables() {
+        return this.countVariables();
+    }
+
+    @Override
+    public int countSlackVariables() {
+        return 0;
+    }
+
+    @Override
     public int countVariables() {
         return myObjective.arity();
     }
@@ -84,29 +104,6 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
      */
     public PhysicalStore<N> getAE() {
         return myAE.get();
-    }
-
-    public SparseArray<N> getAE(final int row) {
-        return myAE.getRow(row);
-    }
-
-    public RowsSupplier<N> getAE(final int... rows) {
-        return myAE.selectRows(rows);
-    }
-
-    /**
-     * Inequality constraints body: [AI][X] <= [BI]
-     */
-    public PhysicalStore<N> getAI() {
-        return myAI.get();
-    }
-
-    public SparseArray<N> getAI(final int row) {
-        return myAI.getRow(row);
-    }
-
-    public RowsSupplier<N> getAI(final int... rows) {
-        return myAI.selectRows(rows);
     }
 
     /**
@@ -120,24 +117,18 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
         return myBE.doubleValue(row);
     }
 
-    /**
-     * Inequality constraints RHS: [AI][X] <= [BI]
-     */
-    public MatrixStore<N> getBI() {
-        return myBI;
-    }
-
     public double getBI(final int row) {
         return myBI.doubleValue(row);
     }
 
-    public ConvexObjectiveFunction<N> getObjective() {
-        return myObjective;
-    }
-
-    public <T extends TwiceDifferentiable<N>> T getObjective(final Class<T> type) {
+    @Override
+    public EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(final int i) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public ConvexObjectiveFunction<N> getObjective() {
+        return myObjective;
     }
 
     public RowView<N> getRowsAE() {
@@ -148,8 +139,22 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
         return myAI.rows();
     }
 
-    public void reset() {
+    @Override
+    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int indexOf(final int idx) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public boolean isNegated(final int idx) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     void addObjective(final int row, final Comparable<?> value) {
@@ -166,6 +171,44 @@ final class ConvexData<N extends Comparable<N>> implements OptimisationData<N> {
 
     void addObjective(final int row, final int col, final double value) {
         myObjective.quadratic().add(row, col, value);
+    }
+
+    SparseArray<N> getAE(final int row) {
+        return myAE.getRow(row);
+    }
+
+    RowsSupplier<N> getAE(final int... rows) {
+        return myAE.selectRows(rows);
+    }
+
+    /**
+     * Inequality constraints body: [AI][X] <= [BI]
+     */
+    PhysicalStore<N> getAI() {
+        return myAI.get();
+    }
+
+    SparseArray<N> getAI(final int row) {
+        return myAI.getRow(row);
+    }
+
+    RowsSupplier<N> getAI(final int... rows) {
+        return myAI.selectRows(rows);
+    }
+
+    /**
+     * Inequality constraints RHS: [AI][X] <= [BI]
+     */
+    MatrixStore<N> getBI() {
+        return myBI;
+    }
+
+    ConstraintsMap getConstraintsMap() {
+        return myConstraintsMap;
+    }
+
+    void reset() {
+        // TODO Auto-generated method stub
     }
 
     void setAE(final int row, final int col, final Comparable<?> value) {

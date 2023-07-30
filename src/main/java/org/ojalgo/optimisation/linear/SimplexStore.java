@@ -45,7 +45,7 @@ import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
-abstract class SimplexStore implements Optimisation.SolverData<Double> {
+abstract class SimplexStore implements Optimisation.ProblemStructure {
 
     enum ColumnState {
 
@@ -76,6 +76,13 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         String key() {
             return myKey;
         }
+    }
+
+    @FunctionalInterface
+    interface SimplexStoreFactory {
+
+        SimplexStore newInstance(LinearStructure structure);
+
     }
 
     static SimplexStore build(final ExpressionsBasedModel model) {
@@ -114,7 +121,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         int nbSlckVars = nbUpConstr + nbLoConstr;
         int nbArtiVars = nbEqConstr;
 
-        LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
+        LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars, nbArtiVars);
 
         S simplex = storeFactory.apply(structure);
         double[] lowerBounds = simplex.getLowerBounds();
@@ -136,6 +143,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
             structure.slack[i] = EntryPair.of(expression, ConstraintType.UPPER);
+            structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
         }
 
         for (int i = 0; i < nbLoConstr; i++) {
@@ -150,6 +158,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
             structure.slack[nbUpConstr + i] = EntryPair.of(expression, ConstraintType.LOWER);
+            structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
         }
 
         for (int i = 0; i < nbEqConstr; i++) {
@@ -163,6 +172,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(true, ZERO));
             lowerBounds[nbProbVars + nbSlckVars + i] = ZERO;
             upperBounds[nbProbVars + nbSlckVars + i] = ZERO;
+            structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false);
         }
 
         for (int i = 0; i < nbProbVars; i++) {
@@ -172,6 +182,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
+        structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
         for (IntIndex key : objective.getLinearKeySet()) {
             double weight = objective.doubleValue(key, true);
@@ -244,33 +255,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         myStructure = structure;
     }
 
-    private SimplexStore basis(final int index) {
-        myPartition.update(index, ColumnState.BASIS);
-        return this;
-    }
-
-    abstract void calculateDualDirection(ExitInfo exit);
-
-    abstract void calculateIteration();
-
-    abstract void calculateIteration(IterDescr iteration);
-
-    abstract void calculatePrimalDirection(EnterInfo enter);
-
-    /**
-     * The simplex' constraints body (including the parts corresponding to slack and artificial variables).
-     */
-    abstract Mutate2D constraintsBody();
-
-    /**
-     * The simplex' constraints RHS.
-     */
-    abstract Mutate1D constraintsRHS();
-
-    abstract void copyBasicSolution(double[] solution);
-
-    abstract void copyObjective();
-
     @Override
     public int countAdditionalConstraints() {
         return 0;
@@ -295,6 +279,58 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     public int countVariables() {
         return n;
     }
+
+    @Override
+    public String toString() {
+
+        myToStringList.clear();
+
+        for (int i = 0; i < myPartition.size(); i++) {
+            myToStringList.add(myPartition.get(i).key());
+        }
+
+        return myToStringList.toString();
+    }
+
+    private SimplexStore basis(final int index) {
+        myPartition.update(index, ColumnState.BASIS);
+        return this;
+    }
+
+    protected void pivot(final SimplexSolver.IterDescr iteration) {
+
+        ExitInfo exit = iteration.exit;
+        EnterInfo enter = iteration.enter;
+
+        this.updateBasis(exit.index, exit.to, enter.index);
+    }
+
+    protected void shiftColumn(final int col, final double shift) {
+        myLowerBounds[col] -= shift;
+        myUpperBounds[col] -= shift;
+    }
+
+    abstract void calculateDualDirection(ExitInfo exit);
+
+    abstract void calculateIteration();
+
+    abstract void calculateIteration(IterDescr iteration);
+
+    abstract void calculatePrimalDirection(EnterInfo enter);
+
+    /**
+     * The simplex' constraints body (including the parts corresponding to slack and artificial variables).
+     */
+    abstract Mutate2D constraintsBody();
+
+    /**
+     * The simplex' constraints RHS.
+     */
+    abstract Mutate1D constraintsRHS();
+
+    abstract void copyBasicSolution(double[] solution);
+
+    abstract void copyObjective();
 
     double[] extractSolution() {
 
@@ -417,10 +453,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
 
     abstract double getReducedCost(int je);
 
-    LinearStructure getStructure() {
-        return myStructure;
-    }
-
     abstract double getTableauElement(ExitInfo exit, int je);
 
     abstract double getTableauElement(int i, EnterInfo enter);
@@ -500,14 +532,6 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      */
     abstract Mutate1D objective();
 
-    protected void pivot(final SimplexSolver.IterDescr iteration) {
-
-        ExitInfo exit = iteration.exit;
-        EnterInfo enter = iteration.enter;
-
-        this.updateBasis(exit.index, exit.to, enter.index);
-    }
-
     /**
      * Everything that is not in the basis is set to be in at lower bound.
      */
@@ -529,25 +553,10 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
 
     abstract void restoreObjective();
 
-    protected void shiftColumn(final int col, final double shift) {
-        myLowerBounds[col] -= shift;
-        myUpperBounds[col] -= shift;
-    }
+    abstract Primitive1D sliceDualVariables();
 
     final LinearStructure structure() {
         return myStructure;
-    }
-
-    @Override
-    public String toString() {
-
-        myToStringList.clear();
-
-        for (int i = 0; i < myPartition.size(); i++) {
-            myToStringList.add(myPartition.get(i).key());
-        }
-
-        return myToStringList.toString();
     }
 
     SimplexStore unbounded(final int index) {

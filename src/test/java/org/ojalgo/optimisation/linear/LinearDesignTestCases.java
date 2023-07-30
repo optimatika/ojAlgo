@@ -24,7 +24,9 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.Map.Entry;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR256;
@@ -33,16 +35,15 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 public class LinearDesignTestCases extends OptimisationLinearTests {
@@ -116,44 +117,50 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         return retVal;
     }
 
+    @AfterEach
+    public void reset() {
+        ExpressionsBasedModel.clearIntegrations();
+    }
+
     /**
      * http://math.uww.edu/~mcfarlat/s-prob.htm
      */
     @Test
     public void test1LinearModelCase() {
 
-        Variable[] variables = { new Variable("X1").lower(ZERO).weight(ONE), new Variable("X2").lower(ZERO).weight(TWO),
-                new Variable("X3").lower(ZERO).weight(ONE.negate()) };
+        Optimisation.Result expected = Result.of(13.0, State.OPTIMAL, 5.0, 4.0, 0.0);
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
+        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
 
-        Expression exprC1 = model.newExpression("C1");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC1.set(i, new BigDecimal[] { TWO, ONE, ONE }[i]);
+            String identifier = entry.getKey();
+            ExpressionsBasedModel.Integration<LinearSolver> integration = entry.getValue();
+
+            ExpressionsBasedModel.clearIntegrations();
+            ExpressionsBasedModel.addIntegration(integration);
+
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+            model.newVariable("X1").lower(ZERO).weight(ONE);
+            model.newVariable("X2").lower(ZERO).weight(TWO);
+            model.newVariable("X3").lower(ZERO).weight(ONE.negate());
+
+            model.newExpression("C1").set(0, TWO).set(1, ONE).set(2, ONE).upper(14);
+            model.newExpression("C2").set(0, FOUR).set(1, TWO).set(2, THREE).upper(28);
+            model.newExpression("C3").set(0, TWO).set(1, FIVE).set(2, FIVE).upper(30);
+
+            if (DEBUG) {
+                model.options.debug(LinearSolver.class);
+            }
+
+            Optimisation.Result actual = model.maximise();
+            if (DEBUG) {
+                BasicLogger.debug("{}: {}", identifier, actual);
+                BasicLogger.debug("{}: {}", identifier, actual.getMatchedMultipliers());
+            }
+            TestUtils.assertStateAndSolution(expected, actual);
+
+            ExpressionsBasedModel.clearIntegrations();
         }
-        exprC1.upper(new BigDecimal("14.0"));
-
-        Expression exprC2 = model.newExpression("C2");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC2.set(i, new BigDecimal[] { FOUR, TWO, THREE }[i]);
-        }
-        exprC2.upper(new BigDecimal("28.0"));
-
-        Expression exprC3 = model.newExpression("C3");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC3.set(i, new BigDecimal[] { TWO, FIVE, FIVE }[i]);
-        }
-        exprC3.upper(new BigDecimal("30.0"));
-
-        if (DEBUG) {
-            model.options.debug(LinearSolver.class);
-        }
-
-        Optimisation.Result actual = Result.of(13.0, State.OPTIMAL, 5.0, 4.0, 0.0);
-
-        Optimisation.Result expected = model.maximise();
-
-        TestUtils.assertStateAndSolution(expected, actual);
     }
 
     /**
@@ -393,115 +400,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result result = model.maximise();
 
         TestUtils.assertStateNotLessThanFeasible(result);
-    }
-
-    /**
-     * http://web.mit.edu/15.053/www/AMP-Chapter-04.pdf
-     * https://web.fe.up.pt/~mac/ensino/docs/OT20122013/Chapter%204%20-%20Duality%20in%20Linear%20Programming.pdf
-     */
-    @Test
-    public void testDuality() {
-
-        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
-
-        Primitive64Store expPrimSol = factory.rows(new double[] { 36.0, 0.0, 6.0 });
-        Primitive64Store expDualSol = factory.rows(new double[] { 11.0, 0.5 });
-        double expOptVal = 294.0;
-
-        LinearSolver.StandardBuilder primal = LinearSolver.newStandardBuilder();
-
-        // Negated since actual problem is max and algorithm expects min
-        Primitive64Store pC = factory.make(5, 1);
-        pC.set(0, -6.0);
-        pC.set(1, -14.0);
-        pC.set(2, -13.0);
-        pC.set(3, 0);
-        pC.set(4, 0);
-
-        primal.objective(pC);
-
-        Primitive64Store pAE = factory.make(2, 5);
-        pAE.set(0, 0, 0.5);
-        pAE.set(0, 1, 2.0);
-        pAE.set(0, 2, 1.0);
-        pAE.set(0, 3, 1.0);
-        pAE.set(0, 4, 0.0);
-        pAE.set(1, 0, 1.0);
-        pAE.set(1, 1, 2.0);
-        pAE.set(1, 2, 4.0);
-        pAE.set(1, 3, 0.0);
-        pAE.set(1, 4, 1.0);
-
-        Primitive64Store pBE = factory.make(2, 1);
-        pBE.set(0, 24.0);
-        pBE.set(1, 60.0);
-
-        primal.equalities(pAE, pBE);
-
-        LinearSolver primalSolver = primal.build();
-        // primalSolver.options.debug(LinearSolver.class);
-        Result pRes = primalSolver.solve();
-        Access1D<?> pMultipliers = factory.columns(pRes.getMultipliers().get());
-
-        TestUtils.assertStateNotLessThanOptimal(pRes);
-        // Negated since actual problem is max and algorithm expects min
-        TestUtils.assertEquals(expOptVal, -pRes.getValue());
-        for (int i = 0; i < expPrimSol.count(); i++) {
-            TestUtils.assertEquals(expPrimSol.doubleValue(i), pRes.doubleValue(i));
-        }
-        for (int i = 0; i < expDualSol.count(); i++) {
-            // Negated since actual problem is max and algorithm expects min
-            TestUtils.assertEquals(expDualSol.doubleValue(i), -pMultipliers.doubleValue(i));
-        }
-
-        LinearSolver.StandardBuilder dual = LinearSolver.newStandardBuilder();
-
-        Primitive64Store dC = factory.make(5, 1);
-        dC.set(0, 24.0);
-        dC.set(1, 60.0);
-        dC.set(2, 0.0);
-        dC.set(3, 0.0);
-        dC.set(4, 0.0);
-
-        dual.objective(dC);
-
-        Primitive64Store dAE = factory.make(3, 5);
-        dAE.set(0, 0, 0.5);
-        dAE.set(0, 1, 1.0);
-        dAE.set(0, 2, -1.0);
-        dAE.set(0, 3, 0.0);
-        dAE.set(0, 4, 0.0);
-        dAE.set(1, 0, 2.0);
-        dAE.set(1, 1, 2.0);
-        dAE.set(1, 2, 0.0);
-        dAE.set(1, 3, -1.0);
-        dAE.set(1, 4, 0.0);
-        dAE.set(2, 0, 1.0);
-        dAE.set(2, 1, 4.0);
-        dAE.set(2, 2, 0.0);
-        dAE.set(2, 3, 0.0);
-        dAE.set(2, 4, -1.0);
-
-        Primitive64Store dBE = factory.make(3, 1);
-        dBE.set(0, 6.0);
-        dBE.set(1, 14.0);
-        dBE.set(2, 13.0);
-
-        dual.equalities(dAE, dBE);
-
-        LinearSolver dualSolver = dual.build();
-        // dualSolver.options.debug(LinearSolver.class);
-        Result dRes = dualSolver.solve();
-        Access1D<?> dMultipliers = factory.columns(dRes.getMultipliers().get());
-
-        TestUtils.assertStateNotLessThanOptimal(dRes);
-        TestUtils.assertEquals(expOptVal, dRes.getValue());
-        for (int i = 0; i < expDualSol.count(); i++) {
-            TestUtils.assertEquals(expDualSol.doubleValue(i), dRes.doubleValue(i));
-        }
-        for (int i = 0; i < expPrimSol.count(); i++) {
-            TestUtils.assertEquals(expPrimSol.doubleValue(i), dMultipliers.doubleValue(i));
-        }
     }
 
     @Test

@@ -70,7 +70,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils /* extends Assertions */ {
 
-    private static final NumberContext EQUALS = NumberContext.of(12, 14);
+    private static final NumberContext EQUALS = NumberContext.of(12);
 
     public static void assertBounds(final Comparable<?> lower, final Access1D<?> values, final Comparable<?> upper, final NumberContext precision) {
         for (ElementView1D<?, ?> tmpValue : values.elements()) {
@@ -431,6 +431,9 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
+    /**
+     * Will compare state, value, solution and multiplier if available.
+     */
     public static void assertResult(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertResult(expected, actual, EQUALS);
     }
@@ -587,7 +590,7 @@ public abstract class TestUtils /* extends Assertions */ {
             boolean failed = false;
 
             if (expectedState == actualState) {
-
+                failed = false;
             } else if (expectedState.isDistinct() && !actualState.isDistinct() || expectedState.isOptimal() && !actualState.isOptimal()) {
                 failed = true;
             } else if (expectedState.isFeasible() && !actualState.isFeasible() || expectedState.isApproximate() && !actualState.isApproximate()) {

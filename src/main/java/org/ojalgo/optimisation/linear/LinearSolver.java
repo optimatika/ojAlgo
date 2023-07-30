@@ -39,9 +39,9 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.OptimisationData;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.SimplexTableauFactory;
 import org.ojalgo.structure.Access1D;
@@ -149,6 +149,56 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             retVal.equalities(mtrxAE, mtrxBE);
 
             return retVal;
+        }
+
+    }
+
+    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
+
+        @Override
+        public LinearSolver build(final ExpressionsBasedModel model) {
+
+            boolean experimental = model.options.experimental;
+
+            this.setSwitch(model, experimental);
+
+            if (experimental) {
+                return NEW_INTEGRATION.build(model);
+            } else {
+                return OLD_INTEGRATION.build(model);
+            }
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return OLD_INTEGRATION.isCapable(model) || NEW_INTEGRATION.isCapable(model);
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.toModelState(solverState, model);
+            } else {
+                return OLD_INTEGRATION.toModelState(solverState, model);
+            }
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.toSolverState(modelState, model);
+            } else {
+                return OLD_INTEGRATION.toSolverState(modelState, model);
+            }
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.getIndexInSolver(model, variable);
+            } else {
+                return OLD_INTEGRATION.getIndexInSolver(model, variable);
+            }
         }
 
     }
@@ -296,11 +346,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             int nbIdentitySlackVariables = ineqSign.countIncluded();
             int nbSlackVariables = ineqSign.countExcluded();
-            int nbProblemVariables = nbVariables;
-            int nbConstraints = nbEqualites + nbInequalites;
-            boolean needDual = true;
 
-            SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
+            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables,
+                    nbInequalites + nbEqualites - nbIdentitySlackVariables);
+
+            SimplexTableau tableau = SimplexTableau.make(structure, options);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -317,7 +367,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     boolean positive = ineqSign.isIncluded(i);
 
                     int row = positive ? insIdSlack : nbIdentitySlackVariables + insGnSlack;
-                    int col = positive ? nbProblemVariables + nbSlackVariables + insIdSlack++ : nbProblemVariables + insGnSlack++;
+                    int col = positive ? nbVariables + nbSlackVariables + insIdSlack++ : nbVariables + insGnSlack++;
 
                     for (NonzeroView<Double> nz : body.nonzeros()) {
                         constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
@@ -326,6 +376,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     constraintsBody.set(row, col, positive ? ONE : NEG);
 
                     constraintsRHS.set(row, positive ? valRHS : -valRHS);
+
+                    structure.negated(row, !positive);
                 }
             }
 
@@ -349,6 +401,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     }
 
                     constraintsRHS.set(row, positive ? valRHS : -valRHS);
+
+                    structure.negated(row, !positive);
                 }
             }
 
@@ -388,7 +442,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbSlckVars = nbUpConstr + nbLoConstr;
             int nbArtiVars = basis.length == nbUpConstr + nbLoConstr + nbEqConstr ? 0 : nbEqConstr;
 
-            LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
+            LinearStructure structure = new LinearStructure(false, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars, nbArtiVars);
 
             S simplex = storeFactory.apply(structure);
 
@@ -458,11 +512,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             int nbIdentitySlackVariables = ineqSign.countIncluded();
             int nbSlackVariables = ineqSign.countExcluded();
-            int nbProblemVariables = nbVariables;
-            int nbConstraints = nbEqualites + nbInequalites;
-            boolean needDual = true;
 
-            T tableau = tableauFactory.make(nbConstraints, nbProblemVariables, 0, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables,
+                    nbInequalites + nbEqualites - nbIdentitySlackVariables);
+
+            T tableau = tableauFactory.make(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -479,7 +533,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                     boolean positive = ineqSign.isIncluded(i);
 
                     int row = positive ? insIdSlack : nbIdentitySlackVariables + insGnSlack;
-                    int col = positive ? nbProblemVariables + nbSlackVariables + insIdSlack++ : nbProblemVariables + insGnSlack++;
+                    int col = positive ? nbVariables + nbSlackVariables + insIdSlack++ : nbVariables + insGnSlack++;
 
                     for (NonzeroView<Double> nz : body.nonzeros()) {
                         constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
@@ -525,121 +579,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
-
-        private static ArrayR064 toModelVariableValues(final Access1D<?> solverVariableValues, final ExpressionsBasedModel model,
-                final ArrayR064 modelVariableValues) {
-
-            List<Variable> positiveVariables = model.getPositiveVariables();
-            for (int p = 0; p < positiveVariables.size(); p++) {
-                Variable variable = positiveVariables.get(p);
-                int index = model.indexOf(variable);
-                modelVariableValues.set(index, solverVariableValues.doubleValue(p));
-            }
-
-            List<Variable> negativeVariables = model.getNegativeVariables();
-            for (int n = 0; n < negativeVariables.size(); n++) {
-                Variable variable = negativeVariables.get(n);
-                int index = model.indexOf(variable);
-                modelVariableValues.add(index, -solverVariableValues.doubleValue(positiveVariables.size() + n));
-            }
-
-            return modelVariableValues;
-        }
-
-        @Override
-        public LinearSolver build(final ExpressionsBasedModel model) {
-
-            SimplexTableau tableau = PrimalSimplex.build(model);
-
-            PrimalSimplex solver = new PrimalSimplex(tableau, model.options);
-
-            if (model.options.validate) {
-                solver.setValidator(this.newValidator(model));
-            }
-
-            return solver;
-        }
-
-        public LinearSolver build(final OptimisationData convexBuilder, final Optimisation.Options options) {
-
-            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
-
-            return new PrimalSimplex(tableau, options);
-        }
-
-        @Override
-        public boolean isCapable(final ExpressionsBasedModel model) {
-            return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
-        }
-
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-
-            ArrayR064 modelSolution = ArrayR064.make(model.countVariables());
-
-            for (IntIndex fixed : model.getFixedVariables()) {
-                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue().doubleValue());
-            }
-
-            ModelIntegration.toModelVariableValues(solverState, model, modelSolution);
-
-            return solverState.withSolution(modelSolution);
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-
-            List<Variable> tmpPositives = model.getPositiveVariables();
-            List<Variable> tmpNegatives = model.getNegativeVariables();
-
-            int tmpCountPositives = tmpPositives.size();
-            int tmpCountNegatives = tmpNegatives.size();
-
-            ArrayR064 solverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
-
-            for (int p = 0; p < tmpCountPositives; p++) {
-                Variable tmpVariable = tmpPositives.get(p);
-                int tmpIndex = model.indexOf(tmpVariable);
-                solverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
-            }
-
-            for (int n = 0; n < tmpCountNegatives; n++) {
-                Variable tmpVariable = tmpNegatives.get(n);
-                int tmpIndex = model.indexOf(tmpVariable);
-                solverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
-            }
-
-            return modelState.withSolution(solverSolution);
-        }
-
-        @Override
-        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-
-            int retVal = -1;
-
-            BigDecimal value = variable.getValue();
-
-            if ((value != null && value.signum() >= 0 || variable.isPositive()) && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
-                return retVal;
-            }
-
-            if ((value != null && value.signum() <= 0 || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
-                retVal += model.getPositiveVariables().size();
-                return retVal;
-            }
-
-            return -1;
-        }
-
-    }
-
     /**
      * An integration to a new/alternative/experimental LP-solver. That solver is intended to replace the
      * current solver, but is not yet ready to do that. You're welcome to try it - just add this integration
      * by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
      */
-    static final class NewIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
+    static final class NewIntegration extends ExpressionsBasedModel.Integration<SimplexSolver> {
 
         @Override
         public SimplexSolver build(final ExpressionsBasedModel model) {
@@ -703,6 +648,121 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             return modelState.withSolution(solverSolution);
         }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return super.getIndexInSolver(model, variable);
+        }
+
+    }
+
+    static final class OldIntegration extends ExpressionsBasedModel.Integration<SimplexTableauSolver> {
+
+        private static ArrayR064 toModelVariableValues(final Access1D<?> solverVariableValues, final ExpressionsBasedModel model,
+                final ArrayR064 modelVariableValues) {
+
+            List<Variable> positiveVariables = model.getPositiveVariables();
+            for (int p = 0; p < positiveVariables.size(); p++) {
+                Variable variable = positiveVariables.get(p);
+                int index = model.indexOf(variable);
+                modelVariableValues.set(index, solverVariableValues.doubleValue(p));
+            }
+
+            List<Variable> negativeVariables = model.getNegativeVariables();
+            for (int n = 0; n < negativeVariables.size(); n++) {
+                Variable variable = negativeVariables.get(n);
+                int index = model.indexOf(variable);
+                modelVariableValues.add(index, -solverVariableValues.doubleValue(positiveVariables.size() + n));
+            }
+
+            return modelVariableValues;
+        }
+
+        public SimplexTableauSolver build(final ConvexData convexBuilder, final Optimisation.Options options) {
+
+            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
+
+            return new PrimalSimplex(tableau, options);
+        }
+
+        @Override
+        public SimplexTableauSolver build(final ExpressionsBasedModel model) {
+
+            SimplexTableau tableau = PrimalSimplex.build(model);
+
+            PrimalSimplex solver = new PrimalSimplex(tableau, model.options);
+
+            if (model.options.validate) {
+                solver.setValidator(this.newValidator(model));
+            }
+
+            return solver;
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return !model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic();
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            ArrayR064 modelSolution = ArrayR064.make(model.countVariables());
+
+            for (IntIndex fixed : model.getFixedVariables()) {
+                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue().doubleValue());
+            }
+
+            OldIntegration.toModelVariableValues(solverState, model, modelSolution);
+
+            return solverState.withSolution(modelSolution);
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+            List<Variable> tmpPositives = model.getPositiveVariables();
+            List<Variable> tmpNegatives = model.getNegativeVariables();
+
+            int tmpCountPositives = tmpPositives.size();
+            int tmpCountNegatives = tmpNegatives.size();
+
+            ArrayR064 solverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
+
+            for (int p = 0; p < tmpCountPositives; p++) {
+                Variable tmpVariable = tmpPositives.get(p);
+                int tmpIndex = model.indexOf(tmpVariable);
+                solverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
+            }
+
+            for (int n = 0; n < tmpCountNegatives; n++) {
+                Variable tmpVariable = tmpNegatives.get(n);
+                int tmpIndex = model.indexOf(tmpVariable);
+                solverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
+            }
+
+            return modelState.withSolution(solverSolution);
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+
+            int retVal = -1;
+
+            BigDecimal value = variable.getValue();
+
+            if ((value != null && value.signum() >= 0 || variable.isPositive()) && (retVal = model.indexOfPositiveVariable(variable)) >= 0) {
+                return retVal;
+            }
+
+            if ((value != null && value.signum() <= 0 || variable.isNegative()) && (retVal = model.indexOfNegativeVariable(variable)) >= 0) {
+                retVal += model.getPositiveVariables().size();
+                return retVal;
+            }
+
+            return -1;
+        }
+
     }
 
     public static final ExpressionsBasedModel.Integration<LinearSolver> INTEGRATION = new ModelIntegration();
@@ -716,7 +776,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      * longer be an integration constant named "NEW_INTEGRATION". Possibly there will instead be one named
      * "OLD_INTEGRATION".
      */
-    public static final ExpressionsBasedModel.Integration<LinearSolver> NEW_INTEGRATION = new NewIntegration();
+    static final NewIntegration NEW_INTEGRATION = new NewIntegration();
+
+    static final OldIntegration OLD_INTEGRATION = new OldIntegration();
 
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
         return new LinearSolver.GeneralBuilder();
@@ -741,7 +803,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         return LinearSolver.newStandardBuilder().objective(objective);
     }
 
-    public static Optimisation.Result solve(final OptimisationData convex, final Optimisation.Options options, final boolean zeroC) {
+    public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {
 
         int dualSize = DualSimplex.size(convex);
         int primSize = PrimalSimplex.size(convex);

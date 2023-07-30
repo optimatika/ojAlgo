@@ -45,7 +45,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         int nbEqus = BE.getRowDim();
         int nbIneq = BI.getRowDim();
 
-        ConvexData<Double> data = new ConvexData<>(Primitive64Store.FACTORY, nbVars, nbEqus, nbIneq);
+        ConvexData<Double> data = new ConvexData<>(false, Primitive64Store.FACTORY, nbVars, nbEqus, nbIneq);
 
         data.getObjective().quadratic().fillMatching(H);
         data.getObjective().linear().fillMatching(g);
@@ -146,7 +146,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
             double relativeComplementarySlackness1 = C1.onMatching(QuadrupleMath.MULTIPLY, x0).collect(GenericStore.R128).aggregateAll(Aggregator.LARGEST)
                     .doubleValue() / C_Size;
             // SUM_i ABS(y0_i * b_i) / |Be|
-            double relativeComplementarySlackness2 = y0.onMatching(QuadrupleMath.MULTIPLY, (be1.below(bi1))).collect(GenericStore.R128)
+            double relativeComplementarySlackness2 = y0.onMatching(QuadrupleMath.MULTIPLY, be1.below(bi1)).collect(GenericStore.R128)
                     .aggregateAll(Aggregator.LARGEST).doubleValue() / be_Size;
             double relativeComplementarySlackness = Math.max(relativeComplementarySlackness1,
                     relativeComplementarySlackness2 * relativeComplementarySlackness2);
@@ -220,7 +220,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
     }
 
     static ConvexData<Quadruple> newInstance(final int nbVars, final int nbEqus, final int nbIneq) {
-        return new ConvexData<>(GenericStore.R128, nbVars, nbEqus, nbIneq);
+        return new ConvexData<>(false, GenericStore.R128, nbVars, nbEqus, nbIneq);
     }
 
     private final ConvexData<Quadruple> myData;
@@ -230,6 +230,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         myData = data;
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
         ConvexObjectiveFunction<Quadruple> objective = myData.getObjective();

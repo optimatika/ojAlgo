@@ -257,6 +257,12 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
+            final double fractionality) {
+        return Collections.emptySet();
+    }
+
+    @Override
     double getCost(final int j) {
         return myObjective.doubleValue(j);
     }
@@ -321,9 +327,25 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-            final double fractionality) {
-        return Collections.emptySet();
+    Primitive1D sliceDualVariables() {
+        return new Primitive1D() {
+
+            @Override
+            public int size() {
+                return m;
+            }
+
+            @Override
+            double doubleValue(final int index) {
+                return -l.doubleValue(index);
+            }
+
+            @Override
+            void set(final int index, final double value) {
+                throw new UnsupportedOperationException();
+            }
+
+        };
     }
 
 }

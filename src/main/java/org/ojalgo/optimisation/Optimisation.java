@@ -23,6 +23,7 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,6 +40,8 @@ import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public interface Optimisation {
 
@@ -197,6 +200,12 @@ public interface Optimisation {
     }
 
     public static final class Options implements Optimisation {
+
+        /**
+         * This may turn on various experimental features. If you do not know exactly what you want to turn
+         * on, for the specific version you're using, then always leave this 'false'.
+         */
+        public boolean experimental = false;
 
         /**
          * Used to determine/validate feasibility. Are the variables within their bounds or not, are the
@@ -390,15 +399,21 @@ public interface Optimisation {
     }
 
     /**
-     * Basic description of the size/structure of an optimisation problem (model or solver).
-     *
-     * @author apete
+     * Basic description of the size/structure of an optimisation problem.
      */
     public interface ProblemStructure extends Optimisation {
 
+        static final boolean DEBUG = false;
+
+        /**
+         * Not included in {@link #countConstraints()} (because they are not simple linear equality or
+         * inequality constraints),
+         */
         int countAdditionalConstraints();
 
-        int countConstraints();
+        default int countConstraints() {
+            return this.countEqualityConstraints() + this.countInequalityConstraints();
+        }
 
         int countEqualityConstraints();
 
@@ -444,7 +459,9 @@ public interface Optimisation {
             return new Result(State.APPROXIMATE, Double.NaN, solution);
         }
 
-        private transient Access1D<?> myMultipliers = null;
+        private ConstraintsMap myConstraintsMap = null;
+        private List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> myMatchedMultipliers = null;
+        private Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -504,6 +521,21 @@ public interface Optimisation {
         }
 
         /**
+         * The dual variables or Lagrange multipliers, matched to their respective constraints (model entity
+         * and constraint type pairs).
+         */
+        public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> getMatchedMultipliers() {
+            if (myMatchedMultipliers == null) {
+                if (myConstraintsMap != null && myMultipliers != null && myConstraintsMap.isEntityMap() && myConstraintsMap.size() == myMultipliers.size()) {
+                    myMatchedMultipliers = myConstraintsMap.match(myMultipliers);
+                } else {
+                    myMatchedMultipliers = List.of();
+                }
+            }
+            return myMatchedMultipliers;
+        }
+
+        /**
          * The dual variables or Lagrange multipliers associated with the problem.
          */
         public Optional<Access1D<?>> getMultipliers() {
@@ -514,13 +546,13 @@ public interface Optimisation {
          * Will round the solution to the given precision
          */
         public Optimisation.Result getSolution(final NumberContext precision) {
-            Optimisation.State state = this.getState();
-            double value = this.getValue();
+
             ArrayR256 solution = ArrayR256.make(this.size());
             for (int i = 0, limit = solution.data.length; i < limit; i++) {
                 solution.set(i, precision.enforce(this.get(i)));
             }
-            return new Optimisation.Result(state, value, solution);
+
+            return this.withSolution(solution);
         }
 
         public Optimisation.State getState() {
@@ -549,6 +581,16 @@ public interface Optimisation {
             return this;
         }
 
+        public Result multipliers(final ConstraintsMap constraintsMap, final Access1D<?> multipliers) {
+            myConstraintsMap = constraintsMap;
+            myMultipliers = multipliers;
+            return this;
+        }
+
+        public Result multipliers(final double... multipliers) {
+            return this.multipliers(ArrayR064.wrap(multipliers));
+        }
+
         @Override
         public int size() {
             return (int) this.count();
@@ -563,16 +605,64 @@ public interface Optimisation {
             return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
+        public Result withNegatedValue() {
+            return this.withValue(-myValue);
+        }
+
         public Result withSolution(final Access1D<?> solution) {
-            return new Result(myState, myValue, solution);
+
+            Result retVal = new Result(myState, myValue, solution);
+
+            this.multipliers(retVal);
+
+            return retVal;
+        }
+
+        public Result withSolutionLength(final int length) {
+
+            ArrayR064 solution = ArrayR064.make(length);
+
+            for (int i = 0, limit = Math.min(solution.size(), mySolution.size()); i < limit; i++) {
+                solution.set(i, mySolution.doubleValue(i));
+            }
+
+            return this.withSolution(solution);
         }
 
         public Result withState(final State state) {
-            return new Result(state, myValue, mySolution);
+
+            Result retVal = new Result(state, myValue, mySolution);
+
+            this.multipliers(retVal);
+
+            return retVal;
         }
 
         public Result withValue(final double value) {
-            return new Result(myState, value, mySolution);
+
+            Result retVal = new Result(myState, value, mySolution);
+
+            this.multipliers(retVal);
+
+            return retVal;
+        }
+
+        private void multipliers(final Result target) {
+
+            Optional<Access1D<?>> multipliers = this.getMultipliers();
+            if (multipliers.isPresent()) {
+                target.multipliers(multipliers.get());
+            }
+
+            List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = this.getMatchedMultipliers();
+            if (matchedMultipliers.size() > 0) {
+                target.multipliers(matchedMultipliers);
+            }
+        }
+
+        Result multipliers(final List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers) {
+            myMatchedMultipliers = matchedMultipliers;
+            return this;
         }
 
     }
@@ -607,16 +697,6 @@ public interface Optimisation {
         }
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
-
-    }
-
-    /**
-     * Intended as a solver data transfer type (if one solver needs to delegate to some other solver). Should
-     * be able to provide data for any problem solvable by ojAlgo solvers.
-     */
-    public interface SolverData<N extends Comparable<N>> extends ProblemStructure {
-
-        static final boolean DEBUG = false;
 
     }
 

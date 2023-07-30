@@ -41,7 +41,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.OptimisationData;
+import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
@@ -50,32 +50,28 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class SimplexTableau extends Primitive2D implements Optimisation.SolverData<Double> {
+abstract class SimplexTableau extends Primitive2D implements Optimisation.ProblemStructure {
 
     static final class DenseRawTableau extends DenseTableau {
 
         private final int myColDim;
         private final double[][] myRaw;
 
-        DenseRawTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-                final int nbIdentitySlackVariables, final boolean needDual) {
+        DenseRawTableau(final LinearStructure structure) {
 
-            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(structure);
 
             int nbRows = this.countConstraints() + 2;
             int nbCols = this.countVariablesTotally() + 1;
 
-            // myTransposed = Primitive64Store.FACTORY.make(nbCols, nbRows);
             myColDim = nbCols;
 
             myRaw = new double[nbRows][nbCols];
-
         }
 
         DenseRawTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.countConstraints(), toCopy.countProblemVariables(), 0, toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
-                    toCopy.countIdentitySlackVariables(), toCopy.isArtificials());
+            super(toCopy.structure());
 
             myColDim = toCopy.getColDim();
 
@@ -330,9 +326,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
     static abstract class DenseTableau extends SimplexTableau {
 
-        DenseTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-                final int nbIdentitySlackVariables, final boolean needDual) {
-            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+        DenseTableau(final LinearStructure structure) {
+            super(structure);
         }
 
     }
@@ -342,10 +337,9 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         private final int myColDim;
         private final Primitive64Store myTransposed;
 
-        DenseTransposedTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-                final int nbIdentitySlackVariables, final boolean needDual) {
+        DenseTransposedTableau(final LinearStructure structure) {
 
-            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(structure);
 
             int nbRows = this.countConstraints() + 2;
             int nbCols = this.countVariablesTotally() + 1;
@@ -356,8 +350,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
         DenseTransposedTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.countConstraints(), toCopy.countProblemVariables(), 0, toCopy.countSlackVariables() - toCopy.countIdentitySlackVariables(),
-                    toCopy.countIdentitySlackVariables(), toCopy.isArtificials());
+            super(toCopy.structure());
 
             myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
             myColDim = myTransposed.getRowDim();
@@ -617,7 +610,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
     @FunctionalInterface
     interface SimplexTableauFactory<T extends SimplexTableau> {
 
-        T make(int nbConstraints, int nbPosVars, int nbNegVars, int nbSlackVars, int nbIdentityVars, boolean needDual);
+        T make(LinearStructure structure);
 
     }
 
@@ -631,12 +624,12 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         private final SparseArray.SparseFactory<Double> mySparseFactory;
         private double myValue = ZERO;
 
-        SparseTableau(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-                final int nbIdentitySlackVariables, final boolean needDual) {
+        SparseTableau(final LinearStructure structure) {
 
-            super(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables, needDual);
+            super(structure);
 
-            int nbProblemVariables = nbPositiveProblemVariables + nbNegativeProblemVariables;
+            int nbConstraints = structure.countConstraints();
+            int nbProblemVariables = structure.countModelVariables();
 
             long initial = Math.max(5L, Math.round(Math.sqrt(Math.min(nbConstraints, nbProblemVariables))));
             mySparseFactory = SparseArray.factory(ArrayR064.FACTORY).initial(initial);
@@ -646,7 +639,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
             myRows = new SparseArray[nbConstraints];
             for (int r = 0; r < nbConstraints; r++) {
-                myRows[r] = mySparseFactory.limit(totNumbVars).make();
+                myRows[r] = mySparseFactory.make(totNumbVars);
             }
 
             myRHS = ARRAY1D_FACTORY.make(nbConstraints);
@@ -992,24 +985,24 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
     static final DenseArray.Factory<Double> DENSE_FACTORY = ArrayR064.FACTORY;
 
-    static void copy(final OptimisationData<Double> builder, final SimplexTableau tableau) {
+    static void copy(final ConvexData<?> builder, final SimplexTableau tableau) {
 
         Mutate2D body = tableau.constraintsBody();
-        for (RowView<Double> row : builder.getRowsAE()) {
-            for (ElementView1D<Double, ?> element : row.nonzeros()) {
+        for (RowView<?> row : builder.getRowsAE()) {
+            for (ElementView1D<?, ?> element : row.nonzeros()) {
                 body.set(row.row(), element.index(), element.doubleValue());
             }
 
         }
 
         Mutate1D rhs = tableau.constraintsRHS();
-        MatrixStore<Double> mtrxBE = builder.getBE();
+        MatrixStore<?> mtrxBE = builder.getBE();
         for (int i = 0; i < mtrxBE.size(); i++) {
             rhs.set(i, mtrxBE.doubleValue(i));
         }
 
         Mutate1D obj = tableau.objective();
-        MatrixStore<Double> mtrxC = builder.getObjective().getLinearFactors(false);
+        MatrixStore<?> mtrxC = builder.getObjective().getLinearFactors(false);
         for (int i = 0; i < mtrxC.size(); i++) {
             obj.set(i, mtrxC.doubleValue(i));
         }
@@ -1019,28 +1012,37 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         return options.sparse != null && options.sparse.booleanValue();
     }
 
-    static SimplexTableau make(final int nbConstraints, final int nbPositiveProblemVariables, final int nbNegativeProblemVariables, final int nbSlackVariables,
-            final int nbIdentitySlackVariables, final boolean needDual, final Optimisation.Options options) {
+    static SimplexTableau make(final ConvexData<Double> builder, final Optimisation.Options options) {
+
+        int nbConstraints = builder.countConstraints();
+        int nbVariables = builder.countVariables();
+
+        LinearStructure structure = new LinearStructure(false, 0, nbConstraints, nbVariables, 0, 0, 0, nbConstraints);
+
+        SimplexTableau tableau = SimplexTableau.make(structure, options);
+        SimplexTableau.copy(builder, tableau);
+        return tableau;
+    }
+
+    static SimplexTableau make(final LinearStructure structure, final Optimisation.Options options) {
 
         if (SimplexTableau.isSparse(options)) {
-            return new SparseTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables,
-                    needDual);
+            return new SparseTableau(structure);
         } else {
-            return new DenseRawTableau(nbConstraints, nbPositiveProblemVariables, nbNegativeProblemVariables, nbSlackVariables, nbIdentitySlackVariables,
-                    needDual);
+            return new DenseRawTableau(structure);
         }
     }
 
-    static SimplexTableau make(final OptimisationData builder, final Optimisation.Options options) {
+    static SimplexTableau newDense(final ConvexData<?> matrices) {
 
-        int nbConstraints = builder.countConstraints();
-        int nbProblemVariables = builder.countVariables();
-        int nbSlackVariables = 0;
-        int nbIdentitySlackVariables = 0;
-        boolean needDual = true;
+        int constrEq = matrices.countConstraints();
 
-        SimplexTableau tableau = SimplexTableau.make(nbConstraints, nbProblemVariables, 0, nbSlackVariables, nbIdentitySlackVariables, needDual, options);
-        SimplexTableau.copy(builder, tableau);
+        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0, constrEq);
+
+        SimplexTableau tableau = new DenseTransposedTableau(structure);
+
+        SimplexTableau.copy(matrices, tableau);
+
         return tableau;
     }
 
@@ -1048,30 +1050,25 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
         return builder.newSimplexTableau(DenseTransposedTableau::new);
     }
 
-    static SimplexTableau newDense(final OptimisationData matrices) {
-
-        SimplexTableau tableau = new DenseTransposedTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
-
-        SimplexTableau.copy(matrices, tableau);
-
-        return tableau;
-    }
-
     static DenseRawTableau newRaw(final LinearSolver.Builder<?> builder) {
         return builder.newSimplexTableau(DenseRawTableau::new);
     }
 
-    static SparseTableau newSparse(final LinearSolver.Builder<?> builder) {
-        return builder.newSimplexTableau(SparseTableau::new);
-    }
+    static SparseTableau newSparse(final ConvexData<?> matrices) {
 
-    static SparseTableau newSparse(final OptimisationData matrices) {
+        int constrEq = matrices.countConstraints();
 
-        SparseTableau tableau = new SparseTableau(matrices.countConstraints(), matrices.countVariables(), 0, 0, 0, true);
+        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0, constrEq);
+
+        SparseTableau tableau = new SparseTableau(structure);
 
         SimplexTableau.copy(matrices, tableau);
 
         return tableau;
+    }
+
+    static SparseTableau newSparse(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(SparseTableau::new);
     }
 
     static int size(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
@@ -1093,8 +1090,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
     private final int myNumberOfSlackVariables;
     private transient Primitive1D myObjective = null;
     private final IndexSelector mySelector;
-
-    final LinearStructure meta;
+    private final LinearStructure myStructure;
 
     /**
      * @param nbConstraints The number of constraints.
@@ -1110,20 +1106,20 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
      *        constructing the tableau. In that case the identity slack variables and the artificial variables
      *        must form an identity matrix in the initial tableau (towards the right hand side).
      */
-    SimplexTableau(final int nbConstraints, final int nbPosVars, final int nbNegVars, final int nbSlackVars, final int nbIdentityVars, final boolean needDual) {
+    SimplexTableau(final LinearStructure structure) {
 
         super();
 
-        myNumberOfConstraints = nbConstraints;
-        myNumberOfProblemVariables = nbPosVars + nbNegVars;
-        myNumberOfSlackVariables = nbSlackVars;
-        myNumberOfIdentitySlackVariables = nbIdentityVars;
-        myNumberOfArtificialVariables = needDual ? nbConstraints - nbIdentityVars : 0;
+        myNumberOfConstraints = structure.countConstraints();
+        myNumberOfProblemVariables = structure.countModelVariables();
+        myNumberOfSlackVariables = structure.nbSlck;
+        myNumberOfIdentitySlackVariables = structure.nbIdty;
+        myNumberOfArtificialVariables = structure.nbArti;
 
         mySelector = new IndexSelector(this.countVariables());
-        myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
+        myBasis = Structure1D.newIncreasingRange(-myNumberOfConstraints, myNumberOfConstraints);
 
-        meta = new LinearStructure(0, 0, nbConstraints, nbPosVars, nbNegVars, nbSlackVars + nbIdentityVars, myNumberOfArtificialVariables);
+        myStructure = structure;
     }
 
     @Override
@@ -1427,7 +1423,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
 
             @Override
             public double doubleValue(final int index) {
-                return -SimplexTableau.this.doubleValue(nbConstraints, dualIdentityBase + index);
+                return SimplexTableau.this.doubleValue(nbConstraints, dualIdentityBase + index);
             }
 
             @Override
@@ -1485,6 +1481,10 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Solver
             }
 
         };
+    }
+
+    LinearStructure structure() {
+        return myStructure;
     }
 
     abstract DenseTableau toDense();

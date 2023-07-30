@@ -134,11 +134,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         @Override
-        public int countConstraints() {
-            return this.countEqualityConstraints() + this.countInequalityConstraints() + this.countAdditionalConstraints();
-        }
-
-        @Override
         public int countEqualityConstraints() {
             return myAE != null ? myAE.getRowDim() : 0;
         }
@@ -175,7 +170,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
         public final Optimisation.Result solve() {
-            return this.build().solve();
+            return this.build().solve().withSolutionLength(this.countVariables());
         }
 
         @Override

@@ -89,7 +89,7 @@ public final class NodeSolver extends IntermediateSolver {
         if (solver instanceof UpdatableSolver) {
             UpdatableSolver updatable = (UpdatableSolver) solver;
 
-            UpdatableSolver.EntityMap entityMap = updatable.getEntityMap();
+            ExpressionsBasedModel.EntityMap entityMap = updatable.getEntityMap();
 
             if (entityMap != null) {
 

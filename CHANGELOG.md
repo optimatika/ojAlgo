@@ -16,6 +16,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - New solver validation mechanism - a tool for solver debugging.
+- When using `ExpressionsBasesModel` the dual variables or Lagrange multipliers are now present in the `Optimisation.Result`. It's a map of `ModelEntity` and `Optimisation.ConstraintType` pairs to the dual variable value for that pair.
+- New optimisation option "experimental", `Optimisation.Options#experimental`, that turns on experimental features (if there are any). Currently this will switch the LP solver to a new implementation that scales better. This new LP solver will become the default, and it already works quite well, but will remain a configuration option for a while.
 
 ### Fixed
 
@@ -40,6 +42,14 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Tweaked how the MIP cut generation works.
+- Moved the nested `EntityMap` interface from `UpdatableSolver` to `ExpressionsBasedModel`.
+- When invoking `solve()` directly on a `GenericSolver.Builder` the solution now has the slack variables removed from the results.
+
+### Removed
+
+#### org.ojalgo.optimisation
+
+- Cleaned up among classes and interfaces for optimisation data modelling. `OptimisationData` and `Optimisation.SolverData` are both gone. Making `ConvexData` public covers whatever those interfaces where used for.
 
 #### org.ojalgo.structure
 
