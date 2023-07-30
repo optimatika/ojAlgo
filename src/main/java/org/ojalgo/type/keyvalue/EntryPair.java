@@ -39,10 +39,22 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
 
     interface KeyedPrimitive<K> extends EntryPair<K, PrimitiveNumber>, PrimitiveNumber {
 
+        @Override
         default PrimitiveNumber getValue() {
             return this;
         }
 
+        @Override
+        default PrimitiveNumber right() {
+            return this;
+        }
+
+        @Override
+        default PrimitiveNumber second() {
+            return this;
+        }
+
+        @Override
         default Collection<PrimitiveNumber> values() {
             return Collections.singleton(this);
         }
@@ -59,18 +71,22 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public byte byteValue() {
             return myValue;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Byte.compare(myValue, other.byteValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.byteValue((Comparable<?>) value) == myValue;
@@ -78,6 +94,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -104,6 +121,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -111,6 +134,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -123,14 +147,22 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + myValue;
         }
 
+        @Override
         public int intValue() {
             return myValue;
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
         }
 
+        @Override
+        public K left() {
+            return myKey;
+        }
+
+        @Override
         public long longValue() {
             return myValue;
         }
@@ -139,6 +171,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
         public String toString() {
             return myKey + "=" + myValue;
         }
+
     }
 
     final class ObjectDouble<K> implements KeyedPrimitive<K> {
@@ -152,14 +185,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Double.compare(myValue, other.doubleValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.doubleValue((Comparable<?>) value) == myValue;
@@ -167,6 +203,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -193,6 +230,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -200,6 +243,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -214,14 +258,21 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + (int) (temp ^ temp >>> 32);
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
+        }
+
+        @Override
+        public K left() {
+            return myKey;
         }
 
         @Override
         public String toString() {
             return myKey + "=" + myValue;
         }
+
     }
 
     final class ObjectFloat<K> implements KeyedPrimitive<K> {
@@ -235,14 +286,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Float.compare(myValue, other.floatValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.floatValue((Comparable<?>) value) == myValue;
@@ -250,6 +304,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -276,10 +331,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public float floatValue() {
             return myValue;
         }
 
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -287,6 +349,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -299,14 +362,21 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + Float.floatToIntBits(myValue);
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
+        }
+
+        @Override
+        public K left() {
+            return myKey;
         }
 
         @Override
         public String toString() {
             return myKey + "=" + myValue;
         }
+
     }
 
     final class ObjectInt<K> implements KeyedPrimitive<K> {
@@ -320,14 +390,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Integer.compare(myValue, other.intValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.intValue((Comparable<?>) value) == myValue;
@@ -335,6 +408,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -361,6 +435,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -368,6 +448,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -380,14 +461,22 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + myValue;
         }
 
+        @Override
         public int intValue() {
             return myValue;
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
         }
 
+        @Override
+        public K left() {
+            return myKey;
+        }
+
+        @Override
         public long longValue() {
             return myValue;
         }
@@ -396,6 +485,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
         public String toString() {
             return myKey + "=" + myValue;
         }
+
     }
 
     final class ObjectLong<K> implements KeyedPrimitive<K> {
@@ -409,14 +499,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Long.compare(myValue, other.longValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.longValue((Comparable<?>) value) == myValue;
@@ -424,6 +517,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -450,6 +544,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -457,6 +557,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -469,14 +570,22 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + (int) (myValue ^ myValue >>> 32);
         }
 
+        @Override
         public int intValue() {
             return Math.toIntExact(myValue);
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
         }
 
+        @Override
+        public K left() {
+            return myKey;
+        }
+
+        @Override
         public long longValue() {
             return myValue;
         }
@@ -485,6 +594,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
         public String toString() {
             return myKey + "=" + myValue;
         }
+
     }
 
     final class ObjectObject<K, V> implements EntryPair<K, V> {
@@ -498,10 +608,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = Objects.requireNonNull(value);
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             return myValue.equals(value);
         }
@@ -532,6 +644,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public V get(final Object key) {
             if (myKey.equals(key)) {
                 return myValue;
@@ -539,10 +657,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
 
+        @Override
         public V getValue() {
             return myValue;
         }
@@ -551,12 +671,28 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((myKey == null) ? 0 : myKey.hashCode());
-            return prime * result + ((myValue == null) ? 0 : myValue.hashCode());
+            result = prime * result + (myKey == null ? 0 : myKey.hashCode());
+            return prime * result + (myValue == null ? 0 : myValue.hashCode());
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
+        }
+
+        @Override
+        public K left() {
+            return myKey;
+        }
+
+        @Override
+        public V right() {
+            return myValue;
+        }
+
+        @Override
+        public V second() {
+            return myValue;
         }
 
         @Override
@@ -564,6 +700,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return myKey + "=" + myValue;
         }
 
+        @Override
         public Collection<V> values() {
             return Collections.singleton(myValue);
         }
@@ -581,14 +718,17 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             myValue = value;
         }
 
+        @Override
         public int compareTo(final PrimitiveNumber other) {
             return Short.compare(myValue, other.shortValue());
         }
 
+        @Override
         public boolean containsKey(final Object key) {
             return myKey.equals(key);
         }
 
+        @Override
         public boolean containsValue(final Object value) {
             if (value instanceof Comparable<?>) {
                 return NumberDefinition.shortValue((Comparable<?>) value) == myValue;
@@ -596,6 +736,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return false;
         }
 
+        @Override
         public double doubleValue() {
             return myValue;
         }
@@ -622,6 +763,12 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return true;
         }
 
+        @Override
+        public K first() {
+            return myKey;
+        }
+
+        @Override
         public PrimitiveNumber get(final Object key) {
             if (myKey.equals(key)) {
                 return this;
@@ -629,6 +776,7 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return null;
         }
 
+        @Override
         public K getKey() {
             return myKey;
         }
@@ -641,18 +789,27 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
             return prime * result + myValue;
         }
 
+        @Override
         public int intValue() {
             return myValue;
         }
 
+        @Override
         public Set<K> keySet() {
             return Collections.singleton(myKey);
         }
 
+        @Override
+        public K left() {
+            return myKey;
+        }
+
+        @Override
         public long longValue() {
             return myValue;
         }
 
+        @Override
         public short shortValue() {
             return myValue;
         }
@@ -752,34 +909,42 @@ public interface EntryPair<K, V> extends KeyValue<K, V>, Map<K, V>, Map.Entry<K,
         return EntryPair.of(key, this);
     }
 
+    @Override
     default void clear() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default Set<Entry<K, V>> entrySet() {
         return Collections.singleton(this);
     }
 
+    @Override
     default boolean isEmpty() {
         return false;
     }
 
+    @Override
     default V put(final K key, final V value) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default void putAll(final Map<? extends K, ? extends V> m) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default V remove(final Object key) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default V setValue(final V value) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default int size() {
         return 1;
     }

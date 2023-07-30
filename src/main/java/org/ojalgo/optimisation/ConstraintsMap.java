@@ -77,7 +77,7 @@ public final class ConstraintsMap implements Structure1D {
 
         for (int i = 0; i < length; i++) {
             EntryPair<ModelEntity<?>, ConstraintType> constraintKey = myMap[i];
-            double adjustmentFactor = constraintKey.getLeft().getAdjustmentFactor();
+            double adjustmentFactor = constraintKey.left().getAdjustmentFactor();
             double multiplierValue = multipliers.doubleValue(i);
             retVal.add(constraintKey.asKeyTo(multiplierValue * adjustmentFactor / myMultiplierScale));
         }

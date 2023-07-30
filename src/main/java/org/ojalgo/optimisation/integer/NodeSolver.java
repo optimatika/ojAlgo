@@ -139,8 +139,8 @@ public final class NodeSolver extends IntermediateSolver {
 
                             if (ibs != null) {
 
-                                ConstraintType type = ibs.getLeft().getLeft();
-                                if (ibs.getLeft().getRight().intValue() != j || ibs.getRight().doubleValue() == PrimitiveMath.ZERO) {
+                                ConstraintType type = ibs.left().left();
+                                if (ibs.left().right().intValue() != j || ibs.right().doubleValue() == PrimitiveMath.ZERO) {
                                     throw new IllegalStateException();
                                 }
 

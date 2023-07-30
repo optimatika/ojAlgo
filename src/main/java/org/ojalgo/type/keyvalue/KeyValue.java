@@ -77,6 +77,11 @@ public interface KeyValue<K, V> {
         }
 
         @Override
+        public T first() {
+            return first;
+        }
+
+        @Override
         public T getKey() {
             return first;
         }
@@ -92,6 +97,21 @@ public interface KeyValue<K, V> {
             int result = 1;
             result = prime * result + (first == null ? 0 : first.hashCode());
             return prime * result + (second == null ? 0 : second.hashCode());
+        }
+
+        @Override
+        public T left() {
+            return first;
+        }
+
+        @Override
+        public T right() {
+            return second;
+        }
+
+        @Override
+        public T second() {
+            return second;
         }
 
     }
@@ -152,16 +172,24 @@ public interface KeyValue<K, V> {
         return EntryPair.of(key, value);
     }
 
-    K getKey();
-
-    default K getLeft() {
+    default K first() {
         return this.getKey();
     }
 
-    default V getRight() {
+    K getKey();
+
+    V getValue();
+
+    default K left() {
+        return this.getKey();
+    }
+
+    default V right() {
         return this.getValue();
     }
 
-    V getValue();
+    default V second() {
+        return this.getValue();
+    }
 
 }
