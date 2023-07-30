@@ -168,7 +168,6 @@ public class LagrangeTest extends OptimisationConvexTests {
 
 
         Optimisation.Options options = new Optimisation.Options();
-        options.debug(Optimisation.Solver.class);
         Result altResult = altBuilder.build(options).solve();
         TestUtils.assertEquals(expectedX, result, accuracy);
 

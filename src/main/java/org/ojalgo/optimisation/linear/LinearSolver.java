@@ -412,7 +412,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 objective.set(i, mtrxC.doubleValue(i));
             }
 
-            return new PrimalSimplex(tableau, options);
+            return new SimplexTableauSolver(tableau, options);
         }
 
         protected final double[] getLowerBounds() {
@@ -490,17 +490,17 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         <T extends SimplexTableau> T newSimplexTableau(final SimplexTableauFactory<T> tableauFactory) {
 
-            int nbInequalites = this.countInequalityConstraints();
-            int nbEqualites = this.countEqualityConstraints();
-            int nbVariables = this.countVariables();
+            int nbVars = this.countVariables();
+            int nbEqus = this.countEqualityConstraints();
+            int nbInes = this.countInequalityConstraints();
 
-            IndexSelector ineqSign = new IndexSelector(nbInequalites);
+            IndexSelector ineqSign = new IndexSelector(nbInes);
 
-            if (nbInequalites > 0) {
+            if (nbInes > 0) {
 
                 MatrixStore<Double> mtrxBI = this.getBI();
 
-                for (int i = 0; i < nbInequalites; i++) {
+                for (int i = 0; i < nbInes; i++) {
                     double valRHS = mtrxBI.doubleValue(i);
                     if (valRHS < ZERO) {
                         ineqSign.exclude(i);
@@ -510,30 +510,30 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 }
             }
 
-            int nbIdentitySlackVariables = ineqSign.countIncluded();
-            int nbSlackVariables = ineqSign.countExcluded();
+            int nbIdentSlackVars = ineqSign.countIncluded();
+            int nbOtherSlackVars = ineqSign.countExcluded();
 
-            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables,
-                    nbInequalites + nbEqualites - nbIdentitySlackVariables);
+            LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars,
+                    nbInes + nbEqus - nbIdentSlackVars);
 
             T tableau = tableauFactory.make(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
 
-            if (nbInequalites > 0) {
+            if (nbInes > 0) {
 
                 int insIdSlack = 0;
                 int insGnSlack = 0;
 
-                for (int i = 0; i < nbInequalites; i++) {
+                for (int i = 0; i < nbInes; i++) {
 
                     SparseArray<Double> body = this.getAI(i);
                     double valRHS = this.getBI(i);
                     boolean positive = ineqSign.isIncluded(i);
 
-                    int row = positive ? insIdSlack : nbIdentitySlackVariables + insGnSlack;
-                    int col = positive ? nbVariables + nbSlackVariables + insIdSlack++ : nbVariables + insGnSlack++;
+                    int row = positive ? insIdSlack : nbIdentSlackVars + insGnSlack;
+                    int col = positive ? nbVars + nbOtherSlackVars + insIdSlack++ : nbVars + insGnSlack++;
 
                     for (NonzeroView<Double> nz : body.nonzeros()) {
                         constraintsBody.set(row, nz.index(), positive ? nz.doubleValue() : -nz.doubleValue());
@@ -545,19 +545,19 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 }
             }
 
-            if (nbEqualites > 0) {
+            if (nbEqus > 0) {
 
                 MatrixStore<Double> mtrxAE = this.getAE();
                 MatrixStore<Double> mtrxBE = this.getBE();
 
-                for (int i = 0; i < nbEqualites; i++) {
+                for (int i = 0; i < nbEqus; i++) {
 
                     double valRHS = mtrxBE.doubleValue(i);
                     boolean positive = valRHS >= ZERO;
 
-                    int row = nbInequalites + i;
+                    int row = nbInes + i;
 
-                    for (int j = 0; j < nbVariables; j++) {
+                    for (int j = 0; j < nbVars; j++) {
                         double value = mtrxAE.doubleValue(i, j);
                         if (Math.abs(value) > MACHINE_EPSILON) {
                             constraintsBody.set(row, j, positive ? value : -value);
@@ -570,7 +570,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             MatrixStore<Double> mtrxC = this.getC();
 
-            for (int i = 0; i < nbVariables; i++) {
+            for (int i = 0; i < nbVars; i++) {
                 objective.set(i, mtrxC.doubleValue(i));
             }
 
@@ -680,17 +680,17 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public SimplexTableauSolver build(final ConvexData convexBuilder, final Optimisation.Options options) {
 
-            SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options, false);
+            SimplexTableau tableau = SimplexTableauSolver.buildPrimal(convexBuilder, options, false);
 
-            return new PrimalSimplex(tableau, options);
+            return new SimplexTableauSolver(tableau, options);
         }
 
         @Override
         public SimplexTableauSolver build(final ExpressionsBasedModel model) {
 
-            SimplexTableau tableau = PrimalSimplex.build(model);
+            SimplexTableau tableau = SimplexTableauSolver.build(model);
 
-            PrimalSimplex solver = new PrimalSimplex(tableau, model.options);
+            SimplexTableauSolver solver = new SimplexTableauSolver(tableau, model.options);
 
             if (model.options.validate) {
                 solver.setValidator(this.newValidator(model));
@@ -790,9 +790,9 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static LinearSolver newSolver(final ExpressionsBasedModel model) {
 
-        SimplexTableau tableau = PrimalSimplex.build(model);
+        SimplexTableau tableau = SimplexTableauSolver.build(model);
 
-        return new PrimalSimplex(tableau, model.options);
+        return new SimplexTableauSolver(tableau, model.options);
     }
 
     public static LinearSolver.StandardBuilder newStandardBuilder() {
@@ -805,11 +805,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {
 
-        int dualSize = DualSimplex.size(convex);
-        int primSize = PrimalSimplex.size(convex);
+        int dualSize = SimplexTableauSolver.sizeOfDual(convex);
+        int primSize = SimplexTableauSolver.sizeOfPrimal(convex);
         boolean dual = dualSize <= primSize;
 
-        return dual ? DualSimplex.doSolve(convex, options, zeroC) : PrimalSimplex.doSolve(convex, options, zeroC);
+        return dual ? SimplexTableauSolver.doSolveDual(convex, options, zeroC) : SimplexTableauSolver.doSolvePrimal(convex, options, zeroC);
     }
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {

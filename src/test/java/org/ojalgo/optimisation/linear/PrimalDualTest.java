@@ -107,8 +107,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         ConvexSolver.copy(model, convex);
 
         ConvexData<Double> convexData = OptimisationConvexTests.getOptimisationData(convex);
-        Result primResult = PrimalSimplex.doSolve(convexData, model.options, false);
-        Result dualResult = DualSimplex.doSolve(convexData, model.options, false);
+        Result primResult = SimplexTableauSolver.doSolvePrimal(convexData, model.options, false);
+        Result dualResult = SimplexTableauSolver.doSolveDual(convexData, model.options, false);
 
         if (DEBUG) {
 
