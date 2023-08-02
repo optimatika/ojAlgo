@@ -287,16 +287,11 @@ abstract class SimplexSolver extends LinearSolver {
     private final SimplexStore mySimplex;
     private final double[] mySolutionShift;
     private double myValueShift = ZERO;
-    /**
-     * Excluding the artificial variables
-     */
-    private final int n;
 
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
         super(solverOptions);
         mySimplex = simplexStore;
         mySolutionShift = new double[simplexStore.n];
-        n = simplexStore.n - simplexStore.structure().nbArti;
     }
 
     @Override
@@ -322,7 +317,7 @@ abstract class SimplexSolver extends LinearSolver {
 
     @Override
     public LinearStructure getEntityMap() {
-        return mySimplex.structure();
+        return mySimplex.structure;
     }
 
     @Override
@@ -352,7 +347,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         Access1D<Double> duals = mySimplex.sliceDualVariables();
 
-        LinearStructure structure = mySimplex.structure();
+        LinearStructure structure = mySimplex.structure;
 
         return new Access1D<Double>() {
 
@@ -362,7 +357,7 @@ abstract class SimplexSolver extends LinearSolver {
             }
 
             @Override
-            public double doubleValue(final long index) {
+            public double doubleValue(final int index) {
                 int i = Math.toIntExact(index);
                 return structure.isConstraintNegated(i) ? -duals.doubleValue(index) : duals.doubleValue(index);
             }
@@ -484,6 +479,7 @@ abstract class SimplexSolver extends LinearSolver {
             enter = iteration.enter;
         }
 
+        int n = mySimplex.structure.countVariables();
         double largest = 1E-10;
         int[] excluded = mySimplex.excluded;
         for (int je = 0; je < excluded.length; je++) {
@@ -730,6 +726,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         iteration.ratioDual = Double.MAX_VALUE;
 
+        int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];

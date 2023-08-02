@@ -166,7 +166,6 @@ public class LagrangeTest extends OptimisationConvexTests {
         MatrixStore<Double> altBI = mtrxBE.below(mtrxBE.negate());
         altBuilder.inequalities(altAI, altBI);
 
-
         Optimisation.Options options = new Optimisation.Options();
         Result altResult = altBuilder.build(options).solve();
         TestUtils.assertEquals(expectedX, result, accuracy);

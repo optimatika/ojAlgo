@@ -496,7 +496,7 @@ public interface Optimisation {
         }
 
         @Override
-        public double doubleValue(final long index) {
+        public double doubleValue(final int index) {
             return mySolution.doubleValue(index);
         }
 

@@ -50,6 +50,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         myCoefficients = coefficients;
     }
 
+    @Override
     public PolynomialFunction<N> buildDerivative() {
 
         if (myDerivative == null) {
@@ -66,6 +67,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return myDerivative;
     }
 
+    @Override
     public PolynomialFunction<N> buildPrimitive() {
 
         if (myPrimitive == null) {
@@ -82,18 +84,22 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return myPrimitive;
     }
 
+    @Override
     public long count() {
         return this.size();
     }
 
+    @Override
     public int degree() {
         return myCoefficients.size() - 1;
     }
 
-    public double doubleValue(final long power) {
+    @Override
+    public double doubleValue(final int power) {
         return myCoefficients.doubleValue(power);
     }
 
+    @Override
     public void estimate(final List<? extends N> x, final List<? extends N> y) {
         this.estimate(Access1D.wrap(x), Access1D.wrap(y));
     }
@@ -124,14 +130,17 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         this.set(tmpQR.getSolution(tmpRHS));
     }
 
+    @Override
     public void estimate(final NumberSeries<?> samples) {
         this.estimate(samples.accessKeys(), samples.accessValues());
     }
 
+    @Override
     public N get(final long power) {
         return myCoefficients.get(power);
     }
 
+    @Override
     public double invoke(final double arg) {
 
         int power = this.degree();
@@ -145,6 +154,7 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return retVal;
     }
 
+    @Override
     public float invoke(final float arg) {
 
         int power = this.degree();
@@ -158,18 +168,21 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
         return retVal;
     }
 
+    @Override
     public void set(final int power, final double coefficient) {
         myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
 
+    @Override
     public void set(final int power, final N coefficient) {
         myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
 
+    @Override
     public int size() {
         return myCoefficients.size();
     }

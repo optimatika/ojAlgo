@@ -110,7 +110,6 @@ public abstract class ErrorFunction {
         }
     }
 
-    private ErrorFunction() {
-    }
+    private ErrorFunction() {}
 
 }

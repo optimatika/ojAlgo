@@ -241,8 +241,8 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         Primitive64Store tmpBE = Primitive64Store.FACTORY.rows(
                 new double[][] { { 2.24 }, { 20.2 }, { 17.4 }, { 0.73 }, { 25.2 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
+        Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
+                { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
         LinearSolver.StandardBuilder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);

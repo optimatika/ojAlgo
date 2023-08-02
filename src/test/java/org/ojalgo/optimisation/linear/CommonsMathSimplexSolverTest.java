@@ -726,8 +726,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Private constructor.
          */
-        private Precision() {
-        }
+        private Precision() {}
     }
 
     /**

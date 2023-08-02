@@ -64,6 +64,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
+        @Override
         public Array2D<N> columns(final Access1D<?>... source) {
 
             int tmpColumns = source.length;
@@ -92,6 +93,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> columns(final Comparable<?>[]... source) {
 
             int tmpColumns = source.length;
@@ -110,6 +112,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> columns(final double[]... source) {
 
             int tmpColumns = source.length;
@@ -128,6 +131,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> columns(final List<? extends Comparable<?>>... source) {
 
             int tmpColumns = source.length;
@@ -146,6 +150,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> copy(final Access2D<?> source) {
             return myDelegate.copy(source).wrapInArray2D(source.countRows());
         }
@@ -156,14 +161,21 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         }
 
         @Override
+        public MathType getMathType() {
+            return myDelegate.getMathType();
+        }
+
+        @Override
         public Array2D<N> make(final long rows, final long columns) {
             return this.makeDense(rows, columns);
         }
 
+        @Override
         public Array2D<N> makeDense(final long rows, final long columns) {
             return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
+        @Override
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
@@ -178,10 +190,12 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(rows);
         }
 
+        @Override
         public Array2D<N> makeSparse(final long rows, final long columns) {
             return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
         }
 
+        @Override
         public Array2D<N> rows(final Access1D<?>... source) {
 
             int tmpRows = source.length;
@@ -208,6 +222,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> rows(final Comparable<?>[]... source) {
 
             int tmpRows = source.length;
@@ -225,6 +240,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> rows(final double[]... source) {
 
             int tmpRows = source.length;
@@ -242,6 +258,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        @Override
         public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
             int tmpRows = source.length;
@@ -268,29 +285,18 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
             return TensorFactory2D.of(this);
         }
 
-        public MathType getMathType() {
-            return myDelegate.getMathType();
-        }
-
     }
 
-    public static final Factory<ComplexNumber> C128 = Array2D.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array2D.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array2D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = Array2D.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = Array2D.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = Array2D.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = Array2D.factory(ArrayR256.FACTORY);
-    public static final Factory<Double> Z008 = Array2D.factory(ArrayZ008.FACTORY);
-    public static final Factory<Double> Z016 = Array2D.factory(ArrayZ016.FACTORY);
-    public static final Factory<Double> Z032 = Array2D.factory(ArrayZ032.FACTORY);
-    public static final Factory<Double> Z064 = Array2D.factory(ArrayZ064.FACTORY);
-
     /**
      * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;
+    public static final Factory<ComplexNumber> C128 = Array2D.factory(ArrayC128.FACTORY);
     /**
      * @deprecated v52 Use {@link #C128} instead
      */
@@ -306,6 +312,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
      */
     @Deprecated
     public static final Factory<Double> DIRECT64 = Array2D.factory(BufferArray.DIRECT64);
+    public static final Factory<Quaternion> H256 = Array2D.factory(ArrayH256.FACTORY);
     /**
      * @deprecated v52 Use {@link #R032} instead
      */
@@ -316,6 +323,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
      */
     @Deprecated
     public static final Factory<Double> PRIMITIVE64 = R064;
+    public static final Factory<RationalNumber> Q128 = Array2D.factory(ArrayQ128.FACTORY);
     /**
      * @deprecated v52 Use {@link #H256} instead
      */
@@ -326,6 +334,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
      */
     @Deprecated
     public static final Factory<RationalNumber> RATIONAL = Q128;
+    public static final Factory<Double> Z008 = Array2D.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = Array2D.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = Array2D.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = Array2D.factory(ArrayZ064.FACTORY);
 
     public static <N extends Comparable<N>> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new Array2D.Factory<>(denseArray);
@@ -444,6 +456,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
+    public byte byteValue(final int row, final int col) {
+        return myDelegate.byteValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public byte byteValue(final long index) {
         return myDelegate.byteValue(index);
     }
@@ -466,6 +488,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     @Override
     public long countRows() {
         return myRowsCount;
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return myDelegate.doubleValue(index);
+    }
+
+    @Override
+    public double doubleValue(final int row, final int col) {
+        return myDelegate.doubleValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override
@@ -632,8 +664,19 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
      *
      * @see org.ojalgo.structure.Structure2D.Reshapable#flatten()
      */
+    @Override
     public Array1D<N> flatten() {
         return myDelegate.wrapInArray1D();
+    }
+
+    @Override
+    public float floatValue(final int index) {
+        return myDelegate.floatValue(index);
+    }
+
+    @Override
+    public float floatValue(final int row, final int col) {
+        return myDelegate.floatValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override
@@ -671,6 +714,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public int intValue(final int index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
+    public int intValue(final int row, final int col) {
+        return myDelegate.intValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public int intValue(final long index) {
         return myDelegate.intValue(index);
     }
@@ -678,6 +731,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     @Override
     public int intValue(final long row, final long col) {
         return myDelegate.intValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return myDelegate.longValue(index);
+    }
+
+    @Override
+    public long longValue(final int row, final int col) {
+        return myDelegate.longValue(Structure2D.index(myRowsCount, row, col));
     }
 
     @Override
@@ -777,15 +840,77 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         return retVal;
     }
 
+    @Override
     public void reset() {
         myDelegate.reset();
     }
 
+    @Override
     public Array2D<N> reshape(final long rows, final long columns) {
         if (Structure2D.count(rows, columns) != this.count()) {
             throw new IllegalArgumentException();
         }
         return myDelegate.wrapInArray2D(rows);
+    }
+
+    @Override
+    public void set(final int index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final byte value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final double value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final float value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final int value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final long value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final short value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final short value) {
+        myDelegate.set(index, value);
     }
 
     @Override
@@ -859,6 +984,16 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
     }
 
     @Override
+    public short shortValue(final int index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
+    public short shortValue(final int row, final int col) {
+        return myDelegate.shortValue(Structure2D.index(myRowsCount, row, col));
+    }
+
+    @Override
     public short shortValue(final long index) {
         return myDelegate.shortValue(index);
     }
@@ -900,6 +1035,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
 
+    @Override
     public void supplyTo(final Mutate2D receiver) {
         myDelegate.supplyTo(receiver);
     }

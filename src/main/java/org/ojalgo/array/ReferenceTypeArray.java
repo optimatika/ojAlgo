@@ -110,7 +110,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        return (prime * result) + Arrays.hashCode(data);
+        return prime * result + Arrays.hashCode(data);
     }
 
     @Override
@@ -153,7 +153,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final N get(final int index) {
+    public final N get(final int index) {
         return data[index];
     }
 
@@ -188,12 +188,12 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void set(final int index, final double value) {
+    public final void set(final int index, final double value) {
         data[index] = this.valueOf(value);
     }
 
     @Override
-    protected final void set(final int index, final float value) {
+    public final void set(final int index, final float value) {
         data[index] = this.valueOf(value);
     }
 

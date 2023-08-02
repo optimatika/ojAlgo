@@ -50,12 +50,12 @@ final class BufferR064 extends BufferArray {
     }
 
     @Override
-    protected byte byteValue(final int index) {
+    public byte byteValue(final int index) {
         return (byte) Math.round(myBuffer.get(index));
     }
 
     @Override
-    protected double doubleValue(final int index) {
+    public double doubleValue(final int index) {
         return myBuffer.get(index);
     }
 
@@ -65,27 +65,27 @@ final class BufferR064 extends BufferArray {
     }
 
     @Override
-    protected float floatValue(final int index) {
+    public float floatValue(final int index) {
         return (float) myBuffer.get(index);
     }
 
     @Override
-    protected int intValue(final int index) {
+    public int intValue(final int index) {
         return (int) Math.round(myBuffer.get(index));
     }
 
     @Override
-    protected long longValue(final int index) {
+    public long longValue(final int index) {
         return Math.round(myBuffer.get(index));
     }
 
     @Override
-    protected void set(final int index, final double value) {
+    public void set(final int index, final double value) {
         myBuffer.put(index, value);
     }
 
     @Override
-    protected void set(final int index, final long value) {
+    public void set(final int index, final long value) {
         myBuffer.put(index, value);
     }
 

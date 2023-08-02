@@ -43,7 +43,8 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
             return this.base().doubleValue(rowIndex, col);
@@ -52,6 +53,7 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public int firstInRow(final int row) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
@@ -61,7 +63,8 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
             return this.base().get(rowIndex, col);
@@ -80,6 +83,7 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
         final MatrixStore<N> base = this.base();
         for (int i = 0; i < myRows.length; i++) {
@@ -92,6 +96,7 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {

@@ -140,12 +140,12 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
-    protected byte byteValue(final int index) {
+    public byte byteValue(final int index) {
         return data[index];
     }
 
     @Override
-    protected double doubleValue(final int index) {
+    public double doubleValue(final int index) {
         return data[index];
     }
 
@@ -180,12 +180,12 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
-    protected float floatValue(final int index) {
+    public float floatValue(final int index) {
         return data[index];
     }
 
     @Override
-    protected final Double get(final int index) {
+    public final Double get(final int index) {
         return Double.valueOf(data[index]);
     }
 
@@ -235,17 +235,17 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
-    protected void set(final int index, final double value) {
+    public void set(final int index, final double value) {
         data[index] = (byte) Math.round(value);
     }
 
     @Override
-    protected void set(final int index, final byte value) {
+    public void set(final int index, final byte value) {
         data[index] = value;
     }
 
     @Override
-    protected void set(final int index, final float value) {
+    public void set(final int index, final float value) {
         data[index] = (byte) Math.round(value);
     }
 
@@ -275,7 +275,7 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
-    protected void set(final int index, final long value) {
+    public void set(final int index, final long value) {
         data[index] = (byte) value;
     }
 

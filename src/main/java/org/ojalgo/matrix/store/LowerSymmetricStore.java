@@ -32,14 +32,16 @@ final class LowerSymmetricStore<N extends Comparable<N>> extends ShadingStore<N>
         myHermitian = hermitian;
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         if (row < col) {
             return this.base().doubleValue(col, row);
         }
         return this.base().doubleValue(row, col);
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         if (myHermitian) {
             return this.toScalar(row, col).get();
         }
@@ -50,6 +52,7 @@ final class LowerSymmetricStore<N extends Comparable<N>> extends ShadingStore<N>
         }
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
         if (row >= col) {
             return this.base().toScalar(row, col);

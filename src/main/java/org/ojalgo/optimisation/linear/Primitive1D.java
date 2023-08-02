@@ -31,52 +31,45 @@ abstract class Primitive1D implements Access1D<Double>, Mutate1D {
         return new Primitive1D() {
 
             @Override
-            public int size() {
-                return values.length;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return values[index];
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 values[index] = value;
+            }
+
+            @Override
+            public int size() {
+                return values.length;
             }
 
         };
     }
 
+    @Override
     public final long count() {
         return this.size();
     }
 
-    public final double doubleValue(final long index) {
-        return this.doubleValue(Math.toIntExact(index));
-    }
-
+    @Override
     public final Double get(final long index) {
-        return Double.valueOf(this.doubleValue(Math.toIntExact(index)));
+        return Double.valueOf(this.doubleValue(index));
     }
 
+    @Override
     public final void set(final long index, final Comparable<?> value) {
-        this.set(Math.toIntExact(index), NumberDefinition.doubleValue(value));
+        this.set(index, NumberDefinition.doubleValue(value));
+
     }
 
-    public final void set(final long index, final double value) {
-        this.set(Math.toIntExact(index), value);
-    }
-
+    @Override
     public abstract int size();
 
     @Override
     public final String toString() {
         return Access1D.toString(this);
     }
-
-    abstract double doubleValue(final int index);
-
-    abstract void set(final int index, final double value);
 
 }

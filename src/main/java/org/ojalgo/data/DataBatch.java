@@ -77,18 +77,22 @@ public final class DataBatch implements Access2D<Double>, Access2D.Collectable<D
      *
      * @see org.ojalgo.structure.Structure2D#countColumns()
      */
+    @Override
     public long countColumns() {
         return myData.countColumns();
     }
 
+    @Override
     public long countRows() {
         return myData.countRows();
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return myData.doubleValue(row, col);
     }
 
+    @Override
     public Double get(final long row, final long col) {
         return Double.valueOf(this.doubleValue(row, col));
     }
@@ -108,6 +112,7 @@ public final class DataBatch implements Access2D<Double>, Access2D.Collectable<D
         myCursor = 0;
     }
 
+    @Override
     public void supplyTo(final Receiver<Double> receiver) {
         receiver.fillMatching(myData);
     }

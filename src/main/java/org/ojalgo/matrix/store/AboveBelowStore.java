@@ -54,34 +54,39 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long col) {
-        return (row >= mySplit) ? myBelow.doubleValue(row - mySplit, col) : this.base().doubleValue(row, col);
+    @Override
+    public double doubleValue(final int row, final int col) {
+        return row >= mySplit ? myBelow.doubleValue(row - mySplit, col) : this.base().doubleValue(row, col);
     }
 
+    @Override
     public int firstInColumn(final int col) {
         final int baseFirst = this.base().firstInColumn(col);
-        return (baseFirst < mySplit) ? baseFirst : mySplit + myBelow.firstInColumn(col);
+        return baseFirst < mySplit ? baseFirst : mySplit + myBelow.firstInColumn(col);
     }
 
+    @Override
     public int firstInRow(final int row) {
-        return (row < mySplit) ? this.base().firstInRow(row) : myBelow.firstInRow(row - mySplit);
+        return row < mySplit ? this.base().firstInRow(row) : myBelow.firstInRow(row - mySplit);
     }
 
-    public N get(final long row, final long col) {
-        return (row >= mySplit) ? myBelow.get(row - mySplit, col) : this.base().get(row, col);
+    @Override
+    public N get(final int row, final int col) {
+        return row >= mySplit ? myBelow.get(row - mySplit, col) : this.base().get(row, col);
     }
 
     @Override
     public int limitOfColumn(final int col) {
         final int belowLimit = myBelow.limitOfColumn(col);
-        return (belowLimit == 0) ? this.base().limitOfColumn(col) : mySplit + belowLimit;
+        return belowLimit == 0 ? this.base().limitOfColumn(col) : mySplit + belowLimit;
     }
 
     @Override
     public int limitOfRow(final int row) {
-        return (row < mySplit) ? this.base().limitOfRow(row) : myBelow.limitOfRow(row - mySplit);
+        return row < mySplit ? this.base().limitOfRow(row) : myBelow.limitOfRow(row - mySplit);
     }
 
+    @Override
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
 
         final Future<?> futureAbove = this.executeMultiply(right, target.regionByLimits(mySplit, this.getColDim()));
@@ -95,6 +100,7 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
         }
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
 
         final Future<MatrixStore<N>> futureAbove = this.executeMultiply(scalar);
@@ -124,6 +130,7 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
         }
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
 
         final Future<MatrixStore<N>> futureAbove = this.executeMultiply(scalar);
@@ -144,6 +151,7 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
@@ -155,8 +163,9 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
         myBelow.supplyTo(receiver.regionByOffsets(mySplit, 0));
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
-        return (row >= mySplit) ? myBelow.toScalar(row - mySplit, column) : this.base().toScalar(row, column);
+        return row >= mySplit ? myBelow.toScalar(row - mySplit, column) : this.base().toScalar(row, column);
     }
 
 }

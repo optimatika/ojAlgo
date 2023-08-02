@@ -33,6 +33,8 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.ConstraintType;
+import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
@@ -45,7 +47,7 @@ import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 
-abstract class SimplexStore implements Optimisation.ProblemStructure {
+abstract class SimplexStore {
 
     enum ColumnState {
 
@@ -213,9 +215,9 @@ abstract class SimplexStore implements Optimisation.ProblemStructure {
     private transient int[] myExcludedUpper = null;
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
-    private final LinearStructure myStructure;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
+
     /**
      * excluded == not in the basis
      */
@@ -228,18 +230,18 @@ abstract class SimplexStore implements Optimisation.ProblemStructure {
      * The number of constraints (upper, lower and equality)
      */
     final int m;
-
     /**
-     * The number of variables (all kinds)
+     * The number of variables totally (all kinds)
      */
     final int n;
+    final LinearStructure structure;
 
-    SimplexStore(final LinearStructure structure) {
+    SimplexStore(final LinearStructure linearStructure) {
 
         super();
 
-        m = structure.countConstraints();
-        n = structure.countVariablesTotally();
+        m = linearStructure.countConstraints();
+        n = linearStructure.countVariablesTotally();
 
         myLowerBounds = new double[n];
         myUpperBounds = new double[n];
@@ -252,32 +254,7 @@ abstract class SimplexStore implements Optimisation.ProblemStructure {
             myPartition.update(included[j], ColumnState.BASIS);
         }
 
-        myStructure = structure;
-    }
-
-    @Override
-    public int countAdditionalConstraints() {
-        return 0;
-    }
-
-    @Override
-    public int countConstraints() {
-        return m;
-    }
-
-    @Override
-    public int countEqualityConstraints() {
-        return m;
-    }
-
-    @Override
-    public int countInequalityConstraints() {
-        return 0;
-    }
-
-    @Override
-    public int countVariables() {
-        return n;
+        structure = linearStructure;
     }
 
     @Override
@@ -495,7 +472,7 @@ abstract class SimplexStore implements Optimisation.ProblemStructure {
      * when debugging.
      */
     boolean isPrintable() {
-        return myStructure.countVariablesTotally() <= 32;
+        return structure.countVariablesTotally() <= 32;
     }
 
     SimplexStore lower(final int index) {
@@ -554,10 +531,6 @@ abstract class SimplexStore implements Optimisation.ProblemStructure {
     abstract void restoreObjective();
 
     abstract Primitive1D sliceDualVariables();
-
-    final LinearStructure structure() {
-        return myStructure;
-    }
 
     SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);

@@ -52,6 +52,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return this.toDataSeries();
     }
 
+    @Override
     public long count() {
         return this.size();
     }
@@ -75,8 +76,9 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return new BinaryFunctionSeries(this, PrimitiveMath.DIVIDE, divisor);
     }
 
-    public double doubleValue(final long index) {
-        return this.value((int) index);
+    @Override
+    public double doubleValue(final int index) {
+        return this.value(index);
     }
 
     public PrimitiveSeries exp() {
@@ -87,6 +89,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return this.value(index);
     }
 
+    @Override
     public Double get(final long index) {
         return this.value((int) index);
     }
@@ -150,6 +153,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
         return DataSeries.wrap(tmpValues);
     }
 
+    @Override
     public abstract int size();
 
     public PrimitiveSeries subtract(final double subtrahend) {

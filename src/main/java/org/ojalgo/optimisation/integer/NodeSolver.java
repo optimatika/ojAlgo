@@ -85,7 +85,6 @@ public final class NodeSolver extends IntermediateSolver {
             throw new IllegalStateException();
         }
 
-
         if (solver instanceof UpdatableSolver) {
             UpdatableSolver updatable = (UpdatableSolver) solver;
 

@@ -41,41 +41,42 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.IndexSelector;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class SimplexTableau extends Primitive2D implements Optimisation.ProblemStructure {
+abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     static final class DenseRawTableau extends DenseTableau {
 
         private final int myColDim;
         private final double[][] myRaw;
 
-        DenseRawTableau(final LinearStructure structure) {
+        DenseRawTableau(final LinearStructure linearStructure) {
 
-            super(structure);
+            super(linearStructure);
 
-            int nbRows = this.countConstraints() + 2;
-            int nbCols = this.countVariablesTotally() + 1;
-
-            myColDim = nbCols;
+            int nbRows = m + 2;
+            int nbCols = n + 1;
 
             myRaw = new double[nbRows][nbCols];
+            myColDim = nbCols;
         }
 
         DenseRawTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.structure());
-
-            myColDim = toCopy.getColDim();
+            super(toCopy.structure);
 
             myRaw = toCopy.toRawCopy2D();
+            myColDim = toCopy.getColDim();
         }
 
         @Override
@@ -148,7 +149,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             // Diff end
 
-            Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
+            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
 
             int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
 
@@ -182,12 +183,12 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         @Override
         double getInfeasibility() {
-            return myRaw[this.countConstraints() + 1][this.countVariablesTotally()];
+            return myRaw[m + 1][structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti];
         }
 
         @Override
         double getValue() {
-            return myRaw[this.countConstraints()][this.countVariablesTotally()];
+            return myRaw[m][structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti];
         }
 
         @Override
@@ -195,11 +196,11 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.countConstraints();
-            int nbVariables = DenseRawTableau.this.countVariables();
+            int nbConstraints = DenseRawTableau.this.m;
+            int nbVariables = DenseRawTableau.this.structure.countVariables();
 
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = this.getDualIdentityBase();
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
 
             return new Primitive2D() {
 
@@ -240,11 +241,13 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.countConstraints();
-            int nbVariablesTotally = DenseRawTableau.this.countVariablesTotally();
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = DenseRawTableau.this.getDualIdentityBase();
-            boolean artificials = DenseRawTableau.this.isArtificials();
+            int nbConstraints = DenseRawTableau.this.m;
+            int nbVariablesTotally = DenseRawTableau.this.structure.countModelVariables() + DenseRawTableau.this.structure.nbSlck
+                    + DenseRawTableau.this.structure.nbIdty + DenseRawTableau.this.structure.nbArti;
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = DenseRawTableau.this.structure.countModelVariables() + DenseRawTableau.this.structure.nbSlck
+                    + DenseRawTableau.this.structure.nbIdty + DenseRawTableau.this.structure.nbArti - DenseRawTableau.this.m;
+            boolean artificials = DenseRawTableau.this.structure.nbArti > 0;
 
             return new Primitive1D() {
 
@@ -280,7 +283,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.countConstraints();
+            int nbConstraints = DenseRawTableau.this.m;
 
             return new Primitive1D() {
 
@@ -296,7 +299,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
                 @Override
                 public int size() {
-                    return DenseRawTableau.this.countProblemVariables();
+                    return DenseRawTableau.this.structure.countModelVariables();
                 }
 
             };
@@ -326,8 +329,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
     static abstract class DenseTableau extends SimplexTableau {
 
-        DenseTableau(final LinearStructure structure) {
-            super(structure);
+        DenseTableau(final LinearStructure linearStructure) {
+            super(linearStructure);
         }
 
     }
@@ -337,12 +340,12 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
         private final int myColDim;
         private final Primitive64Store myTransposed;
 
-        DenseTransposedTableau(final LinearStructure structure) {
+        DenseTransposedTableau(final LinearStructure linearStructure) {
 
-            super(structure);
+            super(linearStructure);
 
-            int nbRows = this.countConstraints() + 2;
-            int nbCols = this.countVariablesTotally() + 1;
+            int nbRows = m + 2;
+            int nbCols = n + 1;
 
             myTransposed = Primitive64Store.FACTORY.make(nbCols, nbRows);
             myColDim = myTransposed.getRowDim();
@@ -350,7 +353,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         DenseTransposedTableau(final SimplexTableau toCopy) {
 
-            super(toCopy.structure());
+            super(toCopy.structure);
 
             myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
             myColDim = myTransposed.getRowDim();
@@ -427,7 +430,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             // Diff end
 
-            Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
+            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
 
             int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
 
@@ -460,7 +463,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         @Override
         double getInfeasibility() {
-            return myTransposed.doubleValue(this.countVariablesTotally(), this.countConstraints() + 1);
+            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m + 1);
         }
 
         Primitive64Store getTransposed() {
@@ -469,7 +472,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         @Override
         double getValue() {
-            return myTransposed.doubleValue(this.countVariablesTotally(), this.countConstraints());
+            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m);
         }
 
         @Override
@@ -477,11 +480,11 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.countConstraints();
-            int nbVariables = DenseTransposedTableau.this.countVariables();
+            int nbConstraints = DenseTransposedTableau.this.m;
+            int nbVariables = DenseTransposedTableau.this.structure.countVariables();
 
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = this.getDualIdentityBase();
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
 
             return new Primitive2D() {
 
@@ -522,11 +525,13 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.countConstraints();
-            int nbVariablesTotally = DenseTransposedTableau.this.countVariablesTotally();
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = DenseTransposedTableau.this.getDualIdentityBase();
-            boolean artificials = DenseTransposedTableau.this.isArtificials();
+            int nbConstraints = DenseTransposedTableau.this.m;
+            int nbVariablesTotally = DenseTransposedTableau.this.structure.countModelVariables() + DenseTransposedTableau.this.structure.nbSlck
+                    + DenseTransposedTableau.this.structure.nbIdty + DenseTransposedTableau.this.structure.nbArti;
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = DenseTransposedTableau.this.structure.countModelVariables() + DenseTransposedTableau.this.structure.nbSlck
+                    + DenseTransposedTableau.this.structure.nbIdty + DenseTransposedTableau.this.structure.nbArti - DenseTransposedTableau.this.m;
+            boolean artificials = DenseTransposedTableau.this.structure.nbArti > 0;
 
             return new Primitive1D() {
 
@@ -562,7 +567,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.countConstraints();
+            int nbConstraints = DenseTransposedTableau.this.m;
 
             return new Primitive1D() {
 
@@ -578,7 +583,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
                 @Override
                 public int size() {
-                    return DenseTransposedTableau.this.countProblemVariables();
+                    return DenseTransposedTableau.this.structure.countModelVariables();
                 }
 
             };
@@ -607,13 +612,6 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
     }
 
-    @FunctionalInterface
-    interface SimplexTableauFactory<T extends SimplexTableau> {
-
-        T make(LinearStructure structure);
-
-    }
-
     static final class SparseTableau extends SimplexTableau {
 
         private double myInfeasibility = ZERO;
@@ -624,18 +622,18 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
         private final SparseArray.SparseFactory<Double> mySparseFactory;
         private double myValue = ZERO;
 
-        SparseTableau(final LinearStructure structure) {
+        SparseTableau(final LinearStructure linearStructure) {
 
-            super(structure);
+            super(linearStructure);
 
-            int nbConstraints = structure.countConstraints();
-            int nbProblemVariables = structure.countModelVariables();
+            int nbConstraints = linearStructure.countConstraints();
+            int nbProblemVariables = linearStructure.countModelVariables();
 
             long initial = Math.max(5L, Math.round(Math.sqrt(Math.min(nbConstraints, nbProblemVariables))));
             mySparseFactory = SparseArray.factory(ArrayR064.FACTORY).initial(initial);
 
             // Including artificial variables
-            final int totNumbVars = this.countVariablesTotally();
+            final int totNumbVars = linearStructure.countModelVariables() + linearStructure.nbSlck + linearStructure.nbIdty + linearStructure.nbArti;
 
             myRows = new SparseArray[nbConstraints];
             for (int r = 0; r < nbConstraints; r++) {
@@ -651,8 +649,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
         @Override
         public double doubleValue(final int row, final int col) {
 
-            int nbConstraints = this.countConstraints();
-            int nbVariables = this.countVariablesTotally();
+            int nbConstraints = m;
+            int nbVariables = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
 
             if (row < nbConstraints) {
                 if (col < nbVariables) {
@@ -674,19 +672,19 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         @Override
         public int getColDim() {
-            return this.countVariablesTotally() + 1;
+            return structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti + 1;
         }
 
         @Override
         public int getRowDim() {
-            return this.countConstraints() + 2;
+            return m + 2;
         }
 
         @Override
         public void set(final int row, final int col, final double value) {
 
-            int nbConstraints = this.countConstraints();
-            int nbVariables = this.countVariablesTotally();
+            int nbConstraints = m;
+            int nbVariables = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
 
             if (row < nbConstraints) {
                 if (col < nbVariables) {
@@ -763,7 +761,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
             SparseArray<Double> currentRow = myRows[row];
             double currentRHS = myRHS.doubleValue(row);
 
-            final int totNumbVars = this.countVariablesTotally();
+            final int totNumbVars = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
 
             SparseArray<Double> auxiliaryRow = mySparseFactory.limit(totNumbVars).make();
             double auxiliaryRHS = ZERO;
@@ -782,7 +780,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             // Diff end
 
-            Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
+            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
 
             int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
 
@@ -854,8 +852,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
         @Override
         Primitive2D newConstraintsBody() {
 
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = this.getDualIdentityBase();
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
 
             return new Primitive2D() {
 
@@ -866,12 +864,12 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
                 @Override
                 public int getColDim() {
-                    return SparseTableau.this.countVariables();
+                    return SparseTableau.this.structure.countVariables();
                 }
 
                 @Override
                 public int getRowDim() {
-                    return SparseTableau.this.countConstraints();
+                    return SparseTableau.this.m;
                 }
 
                 @Override
@@ -896,9 +894,10 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             Array1D<Double> rhs = SparseTableau.this.getRHS();
 
-            int nbIdentitySlackVariables = this.countIdentitySlackVariables();
-            int dualIdentityBase = SparseTableau.this.getDualIdentityBase();
-            boolean artificials = SparseTableau.this.isArtificials();
+            int nbIdentitySlackVariables = structure.nbIdty;
+            int dualIdentityBase = SparseTableau.this.structure.countModelVariables() + SparseTableau.this.structure.nbSlck
+                    + SparseTableau.this.structure.nbIdty + SparseTableau.this.structure.nbArti - SparseTableau.this.m;
+            boolean artificials = SparseTableau.this.structure.nbArti > 0;
 
             return new Primitive1D() {
 
@@ -923,7 +922,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
                 @Override
                 public int size() {
-                    return SparseTableau.this.countConstraints();
+                    return SparseTableau.this.m;
                 }
 
             };
@@ -948,7 +947,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
                 @Override
                 public int size() {
-                    return SparseTableau.this.countProblemVariables();
+                    return SparseTableau.this.structure.countModelVariables();
                 }
 
             };
@@ -1083,14 +1082,18 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
     private final int[] myBasis;
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
-    private final int myNumberOfArtificialVariables;
-    private final int myNumberOfConstraints;
-    private final int myNumberOfIdentitySlackVariables;
-    private final int myNumberOfProblemVariables;
-    private final int myNumberOfSlackVariables;
     private transient Primitive1D myObjective = null;
     private final IndexSelector mySelector;
-    private final LinearStructure myStructure;
+
+    /**
+     * The number of constraints (upper, lower and equality)
+     */
+    final int m;
+    /**
+     * The number of variables totally (all kinds)
+     */
+    final int n;
+    final LinearStructure structure;
 
     /**
      * @param nbConstraints The number of constraints.
@@ -1106,48 +1109,40 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
      *        constructing the tableau. In that case the identity slack variables and the artificial variables
      *        must form an identity matrix in the initial tableau (towards the right hand side).
      */
-    SimplexTableau(final LinearStructure structure) {
+    SimplexTableau(final LinearStructure linearStructure) {
 
         super();
 
-        myNumberOfConstraints = structure.countConstraints();
-        myNumberOfProblemVariables = structure.countModelVariables();
-        myNumberOfSlackVariables = structure.nbSlck;
-        myNumberOfIdentitySlackVariables = structure.nbIdty;
-        myNumberOfArtificialVariables = structure.nbArti;
+        m = linearStructure.countConstraints();
+        n = linearStructure.countVariablesTotally();
 
-        mySelector = new IndexSelector(this.countVariables());
-        myBasis = Structure1D.newIncreasingRange(-myNumberOfConstraints, myNumberOfConstraints);
+        int nbConstraints = linearStructure.countConstraints();
+        int nbVariables = linearStructure.countVariables();
 
-        myStructure = structure;
+        mySelector = new IndexSelector(nbVariables);
+        myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
+
+        structure = linearStructure;
     }
 
     @Override
-    public int countAdditionalConstraints() {
-        return 0;
+    public long countColumns() {
+        return this.getColDim();
     }
 
     @Override
-    public int countConstraints() {
-        return myNumberOfConstraints;
+    public long countRows() {
+        return this.getRowDim();
     }
 
     @Override
-    public int countEqualityConstraints() {
-        return myNumberOfConstraints;
+    public Double get(final long row, final long col) {
+        return Double.valueOf(this.doubleValue(row, col));
     }
 
     @Override
-    public int countInequalityConstraints() {
-        return 0;
-    }
-
-    /**
-     * problem + slack
-     */
-    @Override
-    public int countVariables() {
-        return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
+    public void set(final long row, final long col, final Comparable<?> value) {
+        this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
     /**
@@ -1168,10 +1163,6 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
             myConstraintsRHS = this.newConstraintsRHS();
         }
         return myConstraintsRHS;
-    }
-
-    final int countArtificialVariables() {
-        return myNumberOfArtificialVariables;
     }
 
     /**
@@ -1196,26 +1187,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
      * @return The number of variables (not artificial) that can be added to the basis.
      */
     final int countBasisDeficit() {
-        return myNumberOfConstraints - mySelector.countIncluded();
-    }
-
-    int countIdentitySlackVariables() {
-        return myNumberOfIdentitySlackVariables;
-    }
-
-    int countProblemVariables() {
-        return myNumberOfProblemVariables;
-    }
-
-    int countSlackVariables() {
-        return myNumberOfSlackVariables + myNumberOfIdentitySlackVariables;
-    }
-
-    /**
-     * problem + slack + artificial
-     */
-    int countVariablesTotally() {
-        return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfIdentitySlackVariables + myNumberOfArtificialVariables;
+        return structure.countConstraints() - mySelector.countIncluded();
     }
 
     int findNextPivotColumn(final Access1D<Double> auxiliaryRow, final Access1D<Double> objectiveRow) {
@@ -1225,7 +1197,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
         for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
             final int i = (int) nz.index();
-            if (i >= this.countVariables()) {
+            if (i >= structure.countVariables()) {
                 break;
             }
             final double denominator = nz.doubleValue();
@@ -1246,8 +1218,8 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
-        int m = this.countConstraints();
-        int nbModVars = this.countProblemVariables();
+        int m = this.m;
+        int nbModVars = structure.countModelVariables();
 
         Primitive1D constraintsRHS = this.constraintsRHS();
 
@@ -1258,7 +1230,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
                 solRHS[j] = constraintsRHS.doubleValue(i);
             }
         }
-        if (DEBUG) {
+        if (ProblemStructure.DEBUG) {
             BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
             BasicLogger.debug("Bas: {}", Arrays.toString(myBasis));
         }
@@ -1298,10 +1270,6 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
         return IndexOf.indexOf(myBasis, basisColumnIndex);
     }
 
-    int getDualIdentityBase() {
-        return this.countVariablesTotally() - this.countConstraints();
-    }
-
     final int[] getExcluded() {
         return mySelector.getExcluded();
     }
@@ -1321,18 +1289,14 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
     abstract double getValue();
 
     boolean isAbleToExtractDual() {
-        return myNumberOfIdentitySlackVariables + myNumberOfArtificialVariables == myNumberOfConstraints;
-    }
-
-    boolean isArtificials() {
-        return myNumberOfArtificialVariables > 0;
+        return structure.nbIdty + structure.nbArti == structure.countConstraints();
     }
 
     /**
      * Are there any artificial variables in the basis?
      */
     final boolean isBasicArtificials() {
-        return myNumberOfConstraints > mySelector.countIncluded();
+        return structure.countConstraints() > mySelector.countIncluded();
     }
 
     final boolean isExcluded(final int index) {
@@ -1377,7 +1341,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             @Override
             public int size() {
-                return SimplexTableau.this.countConstraints();
+                return m;
             }
 
         };
@@ -1399,7 +1363,7 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
 
             @Override
             public int size() {
-                return SimplexTableau.this.countVariables();
+                return structure.countVariables();
             }
 
         };
@@ -1414,26 +1378,23 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
      */
     final Primitive1D sliceDualVariables() {
 
-        int nbConstraints = this.countConstraints();
-        int nbVariables = this.countVariablesTotally();
-
-        int dualIdentityBase = this.getDualIdentityBase();
+        int base = n - m;
 
         return new Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
-                return SimplexTableau.this.doubleValue(nbConstraints, dualIdentityBase + index);
+                return SimplexTableau.this.doubleValue(m, base + index);
             }
 
             @Override
             public void set(final int index, final double value) {
-                SimplexTableau.this.set(nbConstraints, dualIdentityBase + index, -value);
+                SimplexTableau.this.set(m, base + index, value);
             }
 
             @Override
             public int size() {
-                return nbVariables - dualIdentityBase;
+                return m;
             }
 
         };
@@ -1481,10 +1442,6 @@ abstract class SimplexTableau extends Primitive2D implements Optimisation.Proble
             }
 
         };
-    }
-
-    LinearStructure structure() {
-        return myStructure;
     }
 
     abstract DenseTableau toDense();

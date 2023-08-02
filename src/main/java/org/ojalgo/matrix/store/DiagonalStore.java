@@ -45,6 +45,7 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
             myMainDiagonal = mainDiagonal;
         }
 
+        @Override
         public DiagonalStore<N, D> get() {
             long dim = this.dimension();
             return new DiagonalStore<>(myFactory, dim, dim, myMainDiagonal, mySuperdiagonal, mySubdiagonal);
@@ -97,18 +98,20 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
         myZero = factory.scalar().zero().get();
     }
 
-    public double doubleValue(final long row, final long col) {
-        if ((myMainDiagonal != null) && (row == col)) {
+    @Override
+    public double doubleValue(final int row, final int col) {
+        if (myMainDiagonal != null && row == col) {
             return myMainDiagonal.doubleValue(row);
-        } else if ((mySuperdiagonal != null) && ((col - row) == 1L)) {
+        } else if (mySuperdiagonal != null && col - row == 1L) {
             return mySuperdiagonal.doubleValue(row);
-        } else if ((mySubdiagonal != null) && ((row - col) == 1L)) {
+        } else if (mySubdiagonal != null && row - col == 1L) {
             return mySubdiagonal.doubleValue(col);
         } else {
             return PrimitiveMath.ZERO;
         }
     }
 
+    @Override
     public int firstInColumn(final int col) {
         if (mySuperdiagonal != null) {
             return col - 1;
@@ -121,6 +124,7 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
         }
     }
 
+    @Override
     public int firstInRow(final int row) {
         if (mySubdiagonal != null) {
             return row - 1;
@@ -133,12 +137,13 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
         }
     }
 
-    public N get(final long row, final long col) {
-        if ((myMainDiagonal != null) && (row == col)) {
+    @Override
+    public N get(final int row, final int col) {
+        if (myMainDiagonal != null && row == col) {
             return myScalarFactory.cast(myMainDiagonal.get(row));
-        } else if ((mySuperdiagonal != null) && ((col - row) == 1L)) {
+        } else if (mySuperdiagonal != null && col - row == 1L) {
             return myScalarFactory.cast(mySuperdiagonal.get(row));
-        } else if ((mySubdiagonal != null) && ((row - col) == 1L)) {
+        } else if (mySubdiagonal != null && row - col == 1L) {
             return myScalarFactory.cast(mySubdiagonal.get(col));
         } else {
             return myZero;
@@ -252,12 +257,13 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
         }
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
-        if ((myMainDiagonal != null) && (row == col)) {
+        if (myMainDiagonal != null && row == col) {
             return myScalarFactory.convert(myMainDiagonal.get(row));
-        } else if ((mySuperdiagonal != null) && ((col - row) == 1L)) {
+        } else if (mySuperdiagonal != null && col - row == 1L) {
             return myScalarFactory.convert(mySuperdiagonal.get(row));
-        } else if ((mySubdiagonal != null) && ((row - col) == 1L)) {
+        } else if (mySubdiagonal != null && row - col == 1L) {
             return myScalarFactory.convert(mySubdiagonal.get(col));
         } else {
             return myScalarFactory.zero();

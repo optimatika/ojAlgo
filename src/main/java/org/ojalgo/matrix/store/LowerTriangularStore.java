@@ -35,7 +35,8 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         myUnitDiagonal = unitDiagonal;
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         if (row < col) {
             return PrimitiveMath.ZERO;
         }
@@ -46,11 +47,13 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         }
     }
 
+    @Override
     public int firstInColumn(final int col) {
         return col;
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         if (row < col) {
             return this.zero().get();
         }
@@ -66,6 +69,7 @@ final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N
         return Math.min(row + 1, this.getColDim());
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
         if (row < col) {
             return this.zero();

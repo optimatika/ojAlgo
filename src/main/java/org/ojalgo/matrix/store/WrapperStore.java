@@ -45,29 +45,35 @@ final class WrapperStore<N extends Comparable<N>> extends FactoryStore<N> {
         myAccess = access;
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
+    @Override
+    public double doubleValue(final int aRow, final int aCol) {
         return myAccess.doubleValue(aRow, aCol);
     }
 
-    public N get(final long aRow, final long aCol) {
+    @Override
+    public N get(final int aRow, final int aCol) {
         return this.physical().scalar().cast(myAccess.get(aRow, aCol));
     }
 
+    @Override
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
 
+    @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
         // TODO Auto-generated method stub
         return super.multiply(right);
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
@@ -79,6 +85,7 @@ final class WrapperStore<N extends Comparable<N>> extends FactoryStore<N> {
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);

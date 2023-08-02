@@ -134,58 +134,72 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         myCount = count;
     }
 
+    @Override
     public final void add(final long index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
 
+    @Override
     public final void add(final long index, final float addend) {
         this.set(index, this.floatValue(index) + addend);
     }
 
+    @Override
     public final void add(final long index, final long addend) {
         this.set(index, this.longValue(index) + addend);
     }
 
+    @Override
     public final void add(final long index, final int addend) {
         this.set(index, this.intValue(index) + addend);
     }
 
+    @Override
     public final void add(final long index, final short addend) {
         this.set(index, this.shortValue(index) + addend);
     }
 
+    @Override
     public final void add(final long index, final byte addend) {
         this.set(index, this.byteValue(index) + addend);
     }
 
+    @Override
     public final long count() {
         return myCount;
     }
 
+    @Override
     public void fillAll(final Double value) {
         this.fill(0L, this.count(), 1L, value);
     }
 
+    @Override
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         this.set(index, values.doubleValue(valueIndex));
     }
 
+    @Override
     public void fillOne(final long index, final Double value) {
         this.set(index, value.doubleValue());
     }
 
+    @Override
     public void fillOne(final long index, final NullaryFunction<?> supplier) {
         this.set(index, supplier.doubleValue());
     }
 
+    @Override
     public Double get(final long index) {
         return Double.valueOf(this.doubleValue(index));
     }
 
+    @Override
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.set(index, modifier.invoke(this.doubleValue(index)));
     }
 
+    @Override
     public void visitOne(final long index, final VoidFunction<Double> visitor) {
         visitor.accept(this.doubleValue(index));
     }

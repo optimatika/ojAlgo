@@ -33,6 +33,7 @@ import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
@@ -67,9 +68,9 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         this(new LinearStructure(mm, nn));
     }
 
-    TableauStore(final LinearStructure structure) {
+    TableauStore(final LinearStructure linearStructure) {
 
-        super(structure);
+        super(linearStructure);
 
         myTableau = new double[m + 1][n + 1];
 
@@ -87,13 +88,8 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     }
 
     @Override
-    public double doubleValue(final long row, final long col) {
-        return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
-    }
-
-    @Override
-    public Double get(final long row, final long col) {
-        return Double.valueOf(this.doubleValue(row, col));
+    public double doubleValue(final int row, final int col) {
+        return myTableau[row][col];
     }
 
     @Override
@@ -177,7 +173,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public int size() {
-                return TableauStore.this.structure().countModelVariables();
+                return TableauStore.this.structure.countModelVariables();
             }
 
         };
@@ -280,10 +276,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myCopiedObjectiveRow = Arrays.copyOf(myTableau[m], myColDim);
     }
 
-    double doubleValue(final int row, final int col) {
-        return myTableau[row][col];
-    }
-
     @Override
     double extractValue() {
 
@@ -312,7 +304,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
             final double fractionality) {
 
-        int nbModVars = this.structure().countModelVariables();
+        int nbModVars = structure.countModelVariables();
 
         List<Equation> retVal = new ArrayList<>();
 
@@ -323,7 +315,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
             int j = included[i];
             solRHS[j] = constraintsRHS.doubleValue(i);
         }
-        if (DEBUG) {
+        if (ProblemStructure.DEBUG) {
             BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
             BasicLogger.debug("Bas: {}", Arrays.toString(included));
         }
@@ -456,7 +448,7 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public int size() {
-                return TableauStore.this.countVariables();
+                return TableauStore.this.n;
             }
 
         };
@@ -488,6 +480,11 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
             }
 
         };
+    }
+
+    @Override
+    public Double get(final long row, final long col) {
+        return Double.valueOf(this.doubleValue(row, col));
     }
 
 }

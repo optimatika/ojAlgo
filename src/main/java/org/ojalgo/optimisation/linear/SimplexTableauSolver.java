@@ -154,18 +154,18 @@ final class SimplexTableauSolver extends LinearSolver {
         Primitive1D retSolution = new Primitive1D() {
 
             @Override
-            public int size() {
-                return multipliers.size();
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return -multipliers.doubleValue(index);
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return multipliers.size();
             }
 
         };
@@ -173,12 +173,7 @@ final class SimplexTableauSolver extends LinearSolver {
         Primitive1D retMultipliers = new Primitive1D() {
 
             @Override
-            public int size() {
-                return nbEqus + nbInes;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 if (index < nbEqus) {
                     return result.doubleValue(index) - result.doubleValue(nbEqus + index);
                 } else {
@@ -187,8 +182,13 @@ final class SimplexTableauSolver extends LinearSolver {
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbEqus + nbInes;
             }
 
         };
@@ -207,18 +207,18 @@ final class SimplexTableauSolver extends LinearSolver {
         Primitive1D solution = new Primitive1D() {
 
             @Override
-            public int size() {
-                return nbVars;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return result.doubleValue(index) - result.doubleValue(nbVars + index);
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbVars;
             }
 
         };
@@ -733,12 +733,13 @@ final class SimplexTableauSolver extends LinearSolver {
         if (this.isLogProgress()) {
             this.log("");
             this.log("Created SimplexSolver");
-            this.log("countVariables: {}", tableau.countVariables());
-            this.log("countProblemVariables: {}", tableau.countProblemVariables());
-            this.log("countSlackVariables: {}", tableau.countSlackVariables());
-            this.log("countArtificialVariables: {}", tableau.countArtificialVariables());
-            this.log("countVariablesTotally: {}", tableau.countVariablesTotally());
-            this.log("countConstraints: {}", tableau.countConstraints());
+            this.log("countVariables: {}", tableau.structure.countVariables());
+            this.log("countProblemVariables: {}", tableau.structure.countModelVariables());
+            this.log("countSlackVariables: {}", tableau.structure.nbSlck + tableau.structure.nbIdty);
+            this.log("countArtificialVariables: {}", tableau.structure.nbArti);
+            this.log("countVariablesTotally: {}",
+                    tableau.structure.countModelVariables() + tableau.structure.nbSlck + tableau.structure.nbIdty + tableau.structure.nbArti);
+            this.log("countConstraints: {}", tableau.m);
             this.log("countBasisDeficit: {}", tableau.countBasisDeficit());
         }
 
@@ -780,7 +781,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     @Override
     public LinearStructure getEntityMap() {
-        return myTableau.structure();
+        return myTableau.structure;
     }
 
     @Override
@@ -820,7 +821,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int[] basis = myTableau.getBasis();
         int[] excluded = myTableau.getExcluded();
 
-        int colRHS = myTableau.countVariablesTotally();
+        int colRHS = myTableau.n;
 
         for (int i = 0; i < basis.length; i++) {
 
@@ -853,7 +854,7 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     private int getRowObjective() {
-        return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
+        return myPoint.isPhase1() ? myTableau.m + 1 : myTableau.m;
     }
 
     private double infeasibility() {
@@ -907,7 +908,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         Access1D<Double> duals = myTableau.sliceDualVariables();
 
-        LinearStructure structure = myTableau.structure();
+        LinearStructure structure = myTableau.structure;
 
         return new Access1D<Double>() {
 
@@ -917,7 +918,7 @@ final class SimplexTableauSolver extends LinearSolver {
             }
 
             @Override
-            public double doubleValue(final long index) {
+            public double doubleValue(final int index) {
                 int i = Math.toIntExact(index);
                 double dualValue = duals.doubleValue(index);
                 return structure.isConstraintNegated(i) ? -dualValue : dualValue;
@@ -941,11 +942,11 @@ final class SimplexTableauSolver extends LinearSolver {
      */
     protected Access1D<?> extractSolution() {
 
-        int colRHS = myTableau.countVariablesTotally();
+        int colRHS = myTableau.n;
 
-        Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.countVariables(), 1);
+        Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.structure.countVariables(), 1);
 
-        int numberOfConstraints = myTableau.countConstraints();
+        int numberOfConstraints = myTableau.m;
         for (int row = 0; row < numberOfConstraints; row++) {
             int variableIndex = myTableau.getBasisColumnIndex(row);
             if (variableIndex >= 0) {
@@ -1051,7 +1052,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         boolean phase2 = myPoint.isPhase2();
 
-        int nbVariables = myTableau.countVariables();
+        int nbVariables = myTableau.structure.countVariables();
 
         if (this.isLogDebug()) {
             if (options.validate) {
@@ -1091,7 +1092,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        int numerCol = myTableau.countVariablesTotally();
+        int numerCol = myTableau.n;
         int denomCol = myPoint.col;
 
         boolean phase1 = myPoint.isPhase1();
@@ -1113,7 +1114,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int retVal = -1;
         double numer = NaN, denom = NaN, ratio = NaN, minRatio = MACHINE_LARGEST, curDenom = MACHINE_SMALLEST;
 
-        int constraintsCount = myTableau.countConstraints();
+        int constraintsCount = myTableau.m;
         for (int i = 0; i < constraintsCount; i++) {
 
             // Numerator/RHS: Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
@@ -1156,7 +1157,7 @@ final class SimplexTableauSolver extends LinearSolver {
     void performIteration(final SimplexTableauSolver.IterationPoint pivot) {
 
         double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
-        int tmpColRHS = myTableau.countVariablesTotally();
+        int tmpColRHS = myTableau.n;
         double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
 
         myTableau.pivot(pivot);

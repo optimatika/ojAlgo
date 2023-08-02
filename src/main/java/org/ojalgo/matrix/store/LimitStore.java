@@ -31,11 +31,13 @@ final class LimitStore<N extends Comparable<N>> extends SelectingStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return this.base().doubleValue(row, col);
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         return this.base().get(row, col);
     }
 

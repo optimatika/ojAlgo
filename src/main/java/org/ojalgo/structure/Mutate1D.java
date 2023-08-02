@@ -294,28 +294,52 @@ public interface Mutate1D extends Structure1D {
         }
     }
 
-    default void set(final long index, final byte value) {
+    default void set(final int index, final byte value) {
         this.set(index, (short) value);
+    }
+
+    void set(int index, double value);
+
+    default void set(final int index, final float value) {
+        this.set(index, (double) value);
+    }
+
+    default void set(final int index, final int value) {
+        this.set(index, (long) value);
+    }
+
+    default void set(final int index, final long value) {
+        this.set(index, (double) value);
+    }
+
+    default void set(final int index, final short value) {
+        this.set(index, (int) value);
+    }
+
+    default void set(final long index, final byte value) {
+        this.set(Math.toIntExact(index), value);
     }
 
     void set(long index, Comparable<?> value);
 
-    void set(long index, double value);
+    default void set(final long index, final double value) {
+        this.set(Math.toIntExact(index), value);
+    }
 
     default void set(final long index, final float value) {
-        this.set(index, (double) value);
+        this.set(Math.toIntExact(index), value);
     }
 
     default void set(final long index, final int value) {
-        this.set(index, (long) value);
+        this.set(Math.toIntExact(index), value);
     }
 
     default void set(final long index, final long value) {
-        this.set(index, (double) value);
+        this.set(Math.toIntExact(index), value);
     }
 
     default void set(final long index, final short value) {
-        this.set(index, (int) value);
+        this.set(Math.toIntExact(index), value);
     }
 
 }

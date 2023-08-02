@@ -56,19 +56,23 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
         return myValue;
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
+    @Override
+    public double doubleValue(final int aRow, final int aCol) {
         return myValue;
     }
 
-    public N get(final long aRow, final long aCol) {
+    @Override
+    public N get(final int aRow, final int aCol) {
         return myNumber;
     }
 
+    @Override
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
@@ -86,6 +90,7 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
@@ -97,15 +102,18 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
         receiver.fillOne(0L, 0L, myNumber);
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
         return this.physical().scalar().convert(myNumber);
     }

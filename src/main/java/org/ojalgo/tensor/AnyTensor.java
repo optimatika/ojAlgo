@@ -63,6 +63,10 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             return true;
         }
 
+        public MathType getMathType() {
+            return myFactory.getMathType();
+        }
+
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -85,10 +89,6 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             }
 
             return new AnyTensor<>(myFactory, rank, Math.toIntExact(dimensions));
-        }
-
-        public MathType getMathType() {
-            return myFactory.getMathType();
         }
 
     }

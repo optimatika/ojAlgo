@@ -61,18 +61,20 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         }
 
         @Override
+        public MathType getMathType() {
+            return myFactory.getMathType();
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = super.hashCode();
             return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
+        @Override
         public VectorTensor<N> make(final long count) {
             return new VectorTensor<>(myFactory, Math.toIntExact(count));
-        }
-
-        public MathType getMathType() {
-            return myFactory.getMathType();
         }
 
     }
@@ -92,6 +94,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         myArray = factory.make(dimensions);
     }
 
+    @Override
     public VectorTensor<N> add(final VectorTensor<N> addend) {
 
         VectorTensor<N> retVal = this.newSameShape();
@@ -101,18 +104,32 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
+    public byte byteValue(final int index) {
+        return myArray.byteValue(index);
+    }
+
+    @Override
     public byte byteValue(final long index) {
         return myArray.byteValue(index);
     }
 
+    @Override
     public VectorTensor<N> conjugate() {
         return this;
     }
 
+    @Override
     public long count() {
         return myArray.count();
     }
 
+    @Override
+    public double doubleValue(final int index) {
+        return myArray.doubleValue(index);
+    }
+
+    @Override
     public double doubleValue(final long index) {
         return myArray.doubleValue(index);
     }
@@ -143,10 +160,17 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return true;
     }
 
+    @Override
+    public float floatValue(final int index) {
+        return myArray.floatValue(index);
+    }
+
+    @Override
     public float floatValue(final long index) {
         return myArray.floatValue(index);
     }
 
+    @Override
     public N get(final long index) {
         return myArray.get(index);
     }
@@ -159,14 +183,27 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
+    @Override
+    public int intValue(final int index) {
+        return myArray.intValue(index);
+    }
+
+    @Override
     public int intValue(final long index) {
         return myArray.intValue(index);
     }
 
+    @Override
+    public long longValue(final int index) {
+        return myArray.longValue(index);
+    }
+
+    @Override
     public long longValue(final long index) {
         return myArray.longValue(index);
     }
 
+    @Override
     public VectorTensor<N> multiply(final double scalarMultiplicand) {
 
         VectorTensor<N> retVal = this.newSameShape();
@@ -176,6 +213,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public VectorTensor<N> multiply(final N scalarMultiplicand) {
 
         VectorTensor<N> retVal = this.newSameShape();
@@ -185,6 +223,7 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public VectorTensor<N> negate() {
 
         VectorTensor<N> retVal = this.newSameShape();
@@ -194,38 +233,82 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public double norm() {
         return this.norm(myArray);
     }
 
+    @Override
+    public void set(final int index, final byte value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final int value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final short value) {
+        myArray.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final byte value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final Comparable<?> value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final double value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final float value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final int value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final long value) {
         myArray.set(index, value);
     }
 
+    @Override
     public void set(final long index, final short value) {
         myArray.set(index, value);
     }
 
+    @Override
+    public short shortValue(final int index) {
+        return myArray.shortValue(index);
+    }
+
+    @Override
     public short shortValue(final long index) {
         return myArray.shortValue(index);
     }

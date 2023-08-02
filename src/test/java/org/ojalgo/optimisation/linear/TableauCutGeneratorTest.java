@@ -45,18 +45,18 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Primitive1D body = new Primitive1D() {
 
             @Override
-            public int size() {
-                return factors.length;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return factors[index];
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 factors[index] = value;
+            }
+
+            @Override
+            public int size() {
+                return factors.length;
             }
 
         };
@@ -69,18 +69,18 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Primitive1D body = new Primitive1D() {
 
             @Override
-            public int size() {
-                return factors.length;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return factors[index];
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 factors[index] = value;
+            }
+
+            @Override
+            public int size() {
+                return factors.length;
             }
 
         };

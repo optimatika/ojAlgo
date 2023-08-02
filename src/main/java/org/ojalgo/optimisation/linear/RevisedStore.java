@@ -98,9 +98,9 @@ final class RevisedStore extends SimplexStore {
         this(new LinearStructure(mm, nn));
     }
 
-    RevisedStore(final LinearStructure structure) {
+    RevisedStore(final LinearStructure linearStructure) {
 
-        super(structure);
+        super(linearStructure);
 
         myObjective = RevisedStore.newColumn(n);
         myConstraintsBody = RevisedStore.newMatrix(m, n);
@@ -331,18 +331,18 @@ final class RevisedStore extends SimplexStore {
         return new Primitive1D() {
 
             @Override
-            public int size() {
-                return m;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return -l.doubleValue(index);
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int size() {
+                return m;
             }
 
         };

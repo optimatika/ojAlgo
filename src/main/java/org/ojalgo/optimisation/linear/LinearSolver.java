@@ -43,7 +43,6 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.SimplexTableau.SimplexTableauFactory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
@@ -488,7 +487,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return simplex;
         }
 
-        <T extends SimplexTableau> T newSimplexTableau(final SimplexTableauFactory<T> tableauFactory) {
+        <T extends SimplexTableau> T newSimplexTableau(final Function<LinearStructure, T> tableauFactory) {
 
             int nbVars = this.countVariables();
             int nbEqus = this.countEqualityConstraints();
@@ -516,7 +515,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars,
                     nbInes + nbEqus - nbIdentSlackVars);
 
-            T tableau = tableauFactory.make(structure);
+            T tableau = tableauFactory.apply(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();

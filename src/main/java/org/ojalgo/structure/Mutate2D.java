@@ -381,9 +381,67 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default boolean isAcceptable(final Structure2D supplier) {
-            return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
+            return this.countRows() >= supplier.countRows() && this.countColumns() >= supplier.countColumns();
         }
 
+    }
+
+    @Override
+    default void set(final int index, final byte value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
+    }
+
+    @Override
+    default void set(final int index, final double value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
+    }
+
+    @Override
+    default void set(final int index, final float value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
+    }
+
+    @Override
+    default void set(final int index, final int value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
+    }
+
+    default void set(final int row, final int col, final byte value) {
+        this.set(row, col, (short) value);
+    }
+
+    void set(int row, int col, double value);
+
+    default void set(final int row, final int col, final float value) {
+        this.set(row, col, (double) value);
+    }
+
+    default void set(final int row, final int col, final int value) {
+        this.set(row, col, (long) value);
+    }
+
+    default void set(final int row, final int col, final long value) {
+        this.set(row, col, (double) value);
+    }
+
+    default void set(final int row, final int col, final short value) {
+        this.set(row, col, (int) value);
+    }
+
+    @Override
+    default void set(final int index, final long value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
+    }
+
+    @Override
+    default void set(final int index, final short value) {
+        long structure = this.countRows();
+        this.set(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
     }
 
     @Override
@@ -428,7 +486,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     void set(long row, long col, Comparable<?> value);
 
-    void set(long row, long col, double value);
+    default void set(final long row, final long col, final double value) {
+        this.set(Math.toIntExact(row), Math.toIntExact(col), value);
+    }
 
     default void set(final long row, final long col, final float value) {
         this.set(row, col, (double) value);

@@ -95,22 +95,25 @@ final class IterativeASS extends ActiveSetSolver {
             return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
         }
 
-        public double doubleValue(final long row, final long col) {
+        @Override
+        public double doubleValue(final int row, final int col) {
 
-            int intRow = (int) row;
-            int intCol = (int) col;
+            int intRow = row;
+            int intCol = col;
 
             if (intCol >= myCountE) {
                 intCol = myCountE + IterativeASS.this.getIncluded(intCol - myCountE);
             }
 
-            return this.doubleValue(intRow, intCol);
+            return super.doubleValue(intRow, intCol);
         }
 
-        public Double get(final long row, final long col) {
+        @Override
+        public Double get(final int row, final int col) {
             return Double.valueOf(this.doubleValue(row, col));
         }
 
+        @Override
         public PhysicalStore.Factory<Double, ?> physical() {
             return MATRIX_FACTORY;
         }

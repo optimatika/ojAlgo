@@ -448,8 +448,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public double doubleValue(final long index) {
-        switch ((int) index) {
+    public double doubleValue(final int index) {
+        switch (index) {
         case 0:
             return myScalar;
         case 1:
@@ -488,11 +488,12 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     @Override
-    public double doubleValue(final long row, final long col) {
+    public double doubleValue(final int row, final int col) {
         if (row == col) {
             return myScalar;
+        } else {
+            return this.doubleValue(row + col * 4);
         }
-        return this.doubleValue(row + col * 4L);
     }
 
     @Override
@@ -534,12 +535,12 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     @Override
     public Double get(final long index) {
-        return this.doubleValue(index);
+        return Double.valueOf(this.doubleValue(index));
     }
 
     @Override
     public Double get(final long row, final long col) {
-        return this.doubleValue(row, col);
+        return Double.valueOf(this.doubleValue(row, col));
     }
 
     /**

@@ -91,20 +91,24 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
             return this;
         }
 
+        @Override
         public long count() {
             return vector.length;
         }
 
-        public double doubleValue(final long anInd) {
-            return vector[(int) anInd].doubleValue();
+        @Override
+        public double doubleValue(final int anInd) {
+            return vector[anInd].doubleValue();
         }
 
+        @Override
         public int first() {
             return first;
         }
 
+        @Override
         public N get(final long index) {
-            return vector[(int) index];
+            return vector[Math.toIntExact(index)];
         }
 
         @Override
@@ -120,7 +124,7 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
             }
             for (int i = first; i < tmpLength; i++) {
                 retVal.append(vector[i]);
-                if ((i + 1) < tmpLength) {
+                if (i + 1 < tmpLength) {
                     retVal.append(", ");
                 }
             }
@@ -187,20 +191,24 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
             return this;
         }
 
+        @Override
         public long count() {
             return vector.length;
         }
 
-        public double doubleValue(final long anInd) {
-            return vector[(int) anInd];
+        @Override
+        public double doubleValue(final int anInd) {
+            return vector[anInd];
         }
 
+        @Override
         public int first() {
             return first;
         }
 
+        @Override
         public Double get(final long index) {
-            return Double.valueOf(vector[(int) index]);
+            return Double.valueOf(vector[Math.toIntExact(index)]);
         }
 
         @Override
@@ -278,20 +286,24 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
             return this;
         }
 
+        @Override
         public long count() {
             return vector.length;
         }
 
-        public double doubleValue(final long anInd) {
-            return vector[(int) anInd];
+        @Override
+        public double doubleValue(final int anInd) {
+            return vector[anInd];
         }
 
+        @Override
         public int first() {
             return first;
         }
 
+        @Override
         public Double get(final long index) {
-            return vector[(int) index];
+            return vector[Math.toIntExact(index)];
         }
 
         @Override

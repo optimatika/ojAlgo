@@ -103,9 +103,8 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * </ul>
      * </ul>
      */
-    static final Hardware AARCH64__08 = new Hardware("aarch64",
-            new BasicMachine[] { new BasicMachine(24L * K * K * K, 8), new BasicMachine(8L * K * K, 8), new BasicMachine(4L * K * K, 4),
-                    new BasicMachine(64L * K, 1) });
+    static final Hardware AARCH64__08 = new Hardware("aarch64", new BasicMachine[] { new BasicMachine(24L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
+            new BasicMachine(4L * K * K, 4), new BasicMachine(64L * K, 1) });
 
     /**
      * <ul>

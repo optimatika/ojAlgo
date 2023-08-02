@@ -145,10 +145,12 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         myPivot = myBody.doubleValue(pivot);
     }
 
+    @Override
     public void add(final long ind, final Comparable<?> addend) {
         this.add(ind, NumberDefinition.doubleValue(addend));
     }
 
+    @Override
     public void add(final long ind, final double addend) {
         myBody.add(ind, addend);
         if (ind == index) {
@@ -167,19 +169,23 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return this.calculate(x, myRHS, relaxation);
     }
 
+    @Override
     public int compareTo(final Equation other) {
         return Integer.compare(index, other.index);
     }
 
+    @Override
     public long count() {
         return myBody.count();
     }
 
+    @Override
     public double dot(final Access1D<?> vector) {
         return myBody.dot(vector);
     }
 
-    public double doubleValue(final long ind) {
+    @Override
+    public double doubleValue(final int ind) {
         return myBody.doubleValue(ind);
     }
 
@@ -198,6 +204,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return true;
     }
 
+    @Override
     public Double get(final long ind) {
         return Double.valueOf(myBody.doubleValue(ind));
     }
@@ -231,6 +238,7 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         this.calculate(x, ZERO, ONE);
     }
 
+    @Override
     public void modifyOne(final long ind, final UnaryFunction<Double> modifier) {
         double value = myBody.doubleValue(ind);
         value = modifier.invoke(value);

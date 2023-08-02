@@ -34,11 +34,13 @@ final class UnaryOperatoStore<N extends Comparable<N>> extends LogicalStore<N> {
         myOperator = operator;
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return myOperator.invoke(this.base().doubleValue(row, col));
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         return myOperator.invoke(this.base().get(row, col));
     }
 

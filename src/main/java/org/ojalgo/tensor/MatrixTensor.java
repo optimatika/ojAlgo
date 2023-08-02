@@ -61,21 +61,23 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         }
 
         @Override
+        public MathType getMathType() {
+            return myFactory.getMathType();
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = super.hashCode();
             return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
+        @Override
         public MatrixTensor<N> make(final long rows, final long columns) {
             if (rows != columns) {
                 throw new IllegalArgumentException();
             }
             return new MatrixTensor<>(myFactory, Math.toIntExact(rows));
-        }
-
-        public MathType getMathType() {
-            return myFactory.getMathType();
         }
 
     }
@@ -95,6 +97,7 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         myArray = factory.make(dimensions, dimensions);
     }
 
+    @Override
     public MatrixTensor<N> add(final MatrixTensor<N> addend) {
 
         MatrixTensor<N> retVal = this.newSameShape();
@@ -104,10 +107,17 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
+    public byte byteValue(final int row, final int col) {
+        return myArray.byteValue(row, col);
+    }
+
+    @Override
     public byte byteValue(final long row, final long col) {
         return myArray.byteValue(row, col);
     }
 
+    @Override
     public MatrixTensor<N> conjugate() {
 
         MatrixTensor<N> retVal = this.newSameShape();
@@ -122,18 +132,27 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public long count() {
         return myArray.count();
     }
 
+    @Override
     public long countColumns() {
         return myArray.countColumns();
     }
 
+    @Override
     public long countRows() {
         return myArray.countRows();
     }
 
+    @Override
+    public double doubleValue(final int row, final int col) {
+        return myArray.doubleValue(row, col);
+    }
+
+    @Override
     public double doubleValue(final long row, final long col) {
         return myArray.doubleValue(row, col);
     }
@@ -164,10 +183,17 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return true;
     }
 
+    @Override
+    public float floatValue(final int row, final int col) {
+        return myArray.floatValue(row, col);
+    }
+
+    @Override
     public float floatValue(final long row, final long col) {
         return myArray.floatValue(row, col);
     }
 
+    @Override
     public N get(final long row, final long col) {
         return myArray.get(row, col);
     }
@@ -180,14 +206,27 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
+    @Override
+    public int intValue(final int row, final int col) {
+        return myArray.intValue(row, col);
+    }
+
+    @Override
     public int intValue(final long row, final long col) {
         return myArray.intValue(row, col);
     }
 
+    @Override
+    public long longValue(final int row, final int col) {
+        return myArray.longValue(row, col);
+    }
+
+    @Override
     public long longValue(final long row, final long col) {
         return myArray.longValue(row, col);
     }
 
+    @Override
     public MatrixTensor<N> multiply(final double scalarMultiplicand) {
 
         MatrixTensor<N> retVal = this.newSameShape();
@@ -197,6 +236,7 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public MatrixTensor<N> multiply(final N scalarMultiplicand) {
 
         MatrixTensor<N> retVal = this.newSameShape();
@@ -206,6 +246,7 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public MatrixTensor<N> negate() {
 
         MatrixTensor<N> retVal = this.newSameShape();
@@ -215,38 +256,82 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         return retVal;
     }
 
+    @Override
     public double norm() {
         return this.norm(myArray);
     }
 
+    @Override
+    public void set(final int row, final int col, final byte value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final double value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final float value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final int value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final long value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
+    public void set(final int row, final int col, final short value) {
+        myArray.set(row, col, value);
+    }
+
+    @Override
     public void set(final long row, final long col, final byte value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final double value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final float value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final int value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final long value) {
         myArray.set(row, col, value);
     }
 
+    @Override
     public void set(final long row, final long col, final short value) {
         myArray.set(row, col, value);
     }
 
+    @Override
+    public short shortValue(final int row, final int col) {
+        return myArray.shortValue(row, col);
+    }
+
+    @Override
     public short shortValue(final long row, final long col) {
         return myArray.shortValue(row, col);
     }

@@ -385,8 +385,8 @@ public final class ComplexNumber
     }
 
     @Override
-    public double doubleValue(final long index) {
-        switch ((int) index) {
+    public double doubleValue(final int index) {
+        switch (index) {
         case 0:
             return myRealValue;
         case 1:
@@ -401,17 +401,16 @@ public final class ComplexNumber
     }
 
     @Override
-    public double doubleValue(final long row, final long col) {
+    public double doubleValue(final int row, final int col) {
         if (row == col) {
             return myRealValue;
-        }
-        if (row == 1L) {
+        } else if (row == 1) {
             return i;
-        }
-        if (col == 1L) {
+        } else if (col == 1) {
             return -i;
+        } else {
+            throw new ArrayIndexOutOfBoundsException();
         }
-        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -454,12 +453,12 @@ public final class ComplexNumber
 
     @Override
     public Double get(final long index) {
-        return this.doubleValue(index);
+        return Double.valueOf(this.doubleValue(index));
     }
 
     @Override
     public Double get(final long row, final long col) {
-        return this.doubleValue(row, col);
+        return Double.valueOf(this.doubleValue(row, col));
     }
 
     public double getArgument() {

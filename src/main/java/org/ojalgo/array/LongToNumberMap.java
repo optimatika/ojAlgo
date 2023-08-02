@@ -66,10 +66,12 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return myStorage.capacity();
     }
 
+    @Override
     public void clear() {
         myStorage.reset();
     }
 
+    @Override
     public Comparator<? super Long> comparator() {
         return null;
     }
@@ -78,6 +80,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return myStorage.index(key) >= 0;
     }
 
+    @Override
     public boolean containsKey(final Object key) {
         if (key instanceof Comparable) {
             return this.containsKey(NumberDefinition.longValue((Comparable<?>) key));
@@ -96,6 +99,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return false;
     }
 
+    @Override
     public boolean containsValue(final Object value) {
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
             if (value.equals(tmpView.get())) {
@@ -105,10 +109,12 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return false;
     }
 
+    @Override
     public long count() {
         return myStorage.getActualLength();
     }
 
+    @Override
     public double doubleValue(final long key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
@@ -118,6 +124,17 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
+    public double doubleValue(final int key) {
+        final int tmpIndex = myStorage.index(key);
+        if (tmpIndex >= 0) {
+            return myStorage.doubleValueInternally(tmpIndex);
+        } else {
+            return PrimitiveMath.NaN;
+        }
+    }
+
+    @Override
     public Set<Map.Entry<Long, N>> entrySet() {
         return new AbstractSet<>() {
 
@@ -163,10 +180,12 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         };
     }
 
+    @Override
     public Long firstKey() {
         return myStorage.firstIndex();
     }
 
+    @Override
     public N get(final long key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
@@ -176,6 +195,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public N get(final Object key) {
         return key instanceof Comparable ? this.get(NumberDefinition.longValue((Comparable<?>) key)) : null;
     }
@@ -184,14 +204,17 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return this.subMap(myStorage.firstIndex(), toKey);
     }
 
+    @Override
     public LongToNumberMap<N> headMap(final Long toKey) {
         return this.headMap(toKey.longValue());
     }
 
+    @Override
     public boolean isEmpty() {
         return myStorage.getActualLength() == 0;
     }
 
+    @Override
     public Set<Long> keySet() {
         return new AbstractSet<>() {
 
@@ -208,10 +231,12 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         };
     }
 
+    @Override
     public Long lastKey() {
         return myStorage.lastIndex();
     }
 
+    @Override
     public double mix(final long key, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myStorage) {
@@ -223,6 +248,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public N mix(final long key, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myStorage) {
@@ -234,6 +260,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public NonzeroView<N> nonzeros() {
         return myStorage.nonzeros();
     }
@@ -252,6 +279,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return oldValue;
     }
 
+    @Override
     public N put(final Long key, final N value) {
         return this.put(key.longValue(), value);
     }
@@ -268,6 +296,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public void putAll(final Map<? extends Long, ? extends N> m) {
         for (final java.util.Map.Entry<? extends Long, ? extends N> tmpEntry : m.entrySet()) {
             myStorage.set(tmpEntry.getKey(), tmpEntry.getValue());
@@ -281,6 +310,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return oldValue;
     }
 
+    @Override
     public N remove(final Object key) {
         if (key instanceof Comparable) {
             return this.remove(NumberDefinition.longValue((Comparable<?>) key));
@@ -289,6 +319,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public int size() {
         return myStorage.getActualLength();
     }
@@ -300,7 +331,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         long tmpKey;
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
             tmpKey = tmpView.index();
-            if ((fromKey <= tmpKey) && (tmpKey < toKey)) {
+            if (fromKey <= tmpKey && tmpKey < toKey) {
                 final N tmpValue = tmpView.get();
                 retVal.put(tmpKey, tmpValue);
             }
@@ -309,6 +340,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return retVal;
     }
 
+    @Override
     public LongToNumberMap<N> subMap(final Long fromKey, final Long toKey) {
         return this.subMap(fromKey.longValue(), toKey.longValue());
     }
@@ -317,6 +349,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         return this.subMap(fromKey, myStorage.lastIndex() + 1L);
     }
 
+    @Override
     public LongToNumberMap<N> tailMap(final Long fromKey) {
         return this.tailMap(fromKey.longValue());
     }
@@ -346,6 +379,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
         }
     }
 
+    @Override
     public NumberList<N> values() {
         return new NumberList<>(myDenseFactory, myGrowthStrategy, myStorage.getValues(), myStorage.getActualLength());
     }

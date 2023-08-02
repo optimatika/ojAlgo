@@ -71,12 +71,12 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected byte byteValue(final int index) {
+    public byte byteValue(final int index) {
         return this.get(index).byteValue();
     }
 
     @Override
-    protected final double doubleValue(final int index) {
+    public final double doubleValue(final int index) {
         return data[index].doubleValue();
     }
 
@@ -86,7 +86,7 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected final float floatValue(final int index) {
+    public final float floatValue(final int index) {
         return data[index].floatValue();
     }
 
@@ -96,7 +96,7 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected int intValue(final int index) {
+    public int intValue(final int index) {
         return this.get(index).intValue();
     }
 
@@ -111,17 +111,17 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected long longValue(final int index) {
+    public long longValue(final int index) {
         return this.get(index).longValue();
     }
 
     @Override
-    protected short shortValue(final int index) {
+    public short shortValue(final int index) {
         return this.get(index).shortValue();
     }
 
     @Override
-    protected void set(final int index, final long value) {
+    public void set(final int index, final long value) {
         data[index] = this.valueOf(value);
     }
 

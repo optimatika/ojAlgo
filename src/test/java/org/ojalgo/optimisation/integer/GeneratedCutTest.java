@@ -67,7 +67,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
             });
 
             Result result = model.minimise();
-            
+
             if (DEBUG) {
                 BasicLogger.debug(minSolution);
                 BasicLogger.debug(result);
@@ -86,7 +86,7 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
             model.setKnownSolution(maxSolution);
 
             Result result = model.maximise();
-            
+
             if (DEBUG) {
                 BasicLogger.debug(maxSolution);
                 BasicLogger.debug(result);
