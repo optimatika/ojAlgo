@@ -702,20 +702,26 @@ final class SimplexTableauSolver extends LinearSolver {
 
     static int sizeOfDual(final ConvexData<?> convex) {
 
-        int numbVars = convex.countVariables();
-        int numbEqus = convex.countEqualityConstraints();
-        int numbInes = convex.countInequalityConstraints();
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
 
-        return SimplexTableau.size(numbVars, numbEqus + numbEqus + numbInes, 0, 0, true);
+        int nbLinEqus = nbCvxVars;
+        int nbLinVars = nbCvxEqus + nbCvxEqus + nbCvxInes + nbLinEqus;
+
+        return (nbLinEqus + 2) * (nbLinVars + 1);
     }
 
-    static int sizeOfPrimal(final ConvexData convex) {
+    static int sizeOfPrimal(final ConvexData<?> convex) {
 
-        int numbVars = convex.countVariables();
-        int numbEqus = convex.countEqualityConstraints();
-        int numbInes = convex.countInequalityConstraints();
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
 
-        return SimplexTableau.size(numbEqus + numbInes, numbVars + numbVars, numbInes, 0, true);
+        int nbLinEqus = nbCvxEqus + nbCvxInes;
+        int nbLinVars = nbCvxVars + nbCvxVars + nbCvxInes + nbLinEqus;
+
+        return (nbLinEqus + 2) * (nbLinVars + 1);
     }
 
     private LongToNumberMap<Double> myFixedVariables = null;

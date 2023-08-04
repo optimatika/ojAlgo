@@ -55,12 +55,12 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
-    static final class DenseRawTableau extends DenseTableau {
+    static final class RawTableau extends DenseTableau {
 
         private final int myColDim;
         private final double[][] myRaw;
 
-        DenseRawTableau(final LinearStructure linearStructure) {
+        RawTableau(final LinearStructure linearStructure) {
 
             super(linearStructure);
 
@@ -71,7 +71,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             myColDim = nbCols;
         }
 
-        DenseRawTableau(final SimplexTableau toCopy) {
+        RawTableau(final SimplexTableau toCopy) {
 
             super(toCopy.structure);
 
@@ -196,8 +196,8 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.m;
-            int nbVariables = DenseRawTableau.this.structure.countVariables();
+            int nbConstraints = RawTableau.this.m;
+            int nbVariables = RawTableau.this.structure.countVariables();
 
             int nbIdentitySlackVariables = structure.nbIdty;
             int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
@@ -226,7 +226,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
                     if (row < nbIdentitySlackVariables) {
                         if (col >= dualIdentityBase && value == 1D) {
-                            DenseRawTableau.this.update(row, col);
+                            RawTableau.this.update(row, col);
                         }
                     } else {
                         store[nbConstraints + 1][col] -= value;
@@ -241,13 +241,13 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.m;
-            int nbVariablesTotally = DenseRawTableau.this.structure.countModelVariables() + DenseRawTableau.this.structure.nbSlck
-                    + DenseRawTableau.this.structure.nbIdty + DenseRawTableau.this.structure.nbArti;
+            int nbConstraints = RawTableau.this.m;
+            int nbVariablesTotally = RawTableau.this.structure.countModelVariables() + RawTableau.this.structure.nbSlck
+                    + RawTableau.this.structure.nbIdty + RawTableau.this.structure.nbArti;
             int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = DenseRawTableau.this.structure.countModelVariables() + DenseRawTableau.this.structure.nbSlck
-                    + DenseRawTableau.this.structure.nbIdty + DenseRawTableau.this.structure.nbArti - DenseRawTableau.this.m;
-            boolean artificials = DenseRawTableau.this.structure.nbArti > 0;
+            int dualIdentityBase = RawTableau.this.structure.countModelVariables() + RawTableau.this.structure.nbSlck
+                    + RawTableau.this.structure.nbIdty + RawTableau.this.structure.nbArti - RawTableau.this.m;
+            boolean artificials = RawTableau.this.structure.nbArti > 0;
 
             return new Primitive1D() {
 
@@ -283,7 +283,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
             double[][] store = myRaw;
 
-            int nbConstraints = DenseRawTableau.this.m;
+            int nbConstraints = RawTableau.this.m;
 
             return new Primitive1D() {
 
@@ -299,7 +299,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
                 @Override
                 public int size() {
-                    return DenseRawTableau.this.structure.countModelVariables();
+                    return RawTableau.this.structure.countModelVariables();
                 }
 
             };
@@ -335,12 +335,12 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     }
 
-    static final class DenseTransposedTableau extends DenseTableau {
+    static final class TransposedTableau extends DenseTableau {
 
         private final int myColDim;
         private final Primitive64Store myTransposed;
 
-        DenseTransposedTableau(final LinearStructure linearStructure) {
+        TransposedTableau(final LinearStructure linearStructure) {
 
             super(linearStructure);
 
@@ -351,7 +351,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             myColDim = myTransposed.getRowDim();
         }
 
-        DenseTransposedTableau(final SimplexTableau toCopy) {
+        TransposedTableau(final SimplexTableau toCopy) {
 
             super(toCopy.structure);
 
@@ -478,10 +478,10 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive2D newConstraintsBody() {
 
-            Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
+            Primitive64Store transposed = TransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.m;
-            int nbVariables = DenseTransposedTableau.this.structure.countVariables();
+            int nbConstraints = TransposedTableau.this.m;
+            int nbVariables = TransposedTableau.this.structure.countVariables();
 
             int nbIdentitySlackVariables = structure.nbIdty;
             int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
@@ -510,7 +510,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
                     if (row < nbIdentitySlackVariables) {
                         if (col >= dualIdentityBase && value == 1D) {
-                            DenseTransposedTableau.this.update(row, col);
+                            TransposedTableau.this.update(row, col);
                         }
                     } else {
                         transposed.add(col, nbConstraints + 1, -value);
@@ -523,15 +523,15 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newConstraintsRHS() {
 
-            Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
+            Primitive64Store transposed = TransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.m;
-            int nbVariablesTotally = DenseTransposedTableau.this.structure.countModelVariables() + DenseTransposedTableau.this.structure.nbSlck
-                    + DenseTransposedTableau.this.structure.nbIdty + DenseTransposedTableau.this.structure.nbArti;
+            int nbConstraints = TransposedTableau.this.m;
+            int nbVariablesTotally = TransposedTableau.this.structure.countModelVariables() + TransposedTableau.this.structure.nbSlck
+                    + TransposedTableau.this.structure.nbIdty + TransposedTableau.this.structure.nbArti;
             int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = DenseTransposedTableau.this.structure.countModelVariables() + DenseTransposedTableau.this.structure.nbSlck
-                    + DenseTransposedTableau.this.structure.nbIdty + DenseTransposedTableau.this.structure.nbArti - DenseTransposedTableau.this.m;
-            boolean artificials = DenseTransposedTableau.this.structure.nbArti > 0;
+            int dualIdentityBase = TransposedTableau.this.structure.countModelVariables() + TransposedTableau.this.structure.nbSlck
+                    + TransposedTableau.this.structure.nbIdty + TransposedTableau.this.structure.nbArti - TransposedTableau.this.m;
+            boolean artificials = TransposedTableau.this.structure.nbArti > 0;
 
             return new Primitive1D() {
 
@@ -565,9 +565,9 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newObjective() {
 
-            Primitive64Store transposed = DenseTransposedTableau.this.getTransposed();
+            Primitive64Store transposed = TransposedTableau.this.getTransposed();
 
-            int nbConstraints = DenseTransposedTableau.this.m;
+            int nbConstraints = TransposedTableau.this.m;
 
             return new Primitive1D() {
 
@@ -583,7 +583,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
                 @Override
                 public int size() {
-                    return DenseTransposedTableau.this.structure.countModelVariables();
+                    return TransposedTableau.this.structure.countModelVariables();
                 }
 
             };
@@ -649,30 +649,27 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         public double doubleValue(final int row, final int col) {
 
-            int nbConstraints = m;
-            int nbVariables = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
-
-            if (row < nbConstraints) {
-                if (col < nbVariables) {
+            if (row < m) {
+                if (col < n) {
                     return myRows[row].doubleValue(col);
+                } else {
+                    return myRHS.doubleValue(row);
                 }
-                return myRHS.doubleValue(row);
-            }
-            if (row == nbConstraints) {
-                if (col < nbVariables) {
+            } else if (row == m) {
+                if (col < n) {
                     return myObjectiveWeights.doubleValue(col);
                 }
                 return myValue;
-            }
-            if (col < nbVariables) {
+            } else if (col < n) {
                 return myPhase1Weights.doubleValue(col);
+            } else {
+                return myInfeasibility;
             }
-            return myInfeasibility;
         }
 
         @Override
         public int getColDim() {
-            return structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti + 1;
+            return n + 1;
         }
 
         @Override
@@ -683,22 +680,19 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         public void set(final int row, final int col, final double value) {
 
-            int nbConstraints = m;
-            int nbVariables = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
-
-            if (row < nbConstraints) {
-                if (col < nbVariables) {
+            if (row < m) {
+                if (col < n) {
                     myRows[row].set(col, value);
                 } else {
                     myRHS.set(row, value);
                 }
-            } else if (row == nbConstraints) {
-                if (col < nbVariables) {
+            } else if (row == m) {
+                if (col < n) {
                     myObjectiveWeights.set(col, value);
                 } else {
                     myValue = value;
                 }
-            } else if (col < nbVariables) {
+            } else if (col < n) {
                 myPhase1Weights.set(col, value);
             } else {
                 myInfeasibility = value;
@@ -976,7 +970,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         @Override
         DenseTableau toDense() {
-            return new DenseTransposedTableau(this);
+            return new TransposedTableau(this);
         }
 
     }
@@ -1028,7 +1022,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         if (SimplexTableau.isSparse(options)) {
             return new SparseTableau(structure);
         } else {
-            return new DenseRawTableau(structure);
+            return new RawTableau(structure);
         }
     }
 
@@ -1038,19 +1032,19 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0, constrEq);
 
-        SimplexTableau tableau = new DenseTransposedTableau(structure);
+        SimplexTableau tableau = new TransposedTableau(structure);
 
         SimplexTableau.copy(matrices, tableau);
 
         return tableau;
     }
 
-    static DenseTransposedTableau newDense(final LinearSolver.Builder<?> builder) {
-        return builder.newSimplexTableau(DenseTransposedTableau::new);
+    static TransposedTableau newDense(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(TransposedTableau::new);
     }
 
-    static DenseRawTableau newRaw(final LinearSolver.Builder<?> builder) {
-        return builder.newSimplexTableau(DenseRawTableau::new);
+    static RawTableau newRaw(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(RawTableau::new);
     }
 
     static SparseTableau newSparse(final ConvexData<?> matrices) {
@@ -1068,15 +1062,6 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     static SparseTableau newSparse(final LinearSolver.Builder<?> builder) {
         return builder.newSimplexTableau(SparseTableau::new);
-    }
-
-    static int size(final int nbConstraints, final int nbProblemVariables, final int nbSlackVariables, final int nbIdentitySlackVariables,
-            final boolean needDual) {
-
-        int numbRows = nbConstraints + 2;
-        int numbCols = nbProblemVariables + nbSlackVariables + (needDual ? nbConstraints : nbIdentitySlackVariables) + 1;
-
-        return numbRows * numbCols; //  Total number of elements in a dense tableau
     }
 
     private final int[] myBasis;

@@ -351,10 +351,16 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         double precision = 0.00001;
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(Variable.make("A").level(2).weight(3));
-        model.addVariable(Variable.make("B").lower(1).upper(3).weight(2));
-        model.addVariable(Variable.make("C").lower(0).upper(4).weight(1));
-        model.newExpression("SUM").set(0, 1).set(1, 1).set(2, 1).level(6);
+
+        Variable varA = model.newVariable("A").level(2).weight(3);
+        Variable varB = model.newVariable("B").lower(1).upper(3).weight(2);
+        Variable varC = model.newVariable("C").lower(0).upper(4).weight(1);
+
+        model.newExpression("SUM").set(varA, 1).set(varB, 1).set(varC, 1).level(6);
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
 
         Optimisation.Result minResult = model.minimise();
         TestUtils.assertTrue(model.validate(minResult));

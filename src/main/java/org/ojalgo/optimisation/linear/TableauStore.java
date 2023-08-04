@@ -38,9 +38,11 @@ import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-final class TableauStore extends SimplexStore implements Access2D<Double> {
+final class TableauStore extends SimplexStore implements Access2D<Double>, Mutate2D {
 
     private static void pivotRow(final double[] dataRow, final int col, final double[] pivotRow, final int length) {
         double dataElement = dataRow[col];
@@ -93,6 +95,11 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     }
 
     @Override
+    public Double get(final long row, final long col) {
+        return Double.valueOf(this.doubleValue(row, col));
+    }
+
+    @Override
     public int getColDim() {
         return myColDim;
     }
@@ -100,6 +107,16 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     @Override
     public int getRowDim() {
         return myTableau.length;
+    }
+
+    @Override
+    public void set(final int row, final int col, final double value) {
+        myTableau[row][col] = value;
+    }
+
+    @Override
+    public final void set(final long row, final long col, final Comparable<?> value) {
+        this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
     private Primitive2D newConstraintsBody() {
@@ -428,10 +445,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myCopiedObjectiveRow = null;
     }
 
-    void set(final int row, final int col, final double value) {
-        myTableau[row][col] = value;
-    }
-
     Primitive1D sliceBodyRow(final int row) {
 
         return new Primitive1D() {
@@ -480,11 +493,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
             }
 
         };
-    }
-
-    @Override
-    public Double get(final long row, final long col) {
-        return Double.valueOf(this.doubleValue(row, col));
     }
 
 }
