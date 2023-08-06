@@ -55,6 +55,14 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
+    static abstract class DenseTableau extends SimplexTableau {
+
+        DenseTableau(final LinearStructure linearStructure) {
+            super(linearStructure);
+        }
+
+    }
+
     static final class RawTableau extends DenseTableau {
 
         private final int myColDim;
@@ -194,42 +202,34 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive2D newConstraintsBody() {
 
-            double[][] store = myRaw;
-
-            int nbConstraints = RawTableau.this.m;
-            int nbVariables = RawTableau.this.structure.countVariables();
-
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
-
             return new Primitive2D() {
 
                 @Override
                 public double doubleValue(final int row, final int col) {
-                    return store[row][col];
+                    return myRaw[row][col];
                 }
 
                 @Override
                 public int getColDim() {
-                    return nbVariables;
+                    return structure.countVariables();
                 }
 
                 @Override
                 public int getRowDim() {
-                    return nbConstraints;
+                    return m;
                 }
 
                 @Override
                 public void set(final int row, final int col, final double value) {
 
-                    store[row][col] = value;
+                    myRaw[row][col] = value;
 
-                    if (row < nbIdentitySlackVariables) {
-                        if (col >= dualIdentityBase && value == 1D) {
+                    if (row < structure.nbIdty) {
+                        if (col >= n - m && value == 1D) {
                             RawTableau.this.update(row, col);
                         }
                     } else {
-                        store[nbConstraints + 1][col] -= value;
+                        myRaw[m + 1][col] -= value;
                     }
                 }
 
@@ -239,40 +239,30 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newConstraintsRHS() {
 
-            double[][] store = myRaw;
-
-            int nbConstraints = RawTableau.this.m;
-            int nbVariablesTotally = RawTableau.this.structure.countModelVariables() + RawTableau.this.structure.nbSlck
-                    + RawTableau.this.structure.nbIdty + RawTableau.this.structure.nbArti;
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = RawTableau.this.structure.countModelVariables() + RawTableau.this.structure.nbSlck
-                    + RawTableau.this.structure.nbIdty + RawTableau.this.structure.nbArti - RawTableau.this.m;
-            boolean artificials = RawTableau.this.structure.nbArti > 0;
-
             return new Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
-                    return store[index][nbVariablesTotally];
+                    return myRaw[index][n];
                 }
 
                 @Override
                 public void set(final int index, final double value) {
 
-                    if (artificials) {
-                        store[index][dualIdentityBase + index] = ONE;
+                    if (structure.nbArti > 0) {
+                        myRaw[index][n - m + index] = ONE;
                     }
 
-                    store[index][nbVariablesTotally] = value;
+                    myRaw[index][n] = value;
 
-                    if (index >= nbIdentitySlackVariables) {
-                        store[nbConstraints + 1][nbVariablesTotally] -= value;
+                    if (index >= structure.nbIdty) {
+                        myRaw[m + 1][n] -= value;
                     }
                 }
 
                 @Override
                 public int size() {
-                    return nbConstraints;
+                    return m;
                 }
 
             };
@@ -281,25 +271,21 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newObjective() {
 
-            double[][] store = myRaw;
-
-            int nbConstraints = RawTableau.this.m;
-
             return new Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
-                    return store[nbConstraints][index];
+                    return myRaw[m][index];
                 }
 
                 @Override
                 public void set(final int index, final double value) {
-                    store[nbConstraints][index] = value;
+                    myRaw[m][index] = value;
                 }
 
                 @Override
                 public int size() {
-                    return RawTableau.this.structure.countModelVariables();
+                    return structure.countModelVariables();
                 }
 
             };
@@ -318,291 +304,6 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             this.doPivot(row, col, pivotRow);
 
             this.update(row, col);
-        }
-
-        @Override
-        DenseTableau toDense() {
-            return this;
-        }
-
-    }
-
-    static abstract class DenseTableau extends SimplexTableau {
-
-        DenseTableau(final LinearStructure linearStructure) {
-            super(linearStructure);
-        }
-
-    }
-
-    static final class TransposedTableau extends DenseTableau {
-
-        private final int myColDim;
-        private final Primitive64Store myTransposed;
-
-        TransposedTableau(final LinearStructure linearStructure) {
-
-            super(linearStructure);
-
-            int nbRows = m + 2;
-            int nbCols = n + 1;
-
-            myTransposed = Primitive64Store.FACTORY.make(nbCols, nbRows);
-            myColDim = myTransposed.getRowDim();
-        }
-
-        TransposedTableau(final SimplexTableau toCopy) {
-
-            super(toCopy.structure);
-
-            myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
-            myColDim = myTransposed.getRowDim();
-        }
-
-        @Override
-        public double doubleValue(final int row, final int col) {
-            return myTransposed.doubleValue(col, row);
-        }
-
-        @Override
-        public int getColDim() {
-            return myColDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myTransposed.getColDim();
-        }
-
-        @Override
-        public void set(final int row, final int col, final double value) {
-            myTransposed.set(col, row, value);
-        }
-
-        private void doPivot(final int row, final int col, final double[] pivotRowData, final int pivotRowIndexBase) {
-
-            double[] data = myTransposed.data;
-
-            for (int i = 0, limit = myTransposed.getColDim(); i < limit; i++) {
-                if (i != row) {
-                    int dataIndexBase = i * myColDim;
-                    double colVal = data[dataIndexBase + col];
-                    if (colVal != ZERO) {
-                        AXPY.invoke(data, dataIndexBase, -colVal, pivotRowData, pivotRowIndexBase, 0, myColDim);
-                    }
-                }
-            }
-        }
-
-        private void scale(final double[] pivotRowData, final int pivotRowIndexBase, final int col) {
-            double pivotElement = pivotRowData[pivotRowIndexBase + col];
-            if (pivotElement != ONE) {
-                CorePrimitiveOperation.divide(pivotRowData, pivotRowIndexBase, pivotRowIndexBase + myColDim, 1, pivotRowData, pivotElement);
-            }
-        }
-
-        @Override
-        boolean fixVariable(final int index, final double value) {
-
-            int row = this.getBasisRowIndex(index);
-
-            if (row < 0) {
-                return false;
-            }
-
-            // Diff begin
-
-            Array1D<Double> currentRow = myTransposed.sliceColumn(row);
-            double currentRHS = currentRow.doubleValue(myColDim - 1);
-
-            final ArrayR064 auxiliaryRow = ArrayR064.make(myColDim);
-            if (currentRHS > value) {
-                currentRow.axpy(NEG, auxiliaryRow);
-                auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myColDim - 1, value - currentRHS);
-            } else if (currentRHS < value) {
-                currentRow.axpy(ONE, auxiliaryRow);
-                auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myColDim - 1, currentRHS - value);
-            } else {
-                return true;
-            }
-
-            // Diff end
-
-            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
-
-            int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
-
-            if (pivotCol < 0) {
-                // TODO Problem infeasible?
-                // Probably better to return true here, and have the subsequest solver.solve() return INFEASIBLE
-                return false;
-            }
-
-            // Diff begin
-
-            this.scale(auxiliaryRow.data, 0, pivotCol);
-
-            this.doPivot(-1, pivotCol, auxiliaryRow.data, 0);
-
-            myTransposed.fillColumn(row, auxiliaryRow);
-
-            // Diff end
-
-            for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
-                if (elem.doubleValue() < ZERO) {
-                    return false;
-                }
-            }
-
-            this.update(row, pivotCol);
-
-            return true;
-        }
-
-        @Override
-        double getInfeasibility() {
-            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m + 1);
-        }
-
-        Primitive64Store getTransposed() {
-            return myTransposed;
-        }
-
-        @Override
-        double getValue() {
-            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m);
-        }
-
-        @Override
-        Primitive2D newConstraintsBody() {
-
-            Primitive64Store transposed = TransposedTableau.this.getTransposed();
-
-            int nbConstraints = TransposedTableau.this.m;
-            int nbVariables = TransposedTableau.this.structure.countVariables();
-
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
-
-            return new Primitive2D() {
-
-                @Override
-                public double doubleValue(final int row, final int col) {
-                    return transposed.doubleValue(col, row);
-                }
-
-                @Override
-                public int getColDim() {
-                    return nbVariables;
-                }
-
-                @Override
-                public int getRowDim() {
-                    return nbConstraints;
-                }
-
-                @Override
-                public void set(final int row, final int col, final double value) {
-
-                    transposed.set(col, row, value);
-
-                    if (row < nbIdentitySlackVariables) {
-                        if (col >= dualIdentityBase && value == 1D) {
-                            TransposedTableau.this.update(row, col);
-                        }
-                    } else {
-                        transposed.add(col, nbConstraints + 1, -value);
-                    }
-                }
-
-            };
-        }
-
-        @Override
-        Primitive1D newConstraintsRHS() {
-
-            Primitive64Store transposed = TransposedTableau.this.getTransposed();
-
-            int nbConstraints = TransposedTableau.this.m;
-            int nbVariablesTotally = TransposedTableau.this.structure.countModelVariables() + TransposedTableau.this.structure.nbSlck
-                    + TransposedTableau.this.structure.nbIdty + TransposedTableau.this.structure.nbArti;
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = TransposedTableau.this.structure.countModelVariables() + TransposedTableau.this.structure.nbSlck
-                    + TransposedTableau.this.structure.nbIdty + TransposedTableau.this.structure.nbArti - TransposedTableau.this.m;
-            boolean artificials = TransposedTableau.this.structure.nbArti > 0;
-
-            return new Primitive1D() {
-
-                @Override
-                public double doubleValue(final int index) {
-                    return transposed.doubleValue(nbVariablesTotally, index);
-                }
-
-                @Override
-                public void set(final int index, final double value) {
-
-                    if (artificials) {
-                        transposed.set(dualIdentityBase + index, index, ONE);
-                    }
-
-                    transposed.set(nbVariablesTotally, index, value);
-
-                    if (index >= nbIdentitySlackVariables) {
-                        transposed.add(nbVariablesTotally, nbConstraints + 1, -value);
-                    }
-                }
-
-                @Override
-                public int size() {
-                    return nbConstraints;
-                }
-
-            };
-        }
-
-        @Override
-        Primitive1D newObjective() {
-
-            Primitive64Store transposed = TransposedTableau.this.getTransposed();
-
-            int nbConstraints = TransposedTableau.this.m;
-
-            return new Primitive1D() {
-
-                @Override
-                public double doubleValue(final int index) {
-                    return transposed.doubleValue(index, nbConstraints);
-                }
-
-                @Override
-                public void set(final int index, final double value) {
-                    transposed.set(index, nbConstraints, value);
-                }
-
-                @Override
-                public int size() {
-                    return TransposedTableau.this.structure.countModelVariables();
-                }
-
-            };
-        }
-
-        @Override
-        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
-
-            int row = iterationPoint.row;
-            int col = iterationPoint.col;
-
-            double[] data = myTransposed.data;
-            int pivotRowIndexBase = row * myColDim;
-
-            this.scale(data, pivotRowIndexBase, col);
-
-            this.doPivot(row, col, data, pivotRowIndexBase);
-
-            this.update(iterationPoint);
         }
 
         @Override
@@ -814,30 +515,6 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             return myInfeasibility;
         }
 
-        Array1D<Double> getObjectiveWeights() {
-            return myObjectiveWeights;
-        }
-
-        DenseArray<Double> getPhase1Weights() {
-            return myPhase1Weights;
-        }
-
-        Array1D<Double> getRHS() {
-            return myRHS;
-        }
-
-        SparseArray<Double> getRow(final int row) {
-            return myRows[row];
-        }
-
-        SparseArray<Double> getRow(final long row) {
-            return myRows[Math.toIntExact(row)];
-        }
-
-        SparseArray<Double>[] getRows() {
-            return myRows;
-        }
-
         @Override
         double getValue() {
             return myValue;
@@ -846,37 +523,34 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive2D newConstraintsBody() {
 
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti - m;
-
             return new Primitive2D() {
 
                 @Override
                 public double doubleValue(final int row, final int col) {
-                    return SparseTableau.this.getRow(row).doubleValue(col);
+                    return myRows[row].doubleValue(col);
                 }
 
                 @Override
                 public int getColDim() {
-                    return SparseTableau.this.structure.countVariables();
+                    return structure.countVariables();
                 }
 
                 @Override
                 public int getRowDim() {
-                    return SparseTableau.this.m;
+                    return m;
                 }
 
                 @Override
                 public void set(final int row, final int col, final double value) {
 
-                    SparseTableau.this.getRow(row).set(col, value);
+                    myRows[row].set(col, value);
 
-                    if (row < nbIdentitySlackVariables) {
-                        if (col >= dualIdentityBase && value == 1D) {
+                    if (row < structure.nbIdty) {
+                        if (col >= n - m && value == 1D) {
                             SparseTableau.this.update(row, col);
                         }
                     } else {
-                        SparseTableau.this.getPhase1Weights().add(col, -value);
+                        myPhase1Weights.add(col, -value);
                     }
                 }
 
@@ -886,37 +560,30 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newConstraintsRHS() {
 
-            Array1D<Double> rhs = SparseTableau.this.getRHS();
-
-            int nbIdentitySlackVariables = structure.nbIdty;
-            int dualIdentityBase = SparseTableau.this.structure.countModelVariables() + SparseTableau.this.structure.nbSlck
-                    + SparseTableau.this.structure.nbIdty + SparseTableau.this.structure.nbArti - SparseTableau.this.m;
-            boolean artificials = SparseTableau.this.structure.nbArti > 0;
-
             return new Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
-                    return rhs.doubleValue(index);
+                    return myRHS.doubleValue(index);
                 }
 
                 @Override
                 public void set(final int index, final double value) {
 
-                    if (artificials) {
-                        SparseTableau.this.getRow(index).set(dualIdentityBase + index, ONE);
+                    if (structure.nbArti > 0) {
+                        myRows[index].set(n - m + index, ONE);
                     }
 
-                    rhs.set(index, value);
+                    myRHS.set(index, value);
 
-                    if (index >= nbIdentitySlackVariables) {
-                        SparseTableau.this.subtractInfeasibility(value);
+                    if (index >= structure.nbIdty) {
+                        myInfeasibility -= value;
                     }
                 }
 
                 @Override
                 public int size() {
-                    return SparseTableau.this.m;
+                    return m;
                 }
 
             };
@@ -925,23 +592,21 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         Primitive1D newObjective() {
 
-            Array1D<Double> objectiveWeights = SparseTableau.this.getObjectiveWeights();
-
             return new Primitive1D() {
 
                 @Override
                 public double doubleValue(final int index) {
-                    return objectiveWeights.doubleValue(index);
+                    return myObjectiveWeights.doubleValue(index);
                 }
 
                 @Override
                 public void set(final int index, final double value) {
-                    objectiveWeights.set(index, value);
+                    myObjectiveWeights.set(index, value);
                 }
 
                 @Override
                 public int size() {
-                    return SparseTableau.this.structure.countModelVariables();
+                    return structure.countModelVariables();
                 }
 
             };
@@ -964,13 +629,260 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             this.update(iterationPoint);
         }
 
-        void subtractInfeasibility(final double infeasibility) {
-            myInfeasibility -= infeasibility;
+        @Override
+        DenseTableau toDense() {
+            return new TransposedTableau(this);
+        }
+
+    }
+
+    static final class TransposedTableau extends DenseTableau {
+
+        private final int myColDim;
+        private final Primitive64Store myTransposed;
+
+        TransposedTableau(final LinearStructure linearStructure) {
+
+            super(linearStructure);
+
+            int nbRows = m + 2;
+            int nbCols = n + 1;
+
+            myTransposed = Primitive64Store.FACTORY.make(nbCols, nbRows);
+            myColDim = myTransposed.getRowDim();
+        }
+
+        TransposedTableau(final SimplexTableau toCopy) {
+
+            super(toCopy.structure);
+
+            myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
+            myColDim = myTransposed.getRowDim();
+        }
+
+        @Override
+        public double doubleValue(final int row, final int col) {
+            return myTransposed.doubleValue(col, row);
+        }
+
+        @Override
+        public int getColDim() {
+            return myColDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myTransposed.getColDim();
+        }
+
+        @Override
+        public void set(final int row, final int col, final double value) {
+            myTransposed.set(col, row, value);
+        }
+
+        private void doPivot(final int row, final int col, final double[] pivotRowData, final int pivotRowIndexBase) {
+
+            double[] data = myTransposed.data;
+
+            for (int i = 0, limit = myTransposed.getColDim(); i < limit; i++) {
+                if (i != row) {
+                    int dataIndexBase = i * myColDim;
+                    double colVal = data[dataIndexBase + col];
+                    if (colVal != ZERO) {
+                        AXPY.invoke(data, dataIndexBase, -colVal, pivotRowData, pivotRowIndexBase, 0, myColDim);
+                    }
+                }
+            }
+        }
+
+        private void scale(final double[] pivotRowData, final int pivotRowIndexBase, final int col) {
+            double pivotElement = pivotRowData[pivotRowIndexBase + col];
+            if (pivotElement != ONE) {
+                CorePrimitiveOperation.divide(pivotRowData, pivotRowIndexBase, pivotRowIndexBase + myColDim, 1, pivotRowData, pivotElement);
+            }
+        }
+
+        @Override
+        boolean fixVariable(final int index, final double value) {
+
+            int row = this.getBasisRowIndex(index);
+
+            if (row < 0) {
+                return false;
+            }
+
+            // Diff begin
+
+            Array1D<Double> currentRow = myTransposed.sliceColumn(row);
+            double currentRHS = currentRow.doubleValue(myColDim - 1);
+
+            final ArrayR064 auxiliaryRow = ArrayR064.make(myColDim);
+            if (currentRHS > value) {
+                currentRow.axpy(NEG, auxiliaryRow);
+                auxiliaryRow.set(index, ZERO);
+                auxiliaryRow.set(myColDim - 1, value - currentRHS);
+            } else if (currentRHS < value) {
+                currentRow.axpy(ONE, auxiliaryRow);
+                auxiliaryRow.set(index, ZERO);
+                auxiliaryRow.set(myColDim - 1, currentRHS - value);
+            } else {
+                return true;
+            }
+
+            // Diff end
+
+            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
+
+            int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
+
+            if (pivotCol < 0) {
+                // TODO Problem infeasible?
+                // Probably better to return true here, and have the subsequest solver.solve() return INFEASIBLE
+                return false;
+            }
+
+            // Diff begin
+
+            this.scale(auxiliaryRow.data, 0, pivotCol);
+
+            this.doPivot(-1, pivotCol, auxiliaryRow.data, 0);
+
+            myTransposed.fillColumn(row, auxiliaryRow);
+
+            // Diff end
+
+            for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
+                if (elem.doubleValue() < ZERO) {
+                    return false;
+                }
+            }
+
+            this.update(row, pivotCol);
+
+            return true;
+        }
+
+        @Override
+        double getInfeasibility() {
+            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m + 1);
+        }
+
+        @Override
+        double getValue() {
+            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m);
+        }
+
+        @Override
+        Primitive2D newConstraintsBody() {
+
+            return new Primitive2D() {
+
+                @Override
+                public double doubleValue(final int row, final int col) {
+                    return myTransposed.doubleValue(col, row);
+                }
+
+                @Override
+                public int getColDim() {
+                    return structure.countVariables();
+                }
+
+                @Override
+                public int getRowDim() {
+                    return m;
+                }
+
+                @Override
+                public void set(final int row, final int col, final double value) {
+
+                    myTransposed.set(col, row, value);
+
+                    if (row < structure.nbIdty) {
+                        if (col >= n - m && value == 1D) {
+                            TransposedTableau.this.update(row, col);
+                        }
+                    } else {
+                        myTransposed.add(col, m + 1, -value);
+                    }
+                }
+
+            };
+        }
+
+        @Override
+        Primitive1D newConstraintsRHS() {
+
+            return new Primitive1D() {
+
+                @Override
+                public double doubleValue(final int index) {
+                    return myTransposed.doubleValue(n, index);
+                }
+
+                @Override
+                public void set(final int index, final double value) {
+
+                    if (structure.nbArti > 0) {
+                        myTransposed.set(n - m + index, index, ONE);
+                    }
+
+                    myTransposed.set(n, index, value);
+
+                    if (index >= structure.nbIdty) {
+                        myTransposed.add(n, m + 1, -value);
+                    }
+                }
+
+                @Override
+                public int size() {
+                    return m;
+                }
+
+            };
+        }
+
+        @Override
+        Primitive1D newObjective() {
+
+            return new Primitive1D() {
+
+                @Override
+                public double doubleValue(final int index) {
+                    return myTransposed.doubleValue(index, m);
+                }
+
+                @Override
+                public void set(final int index, final double value) {
+                    myTransposed.set(index, m, value);
+                }
+
+                @Override
+                public int size() {
+                    return structure.countModelVariables();
+                }
+
+            };
+        }
+
+        @Override
+        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
+
+            int row = iterationPoint.row;
+            int col = iterationPoint.col;
+
+            double[] data = myTransposed.data;
+            int pivotRowIndexBase = row * myColDim;
+
+            this.scale(data, pivotRowIndexBase, col);
+
+            this.doPivot(row, col, data, pivotRowIndexBase);
+
+            this.update(iterationPoint);
         }
 
         @Override
         DenseTableau toDense() {
-            return new TransposedTableau(this);
+            return this;
         }
 
     }

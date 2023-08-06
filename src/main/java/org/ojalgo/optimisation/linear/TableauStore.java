@@ -132,12 +132,12 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
 
             @Override
             public int getColDim() {
-                return TableauStore.this.n;
+                return n;
             }
 
             @Override
             public int getRowDim() {
-                return TableauStore.this.m;
+                return m;
             }
 
             @Override
@@ -156,17 +156,17 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
 
             @Override
             public double doubleValue(final int index) {
-                return store[index][TableauStore.this.n];
+                return store[index][n];
             }
 
             @Override
             public void set(final int index, final double value) {
-                store[index][TableauStore.this.n] = value;
+                store[index][n] = value;
             }
 
             @Override
             public int size() {
-                return TableauStore.this.m;
+                return m;
             }
 
         };
@@ -180,17 +180,17 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
 
             @Override
             public double doubleValue(final int index) {
-                return store[TableauStore.this.m][index];
+                return store[m][index];
             }
 
             @Override
             public void set(final int index, final double value) {
-                store[TableauStore.this.m][index] = value;
+                store[m][index] = value;
             }
 
             @Override
             public int size() {
-                return TableauStore.this.structure.countModelVariables();
+                return structure.countModelVariables();
             }
 
         };
