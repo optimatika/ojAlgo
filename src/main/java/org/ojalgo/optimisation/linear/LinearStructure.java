@@ -66,8 +66,7 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     final int[] positivePartVariables;
     final EntryPair<ModelEntity<?>, ConstraintType>[] slack;
 
-    LinearStructure(final boolean inclMap, final int constrIn, final int constrEq, final int varsPos, final int varsNeg, final int varsSlk, final int varsEye,
-            final int varsArt) {
+    LinearStructure(final boolean inclMap, final int constrIn, final int constrEq, final int varsPos, final int varsNeg, final int varsSlk, final int varsEye) {
 
         positivePartVariables = new int[varsPos];
         negativePartVariables = new int[varsNeg];
@@ -81,11 +80,11 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         nbNegs = varsNeg;
         nbSlck = varsSlk;
         nbIdty = varsEye;
-        nbArti = varsArt;
+        nbArti = constrIn + constrEq - varsEye;
     }
 
     LinearStructure(final int nbConstraints, final int nbVariables) {
-        this(false, 0, nbConstraints, nbVariables, 0, 0, 0, 0);
+        this(false, 0, nbConstraints, nbVariables, 0, 0, 0);
     }
 
     @Override
@@ -196,6 +195,10 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
     int countVariablesTotally() {
         return nbVars + nbNegs + nbSlck + nbIdty + nbArti;
+    }
+
+    boolean isAnyArtificials() {
+        return nbArti > 0;
     }
 
     boolean isFullSetOfArtificials() {

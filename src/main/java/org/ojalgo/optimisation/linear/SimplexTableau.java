@@ -922,7 +922,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         int nbConstraints = builder.countConstraints();
         int nbVariables = builder.countVariables();
 
-        LinearStructure structure = new LinearStructure(false, 0, nbConstraints, nbVariables, 0, 0, 0, nbConstraints);
+        LinearStructure structure = new LinearStructure(false, 0, nbConstraints, nbVariables, 0, 0, 0);
 
         SimplexTableau tableau = SimplexTableau.make(structure, options);
         SimplexTableau.copy(builder, tableau);
@@ -942,7 +942,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         int constrEq = matrices.countConstraints();
 
-        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0, constrEq);
+        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0);
 
         SimplexTableau tableau = new TransposedTableau(structure);
 
@@ -963,7 +963,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         int constrEq = matrices.countConstraints();
 
-        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0, constrEq);
+        LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0);
 
         SparseTableau tableau = new SparseTableau(structure);
 

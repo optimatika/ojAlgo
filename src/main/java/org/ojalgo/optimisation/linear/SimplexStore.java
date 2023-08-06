@@ -121,9 +121,8 @@ abstract class SimplexStore {
 
         int nbProbVars = freeVariables.size();
         int nbSlckVars = nbUpConstr + nbLoConstr;
-        int nbArtiVars = nbEqConstr;
 
-        LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars, nbArtiVars);
+        LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
         S simplex = storeFactory.apply(structure);
         double[] lowerBounds = simplex.getLowerBounds();

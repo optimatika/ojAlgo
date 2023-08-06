@@ -319,8 +319,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int constrEq = exprEqPos.size() + exprEqNeg.size();
         int nbArtificials = constrIn + constrEq - nbIdentitySlackVars;
 
-        LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars,
-                nbArtificials);
+        LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
         SimplexTableau retVal = SimplexTableau.make(structure, model.options);
 
@@ -563,7 +562,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int nbCvxEqus = convex.countEqualityConstraints();
         int nbCvxInes = convex.countInequalityConstraints();
 
-        LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0, nbCvxVars);
+        LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0);
 
         SimplexTableau retVal = SimplexTableau.make(structure, options);
 
@@ -628,7 +627,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int nbEqus = convex.countEqualityConstraints();
         int nbInes = convex.countInequalityConstraints();
 
-        LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0, nbInes + nbEqus);
+        LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0);
 
         SimplexTableau retVal = SimplexTableau.make(structure, options);
 

@@ -346,8 +346,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbIdentitySlackVariables = ineqSign.countIncluded();
             int nbSlackVariables = ineqSign.countExcluded();
 
-            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables,
-                    nbInequalites + nbEqualites - nbIdentitySlackVariables);
+            LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables);
 
             SimplexTableau tableau = SimplexTableau.make(structure, options);
             Primitive2D constraintsBody = tableau.constraintsBody();
@@ -441,7 +440,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbSlckVars = nbUpConstr + nbLoConstr;
             int nbArtiVars = basis.length == nbUpConstr + nbLoConstr + nbEqConstr ? 0 : nbEqConstr;
 
-            LinearStructure structure = new LinearStructure(false, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars, nbArtiVars);
+            LinearStructure structure = new LinearStructure(false, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
             S simplex = storeFactory.apply(structure);
 
@@ -512,8 +511,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             int nbIdentSlackVars = ineqSign.countIncluded();
             int nbOtherSlackVars = ineqSign.countExcluded();
 
-            LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars,
-                    nbInes + nbEqus - nbIdentSlackVars);
+            LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars);
 
             T tableau = tableauFactory.apply(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
