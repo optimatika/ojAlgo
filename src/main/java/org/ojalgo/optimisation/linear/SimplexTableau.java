@@ -130,7 +130,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         boolean fixVariable(final int index, final double value) {
 
-            int row = this.getBasisRowIndex(index);
+            int row = IndexOf.indexOf(included, index);
 
             if (row < 0) {
                 return false;
@@ -191,12 +191,12 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         @Override
         double getInfeasibility() {
-            return myRaw[m + 1][structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti];
+            return myRaw[m + 1][n];
         }
 
         @Override
         double getValue() {
-            return myRaw[m][structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti];
+            return myRaw[m][n];
         }
 
         @Override
@@ -445,7 +445,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         boolean fixVariable(final int index, final double value) {
 
-            int row = this.getBasisRowIndex(index);
+            int row = IndexOf.indexOf(included, index);
 
             if (row < 0) {
                 return false;
@@ -456,9 +456,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             SparseArray<Double> currentRow = myRows[row];
             double currentRHS = myRHS.doubleValue(row);
 
-            final int totNumbVars = structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti;
-
-            SparseArray<Double> auxiliaryRow = mySparseFactory.limit(totNumbVars).make();
+            SparseArray<Double> auxiliaryRow = mySparseFactory.make(n);
             double auxiliaryRHS = ZERO;
 
             if (currentRHS > value) {
@@ -705,7 +703,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         @Override
         boolean fixVariable(final int index, final double value) {
 
-            int row = this.getBasisRowIndex(index);
+            int row = IndexOf.indexOf(included, index);
 
             if (row < 0) {
                 return false;
@@ -764,12 +762,12 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
         @Override
         double getInfeasibility() {
-            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m + 1);
+            return myTransposed.doubleValue(n, m + 1);
         }
 
         @Override
         double getValue() {
-            return myTransposed.doubleValue(structure.countModelVariables() + structure.nbSlck + structure.nbIdty + structure.nbArti, m);
+            return myTransposed.doubleValue(n, m);
         }
 
         @Override
@@ -976,12 +974,13 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         return builder.newSimplexTableau(SparseTableau::new);
     }
 
-    private final int[] myBasis;
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private transient Primitive1D myObjective = null;
+    private int myRemainingArtificials;
     private final IndexSelector mySelector;
 
+    final int[] included;
     /**
      * The number of constraints (upper, lower and equality)
      */
@@ -1013,13 +1012,11 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         m = linearStructure.countConstraints();
         n = linearStructure.countVariablesTotally();
 
-        int nbConstraints = linearStructure.countConstraints();
-        int nbVariables = linearStructure.countVariables();
-
-        mySelector = new IndexSelector(nbVariables);
-        myBasis = Structure1D.newIncreasingRange(-nbConstraints, nbConstraints);
+        included = Structure1D.newIncreasingRange(n - m, m);
+        mySelector = new IndexSelector(n, included);
 
         structure = linearStructure;
+        myRemainingArtificials = linearStructure.nbArti;
     }
 
     @Override
@@ -1063,28 +1060,14 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
     }
 
     /**
-     * {@link #countBasisDeficit()} should return the same number, and is a faster alternative.
-     *
-     * @return The number of artificial variables in the basis.
+     * The number of artificial variables in the basis.
      */
-    final int countBasicArtificials() {
-        int retVal = 0;
-        for (int i = 0, limit = myBasis.length; i < limit; i++) {
-            if (myBasis[i] < 0) {
-                retVal++;
-            }
-        }
-        return retVal;
+    int countRemainingArtificials() {
+        return myRemainingArtificials;
     }
 
-    /**
-     * {@link #countBasicArtificials()} should return the same number, but this is a faster alternative since
-     * it's a simple lookup.
-     *
-     * @return The number of variables (not artificial) that can be added to the basis.
-     */
-    final int countBasisDeficit() {
-        return structure.countConstraints() - mySelector.countIncluded();
+    final int[] excluded() {
+        return mySelector.getExcluded();
     }
 
     int findNextPivotColumn(final Access1D<Double> auxiliaryRow, final Access1D<Double> objectiveRow) {
@@ -1115,21 +1098,20 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
-        int m = this.m;
         int nbModVars = structure.countModelVariables();
 
         Primitive1D constraintsRHS = this.constraintsRHS();
 
         double[] solRHS = new double[integer.length];
         for (int i = 0; i < m; i++) {
-            int j = myBasis[i];
-            if (j >= 0) {
+            int j = included[i];
+            if (j >= 0 && j < nbModVars) {
                 solRHS[j] = constraintsRHS.doubleValue(i);
             }
         }
         if (ProblemStructure.DEBUG) {
             BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
-            BasicLogger.debug("Bas: {}", Arrays.toString(myBasis));
+            BasicLogger.debug("Bas: {}", Arrays.toString(included));
         }
 
         List<Equation> retVal = new ArrayList<>();
@@ -1137,7 +1119,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         boolean[] negated = new boolean[integer.length];
 
         for (int i = 0; i < m; i++) {
-            int j = this.getBasisColumnIndex(i);
+            int j = included[i];
 
             double rhs = constraintsRHS.doubleValue(i);
 
@@ -1155,26 +1137,6 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         return retVal;
     }
 
-    int[] getBasis() {
-        return myBasis.clone();
-    }
-
-    int getBasisColumnIndex(final int basisRowIndex) {
-        return myBasis[basisRowIndex];
-    }
-
-    int getBasisRowIndex(final int basisColumnIndex) {
-        return IndexOf.indexOf(myBasis, basisColumnIndex);
-    }
-
-    final int[] getExcluded() {
-        return mySelector.getExcluded();
-    }
-
-    final int[] getIncluded() {
-        return mySelector.getIncluded();
-    }
-
     /**
      * @return The phase 1 objective function value
      */
@@ -1189,11 +1151,8 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
         return structure.nbIdty + structure.nbArti == structure.countConstraints();
     }
 
-    /**
-     * Are there any artificial variables in the basis?
-     */
-    final boolean isBasicArtificials() {
-        return structure.countConstraints() > mySelector.countIncluded();
+    boolean isArtificial(final int col) {
+        return structure.isArtificialVariable(col);
     }
 
     final boolean isExcluded(final int index) {
@@ -1202,6 +1161,13 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     final boolean isIncluded(final int index) {
         return mySelector.isIncluded(index);
+    }
+
+    /**
+     * Are there any artificial variables in the basis?
+     */
+    boolean isRemainingArtificials() {
+        return myRemainingArtificials > 0;
     }
 
     abstract Primitive2D newConstraintsBody();
@@ -1345,9 +1311,12 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
     void update(final int pivotRow, final int pivotCol) {
 
-        int tmpOld = myBasis[pivotRow];
+        int tmpOld = included[pivotRow];
         if (tmpOld >= 0) {
             mySelector.exclude(tmpOld);
+        }
+        if (this.isArtificial(tmpOld)) {
+            --myRemainingArtificials;
         }
 
         int tmpNew = pivotCol;
@@ -1355,7 +1324,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             mySelector.include(tmpNew);
         }
 
-        myBasis[pivotRow] = pivotCol;
+        included[pivotRow] = pivotCol;
     }
 
     void update(final long pivotRow, final long pivotCol) {
@@ -1372,8 +1341,9 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
     final double value(final boolean phase1) {
         if (phase1) {
             return this.getInfeasibility();
+        } else {
+            return this.getValue();
         }
-        return this.getValue();
     }
 
 }

@@ -745,7 +745,7 @@ final class SimplexTableauSolver extends LinearSolver {
             this.log("countVariablesTotally: {}",
                     tableau.structure.countModelVariables() + tableau.structure.nbSlck + tableau.structure.nbIdty + tableau.structure.nbArti);
             this.log("countConstraints: {}", tableau.m);
-            this.log("countBasisDeficit: {}", tableau.countBasisDeficit());
+            this.log("countBasisDeficit: {}", tableau.countRemainingArtificials());
         }
 
         if (this.isLogDebug() && this.isTableauPrintable()) {
@@ -823,14 +823,14 @@ final class SimplexTableauSolver extends LinearSolver {
      */
     private void cleanUpPhase1Artificials() {
 
-        int[] basis = myTableau.getBasis();
-        int[] excluded = myTableau.getExcluded();
+        int[] basis = myTableau.included;
+        int[] excluded = myTableau.excluded();
 
         int colRHS = myTableau.n;
 
         for (int i = 0; i < basis.length; i++) {
 
-            if (basis[i] < 0) {
+            if (myTableau.isArtificial(basis[i])) {
 
                 double rhs = myTableau.doubleValue(i, colRHS);
 
@@ -871,7 +871,7 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     private void logDebugTableau(final String message) {
-        this.log(message + "; Basics: " + Arrays.toString(myTableau.getBasis()), myTableau);
+        this.log(message + "; Basics: " + Arrays.toString(myTableau.included), myTableau);
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
@@ -953,8 +953,8 @@ final class SimplexTableauSolver extends LinearSolver {
 
         int numberOfConstraints = myTableau.m;
         for (int row = 0; row < numberOfConstraints; row++) {
-            int variableIndex = myTableau.getBasisColumnIndex(row);
-            if (variableIndex >= 0) {
+            int variableIndex = myTableau.included[row];
+            if (!myTableau.isArtificial(variableIndex)) {
                 solution.set(variableIndex, myTableau.doubleValue(row, colRHS));
             }
         }
@@ -976,20 +976,20 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             this.log();
-            this.log("Needs Another Iteration? Phase={} Artificials={} Infeasibility={} Objective={}", this.phase(), myTableau.countBasisDeficit(),
+            this.log("Needs Another Iteration? Phase={} Artificials={} Infeasibility={} Objective={}", this.phase(), myTableau.countRemainingArtificials(),
                     this.infeasibility(), this.value());
         }
 
         boolean retVal = false;
         myPoint.reset();
 
-        if (myPoint.isPhase1() && (PHASE1.isZero(this.infeasibility()) || !myTableau.isBasicArtificials())) {
+        if (myPoint.isPhase1() && (PHASE1.isZero(this.infeasibility()) || !myTableau.isRemainingArtificials())) {
 
             this.cleanUpPhase1Artificials();
 
             if (this.isLogDebug()) {
                 this.log();
-                this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasisDeficit(),
+                this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countRemainingArtificials(),
                         this.infeasibility());
                 this.log();
             }
@@ -1034,7 +1034,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (retVal) {
-                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasisColumnIndex(myPoint.row), myPoint.col);
+                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.included[myPoint.row], myPoint.col);
             } else {
                 this.log("\n==>>\tNo more iterations needed/possible.\n");
             }
@@ -1061,7 +1061,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                int[] excluded = myTableau.getExcluded();
+                int[] excluded = myTableau.excluded();
                 Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(row);
                 double[] exclVals = new double[excluded.length];
                 for (int i = 0; i < exclVals.length; i++) {
@@ -1129,8 +1129,8 @@ final class SimplexTableauSolver extends LinearSolver {
             denom = myTableau.doubleValue(i, denomCol);
 
             // Phase 2, artificial variable still in basis & RHS ≈ 0.0
-            int basisColumnIndex = myTableau.getBasisColumnIndex(i);
-            boolean artificial = basisColumnIndex < 0;
+            int basisColumnIndex = myTableau.included[i];
+            boolean artificial = myTableau.isArtificial(basisColumnIndex);
             boolean degenerate = artificial && DEGENERATE.isZero(numer);
             boolean specialCase = phase2 && degenerate;
 

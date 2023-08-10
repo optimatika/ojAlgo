@@ -44,6 +44,17 @@ import org.ojalgo.type.context.NumberContext;
 
 final class TableauStore extends SimplexStore implements Access2D<Double>, Mutate2D {
 
+    static enum FeatureSet {
+        /**
+         * Used by {@link SimplexTableauSolver}.
+         */
+        CLASSIC,
+        /**
+         * Used by {@link SimplexSolver}.
+         */
+        COMPACT;
+    }
+
     private static void pivotRow(final double[] dataRow, final int col, final double[] pivotRow, final int length) {
         double dataElement = dataRow[col];
         if (dataElement != ZERO) {
@@ -63,20 +74,27 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private double[] myCopiedObjectiveRow = null;
+    private final FeatureSet myFeatureSet;
     private transient Primitive1D myObjective = null;
     private final double[][] myTableau;
 
     TableauStore(final int mm, final int nn) {
-        this(new LinearStructure(mm, nn));
+        this(new LinearStructure(mm, nn), FeatureSet.COMPACT);
     }
 
     TableauStore(final LinearStructure linearStructure) {
+        this(linearStructure, FeatureSet.COMPACT);
+    }
+
+    TableauStore(final LinearStructure linearStructure, final FeatureSet featureSet) {
 
         super(linearStructure);
 
         myTableau = new double[m + 1][n + 1];
 
         myColDim = n + 1;
+
+        myFeatureSet = featureSet;
     }
 
     @Override

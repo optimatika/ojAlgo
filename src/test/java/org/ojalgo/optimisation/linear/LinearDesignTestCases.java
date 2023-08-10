@@ -371,33 +371,26 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test8LinearModelCase() {
 
-        Variable[] variables = { new Variable("X1").lower(ZERO).weight(ONE), new Variable("X2").lower(ZERO).weight(TWO),
-                new Variable("X3").lower(ZERO).weight(ONE) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
+        Variable x1 = model.newVariable("X1").lower(ZERO).weight(ONE);
+        Variable x2 = model.newVariable("X2").lower(ZERO).weight(TWO);
+        Variable x3 = model.newVariable("X3").lower(ZERO).weight(ONE);
 
-        BigDecimal[] valsC1 = { THREE, ONE, NEG };
-        Expression exprC1 = model.newExpression("C1");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC1.set(i, valsC1[i]);
+        model.newExpression("C1").set(x1, THREE).set(x2, ONE).set(x3, NEG).level(TEN.add(FIVE));
+        model.newExpression("C2").set(x1, EIGHT).set(x2, FOUR).set(x3, NEG).level(FIVE.multiply(TEN));
+        model.newExpression("C3").set(x1, TWO).set(x2, TWO).set(x3, ONE).level(TEN.add(TEN));
+
+        if (DEBUG) {
+            BasicLogger.debug(model);
+            model.options.debug(LinearSolver.class);
         }
-        exprC1.level(TEN.add(FIVE));
-
-        BigDecimal[] valsC2 = { EIGHT, FOUR, NEG };
-        Expression exprC2 = model.newExpression("C2");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC2.set(i, valsC2[i]);
-        }
-        exprC2.level(FIVE.multiply(TEN));
-
-        BigDecimal[] valsC3 = { TWO, TWO, ONE };
-        Expression exprC3 = model.newExpression("C3");
-        for (int i = 0; i < model.countVariables(); i++) {
-            exprC3.set(i, valsC3[i]);
-        }
-        exprC3.level(TEN.add(TEN));
 
         Optimisation.Result result = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
 
         TestUtils.assertStateNotLessThanFeasible(result);
     }

@@ -201,8 +201,16 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         return nbArti > 0;
     }
 
+    boolean isArtificialVariable(final int variableIndex) {
+        return variableIndex < 0 || variableIndex >= this.countVariables();
+    }
+
     boolean isFullSetOfArtificials() {
         return nbArti == this.countConstraints();
+    }
+
+    boolean isModelVariable(final int variableIndex) {
+        return variableIndex >= 0 && variableIndex < this.countModelVariables();
     }
 
     void setObjectiveAdjustmentFactor(final double multiplierScale) {
