@@ -118,13 +118,13 @@ public final class Array2D<N extends Comparable<N>>
 
     }
 
+    public static final Factory<ComplexNumber> C128 = Array2D.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = Array2D.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = Array2D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = Array2D.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = Array2D.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = Array2D.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = Array2D.factory(ArrayR256.FACTORY);
-    public static final Factory<ComplexNumber> C128 = Array2D.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array2D.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array2D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> Z008 = Array2D.factory(ArrayZ008.FACTORY);
     public static final Factory<Double> Z016 = Array2D.factory(ArrayZ016.FACTORY);
     public static final Factory<Double> Z032 = Array2D.factory(ArrayZ032.FACTORY);
@@ -855,6 +855,35 @@ public final class Array2D<N extends Comparable<N>>
     @Override
     public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
+    }
+
+    Factory2D<Array2D<N>> factory() {
+
+        return new Factory2D<>() {
+
+            ArrayFactory<N, ?> delegate = myDelegate.factory();
+
+            public FunctionSet<?> function() {
+                return delegate.function();
+            }
+
+            public MathType getMathType() {
+                return delegate.getMathType();
+            }
+
+            public Array2D<N> make(final int nbRows, final int nbCols) {
+                return this.make((long) nbRows, (long) nbCols);
+            }
+
+            public Array2D<N> make(final long nbRows, final long nbCols) {
+                return delegate.make(Structure2D.count(nbRows, nbCols)).wrapInArray2D(nbRows);
+            }
+
+            public Scalar.Factory<?> scalar() {
+                return delegate.scalar();
+            }
+
+        };
     }
 
     BasicArray<N> getDelegate() {

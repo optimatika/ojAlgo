@@ -593,6 +593,10 @@ public abstract class TestUtils /* extends Assertions */ {
         MatrixOperation.setAllOperationThresholds(2);
     }
 
+    public static void success() {
+        Assertions.assertTrue(true);
+    }
+
     private static String buildAbsoluteResourcePath(final String... pathElements) {
 
         File builder = new File(pathElements[0]);

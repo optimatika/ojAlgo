@@ -17,7 +17,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Added the ability to specify the initial capacity of a `SparseStore`.
 
+#### org.ojalgo.structure
+
+- There are new methods fillCompatile(...), modifyCompatile(...) and onCompatile(...) to complement the already existing "fill", "modify" and "on" methods. (Inspired by MATLAB's concept of compatible array sizes for binary operation.)
+- The factory interfaces got methods to construct instances of compatible sizes/shapes. (Inspired by MATLAB's concept of compatible array sizes for binary operation.)
+
 ### Changed
+
+#### org.ojalgo.matrix
+
+- Vector space method like "add" and "subtract" have been redefined to no longer throw exceptions if dimensions are not equal, but instead broadcast/repeat rows or columns. (Inspired by MATLAB's concept of compatible array sizes for binary operation.)
 
 #### org.ojalgo.structure
 

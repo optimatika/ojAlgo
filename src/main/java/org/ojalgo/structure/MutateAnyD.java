@@ -24,6 +24,7 @@ package org.ojalgo.structure;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -37,6 +38,19 @@ import org.ojalgo.function.special.MissingMath;
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Fillable<N extends Comparable<N>> extends MutateAnyD, Mutate1D.Fillable<N> {
+
+        /**
+         * 'this' needs to be of a size compatible with the 'left' and 'right' matrices. No checks are
+         * performed. The term "compatible" refers to MATLAB's rules for "array broadcasting". The result will
+         * be the same as if the 'left' and 'right' matrices where expanded (repeated) so that all three where
+         * of the same size, and then the operation was performed. The actual implementation may be more
+         * efficient than that.
+         * 
+         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         */
+        default void fillCompatible(final AccessAnyD<N> left, final BinaryFunction<N> operator, final AccessAnyD<N> right) {
+            FillCompatible.invoke(this, left, operator, right);
+        }
 
         void fillSet(int dimension, long dimensionalIndex, N value);
 
@@ -142,6 +156,14 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, AccessAnyD<N> {
 
         void modifyAny(TransformationAnyD<N> modifier);
+
+        default void modifyCompatible(final AccessAnyD<N> left, final BinaryFunction<N> operator) {
+            FillCompatible.invoke(this, left, operator, this);
+        }
+
+        default void modifyCompatible(final BinaryFunction<N> operator, final AccessAnyD<N> right) {
+            FillCompatible.invoke(this, this, operator, right);
+        }
 
     }
 

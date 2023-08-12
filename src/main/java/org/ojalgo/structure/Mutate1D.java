@@ -24,6 +24,7 @@ package org.ojalgo.structure;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -76,6 +77,10 @@ public interface Mutate1D extends Structure1D {
             for (long i = 0L, limit = Math.min(this.count(), arguments.count()); i < limit; i++) {
                 this.set(i, function.invoke(arguments.get(i)));
             }
+        }
+
+        default void fillCompatible(final Access1D<N> left, final BinaryFunction<N> operator, final Access1D<N> right) {
+            FillCompatible.invoke(this, left, operator, right);
         }
 
         default void fillRange(final long first, final long limit, final N value) {
@@ -168,6 +173,14 @@ public interface Mutate1D extends Structure1D {
     interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Access1D<N> {
 
         void modifyAny(Transformation1D<N> modifier);
+
+        default void modifyCompatible(final Access1D<N> left, final BinaryFunction<N> operator) {
+            FillCompatible.invoke(this, left, operator, this);
+        }
+
+        default void modifyCompatible(final BinaryFunction<N> operator, final Access1D<N> right) {
+            FillCompatible.invoke(this, this, operator, right);
+        }
 
     }
 

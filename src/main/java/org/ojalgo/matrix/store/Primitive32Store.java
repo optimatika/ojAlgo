@@ -28,6 +28,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.RotateLeft;
 import org.ojalgo.array.operation.RotateRight;
@@ -348,6 +349,11 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     @Override
     public void exchangeRows(final long rowA, final long rowB) {
         myUtility.exchangeRows(rowA, rowB);
+    }
+
+    @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, myRowDim, left, operator, right);
     }
 
     @Override

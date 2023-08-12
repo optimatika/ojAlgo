@@ -33,36 +33,52 @@ import org.ojalgo.structure.Transformation2D;
  * An {@link ElementsSupplier} is not necessarily (or not yet) a matrix, but something from which the elements
  * of a matrix can be derived. There are several matrix related things you can do with them:
  * <ol>
- * <li>You can query the size/shape of the (future) matrix.</li>
- * <li>You can supply the elements to an already existing matrix (or more precisely to an
- * {@linkplain TransformableRegion}) or collect them into a new matrix using a {@linkplain Factory2D}.</li>
- * <li>You can define a stream of additional operations to be executed when the elements are extracted.</li>
+ * <li>You can query the size/shape of the (future) matrix.
+ * <li>You can supply the elements to an already existing matrix (or more precisely to a
+ * {@linkplain TransformableRegion}) or collect them into a new matrix using a {@linkplain Factory2D}.
+ * <li>You can define a stream of additional operations to be executed when the elements are extracted.
  * </ol>
  *
  * @author apete
  */
 public interface ElementsSupplier<N extends Comparable<N>> extends Operate2D<N, ElementsSupplier<N>>, Access2D.Collectable<N, TransformableRegion<N>> {
 
+    @Override
     default ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);
     }
 
+    @Override
     default ElementsSupplier<N> onAny(final Transformation2D<N> operator) {
         return new MatrixPipeline.Transformer<>(this, operator);
     }
 
+    @Override
+    default ElementsSupplier<N> onColumns(final Access1D<N> left, final BinaryFunction<N> operator) {
+        return new MatrixPipeline.ColumnsModifier<>(left, operator, this);
+    }
+
+    @Override
     default ElementsSupplier<N> onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
         return new MatrixPipeline.ColumnsModifier<>(this, operator, right);
     }
 
+    @Override
     default ElementsSupplier<N> onMatching(final Access2D<N> left, final BinaryFunction<N> operator) {
         return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
     }
 
+    @Override
     default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
         return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
     }
 
+    @Override
+    default ElementsSupplier<N> onRows(final Access1D<N> left, final BinaryFunction<N> operator) {
+        return new MatrixPipeline.RowsModifier<>(left, operator, this);
+    }
+
+    @Override
     default ElementsSupplier<N> onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
         return new MatrixPipeline.RowsModifier<>(this, operator, right);
     }

@@ -481,6 +481,20 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
         return this.make(Math.toIntExact(nbRows), Math.toIntExact(nbCols));
     }
 
+    /**
+     * Make new instance of compatible dimensions.
+     */
+    default I make(final Structure1D struct1, final Structure1D struct2) {
+        long[] compatible = StructureAnyD.compatible(struct1, struct2);
+        if (compatible.length == 2) {
+            return this.make(compatible[0], compatible[1]);
+        } else if (compatible.length == 1) {
+            return this.make(compatible[0], 1L);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     default I make(final Structure2D shape) {
         return this.make(shape.countRows(), shape.countColumns());
     }

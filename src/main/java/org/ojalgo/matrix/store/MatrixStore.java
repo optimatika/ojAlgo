@@ -23,12 +23,14 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.Matrix2D;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -90,7 +92,29 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
     @Override
     default MatrixStore<N> add(final MatrixStore<N> addend) {
-        return this.onMatching(this.physical().function().add(), addend).collect(this.physical());
+
+        int nbRowsLeft = this.getRowDim();
+        int nbColsLeft = this.getColDim();
+
+        int nbRowsRight = addend.getRowDim();
+        int nbColsRight = addend.getColDim();
+
+        Factory<N, ?> factory = this.physical();
+
+        BinaryFunction<N> operator = factory.function().add();
+
+        if (nbRowsLeft == nbRowsRight && nbColsLeft == nbColsRight) {
+
+            return this.onMatching(operator, addend).collect(factory);
+
+        } else {
+
+            PhysicalStore<N> target = factory.make(this, addend);
+
+            target.fillCompatible(this, operator, addend);
+
+            return target;
+        }
     }
 
     @Override
@@ -765,7 +789,29 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
     @Override
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.onMatching(this.physical().function().subtract(), subtrahend).collect(this.physical());
+
+        int nbRowsLeft = this.getRowDim();
+        int nbColsLeft = this.getColDim();
+
+        int nbRowsRight = subtrahend.getRowDim();
+        int nbColsRight = subtrahend.getColDim();
+
+        Factory<N, ?> factory = this.physical();
+
+        BinaryFunction<N> operator = factory.function().subtract();
+
+        if (nbRowsLeft == nbRowsRight && nbColsLeft == nbColsRight) {
+
+            return this.onMatching(operator, subtrahend).collect(factory);
+
+        } else {
+
+            PhysicalStore<N> target = factory.make(this, subtrahend);
+
+            target.fillCompatible(this, operator, subtrahend);
+
+            return target;
+        }
     }
 
     @Override

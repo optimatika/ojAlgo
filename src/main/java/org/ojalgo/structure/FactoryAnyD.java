@@ -169,6 +169,13 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
         return this.make(Structure1D.toIntIndexes(shape));
     }
 
+    /**
+     * Make new instance of compatible size/shape.
+     */
+    default I make(final Structure1D struct1, final Structure1D struct2) {
+        return this.make(StructureAnyD.compatible(struct1, struct2));
+    }
+
     default I make(final StructureAnyD shape) {
         return this.make(shape.shape());
     }

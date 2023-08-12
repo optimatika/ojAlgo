@@ -122,13 +122,13 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     }
 
+    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = ArrayAnyD.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = ArrayAnyD.factory(ArrayR256.FACTORY);
-    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
     public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
     public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
@@ -803,6 +803,35 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public void visitSet(final long[] initial, final int dimension, final VoidFunction<N> visitor) {
         this.loop(initial, dimension, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
+    }
+
+    FactoryAnyD<ArrayAnyD<N>> factory() {
+
+        return new FactoryAnyD<>() {
+
+            ArrayFactory<N, ?> delegate = myDelegate.factory();
+
+            public FunctionSet<?> function() {
+                return delegate.function();
+            }
+
+            public MathType getMathType() {
+                return delegate.getMathType();
+            }
+
+            @Override
+            public ArrayAnyD<N> make(final int... shape) {
+                return this.make(Structure1D.toLongIndexes(shape));
+            }
+
+            public ArrayAnyD<N> make(final long... shape) {
+                return delegate.make(StructureAnyD.count(shape)).wrapInArrayAnyD(shape);
+            }
+
+            public Scalar.Factory<?> scalar() {
+                return delegate.scalar();
+            }
+        };
     }
 
     BasicArray<N> getDelegate() {

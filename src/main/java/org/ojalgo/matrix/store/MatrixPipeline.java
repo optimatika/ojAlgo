@@ -28,6 +28,12 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Transformation2D;
 
+/**
+ * Intermediate step in a matrix pipeline – a chain of operations to be executed when the elements are
+ * extracted. Intermediate steps cannot alter the size/shape of the (future) matrix, only the elements
+ * themselves. One notable exception is the {@linkplain #transpose()} operation, which can change the shape of
+ * the matrix.
+ */
 abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSupplier<N> {
 
     static final class BinaryOperatorLeft<N extends Comparable<N>> extends MatrixPipeline<N> {
@@ -69,10 +75,19 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
     static final class ColumnsModifier<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myFunction;
+        private final Access1D<N> myLeftArgumnts;
         private final Access1D<N> myRightArgumnts;
+
+        ColumnsModifier(final Access1D<N> left, final BinaryFunction<N> modifier, final ElementsSupplier<N> base) {
+            super(base);
+            myLeftArgumnts = left;
+            myFunction = modifier;
+            myRightArgumnts = null;
+        }
 
         ColumnsModifier(final ElementsSupplier<N> base, final BinaryFunction<N> modifier, final Access1D<N> right) {
             super(base);
+            myLeftArgumnts = null;
             myFunction = modifier;
             myRightArgumnts = right;
         }
@@ -82,14 +97,15 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
             this.getContext().supplyTo(receiver);
 
-            UnaryFunction<N> modifier;
-
-            final long limit = Math.min(receiver.countColumns(), myRightArgumnts.count());
-            for (long j = 0; j < limit; j++) {
-                modifier = myFunction.second(myRightArgumnts.get(j));
-                receiver.modifyColumn(j, modifier);
+            if (myLeftArgumnts != null) {
+                for (int j = 0, limit = Math.min(receiver.getColDim(), myLeftArgumnts.size()); j < limit; j++) {
+                    receiver.modifyColumn(j, myFunction.first(myLeftArgumnts.get(j)));
+                }
+            } else if (myRightArgumnts != null) {
+                for (int j = 0, limit = Math.min(receiver.getColDim(), myRightArgumnts.size()); j < limit; j++) {
+                    receiver.modifyColumn(j, myFunction.second(myRightArgumnts.get(j)));
+                }
             }
-
         }
 
     }
@@ -135,11 +151,20 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
     static final class RowsModifier<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myFunction;
+        private final Access1D<N> myLeftArgumnts;
         private final Access1D<N> myRightArgumnts;
+
+        RowsModifier(final Access1D<N> left, final BinaryFunction<N> modifier, final ElementsSupplier<N> base) {
+            super(base);
+            myFunction = modifier;
+            myLeftArgumnts = left;
+            myRightArgumnts = null;
+        }
 
         RowsModifier(final ElementsSupplier<N> base, final BinaryFunction<N> modifier, final Access1D<N> right) {
             super(base);
             myFunction = modifier;
+            myLeftArgumnts = null;
             myRightArgumnts = right;
         }
 
@@ -148,14 +173,15 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
             this.getContext().supplyTo(receiver);
 
-            UnaryFunction<N> modifier;
-
-            final long limit = Math.min(receiver.countRows(), myRightArgumnts.count());
-            for (long i = 0; i < limit; i++) {
-                modifier = myFunction.second(myRightArgumnts.get(i));
-                receiver.modifyRow(i, modifier);
+            if (myLeftArgumnts != null) {
+                for (int i = 0, limit = Math.min(receiver.getRowDim(), myLeftArgumnts.size()); i < limit; i++) {
+                    receiver.modifyRow(i, myFunction.first(myLeftArgumnts.get(i)));
+                }
+            } else if (myRightArgumnts != null) {
+                for (int i = 0, limit = Math.min(receiver.getRowDim(), myRightArgumnts.size()); i < limit; i++) {
+                    receiver.modifyRow(i, myFunction.second(myRightArgumnts.get(i)));
+                }
             }
-
         }
 
     }

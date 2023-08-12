@@ -24,6 +24,7 @@ package org.ojalgo.structure;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.FillCompatible;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -78,6 +79,19 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillColumn(final long col, final NullaryFunction<?> supplier) {
             this.fillColumn(0L, col, supplier);
+        }
+
+        /**
+         * 'this' needs to be of a size compatible with the 'left' and 'right' matrices. No checks are
+         * performed. The term "compatible" refers to MATLAB's rules for "array broadcasting". The result will
+         * be the same as if the 'left' and 'right' matrices where expanded (repeated) so that all three where
+         * of the same size, and then the operation was performed. The actual implementation may be more
+         * efficient than that.
+         * 
+         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         */
+        default void fillCompatible(final Access2D<N> left, final BinaryFunction<N> operator, final Access2D<N> right) {
+            FillCompatible.invoke(this, left, operator, right);
         }
 
         default void fillDiagonal(final Access1D<N> values) {
@@ -249,26 +263,46 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.modifyDiagonal(0L, 0L, modifier);
         }
 
+        /**
+         * "Matching In Columns" refers to that the supplied, left, data structure will be treated as a
+         * column, matching the columns of this structure. Matching columns have the same number of rows.
+         * <p>
+         * This method will modify all elements of this structure by applying the modifier function to each of
+         * them. The left/first argument to the modifier function is taken from the supplied data structure,
+         * and the row-index determines which element.
+         */
         default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
-            for (long r = 0L; r < left.count(); r++) {
+            for (long r = 0L, limit = Math.min(left.count(), this.countRows()); r < limit; r++) {
                 this.modifyRow(r, function.first(left.get(r)));
             }
         }
 
+        /**
+         * Same as {@link #modifyMatchingInColumns(Access1D, BinaryFunction)} but with the arguments to the
+         * modifier function swapped.
+         */
         default void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
-            for (long r = 0L; r < right.count(); r++) {
+            for (long r = 0L, limit = Math.min(this.countRows(), right.count()); r < limit; r++) {
                 this.modifyRow(r, function.second(right.get(r)));
             }
         }
 
+        /**
+         * Same as {@link #modifyMatchingInColumns(Access1D, BinaryFunction)} but now the supplied left data
+         * structure is treated as a row. (Matching rows have the same number of columns.)
+         */
         default void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
-            for (long c = 0L; c < left.count(); c++) {
+            for (long c = 0L, limit = Math.min(left.count(), this.countColumns()); c < limit; c++) {
                 this.modifyColumn(c, function.first(left.get(c)));
             }
         }
 
+        /**
+         * Same as {@link #modifyMatchingInRows(Access1D, BinaryFunction)} but with the arguments to the
+         * modifier function swapped.
+         */
         default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
-            for (long c = 0L; c < right.count(); c++) {
+            for (long c = 0L, limit = Math.min(this.countColumns(), right.count()); c < limit; c++) {
                 this.modifyColumn(c, function.second(right.get(c)));
             }
         }
@@ -303,6 +337,66 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Exchangeable, Access2D<N> {
 
         void modifyAny(Transformation2D<N> modifier);
+
+        /**
+         * The "compatible" part of the method name references MATLAB's terminology "Compatible Array Sizes".
+         * Here the possible combinations are somewhat limited as 'this' is modified in-place.
+         * 
+         * @see https://se.mathworks.com/help/matlab/matlab_prog/compatible-array-sizes-for-basic-operations.html
+         */
+        default void modifyCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {
+
+            long nbLeftRows = left.countRows();
+            long nbLeftCols = left.countColumns();
+
+            long nbRightRows = this.countRows();
+            long nbRightCols = this.countColumns();
+
+            if (nbLeftRows != 1L && nbLeftRows != nbRightRows) {
+                throw new IllegalArgumentException("Incompatible row dimensions: " + nbLeftRows + " != " + nbRightRows);
+            }
+
+            if (nbLeftCols != 1L && nbLeftCols != nbRightCols) {
+                throw new IllegalArgumentException("Incompatible column dimensions: " + nbLeftCols + " != " + nbRightCols);
+            }
+
+            if (nbLeftRows == 1L && nbLeftCols == 1L) {
+                this.modifyAll(operator.first(left.get(0, 0)));
+            } else if (nbLeftRows == 1L && nbLeftCols == nbRightCols) {
+                this.modifyMatchingInRows(left, operator);
+            } else if (nbLeftCols == 1L && nbLeftRows == nbRightRows) {
+                this.modifyMatchingInColumns(left, operator);
+            } else {
+                FillCompatible.invoke(this, left, operator, this);
+            }
+        }
+
+        default void modifyCompatible(final BinaryFunction<N> operator, final Access2D<N> right) {
+
+            long nbLeftCols = this.countColumns();
+            long nbLeftRows = this.countRows();
+
+            long nbRightRows = right.countRows();
+            long nbRightCols = right.countColumns();
+
+            if (nbRightRows != 1L && nbRightRows != nbLeftRows) {
+                throw new IllegalArgumentException("Incompatible row dimensions: " + nbLeftRows + " != " + nbRightRows);
+            }
+
+            if (nbRightCols != 1L && nbRightCols != nbLeftCols) {
+                throw new IllegalArgumentException("Incompatible column dimensions: " + nbLeftCols + " != " + nbRightCols);
+            }
+
+            if (nbRightRows == 1L && nbRightCols == 1L) {
+                this.modifyAll(operator.second(right.get(0, 0)));
+            } else if (nbRightRows == 1L && nbRightCols == nbLeftCols) {
+                this.modifyMatchingInRows(operator, right);
+            } else if (nbRightCols == 1L && nbRightRows == nbLeftRows) {
+                this.modifyMatchingInColumns(operator, right);
+            } else {
+                FillCompatible.invoke(this, this, operator, right);
+            }
+        }
 
     }
 

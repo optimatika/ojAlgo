@@ -27,6 +27,7 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -156,7 +157,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     @Override
     public M add(final M addend) {
-        ProgrammingError.throwIfNotEqualDimensions(this.store(), addend);
         return this.newInstance(this.store().add(addend.store()));
     }
 
@@ -559,6 +559,31 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     @Override
+    public M onAll(final BinaryFunction<N> operator, final double right) {
+        return this.newInstance(this.supplier().onAll(operator, right));
+    }
+
+    @Override
+    public M onAll(final BinaryFunction<N> operator, final N right) {
+        return this.newInstance(this.supplier().onAll(operator, right));
+    }
+
+    @Override
+    public M onAll(final double left, final BinaryFunction<N> operator) {
+        return this.newInstance(this.supplier().onAll(left, operator));
+    }
+
+    @Override
+    public M onAll(final N left, final BinaryFunction<N> operator) {
+        return this.newInstance(this.supplier().onAll(left, operator));
+    }
+
+    @Override
+    public M onAll(final ParameterFunction<N> operator, final int parameter) {
+        return this.newInstance(this.supplier().onAll(operator, parameter));
+    }
+
+    @Override
     public M onAll(final UnaryFunction<N> operator) {
         return this.newInstance(this.supplier().onAll(operator));
     }
@@ -569,8 +594,23 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     @Override
+    public M onColumns(final Access1D<N> left, final BinaryFunction<N> operator) {
+        return this.newInstance(this.supplier().onColumns(left, operator));
+    }
+
+    @Override
     public M onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
         return this.newInstance(this.supplier().onColumns(operator, right));
+    }
+
+    @Override
+    public M onCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {
+        return this.newInstance(this.supplier().onCompatible(left, operator));
+    }
+
+    @Override
+    public M onCompatible(final BinaryFunction<N> operator, final Access2D<N> right) {
+        return this.newInstance(this.supplier().onCompatible(operator, right));
     }
 
     @Override
@@ -581,6 +621,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public M onMatching(final BinaryFunction<N> operator, final Access2D<N> right) {
         return this.newInstance(this.supplier().onMatching(operator, right));
+    }
+
+    @Override
+    public M onRows(final Access1D<N> left, final BinaryFunction<N> operator) {
+        return this.newInstance(this.supplier().onRows(left, operator));
     }
 
     @Override
@@ -691,7 +736,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
     @Override
     public M subtract(final M subtrahend) {
-        ProgrammingError.throwIfNotEqualDimensions(this.store(), subtrahend);
         return this.newInstance(this.store().subtract(subtrahend.store()));
     }
 
@@ -889,9 +933,9 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         if (myStore != null) {
             return myStore;
+        } else {
+            return mySupplier;
         }
-
-        return mySupplier;
     }
 
 }

@@ -528,6 +528,11 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
     }
 
     @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, myRowDim, left, operator, right);
+    }
+
+    @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         final int complexity = Math.toIntExact(left.count() / this.countRows());

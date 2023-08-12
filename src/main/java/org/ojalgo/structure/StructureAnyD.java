@@ -279,6 +279,35 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
+    static long[] compatible(final long[] left, final long[] right) {
+
+        int length = Math.max(left.length, right.length);
+
+        long[] retVal = new long[length];
+
+        for (int i = 0; i < length; i++) {
+
+            long li = i < left.length ? left[i] : 1L;
+            long ri = i < right.length ? right[i] : 1L;
+
+            if (li != 1L && ri != 1L && li != ri) {
+                throw new IllegalArgumentException();
+            }
+
+            retVal[i] = Math.max(li, ri);
+        }
+
+        return retVal;
+    }
+
+    static long[] compatible(final Structure1D left, final Structure1D right) {
+        return StructureAnyD.compatible(StructureAnyD.shape(left), StructureAnyD.shape(right));
+    }
+
+    /**
+     * @param structure An access structure
+     * @return The size of an access with that structure
+     */
     static long count(final int... shape) {
         long retVal = 1L;
         for (int i = 0, limit = shape.length; i < limit; i++) {
@@ -417,6 +446,25 @@ public interface StructureAnyD extends Structure1D {
             tmpNext *= shape[s];
             reference[s] = index % tmpNext / tmpPrev;
             tmpPrev = tmpNext;
+        }
+    }
+
+    static long[] shape(final Structure1D structure) {
+
+        if (structure instanceof StructureAnyD) {
+
+            return ((StructureAnyD) structure).shape();
+
+        } else if (structure instanceof Structure2D) {
+
+            long nbRows = ((Structure2D) structure).countRows();
+            long nbCols = ((Structure2D) structure).countColumns();
+
+            return new long[] { nbRows, nbCols };
+
+        } else {
+
+            return new long[] { structure.count() };
         }
     }
 

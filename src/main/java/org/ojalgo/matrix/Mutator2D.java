@@ -390,6 +390,22 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
     }
 
     @Override
+    public void modifyCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {
+        if (!mySafe) {
+            throw new IllegalStateException();
+        }
+        myDelegate.modifyCompatible(left, operator);
+    }
+
+    @Override
+    public void modifyCompatible(final BinaryFunction<N> operator, final Access2D<N> right) {
+        if (!mySafe) {
+            throw new IllegalStateException();
+        }
+        myDelegate.modifyCompatible(operator, right);
+    }
+
+    @Override
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();

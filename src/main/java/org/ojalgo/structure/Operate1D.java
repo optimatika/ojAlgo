@@ -4,6 +4,9 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
+/**
+ * @see Operate2D
+ */
 public interface Operate1D<N extends Comparable<N>, P extends Operate1D<N, P>> {
 
     default P onAll(final BinaryFunction<N> operator, final double right) {
@@ -29,6 +32,10 @@ public interface Operate1D<N extends Comparable<N>, P extends Operate1D<N, P>> {
     P onAll(UnaryFunction<N> operator);
 
     P onAny(Transformation1D<N> operator);
+
+    P onCompatible(Access1D<N> left, BinaryFunction<N> operator);
+
+    P onCompatible(BinaryFunction<N> operator, Access1D<N> right);
 
     P onMatching(Access1D<N> left, BinaryFunction<N> operator);
 

@@ -364,6 +364,11 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, left, operator, right);
+    }
+
+    @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         int complexity = Math.toIntExact(left.count() / this.countRows());

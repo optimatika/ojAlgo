@@ -250,13 +250,13 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     }
 
+    public static final Factory<ComplexNumber> C128 = Array1D.factory(ArrayC128.FACTORY);
+    public static final Factory<Quaternion> H256 = Array1D.factory(ArrayH256.FACTORY);
+    public static final Factory<RationalNumber> Q128 = Array1D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = Array1D.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = Array1D.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = Array1D.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = Array1D.factory(ArrayR256.FACTORY);
-    public static final Factory<ComplexNumber> C128 = Array1D.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array1D.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array1D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> Z008 = Array1D.factory(ArrayZ008.FACTORY);
     public static final Factory<Double> Z016 = Array1D.factory(ArrayZ016.FACTORY);
     public static final Factory<Double> Z032 = Array1D.factory(ArrayZ032.FACTORY);
@@ -763,6 +763,35 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
             this.set(indexA, this.get(indexB));
             this.set(indexB, tmpVal);
         }
+    }
+
+    Factory1D<Array1D<N>> factory() {
+
+        return new Factory1D<>() {
+
+            ArrayFactory<N, ?> delegate = myDelegate.factory();
+
+            public FunctionSet<?> function() {
+                return delegate.function();
+            }
+
+            public MathType getMathType() {
+                return delegate.getMathType();
+            }
+
+            public Array1D<N> make(final int size) {
+                return this.make((long) size);
+            }
+
+            public Array1D<N> make(final long count) {
+                return delegate.make(count).wrapInArray1D();
+            }
+
+            public Scalar.Factory<?> scalar() {
+                return delegate.scalar();
+            }
+
+        };
     }
 
     BasicArray<N> getDelegate() {

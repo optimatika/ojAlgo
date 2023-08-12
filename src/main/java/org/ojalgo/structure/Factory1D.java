@@ -170,4 +170,11 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
         return this.make(shape.count());
     }
 
+    /**
+     * Make new instance of compatible size.
+     */
+    default I make(final Structure1D struct1, final Structure1D struct2) {
+        return this.make(StructureAnyD.count(StructureAnyD.compatible(struct1, struct2)));
+    }
+
 }
