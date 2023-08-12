@@ -54,6 +54,7 @@ public interface StructureAnyD extends Structure1D {
             this(-1);
         }
 
+        @Override
         public int compareTo(final IntReference ref) {
 
             int retVal = reference.length - ref.reference.length;
@@ -120,6 +121,7 @@ public interface StructureAnyD extends Structure1D {
             this(-1L);
         }
 
+        @Override
         public int compareTo(final LongReference ref) {
 
             int retVal = Integer.compare(reference.length, ref.reference.length);
@@ -212,6 +214,7 @@ public interface StructureAnyD extends Structure1D {
             return myMappers[dim].toIndex(key);
         }
 
+        @Override
         public long toIndex(final Object[] keys) {
 
             final long[] ref = new long[keys.length];
@@ -228,6 +231,7 @@ public interface StructureAnyD extends Structure1D {
             return (T) myMappers[dim].toKey(index);
         }
 
+        @Override
         public Object[] toKey(final long index) {
 
             final long[] ref = StructureAnyD.reference(index, myStructure);
@@ -512,6 +516,7 @@ public interface StructureAnyD extends Structure1D {
     /**
      * count() == count(0) * count(1) * count(2) * count(3) * ...
      */
+    @Override
     default long count() {
         return StructureAnyD.count(this.shape());
     }
@@ -584,16 +589,20 @@ public interface StructureAnyD extends Structure1D {
 
     default void loopAllReferences(final ReferenceCallback callback) {
 
-        long[] reference = new long[this.rank()];
+        int rank = this.rank();
 
-        this.loop(reference.length - 1, reference, callback);
+        long[] reference = new long[rank];
+
+        this.loop(rank - 1, reference, callback);
     }
 
     default void loopReferences(final Predicate<long[]> filter, final ReferenceCallback callback) {
 
-        long[] reference = new long[this.rank()];
+        int rank = this.rank();
 
-        this.loop(reference.length - 1, reference, filter, callback);
+        long[] reference = new long[rank];
+
+        this.loop(rank - 1, reference, filter, callback);
     }
 
     /**
