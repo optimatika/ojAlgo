@@ -108,6 +108,22 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     }
 
     /**
+     * <p>
+     * The MIP problem, restricted to match this node, is infeasible.
+     * <p>
+     * The relaxed LP, with these node constraints, has the solution:
+     * 
+     * <pre>
+     * OPTIMAL 1168726.273148148 @ { 6E+1, 9.69598765432097, 0, 63.69598765432098, 5, 0, 62.32638888888889, 13.48958333333333, 0, 69.58333333333333, 4.375, 0, 67, 10.7, 19.99999999999957, 71, 0, 1.35E+3 }
+     * </pre>
+     * <p>
+     * With ojAlgo presolvers turned off ORTools returns this optimal solution:
+     * 
+     * <pre>
+     * OPTIMAL 1168726.273148148 @ { 6E+1, 9.69598765432097, 0, 63.69598765432098, 5, 0, 62.32638888888889, 13.48958333333333, 0, 69.58333333333333, 4.375, 0, 67, 10.7, 19.99999999999957, 71, 0, 1.35E+3 }
+     * </pre>
+     * <p>
+     * 
      * <pre>
     Branch&Bound Node
     7 (5) 2=0.20399305555555447 1168080.295138889 [0=3<18, 1=57<72, 2=0<5, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
@@ -129,7 +145,85 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
         int[] lower = { 3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0 };
         int[] upper = { 18, 72, 5, 75, 18, 75, 18, 67, 18, 75, 18 };
 
-        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.INFEASIBLE);
+        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.OPTIMAL);
+    }
+
+    /**
+     * <p>
+     * The MIP problem, restricted to match this node, is infeasible.
+     * <p>
+     * The relaxed LP, with these node constraints, has the solution:
+     * 
+     * <pre>
+     * OPTIMAL 1168080.2951388888 @ { 6E+1, 9.46932870370369, 0, 63.4693287037037, 5.20399305555555, 0, 62.32638888888889, 13.48958333333333, 0, 69.58333333333333, 4.375, 0, 67, 10.7, 19.99999999999957, 71, 0, 1.35E+3 }
+     * </pre>
+     * <p>
+     * The ojAlgo pre-solver (because it still performs integer rounding) identifies the relaxed LP as
+     * infeasible.
+     * 
+     * <pre>
+     * OPTIMAL 1168080.2951388888 @ { 6E+1, 9.46932870370369, 0, 63.4693287037037, 5.20399305555555, 0, 62.32638888888889, 13.48958333333333, 0, 69.58333333333333, 4.375, 0, 67, 10.7, 19.99999999999957, 71, 0, 1.35E+3 }
+     * </pre>
+     * <p>
+     * With presolvers on, the solver is never invoked because the presolvers determine the model to be
+     * infeasible. Presumably a problem with with some presolver!
+     * <p>
+     * Old/classic LP solver:
+     * 
+     * <pre>
+    Branch&Bound Node
+    5 (4) 7=0.0833333333333286 1167875.1663773148 [0=3<18, 1=57<72, 2=0<18, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
+    Solutions=0 Nodes/Iterations=3 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+    Node Result: { 60.0, 9.469328703703702, 0.0, 63.4693287037037, 5.203993055555555, 0.0, 62.326388888888886, 13.489583333333334, 0.0, 69.58333333333333, 4.375, 0.0, 67.0, 11.0, 50.0, 71.0, 0.0, 1350.0 }
+    Node solved to optimality!
+    0.30 ! 0 <= ANZ6 <= 0
+    Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!
+    Integer indices: [1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16]
+    Lower bounds: [3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0]
+    Upper bounds: [18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18]
+    Done 4 IntegerSolver iterations in 0.044337s with NodeStatistics [I=0, E=0, S=0, A=0]
+    8550 ! 9000 <= STD2
+    8550 ! 9000 <= STD5
+    8550 ! 12000 <= STD6
+    -5.7 ! 0 <= ANZ5 <= 0
+    8550 ! 10000 <= STD4
+    -5.7 ! 0 <= ANZ6 <= 0
+    -5.7 ! 0 <= ANZ3 <= 0
+    -5.7 ! 0 <= ANZ4 <= 0
+     * </pre>
+     * 
+     * New/experimental LP solver:
+     * 
+     * <pre>
+    Branch&Bound Node
+    5 (4) 7=0.0833333333333286 1167875.1663773148 [0=3<18, 1=57<72, 2=0<18, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
+    Solutions=0 Nodes/Iterations=3 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+    Node Result: { 60.0, 9.4693287037037, 0.0, 63.4693287037037, 5.203993055555551, 0.0, 62.326388888888886, 13.48958333333333, 0.0, 69.58333333333333, 4.374999999999997, 0.0, 67.0, 11.0, 50.0, 72.0, 0.0, 1200.0 }
+    Node solved to optimality!
+    -0.70 ! 0 <= ANZ6 <= 0
+    Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!
+    Integer indices: [1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16]
+    Lower bounds: [3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0]
+    Upper bounds: [18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18]
+    Done 4 IntegerSolver iterations in 0.048885709s with NodeStatistics [I=0, E=0, S=0, A=0]
+    8550 ! 9000 <= STD2
+    8550 ! 9000 <= STD5
+    8550 ! 12000 <= STD6
+    -5.7 ! 0 <= ANZ5 <= 0
+    8550 ! 10000 <= STD4
+    -5.7 ! 0 <= ANZ6 <= 0
+    -5.7 ! 0 <= ANZ3 <= 0
+    -5.7 ! 0 <= ANZ4 <= 0
+     * </pre>
+     */
+    @Test
+    public void testFlugplN5() {
+
+        int[] integers = { 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
+        int[] lower = { 3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0 };
+        int[] upper = { 18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18 };
+
+        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.OPTIMAL);
     }
 
     /**

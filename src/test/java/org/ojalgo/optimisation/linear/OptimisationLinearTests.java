@@ -47,6 +47,6 @@ abstract class OptimisationLinearTests {
     public static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Def-Dense", DEFAULT_DENSE, "Def-Sparse",
             DEFAULT_SPARSE, "Exp-Dense", EXPERIMENTAL_DENSE, "Exp-Sparse", EXPERIMENTAL_SPARSE);
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
 }
