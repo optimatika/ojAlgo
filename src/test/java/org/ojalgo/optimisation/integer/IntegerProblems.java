@@ -395,7 +395,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
      * </p>
      */
     @Test
-    public void testP20160701() {
+    public void testSimpleTSP20160701() {
 
         int n = 6;
         double[][] c = new double[n][n];
@@ -442,14 +442,12 @@ public class IntegerProblems extends OptimisationIntegerTests {
         Variable[][] x = new Variable[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
-                model.addVariable(x[i][j]);
+                x[i][j] = model.newVariable("x" + i + "_" + j).binary().weight(c[i][j]);
             }
         }
         Variable[] u = new Variable[n];
         for (int i = 1; i < n; i++) {
-            u[i] = new Variable("u" + i);
-            model.addVariable(u[i]);
+            u[i] = model.newVariable("u" + i);
         }
 
         //CONSTRAINTS
@@ -457,7 +455,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         //flow_out:
         //sum(j in cities : i!=j) x[i][j]==1;
         for (int i = 0; i < n; i++) {
-            Expression constraint_line = model.newExpression("constraint_line" + i).lower(1).upper(1);
+            Expression constraint_line = model.newExpression("constraint_line_" + i).lower(1).upper(1);
             for (int j = 0; j < n; j++) {
                 if (i != j) {
                     constraint_line.set(x[i][j], 1);
@@ -469,7 +467,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         //flow_in:
         //sum(i in cities : i!=j) x[i][j]==1;
         for (int j = 0; j < n; j++) {
-            Expression constraint_column = model.newExpression("constraint_column" + j).lower(1).upper(1);
+            Expression constraint_column = model.newExpression("constraint_column_" + j).lower(1).upper(1);
             for (int i = 0; i < n; i++) {
                 if (i != j) {
                     constraint_column.set(x[i][j], 1);
@@ -483,7 +481,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < n; j++) {
                 if (i != j) {
-                    Expression constraint_subroute = model.newExpression("constraint_subroute" + i + "_" + j).upper(n - 1);
+                    Expression constraint_subroute = model.newExpression("constraint_subroute_" + i + "_" + j).upper(n - 1);
                     constraint_subroute.set(u[i], 1);
                     constraint_subroute.set(u[j], -1);
                     constraint_subroute.set(x[i][j], n);
@@ -491,7 +489,9 @@ public class IntegerProblems extends OptimisationIntegerTests {
             }
         }
 
-        // model.options.debug(IntegerSolver.class);
+        if (OptimisationIntegerTests.DEBUG) {
+            model.options.debug(IntegerSolver.class);
+        }
 
         Optimisation.Result result = model.minimise();
 
@@ -516,7 +516,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
         }
 
         TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertEquals(917.3134949394164, result.getValue());
+        TestUtils.assertTrue(model.validate(result));
+        TestUtils.assertEquals(917.31349493942, result.getValue());
     }
 
     /**

@@ -359,6 +359,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
         model.newExpression("SUM").set(varA, 1).set(varB, 1).set(varC, 1).level(6);
 
         if (DEBUG) {
+            BasicLogger.debug(model);
             model.options.debug(LinearSolver.class);
         }
 

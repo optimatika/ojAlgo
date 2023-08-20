@@ -240,7 +240,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             return myModel.objective().toFunction();
         }
 
-        public Optimisation.Options getOptions() {
+        public Optimisation.Options options() {
             return myModel.options;
         }
 
@@ -382,7 +382,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          *         of each other.
          */
         public static boolean equals(final double x, final double y, final double eps) {
-            return Precision.equals(x, y, 1) || (PrimitiveMath.ABS.invoke(y - x) <= eps);
+            return Precision.equals(x, y, 1) || PrimitiveMath.ABS.invoke(y - x) <= eps;
         }
 
         /**
@@ -437,7 +437,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equals(final float x, final float y, final float eps) {
-            return Precision.equals(x, y, 1) || (PrimitiveMath.ABS.invoke(y - x) <= eps);
+            return Precision.equals(x, y, 1) || PrimitiveMath.ABS.invoke(y - x) <= eps;
         }
 
         /**
@@ -482,7 +482,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y) {
-            return (Double.isNaN(x) && Double.isNaN(y)) || Precision.equals(x, y, 1);
+            return Double.isNaN(x) && Double.isNaN(y) || Precision.equals(x, y, 1);
         }
 
         /**
@@ -496,7 +496,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y, final double eps) {
-            return Precision.equalsIncludingNaN(x, y) || (PrimitiveMath.ABS.invoke(y - x) <= eps);
+            return Precision.equalsIncludingNaN(x, y) || PrimitiveMath.ABS.invoke(y - x) <= eps;
         }
 
         /**
@@ -512,7 +512,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y, final int maxUlps) {
-            return (Double.isNaN(x) && Double.isNaN(y)) || Precision.equals(x, y, maxUlps);
+            return Double.isNaN(x) && Double.isNaN(y) || Precision.equals(x, y, maxUlps);
         }
 
         /**
@@ -525,7 +525,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y) {
-            return (Float.isNaN(x) && Float.isNaN(y)) || Precision.equals(x, y, 1);
+            return Float.isNaN(x) && Float.isNaN(y) || Precision.equals(x, y, 1);
         }
 
         /**
@@ -539,7 +539,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y, final float eps) {
-            return Precision.equalsIncludingNaN(x, y) || (PrimitiveMath.ABS.invoke(y - x) <= eps);
+            return Precision.equalsIncludingNaN(x, y) || PrimitiveMath.ABS.invoke(y - x) <= eps;
         }
 
         /**
@@ -555,7 +555,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y, final int maxUlps) {
-            return (Float.isNaN(x) && Float.isNaN(y)) || Precision.equals(x, y, maxUlps);
+            return Float.isNaN(x) && Float.isNaN(y) || Precision.equals(x, y, maxUlps);
         }
 
         /**
@@ -577,7 +577,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          *         floating number.
          */
         public static double representableDelta(final double x, final double originalDelta) {
-            return (x + originalDelta) - x;
+            return x + originalDelta - x;
         }
 
         /**
@@ -610,7 +610,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public static double round(final double x, final int scale, final int roundingMethod) {
             try {
-                return (new BigDecimal(Double.toString(x)).setScale(scale, roundingMethod)).doubleValue();
+                return new BigDecimal(Double.toString(x)).setScale(scale, roundingMethod).doubleValue();
             } catch (NumberFormatException ex) {
                 if (Double.isInfinite(x)) {
                     return x;
@@ -691,8 +691,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             }
             case BigDecimal.ROUND_HALF_EVEN: {
                 double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
-                if ((fraction > 0.5) || ((fraction >= 0.5)
-                        && ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)))) {
+                if (fraction > 0.5 || fraction >= 0.5
+                        && PrimitiveMath.FLOOR.invoke(unscaled) / 2.0 != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
                 } else {
                     unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
@@ -800,37 +800,37 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 }
             }
 
-            for (LinearConstraint tmpLinearConstraint : constraints) {
-                Expression tmpExpression = model.addExpression(tmpLinearConstraint.toString());
-                double[] tmpFactors = tmpLinearConstraint.getFactors();
-                for (int i = 0; i < tmpFactors.length; i++) {
-                    tmpExpression.set(i, tmpFactors[i]);
+            for (LinearConstraint linearConstraint : constraints) {
+                Expression expression = model.addExpression(linearConstraint.toString());
+                double[] factors = linearConstraint.getFactors();
+                for (int i = 0; i < factors.length; i++) {
+                    expression.set(i, factors[i]);
                 }
-                switch (tmpLinearConstraint.getType()) {
+                switch (linearConstraint.getType()) {
                 case GEQ:
-                    tmpExpression.lower(new BigDecimal(tmpLinearConstraint.getRhs()));
+                    expression.lower(new BigDecimal(linearConstraint.getRhs()));
                     break;
                 case LEQ:
-                    tmpExpression.upper(new BigDecimal(tmpLinearConstraint.getRhs()));
+                    expression.upper(new BigDecimal(linearConstraint.getRhs()));
                     break;
                 default:
-                    tmpExpression.level(new BigDecimal(tmpLinearConstraint.getRhs()));
+                    expression.level(new BigDecimal(linearConstraint.getRhs()));
                     break;
                 }
             }
 
             if (DEBUG) {
-                model.myModel.options.debug(LinearSolver.class);
+                model.options().debug(LinearSolver.class);
             }
 
-            Optimisation.Result tmpResult = null;
+            Optimisation.Result result = null;
             if (minOrMax == GoalType.MINIMIZE) {
-                tmpResult = model.minimise();
+                result = model.minimise();
             } else {
-                tmpResult = model.maximise();
+                result = model.maximise();
             }
 
-            return new PointValuePair(model, tmpResult);
+            return new PointValuePair(model, result);
         }
 
     }
@@ -840,7 +840,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         LargeModelFactory lmf = new LargeModelFactory();
 
         LinearObjectiveFunction f = new LinearObjectiveFunction(lmf.objective, 0);
-        f.getOptions().iterations_abort = 5;
+        f.options().iterations_abort = 5;
 
         Collection<LinearConstraint> constraints = lmf.generateConstraints();
 
@@ -937,9 +937,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(25.8, solution.getValue(), .0000001);
         TestUtils.assertEquals(23.0, solution.getPoint()[0] + solution.getPoint()[2] + solution.getPoint()[4], 0.0000001);
         TestUtils.assertEquals(23.0, solution.getPoint()[1] + solution.getPoint()[3] + solution.getPoint()[5], 0.0000001);
-        TestUtils.assertTrue(solution.getPoint()[0] >= (10.0 - 0.0000001));
-        TestUtils.assertTrue(solution.getPoint()[2] >= (8.0 - 0.0000001));
-        TestUtils.assertTrue(solution.getPoint()[4] >= (5.0 - 0.0000001));
+        TestUtils.assertTrue(solution.getPoint()[0] >= 10.0 - 0.0000001);
+        TestUtils.assertTrue(solution.getPoint()[2] >= 8.0 - 0.0000001);
+        TestUtils.assertTrue(solution.getPoint()[4] >= 5.0 - 0.0000001);
     }
 
     @Test
@@ -1004,9 +1004,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(30.0, solution1.getPoint()[5], .0001);
         TestUtils.assertEquals(40.57143, solution1.getValue(), .0001);
 
-        double valA = (0.8 * solution1.getPoint()[0]) + (0.2 * solution1.getPoint()[1]);
-        double valB = (0.7 * solution1.getPoint()[2]) + (0.3 * solution1.getPoint()[3]);
-        double valC = (0.4 * solution1.getPoint()[4]) + (0.6 * solution1.getPoint()[5]);
+        double valA = 0.8 * solution1.getPoint()[0] + 0.2 * solution1.getPoint()[1];
+        double valB = 0.7 * solution1.getPoint()[2] + 0.3 * solution1.getPoint()[3];
+        double valC = 0.4 * solution1.getPoint()[4] + 0.6 * solution1.getPoint()[5];
 
         f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
         constraints = new ArrayList<>();
@@ -1031,10 +1031,12 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         SimplexSolver solver = new SimplexSolver();
         PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
 
-        TestUtils.assertEquals(5.0, solution.getPoint()[0] + solution.getPoint()[1], epsilon);
-        TestUtils.assertEquals(-10.0, solution.getPoint()[2], epsilon);
-        TestUtils.assertEquals(-10.0, solution.getValue(), epsilon);
+        double[] solutionPoint = solution.getPoint();
+        double solutionValue = solution.getValue();
 
+        TestUtils.assertEquals(5.0, solutionPoint[0] + solutionPoint[1], epsilon);
+        TestUtils.assertEquals(-10.0, solutionPoint[2], epsilon);
+        TestUtils.assertEquals(-10.0, solutionValue, epsilon);
     }
 
     @Test

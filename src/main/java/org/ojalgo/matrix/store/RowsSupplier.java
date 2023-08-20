@@ -72,16 +72,16 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         super();
         myColumnsCount = numberOfColumns;
         myPhysicalStoreFactory = factory;
-        myRowFactory = SparseArray.factory(factory.array()).limit(myColumnsCount);
+        myRowFactory = SparseArray.factory(factory.array());
     }
 
     public SparseArray<N> addRow() {
-        return this.addRow(myRowFactory.make());
+        return this.addRow(myRowFactory.make(myColumnsCount));
     }
 
     public void addRows(final int numberToAdd) {
         for (int i = 0; i < numberToAdd; i++) {
-            myRows.add(myRowFactory.make());
+            myRows.add(myRowFactory.make(myColumnsCount));
         }
     }
 
