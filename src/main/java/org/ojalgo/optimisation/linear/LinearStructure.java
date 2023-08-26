@@ -64,13 +64,11 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     final int nbVars;
     final int[] negativePartVariables;
     final int[] positivePartVariables;
-    final EntryPair<ModelEntity<?>, ConstraintType>[] slack;
 
     LinearStructure(final boolean inclMap, final int constrIn, final int constrEq, final int varsPos, final int varsNeg, final int varsSlk, final int varsEye) {
 
         positivePartVariables = new int[varsPos];
         negativePartVariables = new int[varsNeg];
-        slack = (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[varsSlk + varsEye];
         constraints = ConstraintsMap.newInstance(constrIn + constrEq, inclMap);
 
         nbInes = constrIn;
@@ -128,8 +126,13 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     @Override
-    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int js) {
-        return slack[js];
+    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
+
+        if (idx < nbSlck) {
+            return this.getConstraintMap(nbIdty + idx);
+        } else {
+            return this.getConstraintMap(idx - nbSlck);
+        }
     }
 
     @Override

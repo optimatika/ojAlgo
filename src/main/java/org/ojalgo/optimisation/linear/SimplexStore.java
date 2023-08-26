@@ -45,7 +45,6 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.EntryPair;
 
 abstract class SimplexStore {
 
@@ -143,7 +142,6 @@ abstract class SimplexStore {
             mtrxB.set(i, expression.getUpperLimit(true, POSITIVE_INFINITY));
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
-            structure.slack[i] = EntryPair.of(expression, ConstraintType.UPPER);
             structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
         }
 
@@ -158,7 +156,6 @@ abstract class SimplexStore {
             mtrxB.set(nbUpConstr + i, expression.getLowerLimit(true, NEGATIVE_INFINITY));
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
-            structure.slack[nbUpConstr + i] = EntryPair.of(expression, ConstraintType.LOWER);
             structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
         }
 

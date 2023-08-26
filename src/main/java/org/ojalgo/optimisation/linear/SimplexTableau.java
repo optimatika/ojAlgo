@@ -1109,6 +1109,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
                 solRHS[j] = constraintsRHS.doubleValue(i);
             }
         }
+
         if (ProblemStructure.DEBUG) {
             BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
             BasicLogger.debug("Bas: {}", Arrays.toString(included));

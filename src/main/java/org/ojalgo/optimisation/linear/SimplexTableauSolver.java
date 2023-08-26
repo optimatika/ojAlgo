@@ -50,7 +50,6 @@ import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.EntryPair;
 
 /**
  * Classic simplex solver:
@@ -375,7 +374,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = expression.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.UPPER);
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, false);
             indCnstr++;
             indSlack++;
@@ -395,7 +393,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = -expression.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.LOWER);
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, false);
             indCnstr++;
             indSlack++;
@@ -413,7 +410,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = variable.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.UPPER);
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, false);
             indCnstr++;
             indSlack++;
@@ -431,7 +427,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = -variable.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.LOWER);
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, false);
             indCnstr++;
             indSlack++;
@@ -453,7 +448,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = expression.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.LOWER);
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, true);
             indCnstr++;
             indSlack++;
@@ -473,7 +467,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = -expression.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(expression, ConstraintType.UPPER);
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, true);
             indCnstr++;
             indSlack++;
@@ -491,7 +484,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = variable.getAdjustedLowerLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.LOWER);
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, true);
             indCnstr++;
             indSlack++;
@@ -509,7 +501,6 @@ final class SimplexTableauSolver extends LinearSolver {
             double rhs = -variable.getAdjustedUpperLimit();
             retConstraintsRHS.set(indCnstr, rhs);
 
-            structure.slack[indSlack - baseSlackVars] = EntryPair.of(variable, ConstraintType.UPPER);
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, true);
             indCnstr++;
             indSlack++;

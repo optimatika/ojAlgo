@@ -32,7 +32,7 @@ import org.ojalgo.scalar.ComplexNumber;
  * The naming scheme is the {@link NumberSet} symbol combined with the total number of bits used to represent
  * the components.
  * <p>
- * For instance: C128 referns to C = {@link ComplexNumber} which is implemeted as two double:s each of 64
+ * For instance: C128 refers to C = {@link ComplexNumber} which is implemented as two double:s each of 64
  * bits. If there would be a float based complex number implementation it would be named C064.
  * <p>
  * R032 is a Real number implemented/approximated using a single 32 bit float.

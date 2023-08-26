@@ -197,7 +197,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         int countModelVariables();
 
         /**
-         * The number of slack variables - relates to {@link #getSlack(int)}
+         * The number of slack variables
          */
         int countSlackVariables();
 
@@ -207,7 +207,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * Returns which model entity, and constraint type, that corresponds to the slack variable at the
          * supplied index.
          *
-         * @param idx Index of solver slack variable
+         * @param idx Index of solver slack variable (If there are 3 slack variables this input argument
+         *        should be in the range [0.2].)
          */
         EntryPair<ModelEntity<?>, ConstraintType> getSlack(int idx);
 
