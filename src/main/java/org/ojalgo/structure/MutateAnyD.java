@@ -41,6 +41,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         /**
          * @deprecated v52 Use {@link #set(long, Comparable)} instead.
          */
+        @Override
         @Deprecated
         default void fillOne(final long index, final N value) {
             this.fillOne(StructureAnyD.reference(index, this.shape()), value);
@@ -49,6 +50,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         /**
          * @deprecated v52 Use {@link #set(long, Comparable)} instead.
          */
+        @Override
         @Deprecated
         default void fillOne(final long index, final NullaryFunction<?> supplier) {
             this.fillOne(StructureAnyD.reference(index, this.shape()), supplier);
@@ -209,6 +211,36 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
             return retVal;
         }
 
+    }
+
+    @Override
+    default void set(final int index, final byte value) {
+        this.set((long) index, value);
+    }
+
+    @Override
+    default void set(final int index, final double value) {
+        this.set((long) index, value);
+    }
+
+    @Override
+    default void set(final int index, final float value) {
+        this.set((long) index, value);
+    }
+
+    @Override
+    default void set(final int index, final int value) {
+        this.set((long) index, value);
+    }
+
+    @Override
+    default void set(final int index, final long value) {
+        this.set((long) index, value);
+    }
+
+    @Override
+    default void set(final int index, final short value) {
+        this.set((long) index, value);
     }
 
     @Override

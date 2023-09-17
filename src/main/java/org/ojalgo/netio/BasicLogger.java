@@ -302,41 +302,29 @@ public interface BasicLogger {
             return Optional.empty();
         }
 
-        public void print(final boolean value) {
-        }
+        public void print(final boolean value) {}
 
-        public void print(final byte value) {
-        }
+        public void print(final byte value) {}
 
-        public void print(final char value) {
-        }
+        public void print(final char value) {}
 
-        public void print(final double value) {
-        }
+        public void print(final double value) {}
 
-        public void print(final float value) {
-        }
+        public void print(final float value) {}
 
-        public void print(final int value) {
-        }
+        public void print(final int value) {}
 
-        public void print(final long value) {
-        }
+        public void print(final long value) {}
 
-        public void print(final Object object) {
-        }
+        public void print(final Object object) {}
 
-        public void print(final short value) {
-        }
+        public void print(final short value) {}
 
-        public void print(final Throwable throwable) {
-        }
+        public void print(final Throwable throwable) {}
 
-        public void printf(final String format, final Object... args) {
-        }
+        public void printf(final String format, final Object... args) {}
 
-        public void println() {
-        }
+        public void println() {}
 
     };
 

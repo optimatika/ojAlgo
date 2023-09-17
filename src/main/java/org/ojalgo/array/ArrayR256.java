@@ -115,12 +115,12 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected byte byteValue(final int index) {
+    public byte byteValue(final int index) {
         return this.get(index).byteValue();
     }
 
     @Override
-    protected double doubleValue(final int index) {
+    public double doubleValue(final int index) {
         return data[index].doubleValue();
     }
 
@@ -130,7 +130,7 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected float floatValue(final int index) {
+    public float floatValue(final int index) {
         return data[index].floatValue();
     }
 
@@ -140,7 +140,7 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected int intValue(final int index) {
+    public int intValue(final int index) {
         return this.get(index).intValue();
     }
 
@@ -155,17 +155,17 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected long longValue(final int index) {
+    public long longValue(final int index) {
         return this.get(index).longValue();
     }
 
     @Override
-    protected short shortValue(final int index) {
+    public short shortValue(final int index) {
         return this.get(index).shortValue();
     }
 
     @Override
-    protected void set(final int index, final long value) {
+    public void set(final int index, final long value) {
         data[index] = new BigDecimal(value);
     }
 

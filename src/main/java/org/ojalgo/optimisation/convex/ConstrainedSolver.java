@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -48,9 +49,12 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
 
         Result result = super.buildResult();
 
-        result.multipliers(mySolutionL);
-
-        return result;
+        ConstraintsMap constraints = this.getEntityMap().getConstraintsMap();
+        if (constraints.isEntityMap()) {
+            return result.multipliers(constraints, mySolutionL);
+        } else {
+            return result.multipliers(mySolutionL);
+        }
     }
 
     @Override

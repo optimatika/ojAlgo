@@ -105,8 +105,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         }
 
         @Override
-        protected void reset() {
-        }
+        protected void reset() {}
 
         protected void setMeanReturn(final BigDecimal aMeanReturn) {
             myMeanReturn = aMeanReturn;

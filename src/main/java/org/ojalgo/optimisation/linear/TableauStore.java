@@ -31,14 +31,29 @@ import java.util.List;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-final class TableauStore extends SimplexStore implements Access2D<Double> {
+final class TableauStore extends SimplexStore implements Access2D<Double>, Mutate2D {
+
+    static enum FeatureSet {
+        /**
+         * Used by {@link SimplexTableauSolver}.
+         */
+        CLASSIC,
+        /**
+         * Used by {@link SimplexSolver}.
+         */
+        COMPACT;
+    }
 
     private static void pivotRow(final double[] dataRow, final int col, final double[] pivotRow, final int length) {
         double dataElement = dataRow[col];
@@ -59,44 +74,67 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
     private double[] myCopiedObjectiveRow = null;
+    private final FeatureSet myFeatureSet;
     private transient Primitive1D myObjective = null;
     private final double[][] myTableau;
 
     TableauStore(final int mm, final int nn) {
-        this(new LinearStructure(mm, nn));
+        this(new LinearStructure(mm, nn), FeatureSet.COMPACT);
     }
 
-    TableauStore(final LinearStructure structure) {
+    TableauStore(final LinearStructure linearStructure) {
+        this(linearStructure, FeatureSet.COMPACT);
+    }
 
-        super(structure);
+    TableauStore(final LinearStructure linearStructure, final FeatureSet featureSet) {
+
+        super(linearStructure);
 
         myTableau = new double[m + 1][n + 1];
 
         myColDim = n + 1;
+
+        myFeatureSet = featureSet;
     }
 
+    @Override
     public long countColumns() {
         return this.getColDim();
     }
 
+    @Override
     public long countRows() {
         return this.getRowDim();
     }
 
-    public double doubleValue(final long row, final long col) {
-        return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
+    @Override
+    public double doubleValue(final int row, final int col) {
+        return myTableau[row][col];
     }
 
+    @Override
     public Double get(final long row, final long col) {
         return Double.valueOf(this.doubleValue(row, col));
     }
 
+    @Override
     public int getColDim() {
         return myColDim;
     }
 
+    @Override
     public int getRowDim() {
         return myTableau.length;
+    }
+
+    @Override
+    public void set(final int row, final int col, final double value) {
+        myTableau[row][col] = value;
+    }
+
+    @Override
+    public final void set(final long row, final long col, final Comparable<?> value) {
+        this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
     private Primitive2D newConstraintsBody() {
@@ -112,12 +150,12 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public int getColDim() {
-                return TableauStore.this.n;
+                return n;
             }
 
             @Override
             public int getRowDim() {
-                return TableauStore.this.m;
+                return m;
             }
 
             @Override
@@ -136,17 +174,17 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public double doubleValue(final int index) {
-                return store[index][TableauStore.this.n];
+                return store[index][n];
             }
 
             @Override
             public void set(final int index, final double value) {
-                store[index][TableauStore.this.n] = value;
+                store[index][n] = value;
             }
 
             @Override
             public int size() {
-                return TableauStore.this.m;
+                return m;
             }
 
         };
@@ -160,17 +198,17 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public double doubleValue(final int index) {
-                return store[TableauStore.this.m][index];
+                return store[m][index];
             }
 
             @Override
             public void set(final int index, final double value) {
-                store[TableauStore.this.m][index] = value;
+                store[m][index] = value;
             }
 
             @Override
             public int size() {
-                return TableauStore.this.structure().countModelVariables();
+                return structure.countModelVariables();
             }
 
         };
@@ -273,10 +311,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myCopiedObjectiveRow = Arrays.copyOf(myTableau[m], myColDim);
     }
 
-    double doubleValue(final int row, final int col) {
-        return myTableau[row][col];
-    }
-
     @Override
     double extractValue() {
 
@@ -299,6 +333,60 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         }
 
         return retVal;
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
+            final double fractionality) {
+
+        int nbModVars = structure.countModelVariables();
+
+        List<Equation> retVal = new ArrayList<>();
+
+        Primitive1D constraintsRHS = this.constraintsRHS();
+
+        double[] solRHS = new double[solution.length];
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+            solRHS[j] = constraintsRHS.doubleValue(i);
+        }
+        if (ProblemStructure.DEBUG) {
+            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
+            BasicLogger.debug("Bas: {}", Arrays.toString(included));
+        }
+        for (int j = 0; j < negated.length; j++) {
+            //if (this.getEntityMap().isNegated(j)) {
+            if (this.isNegated(j)) {
+                negated[j] = true;
+            } else {
+                negated[j] = false;
+            }
+        }
+
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+
+            Primitive1D sliceBodyRow = this.sliceBodyRow(i);
+
+            // double rhs = sliceBodyRow.dot(Access1D.wrap(solution));
+            double rhs = constraintsRHS.doubleValue(i);
+            //double rhs = solution[j];
+
+            if (j >= 0 && j < nbModVars && integer[j] && !tolerance.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(sliceBodyRow, j, rhs, integer, fractionality, negated, excluded);
+
+                if (maybe != null) {
+                    retVal.add(maybe);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    int getBasisColumnIndex(final int basisRowIndex) {
+        return included[basisRowIndex];
     }
 
     @Override
@@ -375,48 +463,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
         myCopiedObjectiveRow = null;
     }
 
-    void set(final int row, final int col, final double value) {
-        myTableau[row][col] = value;
-    }
-
-    @Override
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
-
-        // TODO Needs to be generalised to also handle cases with negative (full range) variables
-
-        // BasicLogger.debug("{} {} {}", Arrays.toString(integer), accuracy, fractionality);
-
-        int nbConstraints = this.countConstraints();
-        int nbProblemVariables = meta.countModelVariables();
-
-        Primitive1D constraintsRHS = this.constraintsRHS();
-
-        // BasicLogger.debug("{}x{}: {}", nbConstraints, nbProblemVariables, constraintsRHS);
-
-        List<Equation> retVal = new ArrayList<>();
-
-        for (int i = 0; i < nbConstraints; i++) {
-            int variableIndex = this.getBasisColumnIndex(i);
-
-            double rhs = constraintsRHS.doubleValue(i);
-
-            if (variableIndex >= 0 && variableIndex < nbProblemVariables && integer[variableIndex] && !accuracy.isInteger(rhs)) {
-
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), variableIndex, rhs, integer, fractionality);
-
-                if (maybe != null) {
-                    retVal.add(maybe);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    int getBasisColumnIndex(final int basisRowIndex) {
-        return included[basisRowIndex];
-    }
-
     Primitive1D sliceBodyRow(final int row) {
 
         return new Primitive1D() {
@@ -433,7 +479,35 @@ final class TableauStore extends SimplexStore implements Access2D<Double> {
 
             @Override
             public int size() {
-                return TableauStore.this.countVariables();
+                return TableauStore.this.n;
+            }
+
+        };
+    }
+
+    /**
+     * @return An array of the dual variable values (of the original problem, never phase 1).
+     */
+    @Override
+    final Primitive1D sliceDualVariables() {
+
+        int base = n - m;
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return myObjective.doubleValue(base + index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                myObjective.set(base + index, value);
+            }
+
+            @Override
+            public int size() {
+                return n - base;
             }
 
         };

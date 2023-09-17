@@ -32,26 +32,32 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
         super(base);
     }
 
+    @Override
     public N aggregateColumn(final long col, final Aggregator aggregator) {
         return this.base().aggregateRow(col, aggregator);
     }
 
+    @Override
     public N aggregateRow(final long row, final Aggregator aggregator) {
         return this.base().aggregateColumn(row, aggregator);
     }
 
-    public N get(final long aRow, final long aCol) {
+    @Override
+    public N get(final int aRow, final int aCol) {
         return this.base().get(aCol, aRow);
     }
 
+    @Override
     public void loopColumn(final long col, final RowColumnCallback callback) {
         this.base().loopRow(col, callback);
     }
 
+    @Override
     public void loopRow(final long row, final RowColumnCallback callback) {
         this.base().loopColumn(row, callback);
     }
 
+    @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         MatrixStore<N> retVal;
@@ -70,10 +76,12 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
         return retVal;
     }
 
+    @Override
     public Access1D<N> sliceColumn(final long col) {
         return this.base().sliceRow(col);
     }
 
+    @Override
     public Access1D<N> sliceRow(final long row) {
         return this.base().sliceColumn(row);
     }
@@ -83,6 +91,7 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
         this.base().supplyTo(receiver.regionByTransposing());
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
         return this.base().toScalar(column, row);
     }
@@ -92,10 +101,12 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
         return this.base();
     }
 
+    @Override
     public void visitColumn(final long col, final VoidFunction<N> visitor) {
         this.base().visitRow(col, visitor);
     }
 
+    @Override
     public void visitRow(final long row, final VoidFunction<N> visitor) {
         this.base().visitColumn(row, visitor);
     }

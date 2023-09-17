@@ -33,6 +33,8 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.ConstraintType;
+import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
@@ -43,9 +45,8 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.EntryPair;
 
-abstract class SimplexStore implements Optimisation.SolverData<Double> {
+abstract class SimplexStore {
 
     enum ColumnState {
 
@@ -76,6 +77,13 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         String key() {
             return myKey;
         }
+    }
+
+    @FunctionalInterface
+    interface SimplexStoreFactory {
+
+        SimplexStore newInstance(LinearStructure structure);
+
     }
 
     static SimplexStore build(final ExpressionsBasedModel model) {
@@ -112,13 +120,10 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
 
         int nbProbVars = freeVariables.size();
         int nbSlckVars = nbUpConstr + nbLoConstr;
-        int nbArtiVars = nbEqConstr;
 
-        LinearStructure structure = new LinearStructure(nbUpConstr, nbLoConstr, nbEqConstr, nbProbVars, 0, nbSlckVars, nbArtiVars);
+        LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
         S simplex = storeFactory.apply(structure);
-        LinearStructure meta = simplex.meta;
-
         double[] lowerBounds = simplex.getLowerBounds();
         double[] upperBounds = simplex.getUpperBounds();
 
@@ -137,7 +142,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(i, expression.getUpperLimit(true, POSITIVE_INFINITY));
             lowerBounds[nbProbVars + i] = ZERO;
             upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
-            meta.slack[i] = EntryPair.of(expression, ConstraintType.UPPER);
+            structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
         }
 
         for (int i = 0; i < nbLoConstr; i++) {
@@ -151,7 +156,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(nbUpConstr + i, expression.getLowerLimit(true, NEGATIVE_INFINITY));
             lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
             upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
-            meta.slack[nbUpConstr + i] = EntryPair.of(expression, ConstraintType.LOWER);
+            structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
         }
 
         for (int i = 0; i < nbEqConstr; i++) {
@@ -165,14 +170,17 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(true, ZERO));
             lowerBounds[nbProbVars + nbSlckVars + i] = ZERO;
             upperBounds[nbProbVars + nbSlckVars + i] = ZERO;
+            structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false);
         }
 
         for (int i = 0; i < nbProbVars; i++) {
             Variable variable = freeVariables.get(i);
             lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
             upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
+            structure.positivePartVariables[i] = model.indexOf(variable);
         }
 
+        structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
         boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
         for (IntIndex key : objective.getLinearKeySet()) {
             double weight = objective.doubleValue(key, true);
@@ -191,7 +199,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     static SimplexStore newInstance(final LinearStructure structure) {
-        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
+        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
             return new RevisedStore(structure);
         } else {
             return new TableauStore(structure);
@@ -203,9 +211,9 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     private transient int[] myExcludedUpper = null;
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
-    private final LinearStructure myStructure;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
+
     /**
      * excluded == not in the basis
      */
@@ -219,17 +227,17 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
      */
     final int m;
     /**
-     * The number of variables (all kinds)
+     * The number of variables totally (all kinds)
      */
     final int n;
-    final LinearStructure meta;
+    final LinearStructure structure;
 
-    SimplexStore(final LinearStructure structure) {
+    SimplexStore(final LinearStructure linearStructure) {
 
         super();
 
-        m = structure.countConstraints();
-        n = structure.countVariablesTotally();
+        m = linearStructure.countConstraints();
+        n = linearStructure.countVariablesTotally();
 
         myLowerBounds = new double[n];
         myUpperBounds = new double[n];
@@ -242,28 +250,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
             myPartition.update(included[j], ColumnState.BASIS);
         }
 
-        myStructure = structure;
-        meta = structure; // TODO Don't need both of these
-    }
-
-    public int countAdditionalConstraints() {
-        return 0;
-    }
-
-    public int countConstraints() {
-        return m;
-    }
-
-    public int countEqualityConstraints() {
-        return m;
-    }
-
-    public int countInequalityConstraints() {
-        return 0;
-    }
-
-    public int countVariables() {
-        return n;
+        structure = linearStructure;
     }
 
     @Override
@@ -350,6 +337,18 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
     }
 
     abstract double extractValue();
+
+    /**
+     * Generate a collection of cut candidates, from the current state (of the tableau).
+     *
+     * @param solution Current (iteration) solution
+     * @param integer Are the variables defined as integer or not?
+     * @param tolerance To determine if an ineteger variable value actually is integer or not.
+     * @param fractionality How far "away" from an integer value a tableau row (variable value) must be to be
+     *        used as a potential cut
+     * @return A collection of potential cuts
+     */
+    abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, boolean[] negated, NumberContext tolerance, double fractionality);
 
     ColumnState getColumnState(final int index) {
         return myPartition.get(index);
@@ -456,12 +455,20 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         }
     }
 
+    boolean isNegated(final int j) {
+        if (myUpperBounds[j] <= ZERO && myLowerBounds[j] < ZERO) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * The problem is small enough to be explicitly printed/logged – log the entire tableau at each iteration
      * when debugging.
      */
     boolean isPrintable() {
-        return myStructure.countVariablesTotally() <= 32;
+        return structure.countVariablesTotally() <= 32;
     }
 
     SimplexStore lower(final int index) {
@@ -519,9 +526,7 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
 
     abstract void restoreObjective();
 
-    final LinearStructure structure() {
-        return myStructure;
-    }
+    abstract Primitive1D sliceDualVariables();
 
     SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);
@@ -551,7 +556,5 @@ abstract class SimplexStore implements Optimisation.SolverData<Double> {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }
-
-    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
 
 }

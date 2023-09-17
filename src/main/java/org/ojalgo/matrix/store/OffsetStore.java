@@ -41,11 +41,13 @@ final class OffsetStore<N extends Comparable<N>> extends SelectingStore<N> {
         myColumnOffset = Math.toIntExact(columnOffset);
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return this.base().doubleValue(myRowOffset + row, myColumnOffset + col);
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         return this.base().get(myRowOffset + row, myColumnOffset + col);
     }
 

@@ -45,6 +45,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
+import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -362,7 +363,7 @@ public abstract class ConvexSolver extends GenericSolver {
             int nbEqus = this.countEqualityConstraints();
             int nbIneq = this.countInequalityConstraints();
 
-            ConvexData<N> retVal = new ConvexData<>(factory, nbVars, nbEqus, nbIneq);
+            ConvexData<N> retVal = new ConvexData<>(false, factory, nbVars, nbEqus, nbIneq);
 
             retVal.getObjective().linear().fillMatching(this.getObjective().linear());
             retVal.getObjective().quadratic().fillMatching(this.getObjective().quadratic());
@@ -493,12 +494,24 @@ public abstract class ConvexSolver extends GenericSolver {
             if (options.convex().isExtendedPrecision()) {
 
                 ConvexData<Quadruple> data = ConvexSolver.copy(model, GenericStore.R128);
-                return new IterativeRefinementSolver(options, data);
+                IterativeRefinementSolver solver = new IterativeRefinementSolver(options, data);
+
+                if (model.options.validate) {
+                    solver.setValidator(this.newValidator(model));
+                }
+
+                return solver;
 
             } else {
 
                 ConvexData<Double> data = ConvexSolver.copy(model, Primitive64Store.FACTORY);
-                return BasePrimitiveSolver.newSolver(data, options);
+                BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
+
+                if (model.options.validate) {
+                    solver.setValidator(this.newValidator(model));
+                }
+
+                return solver;
             }
         }
 
@@ -525,7 +538,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue());
             }
 
-            return new Result(solverState.getState(), modelSolution);
+            return solverState.withSolution(modelSolution);
         }
 
         @Override
@@ -542,7 +555,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 solverSolution.set(i, modelState.doubleValue(modelIndex));
             }
 
-            return new Result(modelState.getState(), solverSolution);
+            return modelState.withSolution(solverSolution);
         }
 
     }
@@ -719,7 +732,9 @@ public abstract class ConvexSolver extends GenericSolver {
         int nbLoVar = tmpLoVar.size();
 
         // ConvexData<N> retVal = dataFactory.newInstance(nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
-        ConvexData<N> retVal = new ConvexData<>(factory, nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
+        ConvexData<N> retVal = new ConvexData<>(true, factory, nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
+
+        ConstraintsMap constraintsMap = retVal.getConstraintsMap();
 
         // Q & C
 
@@ -778,6 +793,8 @@ public abstract class ConvexSolver extends GenericSolver {
             }
 
             retVal.setBE(i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
+
+            constraintsMap.setEntry(i, expression, ConstraintType.EQUALITY, false);
         }
 
         // AI & BI
@@ -790,6 +807,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
             }
             retVal.setBI(base + i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
+            constraintsMap.setEntry(nbEqExpr + base + i, expression, ConstraintType.UPPER, false);
         }
 
         base += nbUpExpr;
@@ -798,6 +816,7 @@ public abstract class ConvexSolver extends GenericSolver {
             Variable variable = tmpUpVar.get(i);
             retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), ONE);
             retVal.setBI(base + i, variable.getUpperLimit(false, BigMath.SMALLEST_POSITIVE_INFINITY));
+            constraintsMap.setEntry(nbEqExpr + base + i, variable, ConstraintType.UPPER, false);
         }
 
         base += nbUpVar;
@@ -808,6 +827,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true).negate());
             }
             retVal.setBI(base + i, expression.getLowerLimit(true, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
+            constraintsMap.setEntry(nbEqExpr + base + i, expression, ConstraintType.UPPER, true);
         }
 
         base += nbLoExpr;
@@ -816,6 +836,7 @@ public abstract class ConvexSolver extends GenericSolver {
             Variable variable = tmpLoVar.get(i);
             retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), NEG);
             retVal.setBI(base + i, variable.getLowerLimit(false, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
+            constraintsMap.setEntry(nbEqExpr + base + i, variable, ConstraintType.UPPER, true);
         }
 
         base += nbLoVar;

@@ -227,6 +227,7 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         return this.shortValue((int) index);
     }
 
+    @Override
     public final int size() {
         return mySize;
     }
@@ -271,9 +272,11 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         this.add(index, (int) addend);
     }
 
-    protected abstract byte byteValue(int index);
+    @Override
+    public abstract byte byteValue(int index);
 
-    protected double doubleValue(final int index) {
+    @Override
+    public double doubleValue(final int index) {
         return this.floatValue(index);
     }
 
@@ -304,7 +307,8 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract void fillOne(int index, NullaryFunction<?> supplier);
 
-    protected abstract float floatValue(final int index);
+    @Override
+    public abstract float floatValue(final int index);
 
     protected abstract N get(final int index);
 
@@ -315,7 +319,8 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         return this.indexOfLargest(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step));
     }
 
-    protected int intValue(final int index) {
+    @Override
+    public int intValue(final int index) {
         return this.shortValue(index);
     }
 
@@ -329,7 +334,8 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
      */
     protected abstract boolean isSmall(int index, double comparedTo);
 
-    protected long longValue(final int index) {
+    @Override
+    public long longValue(final int index) {
         return this.intValue(index);
     }
 
@@ -358,29 +364,36 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract int searchAscending(final N number);
 
-    protected void set(final int index, final byte value) {
+    @Override
+    public void set(final int index, final byte value) {
         this.set(index, (short) value);
     }
 
     protected abstract void set(final int index, final Comparable<?> number);
 
-    protected abstract void set(final int index, final double value);
+    @Override
+    public abstract void set(final int index, final double value);
 
-    protected void set(final int index, final float value) {
+    @Override
+    public void set(final int index, final float value) {
         this.set(index, (double) value);
     }
 
-    protected void set(final int index, final int value) {
+    @Override
+    public void set(final int index, final int value) {
         this.set(index, (long) value);
     }
 
-    protected abstract void set(final int index, final long value);
+    @Override
+    public abstract void set(final int index, final long value);
 
-    protected void set(final int index, final short value) {
+    @Override
+    public void set(final int index, final short value) {
         this.set(index, (int) value);
     }
 
-    protected short shortValue(final int index) {
+    @Override
+    public short shortValue(final int index) {
         return this.byteValue(index);
     }
 

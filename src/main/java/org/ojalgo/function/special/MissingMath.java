@@ -243,6 +243,22 @@ public abstract class MissingMath {
         return Math.log(1.0 / (1.0 - arg));
     }
 
+    /**
+     * Returns a rough approximation of {@link Math#log10(double)} for {@link BigDecimal}.
+     * <ul>
+     * <li>For numbers like 10^n it returns the exact correct number, n.
+     * <li>The magnitude of 0.0 is 0.
+     * <li>The error is [0.0,1.0) and the returned value is never more than the actual/correct value. For
+     * 999.0 the correct value is close to 3, but this method returns 2, as the implementation simply counts
+     * the digits.
+     * <li>Works for negative numbers as the sign is disregarded.
+     * <li>Works for fractional numbers 0.1, 0.0456, 1.2 or whatever.
+     * </ul>
+     */
+    public static int magnitude(final BigDecimal arg) {
+        return arg.signum() == 0 ? 0 : arg.precision() - arg.scale() - 1;
+    }
+
     public static double max(final double... values) {
         double retVal = values[0];
         for (int i = values.length; i-- != 1;) {
@@ -536,18 +552,18 @@ public abstract class MissingMath {
 
         BigDecimal retVal;
 
-        BigDecimal tmpPlus = BigMath.EXP.invoke(arg);
-        BigDecimal tmpMinus = BigMath.EXP.invoke(arg.negate());
+        BigDecimal plus = BigMath.EXP.invoke(arg);
+        BigDecimal minus = BigMath.EXP.invoke(arg.negate());
 
-        BigDecimal tmpDividend = tmpPlus.subtract(tmpMinus);
-        BigDecimal tmpDivisor = tmpPlus.add(tmpMinus);
+        BigDecimal dividend = plus.subtract(minus);
+        BigDecimal divisor = plus.add(minus);
 
-        if (tmpDividend.equals(tmpDivisor)) {
+        if (dividend.equals(divisor)) {
             retVal = BigDecimal.ONE;
-        } else if (tmpDividend.equals(tmpDivisor.negate())) {
+        } else if (dividend.equals(divisor.negate())) {
             retVal = BigDecimal.ONE.negate();
         } else {
-            retVal = BigMath.DIVIDE.apply(tmpDividend, tmpDivisor);
+            retVal = BigMath.DIVIDE.apply(dividend, divisor);
         }
 
         return retVal;

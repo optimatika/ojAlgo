@@ -36,14 +36,17 @@ abstract class TransjugatedStore<N extends Comparable<N>> extends LogicalStore<N
         super(base, base.countColumns(), base.countRows());
     }
 
-    public final double doubleValue(final long aRow, final long aCol) {
+    @Override
+    public final double doubleValue(final int aRow, final int aCol) {
         return this.base().doubleValue(aCol, aRow);
     }
 
+    @Override
     public final int firstInColumn(final int col) {
         return this.base().firstInRow(col);
     }
 
+    @Override
     public final int firstInRow(final int row) {
         return this.base().firstInColumn(row);
     }

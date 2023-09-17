@@ -132,6 +132,11 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public double doubleValue(final int index) {
+        return mySegments[index >> myIndexBits].doubleValue(index & myIndexMask);
+    }
+
+    @Override
     public void fillAll(final N value) {
         for (BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.fillAll(value);
@@ -463,6 +468,11 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         tmpSegments[mySegments.length] = tmpNewSegment;
 
         return new SegmentedArray<>(tmpSegments, mySegmentFactory);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        mySegments[index >> myIndexBits].set(index & myIndexMask, value);
     }
 
 }

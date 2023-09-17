@@ -35,15 +35,28 @@ final class OffHeapZ008 extends OffHeapArray {
         myPointer = NativeMemory.allocateByteArray(this, count);
     }
 
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         this.add(index, Scalar.byteValue(addend));
     }
 
+    @Override
     public byte byteValue(final long index) {
         return NativeMemory.getByte(myPointer, index);
     }
 
+    @Override
     public double doubleValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
+    public byte byteValue(final int index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
+    public double doubleValue(final int index) {
         return NativeMemory.getByte(myPointer, index);
     }
 
@@ -52,20 +65,29 @@ final class OffHeapZ008 extends OffHeapArray {
         NativeMemory.initialiseByteArray(myPointer, this.count());
     }
 
+    @Override
     public void set(final long index, final byte value) {
         NativeMemory.setByte(myPointer, index, value);
     }
 
+    @Override
     public void set(final long index, final Comparable<?> value) {
         this.set(index, Scalar.byteValue(value));
     }
 
+    @Override
     public void set(final long index, final double value) {
         NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
+    @Override
     public void set(final long index, final float value) {
         NativeMemory.setByte(myPointer, index, (byte) Math.round(value));
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
 }

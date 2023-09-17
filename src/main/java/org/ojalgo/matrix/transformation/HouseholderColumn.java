@@ -27,16 +27,17 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
     }
 
     @Override
-    public double doubleValue(final long index) {
+    public double doubleValue(final int index) {
         if (index > myFirst) {
             return myStore.doubleValue(index, this.column());
-        }
-        if (index == myFirst) {
+        } else if (index == myFirst) {
             return PrimitiveMath.ONE;
+        } else {
+            return PrimitiveMath.ZERO;
         }
-        return PrimitiveMath.ZERO;
     }
 
+    @Override
     public int first() {
         return myFirst;
     }
@@ -52,6 +53,7 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
         return myStore.physical().scalar().zero().get();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <P extends Householder<N>> P getWorker(final PhysicalStore.Factory<N, ?> factory) {
         if (myWorker == null) {
@@ -60,11 +62,13 @@ final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> imp
         return (P) myWorker;
     }
 
+    @Override
     public boolean isZero() {
         double largest = NumberDefinition.doubleValue(myStore.aggregateColumn(myFirst + 1L, this.column(), Aggregator.LARGEST));
         return PrimitiveScalar.isSmall(PrimitiveMath.ONE, largest);
     }
 
+    @Override
     public void point(final long row, final long col) {
         this.goToColumn(col);
         myFirst = (int) row;

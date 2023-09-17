@@ -109,14 +109,17 @@ public final class SampleSet implements Access1D<Double> {
         this.reset();
     }
 
+    @Override
     public long count() {
         return mySamples.count();
     }
 
-    public double doubleValue(final long index) {
+    @Override
+    public double doubleValue(final int index) {
         return mySamples.doubleValue(index);
     }
 
+    @Override
     public Double get(final long index) {
         return mySamples.doubleValue(index);
     }
@@ -388,6 +391,7 @@ public final class SampleSet implements Access1D<Double> {
         }
     }
 
+    @Override
     public int size() {
         return (int) mySamples.count();
     }

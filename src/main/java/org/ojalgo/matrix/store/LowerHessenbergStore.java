@@ -36,13 +36,15 @@ final class LowerHessenbergStore<N extends Comparable<N>> extends ShadingStore<N
         super(base);
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         if (row + 1 < col) {
             return PrimitiveMath.ZERO;
         }
         return this.base().doubleValue(row, col);
     }
 
+    @Override
     public int firstInColumn(final int col) {
         if (col == 0) {
             return 0;
@@ -50,7 +52,8 @@ final class LowerHessenbergStore<N extends Comparable<N>> extends ShadingStore<N
         return col - 1;
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         if (row + 1 < col) {
             return this.zero().get();
         }
@@ -62,6 +65,7 @@ final class LowerHessenbergStore<N extends Comparable<N>> extends ShadingStore<N
         return Math.min(row + 2, this.getColDim());
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
         if (row + 1 < col) {
             return this.zero();

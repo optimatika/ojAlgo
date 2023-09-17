@@ -76,10 +76,17 @@ public interface KeyValue<K, V> {
             return true;
         }
 
+        @Override
+        public T first() {
+            return first;
+        }
+
+        @Override
         public T getKey() {
             return first;
         }
 
+        @Override
         public T getValue() {
             return second;
         }
@@ -88,8 +95,23 @@ public interface KeyValue<K, V> {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((first == null) ? 0 : first.hashCode());
-            return prime * result + ((second == null) ? 0 : second.hashCode());
+            result = prime * result + (first == null ? 0 : first.hashCode());
+            return prime * result + (second == null ? 0 : second.hashCode());
+        }
+
+        @Override
+        public T left() {
+            return first;
+        }
+
+        @Override
+        public T right() {
+            return second;
+        }
+
+        @Override
+        public T second() {
+            return second;
         }
 
     }
@@ -134,7 +156,7 @@ public interface KeyValue<K, V> {
         return EntryPair.of(key1, key2, value);
     }
 
-    static <K, V> EntryPair<KeyValue.Dual<K>, V> of(final K key1, final K key2, final V value) {
+    static <K, V> KeyValue<KeyValue.Dual<K>, V> of(final K key1, final K key2, final V value) {
         return EntryPair.of(key1, key2, value);
     }
 
@@ -150,8 +172,24 @@ public interface KeyValue<K, V> {
         return EntryPair.of(key, value);
     }
 
+    default K first() {
+        return this.getKey();
+    }
+
     K getKey();
 
     V getValue();
+
+    default K left() {
+        return this.getKey();
+    }
+
+    default V right() {
+        return this.getValue();
+    }
+
+    default V second() {
+        return this.getValue();
+    }
 
 }

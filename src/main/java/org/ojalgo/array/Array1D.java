@@ -67,18 +67,22 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
+        @Override
         public Array1D<N> copy(final Access1D<?> source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
+        @Override
         public Array1D<N> copy(final Comparable<?>[] source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
+        @Override
         public Array1D<N> copy(final double... source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
+        @Override
         public Array1D<N> copy(final List<? extends Comparable<?>> source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
@@ -89,18 +93,26 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         }
 
         @Override
+        public MathType getMathType() {
+            return myDelegate.getMathType();
+        }
+
+        @Override
         public Array1D<N> make(final long count) {
             return this.makeDense(count);
         }
 
+        @Override
         public Array1D<N> makeDense(final long count) {
             return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 
+        @Override
         public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
             return myDelegate.makeFilled(count, supplier).wrapInArray1D();
         }
 
+        @Override
         public Array1D<N> makeSparse(final long count) {
             return myDelegate.makeStructuredZero(count).wrapInArray1D();
         }
@@ -116,10 +128,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
-        }
-
-        public MathType getMathType() {
-            return myDelegate.getMathType();
         }
 
     }
@@ -250,28 +258,16 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     }
 
-    public static final Factory<ComplexNumber> C128 = Array1D.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = Array1D.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = Array1D.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = Array1D.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = Array1D.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = Array1D.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = Array1D.factory(ArrayR256.FACTORY);
-    public static final Factory<Double> Z008 = Array1D.factory(ArrayZ008.FACTORY);
-    public static final Factory<Double> Z016 = Array1D.factory(ArrayZ016.FACTORY);
-    public static final Factory<Double> Z032 = Array1D.factory(ArrayZ032.FACTORY);
-    public static final Factory<Double> Z064 = Array1D.factory(ArrayZ064.FACTORY);
-
-    /**
-     * @deprecated v52 Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static final Factory<RationalNumber> RATIONAL = Q128;
     /**
      * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;
+    public static final Factory<ComplexNumber> C128 = Array1D.factory(ArrayC128.FACTORY);
     /**
      * @deprecated v52 Use {@link #C128} instead
      */
@@ -287,6 +283,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
      */
     @Deprecated
     public static final Factory<Double> DIRECT64 = Array1D.factory(BufferArray.DIRECT64);
+    public static final Factory<Quaternion> H256 = Array1D.factory(ArrayH256.FACTORY);
     /**
      * @deprecated v52 Use {@link #R032} instead
      */
@@ -297,11 +294,21 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
      */
     @Deprecated
     public static final Factory<Double> PRIMITIVE64 = R064;
+    public static final Factory<RationalNumber> Q128 = Array1D.factory(ArrayQ128.FACTORY);
     /**
      * @deprecated v52 Use {@link #H256} instead
      */
     @Deprecated
     public static final Factory<Quaternion> QUATERNION = H256;
+    /**
+     * @deprecated v52 Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final Factory<RationalNumber> RATIONAL = Q128;
+    public static final Factory<Double> Z008 = Array1D.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = Array1D.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = Array1D.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = Array1D.factory(ArrayZ064.FACTORY);
 
     public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new Array1D.Factory<>(denseFactory);
@@ -374,6 +381,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return myDelegate.byteValue(this.convert(index));
+    }
+
+    @Override
     public byte byteValue(final long index) {
         return myDelegate.byteValue(this.convert(index));
     }
@@ -391,6 +403,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Override
     public long count() {
         return length;
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return myDelegate.doubleValue(this.convert(index));
     }
 
     @Override
@@ -456,6 +473,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public float floatValue(final int index) {
+        return myDelegate.floatValue(this.convert(index));
+    }
+
+    @Override
     public float floatValue(final long index) {
         return myDelegate.floatValue(this.convert(index));
     }
@@ -509,6 +531,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public int intValue(final int index) {
+        return myDelegate.intValue(this.convert(index));
+    }
+
+    @Override
     public int intValue(final long index) {
         return myDelegate.intValue(this.convert(index));
     }
@@ -516,6 +543,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Override
     public boolean isEmpty() {
         return length == 0;
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return myDelegate.longValue(this.convert(index));
     }
 
     @Override
@@ -593,8 +625,34 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         myDelegate.modify(this.convert(first), this.convert(limit), myStep, modifier);
     }
 
+    @Override
     public void reset() {
         myDelegate.reset();
+    }
+
+    @Override
+    public void set(final int index, final byte value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final int index, final int value) {
+        myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        myDelegate.set(this.convert(index), value);
     }
 
     @Override
@@ -603,6 +661,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         N retVal = myDelegate.get(tmpIndex);
         myDelegate.set(tmpIndex, value);
         return retVal;
+    }
+
+    @Override
+    public void set(final int index, final short value) {
+        myDelegate.set(this.convert(index), value);
     }
 
     @Override
@@ -638,6 +701,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Override
     public void set(final long index, final short value) {
         myDelegate.set(this.convert(index), value);
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return myDelegate.shortValue(this.convert(index));
     }
 
     @Override
@@ -698,6 +766,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         return this.sliceRange(first, limit);
     }
 
+    @Override
     public void supplyTo(final Mutate1D receiver) {
         long limit = Math.min(length, receiver.count());
         if (myDelegate.isPrimitive()) {

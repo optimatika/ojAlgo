@@ -36,6 +36,10 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).doubleValue();
         }
 
+        default Quaternion invoke(final Quaternion arg1, final double arg2) {
+            return this.invoke(arg1, Quaternion.valueOf(arg2));
+        }
+
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).floatValue();
         }

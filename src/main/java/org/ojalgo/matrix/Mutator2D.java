@@ -46,6 +46,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate = delegate;
     }
 
+    @Override
     public void accept(final Access2D<?> supplied) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -53,6 +54,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.accept(supplied);
     }
 
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -60,6 +62,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.add(index, addend);
     }
 
+    @Override
     public void add(final long index, final double addend) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -67,6 +70,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.add(index, addend);
     }
 
+    @Override
     public void add(final long row, final long col, final Comparable<?> value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -74,6 +78,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.add(row, col, value);
     }
 
+    @Override
     public void add(final long row, final long col, final double value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -81,25 +86,30 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.add(row, col, value);
     }
 
+    @Override
     public long count() {
         return myDelegate.count();
     }
 
+    @Override
     public long countColumns() {
         return myDelegate.countColumns();
     }
 
+    @Override
     public long countRows() {
         return myDelegate.countRows();
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         if (mySafe) {
             return myDelegate.doubleValue(row, col);
         }
         throw new IllegalStateException();
     }
 
+    @Override
     public void exchangeColumns(final long colA, final long colB) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -107,6 +117,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.exchangeColumns(colA, colB);
     }
 
+    @Override
     public void exchangeRows(final long rowA, final long rowB) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -114,6 +125,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.exchangeRows(rowA, rowB);
     }
 
+    @Override
     public void fillAll(final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -121,6 +133,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillAll(myDelegate.physical().scalar().cast(value));
     }
 
+    @Override
     public void fillAll(final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -128,6 +141,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillAll(supplier);
     }
 
+    @Override
     public void fillColumn(final long col, final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -135,6 +149,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn(col, values);
     }
 
+    @Override
     public void fillColumn(final long row, final long col, final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -142,6 +157,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn(row, col, values);
     }
 
+    @Override
     public void fillColumn(final long row, final long column, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -149,6 +165,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn((int) row, (int) column, myDelegate.physical().scalar().cast(value));
     }
 
+    @Override
     public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -156,6 +173,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn(row, col, supplier);
     }
 
+    @Override
     public void fillColumn(final long col, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -163,6 +181,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn(col, value);
     }
 
+    @Override
     public void fillColumn(final long col, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -170,6 +189,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillColumn(col, supplier);
     }
 
+    @Override
     public void fillDiagonal(final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -177,6 +197,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(values);
     }
 
+    @Override
     public void fillDiagonal(final long row, final long col, final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -184,6 +205,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(row, col, values);
     }
 
+    @Override
     public void fillDiagonal(final long row, final long column, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -191,6 +213,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(row, column, myDelegate.physical().scalar().cast(value));
     }
 
+    @Override
     public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -198,6 +221,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(row, col, supplier);
     }
 
+    @Override
     public void fillDiagonal(final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -205,6 +229,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(value);
     }
 
+    @Override
     public void fillDiagonal(final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -212,6 +237,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillDiagonal(supplier);
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -219,6 +245,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillMatching(values);
     }
 
+    @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -226,6 +253,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillMatching(left, function, right);
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -233,6 +261,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillMatching(function, arguments);
     }
 
+    @Override
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -240,6 +269,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(index, values, valueIndex);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -247,6 +277,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(row, col, values, valueIndex);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -254,6 +285,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(row, col, value);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -261,6 +293,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(row, col, supplier);
     }
 
+    @Override
     public void fillOne(final long index, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -268,6 +301,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(index, value);
     }
 
+    @Override
     public void fillOne(final long index, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -275,6 +309,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillOne(index, supplier);
     }
 
+    @Override
     public void fillRange(final long first, final long limit, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -282,6 +317,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRange(first, limit, value);
     }
 
+    @Override
     public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -289,6 +325,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRange(first, limit, supplier);
     }
 
+    @Override
     public void fillRow(final long row, final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -296,6 +333,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRow(row, values);
     }
 
+    @Override
     public void fillRow(final long row, final long col, final Access1D<N> values) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -303,6 +341,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRow(row, col, values);
     }
 
+    @Override
     public void fillRow(final long row, final long column, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -310,6 +349,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRow((int) row, (int) column, myDelegate.physical().scalar().cast(value));
     }
 
+    @Override
     public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -317,6 +357,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRow(row, col, supplier);
     }
 
+    @Override
     public void fillRow(final long row, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -324,6 +365,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.fillRow(row, value);
     }
 
+    @Override
     public void fillRow(final long row, final NullaryFunction<?> supplier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -337,13 +379,16 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         return this.instantiate(myDelegate);
     }
 
+    @Override
     public N get(final long row, final long col) {
         if (mySafe) {
             return myDelegate.get(row, col);
+        } else {
+            throw new IllegalStateException();
         }
-        throw new IllegalStateException();
     }
 
+    @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -351,6 +396,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyAll(modifier);
     }
 
+    @Override
     public void modifyAny(final Transformation2D<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -358,6 +404,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         modifier.transform(myDelegate);
     }
 
+    @Override
     public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -365,6 +412,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyColumn(row, col, modifier);
     }
 
+    @Override
     public void modifyColumn(final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -372,6 +420,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyColumn(col, modifier);
     }
 
+    @Override
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -379,6 +428,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyDiagonal(row, col, modifier);
     }
 
+    @Override
     public void modifyDiagonal(final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -386,6 +436,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyDiagonal(modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -393,6 +444,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatching(left, function);
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -400,6 +452,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatching(function, right);
     }
 
+    @Override
     public void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -407,6 +460,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatchingInColumns(left, function);
     }
 
+    @Override
     public void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -414,6 +468,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatchingInColumns(function, right);
     }
 
+    @Override
     public void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -421,6 +476,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatchingInRows(left, function);
     }
 
+    @Override
     public void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -428,6 +484,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyMatchingInRows(function, right);
     }
 
+    @Override
     public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -435,6 +492,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyOne(row, col, modifier);
     }
 
+    @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -442,6 +500,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyOne(index, modifier);
     }
 
+    @Override
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -449,6 +508,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyRange(first, limit, modifier);
     }
 
+    @Override
     public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -456,6 +516,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyRow(row, col, modifier);
     }
 
+    @Override
     public void modifyRow(final long row, final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -463,6 +524,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.modifyRow(row, modifier);
     }
 
+    @Override
     public void reset() {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -470,6 +532,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.reset();
     }
 
+    @Override
     public void set(final long index, final Comparable<?> value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -477,6 +540,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.set(index, myDelegate.physical().scalar().cast(value));
     }
 
+    @Override
     public void set(final long index, final double value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -484,6 +548,7 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.set(index, value);
     }
 
+    @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -491,13 +556,15 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
         myDelegate.set(row, col, value);
     }
 
-    public void set(final long row, final long col, final double value) {
+    @Override
+    public void set(final int row, final int col, final double value) {
         if (!mySafe) {
             throw new IllegalStateException();
         }
         myDelegate.set(row, col, value);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
         myDelegate.supplyTo(receiver);
     }

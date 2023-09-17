@@ -54,8 +54,7 @@ public final class GenericContext<T> extends FormatContext<T> {
     }
 
     @Override
-    protected void configureFormat(final Format format, final Object object) {
-    }
+    protected void configureFormat(final Format format, final Object object) {}
 
     @Override
     protected String handleFormatException(final Format format, final Object object) {

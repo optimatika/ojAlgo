@@ -34,19 +34,22 @@ final class RepeatedColumnsStore<N extends Comparable<N>> extends ComposingStore
         myBaseColumns = base.countColumns();
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return this.base().doubleValue(row, col % myBaseColumns);
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         return this.base().get(row, col % myBaseColumns);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
         for (long bc = 0L; bc < myBaseColumns; bc++) {
             Access1D<N> column = this.base().sliceColumn(bc);
             for (long r = 0L; r < myRepetitions; r++) {
-                receiver.fillColumn(bc + (myBaseColumns * r), column);
+                receiver.fillColumn(bc + myBaseColumns * r, column);
             }
         }
     }

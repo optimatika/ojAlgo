@@ -213,7 +213,7 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected byte byteValue(final int index) {
+    public byte byteValue(final int index) {
         return (byte) Math.round(data[index]);
     }
 
@@ -222,7 +222,7 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected final double doubleValue(final int index) {
+    public final double doubleValue(final int index) {
         return data[index];
     }
 
@@ -257,12 +257,12 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected float floatValue(final int index) {
+    public float floatValue(final int index) {
         return (float) data[index];
     }
 
     @Override
-    protected final Double get(final int index) {
+    public final Double get(final int index) {
         return Double.valueOf(data[index]);
     }
 
@@ -272,7 +272,7 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected int intValue(final int index) {
+    public int intValue(final int index) {
         return (int) Math.round(data[index]);
     }
 
@@ -287,7 +287,7 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected long longValue(final int index) {
+    public long longValue(final int index) {
         return Math.round(data[index]);
     }
 
@@ -322,12 +322,12 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected final void set(final int index, final double value) {
+    public final void set(final int index, final double value) {
         data[index] = value;
     }
 
     @Override
-    protected short shortValue(final int index) {
+    public short shortValue(final int index) {
         return (short) Math.round(data[index]);
     }
 
@@ -357,7 +357,7 @@ public class ArrayR064 extends PrimitiveArray {
     }
 
     @Override
-    protected void set(final int index, final long value) {
+    public void set(final int index, final long value) {
         data[index] = value;
     }
 

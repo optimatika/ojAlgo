@@ -129,8 +129,8 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     @Override
-    public UpdatableSolver.EntityMap getEntityMap() {
-        return null;
+    public ConvexData<Double> getEntityMap() {
+        return myMatrices;
     }
 
     @Override

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +28,19 @@ import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
+import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -119,27 +120,56 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        int numbEquations = (int) body.countRows();
-        int numbVariables = (int) body.countColumns();
+        int nbEquations = body.getRowDim();
+        int nbVariables = body.getColDim();
 
-        List<Equation> retVal = new ArrayList<>(numbEquations);
-        for (int i = 0; i < numbEquations; i++) {
-            retVal.add(new Equation(i, numbVariables, rhs.doubleValue(i)));
-        }
+        List<Equation> retVal = new ArrayList<>(nbEquations);
 
         if (body instanceof SparseStore) {
 
-            ((SparseStore<?>) body).nonzeros().forEach(view -> retVal.get(Math.toIntExact(view.row())).set(view.column(), view.doubleValue()));
+            for (int i = 0; i < nbEquations; i++) {
+                Equation row = Equation.sparse(i, nbVariables);
+                retVal.add(row);
+                row.setRHS(rhs.doubleValue(i));
+            }
+
+            for (ElementView2D<?, ?> element : ((SparseStore<?>) body).nonzeros()) {
+                int i = Math.toIntExact(element.row());
+                long j = element.column();
+                retVal.get(i).set(j, element.doubleValue());
+            }
+
+        } else if (body instanceof RowsSupplier) {
+
+            for (int i = 0; i < nbEquations; i++) {
+                retVal.add(Equation.wrap(((RowsSupplier<?>) body).getRow(i), i, rhs.doubleValue(i)));
+            }
+
+        } else if (body instanceof ColumnsSupplier) {
+
+            for (int i = 0; i < nbEquations; i++) {
+                Equation row = Equation.sparse(i, nbVariables);
+                retVal.add(row);
+                row.setRHS(rhs.doubleValue(i));
+            }
+
+            for (int j = 0; j < nbVariables; j++) {
+                for (NonzeroView<?> element : ((ColumnsSupplier<?>) body).getColumn(j).nonzeros()) {
+                    int i = Math.toIntExact(element.index());
+                    retVal.get(i).set(j, element.doubleValue());
+                }
+            }
 
         } else {
 
-            for (int i = 0; i < numbEquations; i++) {
-                Equation row = retVal.get(i);
-                for (int j = 0; j < numbVariables; j++) {
-                    double tmpVal = body.doubleValue(i, j);
-                    if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
-                        row.set(j, tmpVal);
-                    }
+            for (int i = 0; i < nbEquations; i++) {
+
+                Equation row = Equation.dense(i, nbVariables);
+                retVal.add(row);
+                row.setRHS(rhs.doubleValue(i));
+
+                for (int j = 0; j < nbVariables; j++) {
+                    row.set(j, body.doubleValue(i, j));
                 }
             }
         }

@@ -35,15 +35,28 @@ final class OffHeapZ016 extends OffHeapArray {
         myPointer = NativeMemory.allocateShortArray(this, count);
     }
 
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         this.add(index, Scalar.shortValue(addend));
     }
 
+    @Override
     public double doubleValue(final long index) {
         return NativeMemory.getShort(myPointer, index);
     }
 
+    @Override
     public float floatValue(final long index) {
+        return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
+    public float floatValue(final int index) {
         return NativeMemory.getShort(myPointer, index);
     }
 
@@ -52,24 +65,39 @@ final class OffHeapZ016 extends OffHeapArray {
         NativeMemory.initialiseShortArray(myPointer, this.count());
     }
 
+    @Override
     public void set(final long index, final Comparable<?> value) {
         this.set(index, Scalar.shortValue(value));
     }
 
+    @Override
     public void set(final long index, final double value) {
         NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
     }
 
+    @Override
     public void set(final long index, final float value) {
         NativeMemory.setShort(myPointer, index, (short) Math.round(value));
     }
 
+    @Override
     public void set(final long index, final short value) {
         NativeMemory.setShort(myPointer, index, value);
     }
 
+    @Override
     public short shortValue(final long index) {
         return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
     }
 
 }

@@ -39,8 +39,9 @@ final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N
         return this.base();
     }
 
-    public N get(final long aRow, final long aCol) {
-        return this.base().toScalar((int) aCol, (int) aRow).conjugate().get();
+    @Override
+    public N get(final int aRow, final int aCol) {
+        return this.base().toScalar(aCol, aRow).conjugate().get();
     }
 
     @Override
@@ -62,6 +63,7 @@ final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N
         return retVal;
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
         return this.base().toScalar(column, row).conjugate();
     }

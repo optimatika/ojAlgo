@@ -45,42 +45,52 @@ public class StoreProblems extends MatrixStoreTests {
             myCountColumns = countColumns;
         }
 
+        @Override
         public long countColumns() {
             return myCountColumns;
         }
 
+        @Override
         public long countRows() {
             return myCountRows;
         }
 
-        public double doubleValue(final long row, final long col) {
+        @Override
+        public double doubleValue(final int row, final int col) {
             return row == col ? 1D : 0D;
         }
 
+        @Override
         public int firstInColumn(final int col) {
             return col;
         }
 
+        @Override
         public int firstInRow(final int row) {
             return row;
         }
 
-        public Double get(final long row, final long col) {
+        @Override
+        public Double get(final int row, final int col) {
             return this.doubleValue(row, col);
         }
 
+        @Override
         public int limitOfColumn(final int col) {
             return col + 1;
         }
 
+        @Override
         public int limitOfRow(final int row) {
             return row + 1;
         }
 
+        @Override
         public org.ojalgo.matrix.store.PhysicalStore.Factory<Double, ?> physical() {
             return Primitive64Store.FACTORY;
         }
 
+        @Override
         public void supplyTo(final TransformableRegion<Double> receiver) {
             receiver.reset();
             receiver.fillDiagonal(1D);

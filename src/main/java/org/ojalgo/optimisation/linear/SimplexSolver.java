@@ -28,10 +28,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Meant to replace {@link SimplexTableauSolver}. It is already better in many aspects, but still can't do
@@ -80,7 +86,7 @@ abstract class SimplexSolver extends LinearSolver {
                 return false;
             }
             EnterInfo other = (EnterInfo) obj;
-            if ((direction != other.direction) || (from != other.from) || (index != other.index)) {
+            if (direction != other.direction || from != other.from || index != other.index) {
                 return false;
             }
             return true;
@@ -90,8 +96,8 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((direction == null) ? 0 : direction.hashCode());
-            result = prime * result + ((from == null) ? 0 : from.hashCode());
+            result = prime * result + (direction == null ? 0 : direction.hashCode());
+            result = prime * result + (from == null ? 0 : from.hashCode());
             return prime * result + index;
         }
 
@@ -143,7 +149,7 @@ abstract class SimplexSolver extends LinearSolver {
                 return false;
             }
             ExitInfo other = (ExitInfo) obj;
-            if ((direction != other.direction) || (index != other.index) || (to != other.to)) {
+            if (direction != other.direction || index != other.index || to != other.to) {
                 return false;
             }
             return true;
@@ -153,9 +159,9 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((direction == null) ? 0 : direction.hashCode());
+            result = prime * result + (direction == null ? 0 : direction.hashCode());
             result = prime * result + index;
-            return prime * result + ((to == null) ? 0 : to.hashCode());
+            return prime * result + (to == null ? 0 : to.hashCode());
         }
 
         @Override
@@ -222,8 +228,8 @@ abstract class SimplexSolver extends LinearSolver {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((enter == null) ? 0 : enter.hashCode());
-            return prime * result + ((exit == null) ? 0 : exit.hashCode());
+            result = prime * result + (enter == null ? 0 : enter.hashCode());
+            return prime * result + (exit == null ? 0 : exit.hashCode());
         }
 
         @Override
@@ -276,32 +282,96 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    interface Validator {
-
-        void validate(Optimisation.Result result);
-
-    }
-
     private static final NumberContext ALGORITHM = NumberContext.of(8).withMode(RoundingMode.HALF_DOWN);
 
     private final SimplexStore mySimplex;
     private final double[] mySolutionShift;
-    private Validator myValidator = null;
     private double myValueShift = ZERO;
-    /**
-     * Excluding the artificial variables
-     */
-    private final int n;
 
     SimplexSolver(final Optimisation.Options solverOptions, final SimplexStore simplexStore) {
         super(solverOptions);
         mySimplex = simplexStore;
         mySolutionShift = new double[simplexStore.n];
-        n = simplexStore.n - simplexStore.structure().nbVarsArt;
     }
 
-    public EntityMap getEntityMap() {
-        return mySimplex.meta;
+    @Override
+    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
+
+        double[] solution = this.extractSolution();
+
+        if (this.isLogDebug()) {
+            BasicLogger.debug("Sol: {}", Arrays.toString(solution));
+            BasicLogger.debug("+++: {}", Arrays.toString(mySolutionShift));
+        }
+
+        boolean[] negated = new boolean[integer.length];
+        for (int j = 0; j < negated.length; j++) {
+            //if (this.getEntityMap().isNegated(j)) {
+            if (this.isNegated(j)) {
+                negated[j] = true;
+            }
+        }
+
+        return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
+    }
+
+    @Override
+    public LinearStructure getEntityMap() {
+        return mySimplex.structure;
+    }
+
+    @Override
+    public KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
+
+        double shift = mySolutionShift[col];
+
+        if (shift != ZERO) {
+
+            ColumnState columnState = mySimplex.getColumnState(col);
+            ConstraintType constraintType = ConstraintType.EQUALITY;
+            if (columnState == ColumnState.LOWER) {
+                constraintType = ConstraintType.LOWER;
+            } else if (columnState == ColumnState.UPPER) {
+                constraintType = ConstraintType.UPPER;
+            }
+
+            return EntryPair.of(constraintType, col).asKeyTo(shift);
+
+        } else {
+
+            return null;
+        }
+    }
+
+    private Access1D<?> extractMultipliers() {
+
+        Access1D<Double> duals = mySimplex.sliceDualVariables();
+
+        LinearStructure structure = mySimplex.structure;
+
+        return new Access1D<Double>() {
+
+            @Override
+            public long count() {
+                return structure.countConstraints();
+            }
+
+            @Override
+            public double doubleValue(final int index) {
+                int i = Math.toIntExact(index);
+                return structure.isConstraintNegated(i) ? -duals.doubleValue(index) : duals.doubleValue(index);
+            }
+
+            @Override
+            public Double get(final long index) {
+                return Double.valueOf(this.doubleValue(index));
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+        };
     }
 
     private double[] extractSolution() {
@@ -409,6 +479,7 @@ abstract class SimplexSolver extends LinearSolver {
             enter = iteration.enter;
         }
 
+        int n = mySimplex.structure.countVariables();
         double largest = 1E-10;
         int[] excluded = mySimplex.excluded;
         for (int je = 0; je < excluded.length; je++) {
@@ -481,6 +552,14 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
+    }
+
+    private boolean isNegated(final int j) {
+        if (this.getUpperBound(j) <= ZERO && this.getLowerBound(j) < ZERO) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void logCurrentState() {
@@ -647,6 +726,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         iteration.ratioDual = Double.MAX_VALUE;
 
+        int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
         for (int je = 0; je < excluded.length; je++) {
             int j = excluded[je];
@@ -927,8 +1007,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     final void doPrimalIterations(final IterDescr iteration) {
 
-        if (options.validate && myValidator != null) {
-            myValidator.validate(this.extractResult());
+        if (options.validate) {
+            this.validate(this.extractResult());
         }
 
         boolean done = false;
@@ -965,8 +1045,8 @@ abstract class SimplexSolver extends LinearSolver {
                 this.logCurrentState();
             }
 
-            if (options.validate && myValidator != null) {
-                myValidator.validate(this.extractResult());
+            if (options.validate) {
+                this.validate(this.extractResult());
             }
         }
     }
@@ -989,9 +1069,12 @@ abstract class SimplexSolver extends LinearSolver {
             this.log("UB: {}", this.getUpperBounds());
         }
 
-        return result;
-
-        // TODO  return result.multipliers(this.extractMultipliers());
+        ConstraintsMap constraints = this.getEntityMap().constraints;
+        if (constraints.isEntityMap()) {
+            return result.multipliers(constraints, this.extractMultipliers());
+        } else {
+            return result.multipliers(this.extractMultipliers());
+        }
     }
 
     void initiatePhase1() {
@@ -1025,17 +1108,9 @@ abstract class SimplexSolver extends LinearSolver {
         return new IterDescr(mySimplex);
     }
 
-    void setValidator(final Validator validator) {
-        myValidator = validator;
-    }
-
     void switchToPhase2() {
         mySimplex.restoreObjective();
         mySimplex.calculateIteration();
-    }
-
-    public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
-        return mySimplex.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
     }
 
 }

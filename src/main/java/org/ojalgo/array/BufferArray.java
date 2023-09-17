@@ -135,6 +135,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             return myTypeFactory.function();
         }
 
+        @Override
         public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
             return (BufferArray) super.makeFilled(shape, supplier);
         }
@@ -169,10 +170,12 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             return super.makeSegmented(structure);
         }
 
+        @Override
         public BufferArray make(final int count) {
             return (BufferArray) super.make(count);
         }
 
+        @Override
         public BufferArray make(final Structure1D shape) {
             return (BufferArray) super.make(shape);
         }
@@ -292,6 +295,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         myFile = file;
     }
 
+    @Override
     public void close() {
         if (myFile != null) {
             try {
@@ -378,7 +382,7 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    protected Double get(final int index) {
+    public Double get(final int index) {
         return Double.valueOf(this.doubleValue(index));
     }
 

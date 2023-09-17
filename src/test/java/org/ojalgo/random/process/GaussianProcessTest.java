@@ -44,8 +44,7 @@ public class GaussianProcessTest {
 
         GaussianField.Covariance<Double> tmpCovar = new GaussianField.Covariance<Double>() {
 
-            public void calibrate(final Collection<EntryPair.KeyedPrimitive<Double>> observations, final Mean<Double> mean) {
-            }
+            public void calibrate(final Collection<EntryPair.KeyedPrimitive<Double>> observations, final Mean<Double> mean) {}
 
             public double invoke(final Double anArg1, final Double anArg2) {
                 return this.invoke(anArg1.doubleValue(), anArg2.doubleValue());

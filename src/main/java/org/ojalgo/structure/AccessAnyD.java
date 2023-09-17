@@ -81,52 +81,64 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             myStructure = structure;
         }
 
+        @Override
         public double doubleValue() {
             return myDelegate1D.doubleValue();
         }
 
+        @Override
         public long estimateSize() {
             return myDelegate1D.estimateSize();
         }
 
+        @Override
         public N get() {
             return myDelegate1D.get();
         }
 
+        @Override
         public boolean hasNext() {
             return myDelegate1D.hasNext();
         }
 
+        @Override
         public boolean hasPrevious() {
             return myDelegate1D.hasPrevious();
         }
 
+        @Override
         public long index() {
             return myDelegate1D.index();
         }
 
+        @Override
         public ElementView<N> iterator() {
             return new ElementView<>(myDelegate1D.iterator(), myStructure);
         }
 
+        @Override
         public ElementView<N> next() {
             myDelegate1D.next();
             return this;
         }
 
+        @Override
         public long nextIndex() {
             return myDelegate1D.nextIndex();
         }
 
+        @Override
         public ElementView<N> previous() {
             myDelegate1D.previous();
             return this;
         }
 
+        @Override
         public long previousIndex() {
             return myDelegate1D.previousIndex();
         }
 
+        @Override
         public long[] reference() {
             return StructureAnyD.reference(myDelegate1D.index(), myStructure);
         }
@@ -136,6 +148,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return myDelegate1D.toString();
         }
 
+        @Override
         public ElementView<N> trySplit() {
 
             ElementView1D<N, ?> delegateSpliterator = myDelegate1D.trySplit();
@@ -176,22 +189,32 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             myLastOffset = myDelegateAnyD.count() - myCount;
         }
 
+        @Override
         public int compareTo(final MatrixView<N> other) {
             return Long.compare(myOffset, other.getOffset());
         }
 
+        @Override
         public long count() {
             return myCount;
         }
 
+        @Override
         public long countColumns() {
             return myColumnsCount;
         }
 
+        @Override
         public long countRows() {
             return myRowsCount;
         }
 
+        @Override
+        public double doubleValue(final int row, final int col) {
+            return myDelegateAnyD.doubleValue(myOffset + Structure2D.index(myRowsCount, row, col));
+        }
+
+        @Override
         public double doubleValue(final long row, final long col) {
             return myDelegateAnyD.doubleValue(myOffset + Structure2D.index(myRowsCount, row, col));
         }
@@ -200,6 +223,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return (myLastOffset - myOffset) / myCount;
         }
 
+        @Override
         public N get(final long row, final long col) {
             return myDelegateAnyD.get(myOffset + Structure2D.index(myRowsCount, row, col));
         }
@@ -214,6 +238,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             myOffset = index * myCount;
         }
 
+        @Override
         public boolean hasNext() {
             return myOffset < myLastOffset;
         }
@@ -234,10 +259,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return myOffset / myCount;
         }
 
+        @Override
         public MatrixView<N> iterator() {
             return new MatrixView<>(myDelegateAnyD);
         }
 
+        @Override
         public MatrixView<N> next() {
             myOffset += myCount;
             return this;
@@ -248,10 +275,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return this;
         }
 
+        @Override
         public void remove() {
             ProgrammingError.throwForUnsupportedOptionalOperation();
         }
 
+        @Override
         public void supplyTo(final Mutate2D receiver) {
             for (long j = 0L, nbColumns = this.countColumns(); j < nbColumns; j++) {
                 for (long i = 0L, nbRows = this.countRows(); i < nbRows; i++) {
@@ -295,22 +324,27 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             }
         }
 
+        @Override
         public long count(final int dimension) {
             return myShape[dimension];
         }
 
+        @Override
         public double doubleValue(final long... ref) {
             return myFullData.doubleValue(this.translate(ref));
         }
 
+        @Override
         public N get(final long... ref) {
             return myFullData.get(this.translate(ref));
         }
 
+        @Override
         public long[] shape() {
             return myShape;
         }
 
+        @Override
         public void supplyTo(final MutateAnyD receiver) {
 
             long[] filteredRef = new long[myShape.length];
@@ -402,15 +436,18 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             myLastOffset = myDelegateAnyD.count() - myCount;
         }
 
+        @Override
         public int compareTo(final VectorView<N> other) {
             return Long.compare(myOffset, other.getOffset());
         }
 
+        @Override
         public long count() {
             return myCount;
         }
 
-        public double doubleValue(final long index) {
+        @Override
+        public double doubleValue(final int index) {
             return myDelegateAnyD.doubleValue(myOffset + Structure2D.index(myCount, index, 0));
         }
 
@@ -418,6 +455,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return (myLastOffset - myOffset) / myCount;
         }
 
+        @Override
         public N get(final long index) {
             return myDelegateAnyD.get(myOffset + Structure2D.index(myCount, index, 0));
         }
@@ -432,6 +470,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             myOffset = index * myCount;
         }
 
+        @Override
         public boolean hasNext() {
             return myOffset < myLastOffset;
         }
@@ -452,10 +491,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return myOffset / myCount;
         }
 
+        @Override
         public VectorView<N> iterator() {
             return new VectorView<>(myDelegateAnyD);
         }
 
+        @Override
         public VectorView<N> next() {
             myOffset += myCount;
             return this;
@@ -466,10 +507,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return this;
         }
 
+        @Override
         public void remove() {
             ProgrammingError.throwForUnsupportedOptionalOperation();
         }
 
+        @Override
         public void supplyTo(final Mutate1D receiver) {
             for (long i = 0L, limit = Math.min(this.count(), receiver.count()); i < limit; i++) {
                 receiver.set(i, this.get(i));
@@ -568,6 +611,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         };
     }
 
+    @Override
+    default byte byteValue(final int index) {
+        return this.byteValue((long) index);
+    }
+
+    @Override
     default byte byteValue(final long index) {
         return this.byteValue(StructureAnyD.reference(index, this.shape()));
     }
@@ -576,20 +625,33 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return (byte) this.shortValue(ref);
     }
 
+    @Override
+    default double doubleValue(final int index) {
+        return this.doubleValue((long) index);
+    }
+
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
      */
+    @Override
     default double doubleValue(final long index) {
         return this.doubleValue(StructureAnyD.reference(index, this.shape()));
     }
 
     double doubleValue(long... ref);
 
+    @Override
     default ElementViewAnyD<N, ?> elements() {
         return new AccessAnyD.ElementView<>(Access1D.super.elements(), this.shape());
     }
 
+    @Override
+    default float floatValue(final int index) {
+        return this.floatValue((long) index);
+    }
+
+    @Override
     default float floatValue(final long index) {
         return this.floatValue(StructureAnyD.reference(index, this.shape()));
     }
@@ -598,12 +660,19 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return (float) this.doubleValue(ref);
     }
 
+    @Override
     default N get(final long index) {
         return this.get(StructureAnyD.reference(index, this.shape()));
     }
 
     N get(long... ref);
 
+    @Override
+    default int intValue(final int index) {
+        return this.intValue((long) index);
+    }
+
+    @Override
     default int intValue(final long index) {
         return this.intValue(StructureAnyD.reference(index, this.shape()));
     }
@@ -612,6 +681,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return (int) this.longValue(ref);
     }
 
+    @Override
+    default long longValue(final int index) {
+        return this.longValue((long) index);
+    }
+
+    @Override
     default long longValue(final long index) {
         return this.longValue(StructureAnyD.reference(index, this.shape()));
     }
@@ -636,6 +711,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return new AccessAnyD.SelectionView<>(this, selections);
     }
 
+    @Override
+    default short shortValue(final int index) {
+        return this.shortValue((long) index);
+    }
+
+    @Override
     default short shortValue(final long index) {
         return this.shortValue(StructureAnyD.reference(index, this.shape()));
     }
@@ -647,4 +728,5 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
     default VectorView<N> vectors() {
         return new VectorView<>(this);
     }
+
 }

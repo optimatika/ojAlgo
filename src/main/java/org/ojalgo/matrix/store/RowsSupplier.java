@@ -27,22 +27,27 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
             myBase = base;
         }
 
+        @Override
         public long countColumns() {
             return myBase.countColumns();
         }
 
+        @Override
         public long countRows() {
             return 1L;
         }
 
+        @Override
         public ElementView1D<N, ?> elements() {
             return this.getCurrent().elements();
         }
 
+        @Override
         public ElementView1D<N, ?> nonzeros() {
             return this.getCurrent().nonzeros();
         }
 
+        @Override
         public void supplyTo(final PhysicalStore<N> receiver) {
 
             receiver.reset();
@@ -67,43 +72,49 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         super();
         myColumnsCount = numberOfColumns;
         myPhysicalStoreFactory = factory;
-        myRowFactory = SparseArray.factory(factory.array()).limit(myColumnsCount);
+        myRowFactory = SparseArray.factory(factory.array());
     }
 
     public SparseArray<N> addRow() {
-        return this.addRow(myRowFactory.make());
+        return this.addRow(myRowFactory.make(myColumnsCount));
     }
 
     public void addRows(final int numberToAdd) {
         for (int i = 0; i < numberToAdd; i++) {
-            myRows.add(myRowFactory.make());
+            myRows.add(myRowFactory.make(myColumnsCount));
         }
     }
 
+    @Override
     public long countColumns() {
         return myColumnsCount;
     }
 
+    @Override
     public long countRows() {
         return myRows.size();
     }
 
-    public double doubleValue(final long row, final long col) {
-        return myRows.get((int) row).doubleValue(col);
+    @Override
+    public double doubleValue(final int row, final int col) {
+        return myRows.get(row).doubleValue(col);
     }
 
+    @Override
     public PhysicalStore<N> get() {
         return this.collect(myPhysicalStoreFactory);
     }
 
-    public N get(final long row, final long col) {
-        return myRows.get((int) row).get(col);
+    @Override
+    public N get(final int row, final int col) {
+        return myRows.get(row).get(col);
     }
 
     public SparseArray<N> getRow(final int index) {
         return myRows.get(index);
     }
 
+    @Override
     public Factory<N, ?> physical() {
         return myPhysicalStoreFactory;
     }
@@ -112,10 +123,12 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         return myRows.remove(index);
     }
 
+    @Override
     public RowView<N> rows() {
         return new SingleView<>(this);
     }
 
+    @Override
     public MatrixStore<N> rows(final int... rows) {
         return new MatrixStore<>() {
 
@@ -127,12 +140,12 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
                 return rows.length;
             }
 
-            public double doubleValue(final long row, final long col) {
-                return RowsSupplier.this.doubleValue(rows[(int) row], col);
+            public double doubleValue(final int row, final int col) {
+                return RowsSupplier.this.doubleValue(rows[row], col);
             }
 
-            public N get(final long row, final long col) {
-                return RowsSupplier.this.get(rows[(int) row], col);
+            public N get(final int row, final int col) {
+                return RowsSupplier.this.get(rows[row], col);
             }
 
             public Factory<N, ?> physical() {
@@ -168,14 +181,17 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         return retVal;
     }
 
+    @Override
+    public void set(final int row, final int col, final double value) {
+        myRows.get(row).set(col, value);
+    }
+
+    @Override
     public void set(final long row, final long col, final Comparable<?> value) {
-        myRows.get((int) row).set(col, value);
+        myRows.get(Math.toIntExact(row)).set(col, value);
     }
 
-    public void set(final long row, final long col, final double value) {
-        myRows.get((int) row).set(col, value);
-    }
-
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();

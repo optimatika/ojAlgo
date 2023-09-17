@@ -60,7 +60,8 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
 
         double retVal = this.base().doubleValue(row, col);
 
@@ -71,32 +72,37 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
         return retVal;
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
 
         N retVal = this.base().get(row, col);
 
         if (this.isCovered(row, col)) {
-            retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).get();
+            retVal = myDiff.toScalar(row - myRowFirst, col - myColFirst).add(retVal).get();
         }
 
         return retVal;
     }
 
+    @Override
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
 
+    @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
         // TODO Auto-generated method stub
         return super.multiply(right);
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
@@ -108,16 +114,19 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
         consumer.fillMatching(this.base());
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
 
         Scalar<N> retVal = this.base().toScalar(row, column);
@@ -130,7 +139,7 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     }
 
     private boolean isCovered(final int row, final int col) {
-        return (myRowFirst <= row) && (myColFirst <= col) && (row < myRowLimit) && (col < myColLimit);
+        return myRowFirst <= row && myColFirst <= col && row < myRowLimit && col < myColLimit;
     }
 
     private boolean isCovered(final long row, final long col) {

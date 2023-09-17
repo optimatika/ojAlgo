@@ -169,6 +169,10 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
                 return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
             }
 
+            public N invoke(final N arg1, final double arg2) {
+                return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
+            }
+
             public N invoke(final N arg1, final N arg2) {
                 return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
             }
@@ -243,6 +247,8 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     default long invoke(final long arg1, final long arg2) {
         return NumberDefinition.toLong(this.invoke((double) arg1, (double) arg2));
     }
+
+    N invoke(N arg1, double arg2);
 
     N invoke(N arg1, N arg2);
 

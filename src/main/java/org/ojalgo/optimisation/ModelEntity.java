@@ -117,6 +117,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         ProgrammingError.throwIfNull(name);
     }
 
+    /**
+     * Add this ({@link Variable} or {@link Expression}) to another {@link Expression}, scaled by a factor.
+     * 
+     * @param target The target {@link Expression}
+     * @param scale The scaling factor
+     */
     public abstract void addTo(Expression target, BigDecimal scale);
 
     public final BigDecimal adjust(final BigDecimal factor) {
@@ -131,7 +137,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         boolean retVal = false;
 
-        if ((obj instanceof ModelEntity<?>) && myName.equals(((ModelEntity<?>) obj).getName())) {
+        if (obj instanceof ModelEntity<?> && myName.equals(((ModelEntity<?>) obj).getName())) {
             retVal = true;
         }
 
@@ -161,10 +167,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
     }
 
+    @Override
     public final BigDecimal getContributionWeight() {
         return myContributionWeight;
     }
 
+    @Override
     public final BigDecimal getLowerLimit() {
         return myLowerLimit;
     }
@@ -211,6 +219,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return this.getUpperLimit(false, Double.POSITIVE_INFINITY);
     }
 
+    @Override
     public final BigDecimal getUpperLimit() {
         return myUpperLimit;
     }
@@ -242,6 +251,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myName.hashCode();
     }
 
+    @Override
     public final boolean isConstraint() {
         return myLowerLimit != null || myUpperLimit != null;
     }
@@ -250,6 +260,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myContributionWeight != null;
     }
 
+    @Override
     public final boolean isEqualityConstraint() {
         return myLowerLimit != null && myUpperLimit != null && myLowerLimit.compareTo(myUpperLimit) == 0;
     }
@@ -259,6 +270,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     public abstract boolean isInteger();
 
+    @Override
     public final boolean isLowerConstraint() {
         return myLowerLimit != null && !this.isEqualityConstraint();
     }
@@ -267,10 +279,12 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myLowerLimit != null;
     }
 
+    @Override
     public final boolean isObjective() {
         return myContributionWeight != null && myContributionWeight.signum() != 0;
     }
 
+    @Override
     public final boolean isUpperConstraint() {
         return myUpperLimit != null && !this.isEqualityConstraint();
     }
@@ -511,7 +525,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         boolean retVal = true;
 
-        if ((myLowerLimit != null && myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0 || myUpperLimit.compareTo(myLowerLimit) < 0)) {
+        if (myLowerLimit != null && myUpperLimit != null && (myLowerLimit.compareTo(myUpperLimit) > 0 || myUpperLimit.compareTo(myLowerLimit) < 0)) {
             if (appender != null) {
                 appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
             }

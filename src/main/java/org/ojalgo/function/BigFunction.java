@@ -46,6 +46,10 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
             return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).doubleValue();
         }
 
+        default BigDecimal invoke(final BigDecimal arg1, final double arg2) {
+            return this.invoke(arg1, BigDecimal.valueOf(arg2));
+        }
+
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).floatValue();
         }

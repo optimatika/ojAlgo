@@ -161,6 +161,7 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
         }
     }
 
+    @Override
     public void close() throws IOException {
         myWriter.close();
     }
@@ -183,6 +184,7 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
         return AutoConsumer.mapped(formatter::format, this);
     }
 
+    @Override
     public void write(final CharSequence itemToWrite) {
         try {
             myWriter.write(itemToWrite.toString());

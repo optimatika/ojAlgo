@@ -23,23 +23,17 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class TableauCutGenerator {
 
+    private static final boolean DEBUG = false;
+
     private static final NumberContext ACCURACY = NumberContext.of(4, 16);
-
-    private static double fraction(final double value) {
-        return value - Math.floor(value);
-    }
-
-    private static boolean ifFractionalEnough(final double value, final double fraction, final double away) {
-        if (ACCURACY.isSmall(value, Math.min(fraction, ONE - fraction))) {
-            return false;
-        }
-        return away < fraction && fraction < ONE - away;
-    }
 
     /**
      * All variables must be integer.
@@ -49,7 +43,7 @@ abstract class TableauCutGenerator {
         int nbVariables = body.size();
 
         double f0 = TableauCutGenerator.fraction(rhs);
-        if (!TableauCutGenerator.ifFractionalEnough(rhs, f0, fractionality)) {
+        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
 
@@ -71,53 +65,78 @@ abstract class TableauCutGenerator {
         return Equation.of(ONE, variableIndex, cut);
     }
 
-    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer,
-            final double fractionality) {
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer, final double fractionality,
+            final boolean[] negated, final int[] excluded) {
 
-        // TODO Needs to be generalised to also handle cases with negative (full range) variables
+        int nbVariables = integer.length;
+        if (body.size() < nbVariables || negated.length != nbVariables) {
+            throw new IllegalArgumentException();
+        }
 
-        // BasicLogger.debug(1, "{} {} -> {} {} {}", body, variableIndex, rhs, Arrays.toString(integer), fractionality);
+        if (DEBUG) {
+            BasicLogger.debug(1, "{} {} = {}", variableIndex, rhs, body);
+            BasicLogger.debug(1, "Integers: {}", Arrays.toString(integer));
+            BasicLogger.debug(1, "Negated:  {}", Arrays.toString(negated));
+        }
 
-        int nbVariables = body.size();
+        // boolean negateRHS = rhs < ZERO;
+        // boolean negateRHS = negated[variableIndex];
+        boolean negateRHS = false;
 
-        double f0 = TableauCutGenerator.fraction(rhs);
-        if (!TableauCutGenerator.ifFractionalEnough(rhs, f0, fractionality)) {
+        double f0 = TableauCutGenerator.fraction(negateRHS ? -rhs : rhs);
+        if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
         double cf0 = ONE - f0;
 
         double[] cut = new double[nbVariables];
 
-        for (int j = 0; j < nbVariables; j++) {
+        for (int je = 0; je < excluded.length; je++) {
+            int j = excluded[je];
 
-            double aj = body.doubleValue(j);
+            if (j < nbVariables) {
 
-            if (j != variableIndex && !ACCURACY.isZero(aj)) {
+                double aj = negateRHS ^ negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
 
-                if (integer[j]) {
+                if (j != variableIndex && !ACCURACY.isZero(aj)) {
 
-                    double fj = TableauCutGenerator.fraction(aj);
+                    if (integer[j]) {
 
-                    if (fj <= f0) {
-                        if (!ACCURACY.isZero(fj)) {
-                            cut[j] = fj / f0;
+                        double fj = TableauCutGenerator.fraction(aj);
+
+                        if (fj <= f0) {
+                            if (!ACCURACY.isZero(fj)) {
+                                cut[j] = fj / f0;
+                            }
+                        } else {
+                            double cfj = ONE - fj;
+                            if (!ACCURACY.isZero(cfj)) {
+                                cut[j] = cfj / cf0;
+                            }
                         }
+
+                    } else if (aj > ZERO) {
+                        cut[j] = aj / f0;
                     } else {
-                        double cfj = ONE - fj;
-                        if (!ACCURACY.isZero(cfj)) {
-                            cut[j] = cfj / cf0;
-                        }
+                        cut[j] = -aj / cf0;
                     }
-
-                } else if (aj > ZERO) {
-                    cut[j] = aj / f0;
-                } else {
-                    cut[j] = -aj / cf0;
                 }
             }
         }
 
         return Equation.of(ONE, variableIndex, cut);
+    }
+
+    private static double fraction(final double value) {
+        return value - Math.floor(value);
+    }
+
+    private static boolean isFractionalEnough(final double value, final double fraction, final double away) {
+        if (ACCURACY.isSmall(value, Math.min(fraction, ONE - fraction))) {
+            return false;
+        } else {
+            return away < fraction && fraction < ONE - away;
+        }
     }
 
 }

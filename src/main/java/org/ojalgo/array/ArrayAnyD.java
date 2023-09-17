@@ -66,6 +66,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
+        @Override
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
             return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
@@ -76,14 +77,21 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         }
 
         @Override
+        public MathType getMathType() {
+            return myDelegate.getMathType();
+        }
+
+        @Override
         public ArrayAnyD<N> make(final long... structure) {
             return this.makeDense(structure);
         }
 
+        @Override
         public ArrayAnyD<N> makeDense(final long... structure) {
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
+        @Override
         public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
 
             BasicArray<N> toBeFilled = myDelegate.makeToBeFilled(structure);
@@ -93,6 +101,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
             return toBeFilled.wrapInArrayAnyD(structure);
         }
 
+        @Override
         public ArrayAnyD<N> makeSparse(final long... structure) {
             return myDelegate.makeStructuredZero(structure).wrapInArrayAnyD(structure);
         }
@@ -106,29 +115,18 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
             return TensorFactoryAnyD.of(this);
         }
 
-        public MathType getMathType() {
-            return myDelegate.getMathType();
-        }
-
     }
 
-    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
-    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
-    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
     public static final Factory<Double> R032 = ArrayAnyD.factory(ArrayR032.FACTORY);
     public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = ArrayAnyD.factory(ArrayR256.FACTORY);
-    public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
-    public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
-    public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
-    public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
-
     /**
      * @deprecated v52 Use {@link #R256} instead
      */
     @Deprecated
     public static final Factory<BigDecimal> BIG = R256;
+    public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
     /**
      * @deprecated v52 Use {@link #C128} instead
      */
@@ -144,6 +142,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
      */
     @Deprecated
     public static final Factory<Double> DIRECT64 = ArrayAnyD.factory(BufferArray.DIRECT64);
+    public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
     /**
      * @deprecated v52 Use {@link #R032} instead
      */
@@ -154,16 +153,21 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
      */
     @Deprecated
     public static final Factory<Double> PRIMITIVE64 = R064;
-    /**
-     * @deprecated v52 Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static final Factory<RationalNumber> RATIONAL = Q128;
+    public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
     /**
      * @deprecated v52 Use {@link #H256} instead
      */
     @Deprecated
     public static final Factory<Quaternion> QUATERNION = H256;
+    /**
+     * @deprecated v52 Use {@link #Q128} instead
+     */
+    @Deprecated
+    public static final Factory<RationalNumber> RATIONAL = Q128;
+    public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
+    public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
+    public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);
+    public static final Factory<Double> Z064 = ArrayAnyD.factory(ArrayZ064.FACTORY);
 
     public static <N extends Comparable<N>> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new ArrayAnyD.Factory<>(denseArray);
@@ -277,6 +281,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return myDelegate.byteValue(index);
+    }
+
+    @Override
     public byte byteValue(final long index) {
         return myDelegate.byteValue(index);
     }
@@ -294,6 +303,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public long count(final int dimension) {
         return StructureAnyD.count(myStructure, dimension);
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return myDelegate.doubleValue(index);
     }
 
     @Override
@@ -328,6 +342,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         return true;
     }
 
+    @Override
     public ArrayAnyD<N> expand(final int rank) {
 
         int r = Math.max(this.rank(), rank);
@@ -411,8 +426,14 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
      *
      * @see org.ojalgo.structure.StructureAnyD.Reshapable#flatten()
      */
+    @Override
     public Array1D<N> flatten() {
         return myDelegate.wrapInArray1D();
+    }
+
+    @Override
+    public float floatValue(final int index) {
+        return myDelegate.floatValue(index);
     }
 
     @Override
@@ -449,6 +470,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public int intValue(final int index) {
+        return myDelegate.intValue(index);
+    }
+
+    @Override
     public int intValue(final long index) {
         return myDelegate.intValue(index);
     }
@@ -456,6 +482,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public int intValue(final long... ref) {
         return myDelegate.intValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return myDelegate.longValue(index);
     }
 
     @Override
@@ -549,31 +580,31 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public Array2D<N> reduce(final int rowDimension, final int columnDimension, final Aggregator aggregator) {
+    public Array2D<N> reduce(final int rowDim, final int colDim, final Aggregator aggregator) {
 
         long[] structure = this.shape();
 
-        long numberOfRows = structure[rowDimension];
-        long numberOfColumns = structure[columnDimension];
+        long nbRows = structure[rowDim];
+        long nbCols = structure[colDim];
 
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
 
         boolean primitive = myDelegate.isPrimitive();
 
-        Array2D<N> retVal = myDelegate.factory().make(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
+        Array2D<N> retVal = myDelegate.factory().make(nbRows * nbCols).wrapInArray2D(nbRows);
 
-        for (long j = 0L; j < numberOfColumns; j++) {
-            long colInd = j;
+        for (long j = 0L; j < nbCols; j++) {
+            final long col = j;
 
-            for (long i = 0L; i < numberOfRows; i++) {
-                long rowInd = i;
+            for (long i = 0L; i < nbRows; i++) {
+                final long row = i;
 
                 visitor.reset();
-                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
+                this.loopReferences(reference -> reference[rowDim] == row && reference[colDim] == col, reference -> this.visitOne(reference, visitor));
                 if (primitive) {
-                    retVal.set(rowInd, colInd, visitor.doubleValue());
+                    retVal.set(row, col, visitor.doubleValue());
                 } else {
-                    retVal.set(rowInd, colInd, visitor.get());
+                    retVal.set(row, col, visitor.get());
                 }
             }
         }
@@ -581,15 +612,47 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         return retVal;
     }
 
+    @Override
     public void reset() {
         myDelegate.reset();
     }
 
+    @Override
     public ArrayAnyD<N> reshape(final long... shape) {
         if (StructureAnyD.count(shape) != this.count()) {
             throw new IllegalArgumentException();
         }
         return myDelegate.wrapInArrayAnyD(shape);
+    }
+
+    @Override
+    public void set(final int index, final byte value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final int value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final int index, final short value) {
+        myDelegate.set(index, value);
     }
 
     @Override
@@ -668,6 +731,11 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
+    public short shortValue(final int index) {
+        return myDelegate.shortValue(index);
+    }
+
+    @Override
     public short shortValue(final long index) {
         return myDelegate.shortValue(index);
     }
@@ -698,6 +766,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         return new Array1D<>(myDelegate, first.longValue(), limit.longValue(), step.longValue());
     }
 
+    @Override
     public ArrayAnyD<N> squeeze() {
 
         long[] oldShape = this.shape();
@@ -724,6 +793,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
         return this.reshape(shape);
     }
 
+    @Override
     public void supplyTo(final MutateAnyD receiver) {
         myDelegate.supplyTo(receiver);
     }
@@ -783,4 +853,5 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     BasicArray<N> getDelegate() {
         return myDelegate;
     }
+
 }

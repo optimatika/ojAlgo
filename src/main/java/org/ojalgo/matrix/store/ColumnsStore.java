@@ -40,7 +40,8 @@ final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
         myColumns = columns;
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
             return this.base().doubleValue(row, colIndex);
@@ -49,6 +50,7 @@ final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public int firstInColumn(final int col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
@@ -58,7 +60,8 @@ final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
             return this.base().get(row, colIndex);
@@ -77,6 +80,7 @@ final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
         final MatrixStore<N> base = this.base();
         for (int j = 0; j < myColumns.length; j++) {
@@ -89,6 +93,7 @@ final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
         }
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {

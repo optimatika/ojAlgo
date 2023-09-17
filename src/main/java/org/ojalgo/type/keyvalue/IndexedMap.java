@@ -46,47 +46,58 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
             myEntries = entries;
         }
 
-        public byte byteValue(final long index) {
+        @Override
+        public byte byteValue(final int index) {
             return myEntries.byteValue(index);
         }
 
+        @Override
         public long count() {
             return myEntries.count();
         }
 
-        public double doubleValue(final long index) {
+        @Override
+        public double doubleValue(final int index) {
             return myEntries.doubleValue(index);
         }
 
-        public float floatValue(final long index) {
+        @Override
+        public float floatValue(final int index) {
             return myEntries.floatValue(index);
         }
 
+        @Override
         public PrimitiveNumber get(final long index) {
             return myEntries.get(index);
         }
 
-        public int intValue(final long index) {
+        @Override
+        public int intValue(final int index) {
             return myEntries.intValue(index);
         }
 
-        public long longValue(final long index) {
+        @Override
+        public long longValue(final int index) {
             return myEntries.longValue(index);
         }
 
+        @Override
         public void set(final long index, final Comparable<?> value) {
             myEntries.set(index, value);
         }
 
-        public void set(final long index, final double value) {
+        @Override
+        public void set(final int index, final double value) {
             myEntries.set(index, value);
         }
 
-        public void set(final long index, final float value) {
+        @Override
+        public void set(final int index, final float value) {
             myEntries.set(index, value);
         }
 
-        public short shortValue(final long index) {
+        @Override
+        public short shortValue(final int index) {
             return myEntries.shortValue(index);
         }
 
@@ -206,14 +217,17 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return myEntrySet;
     }
 
+    @Override
     public K getKey(final int index) {
         return myEntrySet.getKey(index);
     }
 
+    @Override
     public EntryPair<K, V> getPair(final int index) {
         return myEntrySet.getPair(index);
     }
 
+    @Override
     public V getValue(final int index) {
         return myEntrySet.getValue(index);
     }

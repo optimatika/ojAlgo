@@ -48,8 +48,8 @@ public abstract class CommonMachine extends BasicMachine {
      */
     public final int cores;
     /**
-     * The number of top level (L3 or L2) cache units. If there is a a L3 cache this usually corresponds to
-     * the number of CPU:s.
+     * The number of top level (L3 or L2) cache units. If there is a L3 cache this usually corresponds to the
+     * number of CPU:s.
      */
     public final int units;
 
@@ -129,7 +129,7 @@ public abstract class CommonMachine extends BasicMachine {
         } else if (!architecture.equals(other.architecture)) {
             return false;
         }
-        if ((cache != other.cache) || (cores != other.cores) || (units != other.units)) {
+        if (cache != other.cache || cores != other.cores || units != other.units) {
             return false;
         }
         return true;
@@ -155,8 +155,8 @@ public abstract class CommonMachine extends BasicMachine {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((architecture == null) ? 0 : architecture.hashCode());
-        result = prime * result + (int) (cache ^ (cache >>> 32));
+        result = prime * result + (architecture == null ? 0 : architecture.hashCode());
+        result = prime * result + (int) (cache ^ cache >>> 32);
         result = prime * result + cores;
         return prime * result + units;
     }

@@ -29,7 +29,7 @@ import org.ojalgo.scalar.Scalar;
 
 public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
-    static abstract class RationalAggregatorFunction implements AggregatorFunction<Quadruple> {
+    static abstract class QuadrupleAggregatorFunction implements AggregatorFunction<Quadruple> {
 
         public final double doubleValue() {
             return this.get().doubleValue();
@@ -53,7 +53,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private int myCount = 0;
 
@@ -86,7 +86,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private int myCount = 0;
 
@@ -117,7 +117,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
@@ -146,7 +146,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.NEGATIVE_INFINITY;
 
@@ -175,7 +175,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
 
@@ -207,7 +207,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
@@ -236,7 +236,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
@@ -266,7 +266,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ONE;
 
@@ -295,7 +295,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ONE;
 
@@ -326,7 +326,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.POSITIVE_INFINITY;
 
@@ -360,7 +360,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 
@@ -389,7 +389,7 @@ public final class QuadrupleAggregator extends AggregatorSet<Quadruple> {
 
         @Override
         protected AggregatorFunction<Quadruple> initialValue() {
-            return new RationalAggregatorFunction() {
+            return new QuadrupleAggregatorFunction() {
 
                 private Quadruple myNumber = Quadruple.ZERO;
 

@@ -137,12 +137,12 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
     @Test
     public void testSimpleQRCase() {
 
-        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleQRCase.getOriginal());
-        final int tmpMinDim = (int) Math.min(tmpMtrxA.countRows(), tmpMtrxA.countColumns());
+        MatrixStore<Double> mtrxA = Primitive64Store.FACTORY.copy(SimpleQRCase.getOriginal());
+        int minDim = mtrxA.getMinDim();
 
-        TestUtils.assertEquals(JAMA_QR.decompose(tmpMtrxA), PRIMITIVE_QR.decompose(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_QR.decompose(mtrxA), PRIMITIVE_QR.decompose(mtrxA));
 
-        final int[] tmpEconSet = Structure1D.newIncreasingRange(0, tmpMinDim);
+        final int[] tmpEconSet = Structure1D.newIncreasingRange(0, minDim);
 
         TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().columns(tmpEconSet), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().rows(tmpEconSet), COMPARE_CONTEXT);
@@ -152,7 +152,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_QR.isSolvable(), PRIMITIVE_QR.isSolvable());
 
         if (JAMA_QR.isSolvable()) {
-            TestUtils.assertEquals(JAMA_QR.getSolution(tmpMtrxA), PRIMITIVE_QR.getSolution(tmpMtrxA), COMPARE_CONTEXT);
+            TestUtils.assertEquals(JAMA_QR.getSolution(mtrxA), PRIMITIVE_QR.getSolution(mtrxA), COMPARE_CONTEXT);
         }
     }
 

@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.IntegerProblems;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
 
 public class TableauCutGeneratorTest extends OptimisationLinearTests {
@@ -44,24 +45,21 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Primitive1D body = new Primitive1D() {
 
             @Override
-            public int size() {
-                return factors.length;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return factors[index];
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 factors[index] = value;
             }
 
-        };
+            @Override
+            public int size() {
+                return factors.length;
+            }
 
-        boolean[] integer = new boolean[factors.length];
-        Arrays.fill(integer, true);
+        };
 
         return TableauCutGenerator.doGomory(body, 0, rhs, PrimitiveMath.ELEVENTH);
     }
@@ -71,26 +69,28 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Primitive1D body = new Primitive1D() {
 
             @Override
-            public int size() {
-                return factors.length;
-            }
-
-            @Override
-            double doubleValue(final int index) {
+            public double doubleValue(final int index) {
                 return factors[index];
             }
 
             @Override
-            void set(final int index, final double value) {
+            public void set(final int index, final double value) {
                 factors[index] = value;
+            }
+
+            @Override
+            public int size() {
+                return factors.length;
             }
 
         };
 
         boolean[] integer = new boolean[factors.length];
         Arrays.fill(integer, true);
+        boolean[] negated = new boolean[factors.length];
+        int[] excluded = Structure1D.newIncreasingRange(0, factors.length);
 
-        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH);
+        return TableauCutGenerator.doGomoryMixedInteger(body, basic, rhs, integer, PrimitiveMath.ELEVENTH, negated, excluded);
     }
 
     /**

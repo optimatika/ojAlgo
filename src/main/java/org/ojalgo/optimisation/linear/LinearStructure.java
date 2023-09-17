@@ -21,9 +21,9 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.optimisation.ConstraintsMap;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
-import org.ojalgo.optimisation.Optimisation.ConstraintType;
-import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.type.keyvalue.EntryPair;
 
 /**
@@ -31,100 +31,193 @@ import org.ojalgo.type.keyvalue.EntryPair;
  *
  * @author apete
  */
-final class LinearStructure implements UpdatableSolver.EntityMap {
+final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
-    final int nbCnstrEq;
-    final int nbCnstrLo;
-    final int nbCnstrUp;
-    final int nbVarsArt;
-    final int nbVarsNeg;
-    final int nbVarsPos;
-    final int nbVarsSlk;
-
-    final boolean[] negatedDual;
+    final ConstraintsMap constraints;
+    /**
+     * The number of artificial variables
+     */
+    final int nbArti;
+    /**
+     * The number of equality constraints
+     */
+    final int nbEqus;
+    /**
+     * The number of slack variables that also form an identity sub-matrix (in the tableau).
+     */
+    final int nbIdty;
+    /**
+     * The number of inequality constraints
+     */
+    final int nbInes;
+    /**
+     * The number of negated model variables
+     */
+    final int nbNegs;
+    /**
+     * The number of slack variables (not known to be "identity")
+     */
+    final int nbSlck;
+    /**
+     * The number of positive (as-is) model variables
+     */
+    final int nbVars;
     final int[] negativePartVariables;
     final int[] positivePartVariables;
-    final EntryPair<ModelEntity<?>, ConstraintType>[] slack;
 
-    LinearStructure(final int constraints, final int variables) {
-        this(0, 0, constraints, variables, 0, 0, 0);
-    }
-
-    LinearStructure(final int constrUp, final int constrLo, final int constrEq, final int varsPos, final int varsNeg, final int varsSlk, final int varsArt) {
+    LinearStructure(final boolean inclMap, final int constrIn, final int constrEq, final int varsPos, final int varsNeg, final int varsSlk, final int varsEye) {
 
         positivePartVariables = new int[varsPos];
         negativePartVariables = new int[varsNeg];
-        slack = (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[varsSlk];
-        negatedDual = new boolean[constrUp + constrLo + constrEq];
+        constraints = ConstraintsMap.newInstance(constrIn + constrEq, inclMap);
 
-        nbCnstrUp = constrUp;
-        nbCnstrLo = constrLo;
-        nbCnstrEq = constrEq;
+        nbInes = constrIn;
+        nbEqus = constrEq;
 
-        nbVarsPos = varsPos;
-        nbVarsNeg = varsNeg;
-        nbVarsSlk = varsSlk;
-        nbVarsArt = varsArt;
+        nbVars = varsPos;
+        nbNegs = varsNeg;
+        nbSlck = varsSlk;
+        nbIdty = varsEye;
+        nbArti = constrIn + constrEq - varsEye;
     }
 
+    LinearStructure(final int nbConstraints, final int nbVariables) {
+        this(false, 0, nbConstraints, nbVariables, 0, 0, 0);
+    }
+
+    @Override
+    public int countAdditionalConstraints() {
+        return 0;
+    }
+
+    @Override
+    public int countConstraints() {
+        return nbInes + nbEqus;
+    }
+
+    @Override
+    public int countEqualityConstraints() {
+        return nbEqus;
+    }
+
+    @Override
+    public int countInequalityConstraints() {
+        return nbInes;
+    }
+
+    @Override
     public int countModelVariables() {
-        return nbVarsPos + nbVarsNeg;
+        return nbVars + nbNegs;
     }
 
+    @Override
     public int countSlackVariables() {
-        return nbVarsSlk;
+        return nbSlck + nbIdty;
     }
 
+    @Override
+    public int countVariables() {
+        return nbVars + nbNegs + nbSlck + nbIdty;
+    }
+
+    @Override
+    public EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(final int i) {
+        return constraints.getEntry(i);
+    }
+
+    @Override
     public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
-        return slack[idx];
+
+        if (idx < nbSlck) {
+            return this.getConstraintMap(nbIdty + idx);
+        } else {
+            return this.getConstraintMap(idx - nbSlck);
+        }
     }
 
-    public int indexOf(final int idx) {
+    @Override
+    public int indexOf(final int j) {
 
-        if (idx < 0) {
+        if (j < 0) {
             throw new IllegalArgumentException();
         }
 
-        if (idx < positivePartVariables.length) {
-            return positivePartVariables[idx];
+        if (j < positivePartVariables.length) {
+            return positivePartVariables[j];
         }
 
-        int negIdx = idx - positivePartVariables.length;
+        int jn = j - positivePartVariables.length;
 
-        if (negIdx < negativePartVariables.length) {
-            return negativePartVariables[negIdx];
+        if (jn < negativePartVariables.length) {
+            return negativePartVariables[jn];
         }
 
         return -1;
     }
 
-    public boolean isNegated(final int idx) {
+    public boolean isConstraintNegated(final int i) {
+        return constraints.negated[i];
+    }
 
-        if (idx < 0) {
+    @Override
+    public boolean isNegated(final int j) {
+
+        if (j < 0) {
             throw new IllegalArgumentException();
         }
 
-        if (idx < positivePartVariables.length) {
+        if (j < positivePartVariables.length) {
             return false;
         }
 
-        if (idx - positivePartVariables.length < negativePartVariables.length) {
+        if (j - positivePartVariables.length < negativePartVariables.length) {
             return true;
         }
 
+        // TODO This case depends on the solver
+        // return slack[idx - positivePartVariables.length - negativePartVariables.length].getValue() == ConstraintType.LOWER;
         return false;
     }
 
-    int countConstraints() {
-        return nbCnstrUp + nbCnstrLo + nbCnstrEq;
+    public boolean negated(final int i, final boolean negated) {
+        return constraints.negated[i] = negated;
+    }
+
+    public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type) {
+        constraints.setEntry(i, entity, type);
+    }
+
+    public void setConstraintMap(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean negated) {
+        constraints.setEntry(i, entity, type);
+        constraints.negated[i] = negated;
+    }
+
+    public void setConstraintNegated(final int i, final boolean negated) {
+        constraints.negated[i] = negated;
     }
 
     int countVariablesTotally() {
-        return nbVarsPos + nbVarsNeg + nbVarsSlk + nbVarsArt;
+        return nbVars + nbNegs + nbSlck + nbIdty + nbArti;
+    }
+
+    boolean isAnyArtificials() {
+        return nbArti > 0;
+    }
+
+    boolean isArtificialVariable(final int variableIndex) {
+        return variableIndex < 0 || variableIndex >= this.countVariables();
     }
 
     boolean isFullSetOfArtificials() {
-        return nbVarsArt == this.countConstraints();
+        return nbArti == this.countConstraints();
+    }
+
+    boolean isModelVariable(final int variableIndex) {
+        return variableIndex >= 0 && variableIndex < this.countModelVariables();
+    }
+
+    void setObjectiveAdjustmentFactor(final double multiplierScale) {
+        constraints.setMultiplierScale(multiplierScale);
     }
 
 }

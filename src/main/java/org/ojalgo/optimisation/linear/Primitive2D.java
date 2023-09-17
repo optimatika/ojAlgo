@@ -27,32 +27,30 @@ import org.ojalgo.type.NumberDefinition;
 
 abstract class Primitive2D implements Access2D<Double>, Mutate2D {
 
+    @Override
     public final long countColumns() {
         return this.getColDim();
     }
 
+    @Override
     public final long countRows() {
         return this.getRowDim();
     }
 
-    public final double doubleValue(final long row, final long col) {
-        return this.doubleValue(Math.toIntExact(row), Math.toIntExact(col));
-    }
-
+    @Override
     public final Double get(final long row, final long col) {
-        return Double.valueOf(this.doubleValue(Math.toIntExact(row), Math.toIntExact(col)));
+        return Double.valueOf(this.doubleValue(row, col));
     }
 
+    @Override
     public abstract int getColDim();
 
+    @Override
     public abstract int getRowDim();
 
+    @Override
     public final void set(final long row, final long col, final Comparable<?> value) {
-        this.set(Math.toIntExact(row), Math.toIntExact(col), NumberDefinition.doubleValue(value));
-    }
-
-    public final void set(final long row, final long col, final double value) {
-        this.set(Math.toIntExact(row), Math.toIntExact(col), value);
+        this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
     @Override
@@ -60,7 +58,4 @@ abstract class Primitive2D implements Access2D<Double>, Mutate2D {
         return Access2D.toString(this);
     }
 
-    abstract double doubleValue(final int row, final int col);
-
-    abstract void set(final int row, final int col, final double value);
 }

@@ -62,18 +62,22 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             myPhysicalFactory = physicalFactory;
         }
 
+        @Override
         public FunctionSet<?> function() {
             return myPhysicalFactory.function();
         }
 
+        @Override
         public SparseStore<N> make(final long rows, final long columns) {
             return SparseStore.makeSparse(myPhysicalFactory, rows, columns);
         }
 
+        @Override
         public Scalar.Factory<?> scalar() {
             return myPhysicalFactory.scalar();
         }
 
+        @Override
         public MathType getMathType() {
             return myPhysicalFactory.getMathType();
         }
@@ -260,6 +264,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
         synchronized (myElements) {
             myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
@@ -267,6 +272,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
+    @Override
     public void add(final long row, final long col, final double addend) {
         synchronized (myElements) {
             myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
@@ -274,7 +280,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
-    public double doubleValue(final long row, final long col) {
+    @Override
+    public double doubleValue(final int row, final int col) {
         return myElements.doubleValue(Structure2D.index(myFirsts.length, row, col));
     }
 
@@ -300,6 +307,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return true;
     }
 
+    @Override
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
         int complexity = Math.toIntExact(left.count() / this.countRows());
@@ -310,10 +318,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         myMultiplyer.invoke(this, left, complexity, right);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         this.set(row, col, values.get(valueIndex));
     }
 
+    @Override
     public void fillOne(final long row, final long col, final N value) {
         synchronized (myElements) {
             myElements.fillOne(Structure2D.index(myFirsts.length, row, col), value);
@@ -321,6 +331,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         synchronized (myElements) {
             myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
@@ -328,6 +339,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
+    @Override
     public int firstInColumn(final int col) {
 
         long structure = myFirsts.length;
@@ -343,11 +355,13 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return (int) (firstInRange % structure);
     }
 
+    @Override
     public int firstInRow(final int row) {
         return myFirsts[row];
     }
 
-    public N get(final long row, final long col) {
+    @Override
+    public N get(final int row, final int col) {
         return myElements.get(Structure2D.index(myFirsts.length, row, col));
     }
 
@@ -360,6 +374,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return prime * result + Arrays.hashCode(myLimits);
     }
 
+    @Override
     public long indexOfLargest() {
         return myElements.indexOfLargest();
     }
@@ -385,6 +400,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return myLimits[row];
     }
 
+    @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
         long tmpLimit = this.count();
         if (this.isPrimitive()) {
@@ -398,6 +414,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
 
         long limit = Math.min(left.count(), this.count());
@@ -424,6 +441,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
 
         long limit = Math.min(this.count(), right.count());
@@ -450,6 +468,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
         if (this.isPrimitive()) {
             this.set(row, col, modifier.invoke(this.doubleValue(row, col)));
@@ -458,6 +477,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
 
         if (right instanceof SparseStore<?>) {
@@ -494,6 +514,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
 
         SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
@@ -516,6 +537,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         long numberOfRows = this.countRows();
@@ -537,6 +559,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
 
         SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
@@ -567,10 +590,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementView2D<N, ?> nonzeros() {
         return new Access2D.ElementView<>(myElements.nonzeros(), this.countRows());
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
 
         long complexity = this.countRows();
@@ -612,6 +637,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return retVal;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
@@ -625,6 +651,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
@@ -638,32 +665,39 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @Override
     public TransformableRegion<N> regionByColumns(final int... columns) {
         return new Subregion2D.ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
+    @Override
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
         return new Subregion2D.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
+    @Override
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new Subregion2D.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
+    @Override
     public TransformableRegion<N> regionByRows(final int... rows) {
         return new Subregion2D.RowsRegion<>(this, myMultiplyer, rows);
     }
 
+    @Override
     public TransformableRegion<N> regionByTransposing() {
         return new Subregion2D.TransposedRegion<>(this, myMultiplyer);
     }
 
+    @Override
     public void reset() {
         myElements.reset();
         Arrays.fill(myFirsts, this.getColDim());
         Arrays.fill(myLimits, 0);
     }
 
+    @Override
     public void set(final long row, final long col, final Comparable<?> value) {
         synchronized (myElements) {
             myElements.set(Structure2D.index(myFirsts.length, row, col), value);
@@ -671,13 +705,15 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
-    public void set(final long row, final long col, final double value) {
+    @Override
+    public void set(final int row, final int col, final double value) {
         synchronized (myElements) {
             myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         }
         this.updateNonZeros(row, col);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();
@@ -685,6 +721,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         myElements.supplyNonZerosTo(receiver);
     }
 
+    @Override
     public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
 
         long structure = this.countRows();
@@ -694,6 +731,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         myElements.visitRange(first, limit, visitor);
     }
 
+    @Override
     public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         int counter = 0;
         if (this.isPrimitive()) {

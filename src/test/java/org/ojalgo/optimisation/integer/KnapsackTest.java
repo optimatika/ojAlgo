@@ -125,8 +125,8 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
         model.maximise();
         //Expected: just second item
-        this.assertOne(model.getVariables().get(1));
         this.assertZero(model.getVariables().get(0));
+        this.assertOne(model.getVariables().get(1));
     }
 
     private void assertOne(final Variable v) {

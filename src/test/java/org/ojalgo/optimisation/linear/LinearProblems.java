@@ -32,12 +32,14 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.integer.IntegerProblems;
 import org.ojalgo.optimisation.integer.OptimisationIntegerData;
 import org.ojalgo.optimisation.integer.P20150127b;
 import org.ojalgo.type.TypeUtils;
@@ -84,6 +86,41 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result result2 = model.minimise();
 
         TestUtils.assertStateAndSolution(result1, result2);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/discussions/513
+     * <p>
+     * The key problem was that the LP solver failed to solve a (the root) sub-problem. It failed in the worst
+     * possible way – returned a constraint breaking solution but still reported it to be optimal. This test
+     * case reproduces that node model.
+     */
+    @Test
+    public void testGitHub513() {
+
+        ExpressionsBasedModel model = IntegerProblems.makeModelGitHub513();
+
+        Result solutionMIP = Result.of(-97.59, State.OPTIMAL, 0, 1, 0, 1, 0, 1, 1, 0);
+
+        // nudge 9.758999999999999E-5 -> lower constraint = -97.58990241
+
+        // Convert to LP node model
+        model.relax();
+        model.limitObjective(BigDecimal.valueOf(-97.58990241), null);
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Result actual = model.maximise();
+
+        if (DEBUG) {
+            BasicLogger.debug(actual);
+            BasicLogger.debug(model);
+            model.validate(actual, BasicLogger.DEBUG);
+        }
+
+        TestUtils.assertStateLessThanFeasible(actual);
     }
 
     @Test

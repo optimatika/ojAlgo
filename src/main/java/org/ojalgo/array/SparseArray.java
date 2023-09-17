@@ -220,6 +220,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             return this.make(Long.MAX_VALUE);
         }
 
+        @Override
         public SparseArray<N> make(final long count) {
             return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), count);
         }
@@ -326,6 +327,16 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public double doubleValue(final long index) {
+
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            return this.doubleValueInternally(tmpIndex);
+        }
+        return myZeroValue;
+    }
+
+    @Override
+    public double doubleValue(final int index) {
 
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -731,7 +742,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first && tmpIndex < limit) && ((tmpIndex - first) % step == 0L)) {
+            if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
                 if (tmpValue > tmpLargest) {
                     tmpLargest = tmpValue;
@@ -754,7 +765,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first && tmpIndex < limit) && ((tmpIndex - first) % step == 0L)) {
+            if (tmpIndex >= first && tmpIndex < limit && (tmpIndex - first) % step == 0L) {
                 myValues.modify(tmpIndex, i, left, function);
             }
         }
@@ -871,6 +882,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             }
 
             @Override
+            public double doubleValue(final int index) {
+                return myValues.doubleValue(first + index);
+            }
+
+            @Override
             public double doubleValue(final long index) {
                 return myValues.doubleValue(first + index);
             }
@@ -923,6 +939,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             }
 
         }
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+
+        int internalIndex = this.index(index);
+
+        this.update(index, internalIndex, value, false);
     }
 
 }

@@ -21,12 +21,31 @@
  */
 package org.ojalgo.optimisation.linear;
 
-/**
- * OptimisationLinearPackageTests
- *
- * @author apete
- */
+import java.util.Map;
+
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+
 abstract class OptimisationLinearTests {
+
+    public static final ExpressionsBasedModel.Integration<LinearSolver> DEFAULT_DENSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+        opt.experimental = false;
+        opt.sparse = Boolean.FALSE;
+    });
+    public static final ExpressionsBasedModel.Integration<LinearSolver> DEFAULT_SPARSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+        opt.experimental = false;
+        opt.sparse = Boolean.TRUE;
+    });
+    public static final ExpressionsBasedModel.Integration<LinearSolver> EXPERIMENTAL_DENSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+        opt.experimental = true;
+        opt.sparse = Boolean.FALSE;
+    });
+    public static final ExpressionsBasedModel.Integration<LinearSolver> EXPERIMENTAL_SPARSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+        opt.experimental = true;
+        opt.sparse = Boolean.TRUE;
+    });
+
+    public static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Def-Dense", DEFAULT_DENSE, "Def-Sparse",
+            DEFAULT_SPARSE, "Exp-Dense", EXPERIMENTAL_DENSE, "Exp-Sparse", EXPERIMENTAL_SPARSE);
 
     static final boolean DEBUG = false;
 

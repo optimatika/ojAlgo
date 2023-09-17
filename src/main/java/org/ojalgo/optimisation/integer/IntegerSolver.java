@@ -50,10 +50,19 @@ public final class IntegerSolver extends GenericSolver {
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<IntegerSolver> {
 
+        @Override
         public IntegerSolver build(final ExpressionsBasedModel model) {
-            return IntegerSolver.make(model);
+
+            IntegerSolver solver = IntegerSolver.make(model);
+
+            if (model.options.validate) {
+                solver.setValidator(this.newValidator(model));
+            }
+
+            return solver;
         }
 
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !model.isAnyConstraintQuadratic();
         }
@@ -176,6 +185,7 @@ public final class IntegerSolver extends GenericSolver {
         myMinimisation = myIntegerModel.getOptimisationSense() == Optimisation.Sense.MIN;
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
         Result point = kickStarter != null ? kickStarter : myIntegerModel.getVariableValues();
@@ -250,13 +260,14 @@ public final class IntegerSolver extends GenericSolver {
         if (bestSolutionFound.getState().isFeasible()) {
             if (solverNormalExit.get()) {
                 return bestSolutionFound.withState(State.OPTIMAL);
+            } else {
+                return bestSolutionFound.withState(State.FEASIBLE);
             }
-            return bestSolutionFound.withState(State.FEASIBLE);
-        }
-        if (solverNormalExit.get()) {
+        } else if (solverNormalExit.get()) {
             return bestSolutionFound.withState(State.INFEASIBLE);
+        } else {
+            return bestSolutionFound.withState(State.FAILED);
         }
-        return bestSolutionFound.withState(State.FAILED);
     }
 
     @Override
@@ -362,19 +373,12 @@ public final class IntegerSolver extends GenericSolver {
 
         strategy.markInteger(key, result);
 
-        double bestIntegerSolutionValue = myBestResultSoFar.getValue();
+        BigDecimal bestIntegerSolutionValue = BigDecimal.valueOf(myBestResultSoFar.getValue());
 
-        if (!strategy.getGapTolerance().isZero(bestIntegerSolutionValue)) {
-
-            double nudge = Math.abs(bestIntegerSolutionValue * strategy.getGapTolerance().epsilon());
-
-            if ((myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX)) {
-                BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, strategy.getIntegralityTolerance());
-                myIntegerModel.limitObjective(null, upper);
-            } else {
-                BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, strategy.getIntegralityTolerance());
-                myIntegerModel.limitObjective(lower, null);
-            }
+        if (myIntegerModel.getOptimisationSense() != Optimisation.Sense.MAX) {
+            myIntegerModel.limitObjective(null, bestIntegerSolutionValue);
+        } else {
+            myIntegerModel.limitObjective(bestIntegerSolutionValue, null);
         }
     }
 

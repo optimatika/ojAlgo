@@ -90,39 +90,48 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             this(values, -1L, values.count() - 1L);
         }
 
+        @Override
         public double doubleValue() {
             return myValues.doubleValue(myCursor);
         }
 
+        @Override
         public long estimateSize() {
             return myLastCursor - myCursor;
         }
 
+        @Override
         public N get() {
             return myValues.get(myCursor);
         }
 
+        @Override
         public boolean hasNext() {
             return myCursor < myLastCursor;
         }
 
+        @Override
         public boolean hasPrevious() {
             return myCursor > 0;
         }
 
+        @Override
         public long index() {
             return myCursor;
         }
 
+        @Override
         public ElementView<N> iterator() {
             return new ElementView<>(myValues);
         }
 
+        @Override
         public ElementView<N> next() {
             myCursor++;
             return this;
         }
 
+        @Override
         public ElementView<N> previous() {
             myCursor--;
             return this;
@@ -133,6 +142,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             return myCursor + " = " + myValues.get(myCursor);
         }
 
+        @Override
         public ElementView<N> trySplit() {
 
             long remaining = myLastCursor - myCursor;
@@ -166,18 +176,22 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             mySelection = selection;
         }
 
+        @Override
         public long count() {
             return mySelection.length;
         }
 
-        public double doubleValue(final long index) {
-            return myFullData.doubleValue(mySelection[Math.toIntExact(index)]);
+        @Override
+        public double doubleValue(final int index) {
+            return myFullData.doubleValue(mySelection[index]);
         }
 
+        @Override
         public N get(final long index) {
             return myFullData.get(mySelection[Math.toIntExact(index)]);
         }
 
+        @Override
         public void supplyTo(final Mutate1D receiver) {
             for (int i = 0, limit = mySelection.length; i < limit; i++) {
                 receiver.set(i, myFullData.get(mySelection[i]));
@@ -220,12 +234,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
                 return access.count();
             }
 
-            public double doubleValue(final long index) {
+            public double doubleValue(final int index) {
                 return access.doubleValue(index);
             }
 
             public Double get(final long index) {
-                return access.doubleValue(index);
+                return Double.valueOf(access.doubleValue(index));
             }
 
             @Override
@@ -301,8 +315,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
                 return target.length;
             }
 
-            public double doubleValue(final long index) {
-                return target[Math.toIntExact(index)];
+            public double doubleValue(final int index) {
+                return target[index];
             }
 
             public Double get(final long index) {
@@ -324,12 +338,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
                 return target.size();
             }
 
-            public double doubleValue(final long index) {
-                return NumberDefinition.doubleValue(target.get((int) index));
+            public double doubleValue(final int index) {
+                return NumberDefinition.doubleValue(target.get(index));
             }
 
             public N get(final long index) {
-                return target.get((int) index);
+                return target.get(Math.toIntExact(index));
             }
 
             @Override
@@ -347,12 +361,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
                 return target.length;
             }
 
-            public double doubleValue(final long index) {
-                return NumberDefinition.doubleValue(target[(int) index]);
+            public double doubleValue(final int index) {
+                return NumberDefinition.doubleValue(target[index]);
             }
 
             public N get(final long index) {
-                return target[(int) index];
+                return target[Math.toIntExact(index)];
             }
 
             @Override
@@ -399,8 +413,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         }
     }
 
-    default byte byteValue(final long index) {
+    default byte byteValue(final int index) {
         return (byte) this.shortValue(index);
+    }
+
+    default byte byteValue(final long index) {
+        return this.byteValue(Math.toIntExact(index));
     }
 
     /**
@@ -420,7 +438,11 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         return retVal;
     }
 
-    double doubleValue(long index);
+    double doubleValue(int index);
+
+    default double doubleValue(final long index) {
+        return this.doubleValue(Math.toIntExact(index));
+    }
 
     /**
      * Returns an Iterable of ElementView1D. It allows to iterate over the instance's element "positions"
@@ -430,20 +452,38 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         return new Access1D.ElementView<>(this);
     }
 
-    default float floatValue(final long index) {
+    default float floatValue(final int index) {
         return (float) this.doubleValue(index);
+    }
+
+    default float floatValue(final long index) {
+        return this.floatValue(Math.toIntExact(index));
     }
 
     N get(long index);
 
-    default int intValue(final long index) {
+    default int intValue(final int index) {
         return (int) this.longValue(index);
     }
 
-    default long longValue(final long index) {
+    default int intValue(final long index) {
+        return this.intValue(Math.toIntExact(index));
+    }
+
+    default long longValue(final int index) {
         return Math.round(this.doubleValue(index));
     }
 
+    default long longValue(final long index) {
+        return this.longValue(Math.toIntExact(index));
+    }
+
+    /**
+     * Similar to {@link #elements()} but avoids elements that are structurally known to be zero. (That does
+     * not eliminate all zero-values from this view.) With an arbitrary (dense) unstructured implementation
+     * the {@link #nonzeros()} and {@link #elements()} methods do the same thing! Only some specific
+     * implementations are able to actually exploit structure/sparsity to view fewer elements.
+     */
     default ElementView1D<N, ?> nonzeros() {
         return this.elements();
     }
@@ -455,8 +495,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         return new Access1D.SelectionView<>(this, selection);
     }
 
-    default short shortValue(final long index) {
+    default short shortValue(final int index) {
         return (short) this.intValue(index);
+    }
+
+    default short shortValue(final long index) {
+        return this.shortValue(Math.toIntExact(index));
     }
 
     default void supplyTo(final double[] receiver) {

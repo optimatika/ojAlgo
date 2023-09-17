@@ -11,6 +11,52 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [53.1.0] – 2023-09-17
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- New solver validation mechanism - a tool for solver debugging.
+- When using `ExpressionsBasesModel` the dual variables or Lagrange multipliers are now present in the `Optimisation.Result`. It's a map of `ModelEntity` and `Optimisation.ConstraintType` pairs to the dual variable value for that pair.
+- New optimisation option "experimental", `Optimisation.Options#experimental`, that turns on experimental features (if there are any). Currently this will switch the LP solver to a new implementation that scales better. This new LP solver will become the default, and it already works quite well, but will remain a configuration option for a while.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- There was a case when the `IntegerSolver` returned an incorrect solution (constraint breaking) but reported it to be optimal. It was actually the `LinearSolver` that malfunctioned, but behaviour in the `IntegerSolver` that generated the problematic node model. Fixed this problem by 1) making sure the `LinearSolver` handles that case, and 2) altered the problematic behaviour in the `IntegerSolver` to be "safer".
+
+### Changed
+
+#### org.ojalgo.array
+
+- More efficient implementation of `reduce(int,int,Aggregator)` in `ArrayAnyD` (reduce to a 2D structure).
+
+#### org.ojalgo.equation
+
+- Changed the internal (equation body) delegate type from `BasicArray<Double>` to `BasicArray<?>`. The only resulting (breaking) API change is the return type of the `getBody()` method.
+
+#### org.ojalgo.matrix
+
+- More efficient setup of the `IterativeSolverTask.SparseDelegate` solvers when the equation system body is any kind of sparse `MatrixStore`.
+
+#### org.ojalgo.optimisation
+
+- Tweaked how the MIP cut generation works.
+- Moved the nested `EntityMap` interface from `UpdatableSolver` to `ExpressionsBasedModel`.
+- When invoking `solve()` directly on a `GenericSolver.Builder` the solution now has the slack variables removed from the results.
+
+### Removed
+
+#### org.ojalgo.optimisation
+
+- Cleaned up among classes and interfaces for optimisation data modelling. `OptimisationData` and `Optimisation.SolverData` are both gone. Making `ConvexData` public covers whatever those interfaces where used for.
+
+#### org.ojalgo.structure
+
+- Deprecated `loop(Predicate<long[]>,IndexCallback)` in favour of the new `loopReferences(Predicate<long[]>,ReferenceCallback)` method in `StructureAnyD`.
+
 ## [53.0.0] – 2023-04-16
 
 ### Added

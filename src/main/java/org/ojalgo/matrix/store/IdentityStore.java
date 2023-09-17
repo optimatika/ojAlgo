@@ -46,22 +46,26 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         return this;
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
+    @Override
+    public double doubleValue(final int aRow, final int aCol) {
         if (aRow == aCol) {
             return PrimitiveMath.ONE;
         }
         return PrimitiveMath.ZERO;
     }
 
+    @Override
     public int firstInColumn(final int col) {
         return col;
     }
 
+    @Override
     public int firstInRow(final int row) {
         return row;
     }
 
-    public N get(final long aRow, final long aCol) {
+    @Override
+    public N get(final int aRow, final int aCol) {
         if (aRow == aCol) {
             return this.one().get();
         }
@@ -78,6 +82,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         return row + 1;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         if (right instanceof Access2D.Collectable) {
@@ -87,6 +92,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         }
     }
 
+    @Override
     public MatrixStore<N> multiply(final double scalar) {
 
         final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
@@ -101,6 +107,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         return right.copy();
     }
 
+    @Override
     public MatrixStore<N> multiply(final N scalar) {
 
         final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
@@ -116,11 +123,13 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         return super.multiplyBoth(leftAndRight);
     }
 
+    @Override
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
     }
 
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();
@@ -128,6 +137,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
         receiver.fillDiagonal(this.one().get());
     }
 
+    @Override
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
             return this.one();

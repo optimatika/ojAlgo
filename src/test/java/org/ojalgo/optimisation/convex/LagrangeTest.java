@@ -102,7 +102,8 @@ public class LagrangeTest extends OptimisationConvexTests {
     }
 
     /**
-     * Copy of {@link ConvexProblems#testP20200924()} and the modified... <br>
+     * Copy of {@link ConvexProblems#testP20200924()} and then modified...
+     * <p>
      * Nocedal & Wright give the multipliers [3, -2] (because they defined KKT that way) but ojAlgo returns
      * [-3, 2] <br>
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
@@ -120,39 +121,38 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         NumberContext accuracy = NumberContext.of(12);
 
-        Primitive64Store Q = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
-        Primitive64Store C = FACTORY.column(-8, -3, -3);
-        Primitive64Store AE = FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
-        Primitive64Store BE = FACTORY.column(3, 0);
+        Primitive64Store mtrxQ = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+        Primitive64Store mtrxC = FACTORY.column(8, 3, 3); // Negated, because that how ojAgo expects it
+        Primitive64Store mtrxAE = FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
+        Primitive64Store mtrxBE = FACTORY.column(3, 0);
 
         Primitive64Store expectedX = FACTORY.column(2, -1, 1);
-        Primitive64Store expectedDual = FACTORY.column(-3, 2);
+        Primitive64Store expectedDual = FACTORY.column(-3, 2); // Negated, because N&W defined the KKT that way. Don't know why.
 
-        MatrixStore<Double> bodyKKT = Q.right(AE.transpose()).below(AE);
-        MatrixStore<Double> rhsKKT = C.negate().below(BE);
+        MatrixStore<Double> bodyKKT = mtrxQ.right(mtrxAE.transpose()).below(mtrxAE);
+        MatrixStore<Double> rhsKKT = mtrxC.below(mtrxBE);
         MatrixStore<Double> solutionKKT = expectedX.below(expectedDual);
 
-        SolverTask<Double> equationSolver = SolverTask.PRIMITIVE.make(bodyKKT, rhsKKT);
+        SolverTask<Double> equationSolver = SolverTask.R064.make(bodyKKT, rhsKKT);
         MatrixStore<Double> combinedSolution = equationSolver.solve(bodyKKT, rhsKKT);
 
         TestUtils.assertEquals(solutionKKT, combinedSolution, accuracy);
 
         Builder builder = ConvexSolver.newBuilder();
-        builder.objective(Q, C.negate());
-        builder.equalities(AE, BE);
-        ConvexSolver solver = builder.build();
+        builder.objective(mtrxQ, mtrxC);
+        builder.equalities(mtrxAE, mtrxBE);
 
-        Result result = solver.solve();
+        Result result = builder.solve();
 
         TestUtils.assertEquals(expectedX, result, accuracy);
 
         // [A][x] = [b]
-        MatrixStore<Double> computedB = AE.multiply(expectedX);
-        TestUtils.assertEquals(BE, computedB, accuracy);
+        MatrixStore<Double> computedB = mtrxAE.multiply(expectedX);
+        TestUtils.assertEquals(mtrxBE, computedB, accuracy);
 
-        // [Q][x] + [A]<sup>T</sup>[L] = - [C]
-        MatrixStore<Double> computedC = Q.multiply(expectedX).add(AE.transpose().multiply(expectedDual)).negate();
-        TestUtils.assertEquals(C, computedC, accuracy);
+        // [Q][x] + [A]<sup>T</sup>[L] = [C]
+        MatrixStore<Double> computedC = mtrxQ.multiply(expectedX).add(mtrxAE.transpose().multiply(expectedDual));
+        TestUtils.assertEquals(mtrxC, computedC, accuracy);
 
         Optional<Access1D<?>> multipliers = result.getMultipliers();
         TestUtils.assertTrue("No multipliers present", multipliers.isPresent());
@@ -160,20 +160,21 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         //  Test similar system where each equality constraint are converted into two inequality constraints.
         //  The result should be the same.
-        Builder ieBuilder = ConvexSolver.newBuilder();
-        ieBuilder.objective(Q, C.negate());
-        MatrixStore<Double> AI = AE.below(AE.negate());
-        MatrixStore<Double> BI = BE.below(BE.negate());
-        ieBuilder.inequalities(AI, BI);
-        ConvexSolver ieSolver = ieBuilder.build();
-        Result ieResult = ieSolver.solve();
+        Builder altBuilder = ConvexSolver.newBuilder();
+        altBuilder.objective(mtrxQ, mtrxC);
+        MatrixStore<Double> altAI = mtrxAE.below(mtrxAE.negate());
+        MatrixStore<Double> altBI = mtrxBE.below(mtrxBE.negate());
+        altBuilder.inequalities(altAI, altBI);
+
+        Optimisation.Options options = new Optimisation.Options();
+        Result altResult = altBuilder.build(options).solve();
         TestUtils.assertEquals(expectedX, result, accuracy);
 
-        Optional<Access1D<?>> ieMultipliers = ieResult.getMultipliers();
-        TestUtils.assertTrue("No multipliers present", ieMultipliers.isPresent());
+        Optional<Access1D<?>> altMultipliers = altResult.getMultipliers();
+        TestUtils.assertTrue("No multipliers present", altMultipliers.isPresent());
 
         Primitive64Store expectedInequalityDual = FACTORY.column(0, 2, 3, 0);
-        TestUtils.assertEquals(expectedInequalityDual, ieMultipliers.get(), accuracy);
+        TestUtils.assertEquals(expectedInequalityDual, altMultipliers.get(), accuracy);
 
     }
 

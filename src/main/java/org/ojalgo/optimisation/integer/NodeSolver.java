@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -37,9 +38,13 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.UpdatableSolver;
+import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
@@ -49,6 +54,7 @@ public final class NodeSolver extends IntermediateSolver {
     private static final boolean DEBUG = false;
     private static final NumberContext DYNANISM = NumberContext.of(8);
     private static final NumberContext LIMIT = PRECISION.withMode(RoundingMode.FLOOR);
+    private static final NumberContext PARAMETERS = NumberContext.of(12);
     private static final NumberContext SCALE = NumberContext.of(14);
 
     NodeSolver(final ExpressionsBasedModel model) {
@@ -65,21 +71,24 @@ public final class NodeSolver extends IntermediateSolver {
 
     boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
 
-        // TODO Needs to be generalised to also handle cases with negative (full range) variables
-
         if (!this.isSolved()) {
             return false;
         }
 
         ExpressionsBasedModel model = this.getModel();
+        Solver solver = this.getSolver();
         Result result = this.getResult();
 
-        long nbConstr = model.constraints().count();
+        long nbConstr = target.constraints().count();
 
-        if (this.getSolver() instanceof UpdatableSolver) {
-            UpdatableSolver solver = (UpdatableSolver) this.getSolver();
+        if (model.countVariables() != target.countVariables()) {
+            throw new IllegalStateException();
+        }
 
-            UpdatableSolver.EntityMap entityMap = solver.getEntityMap();
+        if (solver instanceof UpdatableSolver) {
+            UpdatableSolver updatable = (UpdatableSolver) solver;
+
+            ExpressionsBasedModel.EntityMap entityMap = updatable.getEntityMap();
 
             if (entityMap != null) {
 
@@ -103,14 +112,16 @@ public final class NodeSolver extends IntermediateSolver {
                     integers[nbProblVars + i] = integer;
                 }
 
-                Collection<Equation> potentialCuts = solver.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
+                Collection<Equation> potentialCuts = updatable.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
 
                 for (Equation equation : potentialCuts) {
 
                     String name = "CUT_GMI_" + equation.index + "_" + COUNTER.incrementAndGet();
 
                     if (DEBUG) {
-                        BasicLogger.debug("Eq: {} {}", name, equation.toString());
+                        BasicLogger.debug();
+                        BasicLogger.debug("Equat: {} {}", name, equation.toString());
+                        BasicLogger.debug();
                     }
 
                     Expression cut = target.newExpression(name);
@@ -118,18 +129,69 @@ public final class NodeSolver extends IntermediateSolver {
                     cut.lower(BigMath.ONE);
 
                     for (int j = 0; j < nbProblVars; j++) {
-                        int mj = entityMap.indexOf(j);
                         double aj = equation.doubleValue(j);
                         if (!SCALE.isZero(aj)) {
-                            if (entityMap.isNegated(j)) {
-                                cut.add(mj, -aj);
+
+                            int mj = entityMap.indexOf(j);
+
+                            KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> ibs = updatable.getImpliedBoundSlack(j);
+
+                            if (ibs != null) {
+
+                                ConstraintType type = ibs.left().left();
+                                if (ibs.left().right().intValue() != j || ibs.right().doubleValue() == PrimitiveMath.ZERO) {
+                                    throw new IllegalStateException();
+                                }
+
+                                Variable entity = target.getVariable(mj);
+
+                                BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
+                                BigDecimal adjusted = entity.adjust(coefficient);
+
+                                if (ConstraintType.LOWER.equals(type)) {
+
+                                    BigDecimal factor = adjusted;
+                                    BigDecimal limit = entity.getLowerLimit();
+
+                                    BigDecimal shift = limit.multiply(factor);
+                                    cut.shift(shift);
+
+                                    entity.addTo(cut, factor);
+                                }
+
+                                if (ConstraintType.UPPER.equals(type)) {
+
+                                    BigDecimal factor = adjusted.negate();
+                                    BigDecimal limit = entity.getUpperLimit();
+
+                                    BigDecimal shift = limit.multiply(factor);
+                                    cut.shift(shift);
+
+                                    entity.addTo(cut, factor);
+                                }
+
+                                if (DEBUG) {
+                                    BasicLogger.debug("Slack {} {} =->> Cut {}: {} < {}", type, entity, name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                                }
+
                             } else {
-                                cut.add(mj, aj);
+
+                                BigDecimal AJ = TypeUtils.toBigDecimal(aj, SCALE);
+                                if (entityMap.isNegated(j)) {
+                                    cut.add(mj, AJ.negate());
+                                } else {
+                                    cut.add(mj, AJ);
+                                }
+
+                                if (DEBUG) {
+                                    BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", target.getVariable(mj), name, cut.getLowerLimit(),
+                                            cut.getLinearEntrySet());
+                                }
                             }
                         }
                     }
 
-                    for (int j = 0; j < entityMap.countSlackVariables(); j++) {
+                    for (int j = 0; j < nbSlackVars; j++) {
                         double aj = equation.doubleValue(nbProblVars + j);
                         if (!SCALE.isZero(aj)) {
 
@@ -137,7 +199,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                             ModelEntity<?> entity = pair.getKey();
                             ConstraintType type = pair.getValue();
-                            BigDecimal coefficient = BigDecimal.valueOf(aj);
+                            BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
                             BigDecimal adjusted = entity.adjust(coefficient);
 
                             if (ConstraintType.LOWER.equals(type)) {
@@ -161,11 +223,11 @@ public final class NodeSolver extends IntermediateSolver {
 
                                 entity.addTo(cut, factor);
                             }
-                        }
-                    }
 
-                    if (DEBUG) {
-                        BasicLogger.debug("Cut: {} := {}", cut, cut.getLinearEntrySet());
+                            if (DEBUG) {
+                                BasicLogger.debug("Slack {} {} =->> Cut {}: {} < {}", type, entity, name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                            }
+                        }
                     }
 
                     BigDecimal cRHS = cut.getLowerLimit();
@@ -178,7 +240,7 @@ public final class NodeSolver extends IntermediateSolver {
                     if (cRHS.abs().compareTo(violation) > 0) {
                         target.removeExpression(name);
                         if (DEBUG) {
-                            BasicLogger.debug("\tViolation small! {}", cRHS);
+                            BasicLogger.debug(1, "Violation small! {}", cRHS);
                         }
                         continue;
                     }
@@ -209,38 +271,48 @@ public final class NodeSolver extends IntermediateSolver {
                     if (DEBUG) {
                         BigDecimal cRatio = MissingMath.divide(cLargest, cSmallest);
                         BigDecimal cEvaluated = cut.evaluate(result);
-                        BasicLogger.debug("\tLargest={}, Smallest={}, Ratio={}: {} < {}", cLargest, cSmallest, cRatio, cRHS, cEvaluated);
+                        BasicLogger.debug(1, "Largest={}, Smallest={}, Ratio={}: {} < {}", cLargest, cSmallest, cRatio, cRHS, cEvaluated);
                     }
 
                     if (DYNANISM.isSmall(cLargest, cSmallest)) {
                         target.removeExpression(name);
                         if (DEBUG) {
-                            BasicLogger.debug("\tDynanism large! {} >> {}", cLargest, cSmallest);
+                            BasicLogger.debug(1, "Dynanism large! {} >> {}", cLargest, cSmallest);
                         }
-                    } else if (model.checkSimilarity(cut)) {
+                    } else if (target.checkSimilarity(cut)) {
                         target.removeExpression(name);
                         if (DEBUG) {
-                            BasicLogger.debug("\tCut similar to current constraint!");
+                            BasicLogger.debug(1, "Cut similar to current constraint!");
                         }
                     } else {
+
                         // Accept this cut!
+                        cut.enforce(PARAMETERS);
                         cut.tighten();
                         if (DEBUG) {
-                            BasicLogger.debug("\t{}", cut);
+                            BasicLogger.debug(1, "{}", cut);
+                            BasicLogger.debug(1, "{} < {}", cut.getLowerLimit(), cut.getLinearEntrySet());
                         }
-                    }
-                    if (DEBUG) {
-                        BasicLogger.debug("\t{} < {}", cut.getLowerLimit(), cut.getLinearEntrySet());
-                    }
 
-                    if (target.options.logger_detailed && target.options.logger_appender != null) {
-                        target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                        if (target.options.logger_detailed && target.options.logger_appender != null) {
+                            target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
+                        }
                     }
                 }
             }
+
         }
 
-        return nbConstr != model.constraints().count();
+        boolean didGenerate = nbConstr != target.constraints().count();
+        if (didGenerate && model.options.validate) {
+            if (!this.validate(target)) {
+                BasicLogger.error("Modified target model cuts off the optimal solution!");
+            }
+            if (target.validate(result)) {
+                BasicLogger.error("Result still valid, was NOT cut off!");
+            }
+        }
+        return didGenerate;
     }
 
 }
