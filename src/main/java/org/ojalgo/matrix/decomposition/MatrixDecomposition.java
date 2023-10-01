@@ -104,6 +104,15 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     interface Factory<D extends MatrixDecomposition<?>> {
 
+        /**
+         * Will create a new decomposition instance and directly perform the decomposition.
+         */
+        default <N extends Comparable<N>, DN extends MatrixDecomposition<N>> DN decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+            DN retVal = (DN) this.make(matrix);
+            retVal.decompose(matrix);
+            return retVal;
+        }
+
         default D make() {
             return this.make(TYPICAL);
         }
@@ -136,11 +145,11 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     public interface Hermitian<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
-         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
+         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result different
          * paths can be chosen - compute or not / choose different algorithms...
          *
          * @param matrix A matrix to check and then (maybe) decompose
-         * @return true if the hermitian check passed and decomposition suceeded; false if not
+         * @return true if the hermitian check passed and decomposition succeeded; false if not
          */
         default boolean checkAndDecompose(final MatrixStore<N> matrix) {
 

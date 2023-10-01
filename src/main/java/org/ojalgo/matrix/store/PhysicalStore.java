@@ -72,12 +72,14 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         I conjugate(Access2D<?> source);
 
+        @Override
         FunctionSet<N> function();
 
         default ColumnsSupplier<N> makeColumnsSupplier(final int numberOfRows) {
             return new ColumnsSupplier<>(this, numberOfRows);
         }
 
+        @Override
         default PhysicalStore<N> makeDense(final long rows, final long columns) {
             return this.make(rows, columns);
         }
@@ -101,6 +103,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return this.makeEye(shape.countRows(), shape.countColumns());
         }
 
+        @Override
         default I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             I retVal = this.make(rows, columns);
@@ -132,6 +135,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return this.makeSingle(this.scalar().cast(element));
         }
 
+        @Override
         default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
             return SparseStore.makeSparse(this, rowsCount, columnsCount);
         }
@@ -168,6 +172,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return this.makeZero(shape.countRows(), shape.countColumns());
         }
 
+        @Override
         Scalar.Factory<N> scalar();
 
         default TensorFactory1D<N, I> tensor1D() {
@@ -188,6 +193,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      */
     List<N> asList();
 
+    @Override
     default void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }
@@ -216,6 +222,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
+    @Override
     default void supplyTo(final TransformableRegion<N> receiver) {
         if (this != receiver) {
             receiver.fillMatching(this);

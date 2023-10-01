@@ -60,6 +60,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
             return this.make(TYPICAL, fullSize);
         }
 
+        @Override
         default SingularValue<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
@@ -70,30 +71,31 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     Factory<ComplexNumber> C128 = (typical, fullSize) -> new SingularValueDecomposition.C128(fullSize);
 
-    Factory<Double> R064 = (typical, fullSize) -> {
-        if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new SingularValueDecomposition.R064(fullSize);
-        }
-        return new RawSingularValue();
-    };
-
-    Factory<Quadruple> R128 = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
-
-    Factory<Quaternion> H256 = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
-
-    Factory<RationalNumber> Q128 = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
-
     /**
      * @deprecated
      */
     @Deprecated
     Factory<ComplexNumber> COMPLEX = C128;
 
+    Factory<Quaternion> H256 = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
+
+    Factory<Double> R064 = (typical, fullSize) -> {
+        if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
+            return new SingularValueDecomposition.R064(fullSize);
+        } else {
+            return new RawSingularValue();
+        }
+    };
+
     /**
      * @deprecated
      */
     @Deprecated
     Factory<Double> PRIMITIVE = R064;
+
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
+
+    Factory<Quadruple> R128 = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
 
     /**
      * @deprecated
@@ -182,6 +184,7 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
      *
      * @return The largest singular value divided by the smallest singular value.
      */
+    @Override
     double getCondition();
 
     /**
@@ -262,10 +265,22 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
      */
     MatrixStore<N> getV();
 
+    @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ1 = this.getU();
         MatrixStore<N> mtrxD = this.getD();
         MatrixStore<N> mtrxQ2 = this.getV();
+        return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
+    }
+
+    default MatrixStore<N> reconstruct(final int k) {
+
+        int limit = Math.min(k, this.getRank());
+
+        MatrixStore<N> mtrxQ1 = this.getU().limits(-1, limit);
+        MatrixStore<N> mtrxD = this.getD().limits(limit, limit);
+        MatrixStore<N> mtrxQ2 = this.getV().limits(-1, limit);
+
         return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }
 

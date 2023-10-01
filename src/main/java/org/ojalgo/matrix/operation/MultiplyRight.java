@@ -154,7 +154,7 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             int firstInCol = Structure2D.firstInColumn(right, j, 0);
-            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
+            int limitOfCol = Structure2D.limitOfColumn(right, j, complexity);
             product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -163,7 +163,7 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             int firstInCol = Structure2D.firstInColumn(right, j, 0);
-            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
+            int limitOfCol = Structure2D.limitOfColumn(right, j, complexity);
             product[j] += DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -315,7 +315,7 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             int firstInCol = Structure2D.firstInColumn(right, j, 0);
-            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
+            int limitOfCol = Structure2D.limitOfColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -324,7 +324,7 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             int firstInCol = Structure2D.firstInColumn(right, j, 0);
-            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
+            int limitOfCol = Structure2D.limitOfColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol);
         }
     }
@@ -333,7 +333,7 @@ public class MultiplyRight implements MatrixOperation {
 
         for (int j = 0, nbCols = product.length; j < nbCols; j++) {
             int firstInCol = Structure2D.firstInColumn(right, j, 0);
-            int limitOfCol = Structure2D.firstInColumn(right, j, complexity);
+            int limitOfCol = Structure2D.limitOfColumn(right, j, complexity);
             product[j] = DOT.invoke(left, 0, right, j * complexity, firstInCol, limitOfCol, scalar);
         }
     }

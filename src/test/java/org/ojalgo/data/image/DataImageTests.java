@@ -19,36 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store;
+package org.ojalgo.data.image;
 
-final class LimitStore<N extends Comparable<N>> extends SelectingStore<N> {
+public abstract class DataImageTests {
 
-    LimitStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
-        super(base, rowsCount, columnsCount);
-    }
+    static final boolean DEBUG = false;
 
-    LimitStore(final long rowsCount, final long columnsCount, final MatrixStore<N> base) {
-        super(base, rowsCount, columnsCount);
-    }
 
-    @Override
-    public double doubleValue(final int row, final int col) {
-        return this.base().doubleValue(row, col);
-    }
-
-    @Override
-    public N get(final int row, final int col) {
-        return this.base().get(row, col);
-    }
-
-    @Override
-    public int limitOfColumn(final int col) {
-        return Math.min(this.base().limitOfColumn(col), this.getRowDim());
-    }
-
-    @Override
-    public int limitOfRow(final int row) {
-        return Math.min(this.base().limitOfRow(row), this.getColDim());
-    }
 
 }

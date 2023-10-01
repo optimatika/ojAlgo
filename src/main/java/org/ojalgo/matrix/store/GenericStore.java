@@ -220,6 +220,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         }
 
         @Override
+        public MathType getMathType() {
+            return myDenseArrayFactory.getMathType();
+        }
+
+        @Override
         public GenericStore<N> make(final long rows, final long columns) {
             return new GenericStore<>(this, (int) rows, (int) columns);
         }
@@ -349,23 +354,17 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return retVal;
         }
 
-        @Override
-        public MathType getMathType() {
-            return myDenseArrayFactory.getMathType();
-        }
-
     }
 
     public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> C128 = new GenericStore.Factory<>(ArrayC128.FACTORY);
-    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
-    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
-
     /**
      * @deprecated Use {@link #C128} instead
      */
     @Deprecated
     public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = C128;
+    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
+    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
+    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
     /**
      * @deprecated Use {@link #R128} instead
      */
@@ -994,12 +993,12 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     @Override
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final int row, final int col, final double value) {
         myUtility.set(row, col, value);
     }
 
     @Override
-    public void set(final int row, final int col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 
@@ -1176,14 +1175,14 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility.visitRow(row, col, visitor);
     }
 
-    private GenericStore<N> cast(final Access1D<N> matrix) {
+    private GenericStore<N> cast(final Access1D<?> matrix) {
         if (matrix instanceof GenericStore) {
             return (GenericStore<N>) matrix;
-        }
-        if (matrix instanceof Access2D<?>) {
+        } else if (matrix instanceof Access2D<?>) {
             return myFactory.copy((Access2D<?>) matrix);
+        } else {
+            return myFactory.columns(matrix);
         }
-        return myFactory.columns(matrix);
     }
 
     private Householder.Generic<N> cast(final Householder<N> transformation) {

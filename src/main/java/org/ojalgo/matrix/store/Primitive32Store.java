@@ -180,6 +180,11 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         }
 
         @Override
+        public MathType getMathType() {
+            return MathType.R032;
+        }
+
+        @Override
         public Primitive32Store make(final long rows, final long columns) {
             return new Primitive32Store((int) rows, (int) columns);
         }
@@ -294,21 +299,16 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
             return retVal;
         }
 
-        @Override
-        public MathType getMathType() {
-            return MathType.R032;
-        }
-
     };
 
-    static Primitive32Store cast(final Access1D<Double> matrix) {
+    static Primitive32Store cast(final Access1D<?> matrix) {
         if (matrix instanceof Primitive32Store) {
             return (Primitive32Store) matrix;
-        }
-        if (matrix instanceof Access2D<?>) {
+        } else if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
+        } else {
+            return FACTORY.columns(matrix);
         }
-        return FACTORY.columns(matrix);
     }
 
     static Householder.Primitive32 cast(final Householder<Double> transformation) {
@@ -878,12 +878,12 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     }
 
     @Override
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final int row, final int col, final double value) {
         myUtility.set(row, col, value);
     }
 
     @Override
-    public void set(final int row, final int col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 

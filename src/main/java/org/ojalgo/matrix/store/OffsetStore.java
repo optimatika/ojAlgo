@@ -51,4 +51,24 @@ final class OffsetStore<N extends Comparable<N>> extends SelectingStore<N> {
         return this.base().get(myRowOffset + row, myColumnOffset + col);
     }
 
+    @Override
+    public int firstInColumn(final int col) {
+        return Math.max(this.base().firstInColumn(col) - myRowOffset, 0);
+    }
+
+    @Override
+    public int firstInRow(final int row) {
+        return Math.max(this.base().firstInRow(row) - myColumnOffset, 0);
+    }
+
+    @Override
+    public int limitOfColumn(final int col) {
+        return Math.min(this.base().limitOfColumn(col) - myRowOffset, this.getRowDim());
+    }
+
+    @Override
+    public int limitOfRow(final int row) {
+        return Math.min(this.base().limitOfRow(row) - myColumnOffset, this.getColDim());
+    }
+
 }
