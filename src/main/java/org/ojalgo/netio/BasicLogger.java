@@ -73,6 +73,7 @@ public interface BasicLogger {
             myPrintWriter = new PrintWriter(out, true);
         }
 
+        @Override
         public Optional<Writer> asWriter() {
             return Optional.of(this);
         }
@@ -87,55 +88,68 @@ public interface BasicLogger {
             myPrintWriter.flush();
         }
 
+        @Override
         public void print(final boolean value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final byte value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final char value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final double value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final float value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final int value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final long value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final Object object) {
             myPrintWriter.append(object.toString());
         }
 
+        @Override
         public void print(final short value) {
             myPrintWriter.print(value);
         }
 
+        @Override
         public void print(final Throwable throwable) {
             throwable.printStackTrace(myPrintWriter);
         }
 
+        @Override
         public void printf(final String format, final Object... args) {
             myPrintWriter.printf(format, args);
             myPrintWriter.println();
         }
 
+        @Override
         public void println() {
             myPrintWriter.println();
         }
 
+        @Override
         public void println(final Object object) {
             myPrintWriter.println(object);
         }
@@ -167,6 +181,12 @@ public interface BasicLogger {
         static void columns(final BasicLogger appender, final int width, final Object... columns) {
             if (appender != null) {
                 appender.columns(width, columns);
+            }
+        }
+
+        static void printf(final BasicLogger appender, final String format, final Object... arguments) {
+            if (appender != null) {
+                appender.printf(format, arguments);
             }
         }
 
@@ -298,32 +318,45 @@ public interface BasicLogger {
 
     BasicLogger NULL = new BasicLogger() {
 
+        @Override
         public Optional<Writer> asWriter() {
             return Optional.empty();
         }
 
+        @Override
         public void print(final boolean value) {}
 
+        @Override
         public void print(final byte value) {}
 
+        @Override
         public void print(final char value) {}
 
+        @Override
         public void print(final double value) {}
 
+        @Override
         public void print(final float value) {}
 
+        @Override
         public void print(final int value) {}
 
+        @Override
         public void print(final long value) {}
 
+        @Override
         public void print(final Object object) {}
 
+        @Override
         public void print(final short value) {}
 
+        @Override
         public void print(final Throwable throwable) {}
 
+        @Override
         public void printf(final String format, final Object... args) {}
 
+        @Override
         public void println() {}
 
     };
@@ -374,6 +407,10 @@ public interface BasicLogger {
 
     static void debugColumns(final int width, final Object... columns) {
         NotNull.columns(DEBUG, width, columns);
+    }
+
+    static void debugFormatted(final String format, final Object... args) {
+        NotNull.printf(DEBUG, format, args);
     }
 
     static void debugMatrix(final String message, final Access2D<?> matrix) {
@@ -430,6 +467,10 @@ public interface BasicLogger {
 
     static void errorColumns(final int width, final Object... columns) {
         NotNull.columns(ERROR, width, columns);
+    }
+
+    static void errorFormatted(final String format, final Object... args) {
+        NotNull.printf(ERROR, format, args);
     }
 
     static void errorMatrix(final String message, final Access2D<?> matrix) {
