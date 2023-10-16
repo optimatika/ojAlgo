@@ -11,6 +11,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [53.1.1] – 2023-10-16
+
+### Added
+
+#### org.ojalgo.data
+
+- New `ImageData` class that wraps a `java.awt.image.BufferedImage` and implements `MatrixStore`. Further it adds a few utility methods to simplify working image data - convert to grey scale, re-sample (change size), separate the colour channels...
+
+#### org.ojalgo.matrix
+
+- It is now possible to create a matrix decomposition instance and calculate the decomposition with 1 method call. Previously you had to first call `make` on the factory instance and then `decompose` on the decomposition instance. Now it is possible to call `decomposed` directly on the factory instance.
+- The `SingularValue` interface now defines a method to reconstruct a matrix using a specified number of singular values. 
+
 ## [53.1.0] – 2023-09-17
 
 ### Added

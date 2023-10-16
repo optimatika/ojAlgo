@@ -25,6 +25,4 @@ public abstract class DataImageTests {
 
     static final boolean DEBUG = false;
 
-
-
 }
