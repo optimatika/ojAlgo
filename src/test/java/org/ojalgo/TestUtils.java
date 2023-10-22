@@ -89,6 +89,17 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
+    public static void assertComplexEquals(final Access1D<ComplexNumber> expected, final Access1D<ComplexNumber> actual) {
+        TestUtils.assertComplexEquals(expected, actual, EQUALS);
+    }
+
+    public static void assertComplexEquals(final Access1D<ComplexNumber> expected, final Access1D<ComplexNumber> actual, final NumberContext context) {
+        TestUtils.assertEquals(expected, actual, context);
+        for (int i = 0; i < expected.size(); i++) {
+            TestUtils.assertEquals(expected.get(i), actual.get(i), context);
+        }
+    }
+
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
         TestUtils.assertEquals(expected, actual, EQUALS);
     }
@@ -390,6 +401,12 @@ public abstract class TestUtils /* extends Assertions */ {
     }
 
     public static void assertInRange(final int first, final int limit, final int actual) {
+        if (first > actual || actual >= limit) {
+            TestUtils.fail("Not in range!");
+        }
+    }
+
+    public static void assertInRange(final double first, final double limit, final double actual) {
         if (first > actual || actual >= limit) {
             TestUtils.fail("Not in range!");
         }

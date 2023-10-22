@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
 
@@ -43,6 +44,15 @@ public interface TransformableRegion<N extends Comparable<N>> extends Modifiable
 
     }
 
+    static <N extends Comparable<N>> TransformableRegion<N> cast(final Mutate2D.ModifiableReceiver<N> target) {
+        if (target instanceof TransformableRegion) {
+            return (TransformableRegion<N>) target;
+        } else {
+            return new Subregion2D.WrapperRegion<>(target);
+        }
+    }
+
+    @Override
     default void exchangeColumns(final long colA, final long colB) {
         N valA, valB;
         for (long i = 0L, limit = this.countRows(); i < limit; i++) {
@@ -53,6 +63,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Modifiable
         }
     }
 
+    @Override
     default void exchangeRows(final long rowA, final long rowB) {
         N valA, valB;
         for (long j = 0L, limit = this.countColumns(); j < limit; j++) {
@@ -65,6 +76,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Modifiable
 
     void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
 
+    @Override
     default void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }

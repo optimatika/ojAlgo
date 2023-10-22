@@ -28,6 +28,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate2D;
 
 abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegion<N> {
 
@@ -713,6 +714,71 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
 
     }
 
+    static final class WrapperRegion<N extends Comparable<N>> extends Subregion2D<N> {
+
+        private final Mutate2D.ModifiableReceiver<N> myBase;
+
+        WrapperRegion(final Mutate2D.ModifiableReceiver<N> base) {
+            super(Subregion2D.findMultiplier(base.get(0, 0).getClass(), base.getRowDim(), base.getColDim()), base.getRowDim(), base.getColDim());
+            myBase = base;
+        }
+
+        @Override
+        public void add(final long row, final long col, final Comparable<?> addend) {
+            myBase.add(row, col, addend);
+        }
+
+        @Override
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(row, col, addend);
+        }
+
+        @Override
+        public long countColumns() {
+            return myBase.countColumns();
+        }
+
+        @Override
+        public long countRows() {
+            return myBase.countRows();
+        }
+
+        @Override
+        public double doubleValue(final int row, final int col) {
+            return myBase.doubleValue(row, col);
+        }
+
+        @Override
+        public N get(final long row, final long col) {
+            return myBase.get(row, col);
+        }
+
+        @Override
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(row, col, modifier);
+        }
+
+        @Override
+        public void set(final int row, final int col, final double value) {
+            myBase.set(row, col, value);
+        }
+
+        @Override
+        public void set(final long row, final long col, final Comparable<?> value) {
+            myBase.set(row, col, value);
+        }
+
+    }
+
+    static <N extends Comparable<N>> TransformableRegion.FillByMultiplying<N> findMultiplier(final Class<?> tmpType, final int rowsCount,
+            final int columnsCount) {
+        if (tmpType.equals(Double.class)) {
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rowsCount, columnsCount);
+        } else {
+            return (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rowsCount, columnsCount);
+        }
+    }
+
     private final TransformableRegion.FillByMultiplying<N> myMultiplier;
 
     @SuppressWarnings("unused")
@@ -737,7 +803,7 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
     @Override
     public final void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
-        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        int complexity = Math.toIntExact(left.count() / this.countRows());
         if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
             ProgrammingError.throwForMultiplicationNotPossible();
         }

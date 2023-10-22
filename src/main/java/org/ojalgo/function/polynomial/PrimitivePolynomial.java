@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.polynomial;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 
 /**
  * @deprecated v53 use {@link PolynomialR064} instead
@@ -33,7 +33,7 @@ public final class PrimitivePolynomial extends PolynomialR064 {
         super(degree);
     }
 
-    public PrimitivePolynomial(final Array1D<Double> coefficients) {
+    public PrimitivePolynomial(final BasicArray<Double> coefficients) {
         super(coefficients);
     }
 

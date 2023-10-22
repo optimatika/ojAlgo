@@ -56,7 +56,7 @@ public abstract class TypeUtils {
         int first = 0;
         int limit = patternLength;
 
-        final StringBuilder retVal = new StringBuilder(patternLength + (argsCount * 20));
+        final StringBuilder retVal = new StringBuilder(patternLength + argsCount * 20);
 
         for (int a = 0; a < argsCount; a++) {
 
@@ -64,32 +64,30 @@ public abstract class TypeUtils {
 
             if (limit == -1) {
                 retVal.append(ASCII.SP);
-                if ((args[a] instanceof Access1D)) {
+                if (args[a] instanceof Access1D) {
                     retVal.append(Access1D.toString((Access1D<?>) args[a]));
-                } else if ((args[a] instanceof double[])) {
+                } else if (args[a] instanceof double[]) {
                     retVal.append(Arrays.toString((double[]) args[a]));
                 } else {
                     retVal.append(args[a]);
                 }
             } else {
                 retVal.append(messagePattern.substring(first, limit));
-                if ((args[a] instanceof Access1D)) {
-                    retVal.append(Access1D.toString((Access1D<?>) args[a]));
-                } else if ((args[a] instanceof double[])) {
+                if (args[a] instanceof double[]) {
                     retVal.append(Arrays.toString((double[]) args[a]));
-                } else if ((args[a] instanceof float[])) {
+                } else if (args[a] instanceof float[]) {
                     retVal.append(Arrays.toString((float[]) args[a]));
-                } else if ((args[a] instanceof long[])) {
+                } else if (args[a] instanceof long[]) {
                     retVal.append(Arrays.toString((long[]) args[a]));
-                } else if ((args[a] instanceof int[])) {
+                } else if (args[a] instanceof int[]) {
                     retVal.append(Arrays.toString((int[]) args[a]));
-                } else if ((args[a] instanceof short[])) {
+                } else if (args[a] instanceof short[]) {
                     retVal.append(Arrays.toString((short[]) args[a]));
-                } else if ((args[a] instanceof byte[])) {
+                } else if (args[a] instanceof byte[]) {
                     retVal.append(Arrays.toString((byte[]) args[a]));
-                } else if ((args[a] instanceof boolean[])) {
+                } else if (args[a] instanceof boolean[]) {
                     retVal.append(Arrays.toString((boolean[]) args[a]));
-                } else if ((args[a] instanceof char[])) {
+                } else if (args[a] instanceof char[]) {
                     retVal.append(Arrays.toString((char[]) args[a]));
                 } else {
                     retVal.append(args[a]);
@@ -196,18 +194,18 @@ public abstract class TypeUtils {
 
         boolean retVal = aCal1.get(Calendar.YEAR) == aCal2.get(Calendar.YEAR);
 
-        retVal = retVal && (aCal1.get(Calendar.MONTH) == aCal2.get(Calendar.MONTH));
+        retVal = retVal && aCal1.get(Calendar.MONTH) == aCal2.get(Calendar.MONTH);
 
-        return retVal && (aCal1.get(Calendar.DAY_OF_MONTH) == aCal2.get(Calendar.DAY_OF_MONTH));
+        return retVal && aCal1.get(Calendar.DAY_OF_MONTH) == aCal2.get(Calendar.DAY_OF_MONTH);
     }
 
     static boolean isSameTime(final Calendar aCal1, final Calendar aCal2) {
 
         boolean retVal = aCal1.get(Calendar.HOUR_OF_DAY) == aCal2.get(Calendar.HOUR_OF_DAY);
 
-        retVal = retVal && (aCal1.get(Calendar.MINUTE) == aCal2.get(Calendar.MINUTE));
+        retVal = retVal && aCal1.get(Calendar.MINUTE) == aCal2.get(Calendar.MINUTE);
 
-        return retVal && (aCal1.get(Calendar.SECOND) == aCal2.get(Calendar.SECOND));
+        return retVal && aCal1.get(Calendar.SECOND) == aCal2.get(Calendar.SECOND);
     }
 
     protected TypeUtils() {

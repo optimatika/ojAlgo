@@ -19,23 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.polynomial;
-
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.scalar.RationalNumber;
+package org.ojalgo.data.transform;
 
 /**
- * @deprecated v53 use {@link PolynomialQ128} instead
+ * DataTransform is a functional interface that can be used to transform data. The transform method takes an
+ * input of type IN and returns an output of type OUT.
  */
-@Deprecated
-public final class RationalPolynomial extends PolynomialQ128 {
+@FunctionalInterface
+public interface DataTransform<IN, OUT> {
 
-    public RationalPolynomial(final BasicArray<RationalNumber> coefficients) {
-        super(coefficients);
-    }
-
-    public RationalPolynomial(final int degree) {
-        super(degree);
-    }
+    OUT transform(IN input);
 
 }

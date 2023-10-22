@@ -34,7 +34,6 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -244,7 +243,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
-    private TransformableRegion.FillByMultiplying<N> myMultiplyer;
+    private final TransformableRegion.FillByMultiplying<N> myMultiplier;
 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
@@ -257,11 +256,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
 
         Class<? extends Comparable> tmpType = factory.scalar().zero().get().getClass();
-        if (tmpType.equals(Double.class)) {
-            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rowsCount, columnsCount);
-        } else {
-            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rowsCount, columnsCount);
-        }
+        myMultiplier = Subregion2D.findMultiplier(tmpType, rowsCount, columnsCount);
     }
 
     @Override
@@ -315,7 +310,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        myMultiplyer.invoke(this, left, complexity, right);
+        myMultiplier.invoke(this, left, complexity, right);
     }
 
     @Override
@@ -667,27 +662,27 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @Override
     public TransformableRegion<N> regionByColumns(final int... columns) {
-        return new Subregion2D.ColumnsRegion<>(this, myMultiplyer, columns);
+        return new Subregion2D.ColumnsRegion<>(this, myMultiplier, columns);
     }
 
     @Override
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new Subregion2D.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this, myMultiplier, rowLimit, columnLimit);
     }
 
     @Override
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new Subregion2D.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this, myMultiplier, rowOffset, columnOffset);
     }
 
     @Override
     public TransformableRegion<N> regionByRows(final int... rows) {
-        return new Subregion2D.RowsRegion<>(this, myMultiplyer, rows);
+        return new Subregion2D.RowsRegion<>(this, myMultiplier, rows);
     }
 
     @Override
     public TransformableRegion<N> regionByTransposing() {
-        return new Subregion2D.TransposedRegion<>(this, myMultiplyer);
+        return new Subregion2D.TransposedRegion<>(this, myMultiplier);
     }
 
     @Override

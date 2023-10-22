@@ -37,7 +37,7 @@ public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, U
 
     default UnaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);
-        return new UnaryFunction<N>() {
+        return new UnaryFunction<>() {
 
             public double invoke(final double arg) {
                 return after.invoke(UnaryFunction.this.invoke(arg));
@@ -54,26 +54,31 @@ public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, U
         };
     }
 
+    @Override
     default N apply(final N arg) {
         return this.invoke(arg);
     }
 
+    @Override
     default double applyAsDouble(final double arg) {
         return this.invoke(arg);
     }
 
     default UnaryFunction<N> compose(final UnaryFunction<N> before) {
         ProgrammingError.throwIfNull(before);
-        return new UnaryFunction<N>() {
+        return new UnaryFunction<>() {
 
+            @Override
             public double invoke(final double arg) {
                 return UnaryFunction.this.invoke(before.invoke(arg));
             }
 
+            @Override
             public float invoke(final float arg) {
                 return UnaryFunction.this.invoke(before.invoke(arg));
             }
 
+            @Override
             public N invoke(final N arg) {
                 return UnaryFunction.this.invoke(before.invoke(arg));
             }

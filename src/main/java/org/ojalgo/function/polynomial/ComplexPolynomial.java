@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.polynomial;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -34,7 +34,7 @@ public final class ComplexPolynomial extends PolynomialC128 {
         super(degree);
     }
 
-    public ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
+    public ComplexPolynomial(final BasicArray<ComplexNumber> coefficients) {
         super(coefficients);
     }
 

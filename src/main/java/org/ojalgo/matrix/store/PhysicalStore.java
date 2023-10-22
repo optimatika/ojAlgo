@@ -127,12 +127,12 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new RowsSupplier<>(this, numberOfColumns);
         }
 
-        default MatrixStore<N> makeSingle(final N element) {
-            return new SingleStore<>(this, element);
-        }
-
         default MatrixStore<N> makeSingle(final double element) {
             return this.makeSingle(this.scalar().cast(element));
+        }
+
+        default MatrixStore<N> makeSingle(final N element) {
+            return new SingleStore<>(this, element);
         }
 
         @Override
@@ -164,6 +164,10 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new WrapperStore<>(this, access);
         }
 
+        default MatrixStore<N> makeWrapperColumn(final Access1D<?> access) {
+            return new WrapperStore<>(access, this);
+        }
+
         default MatrixStore<N> makeZero(final long rowsCount, final long columnsCount) {
             return new ZeroStore<>(this, rowsCount, columnsCount);
         }
@@ -192,6 +196,33 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      *         accessed either row or colomn major.
      */
     List<N> asList();
+
+    default int indexOfLargestInColumn(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, col + 1L);
+        long step = 1L;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest % structure);
+    }
+
+    default int indexOfLargestInRow(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, this.countColumns());
+        long step = structure;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest / structure);
+    }
+
+    default int indexOfLargestOnDiagonal(final int row, final int col) {
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0L, this.countColumns());
+        long step = structure + 1L;
+        long largest = AMAX.invoke(this, first, limit, step);
+        return Math.toIntExact(largest / structure);
+    }
 
     @Override
     default void modifyAny(final Transformation2D<N> modifier) {
@@ -266,32 +297,5 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * @see #transformLeft(Rotation)
      */
     void transformRight(Rotation<N> transformation);
-
-    default int indexOfLargestInColumn(final int row, final int col) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, row, col);
-        long limit = Structure2D.index(structure, 0L, col + 1L);
-        long step = 1L;
-        long largest = AMAX.invoke(this, first, limit, step);
-        return Math.toIntExact(largest % structure);
-    }
-
-    default int indexOfLargestInRow(final int row, final int col) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, row, col);
-        long limit = Structure2D.index(structure, 0L, this.countColumns());
-        long step = structure;
-        long largest = AMAX.invoke(this, first, limit, step);
-        return Math.toIntExact(largest / structure);
-    }
-
-    default int indexOfLargestOnDiagonal(final int row, final int col) {
-        long structure = this.countRows();
-        long first = Structure2D.index(structure, row, col);
-        long limit = Structure2D.index(structure, 0L, this.countColumns());
-        long step = structure + 1L;
-        long largest = AMAX.invoke(this, first, limit, step);
-        return Math.toIntExact(largest / structure);
-    }
 
 }

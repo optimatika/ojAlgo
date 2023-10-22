@@ -348,9 +348,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     /**
-     * Apart from extending {@link Receiver} this interface extends {@link Modifiable} and
-     * {@link Exchangeable} which both imply access to existing elements as well as {@link Access2D} that
-     * dictates explicit access.
+     * Apart from extending {@link org.ojalgo.structure.Mutate2D.Receiver} this interface extends
+     * {@link org.ojalgo.structure.Mutate2D.Modifiable} and {@link Exchangeable} which both imply access to
+     * existing elements as well as {@link Access2D} that dictates explicit access.
      *
      * @author apete
      */

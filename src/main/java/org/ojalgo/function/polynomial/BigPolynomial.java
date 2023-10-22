@@ -23,7 +23,7 @@ package org.ojalgo.function.polynomial;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 
 /**
  * @deprecated v53 use {@link PolynomialR256} instead
@@ -35,7 +35,7 @@ public final class BigPolynomial extends PolynomialR256 {
         super(degree);
     }
 
-    public BigPolynomial(final Array1D<BigDecimal> coefficients) {
+    public BigPolynomial(final BasicArray<BigDecimal> coefficients) {
         super(coefficients);
     }
 

@@ -51,6 +51,9 @@ import org.ojalgo.type.management.Throughput;
  * A batch processing data node for when there's no way to fit the data in memory.
  * <p>
  * Data is stored in sharded files, and data is written/consumed and processed concurrently.
+ * <p>
+ * The data is processed in batches. Each batch is processed in a single thread. The number of threads is
+ * controlled by {@link #parallelism(IntSupplier)}.
  */
 public final class BatchNode<T> {
 
@@ -182,18 +185,22 @@ public final class BatchNode<T> {
             myActualConsumer = consumerFactory.get();
         }
 
+        @Override
         public void consume(final T item) {
             myActualConsumer.accept(item);
         }
 
+        @Override
         public Boolean getResults() {
             return Boolean.TRUE;
         }
 
+        @Override
         public void merge(final Boolean aggregate) {
             // No need to (not possible to) merge, just continue
         }
 
+        @Override
         public void reset() {
             // No need to (not possible to) reset, just continue
         }

@@ -11,13 +11,29 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.data
+
+- There is a new package `org.ojalgo.data.transform` that (so far) contain implementations of the `ZTransform` and the `DiscreteFourierTransform`. Most notably ojAlgo now contains an implementation of the FFT algorithm.
+- `ImageData` has been extended with features to work with Fourier transforms of images, as well as a Gaussian blur function.
+
+#### org.ojalgo.function
+
+- The `PolynomialFunction` interface now extends `org.ojalgo.algebra.Ring` which means it is now possible to `add` and `multiply` polynomials. There's also been some refactoring of the internals of the polynomial implementations.
+- Two new `PrimitiveFunction.Unary` implementations `PeriodicFunction` and `FourierSeries`. It is now possible to take any (periodic) function and, via FFT, get a Fourier series approximation of it (1 method call).
+
+#### org.ojalgo.scalar
+
+- Some minor additions to `ComplexNumber`. It is now possible to do complex number multiplication without creating new instances (calculate the real and imaginary parts separately). Added utilities to get the unit roots.
+
 ## [53.1.1] – 2023-10-16
 
 ### Added
 
 #### org.ojalgo.data
 
-- New `ImageData` class that wraps a `java.awt.image.BufferedImage` and implements `MatrixStore`. Further it adds a few utility methods to simplify working image data - convert to grey scale, re-sample (change size), separate the colour channels...
+- New `ImageData` class that wraps a `java.awt.image.BufferedImage` and implements `MatrixStore`. Further it adds a few utility methods to simplify working with image data - convert to grey scale, re-sample (change size), separate the colour channels...
 
 #### org.ojalgo.matrix
 

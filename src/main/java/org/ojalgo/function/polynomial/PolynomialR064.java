@@ -21,26 +21,57 @@
  */
 package org.ojalgo.function.polynomial;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 
-public class PolynomialR064 extends AbstractPolynomial<Double> {
+public class PolynomialR064 extends AbstractPolynomial<Double, PolynomialR064> {
 
-    public PolynomialR064(final int degree) {
-        super(Array1D.R064.make(degree + 1));
+    public static final PolynomialR064 ONE = PolynomialR064.wrap(PrimitiveMath.ONE);
+
+    public static PolynomialR064 wrap(final double... coefficients) {
+        return new PolynomialR064(ArrayR064.wrap(coefficients));
     }
 
-    PolynomialR064(final Array1D<Double> coefficients) {
+    public PolynomialR064(final int degree) {
+        super(ArrayR064.make(degree + 1));
+    }
+
+    PolynomialR064(final BasicArray<Double> coefficients) {
         super(coefficients);
     }
 
+    @Override
+    public PolynomialR064 add(final PolynomialFunction<Double> addend) {
+
+        int leftDeg = this.degree();
+        int righDeg = addend.degree();
+
+        int retSize = 1 + Math.max(leftDeg, righDeg);
+
+        PolynomialR064 retVal = this.newInstance(retSize);
+        BasicArray<Double> coefficients = retVal.coefficients();
+
+        for (int l = 0; l <= leftDeg; l++) {
+            coefficients.add(l, this.doubleValue(l));
+        }
+
+        for (int r = 0; r <= righDeg; r++) {
+            coefficients.add(r, addend.doubleValue(r));
+        }
+
+        return retVal;
+    }
+
+    @Override
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
         this.estimate(x, y, Primitive64Store.FACTORY, QR.R064);
     }
 
+    @Override
     public Double integrate(final Double fromPoint, final Double toPoint) {
 
         PolynomialFunction<Double> primitive = this.buildPrimitive();
@@ -51,15 +82,49 @@ public class PolynomialR064 extends AbstractPolynomial<Double> {
         return Double.valueOf(toVal - fromVal);
     }
 
+    @Override
     public Double invoke(final Double arg) {
         return Double.valueOf(this.invoke(arg.doubleValue()));
     }
 
-    public void set(final Access1D<?> coefficients) {
-        int limit = Math.min(this.size(), coefficients.size());
-        for (int p = 0; p < limit; p++) {
-            this.set(p, coefficients.doubleValue(p));
+    @Override
+    public PolynomialR064 multiply(final PolynomialFunction<Double> multiplicand) {
+
+        int leftDeg = this.degree();
+        int righDeg = multiplicand.degree();
+
+        int retSize = 1 + leftDeg + righDeg;
+
+        PolynomialR064 retVal = this.newInstance(retSize);
+        BasicArray<Double> coefficients = retVal.coefficients();
+
+        for (int l = 0; l <= leftDeg; l++) {
+
+            double left = this.doubleValue(l);
+
+            for (int r = 0; r <= righDeg; r++) {
+
+                double right = multiplicand.doubleValue(r);
+
+                coefficients.add(l + r, left * right);
+            }
         }
+
+        return retVal;
+    }
+
+    @Override
+    public PolynomialR064 negate() {
+
+        int size = 1 + this.degree();
+
+        PolynomialR064 retVal = this.newInstance(size);
+
+        for (int p = 0; p < size; p++) {
+            retVal.set(p, -this.doubleValue(p));
+        }
+
+        return retVal;
     }
 
     @Override
@@ -77,8 +142,12 @@ public class PolynomialR064 extends AbstractPolynomial<Double> {
     }
 
     @Override
-    protected AbstractPolynomial<Double> makeInstance(final int size) {
-        return new PolynomialR064(Array1D.R064.make(size));
+    protected PolynomialR064 newInstance(final int size) {
+        return new PolynomialR064(ArrayR064.make(size));
     }
 
+    @Override
+    PolynomialR064 one() {
+        return ONE;
+    }
 }

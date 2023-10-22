@@ -52,27 +52,27 @@ public class DataProcessors {
     /**
      * Variables centered so that their average will be 0.0
      */
-    public static final Transformation2D<Double> CENTER = DataProcessors.newTransformation2D(ss -> SUBTRACT.by(ss.getMean()));
+    public static final Transformation2D<Double> CENTER = DataProcessors.newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()));
 
     /**
      * Variables will be centered around 0.0 AND scaled to be [-1.0,1.0]. The minimum value will be
      * transformed to -1.0 and the maximum to +1.0.
      */
     public static final Transformation2D<Double> CENTER_AND_SCALE = DataProcessors
-            .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by((ss.getMaximum() - ss.getMinimum()) / TWO)));
+            .newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by((ss.getMaximum() - ss.getMinimum()) / TWO)));
 
     /**
      * Variables scaled to be within [-1.0,1.0] (divide by largest magnitude regardless of sign). If all
      * values are positive the range will within [0.0,1.0]. If all are negative the range will be within
      * [-1.0,0.0]
      */
-    public static final Transformation2D<Double> SCALE = DataProcessors.newTransformation2D(ss -> DIVIDE.by(ss.getLargest()));
+    public static final Transformation2D<Double> SCALE = DataProcessors.newColumnsTransformer(ss -> DIVIDE.by(ss.getLargest()));
 
     /**
      * Will normalise each variable - replace each value with its standard score.
      */
     public static final Transformation2D<Double> STANDARD_SCORE = DataProcessors
-            .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
+            .newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
 
     /**
      * Calculate the correlation matrix from a set of variables' samples. Each {@link Access1D} instance
@@ -237,7 +237,20 @@ public class DataProcessors {
         return retVal;
     }
 
-    public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
+    /**
+     * Creates a {@link Transformation2D} that will apply a {@link UnaryFunction} to each column. That unary
+     * function will be created by the provided {@link Function} using a {@link SampleSet} (of that column) as
+     * input.
+     * <p>
+     * The constants {@link #CENTER}, {@link #SCALE}, {@link #CENTER_AND_SCALE} and {@link #STANDARD_SCORE}
+     * are predefined {@link Transformation2D} instances created by calling this method.
+     * 
+     * @param definition A {@link Function} that will create a {@link UnaryFunction} from a {@link SampleSet}
+     *        to be applied to each column
+     * @return A {@link Transformation2D} that will apply a {@link UnaryFunction} to each column
+     */
+    public static Transformation2D<Double> newColumnsTransformer(final Function<SampleSet, UnaryFunction<Double>> definition) {
+
         return new Transformation2D<>() {
 
             public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {

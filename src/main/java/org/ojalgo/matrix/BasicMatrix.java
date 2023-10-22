@@ -231,7 +231,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * The returned instance can be have its elements mutated in various ways, while the size/shape is fixed.
+     * The returned instance can have its elements mutated in various ways, while the size/shape is fixed.
      *
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix –
      *         always creates a full dense copy.
@@ -431,21 +431,20 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      * </p>
      * <ul>
      * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using
-     * {@linkplain #solve(Access2D)}.</li>
+     * {@linkplain #solve(Access2D)}.
      * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using {@linkplain #solve(Access2D)}
-     * and transposing.</li>
+     * and transposing.
      * <li>"generalised inverse": [this][generalised inverse][this]=[this]. Note that if [this] is singular or
-     * non-square, then [generalised inverse] is not unique.</li>
+     * non-square, then [generalised inverse] is not unique.
      * <li>"pseudoinverse": The generalised inverse (there are typically/possibly many) with the smallest
-     * frobenius norm is called the pseudoinverse. You may calculate it using the {@linkplain QR} or
-     * {@linkplain SingularValue} decompositions.</li>
+     * frobenius norm is called the (Moore-Penrose) pseudoinverse. You may calculate it using the
+     * {@linkplain QR} or {@linkplain SingularValue} decompositions.
      * <li>"inverse":
      * <ul>
-     * <li>If [left inverse]=[right inverse] then it is also [inverse].</li>
+     * <li>If [left inverse]=[right inverse] then it is also [inverse].
      * <li>If [this] is square and has full rank then the [generalised inverse] is unique, with the
-     * [pseudoinverse] given, and equal to [inverse].</li>
+     * [pseudoinverse] given, and equal to [inverse].
      * </ul>
-     * </li>
      * </ul>
      *
      * @return The "best possible" inverse....

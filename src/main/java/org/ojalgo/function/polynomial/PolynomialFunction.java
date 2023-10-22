@@ -23,16 +23,29 @@ package org.ojalgo.function.polynomial;
 
 import java.util.List;
 
+import org.ojalgo.algebra.Ring;
 import org.ojalgo.function.BasicFunction.Differentiable;
 import org.ojalgo.function.BasicFunction.Integratable;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.NumberSeries;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.context.NumberContext;
 
-public interface PolynomialFunction<N extends Comparable<N>>
-        extends UnaryFunction<N>, Access1D<N>, Differentiable<N, PolynomialFunction<N>>, Integratable<N, PolynomialFunction<N>> {
+public interface PolynomialFunction<N extends Comparable<N>> extends UnaryFunction<N>, Access1D<N>, Mutate1D, Differentiable<N, PolynomialFunction<N>>,
+        Integratable<N, PolynomialFunction<N>>, Ring<PolynomialFunction<N>> {
 
-    int degree();
+    /**
+     * The largest exponent/power of the non-zero coefficients.
+     */
+    default int degree() {
+        return this.degree(AbstractPolynomial.DEGREE_ACCURACY);
+    }
+
+    /**
+     * The largest exponent/power of the non-zero (to the given accuracy) coefficients.
+     */
+    int degree(NumberContext accuracy);
 
     void estimate(Access1D<?> x, Access1D<?> y);
 
@@ -41,8 +54,6 @@ public interface PolynomialFunction<N extends Comparable<N>>
     void estimate(NumberSeries<?> samples);
 
     void set(Access1D<?> coefficients);
-
-    void set(final int power, final double coefficient);
 
     void set(final int power, final N coefficient);
 

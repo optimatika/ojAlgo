@@ -80,13 +80,18 @@ public final class ComplexNumber
     };
 
     /**
-     * Complex number {@code i}, satisfies i<sup>2</sup> = -1;
+     * Complex number {@code i}, Z = (0.0 + 1.0i), satisfies i<sup>2</sup> = -1;
      */
     public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
+
     /**
      * Complex number Z = (+∞ + 0.0i)
      */
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
+    /**
+     * Complex number {@code -i}, Z = (0.0 - 1.0i)
+     */
+    public static final ComplexNumber N = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.NEG);
     /**
      * Complex number Z = (NaN + NaNi)
      */
@@ -163,42 +168,59 @@ public final class ComplexNumber
      */
     public static ComplexNumber makePolar(final double norm, final double phase) {
 
-        double tmpStdPhase = phase % PrimitiveMath.TWO_PI;
-        if (tmpStdPhase < PrimitiveMath.ZERO) {
-            tmpStdPhase += PrimitiveMath.TWO_PI;
+        double stdPhase = phase % PrimitiveMath.TWO_PI;
+        if (stdPhase < PrimitiveMath.ZERO) {
+            stdPhase += PrimitiveMath.TWO_PI;
         }
 
-        if (tmpStdPhase <= ARGUMENT_TOLERANCE) {
+        if (stdPhase <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(norm);
 
-        }
-        if (PrimitiveMath.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveMath.ABS.invoke(stdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(-norm);
 
-        }
-        double tmpRe = PrimitiveMath.ZERO;
-        if (norm != PrimitiveMath.ZERO) {
-            final double tmpCos = PrimitiveMath.COS.invoke(tmpStdPhase);
-            if (tmpCos != PrimitiveMath.ZERO) {
-                tmpRe = norm * tmpCos;
-            }
-        }
+        } else {
 
-        double tmpIm = PrimitiveMath.ZERO;
-        if (norm != PrimitiveMath.ZERO) {
-            final double tmpSin = PrimitiveMath.SIN.invoke(tmpStdPhase);
-            if (tmpSin != PrimitiveMath.ZERO) {
-                tmpIm = norm * tmpSin;
+            double tmpRe = PrimitiveMath.ZERO;
+            if (norm != PrimitiveMath.ZERO) {
+                double tmpCos = PrimitiveMath.COS.invoke(stdPhase);
+                if (tmpCos != PrimitiveMath.ZERO) {
+                    tmpRe = norm * tmpCos;
+                }
             }
-        }
 
-        return new ComplexNumber(tmpRe, tmpIm);
+            double tmpIm = PrimitiveMath.ZERO;
+            if (norm != PrimitiveMath.ZERO) {
+                double tmpSin = PrimitiveMath.SIN.invoke(stdPhase);
+                if (tmpSin != PrimitiveMath.ZERO) {
+                    tmpIm = norm * tmpSin;
+                }
+            }
+
+            return new ComplexNumber(tmpRe, tmpIm);
+        }
     }
 
     public static ComplexNumber makeRotation(final double angle) {
         return new ComplexNumber(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
+    }
+
+    public static ComplexNumber newUnitRoot(final int nbRoots) {
+        return ComplexNumber.makePolar(PrimitiveMath.ONE, -PrimitiveMath.TWO_PI / nbRoots);
+    }
+
+    public static ComplexNumber[] newUnitRoots(final int nbRoots) {
+
+        ComplexNumber[] retVal = new ComplexNumber[nbRoots];
+
+        for (int i = 0; i < retVal.length; i++) {
+            retVal[i] = ComplexNumber.makePolar(PrimitiveMath.ONE, i * -PrimitiveMath.TWO_PI / nbRoots);
+
+        }
+
+        return retVal;
     }
 
     /**
@@ -361,11 +383,13 @@ public final class ComplexNumber
 
             return new ComplexNumber((myRealValue + r * i) / d, (i - r * myRealValue) / d);
 
-        }
-        final double r = tmpRe / tmpIm;
-        final double d = tmpIm + r * tmpRe;
+        } else {
 
-        return new ComplexNumber((r * myRealValue + i) / d, (r * i - myRealValue) / d);
+            final double r = tmpRe / tmpIm;
+            final double d = tmpIm + r * tmpRe;
+
+            return new ComplexNumber((r * myRealValue + i) / d, (r * i - myRealValue) / d);
+        }
     }
 
     /**
@@ -534,10 +558,10 @@ public final class ComplexNumber
     @Override
     public ComplexNumber multiply(final ComplexNumber arg) {
 
-        final double tmpRe = arg.doubleValue();
-        final double tmpIm = arg.i;
+        double argRe = arg.doubleValue();
+        double argIm = arg.i;
 
-        return new ComplexNumber(myRealValue * tmpRe - i * tmpIm, myRealValue * tmpIm + i * tmpRe);
+        return new ComplexNumber(myRealValue * argRe - i * argIm, myRealValue * argIm + i * argRe);
     }
 
     /**
@@ -549,6 +573,22 @@ public final class ComplexNumber
     @Override
     public ComplexNumber multiply(final double arg) {
         return new ComplexNumber(myRealValue * arg, i * arg);
+    }
+
+    /**
+     * The imaginary part of the complex number resulting when multiplying this with a complex number whose
+     * real and imaginary parts are argRe and argIm.
+     */
+    public double multiplyIm(final double argRe, final double argIm) {
+        return myRealValue * argIm + i * argRe;
+    }
+
+    /**
+     * The real part of the complex number resulting when multiplying this with a complex number whose real
+     * and imaginary parts are argRe and argIm.
+     */
+    public double multiplyRe(final double argRe, final double argIm) {
+        return myRealValue * argRe - i * argIm;
     }
 
     /**

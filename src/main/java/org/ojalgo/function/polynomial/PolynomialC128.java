@@ -21,54 +21,32 @@
  */
 package org.ojalgo.function.polynomial;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayC128;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 
-public class PolynomialC128 extends AbstractPolynomial<ComplexNumber> {
+public class PolynomialC128 extends ScalarPolynomial<ComplexNumber, PolynomialC128> {
 
-    public PolynomialC128(final int degree) {
-        super(Array1D.C128.make(degree + 1));
+    public static final PolynomialC128 ONE = PolynomialC128.wrap(ComplexNumber.ONE);
+
+    public static PolynomialC128 wrap(final ComplexNumber... coefficients) {
+        return new PolynomialC128(ArrayC128.wrap(coefficients));
     }
 
-    PolynomialC128(final Array1D<ComplexNumber> coefficients) {
+    public PolynomialC128(final int degree) {
+        super(ArrayC128.make(degree + 1));
+    }
+
+    PolynomialC128(final BasicArray<ComplexNumber> coefficients) {
         super(coefficients);
     }
 
+    @Override
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
         this.estimate(x, y, GenericStore.C128, QR.C128);
-    }
-
-    public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
-
-        PolynomialFunction<ComplexNumber> primitive = this.buildPrimitive();
-
-        ComplexNumber fromVal = primitive.invoke(fromPoint);
-        ComplexNumber toVal = primitive.invoke(toPoint);
-
-        return toVal.subtract(fromVal);
-    }
-
-    public ComplexNumber invoke(final ComplexNumber arg) {
-
-        int power = this.degree();
-
-        ComplexNumber retVal = this.get(power);
-
-        while (--power >= 0) {
-            retVal = this.get(power).add(arg.multiply(retVal));
-        }
-
-        return retVal;
-    }
-
-    public void set(final Access1D<?> coefficients) {
-        int limit = Math.min(this.size(), coefficients.size());
-        for (int p = 0; p < limit; p++) {
-            this.set(p, ComplexNumber.valueOf(coefficients.get(p)));
-        }
     }
 
     @Override
@@ -86,8 +64,13 @@ public class PolynomialC128 extends AbstractPolynomial<ComplexNumber> {
     }
 
     @Override
-    protected AbstractPolynomial<ComplexNumber> makeInstance(final int size) {
-        return new PolynomialC128(Array1D.C128.make(size));
+    protected PolynomialC128 newInstance(final int size) {
+        return new PolynomialC128(ArrayC128.make(size));
+    }
+
+    @Override
+    PolynomialC128 one() {
+        return ONE;
     }
 
 }

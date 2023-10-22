@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -39,12 +40,14 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<Double> {
 
-        default Double invoke(final Double arg1, final Double arg2) {
-            return Double.valueOf(this.invoke(arg1.doubleValue(), arg2.doubleValue()));
-        }
-
+        @Override
         default Double invoke(final Double arg1, final double arg2) {
             return Double.valueOf(this.invoke(arg1.doubleValue(), arg2));
+        }
+
+        @Override
+        default Double invoke(final Double arg1, final Double arg2) {
+            return Double.valueOf(this.invoke(arg1.doubleValue(), arg2.doubleValue()));
         }
 
     }
@@ -52,6 +55,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Consumer extends VoidFunction<Double> {
 
+        @Override
         default void invoke(final Double arg) {
             this.invoke(arg.doubleValue());
         }
@@ -61,6 +65,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Parameter extends ParameterFunction<Double> {
 
+        @Override
         default Double invoke(final Double arg, final int param) {
             return Double.valueOf(this.invoke(arg.doubleValue(), param));
         }
@@ -70,8 +75,56 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<Double> {
 
+        @Override
         default boolean invoke(final Double arg) {
             return this.invoke(arg.doubleValue());
+        }
+
+    }
+
+    public static final class SampleDomain {
+
+        private final double myIncrement;
+        private final double myPeriod;
+        private final int myNumberOfSamples;
+
+        public SampleDomain(final double period, final int nbSamples) {
+            super();
+            myPeriod = period;
+            myNumberOfSamples = nbSamples;
+            myIncrement = period / nbSamples;
+        }
+
+        /**
+         * Adjusts the number of samples to the smallest power of 2 that is not less than the current number
+         * of samples.
+         */
+        public SampleDomain adjustToPowerOf2() {
+            return new SampleDomain(myPeriod, PowerOf2.smallestNotLessThan(myNumberOfSamples));
+        }
+
+        public double argumant(final int index) {
+            return index * myIncrement;
+        }
+
+        public double[] arguments() {
+            double[] retVal = new double[myNumberOfSamples];
+            for (int i = 0; i < myNumberOfSamples; i++) {
+                retVal[i] = i * myIncrement;
+            }
+            return retVal;
+        }
+
+        public double increment() {
+            return myIncrement;
+        }
+
+        public double period() {
+            return myPeriod;
+        }
+
+        public int size() {
+            return myNumberOfSamples;
         }
 
     }
@@ -79,6 +132,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @FunctionalInterface
     public interface Unary extends UnaryFunction<Double> {
 
+        @Override
         default Double invoke(final Double arg) {
             return Double.valueOf(this.invoke(arg.doubleValue()));
         }

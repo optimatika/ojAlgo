@@ -251,7 +251,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     /**
-     * Tests if the two data strauctures are numerically equal to the given accuracy. (Only works with real
+     * Tests if the two data structures are numerically equal to the given accuracy. (Only works with real
      * numbers, and can't handle more than "double precision".) You have to implement your own version to
      * handle other cases.
      */

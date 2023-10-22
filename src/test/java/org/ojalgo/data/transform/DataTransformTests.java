@@ -19,23 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.polynomial;
+package org.ojalgo.data.transform;
 
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.scalar.RationalNumber;
+abstract class DataTransformTests {
 
-/**
- * @deprecated v53 use {@link PolynomialQ128} instead
- */
-@Deprecated
-public final class RationalPolynomial extends PolynomialQ128 {
-
-    public RationalPolynomial(final BasicArray<RationalNumber> coefficients) {
-        super(coefficients);
-    }
-
-    public RationalPolynomial(final int degree) {
-        super(degree);
-    }
+    static final boolean DEBUG = false;
 
 }

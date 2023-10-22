@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 public class ComplexNumberTest extends ScalarTests {
 
@@ -34,7 +35,6 @@ public class ComplexNumberTest extends ScalarTests {
         TestUtils.assertEquals(ONE, ComplexNumber.valueOf(NEG).getModulus());
         TestUtils.assertEquals(NaN, ComplexNumber.NaN.getModulus());
         TestUtils.assertEquals(FIVE, ComplexNumber.of(FOUR, THREE).getModulus());
-
     }
 
     @Test
@@ -49,6 +49,31 @@ public class ComplexNumberTest extends ScalarTests {
         TestUtils.assertEquals(16L, base.power(4));
         TestUtils.assertEquals(32L, base.power(5));
         TestUtils.assertEquals(64L, base.power(6));
+    }
+
+    @Test
+    public void testUnitRoots() {
+
+        for (int p = 1; p <= 9; p++) {
+
+            ComplexNumber[] unitRoots = ComplexNumber.newUnitRoots(p);
+
+            for (int r = 0; r < unitRoots.length; r++) {
+
+                ComplexNumber root = unitRoots[r];
+
+                TestUtils.assertEquals(PrimitiveMath.ONE, root.getModulus());
+                // The range can be either [0, 2π] or [-π,π]
+                TestUtils.assertInRange(-PrimitiveMath.PI, PrimitiveMath.TWO_PI, root.getArgument());
+
+                ComplexNumber unit = root.power(p);
+
+                TestUtils.assertEquals(PrimitiveMath.ONE, unit.getModulus());
+                TestUtils.assertEquals(PrimitiveMath.ZERO, unit.getArgument());
+                TestUtils.assertEquals(PrimitiveMath.ONE, unit.getReal());
+                TestUtils.assertEquals(PrimitiveMath.ZERO, unit.getArgument());
+            }
+        }
     }
 
 }

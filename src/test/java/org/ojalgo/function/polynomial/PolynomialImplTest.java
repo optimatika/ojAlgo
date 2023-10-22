@@ -31,6 +31,20 @@ import org.ojalgo.type.context.NumberContext;
 public class PolynomialImplTest {
 
     @Test
+    public void testAddPolynomials() {
+
+        PolynomialR064 degree3 = PolynomialR064.wrap(1D, 1D, 1D, 1D);
+        PolynomialR064 degree2 = PolynomialR064.wrap(1D, 1D, 1D);
+        PolynomialR064 degree1 = PolynomialR064.wrap(1D, 1D);
+        PolynomialR064 degree0 = PolynomialR064.wrap(1D);
+
+        PolynomialFunction<Double> expected = PolynomialR064.wrap(4D, 3D, 2D, 1D);
+        PolynomialFunction<Double> actual = degree3.add(degree2).add(degree1).add(degree0);
+
+        TestUtils.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testEstimation() {
 
         final int tmpMaxSamples = 9;
@@ -81,8 +95,33 @@ public class PolynomialImplTest {
         tmpPoly.set(2, 10.0);
 
         for (double i = -100.0; i <= 100; i = i + 10.0) {
-            TestUtils.assertEquals(5.0 + i + (10.0 * (i * i)), tmpPoly.invoke(i), 1E-14 / PrimitiveMath.THREE);
+            TestUtils.assertEquals(5.0 + i + 10.0 * (i * i), tmpPoly.invoke(i), 1E-14 / PrimitiveMath.THREE);
         }
+    }
+
+    @Test
+    public void testPower() {
+
+        PolynomialR064 degree3 = PolynomialR064.wrap(1D, 1D, 1D, 1D);
+
+        TestUtils.assertEquals(3, degree3.degree());
+
+        TestUtils.assertEquals(0, degree3.power(0).degree());
+        TestUtils.assertEquals(3, degree3.power(1).degree());
+        TestUtils.assertEquals(6, degree3.power(2).degree());
+        TestUtils.assertEquals(9, degree3.power(3).degree());
+        TestUtils.assertEquals(12, degree3.power(4).degree());
+        TestUtils.assertEquals(15, degree3.power(5).degree());
+
+        degree3 = PolynomialR064.wrap(2D, 1D, 4D, 3D);
+
+        PolynomialFunction<Double> expected = degree3.multiply(degree3);
+        expected = expected.multiply(expected);
+        expected = expected.multiply(expected);
+
+        PolynomialFunction<Double> actual = degree3.power(8);
+
+        TestUtils.assertEquals(expected, actual);
     }
 
 }
