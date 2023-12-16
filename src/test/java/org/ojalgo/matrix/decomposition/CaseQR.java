@@ -68,6 +68,31 @@ public class CaseQR extends MatrixDecompositionTests {
     }
 
     @Test
+    public void testCompilation() {
+
+        // Just want to verify that this compiles and runs without throwing exceptions
+
+        QR<Double> tmpDecomp = QR.PRIMITIVE.make();
+
+        Array2D<Double> a2d = Array2D.R064.makeFilled(3, 3, Normal.standard());
+
+        tmpDecomp.decompose(a2d);
+
+        DenseReceiver dr = MatrixR064.FACTORY.newDenseBuilder(3, 3);
+        dr.fillAll(Normal.standard());
+        tmpDecomp.decompose(dr);
+
+        MatrixR064 ps = dr.get();
+        tmpDecomp.decompose(ps);
+
+        MatrixR064 lb = dr.get().below(2);
+        tmpDecomp.decompose(lb);
+
+        MatrixR064 bm = lb;
+        tmpDecomp.decompose(bm);
+    }
+
+    @Test
     public void testDiagonalCase() {
 
         PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
@@ -86,31 +111,6 @@ public class CaseQR extends MatrixDecompositionTests {
         // TODO Fix so that Q == I when the original A is already triangular, even for RawQR
         TestUtils.assertEquals(Primitive64Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), ACCURACY);
         TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), ACCURACY);
-    }
-
-    @Test
-    public void testCompilation() {
-
-        // Just want to verify that this compiles and runs without throwing exceptions
-
-        QR<Double> tmpDecomp = QR.PRIMITIVE.make();
-
-        Array2D<Double> a2d = Array2D.R064.makeFilled(3, 3, Normal.standard());
-
-        tmpDecomp.decompose(a2d);
-
-        DenseReceiver dr = MatrixR064.FACTORY.makeDense(3, 3);
-        dr.fillAll(Normal.standard());
-        tmpDecomp.decompose(dr);
-
-        MatrixR064 ps = dr.get();
-        tmpDecomp.decompose(ps);
-
-        MatrixR064 lb = dr.get().below(2);
-        tmpDecomp.decompose(lb);
-
-        MatrixR064 bm = lb;
-        tmpDecomp.decompose(bm);
     }
 
     @Test

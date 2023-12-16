@@ -39,6 +39,7 @@ public interface Structure1D {
             super();
         }
 
+        @Override
         public synchronized long toIndex(final T key) {
             long retVal = myKeys.indexOf(key);
             if (retVal < 0L) {
@@ -47,6 +48,7 @@ public interface Structure1D {
             return retVal;
         }
 
+        @Override
         public final T toKey(final long index) {
             return myKeys.get(Math.toIntExact(index));
         }
@@ -131,6 +133,7 @@ public interface Structure1D {
             this(-1);
         }
 
+        @Override
         public int compareTo(final IntIndex ref) {
             return Integer.compare(index, ref.index);
         }
@@ -140,7 +143,7 @@ public interface Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof IntIndex)) {
+            if (obj == null || !(obj instanceof IntIndex)) {
                 return false;
             }
             final IntIndex other = (IntIndex) obj;
@@ -190,6 +193,7 @@ public interface Structure1D {
             this(-1L);
         }
 
+        @Override
         public int compareTo(final LongIndex ref) {
             return Long.compare(index, ref.index);
         }
@@ -199,7 +203,7 @@ public interface Structure1D {
             if (this == obj) {
                 return true;
             }
-            if ((obj == null) || !(obj instanceof LongIndex)) {
+            if (obj == null || !(obj instanceof LongIndex)) {
                 return false;
             }
             final LongIndex other = (LongIndex) obj;
@@ -324,7 +328,7 @@ public interface Structure1D {
     }
 
     /**
-     * @return The total number of elements in this structure.
+     * The total number of elements in this structure.
      */
     long count();
 
@@ -338,6 +342,9 @@ public interface Structure1D {
         }
     }
 
+    /**
+     * The total number of elements in this structure.
+     */
     default int size() {
         return Math.toIntExact(this.count());
     }

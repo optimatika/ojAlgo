@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
@@ -57,8 +56,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -66,85 +65,9 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class Primitive64Store extends ArrayR064 implements PhysicalStore<Double>, DecompositionStore<Double> {
+public final class Primitive64Store extends ArrayR064 implements PhysicalStore<Double>, DecompositionStore<Double>, Factory2D.Builder<Primitive64Store> {
 
-    public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PrimitiveFactory<Primitive64Store>() {
-
-        @Override
-        public Primitive64Store columns(final Access1D<?>... source) {
-
-            final int tmpRowDim = (int) source[0].count();
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = tmpColumn.doubleValue(i);
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store columns(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpColumn[i]);
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store columns(final double[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = tmpColumn[i];
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store columns(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source[0].size();
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpColumn.get(i));
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
+    public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public Primitive64Store copy(final Access2D<?> source) {
@@ -181,84 +104,13 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
         }
 
         @Override
+        public Primitive64Store make(final int rows, final int columns) {
+            return new Primitive64Store(rows, columns);
+        }
+
+        @Override
         public Primitive64Store make(final long rows, final long columns) {
             return new Primitive64Store((int) rows, (int) columns);
-        }
-
-        @Override
-        public Primitive64Store rows(final Access1D<?>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = (int) source[0].count();
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = tmpRow.doubleValue(j);
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store rows(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Comparable<?>[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpRow[j]);
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store rows(final double[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = tmpRow[j];
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive64Store rows(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.doubleValue(tmpRow.get(j));
-                }
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         @Override
@@ -370,7 +222,7 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
         } else if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(matrix);
+            return FACTORY.column(matrix);
         }
     }
 
@@ -532,6 +384,11 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
     @Override
     public Array1D<Double> asList() {
         return myUtility.flatten();
+    }
+
+    @Override
+    public Primitive64Store build() {
+        return this;
     }
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {

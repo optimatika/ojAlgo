@@ -38,12 +38,12 @@ public class QuaternionArray extends ArrayH256 {
         return new QuaternionArray(data);
     }
 
-    QuaternionArray(final Quaternion[] data) {
-        super(data);
-    }
-
     QuaternionArray(final int size) {
         super(size);
+    }
+
+    QuaternionArray(final Quaternion[] data) {
+        super(data);
     }
 
 }

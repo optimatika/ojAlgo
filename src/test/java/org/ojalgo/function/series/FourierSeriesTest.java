@@ -79,6 +79,26 @@ public class FourierSeriesTest extends SeriesFunctionTests {
         FourierSeriesTest.doTest(Math::cos, SAMPLE);
     }
 
+    @Test
+    public void testSawtooth() {
+        FourierSeriesTest.doTest(PeriodicFunction.SAWTOOTH, 256);
+    }
+
+    @Test
+    public void testSin() {
+        FourierSeriesTest.doTest(Math::sin, SAMPLE);
+    }
+
+    @Test
+    public void testSine() {
+        FourierSeriesTest.doTest(PeriodicFunction.SINE, 8);
+    }
+
+    @Test
+    public void testSquare() {
+        FourierSeriesTest.doTest(PeriodicFunction.SQUARE, 128);
+    }
+
     /**
      * https://www.math.kit.edu/iana3/lehre/fourierana2014w/media/fstable141127.pdf
      */
@@ -173,26 +193,6 @@ public class FourierSeriesTest extends SeriesFunctionTests {
         TestUtils.assertEquals(ZERO, function.applyAsDouble(PI - NUDGE));
 
         FourierSeriesTest.doTest(function, 8);
-    }
-
-    @Test
-    public void testSawtooth() {
-        FourierSeriesTest.doTest(PeriodicFunction.SAWTOOTH, 256);
-    }
-
-    @Test
-    public void testSin() {
-        FourierSeriesTest.doTest(Math::sin, SAMPLE);
-    }
-
-    @Test
-    public void testSine() {
-        FourierSeriesTest.doTest(PeriodicFunction.SINE, 8);
-    }
-
-    @Test
-    public void testSquare() {
-        FourierSeriesTest.doTest(PeriodicFunction.SQUARE, 128);
     }
 
     @Test

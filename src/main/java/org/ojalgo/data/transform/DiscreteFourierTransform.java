@@ -425,7 +425,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
                 FFT.doStages(myStages, myUnitRoots, myWorkRe, myWorkIm);
             }
 
-            PhysicalStore<ComplexNumber> output = GenericStore.C128.makeDense(input.length, 1);
+            PhysicalStore<ComplexNumber> output = GenericStore.C128.make(input.length, 1);
 
             FFT.toOutput(myWorkRe, myWorkIm, DEFAULT.conjugate, DEFAULT.scale, output);
 
@@ -500,7 +500,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
 
     public static MatrixStore<ComplexNumber> inverse2D(final MatrixStore<?> input) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.makeDense(input.getRowDim(), input.getColDim());
+        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.make(input.getRowDim(), input.getColDim());
 
         DiscreteFourierTransform.transform2D(input, INVERSE, retVal);
 
@@ -535,7 +535,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
 
     public static MatrixC128 newVandermondeMatrix(final int size) {
 
-        DenseReceiver receiver = MatrixC128.FACTORY.makeDense(size, size);
+        DenseReceiver receiver = MatrixC128.FACTORY.newDenseBuilder(size, size);
 
         DiscreteFourierTransform.generate(receiver);
 
@@ -613,7 +613,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
      */
     public static MatrixStore<ComplexNumber> transform2D(final MatrixStore<?> input) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.makeDense(input.getRowDim(), input.getColDim());
+        PhysicalStore<ComplexNumber> retVal = GenericStore.C128.make(input.getRowDim(), input.getColDim());
 
         DiscreteFourierTransform.transform2D(input, DEFAULT, retVal);
 
@@ -626,7 +626,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
         int nbCols = input.getColDim();
 
         DiscreteFourierTransform transformer = DiscreteFourierTransform.newInstance(nbRows);
-        PhysicalStore<ComplexNumber> workOutput = GenericStore.C128.makeDense(nbRows, 1);
+        PhysicalStore<ComplexNumber> workOutput = GenericStore.C128.make(nbRows, 1);
 
         Directive directive1 = directive;
         for (ColumnView<?> view : input.columns()) {
@@ -636,7 +636,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
 
         if (nbRows != nbCols) {
             transformer = DiscreteFourierTransform.newInstance(nbCols);
-            workOutput = GenericStore.C128.makeDense(nbCols, 1);
+            workOutput = GenericStore.C128.make(nbCols, 1);
         }
 
         Directive directive2 = directive.withComplex(true);
@@ -772,14 +772,14 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
     }
 
     public final MatrixStore<ComplexNumber> inverse(final Access1D<ComplexNumber> input) {
-        PhysicalStore<ComplexNumber> output = GenericStore.C128.makeDense(input.size(), 1);
+        PhysicalStore<ComplexNumber> output = GenericStore.C128.make(input.size(), 1);
         this.transform(input, INVERSE, output);
         return output;
     }
 
     @Override
     public final MatrixStore<ComplexNumber> transform(final Access1D<?> input) {
-        PhysicalStore<ComplexNumber> output = GenericStore.C128.makeDense(input.size(), 1);
+        PhysicalStore<ComplexNumber> output = GenericStore.C128.make(input.size(), 1);
         this.transform(input, DEFAULT, output);
         return output;
     }
@@ -791,7 +791,7 @@ public abstract class DiscreteFourierTransform implements DataTransform<Access1D
     }
 
     public MatrixStore<ComplexNumber> transform(final double... input) {
-        PhysicalStore<ComplexNumber> output = GenericStore.C128.makeDense(input.length, 1);
+        PhysicalStore<ComplexNumber> output = GenericStore.C128.make(input.length, 1);
         this.transform(ArrayR064.wrap(input), DEFAULT, output);
         return output;
     }

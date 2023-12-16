@@ -32,37 +32,46 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
 
-abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements PhysicalStore.Factory<Double, I> {
+abstract class PrimitiveFactory<I extends PhysicalStore<Double> & Factory2D.Builder<I>> implements PhysicalStore.Factory<Double, I> {
 
+    @Override
     public final AggregatorSet<Double> aggregator() {
         return PrimitiveAggregator.getSet();
     }
 
+    @Override
     public DenseArray.Factory<Double> array() {
         return ArrayR064.FACTORY;
     }
 
+    @Override
     public final I conjugate(final Access2D<?> source) {
         return this.transpose(source);
     }
 
+    @Override
     public final FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
     }
 
+    @Override
     public Householder<Double> makeHouseholder(final int length) {
         return new Householder.Primitive64(length);
     }
 
+    @Override
     public final Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {
         return new Rotation.Primitive(low, high, cos, sin);
     }
 
+    @Override
     public final Rotation.Primitive makeRotation(final int low, final int high, final Double cos, final Double sin) {
         return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
     }
 
+    @Override
     public final Scalar.Factory<Double> scalar() {
         return PrimitiveScalar.FACTORY;
     }

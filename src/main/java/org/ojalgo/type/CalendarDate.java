@@ -72,6 +72,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
             return epochMilli + this.toDurationInMillis();
         }
 
+        default CalendarDate adjustInto(final CalendarDate temporal) {
+            return new CalendarDate(this.adjustInto(temporal.millis));
+        }
+
         /**
          * Maps a range of instances in time to a single instance.
          */
@@ -96,10 +100,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
         default CalendarDate toKey(final long index) {
             return new CalendarDate(index);
-        }
-
-        default CalendarDate adjustInto(final CalendarDate temporal) {
-            return new CalendarDate(this.adjustInto(temporal.millis));
         }
 
     }

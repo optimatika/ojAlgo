@@ -30,7 +30,6 @@ import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -55,8 +54,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  */
 public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N> {
 
-    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>>
-            extends Factory2D.Dense<I>, Factory2D.MayBeSparse<I, PhysicalStore<N>, SparseStore<N>> {
+    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N> & Factory2D.Builder<I>> extends Factory2D.TwoStep<I, I> {
 
         AggregatorSet<N> aggregator();
 
@@ -79,12 +77,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new ColumnsSupplier<>(this, numberOfRows);
         }
 
-        @Override
-        default PhysicalStore<N> makeDense(final long rows, final long columns) {
-            return this.make(rows, columns);
-        }
-
-        default <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+        default <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(final D mainDiagonal) {
             return DiagonalStore.builder(this, mainDiagonal);
         }
 
@@ -106,7 +99,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
         @Override
         default I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            I retVal = this.make(rows, columns);
+            I retVal = this.newBuilder(rows, columns);
 
             retVal.fillAll(supplier);
 
@@ -135,9 +128,12 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
             return new SingleStore<>(this, element);
         }
 
-        @Override
-        default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
-            return SparseStore.makeSparse(this, rowsCount, columnsCount);
+        default SparseStore<N> makeSparse(final long nbRows, final long nbCols) {
+            return SparseStore.factory(this).make(nbRows, nbCols);
+        }
+
+        default SparseStore<N> makeSparse(final Structure2D shape) {
+            return this.makeSparse(shape.countRows(), shape.countColumns());
         }
 
         /**
@@ -174,6 +170,11 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         default MatrixStore<N> makeZero(final Structure2D shape) {
             return this.makeZero(shape.countRows(), shape.countColumns());
+        }
+
+        @Override
+        default I newBuilder(final long nbRows, final long nbCols) {
+            return this.make(nbRows, nbCols);
         }
 
         @Override

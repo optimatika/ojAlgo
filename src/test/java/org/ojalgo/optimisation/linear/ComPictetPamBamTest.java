@@ -94,7 +94,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;
             TestUtils.assertTrue(message, validated);
             if (validated) {
-                return Primitive64Store.FACTORY.copy(MatrixQ128.FACTORY.columns(tmpResult));
+                return Primitive64Store.FACTORY.copy(MatrixQ128.FACTORY.column(tmpResult));
             }
         } else {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;

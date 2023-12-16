@@ -22,6 +22,7 @@
 package org.ojalgo.series.primitive;
 
 import org.ojalgo.data.DataProcessors;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
@@ -57,7 +58,7 @@ public class SeriesSet {
     /**
      * Return a {@link Structure2D} with variables in columns and matching samples in rows.
      */
-    public <M extends Structure2D> M getData(final Factory2D.Dense<M> factory) {
+    public <M extends Access2D<?>> M getData(final Factory2D.TwoStep<M, ?> factory) {
         return factory.columns(mySet);
     }
 

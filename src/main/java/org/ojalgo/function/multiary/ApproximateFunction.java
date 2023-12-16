@@ -55,6 +55,7 @@ abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryF
         return true;
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
 
         MatrixStore<N> retVal = this.getGradient(this.factory().makeZero(this.arity(), 1));
@@ -73,16 +74,18 @@ abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryF
         return prime * result + (myPoint == null ? 0 : myPoint.hashCode());
     }
 
+    @Override
     public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {
         return new FirstOrderApproximation<>(this, arg);
     }
 
+    @Override
     public final SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> arg) {
         return new SecondOrderApproximation<>(this, arg);
     }
 
     protected PhysicalStore<N> shift(final Access1D<?> arg) {
-        final PhysicalStore<N> retVal = this.factory().columns(arg);
+        final PhysicalStore<N> retVal = this.factory().column(arg);
         retVal.modifyMatching(this.factory().function().subtract(), myPoint);
         return retVal;
     }

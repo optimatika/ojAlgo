@@ -72,16 +72,16 @@ public enum JavaType {
         return MemoryEstimator.makeForClassExtendingObject().add(this).estimate();
     }
 
+    public Class<?> getJavaClass() {
+        return myJavaClass;
+    }
+
     public final long memory() {
         return myMemoryBytes;
     }
 
     final int getInformationBits() {
         return myInformationBits;
-    }
-
-    public Class<?> getJavaClass() {
-        return myJavaClass;
     }
 
 }

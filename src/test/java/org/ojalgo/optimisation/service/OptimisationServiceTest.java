@@ -26,6 +26,30 @@ public class OptimisationServiceTest {
     }
 
     @Test
+    public void testEnvironment() {
+
+        Response<String> response = ServiceClient.get(HOST + PATH_ENVIRONMENT);
+
+        TestUtils.assertTrue(response.isResponseOK());
+
+        if (DEBUG) {
+            BasicLogger.debug(response.getBody());
+        }
+    }
+
+    @Test
+    public void testTest() {
+
+        Response<String> response = ServiceClient.get(HOST + PATH_TEST);
+
+        TestUtils.assertTrue(response.isResponseOK());
+
+        if (DEBUG) {
+            BasicLogger.debug(response.getBody());
+        }
+    }
+
+    @Test
     public void testVeryBasicModel() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
@@ -47,30 +71,6 @@ public class OptimisationServiceTest {
         TestUtils.assertStateAndSolution(expMin, actMin);
 
         ExpressionsBasedModel.clearIntegrations();
-    }
-
-    @Test
-    public void testTest() {
-
-        Response<String> response = ServiceClient.get(HOST + PATH_TEST);
-
-        TestUtils.assertTrue(response.isResponseOK());
-
-        if (DEBUG) {
-            BasicLogger.debug(response.getBody());
-        }
-    }
-
-    @Test
-    public void testEnvironment() {
-
-        Response<String> response = ServiceClient.get(HOST + PATH_ENVIRONMENT);
-
-        TestUtils.assertTrue(response.isResponseOK());
-
-        if (DEBUG) {
-            BasicLogger.debug(response.getBody());
-        }
     }
 
 }

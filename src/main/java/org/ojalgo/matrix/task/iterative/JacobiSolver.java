@@ -46,6 +46,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         super();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
 
@@ -55,7 +56,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         } else {
             tmpBody = Primitive64Store.FACTORY.makeWrapper(body);
         }
-        MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.columns(tmpBody.sliceDiagonal());
+        MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.column(tmpBody.sliceDiagonal());
 
         MatrixStore<Double> tmpRHS = null;
         if (rhs instanceof MatrixStore<?> && rhs.get(0L) instanceof Double) {

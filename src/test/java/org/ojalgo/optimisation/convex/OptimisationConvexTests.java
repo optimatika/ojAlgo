@@ -34,6 +34,10 @@ public abstract class OptimisationConvexTests {
 
     static boolean DEBUG = false;
 
+    public static ConvexData<Double> getOptimisationData(final ConvexSolver.Builder convexSolverBuilder) {
+        return convexSolverBuilder.getConvexData(Primitive64Store.FACTORY);
+    }
+
     protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, Optimisation.Options options) {
 
         if (options == null) {
@@ -70,10 +74,6 @@ public abstract class OptimisationConvexTests {
         ConvexSolver.copy(model, builder);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy, model.options);
-    }
-
-    public static ConvexData<Double> getOptimisationData(final ConvexSolver.Builder convexSolverBuilder) {
-        return convexSolverBuilder.getConvexData(Primitive64Store.FACTORY);
     }
 
 }

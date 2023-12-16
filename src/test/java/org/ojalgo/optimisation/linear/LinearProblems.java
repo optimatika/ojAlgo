@@ -175,7 +175,7 @@ public class LinearProblems extends OptimisationLinearTests {
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         BigDecimal claimedValue = new BigDecimal("25.8");
 
-        MatrixR064.DenseReceiver solutionBuilder = MatrixR064.FACTORY.makeDense(6, 1);
+        MatrixR064.DenseReceiver solutionBuilder = MatrixR064.FACTORY.newDenseBuilder(6, 1);
         solutionBuilder.set(0, 0, 10);
         solutionBuilder.set(2, 0, 8);
         solutionBuilder.set(4, 0, 5);
@@ -203,21 +203,21 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(true, modFull.validate(tmpFullResult, ACCURACY));
         int[] someRows2 = { 0, 1, 2 };
 
-        TestUtils.assertEquals(claimedSolutionEven, MatrixQ128.FACTORY.columns(tmpEvenResult).rows(someRows2), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionEven, MatrixQ128.FACTORY.column(tmpEvenResult).rows(someRows2), ACCURACY);
         int[] someRows3 = { 0, 1, 2 };
-        TestUtils.assertEquals(claimedSolutionOdd, MatrixQ128.FACTORY.columns(tmpOddResult).rows(someRows3), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionOdd, MatrixQ128.FACTORY.column(tmpOddResult).rows(someRows3), ACCURACY);
         int[] someRows4 = { 0, 1, 2, 3, 4, 5 };
-        TestUtils.assertEquals(claimedSolutionFull, MatrixQ128.FACTORY.columns(tmpFullResult).rows(someRows4), ACCURACY);
+        TestUtils.assertEquals(claimedSolutionFull, MatrixQ128.FACTORY.column(tmpFullResult).rows(someRows4), ACCURACY);
         int[] someRows5 = { 0, 1, 2 };
 
         BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
-                modEven.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpEvenResult).rows(someRows5)))));
+                modEven.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpEvenResult).rows(someRows5)))));
         int[] someRows6 = { 0, 1, 2 };
         BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils
-                .toBigDecimal(modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpOddResult).rows(someRows6)))));
+                .toBigDecimal(modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpOddResult).rows(someRows6)))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
         BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
-                modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.columns(tmpFullResult).rows(someRows7)))));
+                modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpFullResult).rows(someRows7)))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, claimedValue.compareTo(tmpFullValue));
@@ -268,7 +268,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult11);
-        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.columns(tmpResult11));
+        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.column(tmpResult11));
 
         tmpExprC2.set(0, NEG);
         tmpExprC2.set(1, ONE);
@@ -279,7 +279,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result tmpResultN1 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultN1.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultN1);
-        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.columns(tmpResultN1));
+        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.column(tmpResultN1));
 
         tmpExprC2.set(0, ONE);
         tmpExprC2.set(1, NEG);
@@ -290,7 +290,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result tmpResult1N = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult1N.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult1N);
-        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.columns(tmpResult1N));
+        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.column(tmpResult1N));
 
         tmpExprC2.set(0, NEG);
         tmpExprC2.set(1, ONE);
@@ -301,7 +301,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result tmpResultNN = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultNN);
-        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.columns(tmpResultNN));
+        TestUtils.assertEquals(tmpExpectedSolution, MatrixQ128.FACTORY.column(tmpResultNN));
     }
 
     /**

@@ -32,12 +32,12 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<ComplexNumber> {
 
-        default double invoke(final double arg1, final double arg2) {
-            return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
-        }
-
         default ComplexNumber invoke(final ComplexNumber arg1, final double arg2) {
             return this.invoke(arg1, ComplexNumber.valueOf(arg2));
+        }
+
+        default double invoke(final double arg1, final double arg2) {
+            return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
         }
 
         default float invoke(final float arg1, final float arg2) {

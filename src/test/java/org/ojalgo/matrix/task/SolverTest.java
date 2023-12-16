@@ -45,9 +45,9 @@ public class SolverTest extends MatrixTaskTests {
     public void testExampleWikipediA() {
 
         MatrixStore<Double> tmpA = Primitive64Store.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
-        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.columns(new double[] { 1, 2 });
+        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.column(1, 2);
 
-        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.columns(new double[] { 1.0 / 11.0, 7.0 / 11.0 });
+        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.column(1.0 / 11.0, 7.0 / 11.0);
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
         TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
@@ -86,9 +86,9 @@ public class SolverTest extends MatrixTaskTests {
     public void testLinAlg34PDF() {
 
         MatrixStore<Double> tmpA = Primitive64Store.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
-        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.columns(new double[] { 8, -14, 27 });
+        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.column(8, -14, 27);
 
-        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.columns(new double[] { -1, 3, 2 });
+        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.column(-1, 3, 2);
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
         TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());

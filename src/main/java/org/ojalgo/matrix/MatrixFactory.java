@@ -23,8 +23,6 @@ package org.ojalgo.matrix;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
@@ -52,8 +50,8 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>, SR extends Mutate2D.ModifiableReceiver<N> & Supplier<M>>
-        implements Factory2D.Dense<M>, Factory2D.MayBeSparse<M, DR, SR> {
+public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Factory2D.Builder<M>, SR extends Mutate2D.ModifiableReceiver<N> & Factory2D.Builder<M>>
+        implements Factory2D.MayBeSparse<M, DR, SR> {
 
     private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> template) {
         try {
@@ -76,22 +74,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         myConstructor = (Constructor<M>) MatrixFactory.getConstructor(template);
     }
 
-    public M columns(final Access1D<?>... source) {
-        return this.instantiate(myPhysicalFactory.columns(source));
-    }
-
-    public M columns(final Comparable<?>[]... source) {
-        return this.instantiate(myPhysicalFactory.columns(source));
-    }
-
-    public M columns(final double[]... source) {
-        return this.instantiate(myPhysicalFactory.columns(source));
-    }
-
-    public M columns(final List<? extends Comparable<?>>... source) {
-        return this.instantiate(myPhysicalFactory.columns(source));
-    }
-
+    @Override
     public M copy(final Access2D<?> source) {
         return this.instantiate(myPhysicalFactory.copy(source));
     }
@@ -101,16 +84,23 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return myPhysicalFactory.function();
     }
 
-    public M make(final long rows, final long columns) {
-        return this.instantiate(myPhysicalFactory.makeZero((int) rows, (int) columns));
+    @Override
+    public MathType getMathType() {
+        return myPhysicalFactory.getMathType();
+    }
+
+    @Override
+    public M make(final int nbRows, final int nbCols) {
+        return this.instantiate(myPhysicalFactory.makeZero(nbRows, nbCols));
+    }
+
+    @Override
+    public M make(final long nbRows, final long nbCols) {
+        return this.instantiate(myPhysicalFactory.makeZero(nbRows, nbCols));
     }
 
     public DR makeDense(final int count) {
-        return this.makeDense(count, 1);
-    }
-
-    public DR makeDense(final long rows, final long columns) {
-        return this.dense(myPhysicalFactory.make(rows, columns));
+        return this.newDenseBuilder(count, 1);
     }
 
     public M makeDiagonal(final Access1D<?> diagonal) {
@@ -140,6 +130,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return this.makeEye(Math.toIntExact(shape.countRows()), Math.toIntExact(shape.countColumns()));
     }
 
+    @Override
     public M makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
         return this.instantiate(myPhysicalFactory.makeFilled(rows, columns, supplier));
     }
@@ -152,32 +143,18 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return this.instantiate(myPhysicalFactory.makeSingle(element));
     }
 
-    public SR makeSparse(final long rows, final long columns) {
-        return this.sparse(myPhysicalFactory.makeSparse(rows, columns));
-    }
-
-    public SR makeSparse(final Structure2D shape) {
-        return this.makeSparse(Math.toIntExact(shape.countRows()), Math.toIntExact(shape.countColumns()));
-    }
-
     public M makeWrapper(final Access2D<?> elements) {
         return this.instantiate(myPhysicalFactory.makeWrapper(elements));
     }
 
-    public M rows(final Access1D<?>... source) {
-        return this.instantiate(myPhysicalFactory.rows(source));
+    @Override
+    public DR newDenseBuilder(final long nbRows, final long nbCols) {
+        return this.dense(myPhysicalFactory.make(nbRows, nbCols));
     }
 
-    public M rows(final Comparable<?>[]... source) {
-        return this.instantiate(myPhysicalFactory.rows(source));
-    }
-
-    public M rows(final double[]... source) {
-        return this.instantiate(myPhysicalFactory.rows(source));
-    }
-
-    public M rows(final List<? extends Comparable<?>>... source) {
-        return this.instantiate(myPhysicalFactory.rows(source));
+    @Override
+    public SR newSparseBuilder(final long nbRows, final long nbCols) {
+        return this.sparse(myPhysicalFactory.makeSparse(nbRows, nbCols));
     }
 
     @Override
@@ -188,20 +165,29 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     public TensorFactory1D<N, DR> tensor1D() {
         return TensorFactory1D.of(new Factory1D<DR>() {
 
+            @Override
             public FunctionSet<N> function() {
                 return MatrixFactory.this.function();
             }
 
-            public DR make(final long count) {
-                return MatrixFactory.this.makeDense(count, 1L);
-            }
-
-            public Factory<N> scalar() {
-                return MatrixFactory.this.scalar();
-            }
-
+            @Override
             public MathType getMathType() {
                 return MatrixFactory.this.getMathType();
+            }
+
+            @Override
+            public DR make(final int size) {
+                return MatrixFactory.this.newDenseBuilder(size, 1L);
+            }
+
+            @Override
+            public DR make(final long count) {
+                return MatrixFactory.this.newDenseBuilder(count, 1L);
+            }
+
+            @Override
+            public Factory<N> scalar() {
+                return MatrixFactory.this.scalar();
             }
 
         });
@@ -210,20 +196,29 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     public TensorFactory2D<N, DR> tensor2D() {
         return TensorFactory2D.of(new Factory2D<DR>() {
 
+            @Override
             public FunctionSet<N> function() {
                 return MatrixFactory.this.function();
             }
 
-            public DR make(final long rows, final long columns) {
-                return MatrixFactory.this.makeDense(rows, columns);
-            }
-
-            public Factory<N> scalar() {
-                return MatrixFactory.this.scalar();
-            }
-
+            @Override
             public MathType getMathType() {
                 return MatrixFactory.this.getMathType();
+            }
+
+            @Override
+            public DR make(final int nbRows, final int nbCols) {
+                return MatrixFactory.this.newDenseBuilder(nbRows, nbCols);
+            }
+
+            @Override
+            public DR make(final long nbRows, final long nbCols) {
+                return MatrixFactory.this.newDenseBuilder(nbRows, nbCols);
+            }
+
+            @Override
+            public Factory<N> scalar() {
+                return MatrixFactory.this.scalar();
             }
 
         });
@@ -247,9 +242,5 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     abstract SR sparse(final SparseStore<N> store);
-
-    public MathType getMathType() {
-        return myPhysicalFactory.getMathType();
-    }
 
 }

@@ -149,11 +149,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myValues[Math.toIntExact(index)] = NumberDefinition.byteValue(value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myValues[index] = (byte) value;
         }
@@ -161,6 +156,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public void set(final int index, final float value) {
             myValues[index] = (byte) value;
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.byteValue(value);
         }
 
         @Override
@@ -212,11 +212,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myValues[Math.toIntExact(index)] = NumberDefinition.doubleValue(value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myValues[index] = value;
         }
@@ -224,6 +219,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public void set(final int index, final float value) {
             myValues[index] = value;
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.doubleValue(value);
         }
 
         @Override
@@ -275,11 +275,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myValues[Math.toIntExact(index)] = NumberDefinition.floatValue(value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myValues[index] = (float) value;
         }
@@ -287,6 +282,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public void set(final int index, final float value) {
             myValues[index] = value;
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.floatValue(value);
         }
 
         @Override
@@ -349,11 +349,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myValues[Math.toIntExact(index)] = NumberDefinition.intValue(value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myValues[index] = (int) value;
         }
@@ -361,6 +356,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public void set(final int index, final float value) {
             myValues[index] = (int) value;
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.intValue(value);
         }
 
         @Override
@@ -379,17 +379,17 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             myValues = values;
         }
 
+        public void add(final int index, final float addend) {
+            int intIndex = Math.toIntExact(index);
+            myValues[intIndex] = (long) (myValues[intIndex] + addend);
+        }
+
         public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.longValue(addend);
         }
 
         public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (long) addend;
-        }
-
-        public void add(final int index, final float addend) {
-            int intIndex = Math.toIntExact(index);
-            myValues[intIndex] = (long) (myValues[intIndex] + addend);
         }
 
         @Override
@@ -418,11 +418,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myValues[Math.toIntExact(index)] = NumberDefinition.longValue(value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myValues[index] = (long) value;
         }
@@ -430,6 +425,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public void set(final int index, final float value) {
             myValues[index] = (long) value;
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.longValue(value);
         }
 
         @Override
@@ -518,6 +518,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         @Override
+        public void set(final int index, final double value) {
+            myValues[index] = (short) value;
+        }
+
+        @Override
         public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.shortValue(value);
         }
@@ -540,11 +545,6 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public short shortValue(final long index) {
             return myValues[Math.toIntExact(index)];
-        }
-
-        @Override
-        public void set(final int index, final double value) {
-            myValues[index] = (short) value;
         }
 
     }

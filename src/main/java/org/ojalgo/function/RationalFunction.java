@@ -41,12 +41,12 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
         }
 
-        default RationalNumber invoke(final RationalNumber arg1, final double arg2) {
-            return this.invoke(arg1, RationalNumber.valueOf(arg2));
-        }
-
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).floatValue();
+        }
+
+        default RationalNumber invoke(final RationalNumber arg1, final double arg2) {
+            return this.invoke(arg1, RationalNumber.valueOf(arg2));
         }
 
     }

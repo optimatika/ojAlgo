@@ -32,20 +32,20 @@ public final class Price extends ExactDecimal<Price> {
 
     public static final Scalar.Factory<Price> FACTORY = new ExactDecimal.Factory<>() {
 
-        public Price cast(final double value) {
-            return Price.valueOf(value);
-        }
-
         public Price cast(final Comparable<?> number) {
             return Price.valueOf(number);
         }
 
-        public Price convert(final double value) {
+        public Price cast(final double value) {
             return Price.valueOf(value);
         }
 
         public Price convert(final Comparable<?> number) {
             return Price.valueOf(number);
+        }
+
+        public Price convert(final double value) {
+            return Price.valueOf(value);
         }
 
         public Descriptor descriptor() {
@@ -70,10 +70,6 @@ public final class Price extends ExactDecimal<Price> {
     public static final Price TWO = new Price(LONG_DENOMINATOR + LONG_DENOMINATOR);
     public static final Price ZERO = new Price();
 
-    public static Price valueOf(final double value) {
-        return new Price(Math.round(value * DOUBLE_DENOMINATOR));
-    }
-
     public static Price valueOf(final Comparable<?> number) {
 
         if (number == null) {
@@ -85,6 +81,10 @@ public final class Price extends ExactDecimal<Price> {
         }
 
         return Price.valueOf(Scalar.doubleValue(number));
+    }
+
+    public static Price valueOf(final double value) {
+        return new Price(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
     public Price() {

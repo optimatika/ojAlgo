@@ -49,13 +49,13 @@ public class ArrayQ128 extends ScalarArray<RationalNumber> {
         }
 
         @Override
-        public Scalar.Factory<RationalNumber> scalar() {
-            return RationalNumber.FACTORY;
+        public MathType getMathType() {
+            return MathType.Q128;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.Q128;
+        public Scalar.Factory<RationalNumber> scalar() {
+            return RationalNumber.FACTORY;
         }
 
         @Override

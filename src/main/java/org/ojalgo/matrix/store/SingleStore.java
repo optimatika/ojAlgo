@@ -52,12 +52,12 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
     }
 
     @Override
-    public double doubleValue(final long anInd) {
+    public double doubleValue(final int aRow, final int aCol) {
         return myValue;
     }
 
     @Override
-    public double doubleValue(final int aRow, final int aCol) {
+    public double doubleValue(final long anInd) {
         return myValue;
     }
 

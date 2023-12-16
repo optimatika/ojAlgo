@@ -64,13 +64,13 @@ public class ArrayZ008 extends PrimitiveArray {
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        public MathType getMathType() {
+            return MathType.Z008;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.Z008;
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
@@ -108,8 +108,48 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public float floatValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public final Double get(final int index) {
+        return Double.valueOf(data[index]);
+    }
+
+    @Override
     public void reset() {
         Arrays.fill(data, (byte) 0);
+    }
+
+    @Override
+    public void set(final int index, final byte value) {
+        data[index] = value;
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        data[index] = (byte) Math.round(value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        data[index] = (byte) Math.round(value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        data[index] = (byte) value;
     }
 
     @Override
@@ -125,6 +165,11 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
+    protected void add(final int index, final byte addend) {
+        data[index] += addend;
+    }
+
+    @Override
     protected void add(final int index, final Comparable<?> addend) {
         data[index] += NumberDefinition.byteValue(addend);
     }
@@ -132,21 +177,6 @@ public class ArrayZ008 extends PrimitiveArray {
     @Override
     protected void add(final int index, final double addend) {
         data[index] += (byte) Math.round(addend);
-    }
-
-    @Override
-    protected void add(final int index, final byte addend) {
-        data[index] += addend;
-    }
-
-    @Override
-    public byte byteValue(final int index) {
-        return data[index];
-    }
-
-    @Override
-    public double doubleValue(final int index) {
-        return data[index];
     }
 
     @Override
@@ -177,16 +207,6 @@ public class ArrayZ008 extends PrimitiveArray {
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
         data[index] = supplier.byteValue();
-    }
-
-    @Override
-    public float floatValue(final int index) {
-        return data[index];
-    }
-
-    @Override
-    public final Double get(final int index) {
-        return Double.valueOf(data[index]);
     }
 
     @Override
@@ -235,21 +255,6 @@ public class ArrayZ008 extends PrimitiveArray {
     }
 
     @Override
-    public void set(final int index, final double value) {
-        data[index] = (byte) Math.round(value);
-    }
-
-    @Override
-    public void set(final int index, final byte value) {
-        data[index] = value;
-    }
-
-    @Override
-    public void set(final int index, final float value) {
-        data[index] = (byte) Math.round(value);
-    }
-
-    @Override
     protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         OperationVoid.invoke(data, first, limit, step, visitor);
     }
@@ -272,11 +277,6 @@ public class ArrayZ008 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
-    }
-
-    @Override
-    public void set(final int index, final long value) {
-        data[index] = (byte) value;
     }
 
 }

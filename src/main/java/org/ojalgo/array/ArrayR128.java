@@ -49,13 +49,13 @@ public class ArrayR128 extends ScalarArray<Quadruple> {
         }
 
         @Override
-        public Scalar.Factory<Quadruple> scalar() {
-            return Quadruple.FACTORY;
+        public MathType getMathType() {
+            return MathType.R128;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.R128;
+        public Scalar.Factory<Quadruple> scalar() {
+            return Quadruple.FACTORY;
         }
 
         @Override

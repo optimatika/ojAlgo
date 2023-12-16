@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.*;
@@ -52,6 +51,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -59,7 +59,8 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, DecompositionStore<N> {
+public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
+        implements PhysicalStore<N>, DecompositionStore<N>, Factory2D.Builder<GenericStore<N>> {
 
     static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericStore<N>> {
 
@@ -78,82 +79,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         @Override
         public DenseArray.Factory<N> array() {
             return myDenseArrayFactory;
-        }
-
-        @Override
-        public GenericStore<N> columns(final Access1D<?>... source) {
-
-            int tmpRowDim = source[0].size();
-            int tmpColDim = source.length;
-
-            N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Access1D<?> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> columns(final Comparable<?>[]... source) {
-
-            int tmpRowDim = source[0].length;
-            int tmpColDim = source.length;
-
-            N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> columns(final double[]... source) {
-
-            int tmpRowDim = source[0].length;
-            int tmpColDim = source.length;
-
-            N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> columns(final List<? extends Comparable<?>>... source) {
-
-            int tmpRowDim = source[0].size();
-            int tmpColDim = source.length;
-
-            N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            List<? extends Comparable<?>> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         @Override
@@ -225,8 +150,13 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         }
 
         @Override
-        public GenericStore<N> make(final long rows, final long columns) {
-            return new GenericStore<>(this, (int) rows, (int) columns);
+        public GenericStore<N> make(final int nbRows, final int nbCols) {
+            return new GenericStore<>(this, nbRows, nbCols);
+        }
+
+        @Override
+        public GenericStore<N> make(final long nbRows, final long nbCols) {
+            return new GenericStore<>(this, (int) nbRows, (int) nbCols);
         }
 
         @Override
@@ -242,82 +172,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         @Override
         public Rotation.Generic<N> makeRotation(final int low, final int high, final N cos, final N sin) {
             return new Rotation.Generic<>(low, high, cos, sin);
-        }
-
-        @Override
-        public GenericStore<N> rows(final Access1D<?>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = (int) source[0].count();
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Access1D<?> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> rows(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Comparable<?>[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> rows(final double[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            double[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public GenericStore<N> rows(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            List<? extends Comparable<?>> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         @Override
@@ -537,6 +391,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     @Override
     public Array1D<N> asList() {
         return myUtility.flatten();
+    }
+
+    @Override
+    public GenericStore<N> build() {
+        return this;
     }
 
     @Override
@@ -943,7 +802,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         final PhysicalStore<N> tmpStep1 = myFactory.make(1L, leftAndRight.count());
         final PhysicalStore<N> tmpStep2 = myFactory.make(1L, 1L);
 
-        final PhysicalStore<N> tmpLeft = myFactory.rows(leftAndRight);
+        final PhysicalStore<N> tmpLeft = myFactory.row(leftAndRight);
         tmpLeft.modifyAll(myFactory.function().conjugate());
         tmpStep1.fillByMultiplying(tmpLeft, this);
 
@@ -1181,7 +1040,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         } else if (matrix instanceof Access2D<?>) {
             return myFactory.copy((Access2D<?>) matrix);
         } else {
-            return myFactory.columns(matrix);
+            return myFactory.column(matrix);
         }
     }
 

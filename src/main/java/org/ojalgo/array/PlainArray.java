@@ -99,6 +99,9 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
+    public abstract byte byteValue(int index);
+
+    @Override
     public final byte byteValue(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.byteValue((int) index);
@@ -107,6 +110,11 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     @Override
     public final long count() {
         return this.size();
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return this.floatValue(index);
     }
 
     @Override
@@ -151,6 +159,9 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
+    public abstract float floatValue(final int index);
+
+    @Override
     public final float floatValue(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.floatValue((int) index);
@@ -163,9 +174,19 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
+    public int intValue(final int index) {
+        return this.shortValue(index);
+    }
+
+    @Override
     public final int intValue(final long index) {
         // No Math.toIntExact() here, be as direct as possible
         return this.intValue((int) index);
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return this.intValue(index);
     }
 
     @Override
@@ -177,6 +198,32 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     @Override
     public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
         this.modifyOne(Math.toIntExact(index), modifier);
+    }
+
+    @Override
+    public void set(final int index, final byte value) {
+        this.set(index, (short) value);
+    }
+
+    @Override
+    public abstract void set(final int index, final double value);
+
+    @Override
+    public void set(final int index, final float value) {
+        this.set(index, (double) value);
+    }
+
+    @Override
+    public void set(final int index, final int value) {
+        this.set(index, (long) value);
+    }
+
+    @Override
+    public abstract void set(final int index, final long value);
+
+    @Override
+    public void set(final int index, final short value) {
+        this.set(index, (int) value);
     }
 
     @Override
@@ -219,6 +266,11 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     public final void set(final long index, final short value) {
         // No Math.toIntExact() here, be as direct as possible
         this.set((int) index, value);
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return this.byteValue(index);
     }
 
     @Override
@@ -272,14 +324,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
         this.add(index, (int) addend);
     }
 
-    @Override
-    public abstract byte byteValue(int index);
-
-    @Override
-    public double doubleValue(final int index) {
-        return this.floatValue(index);
-    }
-
     protected abstract void exchange(int firstA, int firstB, int step, int count);
 
     @Override
@@ -307,9 +351,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract void fillOne(int index, NullaryFunction<?> supplier);
 
-    @Override
-    public abstract float floatValue(final int index);
-
     protected abstract N get(final int index);
 
     protected abstract int indexOfLargest(int first, int limit, int step);
@@ -317,11 +358,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     @Override
     protected final long indexOfLargest(final long first, final long limit, final long step) {
         return this.indexOfLargest(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step));
-    }
-
-    @Override
-    public int intValue(final int index) {
-        return this.shortValue(index);
     }
 
     /**
@@ -333,11 +369,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
      * @see Scalar#isSmall(double)
      */
     protected abstract boolean isSmall(int index, double comparedTo);
-
-    @Override
-    public long longValue(final int index) {
-        return this.intValue(index);
-    }
 
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
 
@@ -364,38 +395,7 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
 
     protected abstract int searchAscending(final N number);
 
-    @Override
-    public void set(final int index, final byte value) {
-        this.set(index, (short) value);
-    }
-
     protected abstract void set(final int index, final Comparable<?> number);
-
-    @Override
-    public abstract void set(final int index, final double value);
-
-    @Override
-    public void set(final int index, final float value) {
-        this.set(index, (double) value);
-    }
-
-    @Override
-    public void set(final int index, final int value) {
-        this.set(index, (long) value);
-    }
-
-    @Override
-    public abstract void set(final int index, final long value);
-
-    @Override
-    public void set(final int index, final short value) {
-        this.set(index, (int) value);
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return this.byteValue(index);
-    }
 
     protected abstract void sortAscending();
 

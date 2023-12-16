@@ -191,7 +191,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
         MatrixC128 input = MatrixC128.FACTORY.column(0.0, 1.0, 2.0, 3.0);
 
-        DenseReceiver receiver = MatrixC128.FACTORY.makeDense(4, 1);
+        DenseReceiver receiver = MatrixC128.FACTORY.newDenseBuilder(4, 1);
         receiver.set(0, ComplexNumber.of(6, 0));
         receiver.set(1, ComplexNumber.of(-2, 2));
         receiver.set(2, ComplexNumber.of(-2, 0));
@@ -225,7 +225,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
         MatrixC128 input = MatrixC128.FACTORY.column(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0);
 
-        DenseReceiver receiver = MatrixC128.FACTORY.makeDense(8, 1);
+        DenseReceiver receiver = MatrixC128.FACTORY.newDenseBuilder(8, 1);
         receiver.set(0, ComplexNumber.of(4, 0));
         receiver.set(1, ComplexNumber.of(1, -2.4142135623730945));
         receiver.set(2, ComplexNumber.of(0, 0));
@@ -377,7 +377,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
         MatrixC128 input = MatrixC128.FACTORY.column(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0);
 
-        DenseReceiver receiver = MatrixC128.FACTORY.makeDense(8, 1);
+        DenseReceiver receiver = MatrixC128.FACTORY.newDenseBuilder(8, 1);
         receiver.set(0, ComplexNumber.of(28, 0));
         receiver.set(1, ComplexNumber.of(-4, 9.656854249492376));
         receiver.set(2, ComplexNumber.of(-4, 4));
@@ -421,7 +421,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
         ComplexNumber unitRoot = ComplexNumber.newUnitRoot(4);
         double unitRootPhase = unitRoot.phase();
 
-        DenseReceiver receiver = MatrixC128.FACTORY.makeDense(4, 4);
+        DenseReceiver receiver = MatrixC128.FACTORY.newDenseBuilder(4, 4);
         for (int j = 0; j < 4; j++) {
             for (int i = 0; i < 4; i++) {
                 receiver.set(i, j, ComplexNumber.makePolar(PrimitiveMath.ONE, i * j * unitRootPhase));
@@ -436,9 +436,9 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
         DiscreteFourierTransform transform = DiscreteFourierTransform.newInstance(4);
 
-        MatrixC128 columnA = MatrixC128.FACTORY.columns(polynomialA);
+        MatrixC128 columnA = MatrixC128.FACTORY.column(polynomialA);
         MatrixC128 transfA = matrix.multiply(columnA);
-        MatrixC128 columnB = MatrixC128.FACTORY.columns(polynomialB);
+        MatrixC128 columnB = MatrixC128.FACTORY.column(polynomialB);
         MatrixC128 transfB = matrix.multiply(columnB);
 
         MatrixC128 transfC = transfA.onMatching(ComplexMath.MULTIPLY, transfB);

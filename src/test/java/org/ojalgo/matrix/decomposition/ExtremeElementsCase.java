@@ -127,48 +127,6 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         }
     }
 
-    static void doTestSVD(final boolean large) {
-
-        for (int precision = 1; precision < 16; precision++) {
-            NumberContext accuracy = ACCURACY.withPrecision(precision);
-
-            for (int dim = 2; dim <= 10; dim++) {
-
-                // exp = 308 could potentially create numbers that are 2E308 which is larger than Double.MAX_VALUE
-                for (int exp = 0; exp < 308; exp++) {
-                    double scale = POWER.invoke(TEN, large ? exp : -exp);
-
-                    Primitive64Store original = Primitive64Store.FACTORY.makeSPD(dim);
-                    if (DEBUG) {
-                        BasicLogger.debug();
-                        BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, scale, accuracy);
-                        BasicLogger.debug("Original (unscaled) {}", original.toString());
-
-                    }
-                    original.modifyAll(MULTIPLY.by(scale));
-
-                    ExtremeElementsCase.performInvertTest(original, InverterTask.PRIMITIVE.make(original), accuracy);
-
-                    SingularValue<Double>[] allDecomps = MatrixDecompositionTests.getPrimitiveSingularValue();
-                    for (SingularValue<Double> decomp : allDecomps) {
-
-                        if (DEBUG) {
-                            BasicLogger.debug("{} at precision= {}, dim={}, exp={} and scale={}", decomp.getClass(), precision, dim, exp, scale);
-                        }
-                        decomp.decompose(original);
-
-                        if (precision == 2 && dim == 2 && exp == 0) {
-                            BasicLogger.debug();
-                        }
-                        decomp.decompose(original);
-
-                        TestUtils.assertEquals(original, decomp, accuracy);
-                    }
-                }
-            }
-        }
-    }
-
     static void doTestRank(final boolean large) {
 
         for (int dim = 1; dim <= 10; dim++) {
@@ -241,6 +199,48 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                             }
                             ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, (SolverTask<Double>) decomp, tmpContext);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    static void doTestSVD(final boolean large) {
+
+        for (int precision = 1; precision < 16; precision++) {
+            NumberContext accuracy = ACCURACY.withPrecision(precision);
+
+            for (int dim = 2; dim <= 10; dim++) {
+
+                // exp = 308 could potentially create numbers that are 2E308 which is larger than Double.MAX_VALUE
+                for (int exp = 0; exp < 308; exp++) {
+                    double scale = POWER.invoke(TEN, large ? exp : -exp);
+
+                    Primitive64Store original = Primitive64Store.FACTORY.makeSPD(dim);
+                    if (DEBUG) {
+                        BasicLogger.debug();
+                        BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, scale, accuracy);
+                        BasicLogger.debug("Original (unscaled) {}", original.toString());
+
+                    }
+                    original.modifyAll(MULTIPLY.by(scale));
+
+                    ExtremeElementsCase.performInvertTest(original, InverterTask.PRIMITIVE.make(original), accuracy);
+
+                    SingularValue<Double>[] allDecomps = MatrixDecompositionTests.getPrimitiveSingularValue();
+                    for (SingularValue<Double> decomp : allDecomps) {
+
+                        if (DEBUG) {
+                            BasicLogger.debug("{} at precision= {}, dim={}, exp={} and scale={}", decomp.getClass(), precision, dim, exp, scale);
+                        }
+                        decomp.decompose(original);
+
+                        if (precision == 2 && dim == 2 && exp == 0) {
+                            BasicLogger.debug();
+                        }
+                        decomp.decompose(original);
+
+                        TestUtils.assertEquals(original, decomp, accuracy);
                     }
                 }
             }
@@ -466,6 +466,11 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     }
 
     @Test
+    public void testOverflowSVD() {
+        ExtremeElementsCase.doTestSVD(true);
+    }
+
+    @Test
     public void testQR() {
 
         MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
@@ -534,11 +539,6 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testUnderflowSVD() {
         ExtremeElementsCase.doTestSVD(false);
-    }
-
-    @Test
-    public void testOverflowSVD() {
-        ExtremeElementsCase.doTestSVD(true);
     }
 
 }

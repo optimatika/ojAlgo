@@ -55,17 +55,17 @@ abstract class BackPropagationExample extends ANNTest {
         }
 
         Data expected(final double... row) {
-            expected = Primitive64Store.FACTORY.rows(row);
+            expected = Primitive64Store.FACTORY.row(row);
             return this;
         }
 
         Data input(final double... row) {
-            input = Primitive64Store.FACTORY.rows(row);
+            input = Primitive64Store.FACTORY.row(row);
             return this;
         }
 
         Data target(final double... row) {
-            target = Primitive64Store.FACTORY.rows(row);
+            target = Primitive64Store.FACTORY.row(row);
             return this;
         }
 
@@ -230,34 +230,34 @@ abstract class BackPropagationExample extends ANNTest {
 
             if (input != null && expected != null) {
 
-                i = Primitive64Store.FACTORY.rows(input);
-                e = Primitive64Store.FACTORY.rows(expected);
-                a = Primitive64Store.FACTORY.rows(invoker.invoke(i));
+                i = Primitive64Store.FACTORY.row(input);
+                e = Primitive64Store.FACTORY.row(expected);
+                a = Primitive64Store.FACTORY.row(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
-                i = Primitive32Store.FACTORY.rows(input);
-                e = Primitive32Store.FACTORY.rows(expected);
-                a = Primitive32Store.FACTORY.rows(invoker.invoke(i));
+                i = Primitive32Store.FACTORY.row(input);
+                e = Primitive32Store.FACTORY.row(expected);
+                a = Primitive32Store.FACTORY.row(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
-                i = RawStore.FACTORY.rows(input);
-                e = RawStore.FACTORY.rows(expected);
-                a = RawStore.FACTORY.rows(invoker.invoke(i));
+                i = RawStore.FACTORY.row(input);
+                e = RawStore.FACTORY.row(expected);
+                a = RawStore.FACTORY.row(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
-                i = Primitive64Store.FACTORY.columns(input);
-                e = Primitive64Store.FACTORY.columns(expected);
-                a = Primitive64Store.FACTORY.columns(invoker.invoke(i));
+                i = Primitive64Store.FACTORY.column(input);
+                e = Primitive64Store.FACTORY.column(expected);
+                a = Primitive64Store.FACTORY.column(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
-                i = Primitive32Store.FACTORY.columns(input);
-                e = Primitive32Store.FACTORY.columns(expected);
-                a = Primitive32Store.FACTORY.columns(invoker.invoke(i));
+                i = Primitive32Store.FACTORY.column(input);
+                e = Primitive32Store.FACTORY.column(expected);
+                a = Primitive32Store.FACTORY.column(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
-                i = RawStore.FACTORY.columns(input);
-                e = RawStore.FACTORY.columns(expected);
-                a = RawStore.FACTORY.columns(invoker.invoke(i));
+                i = RawStore.FACTORY.column(input);
+                e = RawStore.FACTORY.column(expected);
+                a = RawStore.FACTORY.column(invoker.invoke(i));
                 TestUtils.assertEquals(e, a, this.precision());
 
                 counter++;

@@ -38,12 +38,12 @@ public class RationalArray extends ArrayQ128 {
         return new RationalArray(data);
     }
 
-    RationalArray(final RationalNumber[] data) {
-        super(data);
-    }
-
     RationalArray(final int size) {
         super(size);
+    }
+
+    RationalArray(final RationalNumber[] data) {
+        super(data);
     }
 
 }

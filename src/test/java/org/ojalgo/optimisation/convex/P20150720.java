@@ -16,11 +16,11 @@ import org.ojalgo.optimisation.Variable;
 
 public abstract class P20150720 {
 
-    public static Primitive64Store SOL_1_CPLEX = Primitive64Store.FACTORY.columns(new double[] { 399.999999654, 249.999999654, 149.999999654, 0.0, 0.0, 0.0,
-            0.0, 49.9999996543, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.564712643687, -0.564712643692, -0.564712643701, -0.564712643747, -0.574712643678 });
+    public static Primitive64Store SOL_1_CPLEX = Primitive64Store.FACTORY.column(new double[] { 399.999999654, 249.999999654, 149.999999654, 0.0, 0.0, 0.0, 0.0,
+            49.9999996543, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.564712643687, -0.564712643692, -0.564712643701, -0.564712643747, -0.574712643678 });
     public static Primitive64Store SOL_2_CPLEX = Primitive64Store.FACTORY
-            .columns(new double[] { 22988.5054745, 14367.8158165, 8620.68937468, 0.0, 0.0, 0.0, 0.0, 2873.56291279, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-    public static Primitive64Store SOL_3_CPLEX = Primitive64Store.FACTORY.columns(new double[] { 74542.7288388, 48961.3064461, 13408.93322, 40061.705994, 0.0,
+            .column(new double[] { 22988.5054745, 14367.8158165, 8620.68937468, 0.0, 0.0, 0.0, 0.0, 2873.56291279, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
+    public static Primitive64Store SOL_3_CPLEX = Primitive64Store.FACTORY.column(new double[] { 74542.7288388, 48961.3064461, 13408.93322, 40061.705994, 0.0,
             40061.705994, 13408.93322, 0.0, 7.04812228046, 2773.81908243, 2773.81908243, 0.0, 0.0, 0.0, 11604.5308488, 12395.4691449, 4339.53410099,
             7660.46589271, 78.8113907425, 221.188602961, 11604.5308488, 12395.4691449, 10813.3798123, 0.0, 9186.62018135, 0.0, 11999.9999937, 0.0, 0.0,
             4339.53410099, 7660.46589271, 0.0, 0.0, 47953.0468934, 24046.9531003, 0.0, 0.0, 14244.4816129, 13755.5183808, 12395.4691449, 0.0, 11604.5308488,
@@ -123,7 +123,7 @@ public abstract class P20150720 {
         //BasicLogger.debug("---- Error formula ------");
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            if (!linked.isEmpty() && (entry.getValue().doubleValue() > 0)) {
+            if (!linked.isEmpty() && entry.getValue().doubleValue() > 0) {
                 final Variable error = Variable.make("ERROR:" + entry.getKey());
                 model.addVariable(error);
                 errors.add(error);
@@ -239,12 +239,12 @@ public abstract class P20150720 {
          */
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            if (!linked.isEmpty() && (entry.getValue().doubleValue() > 0)) {
+            if (!linked.isEmpty() && entry.getValue().doubleValue() > 0) {
                 linked.forEach(v1 -> {
                     linked.forEach(v2 -> {
                         objective.set(v1, v2, -1);
                     });
-                    objective.set(v1, ((2 * stockTotal) / demandTotal) * entry.getValue().doubleValue());
+                    objective.set(v1, 2 * stockTotal / demandTotal * entry.getValue().doubleValue());
                 });
             }
         });
@@ -440,7 +440,7 @@ public abstract class P20150720 {
          */
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            if (!linked.isEmpty() && (entry.getValue().doubleValue() > 0)) {
+            if (!linked.isEmpty() && entry.getValue().doubleValue() > 0) {
                 final double demand = entry.getValue();
                 final double ratio = demand / demandTotal;
                 final double target = stockTotal * ratio;
@@ -448,7 +448,7 @@ public abstract class P20150720 {
                     linked.forEach(v2 -> {
                         objective.set(v1, v2, ratio / (target * target));
                     });
-                    objective.set(v1, (-2.0 * ratio) / target);
+                    objective.set(v1, -2.0 * ratio / target);
                 });
             }
         });

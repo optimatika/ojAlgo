@@ -135,6 +135,38 @@ public class StoreProblems extends MatrixStoreTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/330
+     */
+    @Test
+    public void testGitHubIssue330() {
+
+        double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
+
+        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
+        Primitive64Store m = storeFactory.rows(data);
+        Primitive64Store r = storeFactory.make(m.countRows(), m.countColumns());
+
+        QR<Double> qr = QR.PRIMITIVE.make(true);
+        qr.decompose(m);
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Original", m);
+            BasicLogger.debugMatrix("Q", qr.getQ());
+            BasicLogger.debugMatrix("R", qr.getR());
+            BasicLogger.debugMatrix("Receiver (before)", r);
+        }
+
+        // java.lang.ArrayIndexOutOfBoundsException was thrown here
+        qr.getR().supplyTo(r);
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Receiver (after)", r);
+        }
+
+        TestUtils.assertEquals(qr.getR(), r);
+    }
+
+    /**
      * Problem with LogicalStore and multi-threading. The MinBatchSize#EXECUTOR was designed to have a fixed
      * number of threads which doesn't work if nested LogicalStores require more. The program would hang. This
      * test makes sure ojAlgo no longer hangs in such a case.
@@ -202,38 +234,6 @@ public class StoreProblems extends MatrixStoreTests {
         tmpMtrxC.fillByMultiplying(tmpMtrxA.transpose(), tmpMtrxB);
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, NumberContext.of(7, 6));
-    }
-
-    /**
-     * https://github.com/optimatika/ojAlgo/issues/330
-     */
-    @Test
-    public void testGitHubIssue330() {
-
-        double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
-
-        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
-        Primitive64Store m = storeFactory.rows(data);
-        Primitive64Store r = storeFactory.make(m.countRows(), m.countColumns());
-
-        QR<Double> qr = QR.PRIMITIVE.make(true);
-        qr.decompose(m);
-
-        if (DEBUG) {
-            BasicLogger.debugMatrix("Original", m);
-            BasicLogger.debugMatrix("Q", qr.getQ());
-            BasicLogger.debugMatrix("R", qr.getR());
-            BasicLogger.debugMatrix("Receiver (before)", r);
-        }
-
-        // java.lang.ArrayIndexOutOfBoundsException was thrown here
-        qr.getR().supplyTo(r);
-
-        if (DEBUG) {
-            BasicLogger.debugMatrix("Receiver (after)", r);
-        }
-
-        TestUtils.assertEquals(qr.getR(), r);
     }
 
     /**

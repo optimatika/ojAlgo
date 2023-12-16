@@ -141,7 +141,7 @@ public abstract class FinanceUtils {
 
         int tmpSize = timeSeriesCollection.size();
 
-        MatrixR064.DenseReceiver retValStore = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retValStore = MatrixR064.FACTORY.newDenseBuilder(tmpSize, tmpSize);
 
         double tmpToYearFactor = (double) CalendarDateUnit.YEAR.toDurationInMillis() / (double) tmpCoordinator.getResolution().toDurationInMillis();
 
@@ -181,7 +181,7 @@ public abstract class FinanceUtils {
 
         CoordinationSet<N> tmpCoordinated = tmpUncoordinated.prune(tmpDataResolution);
 
-        MatrixR064.DenseReceiver tmpMatrixBuilder = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver tmpMatrixBuilder = MatrixR064.FACTORY.newDenseBuilder(tmpSize, tmpSize);
 
         double tmpToYearFactor = (double) CalendarDateUnit.YEAR.toDurationInMillis() / (double) tmpDataResolution.toDurationInMillis();
 
@@ -380,7 +380,7 @@ public abstract class FinanceUtils {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size, size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -422,7 +422,7 @@ public abstract class FinanceUtils {
 
         int tmpSize = (int) volatilities.count();
 
-        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);

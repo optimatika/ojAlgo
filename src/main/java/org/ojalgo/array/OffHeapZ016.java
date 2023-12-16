@@ -41,17 +41,12 @@ final class OffHeapZ016 extends OffHeapArray {
     }
 
     @Override
-    public double doubleValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
-    }
-
-    @Override
-    public float floatValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
-    }
-
-    @Override
     public double doubleValue(final int index) {
+        return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
+    public double doubleValue(final long index) {
         return NativeMemory.getShort(myPointer, index);
     }
 
@@ -61,8 +56,18 @@ final class OffHeapZ016 extends OffHeapArray {
     }
 
     @Override
+    public float floatValue(final long index) {
+        return NativeMemory.getShort(myPointer, index);
+    }
+
+    @Override
     public void reset() {
         NativeMemory.initialiseShortArray(myPointer, this.count());
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
     }
 
     @Override
@@ -86,18 +91,13 @@ final class OffHeapZ016 extends OffHeapArray {
     }
 
     @Override
-    public short shortValue(final long index) {
-        return NativeMemory.getShort(myPointer, index);
-    }
-
-    @Override
     public short shortValue(final int index) {
         return NativeMemory.getShort(myPointer, index);
     }
 
     @Override
-    public void set(final int index, final double value) {
-        NativeMemory.setShort(myPointer, index, (short) Math.toIntExact(Math.round(value)));
+    public short shortValue(final long index) {
+        return NativeMemory.getShort(myPointer, index);
     }
 
 }

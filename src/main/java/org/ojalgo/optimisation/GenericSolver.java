@@ -443,13 +443,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
             if (lower instanceof Primitive64Store) {
                 myLowerBounds = (Primitive64Store) lower;
             } else {
-                myLowerBounds = FACTORY.columns(lower);
+                myLowerBounds = FACTORY.column(lower);
             }
 
             if (upper instanceof Primitive64Store) {
                 myUpperBounds = (Primitive64Store) upper;
             } else {
-                myUpperBounds = FACTORY.columns(upper);
+                myUpperBounds = FACTORY.column(upper);
             }
         }
 

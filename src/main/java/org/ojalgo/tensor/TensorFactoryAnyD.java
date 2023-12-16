@@ -146,8 +146,14 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
         return true;
     }
 
+    @Override
     public FunctionSet<N> function() {
         return (FunctionSet<N>) myFactory.function();
+    }
+
+    @Override
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
     @Override
@@ -157,8 +163,14 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
-    public T make(final long... structure) {
-        return myFactory.make(structure);
+    @Override
+    public T make(final int... shape) {
+        return myFactory.make(shape);
+    }
+
+    @Override
+    public T make(final long... shape) {
+        return myFactory.make(shape);
     }
 
     public T power(final Access1D<N> vector, final int exponent) {
@@ -189,6 +201,7 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
         return retVal;
     }
 
+    @Override
     public Scalar.Factory<N> scalar() {
         return (Factory<N>) myFactory.scalar();
     }
@@ -217,10 +230,6 @@ public final class TensorFactoryAnyD<N extends Comparable<N>, T extends MutateAn
         }
 
         return retVal;
-    }
-
-    public MathType getMathType() {
-        return myFactory.getMathType();
     }
 
 }

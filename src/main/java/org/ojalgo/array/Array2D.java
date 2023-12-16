@@ -22,7 +22,6 @@
 package org.ojalgo.array;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
@@ -51,11 +50,11 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class Array2D<N extends Comparable<N>> implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
-        Structure2D.ReducibleTo1D<Array1D<N>>, Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable {
+public final class Array2D<N extends Comparable<N>>
+        implements Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Structure2D.ReducibleTo1D<Array1D<N>>,
+        Access2D.Collectable<N, Mutate2D>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N>, Structure2D.Reshapable, Factory2D.Builder<Array2D<N>> {
 
-    public static final class Factory<N extends Comparable<N>>
-            implements Factory2D.Dense<Array2D<N>>, Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -65,94 +64,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         }
 
         @Override
-        public Array2D<N> columns(final Access1D<?>... source) {
-
-            int tmpColumns = source.length;
-            long tmpRows = source[0].count();
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            if (tmpDelegate.isPrimitive()) {
-                long tmpIndex = 0L;
-                for (int j = 0; j < tmpColumns; j++) {
-                    Access1D<?> tmpColumn = source[j];
-                    for (long i = 0L; i < tmpRows; i++) {
-                        tmpDelegate.set(tmpIndex++, tmpColumn.doubleValue(i));
-                    }
-                }
-            } else {
-                long tmpIndex = 0L;
-                for (int j = 0; j < tmpColumns; j++) {
-                    Access1D<?> tmpColumn = source[j];
-                    for (long i = 0L; i < tmpRows; i++) {
-                        tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
-                    }
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> columns(final Comparable<?>[]... source) {
-
-            int tmpColumns = source.length;
-            int tmpRows = source[0].length;
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            long tmpIndex = 0L;
-            for (int j = 0; j < tmpColumns; j++) {
-                Comparable<?>[] tmpColumn = source[j];
-                for (int i = 0; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, tmpColumn[i]);
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> columns(final double[]... source) {
-
-            int tmpColumns = source.length;
-            int tmpRows = source[0].length;
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            long tmpIndex = 0L;
-            for (int j = 0; j < tmpColumns; j++) {
-                double[] tmpColumn = source[j];
-                for (int i = 0; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, tmpColumn[i]);
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> columns(final List<? extends Comparable<?>>... source) {
-
-            int tmpColumns = source.length;
-            int tmpRows = source[0].size();
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            long tmpIndex = 0L;
-            for (int j = 0; j < tmpColumns; j++) {
-                List<? extends Comparable<?>> tmpColumn = source[j];
-                for (int i = 0; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
         public Array2D<N> copy(final Access2D<?> source) {
-            return myDelegate.copy(source).wrapInArray2D(source.countRows());
+            BasicArray<N> basic = myDelegate.make(source.count());
+            basic.fillMatching(source);
+            return basic.wrapInArray2D(source.countRows());
         }
 
         @Override
@@ -166,114 +81,30 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         }
 
         @Override
-        public Array2D<N> make(final long rows, final long columns) {
-            return this.makeDense(rows, columns);
+        public Array2D<N> make(final int nbRows, final int nbCols) {
+            return this.newDenseBuilder(nbRows, nbCols);
         }
 
         @Override
-        public Array2D<N> makeDense(final long rows, final long columns) {
-            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
+        public Array2D<N> make(final long nbRows, final long nbCols) {
+            return this.newDenseBuilder(nbRows, nbCols);
         }
 
         @Override
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
-
-            long tmpIndex = 0L;
-            for (long j = 0L; j < columns; j++) {
-                for (long i = 0L; i < rows; i++) {
-                    tmpDelegate.set(tmpIndex++, supplier.get());
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(rows);
+            BasicArray<N> basic = myDelegate.makeToBeFilled(rows, columns);
+            basic.fillAll(supplier);
+            return basic.wrapInArray2D(rows);
         }
 
         @Override
-        public Array2D<N> makeSparse(final long rows, final long columns) {
-            return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
+        public Array2D<N> newDenseBuilder(final long nbRows, final long nbCols) {
+            return myDelegate.makeToBeFilled(nbRows, nbCols).wrapInArray2D(nbRows);
         }
 
         @Override
-        public Array2D<N> rows(final Access1D<?>... source) {
-
-            int tmpRows = source.length;
-            long tmpColumns = source[0].count();
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            if (tmpDelegate.isPrimitive()) {
-                for (int i = 0; i < tmpRows; i++) {
-                    Access1D<?> tmpRow = source[i];
-                    for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.doubleValue(j));
-                    }
-                }
-            } else {
-                for (int i = 0; i < tmpRows; i++) {
-                    Access1D<?> tmpRow = source[i];
-                    for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
-                    }
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> rows(final Comparable<?>[]... source) {
-
-            int tmpRows = source.length;
-            int tmpColumns = source[0].length;
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            for (int i = 0; i < tmpRows; i++) {
-                Comparable<?>[] tmpRow = source[i];
-                for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> rows(final double[]... source) {
-
-            int tmpRows = source.length;
-            int tmpColumns = source[0].length;
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            for (int i = 0; i < tmpRows; i++) {
-                double[] tmpRow = source[i];
-                for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        @Override
-        public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
-
-            int tmpRows = source.length;
-            int tmpColumns = source[0].size();
-
-            BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            for (int i = 0; i < tmpRows; i++) {
-                List<? extends Comparable<?>> tmpRow = source[i];
-                for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
+        public Array2D<N> newSparseBuilder(final long nbRows, final long nbCols) {
+            return myDelegate.makeStructuredZero(nbRows, nbCols).wrapInArray2D(nbRows);
         }
 
         @Override
@@ -453,6 +284,11 @@ public final class Array2D<N extends Comparable<N>> implements Access2D.Visitabl
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRow(row, col, visitor);
         return visitor.get();
+    }
+
+    @Override
+    public Array2D<N> build() {
+        return this;
     }
 
     @Override

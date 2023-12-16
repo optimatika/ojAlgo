@@ -44,6 +44,7 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
@@ -53,89 +54,9 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class RawStore implements PhysicalStore<Double> {
+public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<RawStore> {
 
-    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<RawStore>() {
-
-        @Override
-        public RawStore columns(final Access1D<?>... source) {
-
-            int nbRows = source[0].size();
-            int nbCols = source.length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-            double[][] retValData = retVal.data;
-
-            Access1D<?> tmpCol;
-            for (int j = 0; j < nbCols; j++) {
-                tmpCol = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    retValData[i][j] = tmpCol.doubleValue(i);
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore columns(final Comparable<?>[]... source) {
-
-            int nbRows = source[0].length;
-            int nbCols = source.length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-            double[][] retValData = retVal.data;
-
-            Comparable<?>[] tmpCol;
-            for (int j = 0; j < nbCols; j++) {
-                tmpCol = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    retValData[i][j] = NumberDefinition.doubleValue(tmpCol[i]);
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore columns(final double[]... source) {
-
-            int nbRows = source[0].length;
-            int nbCols = source.length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-            double[][] retValData = retVal.data;
-
-            double[] tmpCol;
-            for (int j = 0; j < nbCols; j++) {
-                tmpCol = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    retValData[i][j] = tmpCol[i];
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore columns(final List<? extends Comparable<?>>... source) {
-
-            int nbRows = source[0].size();
-            int nbCols = source.length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-            double[][] retValData = retVal.data;
-
-            List<? extends Comparable<?>> tmpCol;
-            for (int j = 0; j < nbCols; j++) {
-                tmpCol = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    retValData[i][j] = NumberDefinition.doubleValue(tmpCol.get(i));
-                }
-            }
-
-            return retVal;
-        }
+    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public RawStore copy(final Access2D<?> source) {
@@ -158,92 +79,13 @@ public final class RawStore implements PhysicalStore<Double> {
         }
 
         @Override
+        public RawStore make(final int rows, final int columns) {
+            return new RawStore(rows, columns);
+        }
+
+        @Override
         public RawStore make(final long rows, final long columns) {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
-        }
-
-        @Override
-        public RawStore rows(final Access1D<?>... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].size();
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-
-            Access1D<?> tmpRow;
-            double[] retValRow;
-            for (int i = 0; i < nbRows; i++) {
-                tmpRow = source[i];
-                retValRow = retVal.data[i];
-                for (int j = 0; j < nbCols; j++) {
-                    retValRow[j] = tmpRow.doubleValue(j);
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore rows(final Comparable<?>[]... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-
-            Comparable<?>[] tmpRow;
-            double[] retValRow;
-            for (int i = 0; i < nbRows; i++) {
-                tmpRow = source[i];
-                retValRow = retVal.data[i];
-                for (int j = 0; j < nbCols; j++) {
-                    retValRow[j] = NumberDefinition.doubleValue(tmpRow[j]);
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore rows(final double[]... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].length;
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-
-            double[] tmpRow;
-            double[] retValRow;
-            for (int i = 0; i < nbRows; i++) {
-                tmpRow = source[i];
-                retValRow = retVal.data[i];
-                for (int j = 0; j < nbCols; j++) {
-                    retValRow[j] = tmpRow[j];
-                }
-            }
-
-            return retVal;
-        }
-
-        @Override
-        public RawStore rows(final List<? extends Comparable<?>>... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].size();
-
-            RawStore retVal = new RawStore(nbRows, nbCols);
-
-            List<? extends Comparable<?>> tmpRow;
-            double[] retValRow;
-            for (int i = 0; i < nbRows; i++) {
-                tmpRow = source[i];
-                retValRow = retVal.data[i];
-                for (int j = 0; j < nbCols; j++) {
-                    retValRow[j] = NumberDefinition.doubleValue(tmpRow.get(j));
-                }
-            }
-
-            return retVal;
         }
 
         @Override
@@ -446,6 +288,11 @@ public final class RawStore implements PhysicalStore<Double> {
                 return (int) RawStore.this.count();
             }
         };
+    }
+
+    @Override
+    public RawStore build() {
+        return this;
     }
 
     @Override

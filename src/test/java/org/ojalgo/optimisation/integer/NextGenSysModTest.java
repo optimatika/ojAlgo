@@ -1409,7 +1409,7 @@ public class NextGenSysModTest {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(size, size);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -1456,7 +1456,7 @@ public class NextGenSysModTest {
 
         int tmpSize = (int) volatilities.count();
 
-        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.makeDense(tmpSize, tmpSize);
+        MatrixR064.DenseReceiver retVal = MatrixR064.FACTORY.newDenseBuilder(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);

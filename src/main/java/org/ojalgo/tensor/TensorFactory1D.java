@@ -74,8 +74,14 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         return true;
     }
 
+    @Override
     public FunctionSet<N> function() {
         return (FunctionSet<N>) myFactory.function();
+    }
+
+    @Override
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
     @Override
@@ -85,10 +91,17 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
+    @Override
+    public T make(final int size) {
+        return myFactory.make(size);
+    }
+
+    @Override
     public T make(final long count) {
         return myFactory.make(count);
     }
 
+    @Override
     public Scalar.Factory<N> scalar() {
         return (Factory<N>) myFactory.scalar();
     }
@@ -139,10 +152,6 @@ public final class TensorFactory1D<N extends Comparable<N>, T extends Mutate1D> 
         }
 
         return retVal;
-    }
-
-    public MathType getMathType() {
-        return myFactory.getMathType();
     }
 
 }

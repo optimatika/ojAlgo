@@ -82,17 +82,17 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         }
 
         @Override
-        public void set(final long index, final Comparable<?> value) {
-            myEntries.set(index, value);
-        }
-
-        @Override
         public void set(final int index, final double value) {
             myEntries.set(index, value);
         }
 
         @Override
         public void set(final int index, final float value) {
+            myEntries.set(index, value);
+        }
+
+        @Override
+        public void set(final long index, final Comparable<?> value) {
             myEntries.set(index, value);
         }
 

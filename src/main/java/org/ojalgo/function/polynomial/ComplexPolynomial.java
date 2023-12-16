@@ -30,12 +30,12 @@ import org.ojalgo.scalar.ComplexNumber;
 @Deprecated
 public final class ComplexPolynomial extends PolynomialC128 {
 
-    public ComplexPolynomial(final int degree) {
-        super(degree);
-    }
-
     public ComplexPolynomial(final BasicArray<ComplexNumber> coefficients) {
         super(coefficients);
+    }
+
+    public ComplexPolynomial(final int degree) {
+        super(degree);
     }
 
 }

@@ -53,7 +53,7 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
     @SafeVarargs
     static <N extends Comparable<N>> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount, final N... columnElements) {
-        MatrixStore<N> retVal = factory.columns(columnElements);
+        MatrixStore<N> retVal = factory.column(columnElements);
         long rowsSoFar = retVal.countRows();
         if (rowsSoFar < rowsCount) {
             retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, rowsCount - rowsSoFar, retVal.countColumns()));
@@ -85,7 +85,7 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
 
     @SafeVarargs
     static <N extends Comparable<N>> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final N... rowElements) {
-        MatrixStore<N> retVal = new TransposedStore<>(factory.columns(rowElements));
+        MatrixStore<N> retVal = new TransposedStore<>(factory.column(rowElements));
         long colsSoFar = retVal.countColumns();
         if (colsSoFar < colsCount) {
             retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, retVal.countRows(), colsCount - colsSoFar));
@@ -124,10 +124,12 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         this(Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
     }
 
+    @Override
     public long countColumns() {
         return myColDim;
     }
 
+    @Override
     public long countRows() {
         return myRowDim;
     }
@@ -157,18 +159,22 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return true;
     }
 
+    @Override
     public final int getColDim() {
         return myColDim;
     }
 
+    @Override
     public final int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
 
+    @Override
     public final int getMinDim() {
         return Math.min(myRowDim, myColDim);
     }
 
+    @Override
     public final int getRowDim() {
         return myRowDim;
     }
@@ -183,14 +189,17 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return result;
     }
 
+    @Override
     public int limitOfColumn(final int col) {
         return myRowDim;
     }
 
+    @Override
     public int limitOfRow(final int row) {
         return myColDim;
     }
 
+    @Override
     public N multiplyBoth(final Access1D<N> leftAndRight) {
 
         if (this.isPrimitive()) {

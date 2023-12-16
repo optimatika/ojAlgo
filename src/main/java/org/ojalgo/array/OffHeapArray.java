@@ -70,6 +70,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         }
 
         @Override
+        public MathType getMathType() {
+            return myMathType;
+        }
+
+        @Override
         public DenseArray<Double> makeDenseArray(final long size) {
             return myConstructor.apply(size);
         }
@@ -82,11 +87,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
         @Override
         long getCapacityLimit() {
             return Long.MAX_VALUE;
-        }
-
-        @Override
-        public MathType getMathType() {
-            return myMathType;
         }
 
     }
@@ -135,6 +135,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
+    public final void add(final long index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
+    }
+
+    @Override
     public final void add(final long index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
@@ -145,23 +150,18 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    public final void add(final long index, final long addend) {
-        this.set(index, this.longValue(index) + addend);
-    }
-
-    @Override
     public final void add(final long index, final int addend) {
         this.set(index, this.intValue(index) + addend);
     }
 
     @Override
-    public final void add(final long index, final short addend) {
-        this.set(index, this.shortValue(index) + addend);
+    public final void add(final long index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
     }
 
     @Override
-    public final void add(final long index, final byte addend) {
-        this.set(index, this.byteValue(index) + addend);
+    public final void add(final long index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
     }
 
     @Override

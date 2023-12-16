@@ -73,8 +73,8 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
         }
 
         @Override
-        public VectorTensor<N> make(final long count) {
-            return new VectorTensor<>(myFactory, Math.toIntExact(count));
+        public VectorTensor<N> make(final int size) {
+            return new VectorTensor<>(myFactory, size);
         }
 
     }

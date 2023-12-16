@@ -70,7 +70,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
 
-        MatrixR064.DenseReceiver expectedExcessReturns1 = MatrixR064.FACTORY.makeDense(assetNum, 1);
+        MatrixR064.DenseReceiver expectedExcessReturns1 = MatrixR064.FACTORY.newDenseBuilder(assetNum, 1);
         expectedExcessReturns1.set(0, 0, 0.03360872);
         expectedExcessReturns1.set(1, 0, 0.027322319);
         expectedExcessReturns1.set(2, 0, 0.027668137);
@@ -122,7 +122,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         int row = returns.length;
         int col = returns[0].length;
 
-        MatrixR064.DenseReceiver covariances = MatrixR064.FACTORY.makeDense(row, col);
+        MatrixR064.DenseReceiver covariances = MatrixR064.FACTORY.newDenseBuilder(row, col);
 
         for (int i = 1; i <= row; i++) {
             for (int j = i; j <= col; j++) {

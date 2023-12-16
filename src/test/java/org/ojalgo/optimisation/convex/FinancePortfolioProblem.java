@@ -48,7 +48,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
             MatrixR064.DenseReceiver mtrxBuilder;
 
-            mtrxBuilder = MatrixR064.FACTORY.makeDense(2, 2);
+            mtrxBuilder = MatrixR064.FACTORY.newDenseBuilder(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);
             mtrxBuilder.add(0, 1, 0.1000);
             mtrxBuilder.add(1, 0, 0.1000);

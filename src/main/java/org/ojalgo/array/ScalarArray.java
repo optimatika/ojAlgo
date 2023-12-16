@@ -51,6 +51,41 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return this.get(index).byteValue();
+    }
+
+    @Override
+    public final double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    public final float floatValue(final int index) {
+        return data[index].floatValue();
+    }
+
+    @Override
+    public int intValue(final int index) {
+        return this.get(index).intValue();
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return this.get(index).longValue();
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return this.get(index).shortValue();
+    }
+
+    @Override
     public final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -71,33 +106,13 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    public byte byteValue(final int index) {
-        return this.get(index).byteValue();
-    }
-
-    @Override
-    public final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
     protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
-    public final float floatValue(final int index) {
-        return data[index].floatValue();
-    }
-
-    @Override
     protected final int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
-    }
-
-    @Override
-    public int intValue(final int index) {
-        return this.get(index).intValue();
     }
 
     @Override
@@ -108,21 +123,6 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     @Override
     protected final boolean isSmall(final int index, final double comparedTo) {
         return data[index].isSmall(comparedTo);
-    }
-
-    @Override
-    public long longValue(final int index) {
-        return this.get(index).longValue();
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return this.get(index).shortValue();
-    }
-
-    @Override
-    public void set(final int index, final long value) {
-        data[index] = this.valueOf(value);
     }
 
 }

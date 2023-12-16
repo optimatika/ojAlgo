@@ -240,10 +240,6 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             return myModel.objective().toFunction();
         }
 
-        public Optimisation.Options options() {
-            return myModel.options;
-        }
-
         public List<Variable> getVariables() {
             return myModel.getVariables();
         }
@@ -254,6 +250,10 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         public Result minimise() {
             return myModel.minimise();
+        }
+
+        public Optimisation.Options options() {
+            return myModel.options;
         }
 
     }

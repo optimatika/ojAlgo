@@ -110,9 +110,9 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         NetworkTrainer largerTrainer = largerNetwork.newTrainer();
         NetworkInvoker largerInvoker = largerNetwork.newInvoker();
 
-        Access1D<Double> preTrainingOutput = factory.rows(largerInvoker.invoke(givenInput));
+        Access1D<Double> preTrainingOutput = factory.row(largerInvoker.invoke(givenInput));
         largerTrainer.rate(HALF).train(givenInput, targetOutput);
-        Access1D<Double> postTrainingOutput = factory.rows(largerInvoker.invoke(givenInput));
+        Access1D<Double> postTrainingOutput = factory.row(largerInvoker.invoke(givenInput));
 
         // Even in this case training should reduce the error
         TestUtils.assertTrue(errorMeassure.invoke(targetOutput, preTrainingOutput) > errorMeassure.invoke(targetOutput, postTrainingOutput));

@@ -49,13 +49,13 @@ public class ArrayC128 extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        public Scalar.Factory<ComplexNumber> scalar() {
-            return ComplexNumber.FACTORY;
+        public MathType getMathType() {
+            return MathType.C128;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.C128;
+        public Scalar.Factory<ComplexNumber> scalar() {
+            return ComplexNumber.FACTORY;
         }
 
         @Override

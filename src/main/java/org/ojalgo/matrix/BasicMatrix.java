@@ -275,13 +275,13 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     @Override
-    public double doubleValue(final long index) {
-        return this.store().doubleValue(index);
+    public double doubleValue(final int row, final int col) {
+        return this.store().doubleValue(row, col);
     }
 
     @Override
-    public double doubleValue(final int row, final int col) {
-        return this.store().doubleValue(row, col);
+    public double doubleValue(final long index) {
+        return this.store().doubleValue(index);
     }
 
     @Override

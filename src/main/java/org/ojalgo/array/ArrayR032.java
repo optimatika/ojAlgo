@@ -62,13 +62,13 @@ public class ArrayR032 extends PrimitiveArray {
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        public MathType getMathType() {
+            return MathType.R032;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.R032;
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
@@ -111,6 +111,11 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return (byte) Math.round(data[index]);
+    }
+
+    @Override
     public double dot(final Access1D<?> vector) {
 
         double retVal = ZERO;
@@ -120,6 +125,11 @@ public class ArrayR032 extends PrimitiveArray {
         }
 
         return retVal;
+    }
+
+    @Override
+    public final double doubleValue(final int index) {
+        return data[index];
     }
 
     @Override
@@ -159,6 +169,16 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
+    public float floatValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public final Double get(final int index) {
+        return Double.valueOf(data[index]);
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -166,8 +186,33 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
+    public int intValue(final int index) {
+        return Math.round(data[index]);
+    }
+
+    @Override
     public final void reset() {
         Arrays.fill(data, 0.0F);
+    }
+
+    @Override
+    public final void set(final int index, final double value) {
+        data[index] = (float) value;
+    }
+
+    @Override
+    public final void set(final int index, final float value) {
+        data[index] = value;
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        data[index] = value;
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return (short) Math.round(data[index]);
     }
 
     @Override
@@ -205,18 +250,8 @@ public class ArrayR032 extends PrimitiveArray {
         data[index] += addend;
     }
 
-    @Override
-    public byte byteValue(final int index) {
-        return (byte) Math.round(data[index]);
-    }
-
     protected final float[] copyOfData() {
         return COPY.copyOf(data);
-    }
-
-    @Override
-    public final double doubleValue(final int index) {
-        return data[index];
     }
 
     @Override
@@ -250,23 +285,8 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
-    public float floatValue(final int index) {
-        return data[index];
-    }
-
-    @Override
-    public final Double get(final int index) {
-        return Double.valueOf(data[index]);
-    }
-
-    @Override
     protected final int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
-    }
-
-    @Override
-    public int intValue(final int index) {
-        return Math.round(data[index]);
     }
 
     @Override
@@ -310,21 +330,6 @@ public class ArrayR032 extends PrimitiveArray {
     }
 
     @Override
-    public final void set(final int index, final double value) {
-        data[index] = (float) value;
-    }
-
-    @Override
-    public final void set(final int index, final float value) {
-        data[index] = value;
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return (short) Math.round(data[index]);
-    }
-
-    @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         OperationVoid.invoke(data, first, limit, step, visitor);
     }
@@ -347,11 +352,6 @@ public class ArrayR032 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
-    }
-
-    @Override
-    public void set(final int index, final long value) {
-        data[index] = value;
     }
 
 }

@@ -79,6 +79,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             return PrimitiveFunction.getSet();
         }
 
+        @Override
+        public MathType getMathType() {
+            return myMathType;
+        }
+
         public MappedFileFactory newMapped(final File file) {
             return new MappedFileFactory(this, file);
         }
@@ -112,11 +117,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             return myConstructor.newInstance(factory, buffer, closeable);
         }
 
-        @Override
-        public MathType getMathType() {
-            return myMathType;
-        }
-
     }
 
     public static final class MappedFileFactory extends DenseArray.Factory<Double> {
@@ -128,16 +128,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
             super();
             myTypeFactory = typeFactory;
             myFile = file;
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return myTypeFactory.function();
-        }
-
-        @Override
-        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-            return (BufferArray) super.makeFilled(shape, supplier);
         }
 
         @Override
@@ -161,17 +151,22 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
+        public FunctionSet<Double> function() {
+            return myTypeFactory.function();
+        }
+
+        @Override
+        public MathType getMathType() {
+            return myTypeFactory.getMathType();
+        }
+
+        @Override
+        public BufferArray make(final int size) {
+            return (BufferArray) super.make(size);
+        }
+
+        @Override
         public BufferArray make(final long count) {
-            return (BufferArray) super.make(count);
-        }
-
-        @Override
-        SegmentedArray<Double> makeSegmented(final long... structure) {
-            return super.makeSegmented(structure);
-        }
-
-        @Override
-        public BufferArray make(final int count) {
             return (BufferArray) super.make(count);
         }
 
@@ -183,6 +178,11 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         @Override
         public BufferArray makeFilled(final long count, final NullaryFunction<?> supplier) {
             return (BufferArray) super.makeFilled(count, supplier);
+        }
+
+        @Override
+        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+            return (BufferArray) super.makeFilled(shape, supplier);
         }
 
         @Override
@@ -213,8 +213,8 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        public MathType getMathType() {
-            return myTypeFactory.getMathType();
+        SegmentedArray<Double> makeSegmented(final long... structure) {
+            return super.makeSegmented(structure);
         }
 
     }
@@ -307,9 +307,19 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
+    public Double get(final int index) {
+        return Double.valueOf(this.doubleValue(index));
+    }
+
+    @Override
     public void reset() {
         this.fillAll(PrimitiveMath.ZERO);
         myBuffer.clear();
+    }
+
+    @Override
+    protected final void add(final int index, final byte addend) {
+        this.set(index, this.byteValue(index) + addend);
     }
 
     @Override
@@ -323,23 +333,18 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     }
 
     @Override
-    protected final void add(final int index, final long addend) {
-        this.set(index, this.longValue(index) + addend);
-    }
-
-    @Override
     protected final void add(final int index, final int addend) {
         this.set(index, this.intValue(index) + addend);
     }
 
     @Override
-    protected final void add(final int index, final short addend) {
-        this.set(index, this.shortValue(index) + addend);
+    protected final void add(final int index, final long addend) {
+        this.set(index, this.longValue(index) + addend);
     }
 
     @Override
-    protected final void add(final int index, final byte addend) {
-        this.set(index, this.byteValue(index) + addend);
+    protected final void add(final int index, final short addend) {
+        this.set(index, this.shortValue(index) + addend);
     }
 
     @Override
@@ -379,11 +384,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     @Override
     protected void fillOne(final int index, final Double value) {
         this.set(index, value);
-    }
-
-    @Override
-    public Double get(final int index) {
-        return Double.valueOf(this.doubleValue(index));
     }
 
     @Override

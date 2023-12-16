@@ -29,6 +29,13 @@ public class ParallelismSupplierTest {
     static final ParallelismSupplier INIT9 = () -> 9;
 
     @Test
+    public void testAdjustUpDown() {
+
+        TestUtils.assertEquals(16, INIT9.adjustUp());
+        TestUtils.assertEquals(8, INIT9.adjustDown());
+    }
+
+    @Test
     public void testDivideBy() {
 
         TestUtils.assertEquals(9, INIT9.divideBy(-10));
@@ -50,10 +57,12 @@ public class ParallelismSupplierTest {
     }
 
     @Test
-    public void testAdjustUpDown() {
+    public void testIncrementDecrement() {
 
-        TestUtils.assertEquals(16, INIT9.adjustUp());
-        TestUtils.assertEquals(8, INIT9.adjustDown());
+        TestUtils.assertEquals(8, INIT9.decrement());
+        TestUtils.assertEquals(10, INIT9.increment());
+
+        TestUtils.assertEquals(9, INIT9.increment().decrement());
     }
 
     @Test
@@ -61,15 +70,6 @@ public class ParallelismSupplierTest {
 
         TestUtils.assertEquals(8, INIT9.limit(8));
         TestUtils.assertEquals(10, INIT9.require(10));
-    }
-
-    @Test
-    public void testIncrementDecrement() {
-
-        TestUtils.assertEquals(8, INIT9.decrement());
-        TestUtils.assertEquals(10, INIT9.increment());
-
-        TestUtils.assertEquals(9, INIT9.increment().decrement());
     }
 
 }

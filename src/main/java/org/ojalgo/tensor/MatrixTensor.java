@@ -73,11 +73,19 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
         }
 
         @Override
-        public MatrixTensor<N> make(final long rows, final long columns) {
-            if (rows != columns) {
+        public MatrixTensor<N> make(final int nbRows, final int nbCols) {
+            if (nbRows != nbCols) {
                 throw new IllegalArgumentException();
             }
-            return new MatrixTensor<>(myFactory, Math.toIntExact(rows));
+            return new MatrixTensor<>(myFactory, nbRows);
+        }
+
+        @Override
+        public MatrixTensor<N> make(final long nbRows, final long nbCols) {
+            if (nbRows != nbCols) {
+                throw new IllegalArgumentException();
+            }
+            return new MatrixTensor<>(myFactory, Math.toIntExact(nbRows));
         }
 
     }

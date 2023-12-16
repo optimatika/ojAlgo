@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
@@ -53,11 +52,11 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 
 /**
@@ -65,89 +64,13 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class Primitive32Store extends ArrayR032 implements PhysicalStore<Double> {
+public final class Primitive32Store extends ArrayR032 implements PhysicalStore<Double>, Factory2D.Builder<Primitive32Store> {
 
-    public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PrimitiveFactory<Primitive32Store>() {
+    public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public DenseArray.Factory<Double> array() {
             return ArrayR032.FACTORY;
-        }
-
-        @Override
-        public Primitive32Store columns(final Access1D<?>... source) {
-
-            final int tmpRowDim = (int) source[0].count();
-            final int tmpColDim = source.length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = tmpColumn.floatValue(i);
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store columns(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpColumn[i]);
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store columns(final double[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = (float) tmpColumn[i];
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store columns(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source[0].size();
-            final int tmpColDim = source.length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpColumn.get(i));
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         @Override
@@ -185,6 +108,11 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         }
 
         @Override
+        public Primitive32Store make(final int rows, final int columns) {
+            return new Primitive32Store(rows, columns);
+        }
+
+        @Override
         public Primitive32Store make(final long rows, final long columns) {
             return new Primitive32Store((int) rows, (int) columns);
         }
@@ -192,82 +120,6 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         @Override
         public Householder<Double> makeHouseholder(final int length) {
             return new Householder.Primitive32(length);
-        }
-
-        @Override
-        public Primitive32Store rows(final Access1D<?>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = (int) source[0].count();
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = tmpRow.floatValue(j);
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store rows(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            Comparable<?>[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpRow[j]);
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store rows(final double[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            double[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = (float) tmpRow[j];
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        @Override
-        public Primitive32Store rows(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
-
-            final float[] tmpData = new float[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + tmpRowDim * j] = NumberDefinition.floatValue(tmpRow.get(j));
-                }
-            }
-
-            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         @Override
@@ -307,7 +159,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         } else if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(matrix);
+            return FACTORY.column(matrix);
         }
     }
 
@@ -426,6 +278,11 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     @Override
     public Array1D<Double> asList() {
         return myUtility.flatten();
+    }
+
+    @Override
+    public Primitive32Store build() {
+        return this;
     }
 
     @Override

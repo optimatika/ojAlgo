@@ -115,7 +115,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     @Override
-    public double doubleValue(final long key) {
+    public double doubleValue(final int key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
             return myStorage.doubleValueInternally(tmpIndex);
@@ -125,7 +125,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     @Override
-    public double doubleValue(final int key) {
+    public double doubleValue(final long key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
             return myStorage.doubleValueInternally(tmpIndex);

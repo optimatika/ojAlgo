@@ -221,6 +221,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         }
 
         @Override
+        public SparseArray<N> make(final int size) {
+            return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), size);
+        }
+
+        @Override
         public SparseArray<N> make(final long count) {
             return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), count);
         }
@@ -238,9 +243,9 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
      */
     private int myActualLength = 0;
     private final long myCount;
-    private long[] myIndices;
     private final DenseArray.Factory<N> myDenseFactory;
     private final GrowthStrategy myGrowthStrategy;
+    private long[] myIndices;
     private DenseArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
@@ -326,7 +331,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public double doubleValue(final long index) {
+    public double doubleValue(final int index) {
 
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -336,7 +341,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public double doubleValue(final int index) {
+    public double doubleValue(final long index) {
 
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -476,6 +481,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     public void reset() {
         myActualLength = 0;
         myValues.reset();
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+
+        int internalIndex = this.index(index);
+
+        this.update(index, internalIndex, value, false);
     }
 
     @Override
@@ -939,14 +952,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             }
 
         }
-    }
-
-    @Override
-    public void set(final int index, final double value) {
-
-        int internalIndex = this.index(index);
-
-        this.update(index, internalIndex, value, false);
     }
 
 }

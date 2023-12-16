@@ -46,11 +46,6 @@ final class BufferZ016 extends BufferArray {
     }
 
     @Override
-    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        myBuffer.put(index, supplier.shortValue());
-    }
-
-    @Override
     public float floatValue(final int index) {
         return myBuffer.get(index);
     }
@@ -58,11 +53,6 @@ final class BufferZ016 extends BufferArray {
     @Override
     public void set(final int index, final double value) {
         myBuffer.put(index, (short) Math.round(value));
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return myBuffer.get(index);
     }
 
     @Override
@@ -76,7 +66,17 @@ final class BufferZ016 extends BufferArray {
     }
 
     @Override
+    public short shortValue(final int index) {
+        return myBuffer.get(index);
+    }
+
+    @Override
     protected void add(final int index, final Comparable<?> addend) {
         this.set(index, this.shortValue(index) + NumberDefinition.shortValue(addend));
+    }
+
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        myBuffer.put(index, supplier.shortValue());
     }
 }

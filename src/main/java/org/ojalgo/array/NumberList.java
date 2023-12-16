@@ -199,7 +199,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
-    public double doubleValue(final long index) {
+    public double doubleValue(final int index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -208,7 +208,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
-    public double doubleValue(final int index) {
+    public double doubleValue(final long index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -369,6 +369,15 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
+    public void set(final int index, final double value) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.set(index, value);
+        }
+    }
+
+    @Override
     public N set(final int index, final N element) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -476,15 +485,6 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
             BasicArray<N> newStorage = myDenseFactory.make(newTotalCount);
             newStorage.fillMatching(myStorage);
             myStorage = newStorage;
-        }
-    }
-
-    @Override
-    public void set(final int index, final double value) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.set(index, value);
         }
     }
 

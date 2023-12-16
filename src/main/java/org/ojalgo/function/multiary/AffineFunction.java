@@ -54,7 +54,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
 
         public AffineFunction<N> make(final int arity) {
             if (myCoefficients != null) {
-                return new AffineFunction<>(myFactory.rows(myCoefficients));
+                return new AffineFunction<>(myFactory.row(myCoefficients));
             } else {
                 return new AffineFunction<>(myFactory.make(1, arity));
             }
@@ -139,10 +139,12 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         myConstant = new ConstantFunction<>(coefficients.count(), coefficients.physical());
     }
 
+    @Override
     public int arity() {
         return Math.toIntExact(myCoefficients.count());
     }
 
+    @Override
     public N getConstant() {
         return myConstant.getConstant();
     }
@@ -157,6 +159,7 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         return myCoefficients.physical().makeZero(this.arity(), this.arity());
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
 
         MatrixStore<N> retVal = myCoefficients;
@@ -177,10 +180,12 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         return this.getScalarValue(arg).get();
     }
 
+    @Override
     public PhysicalStore<N> linear() {
         return (PhysicalStore<N>) myCoefficients;
     }
 
+    @Override
     public void setConstant(final Comparable<?> constant) {
         myConstant.setConstant(constant);
     }

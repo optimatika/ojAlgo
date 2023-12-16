@@ -51,12 +51,12 @@ final class ZeroStore<N extends Comparable<N>> extends FactoryStore<N> {
     }
 
     @Override
-    public double doubleValue(final long anInd) {
+    public double doubleValue(final int aRow, final int aCol) {
         return PrimitiveMath.ZERO;
     }
 
     @Override
-    public double doubleValue(final int aRow, final int aCol) {
+    public double doubleValue(final long anInd) {
         return PrimitiveMath.ZERO;
     }
 

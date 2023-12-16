@@ -80,6 +80,11 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         }
 
         @Override
+        public MathType getMathType() {
+            return myDenseFactory.getMathType();
+        }
+
+        @Override
         public Scalar.Factory<N> scalar() {
             return myDenseFactory.scalar();
         }
@@ -87,11 +92,6 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         @Override
         long getCapacityLimit() {
             return Long.MAX_VALUE;
-        }
-
-        @Override
-        public MathType getMathType() {
-            return myDenseFactory.getMathType();
         }
 
         @Override
@@ -139,6 +139,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         myFactory = factory;
     }
 
+    @Override
     public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
 
         AggregatorFunction<N> visitor = aggregator.getFunction(myFactory.aggregator());
@@ -178,6 +179,7 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
+    @Override
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
     }
@@ -186,24 +188,29 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return myFactory.getMathType().isPrimitive();
     }
 
+    @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
         this.modify(0L, this.count(), 1L, modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         long limit = Math.min(left.count(), this.count());
         this.modify(0L, limit, 1L, left, function);
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         long limit = Math.min(this.count(), right.count());
         this.modify(0L, limit, 1L, function, right);
     }
 
+    @Override
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         this.modify(first, limit, 1L, modifier);
     }
 
+    @Override
     public void supplyTo(final Mutate1D receiver) {
         long limit = Math.min(this.count(), receiver.count());
         for (long i = 0; i < limit; i++) {
@@ -216,10 +223,12 @@ public abstract class BasicArray<N extends Comparable<N>> implements Access1D<N>
         return Access1D.toString(this);
     }
 
+    @Override
     public void visitAll(final VoidFunction<N> visitor) {
         this.visit(0L, this.count(), 1L, visitor);
     }
 
+    @Override
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
         this.visit(first, limit, 1L, visitor);
     }

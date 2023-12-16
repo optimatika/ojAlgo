@@ -252,7 +252,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         final int tmpRowDim = myViews.size();
         final int tmpColDim = (int) myOriginalWeights.count();
 
-        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.makeDense(tmpRowDim, tmpColDim);
+        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.newDenseBuilder(tmpRowDim, tmpColDim);
 
         FinancePortfolio tmpView;
         List<BigDecimal> tmpWeights;
@@ -278,7 +278,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         final int tmpRowDim = myViews.size();
         final int tmpColDim = 1;
 
-        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.makeDense(tmpRowDim, tmpColDim);
+        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.newDenseBuilder(tmpRowDim, tmpColDim);
 
         double tmpRet;
         final double tmpRAF = this.getRiskAversion().doubleValue();
@@ -304,7 +304,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
         final int tmpDim = myViews.size();
 
-        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.makeDense(tmpDim, tmpDim);
+        final MatrixR064.DenseReceiver retVal = MATRIX_FACTORY.newDenseBuilder(tmpDim, tmpDim);
 
         if (myConfidence.compareTo(BigMath.ONE) == 0) {
 

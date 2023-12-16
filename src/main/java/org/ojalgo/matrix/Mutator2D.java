@@ -30,11 +30,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
 abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, MR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>>
-        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>> {
+        implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>>, Factory2D.Builder<M> {
 
     private final MR myDelegate;
     private boolean mySafe = true;
@@ -84,6 +85,12 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
             throw new IllegalStateException();
         }
         myDelegate.add(row, col, value);
+    }
+
+    @Override
+    public M build() {
+        mySafe = false;
+        return this.instantiate(myDelegate);
     }
 
     @Override
@@ -533,6 +540,14 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
     }
 
     @Override
+    public void set(final int row, final int col, final double value) {
+        if (!mySafe) {
+            throw new IllegalStateException();
+        }
+        myDelegate.set(row, col, value);
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -550,14 +565,6 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
 
     @Override
     public void set(final long row, final long col, final Comparable<?> value) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.set(row, col, value);
-    }
-
-    @Override
-    public void set(final int row, final int col, final double value) {
         if (!mySafe) {
             throw new IllegalStateException();
         }

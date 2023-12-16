@@ -29,8 +29,8 @@ public class SpecialTest extends MatrixTests {
     @Test
     public void testDenseReceiver() {
 
-        MatrixQ128.DenseReceiver rDR = MatrixQ128.FACTORY.makeDense(5, 7);
-        MatrixR032.DenseReceiver p32DR = MatrixR032.FACTORY.makeDense(5, 7);
+        MatrixQ128.DenseReceiver rDR = MatrixQ128.FACTORY.newDenseBuilder(5, 7);
+        MatrixR032.DenseReceiver p32DR = MatrixR032.FACTORY.newDenseBuilder(5, 7);
 
         rDR.set(1, 1, 1D);
         p32DR.set(1, 1, 1D);
@@ -47,8 +47,8 @@ public class SpecialTest extends MatrixTests {
     @Test
     public void testSparseReceiver() {
 
-        MatrixQ128.SparseReceiver rSR = MatrixQ128.FACTORY.makeSparse(5, 7);
-        MatrixR032.SparseReceiver p32SR = MatrixR032.FACTORY.makeSparse(5, 7);
+        MatrixQ128.SparseReceiver rSR = MatrixQ128.FACTORY.newSparseBuilder(5, 7);
+        MatrixR032.SparseReceiver p32SR = MatrixR032.FACTORY.newSparseBuilder(5, 7);
 
         rSR.set(1, 1, 1D);
         p32SR.set(1, 1, 1D);

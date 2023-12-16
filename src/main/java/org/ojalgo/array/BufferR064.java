@@ -42,14 +42,6 @@ final class BufferR064 extends BufferArray {
     }
 
     @Override
-    public void supplyTo(final Mutate1D receiver) {
-        int limit = Math.min(this.size(), receiver.size());
-        for (int i = 0; i < limit; i++) {
-            receiver.set(i, this.doubleValue(i));
-        }
-    }
-
-    @Override
     public byte byteValue(final int index) {
         return (byte) Math.round(myBuffer.get(index));
     }
@@ -57,11 +49,6 @@ final class BufferR064 extends BufferArray {
     @Override
     public double doubleValue(final int index) {
         return myBuffer.get(index);
-    }
-
-    @Override
-    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        myBuffer.put(index, supplier.doubleValue());
     }
 
     @Override
@@ -90,7 +77,20 @@ final class BufferR064 extends BufferArray {
     }
 
     @Override
+    public void supplyTo(final Mutate1D receiver) {
+        int limit = Math.min(this.size(), receiver.size());
+        for (int i = 0; i < limit; i++) {
+            receiver.set(i, this.doubleValue(i));
+        }
+    }
+
+    @Override
     protected void add(final int index, final Comparable<?> addend) {
         this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
+    }
+
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        myBuffer.put(index, supplier.doubleValue());
     }
 }

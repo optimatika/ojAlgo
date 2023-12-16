@@ -37,16 +37,16 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<Quadruple> {
 
-        default Quadruple invoke(final Quadruple arg1, final double arg2) {
-            return this.invoke(arg1, Quadruple.valueOf(arg2));
-        }
-
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(Quadruple.valueOf(arg1), Quadruple.valueOf(arg2)).doubleValue();
         }
 
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(Quadruple.valueOf(arg1), Quadruple.valueOf(arg2)).floatValue();
+        }
+
+        default Quadruple invoke(final Quadruple arg1, final double arg2) {
+            return this.invoke(arg1, Quadruple.valueOf(arg2));
         }
 
     }

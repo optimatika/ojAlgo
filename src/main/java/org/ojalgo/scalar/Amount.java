@@ -32,20 +32,20 @@ public final class Amount extends ExactDecimal<Amount> {
 
     public static final Scalar.Factory<Amount> FACTORY = new ExactDecimal.Factory<>() {
 
-        public Amount cast(final double value) {
-            return Amount.valueOf(value);
-        }
-
         public Amount cast(final Comparable<?> number) {
             return Amount.valueOf(number);
         }
 
-        public Amount convert(final double value) {
+        public Amount cast(final double value) {
             return Amount.valueOf(value);
         }
 
         public Amount convert(final Comparable<?> number) {
             return Amount.valueOf(number);
+        }
+
+        public Amount convert(final double value) {
+            return Amount.valueOf(value);
         }
 
         public Descriptor descriptor() {
@@ -70,10 +70,6 @@ public final class Amount extends ExactDecimal<Amount> {
     public static final Amount TWO = new Amount(LONG_DENOMINATOR + LONG_DENOMINATOR);
     public static final Amount ZERO = new Amount();
 
-    public static Amount valueOf(final double value) {
-        return new Amount(Math.round(value * DOUBLE_DENOMINATOR));
-    }
-
     public static Amount valueOf(final Comparable<?> number) {
 
         if (number == null) {
@@ -85,6 +81,10 @@ public final class Amount extends ExactDecimal<Amount> {
         }
 
         return Amount.valueOf(Scalar.doubleValue(number));
+    }
+
+    public static Amount valueOf(final double value) {
+        return new Amount(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
     public Amount() {

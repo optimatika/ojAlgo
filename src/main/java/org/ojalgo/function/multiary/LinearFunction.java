@@ -53,7 +53,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
 
         public LinearFunction<N> make(final int arity) {
             if (myCoefficients != null) {
-                return new LinearFunction<>(myFactory.rows(myCoefficients));
+                return new LinearFunction<>(myFactory.row(myCoefficients));
             } else {
                 return new LinearFunction<>(myFactory.make(1, arity));
             }
@@ -136,6 +136,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
         myCoefficients = coefficients;
     }
 
+    @Override
     public int arity() {
         return Math.toIntExact(myCoefficients.count());
     }
@@ -150,6 +151,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
         return this.factory().makeZero(this.arity(), this.arity());
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
 
         MatrixStore<N> retVal = myCoefficients;
@@ -175,6 +177,7 @@ public final class LinearFunction<N extends Comparable<N>> implements MultiaryFu
         return preallocated.get(0, 0);
     }
 
+    @Override
     public PhysicalStore<N> linear() {
         return (PhysicalStore<N>) myCoefficients;
     }

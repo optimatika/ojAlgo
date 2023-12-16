@@ -35,7 +35,7 @@ import org.ojalgo.structure.Access2D;
 
 public final class SimplePortfolio extends FinancePortfolio implements Context {
 
-    static List<SimpleAsset> toSimpleAssets(final double[] someWeights) {
+    static List<SimpleAsset> toSimpleAssets(final Comparable<?>[] someWeights) {
 
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
 
@@ -46,7 +46,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return retVal;
     }
 
-    static List<SimpleAsset> toSimpleAssets(final Comparable<?>[] someWeights) {
+    static List<SimpleAsset> toSimpleAssets(final double[] someWeights) {
 
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
 
@@ -78,6 +78,10 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
         myCorrelations = MATRIX_FACTORY.copy(correlationsMatrix);
         myComponents = someAssets;
+    }
+
+    public SimplePortfolio(final Comparable<?>... someWeights) {
+        this(SimplePortfolio.toSimpleAssets(someWeights));
     }
 
     public SimplePortfolio(final Context portfolioContext, final FinancePortfolio weightsPortfolio) {
@@ -112,10 +116,6 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         this(MATRIX_FACTORY.makeEye(someAssets.size(), someAssets.size()), someAssets);
     }
 
-    public SimplePortfolio(final Comparable<?>... someWeights) {
-        this(SimplePortfolio.toSimpleAssets(someWeights));
-    }
-
     public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
         final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.columns(tmpWeights);
@@ -135,7 +135,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
             final int tmpSize = myComponents.size();
 
-            final MatrixR064.DenseReceiver tmpReturns = MATRIX_FACTORY.makeDense(tmpSize, 1);
+            final MatrixR064.DenseReceiver tmpReturns = MATRIX_FACTORY.newDenseBuilder(tmpSize, 1);
 
             for (int i = 0; i < tmpSize; i++) {
                 tmpReturns.set(i, 0, this.getMeanReturn(i));
@@ -153,7 +153,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
             final int tmpSize = myComponents.size();
 
-            final MatrixR064.DenseReceiver tmpVolatilities = MATRIX_FACTORY.makeDense(tmpSize, 1);
+            final MatrixR064.DenseReceiver tmpVolatilities = MATRIX_FACTORY.newDenseBuilder(tmpSize, 1);
 
             for (int i = 0; i < tmpSize; i++) {
                 tmpVolatilities.set(i, 0, this.getVolatility(i));
@@ -195,7 +195,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
             final int tmpSize = myComponents.size();
 
-            final MatrixR064.DenseReceiver tmpCovaris = MATRIX_FACTORY.makeDense(tmpSize, tmpSize);
+            final MatrixR064.DenseReceiver tmpCovaris = MATRIX_FACTORY.newDenseBuilder(tmpSize, tmpSize);
 
             for (int j = 0; j < tmpSize; j++) {
                 for (int i = 0; i < tmpSize; i++) {
@@ -304,7 +304,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
             final int tmpSize = myComponents.size();
 
-            final MatrixR064.DenseReceiver tmpWeights = MATRIX_FACTORY.makeDense(tmpSize, 1);
+            final MatrixR064.DenseReceiver tmpWeights = MATRIX_FACTORY.newDenseBuilder(tmpSize, 1);
 
             for (int i = 0; i < tmpSize; i++) {
                 tmpWeights.set(i, 0, this.getWeight(i));

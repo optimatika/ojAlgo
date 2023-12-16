@@ -45,6 +45,40 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         myFactory = factory;
     }
 
+    /**
+     * Will create a block diagonal tensor using the input matrices as blocks in the supplied order.
+     */
+    public T blocks(final Access2D<N>... matrices) {
+
+        long rows = 0;
+        long cols = 0;
+        for (Access2D<N> matrix : matrices) {
+            rows += matrix.countRows();
+            cols += matrix.countColumns();
+        }
+
+        T retVal = myFactory.make(rows, cols);
+
+        long rowOffset = 0L;
+        long colOffset = 0L;
+        for (Access2D<N> matrix : matrices) {
+
+            long m = matrix.countRows();
+            long n = matrix.countColumns();
+
+            for (int j = 0; j < n; j++) {
+                for (int i = 0; i < m; i++) {
+                    retVal.set(rowOffset + i, colOffset + j, matrix.get(i, j));
+                }
+            }
+
+            rowOffset += m;
+            colOffset += n;
+        }
+
+        return retVal;
+    }
+
     public T copy(final Access2D<N> elements) {
 
         T retVal = myFactory.make(elements.countRows(), elements.countColumns());
@@ -75,8 +109,14 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         return true;
     }
 
+    @Override
     public FunctionSet<N> function() {
         return (FunctionSet<N>) myFactory.function();
+    }
+
+    @Override
+    public MathType getMathType() {
+        return myFactory.getMathType();
     }
 
     @Override
@@ -97,33 +137,6 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         }
 
         return retVal;
-    }
-
-    public T make(final long rows, final long columns) {
-        return myFactory.make(rows, columns);
-    }
-
-    /**
-     * Same as {@link TensorFactoryAnyD#product(Access1D...)} but explicitly for rank 2.
-     */
-    public T product(final Access1D<N> vector1, final Access1D<N> vector2) {
-
-        long rows = vector1.count();
-        long cols = vector2.count();
-
-        T retVal = myFactory.make(rows, cols);
-
-        for (long j = 0; j < cols; j++) {
-            for (long i = 0; i < rows; i++) {
-                retVal.set(i, j, vector1.doubleValue(i) * vector2.doubleValue(j));
-            }
-        }
-
-        return retVal;
-    }
-
-    public T power2(final Access1D<N> vector) {
-        return this.product(vector, vector);
     }
 
     /**
@@ -164,46 +177,42 @@ public final class TensorFactory2D<N extends Comparable<N>, T extends Mutate2D> 
         return retVal;
     }
 
-    public Scalar.Factory<N> scalar() {
-        return (Factory<N>) myFactory.scalar();
+    @Override
+    public T make(final int nbRows, final int nbCols) {
+        return myFactory.make(nbRows, nbCols);
+    }
+
+    @Override
+    public T make(final long nbRows, final long nbCols) {
+        return myFactory.make(nbRows, nbCols);
+    }
+
+    public T power2(final Access1D<N> vector) {
+        return this.product(vector, vector);
     }
 
     /**
-     * Will create a block diagonal tensor using the input matrices as blocks in the supplied order.
+     * Same as {@link TensorFactoryAnyD#product(Access1D...)} but explicitly for rank 2.
      */
-    public T blocks(final Access2D<N>... matrices) {
+    public T product(final Access1D<N> vector1, final Access1D<N> vector2) {
 
-        long rows = 0;
-        long cols = 0;
-        for (Access2D<N> matrix : matrices) {
-            rows += matrix.countRows();
-            cols += matrix.countColumns();
-        }
+        long rows = vector1.count();
+        long cols = vector2.count();
 
         T retVal = myFactory.make(rows, cols);
 
-        long rowOffset = 0L;
-        long colOffset = 0L;
-        for (Access2D<N> matrix : matrices) {
-
-            long m = matrix.countRows();
-            long n = matrix.countColumns();
-
-            for (int j = 0; j < n; j++) {
-                for (int i = 0; i < m; i++) {
-                    retVal.set(rowOffset + i, colOffset + j, matrix.get(i, j));
-                }
+        for (long j = 0; j < cols; j++) {
+            for (long i = 0; i < rows; i++) {
+                retVal.set(i, j, vector1.doubleValue(i) * vector2.doubleValue(j));
             }
-
-            rowOffset += m;
-            colOffset += n;
         }
 
         return retVal;
     }
 
-    public MathType getMathType() {
-        return myFactory.getMathType();
+    @Override
+    public Scalar.Factory<N> scalar() {
+        return (Factory<N>) myFactory.scalar();
     }
 
 }

@@ -50,14 +50,6 @@ final class Pivot {
         }
     }
 
-    int[] reverseOrder() {
-        int[] inverse = new int[myOrder.length];
-        for (int i = 0; i < myOrder.length; i++) {
-            inverse[myOrder[i]] = i;
-        }
-        return inverse;
-    }
-
     int[] getOrder() {
         return myOrder;
     }
@@ -78,6 +70,14 @@ final class Pivot {
 
         myModified = false;
         mySign = 1;
+    }
+
+    int[] reverseOrder() {
+        int[] inverse = new int[myOrder.length];
+        for (int i = 0; i < myOrder.length; i++) {
+            inverse[myOrder[i]] = i;
+        }
+        return inverse;
     }
 
     int signum() {

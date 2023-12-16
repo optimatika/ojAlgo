@@ -35,6 +35,18 @@ abstract class TableauCutGenerator {
 
     private static final NumberContext ACCURACY = NumberContext.of(4, 16);
 
+    private static double fraction(final double value) {
+        return value - Math.floor(value);
+    }
+
+    private static boolean isFractionalEnough(final double value, final double fraction, final double away) {
+        if (ACCURACY.isSmall(value, Math.min(fraction, ONE - fraction))) {
+            return false;
+        } else {
+            return away < fraction && fraction < ONE - away;
+        }
+    }
+
     /**
      * All variables must be integer.
      */
@@ -125,18 +137,6 @@ abstract class TableauCutGenerator {
         }
 
         return Equation.of(ONE, variableIndex, cut);
-    }
-
-    private static double fraction(final double value) {
-        return value - Math.floor(value);
-    }
-
-    private static boolean isFractionalEnough(final double value, final double fraction, final double away) {
-        if (ACCURACY.isSmall(value, Math.min(fraction, ONE - fraction))) {
-            return false;
-        } else {
-            return away < fraction && fraction < ONE - away;
-        }
     }
 
 }

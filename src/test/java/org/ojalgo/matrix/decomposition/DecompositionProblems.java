@@ -86,7 +86,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<Double> product = matrix.multiply(q);
         int kernelCount = 0;
         for (int i = 0; i < product.countColumns(); i++) {
-            double norm = Primitive64Store.FACTORY.columns(product.sliceColumn(i)).norm();
+            double norm = Primitive64Store.FACTORY.column(product.sliceColumn(i)).norm();
             if (norm < ZERO) {
                 if (DEBUG) {
                     System.out.println(String.format("Column %d of Q belongs to the " + "kernel of A.", i));
@@ -135,7 +135,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<Double> product = matrix.multiply(q2);
         int kernelCount = 0;
         for (int i = 0; i < product.countColumns(); i++) {
-            double norm = Primitive64Store.FACTORY.columns(product.sliceColumn(i)).norm();
+            double norm = Primitive64Store.FACTORY.column(product.sliceColumn(i)).norm();
             if (norm < ZERO) {
                 if (DEBUG) {
                     System.out.println(String.format("Column %d of Q2 belongs to the " + "kernel of A.", i));

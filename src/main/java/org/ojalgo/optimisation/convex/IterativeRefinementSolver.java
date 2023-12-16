@@ -37,6 +37,14 @@ import org.ojalgo.scalar.Quadruple;
  */
 final class IterativeRefinementSolver extends ConvexSolver {
 
+    private static Result buildResult(final MatrixStore<Quadruple> Q0, final MatrixStore<Quadruple> C0, final MatrixStore<Quadruple> x0,
+            final MatrixStore<Quadruple> y0, final State state) {
+        Quadruple objectiveValue = Q0.multiplyBoth(x0).divide(2).subtract(x0.transpose().multiply(C0).get(0));
+        Result result = new Result(state, objectiveValue.doubleValue(), x0);
+        result.multipliers(y0);
+        return result;
+    }
+
     private static Optimisation.Result doIteration(final MatrixStore<Quadruple> H, final MatrixStore<Quadruple> g, final MatrixStore<Quadruple> AE,
             final MatrixStore<Quadruple> BE, final MatrixStore<Quadruple> AI, final MatrixStore<Quadruple> BI, final Optimisation.Options options,
             final Optimisation.Result startValue) {
@@ -116,8 +124,8 @@ final class IterativeRefinementSolver extends ConvexSolver {
             //         sometimes it works second time...?!
             x_y_double = IterativeRefinementSolver.doIteration(Q_in, C_in, ae_in, be_in, ai_in, bi_in, options, startValue);
         }
-        MatrixStore<Quadruple> x0 = GenericStore.R128.columns(x_y_double);
-        MatrixStore<Quadruple> y0 = GenericStore.R128.columns(x_y_double.getMultipliers().get());
+        MatrixStore<Quadruple> x0 = GenericStore.R128.column(x_y_double);
+        MatrixStore<Quadruple> y0 = GenericStore.R128.column(x_y_double.getMultipliers().get());
         double initialSolutionValue = x_y_double.getValue();
 
         //  Set initial values
@@ -194,8 +202,8 @@ final class IterativeRefinementSolver extends ConvexSolver {
                 //  Cant solve this sub problem. Abort.
                 break;
             }
-            MatrixStore<Quadruple> x1 = GenericStore.R128.columns(x_y_double);
-            MatrixStore<Quadruple> y1 = GenericStore.R128.columns(x_y_double.getMultipliers().get());
+            MatrixStore<Quadruple> x1 = GenericStore.R128.column(x_y_double);
+            MatrixStore<Quadruple> y1 = GenericStore.R128.column(x_y_double.getMultipliers().get());
             if (x1.aggregateAll(Aggregator.LARGEST).compareTo(Quadruple.ZERO) == 0 && y1.aggregateAll(Aggregator.LARGEST).compareTo(Quadruple.ZERO) == 0) {
                 // No progress if x1 and y1 = 0, abort.
                 break;
@@ -208,14 +216,6 @@ final class IterativeRefinementSolver extends ConvexSolver {
         }
         Result result = IterativeRefinementSolver.buildResult(Q0, C0, x0, y0, State.OPTIMAL);
         double improvement = (initialSolutionValue - result.getValue()) / initialSolutionValue;
-        return result;
-    }
-
-    private static Result buildResult(final MatrixStore<Quadruple> Q0, final MatrixStore<Quadruple> C0, final MatrixStore<Quadruple> x0,
-            final MatrixStore<Quadruple> y0, final State state) {
-        Quadruple objectiveValue = Q0.multiplyBoth(x0).divide(2).subtract(x0.transpose().multiply(C0).get(0));
-        Result result = new Result(state, objectiveValue.doubleValue(), x0);
-        result.multipliers(y0);
         return result;
     }
 

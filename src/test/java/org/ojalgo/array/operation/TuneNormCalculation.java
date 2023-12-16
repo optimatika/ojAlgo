@@ -83,42 +83,14 @@ TuneNormCalculation.usingHypot  10000  thrpt    3       577175.912 ±      37372
 @State(Scope.Benchmark)
 public class TuneNormCalculation {
 
-    @Param({ "1", "2", "5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000", "10000" })
-    public int dim;
-
     public static void main(final String[] args) throws RunnerException {
         BenchmarkUtils.run(TuneNormCalculation.class);
     }
 
+    @Param({ "1", "2", "5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000", "10000" })
+    public int dim;
+
     public double[] array;
-
-    @Setup
-    public void setup() {
-
-        ArrayR064 l = ArrayR064.make(dim);
-        l.fillAll(Uniform.standard());
-
-        array = l.data;
-    }
-
-    @Benchmark
-    public double naive() {
-        double retVal = 0D;
-        for (int i = 0; i < array.length; i++) {
-            double tmpVal = array[i];
-            retVal += tmpVal * tmpVal;
-        }
-        return retVal;
-    }
-
-    @Benchmark
-    public double usingHypot() {
-        double retVal = 0D;
-        for (int i = 0; i < array.length; i++) {
-            retVal = MissingMath.hypot(retVal, array[i]);
-        }
-        return retVal;
-    }
 
     @Benchmark
     public double doubleLoop() {
@@ -132,6 +104,34 @@ public class TuneNormCalculation {
             retVal += tmpVal * tmpVal;
         }
         return Math.sqrt(retVal) * infNorm;
+    }
+
+    @Benchmark
+    public double naive() {
+        double retVal = 0D;
+        for (int i = 0; i < array.length; i++) {
+            double tmpVal = array[i];
+            retVal += tmpVal * tmpVal;
+        }
+        return retVal;
+    }
+
+    @Setup
+    public void setup() {
+
+        ArrayR064 l = ArrayR064.make(dim);
+        l.fillAll(Uniform.standard());
+
+        array = l.data;
+    }
+
+    @Benchmark
+    public double usingHypot() {
+        double retVal = 0D;
+        for (int i = 0; i < array.length; i++) {
+            retVal = MissingMath.hypot(retVal, array[i]);
+        }
+        return retVal;
     }
 
 }

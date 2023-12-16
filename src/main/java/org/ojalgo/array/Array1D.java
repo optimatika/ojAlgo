@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import java.math.BigDecimal;
 import java.util.AbstractList;
-import java.util.List;
 import java.util.RandomAccess;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -55,10 +54,9 @@ import org.ojalgo.type.math.MathType;
  * @author apete
  */
 public final class Array1D<N extends Comparable<N>> extends AbstractList<N> implements Access1D.Visitable<N>, Access1D.Aggregatable<N>, Access1D.Sliceable<N>,
-        Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+        Access1D.Collectable<N, Mutate1D>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess, Factory1D.Builder<Array1D<N>> {
 
-    public static final class Factory<N extends Comparable<N>>
-            implements Factory1D.Dense<Array1D<N>>, Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -69,22 +67,9 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         @Override
         public Array1D<N> copy(final Access1D<?> source) {
-            return myDelegate.copy(source).wrapInArray1D();
-        }
-
-        @Override
-        public Array1D<N> copy(final Comparable<?>[] source) {
-            return myDelegate.copy(source).wrapInArray1D();
-        }
-
-        @Override
-        public Array1D<N> copy(final double... source) {
-            return myDelegate.copy(source).wrapInArray1D();
-        }
-
-        @Override
-        public Array1D<N> copy(final List<? extends Comparable<?>> source) {
-            return myDelegate.copy(source).wrapInArray1D();
+            BasicArray<N> basic = myDelegate.make(source.count());
+            basic.fillMatching(source);
+            return basic.wrapInArray1D();
         }
 
         @Override
@@ -98,22 +83,29 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         }
 
         @Override
-        public Array1D<N> make(final long count) {
-            return this.makeDense(count);
+        public Array1D<N> make(final int size) {
+            return this.newDenseBuilder(size);
         }
 
         @Override
-        public Array1D<N> makeDense(final long count) {
-            return myDelegate.makeToBeFilled(count).wrapInArray1D();
+        public Array1D<N> make(final long count) {
+            return this.newDenseBuilder(count);
         }
 
         @Override
         public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(count, supplier).wrapInArray1D();
+            BasicArray<N> basic = myDelegate.make(count);
+            basic.fillAll(supplier);
+            return basic.wrapInArray1D();
         }
 
         @Override
-        public Array1D<N> makeSparse(final long count) {
+        public Array1D<N> newDenseBuilder(final long count) {
+            return myDelegate.makeToBeFilled(count).wrapInArray1D();
+        }
+
+        @Override
+        public Array1D<N> newSparseBuilder(final long count) {
             return myDelegate.makeStructuredZero(count).wrapInArray1D();
         }
 
@@ -378,6 +370,11 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
+    }
+
+    @Override
+    public Array1D<N> build() {
+        return this;
     }
 
     @Override

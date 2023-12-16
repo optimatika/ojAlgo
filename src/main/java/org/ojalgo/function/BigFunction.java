@@ -42,12 +42,12 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<BigDecimal> {
 
-        default double invoke(final double arg1, final double arg2) {
-            return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).doubleValue();
-        }
-
         default BigDecimal invoke(final BigDecimal arg1, final double arg2) {
             return this.invoke(arg1, BigDecimal.valueOf(arg2));
+        }
+
+        default double invoke(final double arg1, final double arg2) {
+            return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).doubleValue();
         }
 
         default float invoke(final float arg1, final float arg2) {

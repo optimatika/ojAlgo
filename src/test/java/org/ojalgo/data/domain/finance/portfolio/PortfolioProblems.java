@@ -98,7 +98,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20110614() {
 
-        MatrixR064.DenseReceiver tmpCovarsBuilder = MatrixR064.FACTORY.makeDense(3, 3);
+        MatrixR064.DenseReceiver tmpCovarsBuilder = MatrixR064.FACTORY.newDenseBuilder(3, 3);
         tmpCovarsBuilder.set(0, 0, 0.04);
         tmpCovarsBuilder.set(0, 1, 0.01);
         tmpCovarsBuilder.set(0, 2, 0.02);
@@ -109,7 +109,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpCovarsBuilder.set(2, 1, 0.01);
         tmpCovarsBuilder.set(2, 2, 0.16);
         MatrixR064 tmpCovars = tmpCovarsBuilder.get();
-        MatrixR064.DenseReceiver tmpReturnsBuilder = MatrixR064.FACTORY.makeDense(3, 1);
+        MatrixR064.DenseReceiver tmpReturnsBuilder = MatrixR064.FACTORY.newDenseBuilder(3, 1);
         tmpReturnsBuilder.set(0, 0, 0.10);
         tmpReturnsBuilder.set(1, 0, 0.15);
         tmpReturnsBuilder.set(2, 0, 0.18);
@@ -202,7 +202,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
 
-        MatrixR064.DenseReceiver tmpExcessReturnsBuilder = MatrixR064.FACTORY.makeDense(2, 1);
+        MatrixR064.DenseReceiver tmpExcessReturnsBuilder = MatrixR064.FACTORY.newDenseBuilder(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
         MatrixR064 tmpExcessReturns = tmpExcessReturnsBuilder.get();
@@ -327,7 +327,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         MatrixR064.Factory matrixFactory = MatrixR064.FACTORY;
         MatrixR064 cov = matrixFactory.rows(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } });
-        MatrixR064 ret = matrixFactory.columns(new double[] { 0.0427, 0.0015, 0.0285 });
+        MatrixR064 ret = matrixFactory.column(0.0427, 0.0015, 0.0285);
 
         MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
         MarkowitzModel markowitz = new MarkowitzModel(marketEquilibrium, ret);
@@ -365,7 +365,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20170508() {
 
-        MatrixR064.DenseReceiver tmpBuilder = MatrixR064.FACTORY.makeDense(2, 2);
+        MatrixR064.DenseReceiver tmpBuilder = MatrixR064.FACTORY.newDenseBuilder(2, 2);
         tmpBuilder.add(0, 0, 0.040000);
         tmpBuilder.add(0, 1, 0.1000);
         tmpBuilder.add(1, 0, 0.1000);
@@ -417,7 +417,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         double[] assetsReturns = { 1.43676262431851, 0.9538185507216703, 1.069364872519786, 1.1612520648051148, 0.8803365994805741 };
         double targetReturn = 0.08;
 
-        DenseReceiver assetsCovariancesMatrix = MatrixR064.FACTORY.makeDense(assetsCovariances.length, assetsCovariances.length);
+        DenseReceiver assetsCovariancesMatrix = MatrixR064.FACTORY.newDenseBuilder(assetsCovariances.length, assetsCovariances.length);
         for (int i = 0; i < assetsCovariances.length; i++) {
             for (int j = 0; j < assetsCovariances[i].length; j++) {
                 assetsCovariancesMatrix.set(i, j, assetsCovariances[i][j]);

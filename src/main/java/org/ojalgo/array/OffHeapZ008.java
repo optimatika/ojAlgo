@@ -41,17 +41,12 @@ final class OffHeapZ008 extends OffHeapArray {
     }
 
     @Override
-    public byte byteValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
-    }
-
-    @Override
-    public double doubleValue(final long index) {
-        return NativeMemory.getByte(myPointer, index);
-    }
-
-    @Override
     public byte byteValue(final int index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
+    public byte byteValue(final long index) {
         return NativeMemory.getByte(myPointer, index);
     }
 
@@ -61,8 +56,18 @@ final class OffHeapZ008 extends OffHeapArray {
     }
 
     @Override
+    public double doubleValue(final long index) {
+        return NativeMemory.getByte(myPointer, index);
+    }
+
+    @Override
     public void reset() {
         NativeMemory.initialiseByteArray(myPointer, this.count());
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
     @Override
@@ -83,11 +88,6 @@ final class OffHeapZ008 extends OffHeapArray {
     @Override
     public void set(final long index, final float value) {
         NativeMemory.setByte(myPointer, index, (byte) Math.round(value));
-    }
-
-    @Override
-    public void set(final int index, final double value) {
-        NativeMemory.setByte(myPointer, index, (byte) Math.toIntExact(Math.round(value)));
     }
 
 }

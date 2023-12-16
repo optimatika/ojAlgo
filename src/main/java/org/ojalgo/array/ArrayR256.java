@@ -57,13 +57,13 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        public Scalar.Factory<BigDecimal> scalar() {
-            return BigScalar.FACTORY;
+        public MathType getMathType() {
+            return MathType.R128;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.R128;
+        public Scalar.Factory<BigDecimal> scalar() {
+            return BigScalar.FACTORY;
         }
 
         @Override
@@ -95,6 +95,41 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return this.get(index).byteValue();
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    public float floatValue(final int index) {
+        return data[index].floatValue();
+    }
+
+    @Override
+    public int intValue(final int index) {
+        return this.get(index).intValue();
+    }
+
+    @Override
+    public long longValue(final int index) {
+        return this.get(index).longValue();
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        data[index] = new BigDecimal(value);
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return this.get(index).shortValue();
+    }
+
+    @Override
     public void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -115,33 +150,13 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    public byte byteValue(final int index) {
-        return this.get(index).byteValue();
-    }
-
-    @Override
-    public double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
-    public float floatValue(final int index) {
-        return data[index].floatValue();
-    }
-
-    @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
-    }
-
-    @Override
-    public int intValue(final int index) {
-        return this.get(index).intValue();
     }
 
     @Override
@@ -152,21 +167,6 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    public long longValue(final int index) {
-        return this.get(index).longValue();
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return this.get(index).shortValue();
-    }
-
-    @Override
-    public void set(final int index, final long value) {
-        data[index] = new BigDecimal(value);
     }
 
 }

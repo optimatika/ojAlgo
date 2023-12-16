@@ -67,8 +67,18 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
 
         @Override
-        public SparseStore<N> make(final long rows, final long columns) {
-            return SparseStore.makeSparse(myPhysicalFactory, rows, columns);
+        public MathType getMathType() {
+            return myPhysicalFactory.getMathType();
+        }
+
+        @Override
+        public SparseStore<N> make(final int nbRows, final int nbCols) {
+            return SparseStore.makeSparse(myPhysicalFactory, nbRows, nbCols);
+        }
+
+        @Override
+        public SparseStore<N> make(final long nbRows, final long nbCols) {
+            return SparseStore.makeSparse(myPhysicalFactory, nbRows, nbCols);
         }
 
         @Override
@@ -76,25 +86,18 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             return myPhysicalFactory.scalar();
         }
 
-        @Override
-        public MathType getMathType() {
-            return myPhysicalFactory.getMathType();
-        }
-
     }
 
-    public static final SparseStore.Factory<ComplexNumber> C128 = SparseStore.factory(GenericStore.C128);
-    public static final SparseStore.Factory<Quaternion> H256 = SparseStore.factory(GenericStore.H256);
     public static final SparseStore.Factory<Double> R032 = SparseStore.factory(Primitive32Store.FACTORY);
     public static final SparseStore.Factory<Double> R064 = SparseStore.factory(Primitive64Store.FACTORY);
     public static final SparseStore.Factory<Quadruple> R128 = SparseStore.factory(GenericStore.R128);
-    public static final SparseStore.Factory<RationalNumber> Q128 = SparseStore.factory(GenericStore.Q128);
-
+    public static final SparseStore.Factory<ComplexNumber> C128 = SparseStore.factory(GenericStore.C128);
     /**
      * @deprecated v53 Use {@link #C128} instead
      */
     @Deprecated
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = C128;
+    public static final SparseStore.Factory<Quaternion> H256 = SparseStore.factory(GenericStore.H256);
     /**
      * @deprecated v53 Use {@link #R032} instead
      */
@@ -105,6 +108,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
      */
     @Deprecated
     public static final SparseStore.Factory<Double> PRIMITIVE64 = R064;
+    public static final SparseStore.Factory<RationalNumber> Q128 = SparseStore.factory(GenericStore.Q128);
+
     /**
      * @deprecated v53 Use {@link #H256} instead
      */
@@ -693,7 +698,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final int row, final int col, final double value) {
         synchronized (myElements) {
             myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         }
@@ -701,7 +706,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    public void set(final int row, final int col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         synchronized (myElements) {
             myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         }

@@ -41,13 +41,13 @@ final class BufferZ008 extends BufferArray {
     }
 
     @Override
-    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
-        myBuffer.put(index, supplier.byteValue());
+    public float floatValue(final int index) {
+        return myBuffer.get(index);
     }
 
     @Override
-    public float floatValue(final int index) {
-        return myBuffer.get(index);
+    public void set(final int index, final byte value) {
+        myBuffer.put(index, value);
     }
 
     @Override
@@ -61,12 +61,12 @@ final class BufferZ008 extends BufferArray {
     }
 
     @Override
-    public void set(final int index, final byte value) {
-        myBuffer.put(index, value);
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.byteValue(index) + NumberDefinition.byteValue(addend));
     }
 
     @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        this.set(index, this.byteValue(index) + NumberDefinition.byteValue(addend));
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        myBuffer.put(index, supplier.byteValue());
     }
 }

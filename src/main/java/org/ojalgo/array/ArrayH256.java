@@ -49,13 +49,13 @@ public class ArrayH256 extends ScalarArray<Quaternion> {
         }
 
         @Override
-        public Scalar.Factory<Quaternion> scalar() {
-            return Quaternion.FACTORY;
+        public MathType getMathType() {
+            return MathType.H256;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.H256;
+        public Scalar.Factory<Quaternion> scalar() {
+            return Quaternion.FACTORY;
         }
 
         @Override

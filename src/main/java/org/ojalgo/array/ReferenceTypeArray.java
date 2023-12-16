@@ -107,6 +107,11 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
+    public final N get(final int index) {
+        return data[index];
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -116,6 +121,16 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     @Override
     public final void reset() {
         Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
+    }
+
+    @Override
+    public final void set(final int index, final double value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
+    public final void set(final int index, final float value) {
+        data[index] = this.valueOf(value);
     }
 
     public final Spliterator<N> spliterator() {
@@ -153,11 +168,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    public final N get(final int index) {
-        return data[index];
-    }
-
-    @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<N> left, final BinaryFunction<N> function) {
         OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
@@ -184,16 +194,6 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
 
     @Override
     protected final void set(final int index, final Comparable<?> value) {
-        data[index] = this.valueOf(value);
-    }
-
-    @Override
-    public final void set(final int index, final double value) {
-        data[index] = this.valueOf(value);
-    }
-
-    @Override
-    public final void set(final int index, final float value) {
         data[index] = this.valueOf(value);
     }
 

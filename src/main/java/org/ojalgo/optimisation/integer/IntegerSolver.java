@@ -297,7 +297,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> extractSolution() {
-        return Primitive64Store.FACTORY.columns(this.getBestResultSoFar());
+        return Primitive64Store.FACTORY.column(this.getBestResultSoFar());
     }
 
     protected Optimisation.Result getBestEstimate() {

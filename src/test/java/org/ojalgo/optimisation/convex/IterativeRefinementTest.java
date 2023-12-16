@@ -31,6 +31,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
     private static final NumberContext HIGH_ACCURACY = NumberContext.of(9);
     private static final Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = GenericStore.Q128;
 
+    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> Math.abs(arg2) < 1e-6 ? 0 : arg1 / arg2;
+
     private static void doReimplementExample4(final boolean step1AsInExample) {
 
         try {
@@ -106,8 +108,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
 
             Result resultStep1 = ConvexSolver.newBuilder(mtrxQ).linear(mtrxC).equalities(mtrxAE, mtrxBE).inequalities(mtrxAI, mtrxBI).solve();
 
-            GenericStore<RationalNumber> step1X = Q128.columns(resultStep1);
-            GenericStore<RationalNumber> step1L = Q128.columns(resultStep1.getMultipliers().get());
+            GenericStore<RationalNumber> step1X = Q128.column(resultStep1);
+            GenericStore<RationalNumber> step1L = Q128.column(resultStep1.getMultipliers().get());
 
             if (DEBUG) {
                 BasicLogger.debugMatrix("Step 1 Solution", step1X);
@@ -138,8 +140,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
 
             Result resultStep2 = ConvexSolver.newBuilder(mtrxQ).linear(mtrxC).equalities(mtrxAE, mtrxBE).inequalities(mtrxAI, mtrxBI).solve();
 
-            GenericStore<RationalNumber> step2X = Q128.columns(resultStep2);
-            GenericStore<RationalNumber> step2L = Q128.columns(resultStep2.getMultipliers().get());
+            GenericStore<RationalNumber> step2X = Q128.column(resultStep2);
+            GenericStore<RationalNumber> step2L = Q128.column(resultStep2.getMultipliers().get());
 
             if (DEBUG) {
                 BasicLogger.debugMatrix("Step 2 Solution", step2X);
@@ -186,8 +188,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         double C_Size = C_in.aggregateAll(Aggregator.LARGEST).doubleValue();
         double Q_Size = Q_in.aggregateAll(Aggregator.LARGEST).doubleValue();
 
-        MatrixStore<Quadruple> x = GenericStore.R128.columns(x_in);
-        MatrixStore<Quadruple> y = GenericStore.R128.columns(y_in);
+        MatrixStore<Quadruple> x = GenericStore.R128.column(x_in);
+        MatrixStore<Quadruple> y = GenericStore.R128.column(y_in);
 
         MatrixStore<Quadruple> Q = GenericStore.R128.makeWrapper(Q_in);
         MatrixStore<Quadruple> C = GenericStore.R128.makeWrapper(C_in);
@@ -338,8 +340,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
 
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
-        MatrixStore<Double> x = Primitive64Store.FACTORY.columns(result);
-        MatrixStore<Double> y = Primitive64Store.FACTORY.columns(result.getMultipliers().get());
+        MatrixStore<Double> x = Primitive64Store.FACTORY.column(result);
+        MatrixStore<Double> y = Primitive64Store.FACTORY.column(result.getMultipliers().get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-15, precision);
@@ -365,8 +367,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
 
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
-        MatrixStore<Double> x = Primitive64Store.FACTORY.columns(result);
-        MatrixStore<Double> y = Primitive64Store.FACTORY.columns(result.getMultipliers().get());
+        MatrixStore<Double> x = Primitive64Store.FACTORY.column(result);
+        MatrixStore<Double> y = Primitive64Store.FACTORY.column(result.getMultipliers().get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-15, precision);
@@ -389,8 +391,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         GenericStore<Quadruple> Q = GenericStore.R128.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
         Optimisation.Result result = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
-        MatrixStore<Double> x = Primitive64Store.FACTORY.columns(result);
-        MatrixStore<Double> y = Primitive64Store.FACTORY.columns(result.getMultipliers().get());
+        MatrixStore<Double> x = Primitive64Store.FACTORY.column(result);
+        MatrixStore<Double> y = Primitive64Store.FACTORY.column(result.getMultipliers().get());
 
         double precision = IterativeRefinementTest.getResidualQuadruplePrecision(x, y, Q, C, AE, BE, AI, BI);
         TestUtils.assertLessThan(1e-12, precision);
@@ -447,8 +449,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         options.convex().solverSPD(Cholesky.R064::make).solverGeneral(LU.R064::make).iterative(NumberContext.of(16));
         Optimisation.Result resultQuadruple = IterativeRefinementSolver.doSolve(Q, C, AE, BE, AI, BI, options);
 
-        MatrixStore<Double> xQ = Primitive64Store.FACTORY.columns(resultQuadruple);
-        MatrixStore<Double> yQ = Primitive64Store.FACTORY.columns(resultQuadruple.getMultipliers().get());
+        MatrixStore<Double> xQ = Primitive64Store.FACTORY.column(resultQuadruple);
+        MatrixStore<Double> yQ = Primitive64Store.FACTORY.column(resultQuadruple.getMultipliers().get());
 
         double precisionQuadruple = IterativeRefinementTest.getResidualQuadruplePrecision(xQ, yQ, Q, C, AE, BE, AI, BI);
         //        TestUtils.assertLessThan(1e-15, precision);
@@ -456,8 +458,8 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         options.convex().extendedPrecision(false);
         ConvexSolver model = ConvexSolver.newBuilder().objective(Q, C).equalities(AE, BE).inequalities(AI, BI).build(options);
         Result resultDouble = model.solve();
-        MatrixStore<Double> xD = Primitive64Store.FACTORY.columns(resultDouble);
-        MatrixStore<Double> yD = Primitive64Store.FACTORY.columns(resultDouble.getMultipliers().get());
+        MatrixStore<Double> xD = Primitive64Store.FACTORY.column(resultDouble);
+        MatrixStore<Double> yD = Primitive64Store.FACTORY.column(resultDouble.getMultipliers().get());
         double precisionDouble = IterativeRefinementTest.getResidualQuadruplePrecision(xD, yD, Q, C, AE, BE, AI, BI);
         double improvement = (resultDouble.getValue() - resultQuadruple.getValue()) / resultDouble.getValue();
 
@@ -475,6 +477,4 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
         yAbsolute.onMatching(DIVIDE_SAFE, yQ).supplyTo(yRelative);
         double largestRelativeDualDiff = yRelative.aggregateAll(Aggregator.LARGEST).doubleValue();
     }
-
-    public static final PrimitiveFunction.Binary DIVIDE_SAFE = (arg1, arg2) -> Math.abs(arg2) < 1e-6 ? 0 : arg1 / arg2;
 }

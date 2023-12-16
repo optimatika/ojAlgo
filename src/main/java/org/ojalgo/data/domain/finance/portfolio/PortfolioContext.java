@@ -60,21 +60,25 @@ public class PortfolioContext implements FinancePortfolio.Context {
         myAssetReturns = null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         return FinancePortfolio.MATRIX_FACTORY.rows(weightsPortfolio.getWeights()).multiply(this.getAssetReturns()).doubleValue(0);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final MatrixR064 tmpWeights = FinancePortfolio.MATRIX_FACTORY.columns(weightsPortfolio.getWeights());
         return tmpWeights.transpose().multiply(this.getCovariances().multiply(tmpWeights)).doubleValue(0);
     }
 
+    @Override
     public MatrixR064 getAssetReturns() {
         return myAssetReturns;
     }
 
+    @Override
     public MatrixR064 getAssetVolatilities() {
         if (myAssetVolatilities == null) {
             myAssetVolatilities = FinanceUtils.toVolatilities(myCovariances);
@@ -82,6 +86,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
         return myAssetVolatilities;
     }
 
+    @Override
     public MatrixR064 getCorrelations() {
         if (myCorrelations == null) {
             myCorrelations = FinanceUtils.toCorrelations(myCovariances, false);
@@ -89,6 +94,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
         return myCorrelations;
     }
 
+    @Override
     public MatrixR064 getCovariances() {
         if (myCovariances == null) {
             myCovariances = FinanceUtils.toCovariances(myAssetVolatilities, myCorrelations);
@@ -96,6 +102,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
         return myCovariances;
     }
 
+    @Override
     public int size() {
         return (int) myAssetReturns.count();
     }

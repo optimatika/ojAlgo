@@ -50,7 +50,7 @@ class P20090115 {
 
         int numbAssets = returns.length;
 
-        MatrixR064.DenseReceiver builder = MatrixR064.FACTORY.makeDense(numbAssets, numbAssets);
+        MatrixR064.DenseReceiver builder = MatrixR064.FACTORY.newDenseBuilder(numbAssets, numbAssets);
 
         for (int i = 0; i < numbAssets; i++) {
             for (int j = i; j < numbAssets; j++) {

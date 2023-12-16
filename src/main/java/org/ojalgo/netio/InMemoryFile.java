@@ -105,21 +105,16 @@ public class InMemoryFile {
         return Optional.ofNullable(myName);
     }
 
-    public InMemoryFile name(final String name) {
-        this.setName(name);
-        return this;
-    }
-
-    public InMemoryFile type(final String type) {
-        this.setType(type);
-        return this;
-    }
-
     /**
      * MIME Type
      */
     public Optional<String> getType() {
         return Optional.ofNullable(myType);
+    }
+
+    public InMemoryFile name(final String name) {
+        this.setName(name);
+        return this;
     }
 
     /**
@@ -156,6 +151,11 @@ public class InMemoryFile {
 
     public void setType(final String type) {
         myType = type;
+    }
+
+    public InMemoryFile type(final String type) {
+        this.setType(type);
+        return this;
     }
 
 }

@@ -235,7 +235,7 @@ public class GitHubIssue24 extends FinancePortfolioTests {
             marketEquilibrium = marketEquilibrium.clean();
         }
 
-        MarkowitzModel retVal = new MarkowitzModel(marketEquilibrium, MatrixR064.FACTORY.rows(expectedReturns));
+        MarkowitzModel retVal = new MarkowitzModel(marketEquilibrium, MatrixR064.FACTORY.row(expectedReturns));
 
         retVal.optimiser().debug(debugOptimisationSolver).validate(validateOptimisationModel);
 

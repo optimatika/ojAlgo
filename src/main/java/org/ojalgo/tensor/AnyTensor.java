@@ -63,6 +63,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             return true;
         }
 
+        @Override
         public MathType getMathType() {
             return myFactory.getMathType();
         }
@@ -74,16 +75,35 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
             return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
         }
 
-        public AnyTensor<N> make(final long... structure) {
+        @Override
+        public AnyTensor<N> make(final int... shape) {
 
-            int rank = structure.length;
-            long dimensions = structure[0];
+            int rank = shape.length;
+            long dimensions = shape[0];
 
             if (rank <= 0 || dimensions <= 0L) {
                 throw new IllegalArgumentException();
             }
             for (int i = 1; i < rank; i++) {
-                if (structure[i] != dimensions) {
+                if (shape[i] != dimensions) {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            return new AnyTensor<>(myFactory, rank, Math.toIntExact(dimensions));
+        }
+
+        @Override
+        public AnyTensor<N> make(final long... shape) {
+
+            int rank = shape.length;
+            long dimensions = shape[0];
+
+            if (rank <= 0 || dimensions <= 0L) {
+                throw new IllegalArgumentException();
+            }
+            for (int i = 1; i < rank; i++) {
+                if (shape[i] != dimensions) {
                     throw new IllegalArgumentException();
                 }
             }
@@ -111,6 +131,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         myArray = factory.make(shape);
     }
 
+    @Override
     public AnyTensor<N> add(final AnyTensor<N> addend) {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -120,10 +141,12 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    @Override
     public byte byteValue(final long... ref) {
         return myArray.byteValue(ref);
     }
 
+    @Override
     public AnyTensor<N> conjugate() {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -142,10 +165,12 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    @Override
     public long count(final int dimension) {
         return myArray.count(dimension);
     }
 
+    @Override
     public double doubleValue(final long... ref) {
         return myArray.doubleValue(ref);
     }
@@ -176,26 +201,32 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return true;
     }
 
+    @Override
     public void fillSet(final int dimension, final long dimensionalIndex, final N value) {
         myArray.fillSet(dimension, dimensionalIndex, value);
     }
 
+    @Override
     public void fillSet(final int dimension, final long dimensionalIndex, final NullaryFunction<?> supplier) {
         myArray.fillSet(dimension, dimensionalIndex, supplier);
     }
 
+    @Override
     public void fillSet(final long[] initial, final int dimension, final N value) {
         myArray.fillSet(initial, dimension, value);
     }
 
+    @Override
     public void fillSet(final long[] initial, final int dimension, final NullaryFunction<?> supplier) {
         myArray.fillSet(initial, dimension, supplier);
     }
 
+    @Override
     public float floatValue(final long... ref) {
         return myArray.floatValue(ref);
     }
 
+    @Override
     public N get(final long... ref) {
         return myArray.get(ref);
     }
@@ -208,14 +239,17 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return prime * result + (myFactory == null ? 0 : myFactory.hashCode());
     }
 
+    @Override
     public int intValue(final long... ref) {
         return myArray.intValue(ref);
     }
 
+    @Override
     public long longValue(final long... ref) {
         return myArray.longValue(ref);
     }
 
+    @Override
     public AnyTensor<N> multiply(final double scalarMultiplicand) {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -225,6 +259,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    @Override
     public AnyTensor<N> multiply(final N scalarMultiplicand) {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -234,6 +269,7 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    @Override
     public AnyTensor<N> negate() {
 
         AnyTensor<N> retVal = this.newSameShape();
@@ -243,42 +279,52 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
         return retVal;
     }
 
+    @Override
     public double norm() {
         return this.norm(myArray);
     }
 
+    @Override
     public void set(final long[] reference, final byte value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final Comparable<?> value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final double value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final float value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final int value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final long value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public void set(final long[] reference, final short value) {
         myArray.set(reference, value);
     }
 
+    @Override
     public long[] shape() {
         return myArray.shape();
     }
 
+    @Override
     public short shortValue(final long... ref) {
         return myArray.shortValue(ref);
     }

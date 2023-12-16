@@ -418,6 +418,19 @@ public final class ResourceLocator {
         }
 
         /**
+         * Open a connection and get the input stream.
+         */
+        public InputStream getInputStream() {
+            InputStream retVal = null;
+            try {
+                retVal = myConnection.getInputStream();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+            return retVal;
+        }
+
+        /**
          * Will recreate the request that resulted in the final response. If there has been one or more
          * redirects, then this is NOT the same as the original request.
          */
@@ -489,19 +502,6 @@ public final class ResourceLocator {
             }
 
             return myString;
-        }
-
-        /**
-         * Open a connection and get the input stream.
-         */
-        public InputStream getInputStream() {
-            InputStream retVal = null;
-            try {
-                retVal = myConnection.getInputStream();
-            } catch (final IOException exception) {
-                exception.printStackTrace();
-            }
-            return retVal;
         }
 
     }
@@ -629,15 +629,15 @@ public final class ResourceLocator {
         return this;
     }
 
+    public InputStream getInputStream() {
+        return this.response().getInputStream();
+    }
+
     /**
      * Open connection and return an input stream reader.
      */
     public Reader getStreamReader() {
         return this.response().getStreamReader();
-    }
-
-    public InputStream getInputStream() {
-        return this.response().getInputStream();
     }
 
     public ResourceLocator host(final String host) {

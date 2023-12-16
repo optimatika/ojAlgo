@@ -260,7 +260,7 @@ public class DesignCase extends MatrixDecompositionTests {
         double scalePriSVD = PrimitiveMath.ABS.invoke(nullspacePriSVD.doubleValue(0));
         nullspacePriSVD.modifyAll(PrimitiveMath.DIVIDE.second(scalePriSVD));
 
-        Primitive64Store nullspace = Primitive64Store.FACTORY.columns(new double[] { -1, -26, 16 });
+        Primitive64Store nullspace = Primitive64Store.FACTORY.column(-1, -26, 16);
 
         TestUtils.assertEquals(nullspace, nullspacePriQR, precision);
         TestUtils.assertEquals(nullspace, nullspacePriSVD, precision);

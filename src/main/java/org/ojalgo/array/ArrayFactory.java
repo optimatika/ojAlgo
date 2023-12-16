@@ -21,74 +21,30 @@
  */
 package org.ojalgo.array;
 
-import java.util.List;
-
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
-abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D.Dense<I> {
+abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D<I> {
 
-    public I copy(final Access1D<?> source) {
-        long count = source.count();
-        I retVal = this.makeToBeFilled(count);
-        retVal.fillMatching(source);
-        return retVal;
-    }
-
-    public I copy(final Comparable<?>[] source) {
-        int length = source.length;
-        I retVal = this.makeToBeFilled(length);
-        for (int i = 0; i < length; i++) {
-            retVal.set(i, source[i]);
-        }
-        return retVal;
-    }
-
-    public I copy(final double... source) {
-        int length = source.length;
-        I retVal = this.makeToBeFilled(length);
-        for (int i = 0; i < length; i++) {
-            retVal.set(i, source[i]);
-        }
-        return retVal;
-    }
-
-    public I copy(final List<? extends Comparable<?>> source) {
-        int size = source.size();
-        I retVal = this.makeToBeFilled(size);
-        for (int i = 0; i < size; i++) {
-            retVal.set(i, source.get(i));
-        }
-        return retVal;
-    }
-
+    @Override
     public abstract FunctionSet<N> function();
 
+    @Override
+    public I make(final int size) {
+        return this.makeStructuredZero(size);
+    }
+
+    @Override
     public I make(final long count) {
         return this.makeStructuredZero(count);
     }
 
-    public I makeFilled(final long count, final NullaryFunction<?> supplier) {
-        I retVal = this.makeToBeFilled(count);
-        if (retVal.isPrimitive()) {
-            for (long i = 0L; i < count; i++) {
-                retVal.set(i, supplier.doubleValue());
-            }
-        } else {
-            for (long i = 0L; i < count; i++) {
-                retVal.set(i, supplier.get());
-            }
-        }
-        return retVal;
-    }
-
+    @Override
     public abstract Scalar.Factory<N> scalar();
 
     abstract AggregatorSet<N> aggregator();

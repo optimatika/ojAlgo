@@ -64,13 +64,13 @@ public class ArrayZ016 extends PrimitiveArray {
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        public MathType getMathType() {
+            return MathType.Z016;
         }
 
         @Override
-        public MathType getMathType() {
-            return MathType.Z016;
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
@@ -108,8 +108,53 @@ public class ArrayZ016 extends PrimitiveArray {
     }
 
     @Override
+    public byte byteValue(final int index) {
+        return (byte) data[index];
+    }
+
+    @Override
+    public double doubleValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public float floatValue(final int index) {
+        return data[index];
+    }
+
+    @Override
+    public final Double get(final int index) {
+        return Double.valueOf(data[index]);
+    }
+
+    @Override
     public void reset() {
         Arrays.fill(data, (short) 0);
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        data[index] = (short) Math.round(value);
+    }
+
+    @Override
+    public void set(final int index, final float value) {
+        data[index] = (short) Math.round(value);
+    }
+
+    @Override
+    public void set(final int index, final long value) {
+        data[index] = (short) value;
+    }
+
+    @Override
+    public void set(final int index, final short value) {
+        data[index] = value;
+    }
+
+    @Override
+    public short shortValue(final int index) {
+        return data[index];
     }
 
     @Override
@@ -140,16 +185,6 @@ public class ArrayZ016 extends PrimitiveArray {
     }
 
     @Override
-    public byte byteValue(final int index) {
-        return (byte) data[index];
-    }
-
-    @Override
-    public double doubleValue(final int index) {
-        return data[index];
-    }
-
-    @Override
     protected void exchange(final int firstA, final int firstB, final int step, final int count) {
         Exchange.exchange(data, firstA, firstB, step, count);
     }
@@ -177,16 +212,6 @@ public class ArrayZ016 extends PrimitiveArray {
     @Override
     protected void fillOne(final int index, final NullaryFunction<?> supplier) {
         data[index] = supplier.shortValue();
-    }
-
-    @Override
-    public float floatValue(final int index) {
-        return data[index];
-    }
-
-    @Override
-    public final Double get(final int index) {
-        return Double.valueOf(data[index]);
     }
 
     @Override
@@ -235,26 +260,6 @@ public class ArrayZ016 extends PrimitiveArray {
     }
 
     @Override
-    public void set(final int index, final double value) {
-        data[index] = (short) Math.round(value);
-    }
-
-    @Override
-    public void set(final int index, final float value) {
-        data[index] = (short) Math.round(value);
-    }
-
-    @Override
-    public void set(final int index, final short value) {
-        data[index] = value;
-    }
-
-    @Override
-    public short shortValue(final int index) {
-        return data[index];
-    }
-
-    @Override
     protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         OperationVoid.invoke(data, first, limit, step, visitor);
     }
@@ -277,11 +282,6 @@ public class ArrayZ016 extends PrimitiveArray {
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         data[intIndex] = function.invoke(data[intIndex]);
-    }
-
-    @Override
-    public void set(final int index, final long value) {
-        data[index] = (short) value;
     }
 
 }

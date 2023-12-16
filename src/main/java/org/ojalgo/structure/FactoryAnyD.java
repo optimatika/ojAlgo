@@ -28,20 +28,9 @@ import org.ojalgo.type.math.MathType;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
-    /**
-     * Should only be implemented by factories that always (or primarily) produce dense structures.
-     *
-     * @author apete
-     */
-    interface Dense<I extends StructureAnyD> extends FactoryAnyD<I> {
+    interface Builder<I extends StructureAnyD> extends MutateAnyD {
 
-        I copy(AccessAnyD<?> source);
-
-        I makeFilled(long[] structure, NullaryFunction<?> supplier);
-
-        default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
-            return this.makeFilled(shape.shape(), supplier);
-        }
+        I build();
 
     }
 
@@ -50,19 +39,97 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
      *
      * @author apete
      */
-    interface MayBeSparse<I extends StructureAnyD, DR extends MutateAnyD.ModifiableReceiver<?>, SR extends MutateAnyD.Receiver<?>> extends FactoryAnyD<I> {
+    interface MayBeSparse<I extends StructureAnyD, DENSE extends Builder<I>, SPARSE extends Builder<I>> extends TwoStep<I, DENSE> {
 
-        DR makeDense(long... structure);
-
-        default DR makeDense(final StructureAnyD shape) {
-            return this.makeDense(shape.shape());
+        /**
+         * @deprecated v54 Use {@link #newDenseBuilder(long...)} instead
+         */
+        @Deprecated
+        default DENSE makeDense(final long... shape) {
+            return this.newDenseBuilder(shape);
         }
 
-        SR makeSparse(long... structure);
-
-        default SR makeSparse(final StructureAnyD shape) {
-            return this.makeSparse(shape.shape());
+        /**
+         * @deprecated v54 Use {@link #newDenseBuilder(StructureAnyD)} instead
+         */
+        @Deprecated
+        default DENSE makeDense(final StructureAnyD shape) {
+            return this.newDenseBuilder(shape.shape());
         }
+
+        /**
+         * @deprecated v54 Use {@link #newSparseBuilder(long...)} instead
+         */
+        @Deprecated
+        default SPARSE makeSparse(final long... shape) {
+            return this.newSparseBuilder(shape);
+        }
+
+        /**
+         * @deprecated v54 Use {@link #newSparseBuilder(StructureAnyD)} instead
+         */
+        @Deprecated
+        default SPARSE makeSparse(final StructureAnyD shape) {
+            return this.newSparseBuilder(shape.shape());
+        }
+
+        @Override
+        default DENSE newBuilder(final long... shape) {
+            return this.newDenseBuilder(shape);
+        }
+
+        DENSE newDenseBuilder(long... shape);
+
+        SPARSE newSparseBuilder(long... shape);
+
+    }
+
+    public interface TwoStep<I extends StructureAnyD, B extends Builder<I>> extends FactoryAnyD<I> {
+
+        default I copy(final AccessAnyD<?> source) {
+            B builder = this.newBuilder(source.shape());
+            for (long i = 0L, count = source.count(); i < count; i++) {
+                builder.set(i, source.get(i));
+            }
+            return builder.build();
+        }
+
+        @Override
+        default I make(final int... shape) {
+            B builder = this.newBuilder(Structure1D.toLongIndexes(shape));
+            return builder.build();
+        }
+
+        @Override
+        default I make(final long... shape) {
+            B builder = this.newBuilder(shape);
+            return builder.build();
+
+        }
+
+        @Override
+        default I make(final StructureAnyD shape) {
+            B builder = this.newBuilder(shape.shape());
+            return builder.build();
+        }
+
+        default I makeFilled(final long[] shape, final NullaryFunction<?> supplier) {
+            B builder = this.newBuilder(shape);
+            for (long i = 0L, count = StructureAnyD.count(shape); i < count; i++) {
+                builder.set(i, supplier.get());
+            }
+            return builder.build();
+        }
+
+        /**
+         * @deprecated v54 Use {@link #makeFilled(StructureAnyD, NullaryFunction)} instead
+         */
+        @Deprecated
+        default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
+            return this.makeFilled(shape.shape(), supplier);
+        }
+
+        B newBuilder(long... shape);
 
     }
 
@@ -73,30 +140,34 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
                 return FactoryAnyD.this.function();
             }
 
+            public MathType getMathType() {
+                return FactoryAnyD.this.getMathType();
+            }
+
+            public I make(final int size) {
+                return FactoryAnyD.this.make(size);
+            }
+
             public I make(final long count) {
                 return FactoryAnyD.this.make(count);
+            }
+
+            public I make(final Structure1D shape) {
+                return FactoryAnyD.this.make(shape.count());
             }
 
             public Factory<?> scalar() {
                 return FactoryAnyD.this.scalar();
             }
 
-            public MathType getMathType() {
-                return FactoryAnyD.this.getMathType();
-            }
-
         };
     }
 
-    default I make(final int... structure) {
-        long[] shape = new long[structure.length];
-        for (int i = 0; i < shape.length; i++) {
-            shape[i] = structure[i];
-        }
-        return this.make(shape);
-    }
+    I make(int... shape);
 
-    I make(long... structure);
+    default I make(final long... shape) {
+        return this.make(Structure1D.toIntIndexes(shape));
+    }
 
     default I make(final StructureAnyD shape) {
         return this.make(shape.shape());

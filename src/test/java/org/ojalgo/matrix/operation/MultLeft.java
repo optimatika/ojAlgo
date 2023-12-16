@@ -69,14 +69,14 @@ public class MultLeft {
     public Primitive64Store right;
 
     @Benchmark
-    public Primitive64Store fillRxN() {
-        MultiplyLeft.fillRxN(product.data, 0, dim, left, dim, right.data);
+    public Primitive64Store fillMxN() {
+        MultiplyLeft.fillMxN(product.data, left, dim, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store fillMxN() {
-        MultiplyLeft.fillMxN(product.data, left, dim, right.data);
+    public Primitive64Store fillRxN() {
+        MultiplyLeft.fillRxN(product.data, 0, dim, left, dim, right.data);
         return product;
     }
 

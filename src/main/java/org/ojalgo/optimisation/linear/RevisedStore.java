@@ -43,7 +43,7 @@ import org.ojalgo.type.context.NumberContext;
 final class RevisedStore extends SimplexStore {
 
     private static Primitive64Store newColumn(final int nbRows) {
-        return (Primitive64Store) Primitive64Store.FACTORY.makeDense(nbRows, 1);
+        return Primitive64Store.FACTORY.make(nbRows, 1);
     }
 
     private static ColumnsSupplier<Double> newMatrix(final int nbRows, final int nbCols) {
@@ -53,7 +53,7 @@ final class RevisedStore extends SimplexStore {
     }
 
     private static Primitive64Store newRow(final int nbCols) {
-        return (Primitive64Store) Primitive64Store.FACTORY.makeDense(1, nbCols);
+        return Primitive64Store.FACTORY.make(1, nbCols);
     }
 
     static RevisedStore build(final ExpressionsBasedModel model) {

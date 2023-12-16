@@ -57,6 +57,14 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
         return myEigenvalue.getDeterminant();
     }
 
+    public Eigenpair getEigenpair(final int index) {
+
+        ComplexNumber value = ComplexNumber.FACTORY.cast(this.getD().get(index, index));
+        DenseArray<ComplexNumber> vector = ArrayC128.FACTORY.copy(this.getV().sliceColumn(index));
+
+        return new Eigenpair(value, vector);
+    }
+
     public ComplexNumber getTrace() {
         return myEigenvalue.getTrace();
     }
@@ -113,14 +121,6 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
         return myEigenvalue.getEigenvalues();
-    }
-
-    public Eigenpair getEigenpair(final int index) {
-
-        ComplexNumber value = ComplexNumber.FACTORY.cast(this.getD().get(index, index));
-        DenseArray<ComplexNumber> vector = ArrayC128.FACTORY.copy(this.getV().sliceColumn(index));
-
-        return new Eigenpair(value, vector);
     }
 
     @Override

@@ -32,20 +32,20 @@ public final class Quantity extends ExactDecimal<Quantity> {
 
     public static final Scalar.Factory<Quantity> FACTORY = new ExactDecimal.Factory<>() {
 
-        public Quantity cast(final double value) {
-            return Quantity.valueOf(value);
-        }
-
         public Quantity cast(final Comparable<?> number) {
             return Quantity.valueOf(number);
         }
 
-        public Quantity convert(final double value) {
+        public Quantity cast(final double value) {
             return Quantity.valueOf(value);
         }
 
         public Quantity convert(final Comparable<?> number) {
             return Quantity.valueOf(number);
+        }
+
+        public Quantity convert(final double value) {
+            return Quantity.valueOf(value);
         }
 
         public Descriptor descriptor() {
@@ -70,10 +70,6 @@ public final class Quantity extends ExactDecimal<Quantity> {
     public static final Quantity TWO = new Quantity(LONG_DENOMINATOR + LONG_DENOMINATOR);
     public static final Quantity ZERO = new Quantity();
 
-    public static Quantity valueOf(final double value) {
-        return new Quantity(Math.round(value * DOUBLE_DENOMINATOR));
-    }
-
     public static Quantity valueOf(final Comparable<?> number) {
 
         if (number == null) {
@@ -85,6 +81,10 @@ public final class Quantity extends ExactDecimal<Quantity> {
         }
 
         return Quantity.valueOf(Scalar.doubleValue(number));
+    }
+
+    public static Quantity valueOf(final double value) {
+        return new Quantity(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
     public Quantity() {

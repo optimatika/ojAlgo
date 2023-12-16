@@ -32,9 +32,9 @@ import org.ojalgo.type.NumberDefinition;
 /**
  * <p>
  * An array implemented as a sequence of segments that together make up the data structure. Any
- * {@link BasicArray} subclass can be used for segements. A {@link BasicArray.Factory} is used to create
- * sparse segments (they're not guaranteed to actually be sparse) and a {@link DenseArray.Factory} is used to
- * create dense segments (guaranteed to be dense).
+ * {@link BasicArray} subclass can be used for segments. A {@link BasicArray.Factory} is used to create sparse
+ * segments (they're not guaranteed to actually be sparse) and a {@link DenseArray.Factory} is used to create
+ * dense segments (guaranteed to be dense).
  * </p>
  *
  * @author apete
@@ -127,13 +127,13 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public double doubleValue(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].doubleValue(index & myIndexMask);
+    public double doubleValue(final int index) {
+        return mySegments[index >> myIndexBits].doubleValue(index & myIndexMask);
     }
 
     @Override
-    public double doubleValue(final int index) {
-        return mySegments[index >> myIndexBits].doubleValue(index & myIndexMask);
+    public double doubleValue(final long index) {
+        return mySegments[(int) (index >> myIndexBits)].doubleValue(index & myIndexMask);
     }
 
     @Override
@@ -214,6 +214,11 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         for (BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.reset();
         }
+    }
+
+    @Override
+    public void set(final int index, final double value) {
+        mySegments[index >> myIndexBits].set(index & myIndexMask, value);
     }
 
     @Override
@@ -468,11 +473,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
         tmpSegments[mySegments.length] = tmpNewSegment;
 
         return new SegmentedArray<>(tmpSegments, mySegmentFactory);
-    }
-
-    @Override
-    public void set(final int index, final double value) {
-        mySegments[index >> myIndexBits].set(index & myIndexMask, value);
     }
 
 }

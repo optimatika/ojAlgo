@@ -27,26 +27,9 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
-    /**
-     * Should only be implemented by factories that always (or primarily) produce dense structures.
-     *
-     * @author apete
-     */
-    interface Dense<I extends Structure1D> extends Factory1D<I> {
+    interface Builder<I extends Structure1D> extends Mutate1D {
 
-        I copy(Access1D<?> source);
-
-        I copy(Comparable<?>[] source);
-
-        I copy(double... source);
-
-        I copy(List<? extends Comparable<?>> source);
-
-        I makeFilled(long count, NullaryFunction<?> supplier);
-
-        default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-            return this.makeFilled(shape.count(), supplier);
-        }
+        I build();
 
     }
 
@@ -55,27 +38,133 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
      *
      * @author apete
      */
-    interface MayBeSparse<I extends Structure1D, DR extends Mutate1D.ModifiableReceiver<?>, SR extends Mutate1D.Receiver<?>> extends Factory1D<I> {
+    interface MayBeSparse<I extends Structure1D, DENSE extends Builder<I>, SPARSE extends Builder<I>> extends TwoStep<I, DENSE> {
 
-        DR makeDense(long count);
-
-        default DR makeDense(final Structure1D shape) {
-            return this.makeDense(shape.count());
+        /**
+         * @deprecated v54 Use {@link #newDenseBuilder(long)} instead
+         */
+        @Deprecated
+        default DENSE makeDense(final long count) {
+            return this.newDenseBuilder(count);
         }
 
-        SR makeSparse(long count);
-
-        default SR makeSparse(final Structure1D shape) {
-            return this.makeSparse(shape.count());
+        /**
+         * @deprecated v54 Use {@link #newDenseBuilder(Structure1D)} instead
+         */
+        @Deprecated
+        default DENSE makeDense(final Structure1D shape) {
+            return this.newDenseBuilder(shape.count());
         }
+
+        /**
+         * @deprecated v54 Use {@link #newSparseBuilder(long)} instead
+         */
+        @Deprecated
+        default SPARSE makeSparse(final long count) {
+            return this.newSparseBuilder(count);
+        }
+
+        /**
+         * @deprecated v54 Use {@link #newSparseBuilder(Structure1D)} instead
+         */
+        @Deprecated
+        default SPARSE makeSparse(final Structure1D shape) {
+            return this.newSparseBuilder(shape.count());
+        }
+
+        @Override
+        default DENSE newBuilder(final long count) {
+            return this.newDenseBuilder(count);
+        }
+
+        DENSE newDenseBuilder(long count);
+
+        SPARSE newSparseBuilder(long count);
 
     }
 
-    default I make(final int count) {
-        return this.make((long) count);
+    public interface TwoStep<I extends Structure1D, B extends Builder<I>> extends Factory1D<I> {
+
+        default I copy(final Access1D<?> source) {
+            long count = source.count();
+            B builder = this.newBuilder(count);
+            for (long i = 0L; i < count; i++) {
+                builder.set(i, source.get(i));
+            }
+            return builder.build();
+        }
+
+        default I copy(final Comparable<?>... source) {
+            int length = source.length;
+            B builder = this.newBuilder(length);
+            for (int i = 0; i < length; i++) {
+                builder.set(i, source[i]);
+            }
+            return builder.build();
+        }
+
+        default I copy(final double[] source) {
+            int length = source.length;
+            B builder = this.newBuilder(length);
+            for (int i = 0; i < length; i++) {
+                builder.set(i, source[i]);
+            }
+            return builder.build();
+        }
+
+        default I copy(final List<? extends Comparable<?>> source) {
+            int size = source.size();
+            B builder = this.newBuilder(size);
+            for (int i = 0; i < size; i++) {
+                builder.set(i, source.get(i));
+            }
+            return builder.build();
+        }
+
+        @Override
+        default I make(final int size) {
+            B builder = this.newBuilder(size);
+            return builder.build();
+        }
+
+        @Override
+        default I make(final long count) {
+            B builder = this.newBuilder(count);
+            return builder.build();
+
+        }
+
+        @Override
+        default I make(final Structure1D shape) {
+            B builder = this.newBuilder(shape.count());
+            return builder.build();
+        }
+
+        default I makeFilled(final long count, final NullaryFunction<?> supplier) {
+            B builder = this.newBuilder(count);
+            for (long i = 0L; i < count; i++) {
+                builder.set(i, supplier.get());
+            }
+            return builder.build();
+        }
+
+        /**
+         * @deprecated v54 Use {@link #makeFilled(long, NullaryFunction)} instead
+         */
+        @Deprecated
+        default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+            return this.makeFilled(shape.count(), supplier);
+        }
+
+        B newBuilder(long count);
+
     }
 
-    I make(long count);
+    I make(int size);
+
+    default I make(final long count) {
+        return this.make(Math.toIntExact(count));
+    }
 
     default I make(final Structure1D shape) {
         return this.make(shape.count());

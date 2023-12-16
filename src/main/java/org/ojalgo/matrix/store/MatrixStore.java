@@ -440,7 +440,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         PhysicalStore<N> tmpStep1 = this.physical().make(1L, leftAndRight.count());
         PhysicalStore<N> tmpStep2 = this.physical().make(1L, 1L);
 
-        PhysicalStore<N> tmpLeft = this.physical().rows(leftAndRight);
+        PhysicalStore<N> tmpLeft = this.physical().row(leftAndRight);
         tmpLeft.modifyAll(this.physical().function().conjugate());
         tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
 
