@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [53.2.0] – 2023-12-29
+
 ### Added
 
 #### org.ojalgo.data
