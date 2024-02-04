@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 /**
  * A (CSV) parser interface. Could theoretically parse anything, but is primarily aimed towards parsing
  * delimited text lines.
+ * <p>
+ * The default implementations are based on {@link TextLineReader}.
  *
  * @author apete
  */
@@ -53,7 +55,8 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     }
 
     /**
-     * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
+     * Will parse this file, line by line, passing the resulting objects (1 per line) to the supplied
+     * consumer.
      *
      * @param file The CSV file to parse
      * @param consumer The results consumer
@@ -103,7 +106,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
         }
 
         while ((line = lineSupplier.get()) != null) {
-            if (TextLineReader.isLineOK(line) && ((item = this.parse(line)) != null)) {
+            if (TextLineReader.isLineOK(line) && (item = this.parse(line)) != null) {
                 consumer.accept(item);
             }
         }

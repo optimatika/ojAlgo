@@ -23,11 +23,13 @@ package org.ojalgo.type;
 
 import java.lang.ref.Cleaner;
 import java.lang.reflect.Field;
+import java.nio.Buffer;
 
 import sun.misc.Unsafe;
 
 public abstract class NativeMemory {
 
+    static final long ADDRESS_OFFSET;
     static final Cleaner CLEANER = Cleaner.create();
     static final long SIZE_BYTE = Unsafe.ARRAY_BYTE_INDEX_SCALE;
     static final long SIZE_DOUBLE = Unsafe.ARRAY_DOUBLE_INDEX_SCALE;
@@ -46,15 +48,18 @@ public abstract class NativeMemory {
     static {
 
         Unsafe tmpUnsafe = null;
+        long tmpAddressOffset = Long.MIN_VALUE;
 
         try {
-            final Field tmpField = Unsafe.class.getDeclaredField("theUnsafe");
-            tmpField.setAccessible(true);
-            tmpUnsafe = (Unsafe) tmpField.get(null);
-        } catch (final Exception cause) {
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            tmpUnsafe = (Unsafe) theUnsafe.get(null);
+            tmpAddressOffset = tmpUnsafe.objectFieldOffset(Buffer.class.getDeclaredField("address"));
+        } catch (Throwable cause) {
             throw new RuntimeException(cause);
         } finally {
             UNSAFE = tmpUnsafe;
+            ADDRESS_OFFSET = tmpAddressOffset;
         }
     }
 
@@ -118,24 +123,56 @@ public abstract class NativeMemory {
         }
     }
 
+    public static long getAddressOf(final Buffer buffer) {
+        return UNSAFE.getLong(buffer, ADDRESS_OFFSET);
+    }
+
+    public static byte getByte(final long address) {
+        return UNSAFE.getByte(address);
+    }
+
     public static byte getByte(final long basePointer, final long index) {
         return UNSAFE.getByte(basePointer + SIZE_BYTE * index);
+    }
+
+    public static char getChar(final long address) {
+        return UNSAFE.getChar(address);
+    }
+
+    public static double getDouble(final long address) {
+        return UNSAFE.getDouble(address);
     }
 
     public static double getDouble(final long basePointer, final long index) {
         return UNSAFE.getDouble(basePointer + SIZE_DOUBLE * index);
     }
 
+    public static float getFloat(final long address) {
+        return UNSAFE.getFloat(address);
+    }
+
     public static float getFloat(final long basePointer, final long index) {
         return UNSAFE.getFloat(basePointer + SIZE_FLOAT * index);
+    }
+
+    public static int getInt(final long address) {
+        return UNSAFE.getInt(address);
     }
 
     public static int getInt(final long basePointer, final long index) {
         return UNSAFE.getInt(basePointer + SIZE_INT * index);
     }
 
+    public static long getLong(final long address) {
+        return UNSAFE.getLong(address);
+    }
+
     public static long getLong(final long basePointer, final long index) {
         return UNSAFE.getLong(basePointer + SIZE_LONG * index);
+    }
+
+    public static short getShort(final long address) {
+        return UNSAFE.getShort(address);
     }
 
     public static short getShort(final long basePointer, final long index) {
@@ -192,7 +229,7 @@ public abstract class NativeMemory {
 
     static long allocate(final Object owner, final long bytes) {
 
-        final long pointer = UNSAFE.allocateMemory(bytes);
+        long pointer = UNSAFE.allocateMemory(bytes);
 
         CLEANER.register(owner, () -> UNSAFE.freeMemory(pointer));
 

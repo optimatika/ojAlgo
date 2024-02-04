@@ -234,6 +234,10 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
+    public static void assertNull(final Object actual) {
+        Assertions.assertNull(actual);
+    }
+
     public static void assertEquals(final Object expected, final Object actual) {
         Assertions.assertEquals(expected, actual);
     }
@@ -400,13 +404,13 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
-    public static void assertInRange(final int first, final int limit, final int actual) {
+    public static void assertInRange(final double first, final double limit, final double actual) {
         if (first > actual || actual >= limit) {
             TestUtils.fail("Not in range!");
         }
     }
 
-    public static void assertInRange(final double first, final double limit, final double actual) {
+    public static void assertInRange(final int first, final int limit, final int actual) {
         if (first > actual || actual >= limit) {
             TestUtils.fail("Not in range!");
         }

@@ -19,6 +19,12 @@ import java.util.function.Supplier;
 
 import org.ojalgo.type.function.TwoStepMapper;
 
+/**
+ * A simple wrapper around an {@link ExecutorService} that makes it easier to process collections of items in
+ * parallel. The work items are processed by a {@link Consumer}, {@link Function} or {@link TwoStepMapper}. In
+ * particular the {@link TwoStepMapper} can be used to aggregate/reduce data from the work items and then
+ * combine the collected data into a final result.
+ */
 public final class ProcessingService {
 
     static final class CallableConsumer<W> implements Callable<Boolean> {
@@ -32,6 +38,7 @@ public final class ProcessingService {
             myConsumer = consumer;
         }
 
+        @Override
         public Boolean call() throws Exception {
 
             W item = null;
@@ -55,6 +62,7 @@ public final class ProcessingService {
             myMapper = mapper;
         }
 
+        @Override
         public TwoStepMapper<W, R> call() throws Exception {
 
             W item = null;
@@ -105,7 +113,7 @@ public final class ProcessingService {
      * @return A map of function input to output
      */
     public <W, R> Map<W, R> compute(final Collection<W> work, final int parallelism, final Function<W, R> computer) {
-        return this.reduce(work, parallelism, () -> new TwoStepMapper.SimpleCache<>(computer));
+        return this.reduceMergeable(work, parallelism, () -> new TwoStepMapper.SimpleCache<>(computer));
     }
 
     /**
@@ -223,17 +231,47 @@ public final class ProcessingService {
     }
 
     /**
-     * Will (map and) reduce the collection of input work items to 1 single, but arbitrarily large/complex,
-     * output instance.
-     *
-     * @param <W> The work item type
-     * @param <R> The output type
+     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,int,Supplier<? extends
+     *             TwoStepMapper.Mergeable<W, R>>)} instead
+     */
+    @Deprecated
+    public <W, R> R reduce(final Collection<W> work, final int parallelism, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
+        return this.reduceMergeable(work, parallelism, reducer);
+    }
+
+    /**
+     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,IntSupplier,Supplier<? extends
+     *             TwoStepMapper.Mergeable<W, R>>)} instead
+     */
+    @Deprecated
+    public <W, R> R reduce(final Collection<W> work, final IntSupplier parallelism, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
+        return this.reduceMergeable(work, parallelism, reducer);
+    }
+
+    /**
+     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,Supplier<? extends TwoStepMapper.Mergeable<W,
+     *             R>>)} instead
+     */
+    @Deprecated
+    public <W, R> R reduce(final Collection<W> work, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
+        return this.reduceMergeable(work, reducer);
+    }
+
+    /**
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code reducer}. The state of each task's {@code reducer} will be combined into a single instance,
+     * and the results of that instance will be returned.
+     * <p>
+     * Each {@link TwoStepMapper.Combineable} is only worked on by a single thread, and the results are
+     * combined into a single instance. The instances are not reused.
+     * 
      * @param work The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
-     * @param reducer Providing a {@link TwoStepMapper} implementation that does what you want is the key.
+     * @param reducer A {@link TwoStepMapper.Combineable} implementation that does what you want.
      * @return The results...
      */
-    public <W, R> R reduce(final Collection<W> work, final int parallelism, final Supplier<TwoStepMapper<W, R>> reducer) {
+    public <W, R, A extends TwoStepMapper.Combineable<W, R, A>> R reduceCombineable(final Collection<W> work, final int parallelism,
+            final Supplier<A> reducer) {
 
         int concurrency = Math.min(work.size(), parallelism);
 
@@ -244,13 +282,13 @@ public final class ProcessingService {
             tasks.add(new CallableMapper<>(queue, reducer.get()));
         }
 
-        TwoStepMapper<W, R> totalResults = reducer.get();
+        A totalResults = reducer.get();
 
         try {
             for (Future<TwoStepMapper<W, R>> future : myExecutor.invokeAll(tasks)) {
-                TwoStepMapper<W, R> mapper = future.get();
-                totalResults.merge(mapper.getResults());
-                mapper.reset();
+                A partialResults = (A) future.get();
+                totalResults.combine(partialResults);
+                partialResults.reset();
             }
         } catch (InterruptedException | ExecutionException cause) {
             throw new RuntimeException(cause);
@@ -260,17 +298,76 @@ public final class ProcessingService {
     }
 
     /**
-     * @see ProcessingService#reduce(Collection, int, Supplier)
+     * @see ProcessingService#reduceCombineable(Collection, int, Supplier)
      */
-    public <W, R> R reduce(final Collection<W> work, final IntSupplier parallelism, final Supplier<TwoStepMapper<W, R>> reducer) {
-        return this.reduce(work, parallelism.getAsInt(), reducer);
+    public <W, R, A extends TwoStepMapper.Combineable<W, R, A>> R reduceCombineable(final Collection<W> work, final IntSupplier parallelism,
+            final Supplier<A> reducer) {
+        return this.reduceCombineable(work, parallelism.getAsInt(), reducer);
     }
 
     /**
-     * @see ProcessingService#reduce(Collection, int, Supplier)
+     * Using parallelism {@link Parallelism#CORES}.
+     * 
+     * @see ProcessingService#reduceCombineable(Collection, int, Supplier)
      */
-    public <W, R> R reduce(final Collection<W> work, final Supplier<TwoStepMapper<W, R>> reducer) {
-        return this.reduce(work, Parallelism.CORES, reducer);
+    public <W, R, A extends TwoStepMapper.Combineable<W, R, A>> R reduceCombineable(final Collection<W> work, final Supplier<A> reducer) {
+        return this.reduceCombineable(work, Parallelism.CORES, reducer);
+    }
+
+    /**
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code reducer}. The results of each task's {@code reducer} will be merged into a single instance,
+     * and the results of that instance will be returned.
+     * <p>
+     * Each {@link TwoStepMapper.Mergeable} is only worked on by a single thread, and the results are combined
+     * into a single instance. The instances are not reused.
+     * 
+     * @param work The collection of work items
+     * @param parallelism The maximum number of concurrent workers that will process the work items
+     * @param reducer A {@link TwoStepMapper.Mergeable} implementation that does what you want.
+     * @return The results...
+     */
+    public <W, R, A extends TwoStepMapper.Mergeable<W, R>> R reduceMergeable(final Collection<W> work, final int parallelism, final Supplier<A> reducer) {
+
+        int concurrency = Math.min(work.size(), parallelism);
+
+        Queue<W> queue = new LinkedBlockingDeque<>(work);
+
+        List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
+        for (int i = 0; i < concurrency; i++) {
+            tasks.add(new CallableMapper<>(queue, reducer.get()));
+        }
+
+        A totalResults = reducer.get();
+
+        try {
+            for (Future<TwoStepMapper<W, R>> future : myExecutor.invokeAll(tasks)) {
+                TwoStepMapper<W, R> partialResults = future.get();
+                totalResults.merge(partialResults.getResults());
+                partialResults.reset();
+            }
+        } catch (InterruptedException | ExecutionException cause) {
+            throw new RuntimeException(cause);
+        }
+
+        return totalResults.getResults();
+    }
+
+    /**
+     * @see ProcessingService#reduceMergeable(Collection, int, Supplier)
+     */
+    public <W, R, A extends TwoStepMapper.Mergeable<W, R>> R reduceMergeable(final Collection<W> work, final IntSupplier parallelism,
+            final Supplier<A> reducer) {
+        return this.reduceMergeable(work, parallelism.getAsInt(), reducer);
+    }
+
+    /**
+     * Using parallelism {@link Parallelism#CORES}.
+     * 
+     * @see ProcessingService#reduceMergeable(Collection, int, Supplier)
+     */
+    public <W, R, A extends TwoStepMapper.Mergeable<W, R>> R reduceMergeable(final Collection<W> work, final Supplier<A> reducer) {
+        return this.reduceMergeable(work, Parallelism.CORES, reducer);
     }
 
     /**

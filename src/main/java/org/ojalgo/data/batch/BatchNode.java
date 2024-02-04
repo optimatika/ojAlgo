@@ -196,11 +196,6 @@ public final class BatchNode<T> {
         }
 
         @Override
-        public void merge(final Boolean aggregate) {
-            // No need to (not possible to) merge, just continue
-        }
-
-        @Override
         public void reset() {
             // No need to (not possible to) reset, just continue
         }
@@ -263,10 +258,10 @@ public final class BatchNode<T> {
     /**
      * Process each and every item individually
      *
-     * @param consumer Must be able to consume concurrently
+     * @param processor Must be able to consume concurrently
      */
-    public void processAll(final Consumer<T> consumer) {
-        myProcessor.process(myShards.files(), myParallelism, shard -> this.process(shard, consumer));
+    public void processAll(final Consumer<T> processor) {
+        myProcessor.process(myShards.files(), myParallelism, shard -> this.process(shard, processor));
     }
 
     /**
@@ -274,8 +269,20 @@ public final class BatchNode<T> {
      * specific consumer. Internally there will be 1 consumer per worker thread instantiated. This variant is
      * for when the consumer(s) are stateful.
      */
-    public void processAll(final Supplier<Consumer<T>> consumerFactory) {
-        this.processMapped(() -> new TwoStepWrapper<>(consumerFactory), DUMMY);
+    public void processAll(final Supplier<Consumer<T>> processorFactory) {
+        this.processMergeable(() -> new TwoStepWrapper<>(processorFactory), DUMMY);
+    }
+
+    /**
+     * Similar to {@link #processMergeable(Supplier, Consumer)} but the {@code processor} is called with the
+     * aggregator instance itself rather than its extracted results. This corresponds to
+     * {@link TwoStepMapper#Combineable} rather than {@link TwoStepMapper#Mergeable}.
+     * 
+     * @see #processMergeable(Supplier, Consumer)
+     */
+    public <R, A extends TwoStepMapper<T, R>> void processCombineable(final Supplier<A> aggregatorFactory, final Consumer<A> processor) {
+        ThreadLocal<A> threadLocal = ThreadLocal.withInitial(aggregatorFactory);
+        myProcessor.process(myShards.files(), myParallelism, shard -> this.processAggregators(shard, threadLocal::get, processor));
     }
 
     /**
@@ -290,31 +297,82 @@ public final class BatchNode<T> {
      * {@link Builder#fragmentation(int)} and which item goes in which shard via
      * {@link Builder#distributor(ToIntFunction)}.
      *
-     * @param <H> The mapped/derived data holding type
-     * @param mapper Produces the {@link TwoStepMapper} mapping instances
-     * @param consumer Consumes the mapped/derived data - one whole {@link TwoStepMapper} instance at the time
+     * @param <R> The mapped/derived data holding type
+     * @param aggregatorFactory Produces the {@link TwoStepMapper} mapping instances
+     * @param processor Consumes the mapped/derived data - the results of one whole {@link TwoStepMapper}
+     *        instance at the time
+     * @deprecated v54 Use {@link #processMergeable(Supplier<? extends TwoStepMapper<T, H>>,Consumer<H>)}
+     *             instead
      */
-    public <H> void processMapped(final Supplier<TwoStepMapper<T, H>> mapper, final Consumer<H> consumer) {
-        ThreadLocal<TwoStepMapper<T, H>> threadLocal = ThreadLocal.withInitial(mapper);
-        myProcessor.process(myShards.files(), myParallelism, shard -> this.process(shard, threadLocal::get, consumer));
+    @Deprecated
+    public <R> void processMapped(final Supplier<? extends TwoStepMapper<T, R>> aggregatorFactory, final Consumer<R> processor) {
+        this.processMergeable(aggregatorFactory, processor);
     }
 
     /**
-     * Same as {@link #processMapped(Supplier, Consumer)}, but then also reduce/merge the total results using
-     * {@link TwoStepMapper#merge(Object)}.
+     * Each shard is processed/aggregated separately by a {@link TwoStepMapper} instance. The results are then
+     * processed/merged by the provided {@code processor}.
+     * <p>
+     * There is one {@link TwoStepMapper} instance per underlying worker thread. Those instances are reset and
+     * reused for each shard.
+     * <p>
+     * The {@code processor} is called concurrently from multiple threads.
+     * <P>
+     * You must make sure that all data items that need to be in the same aggregator instance are in the same
+     * file/shard. You control the number of shards via {@link Builder#fragmentation(int)} and which item goes
+     * in which shard via {@link Builder#distributor(ToIntFunction)}.
+     *
+     * @param aggregatorFactory Produces the {@link TwoStepMapper} aggregator instances
+     * @param processor Consumes the aggregated/derived data - the results of one whole {@link TwoStepMapper}
+     *        instance at the time
+     */
+    public <R, A extends TwoStepMapper<T, R>> void processMergeable(final Supplier<A> aggregatorFactory, final Consumer<R> processor) {
+        ThreadLocal<TwoStepMapper<T, R>> threadLocal = ThreadLocal.withInitial(aggregatorFactory);
+        myProcessor.process(myShards.files(), myParallelism, shard -> this.processResults(shard, threadLocal::get, processor));
+    }
+
+    /**
+     * Calls {@link #processCombineable(Supplier, Consumer)} with the
+     * {@link TwoStepMapper.Combineable#merge(Object)} method of a global {@link TwoStepMapper.Combineable}
+     * instance as the {@code consumer}.
+     */
+    public <R, A extends TwoStepMapper.Combineable<T, R, A>> R reduceByCombining(final Supplier<A> aggregatorFactory) {
+
+        A globalAggregator = aggregatorFactory.get();
+
+        this.processCombineable(aggregatorFactory, globalAggregator::combine);
+
+        return globalAggregator.getResults();
+    }
+
+    /**
+     * Calls {@link #processMergeable(Supplier, Consumer)} with the
+     * {@link TwoStepMapper.Mergeable#merge(Object)} method of a global {@link TwoStepMapper.Mergeable}
+     * instance as the {@code consumer}.
+     */
+    public <R, A extends TwoStepMapper.Mergeable<T, R>> R reduceByMerging(final Supplier<A> aggregatorFactory) {
+
+        A globalAggregator = aggregatorFactory.get();
+
+        this.processMergeable(aggregatorFactory, globalAggregator::merge);
+
+        return globalAggregator.getResults();
+    }
+
+    /**
+     * Same as {@link #processMergeable(Supplier, Consumer)}, but then also reduce/merge the total
+     * results using {@link TwoStepMapper#merge(Object)}.
      * <P>
      * Create a class that implements {@link TwoStepMapper} and make sure to also implement
      * {@link TwoStepMapper#merge(Object)} - you can only use this if merging partial (sub)results is
      * possible. Use a constructor or factory method that produce instances of that type as the argument to
      * this method.
+     * 
+     * @deprecated v54 Use {@link #reduceByMerging(Supplier<A>)} instead
      */
-    public <R> R reduceMapped(final Supplier<TwoStepMapper<T, R>> mapper) {
-
-        TwoStepMapper<T, R> totalResults = mapper.get();
-
-        this.processMapped(mapper, totalResults::merge);
-
-        return totalResults.getResults();
+    @Deprecated
+    public <R, A extends TwoStepMapper.Mergeable<T, R>> R reduceMapped(final Supplier<A> aggregatorFactory) {
+        return this.reduceByMerging(aggregatorFactory);
     }
 
     private Function<File, AutoSupplier<T>> getReaderFactory() {
@@ -324,10 +382,6 @@ public final class BatchNode<T> {
                     .statistics(myReaderManager).build(baseReader);
         }
         return myReaderFactory;
-    }
-
-    private AutoSupplier<T> newReader(final File file) {
-        return this.getReaderFactory().apply(file);
     }
 
     private void process(final File shard, final Consumer<T> consumer) {
@@ -345,9 +399,9 @@ public final class BatchNode<T> {
 
     }
 
-    private <G> void process(final File shard, final Supplier<TwoStepMapper<T, G>> aggregatorSupplier, final Consumer<G> consumer) {
+    private <R, A extends TwoStepMapper<T, R>> void processAggregators(final File shard, final Supplier<A> aggregatorFactory, final Consumer<A> processor) {
 
-        TwoStepMapper<T, G> aggregator = aggregatorSupplier.get(); // It's a ThreadLocal...
+        A aggregator = aggregatorFactory.get(); // It's a ThreadLocal...
 
         try (AutoSupplier<T> reader = this.newReader(shard)) {
 
@@ -356,13 +410,37 @@ public final class BatchNode<T> {
                 aggregator.consume(item);
             }
 
-            consumer.accept(aggregator.getResults());
+            processor.accept(aggregator);
 
             aggregator.reset(); // ...and needs to be reset.
 
         } catch (Exception cause) {
             throw new RuntimeException(cause);
         }
+    }
+
+    private <R, A extends TwoStepMapper<T, R>> void processResults(final File shard, final Supplier<A> aggregatorFactory, final Consumer<R> processor) {
+
+        A aggregator = aggregatorFactory.get(); // It's a ThreadLocal...
+
+        try (AutoSupplier<T> reader = this.newReader(shard)) {
+
+            T item = null;
+            while ((item = reader.read()) != null) {
+                aggregator.consume(item);
+            }
+
+            processor.accept(aggregator.getResults());
+
+            aggregator.reset(); // ...and needs to be reset.
+
+        } catch (Exception cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    AutoSupplier<T> newReader(final File file) {
+        return this.getReaderFactory().apply(file);
     }
 
 }

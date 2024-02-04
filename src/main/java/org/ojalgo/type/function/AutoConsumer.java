@@ -83,16 +83,31 @@ public interface AutoConsumer<T> extends AutoCloseable, Consumer<T>, AutoFunctio
         return ShardedConsumer.of(distributor, consumers);
     }
 
+    /**
+     * @see #write(Object)
+     */
+    @Override
     default void accept(final T item) {
         this.write(item);
     }
 
+    @Override
     default void close() throws Exception {
         // Default implementation does nothing
     }
 
+    /**
+     * Write the item to the consumer.
+     * 
+     * @param item The item to be written
+     */
     void write(T item);
 
+    /**
+     * Write the batch (collection of items) to the consumer.
+     * 
+     * @param batch The batch to be written
+     */
     default void writeBatch(final Iterable<? extends T> batch) {
         for (T item : batch) {
             this.write(item);

@@ -98,13 +98,14 @@ public interface AutoSupplier<T> extends AutoCloseable, Supplier<T>, AutoFunctio
      * @param <S> The type of some sort of item container (maybe a {@link File})
      * @param <T> The supplier item type (what do the files contain?)
      * @param sources A set of item containers (could be a set of {@link File}:s)
-     * @param factory A factory method that can take one of the "containers" and return an item suppiler.
+     * @param factory A factory method that can take one of the "containers" and return an item supplier.
      * @return A sequenced supplier.
      */
     static <S, T> AutoSupplier<T> sequenced(final BlockingQueue<S> sources, final Function<S, ? extends Supplier<T>> factory) {
         return new SequencedSupplier<>(sources, factory);
     }
 
+    @Override
     default void close() throws Exception {
         // Default implementation does nothing
     }
@@ -122,10 +123,12 @@ public interface AutoSupplier<T> extends AutoCloseable, Supplier<T>, AutoFunctio
         return retVal;
     }
 
+    @Override
     default T get() {
         return this.read();
     }
 
+    @Override
     default Iterator<T> iterator() {
         return new SupplierIterator<>(this);
     }

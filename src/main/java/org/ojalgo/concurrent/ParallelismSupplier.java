@@ -57,8 +57,9 @@ public interface ParallelismSupplier extends IntSupplier {
     default ParallelismSupplier divideBy(final int divisor) {
         if (divisor > 1) {
             return () -> Math.max(1, (this.getAsInt() + divisor - 1) / divisor);
+        } else {
+            return this::getAsInt;
         }
-        return this::getAsInt;
     }
 
     default ParallelismSupplier halve() {

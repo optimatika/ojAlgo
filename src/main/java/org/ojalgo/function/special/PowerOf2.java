@@ -77,6 +77,9 @@ public abstract class PowerOf2 {
 
     }
 
+    public static final int MAX_INT;
+    public static final long MAX_LONG;
+
     private static final int[] INT_POWERS = new int[31];
     private static double LN2 = Math.log(PrimitiveMath.TWO);
     private static final long[] LONG_POWERS = new long[63];
@@ -87,25 +90,41 @@ public abstract class PowerOf2 {
         for (int p = 1; p < INT_POWERS.length; p++) {
             INT_POWERS[p] = INT_POWERS[p - 1] * 2;
         }
+        MAX_INT = INT_POWERS[INT_POWERS.length - 1];
 
         LONG_POWERS[0] = 1L;
         for (int p = 1; p < LONG_POWERS.length; p++) {
             LONG_POWERS[p] = LONG_POWERS[p - 1] * 2L;
         }
+        MAX_LONG = LONG_POWERS[LONG_POWERS.length - 1];
+    }
+
+    /**
+     * @see PowerOf2#largestNotGreaterThan(long)
+     */
+    public static long adjustDown(final double value) {
+        return PowerOf2.largestNotGreaterThan(Math.round(value));
     }
 
     /**
      * @see PowerOf2#largestNotGreaterThan(int)
      */
-    public static int adjustDown(final double value) {
-        return PowerOf2.largestNotGreaterThan(Math.toIntExact(Math.round(value)));
+    public static int adjustDown(final float value) {
+        return PowerOf2.largestNotGreaterThan(Math.round(value));
+    }
+
+    /**
+     * @see PowerOf2#smallestNotLessThan(long)
+     */
+    public static long adjustUp(final double value) {
+        return PowerOf2.smallestNotLessThan(Math.round(value));
     }
 
     /**
      * @see PowerOf2#smallestNotLessThan(int)
      */
-    public static int adjustUp(final double value) {
-        return PowerOf2.smallestNotLessThan(Math.toIntExact(Math.round(value)));
+    public static int adjustUp(final float value) {
+        return PowerOf2.smallestNotLessThan(Math.round(value));
     }
 
     public static int exponent(final double value) {
@@ -135,11 +154,11 @@ public abstract class PowerOf2 {
     }
 
     public static boolean isPowerOf2(final int value) {
-        return (value > 0) && ((value & (value - 1)) == 0);
+        return value > 0 && (value & value - 1) == 0;
     }
 
     public static boolean isPowerOf2(final long value) {
-        return (value > 0L) && ((value & (value - 1L)) == 0L);
+        return value > 0L && (value & value - 1L) == 0L;
     }
 
     /**
@@ -150,6 +169,17 @@ public abstract class PowerOf2 {
             throw new ArithmeticException();
         } else {
             return Integer.highestOneBit(value);
+        }
+    }
+
+    /**
+     * @return The largest power of 2 that is less than or equal to the input (not greater than)
+     */
+    public static long largestNotGreaterThan(final long value) {
+        if (value <= 0L) {
+            throw new ArithmeticException();
+        } else {
+            return Long.highestOneBit(value);
         }
     }
 
@@ -204,6 +234,24 @@ public abstract class PowerOf2 {
         } else {
             int candidate = Integer.highestOneBit(value);
             if (candidate == Integer.lowestOneBit(value)) {
+                return candidate;
+            } else {
+                return candidate << 1;
+            }
+        }
+    }
+
+    /**
+     * @return The smallest power of 2 that is greater than or equal to the input (not less than)
+     */
+    public static long smallestNotLessThan(final long value) {
+        if (value < 0L) {
+            throw new ArithmeticException();
+        } else if (value == 0L) {
+            return 1L;
+        } else {
+            long candidate = Long.highestOneBit(value);
+            if (candidate == Long.lowestOneBit(value)) {
                 return candidate;
             } else {
                 return candidate << 1;

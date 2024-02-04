@@ -90,6 +90,13 @@ public abstract class CommonMachine extends BasicMachine {
     }
 
     /**
+     * The total amount of top level (L3 or L2) cache memory in bytes.
+     */
+    public final long cache() {
+        return cache * units;
+    }
+
+    /**
      * @deprecated v53 Use {@link Parallelism#CORES} instead.
      */
     @Deprecated

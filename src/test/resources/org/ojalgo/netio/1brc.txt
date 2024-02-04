@@ -1,0 +1,20 @@
+Mek'ele;22.2
+Da Nang;24.0
+Hat Yai;32.1
+Marseille;7.9
+Yakutsk;-3.0
+Rangpur;30.8
+San Juan;32.6
+Mango;23.8
+Benghazi;34.7
+Houston;24.7
+Denpasar;32.5
+Managua;25.0
+Dubai;20.7
+Baghdad;33.4
+Tamale;27.5
+Kuwait City;9.6
+Bissau;28.5
+Austin;21.6
+Baltimore;33.8
+Omaha;-1.7

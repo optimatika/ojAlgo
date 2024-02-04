@@ -19,18 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.management;
+package org.ojalgo.netio;
 
-public interface ThroughputMBean {
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
-    /**
-     * The, current, throughput rate (items/second)
-     */
-    double getRate();
+final class ByteBufferBackedInputStream extends InputStream {
 
-    /**
-     * The total number of items that passed through here.
-     */
-    long getTotal();
+    private final ByteBuffer myBuffer;
+
+    ByteBufferBackedInputStream(final ByteBuffer buffer) {
+        myBuffer = buffer;
+    }
+
+    @Override
+    public int available() {
+        return myBuffer.remaining();
+    }
+
+    @Override
+    public int read() throws IOException {
+        return myBuffer.hasRemaining() ? myBuffer.get() & 0xFF : -1;
+    }
+
+    @Override
+    public int read(final byte[] bytes, final int off, final int len) throws IOException {
+        if (!myBuffer.hasRemaining()) {
+            return -1;
+        }
+        int length = Math.min(len, myBuffer.remaining());
+        myBuffer.get(bytes, off, length);
+        return length;
+    }
 
 }

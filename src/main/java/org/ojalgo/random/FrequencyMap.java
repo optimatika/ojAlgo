@@ -43,7 +43,6 @@ public final class FrequencyMap<T> {
     }
 
     private final ConcurrentHashMap<T, LongAdder> myMap = new ConcurrentHashMap<>();
-
     private final LongAdder myPopulation = new LongAdder();
 
     public FrequencyMap() {
@@ -137,7 +136,7 @@ public final class FrequencyMap<T> {
             return PrimitiveMath.ZERO;
         }
 
-        return ((double) this.getFrequency(element)) / ((double) populationSize);
+        return (double) this.getFrequency(element) / (double) populationSize;
     }
 
     public void increment(final T element) {

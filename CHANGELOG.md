@@ -11,6 +11,35 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.function
+
+- Some additional `PowerOf2` utilities.
+
+#### org.ojalgo.netio
+
+- `SegmentedFile` that divides a large file in segments to enable reading those in parallel using memory mapped files (memory mapped file segments).
+
+#### org.ojalgo.type
+
+- New primitive number parsers in `NumberDefinition`. They take `CharSequence` rather than `String` as input and do not create any intermediate objects. In particular the `parseDouble` performs much better than its counterpart in `Double`. The downside is that it only handles a limited plain format.
+
+### Changed
+
+#### org.ojalgo.concurrent
+
+- The `reduce(...)` methods of `ProcessingService` are renamed (deprecated) `reduceMergeable(...)`. In addition there are now also `reduceCombineable(...)`.
+
+#### org.ojalgo.data
+
+- The `processMapped(...)` method of `BatchNode` is renamed (deprecated) `processMergeable(...)`. In addition there is now also `processCombineable(...)`.
+- The `reduceMapped(...)` method of `BatchNode` is renamed (deprecated) `reduceByMerging(...)`. In addition there is now also `reduceByCombining(...)`.
+
+#### org.ojalgo.type
+
+- The `merge(Object)` method of `TwoStepMapper` has been removed. Instead there are two new sub-interfaces `TwoStepMapper.Mergeable` and `TwoStepMapper.Combineable`.
+
 ## [53.2.0] – 2023-12-29
 
 ### Added
