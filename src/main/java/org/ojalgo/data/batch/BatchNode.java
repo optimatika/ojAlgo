@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2023 Optimatika
+ * Copyright 1997-2024 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -360,8 +360,8 @@ public final class BatchNode<T> {
     }
 
     /**
-     * Same as {@link #processMergeable(Supplier, Consumer)}, but then also reduce/merge the total
-     * results using {@link TwoStepMapper#merge(Object)}.
+     * Same as {@link #processMergeable(Supplier, Consumer)}, but then also reduce/merge the total results
+     * using {@link TwoStepMapper#merge(Object)}.
      * <P>
      * Create a class that implements {@link TwoStepMapper} and make sure to also implement
      * {@link TwoStepMapper#merge(Object)} - you can only use this if merging partial (sub)results is
