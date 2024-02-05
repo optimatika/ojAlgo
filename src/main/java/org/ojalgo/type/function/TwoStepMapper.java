@@ -24,6 +24,8 @@ package org.ojalgo.type.function;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import org.ojalgo.random.FrequencyMap;
 import org.ojalgo.random.FrequencyMap.FrequencyPredicate;
@@ -50,9 +52,18 @@ public interface TwoStepMapper<T, R> {
      */
     interface Combineable<T, R, A extends Combineable<T, R, A>> extends TwoStepMapper<T, R> {
 
-        static <T, R, A extends Combineable<T, R, A>> A combine(final A target, final A other) {
+        static <T, R, A extends Combineable<T, R, A>> A combine2(final A target, final A other) {
             target.combine(other);
             return target;
+        }
+
+        /**
+         * Create a new {@link Collector} that can be used with
+         * {@link java.util.stream.Stream#collect(Collector)}. Just provide a constructor or factory method
+         * reference to create instances of a {@link Combineable} implementation.
+         */
+        static <T, R, A extends Combineable<T, R, A>> Collector<T, A, R> newCollector(final Supplier<A> supplier) {
+            return Collector.of(supplier, Combineable::consume, Combineable::combine2, Combineable::getResults);
         }
 
         /**
@@ -134,9 +145,18 @@ public interface TwoStepMapper<T, R> {
      */
     interface Mergeable<T, R> extends TwoStepMapper<T, R> {
 
-        static <T, R, A extends Mergeable<T, R>> A merge(final A target, final A other) {
+        static <T, R, A extends Mergeable<T, R>> A merge2(final A target, final A other) {
             target.merge(other.getResults());
             return target;
+        }
+
+        /**
+         * Create a new {@link Collector} that can be used with
+         * {@link java.util.stream.Stream#collect(Collector)}. Just provide a constructor or factory method
+         * reference to create instances of a {@link Mergeable} implementation.
+         */
+        static <T, R, A extends Mergeable<T, R>> Collector<T, A, R> newCollector(final Supplier<A> supplier) {
+            return Collector.of(supplier, Mergeable::consume, Mergeable::merge2, Mergeable::getResults);
         }
 
         /**
