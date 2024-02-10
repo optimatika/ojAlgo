@@ -159,11 +159,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            boolean experimental = model.options.experimental;
+            boolean alternative = !model.options.experimental;
 
-            this.setSwitch(model, experimental);
+            this.setSwitch(model, alternative);
 
-            if (experimental) {
+            if (alternative) {
                 return NEW_INTEGRATION.build(model);
             } else {
                 return OLD_INTEGRATION.build(model);

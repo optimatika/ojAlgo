@@ -1,0 +1,7 @@
+V	bieter1	624985000	829209000	1	false
+V	bieter2	0	398636000	1	false
+V	bieter3	0	131103000	1	false
+V	bieter4	72746000	876541000	1	false
+E	bieter4&bieter1	857550000		
+L	0	1
+L	3	1
