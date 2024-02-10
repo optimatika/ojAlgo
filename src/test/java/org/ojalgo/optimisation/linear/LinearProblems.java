@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -121,6 +122,31 @@ public class LinearProblems extends OptimisationLinearTests {
         }
 
         TestUtils.assertStateLessThanFeasible(actual);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/546
+     */
+    @Test
+    public void testGitHub546() {
+
+        // INFEASIBLE 8.5755E8 @ { 7.84804E+8, 0, 0, 7.2746E+7 }
+        // OPTIMAL    8.5755E8 @ { 7.84804E+8, 0, 0, 7.2746E+7 }
+
+        Optimisation.Result result = Result.of(8.5755E8, State.OPTIMAL, 7.84804E+8, 0, 0, 7.2746E+7);
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", "GitHub546.ebm", false);
+
+        model.validate(result, BasicLogger.DEBUG);
+
+        model.options.experimental = false;
+        model.options.debug(LinearSolver.class);
+
+        BasicLogger.debug(model);
+
+        Result min = model.minimise();
+
+        BasicLogger.debug(min);
     }
 
     @Test
