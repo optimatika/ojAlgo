@@ -231,18 +231,8 @@ final class SimplexTableauSolver extends LinearSolver {
 
         List<Variable> posVariables = model.getPositiveVariables();
         List<Variable> negVariables = model.getNegativeVariables();
-        Set<IntIndex> fixedVariables = model.getFixedVariables();
-
-        for (Variable pos : posVariables) {
-            if (pos.isEqualityConstraint()) {
-                BasicLogger.debug(pos);
-            }
-        }
-        for (Variable neg : negVariables) {
-            if (neg.isEqualityConstraint()) {
-                BasicLogger.debug(neg);
-            }
-        }
+        Set<IntIndex> fixedVariables = model.getFixedVariables(); // TODO Remove
+        Set<IntIndex> shiftedVariables = model.getShiftedVariables(); // TODO Use
 
         List<Variable> bounds = model.bounds().collect(Collectors.toList());
 
@@ -252,21 +242,8 @@ final class SimplexTableauSolver extends LinearSolver {
         List<Variable> varsNegLo = new ArrayList<>();
 
         for (Variable variable : bounds) {
-            if (variable.isPositive()) {
-                if (variable.isUpperConstraint() && variable.getUpperLimit().signum() > 0) {
-                    varsPosUp.add(variable);
-                }
-                if (variable.isLowerConstraint() && variable.getLowerLimit().signum() > 0) {
-                    varsPosLo.add(variable);
-                }
-            }
-            if (variable.isNegative()) {
-                if (variable.isUpperConstraint() && variable.getUpperLimit().signum() < 0) {
-                    varsNegUp.add(variable);
-                }
-                if (variable.isLowerConstraint() && variable.getLowerLimit().signum() < 0) {
-                    varsNegLo.add(variable);
-                }
+            if (variable.isPositive() && variable.isUpperConstraint()) {
+                varsPosUp.add(variable);
             }
         }
 
@@ -275,7 +252,7 @@ final class SimplexTableauSolver extends LinearSolver {
         //        BasicLogger.debug("varsNegLo: {}", varsNegLo);
         //        BasicLogger.debug("varsNegUp: {}", varsNegUp);
 
-        List<Expression> constraints = model.constraints().map(c -> c.compensate(fixedVariables)).collect(Collectors.toList());
+        List<Expression> constraints = model.constraints().map(c -> c.compensate(shiftedVariables)).collect(Collectors.toList());
 
         List<Expression> exprUpPos = new ArrayList<>();
         List<Expression> exprUpNeg = new ArrayList<>();
@@ -309,18 +286,17 @@ final class SimplexTableauSolver extends LinearSolver {
             }
         }
 
-        Expression objective = model.objective().compensate(fixedVariables);
+        Expression objective = model.objective().compensate(shiftedVariables);
 
-        int nbPosProbVars = posVariables.size();
-        int nbNegProbVars = negVariables.size();
-        int nbIdentitySlackVars = exprUpPos.size() + exprLoNeg.size() + varsPosUp.size() + varsNegLo.size();
-        int nbOtherSlackVars = exprUpNeg.size() + exprLoPos.size() + varsNegUp.size() + varsPosLo.size();
-        int nbConstraints = nbIdentitySlackVars + nbOtherSlackVars + exprEqPos.size() + exprEqNeg.size();
-        int constrIn = nbConstraints - (exprEqPos.size() + exprEqNeg.size());
-        int constrEq = exprEqPos.size() + exprEqNeg.size();
-        int nbArtificials = constrIn + constrEq - nbIdentitySlackVars;
+        int nbVars = posVariables.size();
+        int nbNegs = negVariables.size();
+        int nbSlck = exprUpNeg.size() + exprLoPos.size() + varsNegUp.size() + varsPosLo.size();
+        int nbIdty = exprUpPos.size() + exprLoNeg.size() + varsPosUp.size() + varsNegLo.size();
 
-        LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
+        int nbInes = nbIdty + nbSlck;
+        int nbEqus = exprEqPos.size() + exprEqNeg.size();
+
+        LinearStructure structure = new LinearStructure(true, nbInes, nbEqus, nbVars, nbNegs, nbSlck, nbIdty);
 
         SimplexTableau retVal = SimplexTableau.make(structure, model.options);
 
@@ -328,11 +304,11 @@ final class SimplexTableauSolver extends LinearSolver {
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
         Primitive1D retObjective = retVal.objective();
 
-        int basePosVars = 0; // 0 + 0
-        int baseNegVars = nbPosProbVars; // 0 + nbPosProbVars
-        int baseSlackVars = baseNegVars + nbNegProbVars;
-        int baseIdSlackVars = baseSlackVars + nbOtherSlackVars;
-        int baseArtificialVars = baseIdSlackVars + nbIdentitySlackVars;
+        int baseVars = 0;
+        int baseNegs = baseVars + nbVars;
+        int baseSlck = baseNegs + nbNegs;
+        int baseIdty = baseSlck + nbSlck;
+        int baseArti = baseIdty + nbIdty;
 
         for (int i = 0; i < posVariables.size(); i++) {
             structure.positivePartVariables[i] = model.indexOf(posVariables.get(i));
@@ -350,25 +326,25 @@ final class SimplexTableauSolver extends LinearSolver {
 
             int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
             if (tmpPosInd >= 0) {
-                retObjective.set(basePosVars + tmpPosInd, tmpFactor);
+                retObjective.set(baseVars + tmpPosInd, tmpFactor);
             }
 
             int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
             if (tmpNegInd >= 0) {
-                retObjective.set(baseNegVars + tmpNegInd, -tmpFactor);
+                retObjective.set(baseNegs + tmpNegInd, -tmpFactor);
             }
         }
 
         //  BasicLogger.debug("objective", retVal);
 
         int indCnstr = 0;
-        int indSlack = baseIdSlackVars;
+        int indSlack = baseIdty;
 
         for (Expression expression : exprUpPos) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
@@ -387,7 +363,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = -expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
@@ -405,7 +381,7 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Variable variable : varsPosUp) {
 
             double factor = variable.getAdjustmentFactor();
-            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, variable, factor);
+            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, variable, factor);
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
@@ -422,7 +398,7 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Variable variable : varsNegLo) {
 
             double factor = -variable.getAdjustmentFactor();
-            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, variable, factor);
+            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, variable, factor);
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
@@ -436,13 +412,13 @@ final class SimplexTableauSolver extends LinearSolver {
 
         //   BasicLogger.debug("varsLoNeg", retVal);
 
-        indSlack = baseSlackVars;
+        indSlack = baseSlck;
 
         for (Expression expression : exprLoPos) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
@@ -461,7 +437,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = -expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
@@ -479,7 +455,7 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Variable variable : varsPosLo) {
 
             double factor = variable.getAdjustmentFactor();
-            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, variable, factor);
+            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, variable, factor);
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
@@ -496,7 +472,7 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Variable variable : varsNegUp) {
 
             double factor = -variable.getAdjustmentFactor();
-            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, variable, factor);
+            SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, variable, factor);
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
@@ -516,7 +492,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             double rhs = expression.getAdjustedUpperLimit();
@@ -533,7 +509,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             for (IntIndex key : expression.getLinearKeySet()) {
                 double factor = -expression.getAdjustedLinearFactor(key);
-                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
+                SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, baseVars, baseNegs, key, factor);
             }
 
             double rhs = -expression.getAdjustedLowerLimit();

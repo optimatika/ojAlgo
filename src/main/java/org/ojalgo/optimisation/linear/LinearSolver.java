@@ -642,26 +642,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     static final class OldIntegration extends ExpressionsBasedModel.Integration<SimplexTableauSolver> {
 
-        private static ArrayR064 toModelVariableValues(final Access1D<?> solverVariableValues, final ExpressionsBasedModel model,
-                final ArrayR064 modelVariableValues) {
-
-            List<Variable> positiveVariables = model.getPositiveVariables();
-            for (int p = 0; p < positiveVariables.size(); p++) {
-                Variable variable = positiveVariables.get(p);
-                int index = model.indexOf(variable);
-                modelVariableValues.set(index, solverVariableValues.doubleValue(p));
-            }
-
-            List<Variable> negativeVariables = model.getNegativeVariables();
-            for (int n = 0; n < negativeVariables.size(); n++) {
-                Variable variable = negativeVariables.get(n);
-                int index = model.indexOf(variable);
-                modelVariableValues.add(index, -solverVariableValues.doubleValue(positiveVariables.size() + n));
-            }
-
-            return modelVariableValues;
-        }
-
         public SimplexTableauSolver build(final ConvexData convexBuilder, final Optimisation.Options options) {
 
             SimplexTableau tableau = SimplexTableauSolver.buildPrimal(convexBuilder, options, false);
@@ -693,11 +673,27 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             ArrayR064 modelSolution = ArrayR064.make(model.countVariables());
 
-            for (IntIndex fixed : model.getFixedVariables()) {
-                modelSolution.set(fixed.index, model.getVariable(fixed.index).getValue().doubleValue());
+            for (IntIndex shifted : model.getShiftedVariables()) {
+                modelSolution.set(shifted.index, model.getVariable(shifted.index).getBaseValue().doubleValue());
             }
 
-            OldIntegration.toModelVariableValues(solverState, model, modelSolution);
+            List<Variable> positives = model.getPositiveVariables();
+            List<Variable> negatives = model.getNegativeVariables();
+
+            int nbPositives = positives.size();
+            int nbNegatives = negatives.size();
+
+            for (int p = 0; p < nbPositives; p++) {
+                Variable variable = positives.get(p);
+                int index = model.indexOf(variable);
+                modelSolution.add(index, solverState.doubleValue(p));
+            }
+            
+            for (int n = 0; n < nbNegatives; n++) {
+                Variable variable = negatives.get(n);
+                int index = model.indexOf(variable);
+                modelSolution.add(index, -solverState.doubleValue(nbPositives + n));
+            }
 
             return solverState.withSolution(modelSolution);
         }
@@ -705,24 +701,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-            List<Variable> tmpPositives = model.getPositiveVariables();
-            List<Variable> tmpNegatives = model.getNegativeVariables();
+            List<Variable> positives = model.getPositiveVariables();
+            List<Variable> negatives = model.getNegativeVariables();
 
-            int tmpCountPositives = tmpPositives.size();
-            int tmpCountNegatives = tmpNegatives.size();
+            int nbPositives = positives.size();
+            int nbNegatives = negatives.size();
 
-            ArrayR064 solverSolution = ArrayR064.make(tmpCountPositives + tmpCountNegatives);
+            ArrayR064 solverSolution = ArrayR064.make(nbPositives + nbNegatives);
 
-            for (int p = 0; p < tmpCountPositives; p++) {
-                Variable tmpVariable = tmpPositives.get(p);
-                int tmpIndex = model.indexOf(tmpVariable);
-                solverSolution.set(p, MAX.invoke(modelState.doubleValue(tmpIndex), ZERO));
+            for (int p = 0; p < nbPositives; p++) {
+                Variable variable = positives.get(p);
+                int index = model.indexOf(variable);
+                solverSolution.set(p, MAX.invoke(modelState.doubleValue(index), ZERO));
             }
 
-            for (int n = 0; n < tmpCountNegatives; n++) {
-                Variable tmpVariable = tmpNegatives.get(n);
-                int tmpIndex = model.indexOf(tmpVariable);
-                solverSolution.set(tmpCountPositives + n, MAX.invoke(-modelState.doubleValue(tmpIndex), ZERO));
+            for (int n = 0; n < nbNegatives; n++) {
+                Variable variable = negatives.get(n);
+                int index = model.indexOf(variable);
+                solverSolution.set(nbPositives + n, MAX.invoke(-modelState.doubleValue(index), ZERO));
             }
 
             return modelState.withSolution(solverSolution);
