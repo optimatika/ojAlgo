@@ -187,7 +187,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    interface Receiver<N extends Comparable<N>> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
+    interface Receiver<N extends Comparable<N>> extends Fillable<N>, Consumer<AccessAnyD<?>> {
 
         @Override
         default void accept(final AccessAnyD<?> supplied) {
@@ -213,93 +213,60 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    @Override
-    default void set(final int index, final byte value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final byte value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final int index, final double value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final Comparable<?> value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final int index, final float value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final double value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final int index, final int value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final float value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final int index, final long value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final int value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final int index, final short value) {
-        this.set((long) index, value);
+    default void set(final int[] ref, final long value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final byte value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final int[] ref, final short value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final Comparable<?> value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final byte value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final double value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final Comparable<?> value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final float value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final double value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final int value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final float value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final long value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final int value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    @Override
-    default void set(final long index, final short value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    default void set(final long[] ref, final long value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
-    default void set(final long[] reference, final byte value) {
-        this.set(reference, (short) value);
-    }
-
-    void set(long[] reference, Comparable<?> value);
-
-    void set(long[] reference, double value);
-
-    default void set(final long[] reference, final float value) {
-        this.set(reference, (double) value);
-    }
-
-    default void set(final long[] reference, final int value) {
-        this.set(reference, (long) value);
-    }
-
-    default void set(final long[] reference, final long value) {
-        this.set(reference, (double) value);
-    }
-
-    default void set(final long[] reference, final short value) {
-        this.set(reference, (int) value);
+    default void set(final long[] ref, final short value) {
+        this.set(StructureAnyD.index(this, ref), value);
     }
 
 }

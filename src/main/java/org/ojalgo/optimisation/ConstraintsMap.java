@@ -98,6 +98,11 @@ public final class ConstraintsMap implements Structure1D {
         myMultiplierScale = multiplierScale;
     }
 
+    @Override
+    public int size() {
+        return negated.length;
+    }
+
     double getMultiplierScale() {
         return myMultiplierScale;
     }

@@ -352,11 +352,6 @@ abstract class SimplexSolver extends LinearSolver {
         return new Access1D<Double>() {
 
             @Override
-            public long count() {
-                return structure.countConstraints();
-            }
-
-            @Override
             public double doubleValue(final int index) {
                 int i = Math.toIntExact(index);
                 return structure.isConstraintNegated(i) ? -duals.doubleValue(index) : duals.doubleValue(index);
@@ -365,6 +360,11 @@ abstract class SimplexSolver extends LinearSolver {
             @Override
             public Double get(final long index) {
                 return Double.valueOf(this.doubleValue(index));
+            }
+
+            @Override
+            public int size() {
+                return structure.countConstraints();
             }
 
             @Override

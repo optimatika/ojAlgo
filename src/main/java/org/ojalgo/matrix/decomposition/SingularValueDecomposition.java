@@ -334,12 +334,12 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     private final Structure2D myInputStructure = new Structure2D() {
 
         @Override
-        public long countColumns() {
+        public int getColDim() {
             return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
         }
 
         @Override
-        public long countRows() {
+        public int getRowDim() {
             return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
         }
     };

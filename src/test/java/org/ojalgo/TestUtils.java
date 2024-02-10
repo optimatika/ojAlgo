@@ -234,10 +234,6 @@ public abstract class TestUtils /* extends Assertions */ {
         }
     }
 
-    public static void assertNull(final Object actual) {
-        Assertions.assertNull(actual);
-    }
-
     public static void assertEquals(final Object expected, final Object actual) {
         Assertions.assertEquals(expected, actual);
     }
@@ -450,6 +446,10 @@ public abstract class TestUtils /* extends Assertions */ {
         } else if (actual.length() <= 0) {
             TestUtils.fail("Is empty!");
         }
+    }
+
+    public static void assertNull(final Object actual) {
+        Assertions.assertNull(actual);
     }
 
     /**

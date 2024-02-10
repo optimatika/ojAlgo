@@ -43,6 +43,16 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         }
 
         @Override
+        public int getColDim() {
+            return myBase.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return 1;
+        }
+
+        @Override
         public ElementView1D<N, ?> nonzeros() {
             return this.getCurrent().nonzeros();
         }
@@ -110,8 +120,18 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
         return myRows.get(row).get(col);
     }
 
+    @Override
+    public int getColDim() {
+        return myColumnsCount;
+    }
+
     public SparseArray<N> getRow(final int index) {
         return myRows.get(index);
+    }
+
+    @Override
+    public int getRowDim() {
+        return myRows.size();
     }
 
     @Override
@@ -146,6 +166,14 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
 
             public N get(final int row, final int col) {
                 return RowsSupplier.this.get(rows[row], col);
+            }
+
+            public int getColDim() {
+                return RowsSupplier.this.getColDim();
+            }
+
+            public int getRowDim() {
+                return rows.length;
             }
 
             public Factory<N, ?> physical() {

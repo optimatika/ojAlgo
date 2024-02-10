@@ -121,12 +121,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return this.make(new Structure2D() {
 
                 @Override
-                public long countColumns() {
+                public int getColDim() {
                     return numberOfColumns;
                 }
 
                 @Override
-                public long countRows() {
+                public int getRowDim() {
                     return numberOfRows;
                 }
             });
@@ -420,13 +420,13 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     Structure2D TYPICAL = new Structure2D() {
 
         @Override
-        public long countColumns() {
-            return 50L;
+        public int getColDim() {
+            return 50;
         }
 
         @Override
-        public long countRows() {
-            return 50L;
+        public int getRowDim() {
+            return 50;
         }
 
     };

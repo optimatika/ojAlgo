@@ -97,7 +97,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     public static final DenseArray.Factory<Double> Z016 = new Factory(MathType.Z016, OffHeapZ016::new);
     public static final DenseArray.Factory<Double> Z032 = new Factory(MathType.Z032, OffHeapZ032::new);
     public static final DenseArray.Factory<Double> Z064 = new Factory(MathType.Z064, OffHeapZ064::new);
-
     /**
      * @deprecated Use {@link #R032} instead
      */
@@ -197,6 +196,11 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     @Override
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.set(index, modifier.invoke(this.doubleValue(index)));
+    }
+
+    @Override
+    public final int size() {
+        return Math.toIntExact(myCount);
     }
 
     @Override

@@ -80,6 +80,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
             vector = aVector;
         }
 
+        @Override
         public int compareTo(final Eigenpair other) {
             return DESCENDING_NORM.compare(value, other.value);
         }
@@ -129,17 +130,20 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
             return this.make(new Structure2D() {
 
-                public long countColumns() {
+                @Override
+                public int getColDim() {
                     return dimension;
                 }
 
-                public long countRows() {
+                @Override
+                public int getRowDim() {
                     return dimension;
                 }
 
             }, hermitian);
         }
 
+        @Override
         default Eigenvalue<N> make(final Structure2D typical) {
             if (typical instanceof MatrixStore) {
                 return this.make(typical, ((MatrixStore<?>) typical).isHermitian());
@@ -442,6 +446,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
      *
      * @see org.ojalgo.matrix.Provider2D.Eigenpairs#getEigenpairs()
      */
+    @Override
     default List<Eigenpair> getEigenpairs() {
 
         List<Eigenpair> retVal = new ArrayList<>();
@@ -569,8 +574,10 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
      *
      * @return true if they are ordered
      */
+    @Override
     boolean isOrdered();
 
+    @Override
     default MatrixStore<N> reconstruct() {
         final MatrixStore<N> mtrxV = this.getV();
         MatrixStore<N> mtrxD = this.getD();

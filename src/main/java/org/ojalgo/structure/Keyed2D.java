@@ -38,6 +38,7 @@ public final class Keyed2D<R, C, N extends Comparable<N>> implements Structure1D
         return myStructure.byteValue(myMapper.toRowIndex(row), myMapper.toColumnIndex(col));
     }
 
+    @Override
     public long count() {
         return myStructure.count();
     }
@@ -120,6 +121,11 @@ public final class Keyed2D<R, C, N extends Comparable<N>> implements Structure1D
 
     public short shortValue(final R row, final C col) {
         return myStructure.shortValue(myMapper.toRowIndex(row), myMapper.toColumnIndex(col));
+    }
+
+    @Override
+    public int size() {
+        return myStructure.size();
     }
 
 }

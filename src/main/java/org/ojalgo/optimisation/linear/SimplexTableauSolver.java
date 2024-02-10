@@ -48,6 +48,8 @@ import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Primitive1D;
+import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -909,20 +911,19 @@ final class SimplexTableauSolver extends LinearSolver {
         return new Access1D<Double>() {
 
             @Override
-            public long count() {
-                return structure.countConstraints();
-            }
-
-            @Override
             public double doubleValue(final int index) {
-                int i = Math.toIntExact(index);
                 double dualValue = duals.doubleValue(index);
-                return structure.isConstraintNegated(i) ? -dualValue : dualValue;
+                return structure.isConstraintNegated(index) ? -dualValue : dualValue;
             }
 
             @Override
             public Double get(final long index) {
                 return Double.valueOf(this.doubleValue(index));
+            }
+
+            @Override
+            public int size() {
+                return structure.countConstraints();
             }
 
             @Override

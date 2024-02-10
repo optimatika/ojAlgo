@@ -43,11 +43,13 @@ public interface DeterminantTask<N extends Comparable<N>> extends MatrixTask<N> 
 
             final Structure2D template = new Structure2D() {
 
-                public long countColumns() {
+                @Override
+                public int getColDim() {
                     return dim;
                 }
 
-                public long countRows() {
+                @Override
+                public int getRowDim() {
                     return dim;
                 }
             };

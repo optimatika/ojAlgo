@@ -41,6 +41,7 @@ import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.EnumPartition;

@@ -68,6 +68,7 @@ public interface Structure2D extends Structure1D {
             return myColumn;
         }
 
+        @Override
         public int compareTo(final IntRowColumn ref) {
             if (column == ref.column) {
                 return Integer.compare(row, ref.row);
@@ -291,6 +292,7 @@ public interface Structure2D extends Structure1D {
             return myColumn;
         }
 
+        @Override
         public int compareTo(final LongRowColumn ref) {
 
             if (column == ref.column) {
@@ -358,21 +360,6 @@ public interface Structure2D extends Structure1D {
          * @see StructureAnyD.Reshapable#reshape(long...)
          */
         Structure2D reshape(long rows, long columns);
-
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    @FunctionalInterface
-    public interface RowColumnCallback {
-
-        /**
-         * @param row Row
-         * @param col Column
-         */
-        void call(final long row, final long col);
 
     }
 
@@ -458,10 +445,12 @@ public interface Structure2D extends Structure1D {
             return Structure2D.index(myStructure, row, col);
         }
 
+        @Override
         public long toIndex(final RowColumnKey<R, C> key) {
             return this.toIndex(key.row, key.column);
         }
 
+        @Override
         public RowColumnKey<R, C> toKey(final long index) {
             return RowColumnKey.of(this.toRowKey(index), this.toColumnKey(index));
         }
@@ -537,20 +526,6 @@ public interface Structure2D extends Structure1D {
         return structure instanceof Structure2D ? Math.min(((Structure2D) structure).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
-        long tmpCountRows = Math.min(structureA.countRows(), structureB.countRows());
-        long tmpCountColumns = Math.min(structureA.countColumns(), structureB.countColumns());
-        for (long j = 0L; j < tmpCountColumns; j++) {
-            for (long i = 0L; i < tmpCountRows; i++) {
-                callback.call(i, j);
-            }
-        }
-    }
-
     static <R, C> RowColumnMapper<R, C> mapperOf(final Structure2D structure, final Structure1D.IndexMapper<R> rowMappwer,
             final Structure1D.IndexMapper<C> columnMappwer) {
         return new RowColumnMapper<>(structure, rowMappwer, columnMappwer);
@@ -579,19 +554,28 @@ public interface Structure2D extends Structure1D {
     /**
      * count() == countRows() * countColumns()
      */
+    @Override
     default long count() {
         return this.countRows() * this.countColumns();
     }
 
     /**
+     * Only need to implement if the structure may contain more than Integer.MAX_VALUE elements.
+     * 
      * @return The number of columns
      */
-    long countColumns();
+    default long countColumns() {
+        return this.getColDim();
+    }
 
     /**
+     * Only need to implement if the structure may contain more than Integer.MAX_VALUE elements.
+     * 
      * @return The number of rows
      */
-    long countRows();
+    default long countRows() {
+        return this.getRowDim();
+    }
 
     /**
      * The default value is simply <code>0</code>, and if all elements are zeros then
@@ -614,9 +598,10 @@ public interface Structure2D extends Structure1D {
         return 0;
     }
 
-    default int getColDim() {
-        return Math.toIntExact(this.countColumns());
-    }
+    /**
+     * @return The number of columns
+     */
+    int getColDim();
 
     default int getMaxDim() {
         return Math.toIntExact(Math.max(this.countRows(), this.countColumns()));
@@ -626,9 +611,10 @@ public interface Structure2D extends Structure1D {
         return Math.toIntExact(Math.min(this.countRows(), this.countColumns()));
     }
 
-    default int getRowDim() {
-        return Math.toIntExact(this.countRows());
-    }
+    /**
+     * @return The number of rows
+     */
+    int getRowDim();
 
     /**
      * 2D data structures are either square, tall, fat or empty.
@@ -673,8 +659,8 @@ public interface Structure2D extends Structure1D {
      * @return true if matrix is square
      */
     default boolean isSquare() {
-        final long tmpCountRows = this.countRows();
-        return tmpCountRows > 0L && tmpCountRows == this.countColumns();
+        long nbRows = this.countRows();
+        return nbRows > 0L && nbRows == this.countColumns();
     }
 
     /**
@@ -720,63 +706,11 @@ public interface Structure2D extends Structure1D {
     }
 
     /**
-     * @deprecated v53 Will be removed!
+     * size() == getRowDim() * getColDim()
      */
-    @Deprecated
-    default void loopAll(final RowColumnCallback callback) {
-        final long tmpCountRows = this.countRows();
-        final long tmpCountColumns = this.countColumns();
-        for (long j = 0L; j < tmpCountColumns; j++) {
-            for (long i = 0L; i < tmpCountRows; i++) {
-                callback.call(i, j);
-            }
-        }
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopColumn(final long row, final long col, final RowColumnCallback callback) {
-        for (long i = row, limit = this.countRows(); i < limit; i++) {
-            callback.call(i, col);
-        }
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopColumn(final long col, final RowColumnCallback callback) {
-        this.loopColumn(0L, col, callback);
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopDiagonal(final long row, final long col, final RowColumnCallback callback) {
-        for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
-            callback.call(row + ij, col + ij);
-        }
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopRow(final long row, final long col, final RowColumnCallback callback) {
-        for (long j = col, limit = this.countColumns(); j < limit; j++) {
-            callback.call(row, j);
-        }
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopRow(final long row, final RowColumnCallback callback) {
-        this.loopRow(row, 0L, callback);
+    @Override
+    default int size() {
+        return this.getRowDim() * this.getColDim();
     }
 
 }

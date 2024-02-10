@@ -100,7 +100,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         private final MatrixStore<N> myBase;
 
         ColumnsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
-            super(base, 1L, base.countColumns());
+            super(base, 1, base.getColDim());
             myBase = base;
             myAggregator = aggregator;
         }
@@ -119,7 +119,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
 
         Multiplication(final Access1D<N> left, final MatrixStore<N> right) {
 
-            super(right, left.count() / right.countRows(), right.countColumns());
+            super(right, Math.toIntExact(left.count() / right.countRows()), right.getColDim());
 
             myLeft = left;
             myRight = right;
@@ -166,7 +166,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         private final MatrixStore<N> myBase;
 
         RowsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
-            super(base, base.countRows(), 1L);
+            super(base, base.getRowDim(), 1);
             myBase = base;
             myAggregator = aggregator;
         }
@@ -197,7 +197,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
     static final class Transpose<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         Transpose(final ElementsSupplier<N> context) {
-            super(context, context.countColumns(), context.countRows());
+            super(context, context.getColDim(), context.getRowDim());
         }
 
         @Override
@@ -205,6 +205,7 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
             this.getContext().supplyTo(receiver.regionByTransposing());
         }
 
+        @Override
         public ElementsSupplier<N> transpose() {
             return this.getContext();
         }
@@ -226,26 +227,38 @@ abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSuppli
         }
     }
 
-    private final long myColumnsCount;
+    private final int myColumnsCount;
     private final ElementsSupplier<N> myContext;
-    private final long myRowsCount;
+    private final int myRowsCount;
 
     MatrixPipeline(final ElementsSupplier<N> context) {
-        this(context, context.countRows(), context.countColumns());
+        this(context, context.getRowDim(), context.getColDim());
     }
 
-    MatrixPipeline(final ElementsSupplier<N> context, final long rowsCount, final long columnsCount) {
+    MatrixPipeline(final ElementsSupplier<N> context, final int rowsCount, final int columnsCount) {
         super();
         myContext = context;
         myRowsCount = rowsCount;
         myColumnsCount = columnsCount;
     }
 
+    @Override
     public final long countColumns() {
         return myColumnsCount;
     }
 
+    @Override
     public final long countRows() {
+        return myRowsCount;
+    }
+
+    @Override
+    public final int getColDim() {
+        return myColumnsCount;
+    }
+
+    @Override
+    public final int getRowDim() {
         return myRowsCount;
     }
 

@@ -24,7 +24,6 @@ package org.ojalgo.structure;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.aggregator.Aggregator;
 
 /**
@@ -280,104 +279,124 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    /**
-     * @param structure An access structure
-     * @return The size of an access with that structure
-     */
-    static int count(final int[] structure) {
-        int retVal = 1;
-        final int tmpLength = structure.length;
-        for (int i = 0; i < tmpLength; i++) {
-            retVal *= structure[i];
+    static long count(final int... shape) {
+        long retVal = 1L;
+        for (int i = 0, limit = shape.length; i < limit; i++) {
+            retVal *= shape[i];
         }
         return retVal;
     }
 
     /**
-     * @param structure An access structure
+     * @param shape An access structure
+     * @return The size of an access with that structure
+     */
+    static long count(final long... shape) {
+        long retVal = 1L;
+        for (int i = 0, limit = shape.length; i < limit; i++) {
+            retVal *= shape[i];
+        }
+        return retVal;
+    }
+
+    /**
+     * @param shape An access structure
      * @param dimension A dimension index
      * @return The size of that dimension
      */
-    static int count(final int[] structure, final int dimension) {
-        return structure.length > dimension ? structure[dimension] : 1;
+    static long count(final long[] shape, final int dimension) {
+        return shape.length > dimension ? shape[dimension] : 1L;
     }
 
     /**
-     * @param structure An access structure
-     * @return The size of an access with that structure
+     * @see #index(long[], long[])
      */
-    static long count(final long[] structure) {
-        long retVal = 1;
-        final int tmpLength = structure.length;
-        for (int i = 0; i < tmpLength; i++) {
-            retVal *= structure[i];
-        }
-        return retVal;
-    }
-
-    /**
-     * @param structure An access structure
-     * @param dimension A dimension index
-     * @return The size of that dimension
-     */
-    static long count(final long[] structure, final int dimension) {
-        return structure.length > dimension ? structure[dimension] : 1;
-    }
-
-    /**
-     * @param structure An access structure
-     * @param reference An access element reference
-     * @return The index of that element
-     */
-    static int index(final int[] structure, final int[] reference) {
-        int retVal = reference[0];
-        int tmpFactor = structure[0];
-        final int tmpLength = reference.length;
-        for (int i = 1; i < tmpLength; i++) {
-            retVal += tmpFactor * reference[i];
-            tmpFactor *= structure[i];
-        }
-        return retVal;
-    }
-
-    /**
-     * @param structure An access structure
-     * @param reference An access element reference
-     * @return The index of that element
-     */
-    static long index(final long[] structure, final long[] reference) {
+    static long index(final int[] shape, final int[] reference) {
         long retVal = reference[0];
-        long tmpFactor = structure[0];
-        final int tmpLength = Math.min(structure.length, reference.length);
-        for (int i = 1; i < tmpLength; i++) {
-            retVal += tmpFactor * reference[i];
-            tmpFactor *= structure[i];
+        long factor = shape[0];
+        for (int i = 1, limit = Math.min(shape.length, reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= shape[i];
         }
         return retVal;
     }
 
     /**
-     * @deprecated v53 Will be removed!
+     * @see #index(long[], long[])
      */
-    @Deprecated
-    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final IndexCallback callback) {
-        if (!Arrays.equals(structureA.shape(), structureB.shape())) {
-            throw new ProgrammingError("The 2 structures must have the same shape!");
+    static long index(final int[] shape, final long[] reference) {
+        long retVal = reference[0];
+        long factor = shape[0];
+        for (int i = 1, limit = Math.min(shape.length, reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= shape[i];
         }
-        for (long i = 0L, limit = Math.min(structureA.count(), structureB.count()); i < limit; i++) {
-            callback.call(i);
+        return retVal;
+    }
+
+    /**
+     * @see #index(long[], long[])
+     */
+    static long index(final long[] shape, final int[] reference) {
+        long retVal = reference[0];
+        long factor = shape[0];
+        for (int i = 1, limit = Math.min(shape.length, reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= shape[i];
         }
+        return retVal;
+    }
+
+    /**
+     * @param shape An access structure
+     * @param reference An access element reference
+     * @return The index of that element
+     */
+    static long index(final long[] shape, final long[] reference) {
+        long retVal = reference[0];
+        long factor = shape[0];
+        for (int i = 1, limit = Math.min(shape.length, reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= shape[i];
+        }
+        return retVal;
+    }
+
+    /**
+     * @see #index(long[], long[])
+     */
+    static long index(final StructureAnyD structure, final int[] reference) {
+        long retVal = reference[0];
+        long factor = structure.count(0);
+        for (int i = 1, limit = Math.min(structure.rank(), reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= structure.count(i);
+        }
+        return retVal;
+    }
+
+    /**
+     * @see #index(long[], long[])
+     */
+    static long index(final StructureAnyD structure, final long[] reference) {
+        long retVal = reference[0];
+        long factor = structure.count(0);
+        for (int i = 1, limit = Math.min(structure.rank(), reference.length); i < limit; i++) {
+            retVal += factor * reference[i];
+            factor *= structure.count(i);
+        }
+        return retVal;
     }
 
     static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
         return new StructureAnyD.ReferenceMapper(structure, mappers);
     }
 
-    static long[] reference(final long index, final long[] structure) {
+    static long[] reference(final long index, final long[] shape) {
 
-        long[] retVal = new long[structure.length];
+        long[] retVal = new long[shape.length];
 
-        StructureAnyD.reference(index, structure, retVal);
+        StructureAnyD.reference(index, shape, retVal);
 
         return retVal;
     }
@@ -386,51 +405,51 @@ public interface StructureAnyD extends Structure1D {
      * Based on the input index and structure/shape the reference array will derived.
      *
      * @param index Input index
-     * @param structure Relevant structure/shape
+     * @param shape Relevant structure/shape
      * @param reference Will be updated to the correct reference array given the index and structure
      */
-    static void reference(final long index, final long[] structure, final long[] reference) {
+    static void reference(final long index, final long[] shape, final long[] reference) {
 
         long tmpPrev = 1L;
         long tmpNext = 1L;
 
-        for (int s = 0; s < structure.length; s++) {
-            tmpNext *= structure[s];
+        for (int s = 0; s < shape.length; s++) {
+            tmpNext *= shape[s];
             reference[s] = index % tmpNext / tmpPrev;
             tmpPrev = tmpNext;
         }
     }
 
-    static long[] shape(final StructureAnyD structure) {
-
-        final long tmpSize = structure.count();
-
-        long tmpTotal = structure.count(0);
-        int tmpRank = 1;
-
-        while (tmpTotal < tmpSize) {
-            tmpTotal *= structure.count(tmpRank);
-            tmpRank++;
+    /**
+     * @param shape An access structure
+     * @return The size of an access with that structure
+     */
+    static int size(final int... shape) {
+        int retVal = 1;
+        for (int i = 0, limit = shape.length; i < limit; i++) {
+            retVal *= shape[i];
         }
-
-        final long[] retVal = new long[tmpRank];
-
-        for (int i = 0; i < retVal.length; i++) {
-            retVal[i] = structure.count(i);
-        }
-
         return retVal;
     }
 
     /**
-     * @param structure An access structure
+     * @param shape An access structure
+     * @param dimension A dimension index
+     * @return The size of that dimension
+     */
+    static int size(final int[] shape, final int dimension) {
+        return shape.length > dimension ? shape[dimension] : 1;
+    }
+
+    /**
+     * @param shape An access structure
      * @param dimension A dimension index indication a direction
      * @return The step size (index change) in that direction
      */
-    static int step(final int[] structure, final int dimension) {
+    static int step(final int[] shape, final int dimension) {
         int retVal = 1;
         for (int i = 0; i < dimension; i++) {
-            retVal *= StructureAnyD.count(structure, i);
+            retVal *= StructureAnyD.size(shape, i);
         }
         return retVal;
     }
@@ -438,17 +457,17 @@ public interface StructureAnyD extends Structure1D {
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
-     * @param structure An access structure
+     * @param shape An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
      */
-    static int step(final int[] structure, final int[] increment) {
+    static int step(final int[] shape, final int[] increment) {
         int retVal = 0;
         int tmpFactor = 1;
         final int tmpLimit = increment.length;
         for (int i = 1; i < tmpLimit; i++) {
             retVal += tmpFactor * increment[i];
-            tmpFactor *= structure[i];
+            tmpFactor *= shape[i];
         }
         return retVal;
     }
@@ -457,14 +476,14 @@ public interface StructureAnyD extends Structure1D {
      * How does the index change when stepping to the next dimensional unit (next row, next column. next
      * matrix/area, next cube...)
      *
-     * @param structure An access structure
+     * @param shape An access structure
      * @param dimension Which reference index to increment
      * @return The step size (index change)
      */
-    static long step(final long[] structure, final int dimension) {
+    static long step(final long[] shape, final int dimension) {
         long retVal = 1;
         for (int i = 0; i < dimension; i++) {
-            retVal *= StructureAnyD.count(structure, i);
+            retVal *= StructureAnyD.count(shape, i);
         }
         return retVal;
     }
@@ -472,18 +491,18 @@ public interface StructureAnyD extends Structure1D {
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
-     * @param structure An access structure
+     * @param shape An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
      */
-    static long step(final long[] structure, final long[] increment) {
+    static long step(final long[] shape, final long[] increment) {
 
         long retVal = 0L;
         long factor = 1L;
 
         for (int i = 1, limit = increment.length; i < limit; i++) {
             retVal += factor * increment[i];
-            factor *= structure[i];
+            factor *= shape[i];
         }
 
         return retVal;
@@ -516,12 +535,9 @@ public interface StructureAnyD extends Structure1D {
     /**
      * count() == count(0) * count(1) * count(2) * count(3) * ...
      */
-    @Override
-    default long count() {
-        return StructureAnyD.count(this.shape());
+    default long count(final int dimension) {
+        return this.size(dimension);
     }
-
-    long count(int dimension);
 
     /**
      * Will loop through this multidimensional data structure so that one index value of one dimension is
@@ -573,20 +589,6 @@ public interface StructureAnyD extends Structure1D {
         callback.call(first, limit, step);
     }
 
-    /**
-     * @deprecated v53 Use {@link #loopReferences(Predicate, ReferenceCallback)}
-     */
-    @Deprecated
-    default void loop(final Predicate<long[]> filter, final IndexCallback callback) {
-        long[] structure = this.shape();
-        for (long i = 0L, limit = this.count(); i < limit; i++) {
-            long[] reference = StructureAnyD.reference(i, structure);
-            if (filter.test(reference)) {
-                callback.call(i);
-            }
-        }
-    }
-
     default void loopAllReferences(final ReferenceCallback callback) {
 
         int rank = this.rank();
@@ -609,13 +611,33 @@ public interface StructureAnyD extends Structure1D {
      * @return The number of dimensions (the number of indices used to reference one element)
      */
     default int rank() {
-        return this.shape().length;
+
+        long count = this.count();
+
+        long total = this.count(0);
+        int retVal = 1;
+
+        while (total < count) {
+            total *= this.count(retVal);
+            retVal++;
+        }
+
+        return retVal;
     }
 
-    long[] shape();
+    default long[] shape() {
 
-    default int size(final int dimension) {
-        return Math.toIntExact(this.count(dimension));
+        int rank = this.rank();
+
+        long[] retVal = new long[rank];
+
+        for (int i = 0; i < rank; i++) {
+            retVal[i] = this.count(i);
+        }
+
+        return retVal;
     }
+
+    int size(final int dimension);
 
 }

@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class TableauCutGenerator {

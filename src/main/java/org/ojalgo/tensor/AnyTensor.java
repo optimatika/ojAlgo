@@ -171,6 +171,11 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
     }
 
     @Override
+    public double doubleValue(final int index) {
+        return myArray.doubleValue(index);
+    }
+
+    @Override
     public double doubleValue(final long... ref) {
         return myArray.doubleValue(ref);
     }
@@ -232,6 +237,11 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
     }
 
     @Override
+    public N get(final long index) {
+        return myArray.get(index);
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -285,6 +295,16 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
     }
 
     @Override
+    public void set(final int index, final double value) {
+        myArray.set(index, value);
+    }
+
+    @Override
+    public void set(final long index, final Comparable<?> value) {
+        myArray.set(index, value);
+    }
+
+    @Override
     public void set(final long[] reference, final byte value) {
         myArray.set(reference, value);
     }
@@ -327,6 +347,16 @@ public final class AnyTensor<N extends Comparable<N>> extends ArrayBasedTensor<N
     @Override
     public short shortValue(final long... ref) {
         return myArray.shortValue(ref);
+    }
+
+    @Override
+    public int size() {
+        return myArray.size();
+    }
+
+    @Override
+    public int size(final int dimension) {
+        return myArray.size(dimension);
     }
 
     @Override

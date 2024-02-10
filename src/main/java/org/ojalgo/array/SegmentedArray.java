@@ -237,6 +237,11 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public int size() {
+        return Math.toIntExact(this.count());
+    }
+
+    @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));

@@ -112,6 +112,11 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
         }
 
         @Override
+        public int size() {
+            return vector.length;
+        }
+
+        @Override
         public String toString() {
 
             final StringBuilder retVal = new StringBuilder("{");
@@ -212,6 +217,11 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
         }
 
         @Override
+        public int size() {
+            return vector.length;
+        }
+
+        @Override
         public String toString() {
 
             final StringBuilder retVal = new StringBuilder("{ ");
@@ -304,6 +314,11 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
         @Override
         public Double get(final long index) {
             return vector[Math.toIntExact(index)];
+        }
+
+        @Override
+        public int size() {
+            return vector.length;
         }
 
         @Override

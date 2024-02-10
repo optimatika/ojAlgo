@@ -36,6 +36,7 @@ public final class Keyed1D<K, N extends Comparable<N>> implements Structure1D {
         return myStructure.byteValue(myMapper.toIndex(key));
     }
 
+    @Override
     public long count() {
         return myStructure.count();
     }
@@ -118,6 +119,11 @@ public final class Keyed1D<K, N extends Comparable<N>> implements Structure1D {
 
     public short shortValue(final K key) {
         return myStructure.shortValue(myMapper.toIndex(key));
+    }
+
+    @Override
+    public int size() {
+        return myStructure.size();
     }
 
 }

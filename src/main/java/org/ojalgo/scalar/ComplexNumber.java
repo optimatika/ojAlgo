@@ -489,6 +489,11 @@ public final class ComplexNumber
         return this.phase();
     }
 
+    @Override
+    public int getColDim() {
+        return 2;
+    }
+
     public double getImaginary() {
         return i;
     }
@@ -499,6 +504,11 @@ public final class ComplexNumber
 
     public double getReal() {
         return this.doubleValue();
+    }
+
+    @Override
+    public int getRowDim() {
+        return 2;
     }
 
     @Override

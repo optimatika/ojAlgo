@@ -97,6 +97,16 @@ public final class DataBatch implements Access2D<Double>, Access2D.Collectable<D
         return Double.valueOf(this.doubleValue(row, col));
     }
 
+    @Override
+    public int getColDim() {
+        return myData.getColDim();
+    }
+
+    @Override
+    public int getRowDim() {
+        return myData.getRowDim();
+    }
+
     public boolean isFull() {
         return this.remaining() == 0;
     }

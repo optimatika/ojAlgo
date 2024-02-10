@@ -200,7 +200,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface Receiver<N extends Comparable<N>> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
+    interface Receiver<N extends Comparable<N>> extends Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
         @Override
         default void accept(final Access1D<?> supplied) {

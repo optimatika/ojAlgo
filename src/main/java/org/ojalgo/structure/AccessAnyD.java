@@ -228,6 +228,16 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             return myDelegateAnyD.get(myOffset + Structure2D.index(myRowsCount, row, col));
         }
 
+        @Override
+        public int getColDim() {
+            return Math.toIntExact(myColumnsCount);
+        }
+
+        @Override
+        public int getRowDim() {
+            return Math.toIntExact(myRowsCount);
+        }
+
         /**
          * Move the view to a specific matrix. The index specified here should correspond to what is returned
          * by the {@link #index()} method.
@@ -325,8 +335,23 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         }
 
         @Override
+        public long count() {
+            return StructureAnyD.count(myShape);
+        }
+
+        @Override
         public long count(final int dimension) {
             return myShape[dimension];
+        }
+
+        @Override
+        public double doubleValue(final int index) {
+            return this.doubleValue(StructureAnyD.reference(index, myShape));
+        }
+
+        @Override
+        public double doubleValue(final long index) {
+            return this.doubleValue(StructureAnyD.reference(index, myShape));
         }
 
         @Override
@@ -340,8 +365,23 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         }
 
         @Override
+        public N get(final long index) {
+            return this.get(StructureAnyD.reference(index, myShape));
+        }
+
+        @Override
         public long[] shape() {
-            return myShape;
+            return myShape.clone();
+        }
+
+        @Override
+        public int size() {
+            return Math.toIntExact(this.count());
+        }
+
+        @Override
+        public int size(final int dimension) {
+            return Math.toIntExact(myShape[dimension]);
         }
 
         @Override
@@ -513,6 +553,11 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         }
 
         @Override
+        public int size() {
+            return Math.toIntExact(myCount);
+        }
+
+        @Override
         public void supplyTo(final Mutate1D receiver) {
             for (long i = 0L, limit = Math.min(this.count(), receiver.count()); i < limit; i++) {
                 receiver.set(i, this.get(i));
@@ -540,38 +585,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
 
     }
 
+    /**
+     * @deprecated v54 Use {@link PrimitiveAnyD#wrap(StructureAnyD)} instead
+     */
+    @Deprecated
     static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long... ref) {
-                return access.doubleValue(ref);
-            }
-
-            public Double get(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Double get(final long... ref) {
-                return access.doubleValue(ref);
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return PrimitiveAnyD.wrap(access);
     }
 
     static boolean equals(final AccessAnyD<?> accessA, final AccessAnyD<?> accessB, final NumberContext accuracy) {
@@ -604,6 +623,14 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
                 return AccessAnyD.this.shape();
             }
 
+            public int size() {
+                return AccessAnyD.this.size();
+            }
+
+            public int size(final int dimension) {
+                return AccessAnyD.this.size(dimension);
+            }
+
             public void supplyTo(final R receiver) {
                 receiver.accept(AccessAnyD.this);
             }
@@ -611,88 +638,57 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         };
     }
 
-    @Override
-    default byte byteValue(final int index) {
-        return this.byteValue((long) index);
-    }
-
-    @Override
-    default byte byteValue(final long index) {
-        return this.byteValue(StructureAnyD.reference(index, this.shape()));
+    default byte byteValue(final int... ref) {
+        return this.byteValue(StructureAnyD.index(this, ref));
     }
 
     default byte byteValue(final long... ref) {
-        return (byte) this.shortValue(ref);
+        return this.byteValue(StructureAnyD.index(this, ref));
     }
 
-    @Override
-    default double doubleValue(final int index) {
-        return this.doubleValue((long) index);
+    default double doubleValue(final int... ref) {
+        return this.doubleValue(StructureAnyD.index(this, ref));
     }
 
-    /**
-     * Will pass through each matching element position calling the {@code through} function. What happens is
-     * entirely dictated by how you implement the callback.
-     */
-    @Override
-    default double doubleValue(final long index) {
-        return this.doubleValue(StructureAnyD.reference(index, this.shape()));
+    default double doubleValue(final long... ref) {
+        return this.doubleValue(StructureAnyD.index(this, ref));
     }
-
-    double doubleValue(long... ref);
 
     @Override
     default ElementViewAnyD<N, ?> elements() {
         return new AccessAnyD.ElementView<>(Access1D.super.elements(), this.shape());
     }
 
-    @Override
-    default float floatValue(final int index) {
-        return this.floatValue((long) index);
-    }
-
-    @Override
-    default float floatValue(final long index) {
-        return this.floatValue(StructureAnyD.reference(index, this.shape()));
+    default float floatValue(final int... ref) {
+        return this.floatValue(StructureAnyD.index(this, ref));
     }
 
     default float floatValue(final long... ref) {
-        return (float) this.doubleValue(ref);
+        return this.floatValue(StructureAnyD.index(this, ref));
     }
 
-    @Override
-    default N get(final long index) {
-        return this.get(StructureAnyD.reference(index, this.shape()));
+    default N get(final int... ref) {
+        return this.get(StructureAnyD.index(this, ref));
     }
 
-    N get(long... ref);
-
-    @Override
-    default int intValue(final int index) {
-        return this.intValue((long) index);
+    default N get(final long... ref) {
+        return this.get(StructureAnyD.index(this, ref));
     }
 
-    @Override
-    default int intValue(final long index) {
-        return this.intValue(StructureAnyD.reference(index, this.shape()));
+    default int intValue(final int... ref) {
+        return this.intValue(StructureAnyD.index(this, ref));
     }
 
     default int intValue(final long... ref) {
-        return (int) this.longValue(ref);
+        return this.intValue(StructureAnyD.index(this, ref));
     }
 
-    @Override
-    default long longValue(final int index) {
-        return this.longValue((long) index);
-    }
-
-    @Override
-    default long longValue(final long index) {
-        return this.longValue(StructureAnyD.reference(index, this.shape()));
+    default long longValue(final int... ref) {
+        return this.longValue(StructureAnyD.index(this, ref));
     }
 
     default long longValue(final long... ref) {
-        return Math.round(this.doubleValue(ref));
+        return this.longValue(StructureAnyD.index(this, ref));
     }
 
     default MatrixView<N> matrices() {
@@ -711,18 +707,12 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         return new AccessAnyD.SelectionView<>(this, selections);
     }
 
-    @Override
-    default short shortValue(final int index) {
-        return this.shortValue((long) index);
-    }
-
-    @Override
-    default short shortValue(final long index) {
-        return this.shortValue(StructureAnyD.reference(index, this.shape()));
+    default short shortValue(final int... ref) {
+        return this.shortValue(StructureAnyD.index(this, ref));
     }
 
     default short shortValue(final long... ref) {
-        return (short) this.intValue(ref);
+        return this.shortValue(StructureAnyD.index(this, ref));
     }
 
     default VectorView<N> vectors() {

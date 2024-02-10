@@ -37,9 +37,9 @@ public class StoreProblems extends MatrixStoreTests {
 
     static class EyeStore implements MatrixStore<Double> {
 
-        private final long myCountRows, myCountColumns;
+        private final int myCountRows, myCountColumns;
 
-        EyeStore(final long countRows, final long countColumns) {
+        EyeStore(final int countRows, final int countColumns) {
             super();
             myCountRows = countRows;
             myCountColumns = countColumns;
@@ -73,6 +73,16 @@ public class StoreProblems extends MatrixStoreTests {
         @Override
         public Double get(final int row, final int col) {
             return this.doubleValue(row, col);
+        }
+
+        @Override
+        public int getColDim() {
+            return myCountColumns;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myCountRows;
         }
 
         @Override

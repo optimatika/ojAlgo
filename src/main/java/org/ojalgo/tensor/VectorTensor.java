@@ -314,6 +314,11 @@ public final class VectorTensor<N extends Comparable<N>> extends ArrayBasedTenso
     }
 
     @Override
+    public int size() {
+        return myArray.size();
+    }
+
+    @Override
     public String toString() {
         return Access1D.toString(myArray);
     }

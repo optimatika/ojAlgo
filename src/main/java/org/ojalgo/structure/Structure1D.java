@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author apete
  */
+@FunctionalInterface
 public interface Structure1D {
 
     class BasicMapper<T> implements IndexMapper<T> {
@@ -58,20 +59,6 @@ public interface Structure1D {
             myKeys.add(newKey);
             return retVal;
         }
-
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    @FunctionalInterface
-    public interface IndexCallback {
-
-        /**
-         * @param index Index
-         */
-        void call(final long index);
 
     }
 
@@ -244,27 +231,6 @@ public interface Structure1D {
     }
 
     /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
-        long limit = Math.min(structureA.count(), structureB.count());
-        for (long i = 0L; i < limit; i++) {
-            callback.call(i);
-        }
-    }
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    static void loopRange(final long first, final long limit, final IndexCallback callback) {
-        for (long i = first; i < limit; i++) {
-            callback.call(i);
-        }
-    }
-
-    /**
      * @return A very simple implementation - you better come up with something else.
      */
     static <T> IndexMapper<T> mapper() {
@@ -329,24 +295,17 @@ public interface Structure1D {
 
     /**
      * The total number of elements in this structure.
+     * <p>
+     * You only need to implement this method if the structure can contain more than Integer.MAX_VALUE
+     * elements.
      */
-    long count();
-
-    /**
-     * @deprecated v53 Will be removed!
-     */
-    @Deprecated
-    default void loopAll(final IndexCallback callback) {
-        for (long i = 0L; i < this.count(); i++) {
-            callback.call(i);
-        }
+    default long count() {
+        return this.size();
     }
 
     /**
      * The total number of elements in this structure.
      */
-    default int size() {
-        return Math.toIntExact(this.count());
-    }
+    int size();
 
 }

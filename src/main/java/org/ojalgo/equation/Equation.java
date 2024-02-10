@@ -264,6 +264,11 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     }
 
     @Override
+    public int size() {
+        return myBody.size();
+    }
+
+    @Override
     public String toString() {
         return index + ": " + myBody.toString() + " = " + myRHS;
     }

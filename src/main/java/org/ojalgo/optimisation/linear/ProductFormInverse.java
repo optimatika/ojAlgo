@@ -74,6 +74,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
             myNegatedDiagonal = -diagonalElement;
         }
 
+        @Override
         public void btran(final PhysicalStore<Double> arg) {
 
             double f = -arg.doubleValue(myIndex);
@@ -93,14 +94,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
             }
         }
 
-        public long countColumns() {
-            return myColumn.count();
-        }
-
-        public long countRows() {
-            return myColumn.count();
-        }
-
+        @Override
         public void ftran(final PhysicalStore<Double> arg) {
 
             double d = arg.doubleValue(myIndex);
@@ -121,6 +115,16 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
             }
         }
 
+        @Override
+        public int getColDim() {
+            return myColumn.size();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myColumn.size();
+        }
+
         SparseArray<Double> getColumn() {
             return myColumn;
         }
@@ -131,8 +135,8 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
     private final int myDim;
     private final List<ElementaryFactor> myFactors = new ArrayList<>();
     private final LU<Double> myRoot;
-    private final Primitive64Store myWork;
     private final double myScalingThreshold;
+    private final Primitive64Store myWork;
 
     ProductFormInverse(final int dim, final double scalingThreshold) {
 
@@ -145,6 +149,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         myScalingThreshold = scalingThreshold;
     }
 
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
         for (int i = myFactors.size() - 1; i >= 0; i--) {
             myFactors.get(i).btran(arg);
@@ -154,14 +159,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         }
     }
 
-    public long countColumns() {
-        return myDim;
-    }
-
-    public long countRows() {
-        return myDim;
-    }
-
+    @Override
     public void ftran(final PhysicalStore<Double> arg) {
         if (myRoot.isSolvable()) {
             myRoot.btran(arg);
@@ -169,6 +167,16 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         for (InvertibleFactor<Double> factor : myFactors) {
             factor.ftran(arg);
         }
+    }
+
+    @Override
+    public int getColDim() {
+        return myDim;
+    }
+
+    @Override
+    public int getRowDim() {
+        return myDim;
     }
 
     private void clearFactors() {

@@ -207,6 +207,16 @@ public final class MatrixTensor<N extends Comparable<N>> extends ArrayBasedTenso
     }
 
     @Override
+    public int getColDim() {
+        return myArray.getColDim();
+    }
+
+    @Override
+    public int getRowDim() {
+        return myArray.getRowDim();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();

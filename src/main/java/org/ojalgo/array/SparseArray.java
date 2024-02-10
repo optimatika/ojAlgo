@@ -515,6 +515,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         this.update(index, internalIndex, value, false);
     }
 
+    @Override
+    public int size() {
+        return Math.toIntExact(myCount);
+    }
+
     public void supplyNonZerosTo(final Mutate1D consumer) {
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {
@@ -890,11 +895,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return new Access1D<>() {
 
             @Override
-            public long count() {
-                return limit - first;
-            }
-
-            @Override
             public double doubleValue(final int index) {
                 return myValues.doubleValue(first + index);
             }
@@ -907,6 +907,11 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             @Override
             public N get(final long index) {
                 return myValues.get(first + index);
+            }
+
+            @Override
+            public int size() {
+                return limit - first;
             }
 
         };

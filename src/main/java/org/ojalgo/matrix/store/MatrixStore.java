@@ -662,6 +662,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 return MatrixStore.this.get(row + index, col);
             }
 
+            public int size() {
+                return Math.toIntExact(this.count());
+            }
+
             @Override
             public String toString() {
                 return Access1D.toString(this);
@@ -684,6 +688,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
             public N get(final long index) {
                 return MatrixStore.this.get(row + index, col + index);
+            }
+
+            public int size() {
+                return Math.toIntExact(this.count());
             }
 
             @Override
@@ -710,6 +718,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
                 return MatrixStore.this.get(first + index);
             }
 
+            public int size() {
+                return Math.toIntExact(this.count());
+            }
+
             @Override
             public String toString() {
                 return Access1D.toString(this);
@@ -732,6 +744,10 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
 
             public N get(final long index) {
                 return MatrixStore.this.get(row, col + index);
+            }
+
+            public int size() {
+                return Math.toIntExact(this.count());
             }
 
             @Override

@@ -63,20 +63,24 @@ public interface InvertibleFactor<N extends Comparable<N>> extends Structure2D {
             myDim = dim;
         }
 
+        @Override
         public void btran(final PhysicalStore<N> arg) {
             // No-op
         }
 
-        public long countColumns() {
-            return myDim;
-        }
-
-        public long countRows() {
-            return myDim;
-        }
-
+        @Override
         public void ftran(final PhysicalStore<N> arg) {
             // No-op
+        }
+
+        @Override
+        public int getColDim() {
+            return myDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myDim;
         }
 
     }

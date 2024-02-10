@@ -346,6 +346,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.store().get(row, col);
     }
 
+    @Override
+    public int getColDim() {
+        return mySupplier.getColDim();
+    }
+
     /**
      * Matrix condition (2-norm)
      *
@@ -384,6 +389,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public int getRank() {
         return this.getRankProvider().getRank();
+    }
+
+    @Override
+    public int getRowDim() {
+        return mySupplier.getRowDim();
     }
 
     /**
@@ -646,6 +656,11 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     @Override
     public M signum() {
         return this.newInstance(this.store().signum());
+    }
+
+    @Override
+    public int size() {
+        return mySupplier.size();
     }
 
     /**

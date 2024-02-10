@@ -396,6 +396,16 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
     }
 
     @Override
+    public int getColDim() {
+        return myDelegate.getColDim();
+    }
+
+    @Override
+    public int getRowDim() {
+        return myDelegate.getRowDim();
+    }
+
+    @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
         if (!mySafe) {
             throw new IllegalStateException();
@@ -569,6 +579,11 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
             throw new IllegalStateException();
         }
         myDelegate.set(row, col, value);
+    }
+
+    @Override
+    public int size() {
+        return myDelegate.size();
     }
 
     @Override

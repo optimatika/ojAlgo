@@ -360,7 +360,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Receiver<N extends Comparable<N>> extends Mutate2D, Fillable<N>, Consumer<Access2D<?>> {
+    interface Receiver<N extends Comparable<N>> extends Fillable<N>, Consumer<Access2D<?>> {
 
         @Override
         default void accept(final Access2D<?> supplied) {

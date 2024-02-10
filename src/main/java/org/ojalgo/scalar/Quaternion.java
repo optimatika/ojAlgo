@@ -543,6 +543,11 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         return Double.valueOf(this.doubleValue(row, col));
     }
 
+    @Override
+    public int getColDim() {
+        return 4;
+    }
+
     /**
      * The fourth power of the norm of a quaternion is the determinant of the corresponding matrix.
      */
@@ -563,6 +568,11 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
         }
         return IJK;
 
+    }
+
+    @Override
+    public int getRowDim() {
+        return 4;
     }
 
     public double getVectorLength() {

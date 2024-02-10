@@ -177,11 +177,6 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         }
 
         @Override
-        public long count() {
-            return mySelection.length;
-        }
-
-        @Override
         public double doubleValue(final int index) {
             return myFullData.doubleValue(mySelection[index]);
         }
@@ -189,6 +184,11 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         @Override
         public N get(final long index) {
             return myFullData.get(mySelection[Math.toIntExact(index)]);
+        }
+
+        @Override
+        public int size() {
+            return mySelection.length;
         }
 
         @Override
@@ -227,27 +227,12 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v54 Use {@link Primitive1D#wrap(Structure1D)} instead
+     */
+    @Deprecated
     static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
-        return new Access1D<>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final int index) {
-                return access.doubleValue(index);
-            }
-
-            public Double get(final long index) {
-                return Double.valueOf(access.doubleValue(index));
-            }
-
-            @Override
-            public String toString() {
-                return Access1D.toString(this);
-            }
-
-        };
+        return Primitive1D.wrap(access);
     }
 
     /**
@@ -309,34 +294,11 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     static Access1D<Double> wrap(final double... target) {
-        return new Access1D<>() {
-
-            public long count() {
-                return target.length;
-            }
-
-            public double doubleValue(final int index) {
-                return target[index];
-            }
-
-            public Double get(final long index) {
-                return Double.valueOf(this.doubleValue(index));
-            }
-
-            @Override
-            public String toString() {
-                return Access1D.toString(this);
-            }
-
-        };
+        return Primitive1D.of(target);
     }
 
     static <N extends Comparable<N>> Access1D<N> wrap(final List<? extends N> target) {
         return new Access1D<>() {
-
-            public long count() {
-                return target.size();
-            }
 
             public double doubleValue(final int index) {
                 return NumberDefinition.doubleValue(target.get(index));
@@ -344,6 +306,10 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
             public N get(final long index) {
                 return target.get(Math.toIntExact(index));
+            }
+
+            public int size() {
+                return target.size();
             }
 
             @Override
@@ -357,16 +323,16 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     static <N extends Comparable<N>> Access1D<N> wrap(final N[] target) {
         return new Access1D<>() {
 
-            public long count() {
-                return target.length;
-            }
-
             public double doubleValue(final int index) {
                 return NumberDefinition.doubleValue(target[index]);
             }
 
             public N get(final long index) {
                 return target[Math.toIntExact(index)];
+            }
+
+            public int size() {
+                return target.length;
             }
 
             @Override
@@ -384,8 +350,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
         return new Collectable<>() {
 
-            public long count() {
-                return Access1D.this.count();
+            public int size() {
+                return Access1D.this.size();
             }
 
             public void supplyTo(final R receiver) {

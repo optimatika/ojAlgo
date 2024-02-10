@@ -737,7 +737,7 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
 
     @Override
     public long[] shape() {
-        return myStructure;
+        return myStructure.clone();
     }
 
     @Override
@@ -753,6 +753,16 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     @Override
     public short shortValue(final long... ref) {
         return myDelegate.shortValue(StructureAnyD.index(myStructure, ref));
+    }
+
+    @Override
+    public int size() {
+        return myDelegate.size();
+    }
+
+    @Override
+    public int size(final int dimension) {
+        return Math.toIntExact(this.count(dimension));
     }
 
     @Override

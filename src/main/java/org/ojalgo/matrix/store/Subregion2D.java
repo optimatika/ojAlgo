@@ -131,6 +131,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public int getColDim() {
+            return myColumns.length;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBase.getRowDim();
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -237,6 +247,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public N get(final long row, final long col) {
             return myBase.get(row, col);
+        }
+
+        @Override
+        public int getColDim() {
+            return myColumnLimit;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myRowLimit;
         }
 
         @Override
@@ -392,6 +412,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public int getColDim() {
+            return myBase.getColDim() - myColumnOffset;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBase.getRowDim() - myRowOffset;
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -533,6 +563,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public int getColDim() {
+            return myBase.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myRows.length;
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -666,6 +706,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
+        public int getColDim() {
+            return myBase.getRowDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBase.getColDim();
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -751,6 +801,16 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public N get(final long row, final long col) {
             return myBase.get(row, col);
+        }
+
+        @Override
+        public int getColDim() {
+            return myBase.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBase.getRowDim();
         }
 
         @Override

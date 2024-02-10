@@ -16,6 +16,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - Refactored the builder/factory interfaces to better support creating immutable 1D, 2D or AnyD structures. This has implications for most ojAlgo data structures. There are deprecations in all factory classes, but everything that worked before still works (I believe).
+- The `Structure*D`, `Access*D`, `Mutate*D` and `Factory*D` interfaces have all been refactored to make working with `int` indices (rather than `long`) the primary alternative. Huge data structures, that require `long` indices, are still suported – no change in this regard. In reality only a few implementations actually allowed to create such large instances. This change is to allow all the other classes to be implemented using `int` and not bother (so much) with `long`. Users of the various classes in ojAlgo should see no difference. If you have created your own classes implementing some of ojAlgo's interfaces you will probably need to implement some additional methods in those classes.
 
 ## [53.3.0] – 2024-02-04
 

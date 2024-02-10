@@ -536,6 +536,16 @@ public final class Array2D<N extends Comparable<N>>
     }
 
     @Override
+    public int getColDim() {
+        return Math.toIntExact(myColumnsCount);
+    }
+
+    @Override
+    public int getRowDim() {
+        return Math.toIntExact(myRowsCount);
+    }
+
+    @Override
     public int hashCode() {
         int prime = 31;
         int result = 1;

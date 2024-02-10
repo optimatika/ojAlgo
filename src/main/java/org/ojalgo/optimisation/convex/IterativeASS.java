@@ -86,16 +86,6 @@ final class IterativeASS extends ActiveSetSolver {
         }
 
         @Override
-        public long countColumns() {
-            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
-        }
-
-        @Override
-        public long countRows() {
-            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
-        }
-
-        @Override
         public double doubleValue(final int row, final int col) {
 
             int intRow = row;
@@ -111,6 +101,16 @@ final class IterativeASS extends ActiveSetSolver {
         @Override
         public Double get(final int row, final int col) {
             return Double.valueOf(this.doubleValue(row, col));
+        }
+
+        @Override
+        public int getColDim() {
+            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
+        }
+
+        @Override
+        public int getRowDim() {
+            return IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countIncluded();
         }
 
         @Override

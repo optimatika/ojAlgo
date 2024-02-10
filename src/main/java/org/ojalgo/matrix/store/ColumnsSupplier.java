@@ -44,6 +44,16 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         }
 
         @Override
+        public int getColDim() {
+            return 1;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myBase.getRowDim();
+        }
+
+        @Override
         public ElementView1D<N, ?> nonzeros() {
             return this.getCurrent().nonzeros();
         }
@@ -111,6 +121,14 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
                 return ColumnsSupplier.this.get(row, columns[col]);
             }
 
+            public int getColDim() {
+                return columns.length;
+            }
+
+            public int getRowDim() {
+                return ColumnsSupplier.this.getRowDim();
+            }
+
             public Factory<N, ?> physical() {
                 return ColumnsSupplier.this.physical();
             }
@@ -133,6 +151,7 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
             public String toString() {
                 return Access2D.toString(this);
             }
+
         };
     }
 
@@ -161,8 +180,18 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
         return myColumns.get(col).get(row);
     }
 
+    @Override
+    public int getColDim() {
+        return myColumns.size();
+    }
+
     public SparseArray<N> getColumn(final int index) {
         return myColumns.get(index);
+    }
+
+    @Override
+    public int getRowDim() {
+        return myRowsCount;
     }
 
     @Override

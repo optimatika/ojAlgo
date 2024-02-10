@@ -30,6 +30,7 @@ import java.util.stream.StreamSupport;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -189,6 +190,11 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         @Override
         public void remove() {
             ProgrammingError.throwForUnsupportedOptionalOperation();
+        }
+
+        @Override
+        public int size() {
+            return myDelegate2D.getRowDim();
         }
 
         public Stream<ColumnView<N>> stream() {
@@ -439,6 +445,11 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             return myRow;
         }
 
+        @Override
+        public int size() {
+            return myDelegate2D.getColDim();
+        }
+
         public Stream<RowView<N>> stream() {
             return StreamSupport.stream(this, false);
         }
@@ -529,6 +540,16 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         }
 
         @Override
+        public int getColDim() {
+            return myColumns.length;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myRows.length;
+        }
+
+        @Override
         public void supplyTo(final Mutate2D receiver) {
             for (int j = 0; j < myColumns.length; j++) {
                 for (int i = 0; i < myRows.length; i++) {
@@ -609,39 +630,12 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     }
 
+    /**
+     * @deprecated v54 Use {@link Primitive2D#wrap(Structure2D)} instead
+     */
+    @Deprecated
     static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
-        return new Access2D<>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final int row, final int col) {
-                return access.doubleValue(row, col);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public Double get(final long row, final long col) {
-                return Double.valueOf(access.doubleValue(row, col));
-            }
-
-            @Override
-            public String toString() {
-                return Access2D.toString(this);
-            }
-
-        };
+        return Primitive2D.wrap(access);
     }
 
     static boolean equals(final Access2D<?> accessA, final Access2D<?> accessB, final NumberContext accuracy) {
@@ -657,6 +651,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
             public long countRows() {
                 return anything1D.count();
+            }
+
+            public int getColDim() {
+                return 1;
+            }
+
+            public int getRowDim() {
+                return anything1D.size();
             }
 
             public void supplyTo(final R receiver) {
@@ -676,6 +678,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
             public long countRows() {
                 return 1L;
+            }
+
+            public int getColDim() {
+                return anything1D.size();
+            }
+
+            public int getRowDim() {
+                return 1;
             }
 
             public void supplyTo(final R receiver) {
@@ -726,38 +736,7 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
     }
 
     static Access2D<Double> wrap(final double[][] target) {
-        return new Access2D<>() {
-
-            public long count() {
-                return Structure2D.count(target.length, target[0].length);
-            }
-
-            public long countColumns() {
-                return target[0].length;
-            }
-
-            public long countRows() {
-                return target.length;
-            }
-
-            public double doubleValue(final int row, final int col) {
-                return target[row][col];
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return target[Math.toIntExact(row)][Math.toIntExact(col)];
-            }
-
-            public Double get(final long row, final long col) {
-                return Double.valueOf(target[Math.toIntExact(row)][Math.toIntExact(col)]);
-            }
-
-            @Override
-            public String toString() {
-                return Access2D.toString(this);
-            }
-
-        };
+        return RawStore.wrap(target);
     }
 
     static <N extends Comparable<N>> Access2D<N> wrap(final N[][] target) {
@@ -787,6 +766,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
                 return target[Math.toIntExact(row)][Math.toIntExact(col)];
             }
 
+            public int getColDim() {
+                return target[0].length;
+            }
+
+            public int getRowDim() {
+                return target.length;
+            }
+
             @Override
             public String toString() {
                 return Access2D.toString(this);
@@ -804,6 +791,14 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
             public long countRows() {
                 return Access2D.this.countRows();
+            }
+
+            public int getColDim() {
+                return Access2D.this.getColDim();
+            }
+
+            public int getRowDim() {
+                return Access2D.this.getRowDim();
             }
 
             public void supplyTo(final R receiver) {

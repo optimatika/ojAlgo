@@ -48,16 +48,6 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
     }
 
     @Override
-    public void loopColumn(final long col, final RowColumnCallback callback) {
-        this.base().loopRow(col, callback);
-    }
-
-    @Override
-    public void loopRow(final long row, final RowColumnCallback callback) {
-        this.base().loopColumn(row, callback);
-    }
-
-    @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         MatrixStore<N> retVal;

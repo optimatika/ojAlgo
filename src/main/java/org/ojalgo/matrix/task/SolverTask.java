@@ -49,22 +49,26 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
             Structure2D templateBody = new Structure2D() {
 
-                public long countColumns() {
+                @Override
+                public int getColDim() {
                     return numberOfVariables;
                 }
 
-                public long countRows() {
+                @Override
+                public int getRowDim() {
                     return numberOfEquations;
                 }
             };
 
             Structure2D templateRHS = new Structure2D() {
 
-                public long countColumns() {
+                @Override
+                public int getColDim() {
                     return numberOfSolutions;
                 }
 
-                public long countRows() {
+                @Override
+                public int getRowDim() {
                     return numberOfEquations;
                 }
             };
@@ -112,6 +116,52 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
      */
     @Deprecated
     Factory<ComplexNumber> COMPLEX = C128;
+
+    Factory<Quaternion> H256 = new Factory<>() {
+
+        @Override
+        public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.H256.make(templateBody);
+                } else {
+                    return LU.H256.make(templateBody);
+                }
+            } else if (templateBody.isTall()) {
+                return QR.H256.make(templateBody);
+            } else {
+                return SingularValue.H256.make(templateBody);
+            }
+        }
+
+    };
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
+
+        @Override
+        public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.Q128.make(templateBody);
+                } else {
+                    return LU.Q128.make(templateBody);
+                }
+            } else if (templateBody.isTall()) {
+                return QR.Q128.make(templateBody);
+            } else {
+                return SingularValue.Q128.make(templateBody);
+            }
+        }
+
+    };
+
+    /**
+     * @deprecated Use {@link #H256} instead.
+     */
+    @Deprecated
+    Factory<Quaternion> QUATERNION = H256;
 
     Factory<Double> R064 = new Factory<>() {
 
@@ -167,12 +217,6 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    /**
-     * @deprecated Use {@link #R064} instead.
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
     Factory<Quadruple> R128 = new Factory<>() {
 
         @Override
@@ -194,83 +238,45 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
     };
 
     /**
+     * @deprecated Use {@link #Q128} instead.
+     */
+    @Deprecated
+    Factory<RationalNumber> RATIONAL = Q128;
+    /**
+     * @deprecated Use {@link #R064} instead.
+     */
+    @Deprecated
+    Factory<Double> PRIMITIVE = R064;
+    /**
      * @deprecated Use {@link #R128} instead.
      */
     @Deprecated
     Factory<Quadruple> QUADRUPLE = R128;
 
-    Factory<Quaternion> H256 = new Factory<>() {
-
-        @Override
-        public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
-                final boolean positiveDefinite) {
-            if (templateBody.isSquare()) {
-                if (symmetric && positiveDefinite) {
-                    return Cholesky.H256.make(templateBody);
-                } else {
-                    return LU.H256.make(templateBody);
-                }
-            } else if (templateBody.isTall()) {
-                return QR.H256.make(templateBody);
-            } else {
-                return SingularValue.H256.make(templateBody);
-            }
-        }
-
-    };
-
-    /**
-     * @deprecated Use {@link #H256} instead.
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    Factory<RationalNumber> Q128 = new Factory<>() {
-
-        @Override
-        public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
-                final boolean positiveDefinite) {
-            if (templateBody.isSquare()) {
-                if (symmetric && positiveDefinite) {
-                    return Cholesky.Q128.make(templateBody);
-                } else {
-                    return LU.Q128.make(templateBody);
-                }
-            } else if (templateBody.isTall()) {
-                return QR.Q128.make(templateBody);
-            } else {
-                return SingularValue.Q128.make(templateBody);
-            }
-        }
-
-    };
-
-    /**
-     * @deprecated Use {@link #Q128} instead.
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
-
     default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
 
         Structure2D templateBody = new Structure2D() {
 
-            public long countColumns() {
+            @Override
+            public int getColDim() {
                 return numberOfVariables;
             }
 
-            public long countRows() {
+            @Override
+            public int getRowDim() {
                 return numberOfEquations;
             }
         };
 
         Structure2D templateRHS = new Structure2D() {
 
-            public long countColumns() {
+            @Override
+            public int getColDim() {
                 return numberOfSolutions;
             }
 
-            public long countRows() {
+            @Override
+            public int getRowDim() {
                 return numberOfEquations;
             }
         };
