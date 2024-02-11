@@ -211,29 +211,9 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> C128 = new GenericStore.Factory<>(ArrayC128.FACTORY);
-    /**
-     * @deprecated Use {@link #C128} instead
-     */
-    @Deprecated
-    public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = C128;
     public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> H256 = new GenericStore.Factory<>(ArrayH256.FACTORY);
     public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> Q128 = new GenericStore.Factory<>(ArrayQ128.FACTORY);
     public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> R128 = new GenericStore.Factory<>(ArrayR128.FACTORY);
-    /**
-     * @deprecated Use {@link #R128} instead
-     */
-    @Deprecated
-    public static final PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> QUADRUPLE = R128;
-    /**
-     * @deprecated Use {@link #H256} instead
-     */
-    @Deprecated
-    public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = H256;
-    /**
-     * @deprecated Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = Q128;
 
     public static <N extends Scalar<N>> GenericStore<N> wrap(final GenericStore.Factory<N> factory, final N... data) {
         return new GenericStore<>(factory, data.length, 1, data);

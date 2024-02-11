@@ -156,7 +156,7 @@ public class StoreProblems extends MatrixStoreTests {
         Primitive64Store m = storeFactory.rows(data);
         Primitive64Store r = storeFactory.make(m.countRows(), m.countColumns());
 
-        QR<Double> qr = QR.PRIMITIVE.make(true);
+        QR<Double> qr = QR.R064.make(true);
         qr.decompose(m);
 
         if (DEBUG) {

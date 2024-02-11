@@ -42,12 +42,12 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
     private static LU<Double> JAMA_LU = new RawLU();
     private static QR<Double> JAMA_QR = new RawQR();
     private static SingularValue<Double> JAMA_SVD = new RawSingularValue();
-    private static Cholesky<Double> PRIMITIVE_CHOLESKY = Cholesky.PRIMITIVE.make();
-    private static LU<Double> PRIMITIVE_DENSE_LU = LU.PRIMITIVE.make();
-    private static Eigenvalue<Double> PRIMITIVE_EvD = Eigenvalue.PRIMITIVE.make();
-    private static QR<Double> PRIMITIVE_QR = QR.PRIMITIVE.make();
-    private static LU<Double> PRIMITIVE_RAW_LU = LU.PRIMITIVE.make();
-    private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.PRIMITIVE.make();
+    private static Cholesky<Double> PRIMITIVE_CHOLESKY = Cholesky.R064.make();
+    private static LU<Double> PRIMITIVE_DENSE_LU = LU.R064.make();
+    private static Eigenvalue<Double> PRIMITIVE_EvD = Eigenvalue.R064.make();
+    private static QR<Double> PRIMITIVE_QR = QR.R064.make();
+    private static LU<Double> PRIMITIVE_RAW_LU = LU.R064.make();
+    private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.R064.make();
 
     @Override
     @BeforeEach

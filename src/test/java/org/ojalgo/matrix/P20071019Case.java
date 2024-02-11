@@ -72,8 +72,8 @@ public class P20071019Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
-        LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
+        LU<Double> tmpJamaLU = LU.R064.make();
+        LU<Double> tmpDenseLU = LU.R064.make();
 
         MatrixStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getFatProblematic());
 

@@ -56,7 +56,7 @@ public class SubstitutionTest extends ArrayOperationTests {
         TestUtils.assertEquals(expected, rawRHS);
         TestUtils.assertEquals(expected, rationalRHS);
 
-        Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(numbEquations, numbEquations);
+        Cholesky<Double> cholesky = Cholesky.R064.make(numbEquations, numbEquations);
         cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getR();
@@ -101,7 +101,7 @@ public class SubstitutionTest extends ArrayOperationTests {
         TestUtils.assertEquals(expected, rawRHS);
         TestUtils.assertEquals(expected, rationalRHS);
 
-        Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(numbEquations, numbEquations);
+        Cholesky<Double> cholesky = Cholesky.R064.make(numbEquations, numbEquations);
         cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getL();

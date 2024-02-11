@@ -51,7 +51,7 @@ public class LongToNumberMapTest extends ArrayTests {
     public void testCompareWithTreeMap() {
 
         final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(ArrayR064.FACTORY).make();
-        final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.DIRECT64).make();
+        final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.R064).make();
 
         final SortedMap<Long, Double> expectedMap = new TreeMap<>();
 

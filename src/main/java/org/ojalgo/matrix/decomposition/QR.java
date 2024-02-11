@@ -71,6 +71,10 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
 
     Factory<ComplexNumber> C128 = (typical, fullSize) -> new QRDecomposition.C128(fullSize);
 
+    Factory<Quaternion> H256 = (typical, fullSize) -> new QRDecomposition.H256(fullSize);
+
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new QRDecomposition.Q128(fullSize);
+
     Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
             return new QRDecomposition.R064(fullSize);
@@ -79,40 +83,6 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
     };
 
     Factory<Quadruple> R128 = (typical, fullSize) -> new QRDecomposition.R128(fullSize);
-
-    Factory<Quaternion> H256 = (typical, fullSize) -> new QRDecomposition.H256(fullSize);
-
-    Factory<RationalNumber> Q128 = (typical, fullSize) -> new QRDecomposition.Q128(fullSize);
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quadruple> QUADRUPLE = R128;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
 

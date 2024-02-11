@@ -45,7 +45,7 @@ public class FinanceUtilsTest extends FinanceTests {
 
         MatrixR064 original = MatrixR064.FACTORY.rows(rawOriginal);
 
-        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(original);
+        SingularValue<Double> svd = SingularValue.R064.make(original);
         svd.decompose(original);
         double refCondition = svd.getCondition();
         int refRank = svd.getRank();

@@ -96,7 +96,7 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
     public static final class CodeAndData {
 
         public static QR<Double> newInstance(final int dim) {
-            return QR.PRIMITIVE.make(2 * dim, dim);
+            return QR.R064.make(2 * dim, dim);
         }
 
         public static QR<Double> newPrimitive() {

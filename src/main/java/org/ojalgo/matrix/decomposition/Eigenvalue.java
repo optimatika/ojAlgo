@@ -234,8 +234,58 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.C128;
-            Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
+            Cholesky<ComplexNumber> cholesky = Cholesky.C128.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    /**
+     * Sorts on the norm in descending order. If the 2 eigenvalues have equal norm then the usual
+     * {@link ComplexNumber} sort order is used (reversed).
+     */
+    Comparator<ComplexNumber> DESCENDING_NORM = (arg1, arg2) -> {
+        int retVal = Double.compare(arg2.norm(), arg1.norm());
+        if (retVal == 0) {
+            return arg2.compareTo(arg1);
+        }
+        return retVal;
+    };
+
+    Factory<Quaternion> H256 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.H256() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.H256;
+            Cholesky<Quaternion> cholesky = Cholesky.H256.make(typical);
+            Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
+        }
+
+    };
+
+    Factory<RationalNumber> Q128 = new Factory<>() {
+
+        @Override
+        public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Q128() : null;
+        }
+
+        @Override
+        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
+
+            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.Q128;
+            Cholesky<RationalNumber> cholesky = Cholesky.Q128.make(typical);
+            Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
             return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
@@ -270,46 +320,8 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
-            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
+            Cholesky<Double> cholesky = Cholesky.R064.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
-        }
-
-    };
-
-    Factory<Quaternion> H256 = new Factory<>() {
-
-        @Override
-        public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.H256() : null;
-        }
-
-        @Override
-        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
-
-            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.H256;
-            Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
-            Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
-
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
-        }
-
-    };
-
-    Factory<RationalNumber> Q128 = new Factory<>() {
-
-        @Override
-        public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Q128() : null;
-        }
-
-        @Override
-        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
-
-            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.Q128;
-            Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
-            Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
             return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
@@ -327,55 +339,13 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         public Eigenvalue.Generalised<Quadruple> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<Quadruple, GenericStore<Quadruple>> factory = GenericStore.R128;
-            Cholesky<Quadruple> cholesky = Cholesky.QUADRUPLE.make(typical);
+            Cholesky<Quadruple> cholesky = Cholesky.R128.make(typical);
             Eigenvalue<Quadruple> eigenvalue = this.make(typical, true);
 
             return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
 
     };
-
-    /**
-     * Sorts on the norm in descending order. If the 2 eigenvalues have equal norm then the usual
-     * {@link ComplexNumber} sort order is used (reversed).
-     */
-    Comparator<ComplexNumber> DESCENDING_NORM = (arg1, arg2) -> {
-        int retVal = Double.compare(arg2.norm(), arg1.norm());
-        if (retVal == 0) {
-            return arg2.compareTo(arg1);
-        }
-        return retVal;
-    };
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quadruple> QUADRUPLE = R128;
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
 

@@ -34,12 +34,12 @@ public class DirectCleanupTest extends ArrayTests {
 
     public static void main(final String[] args) {
 
-        DenseArray<Double> tmpOrg = BufferArray.DIRECT64.make(SIZE);
+        DenseArray<Double> tmpOrg = BufferArray.R064.make(SIZE);
         tmpOrg.fillAll(new Uniform());
 
         while (true) {
 
-            final DenseArray<Double> tmpCopy = BufferArray.DIRECT64.make(SIZE);
+            final DenseArray<Double> tmpCopy = BufferArray.R064.make(SIZE);
 
             final long start = System.nanoTime();
             tmpCopy.fillMatching(tmpOrg);

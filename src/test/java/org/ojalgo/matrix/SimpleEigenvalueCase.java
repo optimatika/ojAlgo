@@ -87,7 +87,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         BasicMatrix<?, ?> actMtrx;
         BasicMatrix<?, ?> expMtrx;
 
-        Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> tmpEigen = Eigenvalue.R064.make();
         tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
         MatrixStore<Double> tmpV = tmpEigen.getV();

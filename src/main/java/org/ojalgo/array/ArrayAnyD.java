@@ -126,49 +126,9 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     public static final Factory<Double> R064 = ArrayAnyD.factory(ArrayR064.FACTORY);
     public static final Factory<Quadruple> R128 = ArrayAnyD.factory(ArrayR128.FACTORY);
     public static final Factory<BigDecimal> R256 = ArrayAnyD.factory(ArrayR256.FACTORY);
-    /**
-     * @deprecated v52 Use {@link #R256} instead
-     */
-    @Deprecated
-    public static final Factory<BigDecimal> BIG = R256;
     public static final Factory<ComplexNumber> C128 = ArrayAnyD.factory(ArrayC128.FACTORY);
-    /**
-     * @deprecated v52 Use {@link #C128} instead
-     */
-    @Deprecated
-    public static final Factory<ComplexNumber> COMPLEX = C128;
-    /**
-     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
-     */
-    @Deprecated
-    public static final Factory<Double> DIRECT32 = ArrayAnyD.factory(BufferArray.DIRECT32);
-    /**
-     * @deprecated v52 Use {@link #factory(DenseArray.Factory)} instead
-     */
-    @Deprecated
-    public static final Factory<Double> DIRECT64 = ArrayAnyD.factory(BufferArray.DIRECT64);
     public static final Factory<Quaternion> H256 = ArrayAnyD.factory(ArrayH256.FACTORY);
-    /**
-     * @deprecated v52 Use {@link #R032} instead
-     */
-    @Deprecated
-    public static final Factory<Double> PRIMITIVE32 = R032;
-    /**
-     * @deprecated v52 Use {@link #R064} instead
-     */
-    @Deprecated
-    public static final Factory<Double> PRIMITIVE64 = R064;
     public static final Factory<RationalNumber> Q128 = ArrayAnyD.factory(ArrayQ128.FACTORY);
-    /**
-     * @deprecated v52 Use {@link #H256} instead
-     */
-    @Deprecated
-    public static final Factory<Quaternion> QUATERNION = H256;
-    /**
-     * @deprecated v52 Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static final Factory<RationalNumber> RATIONAL = Q128;
     public static final Factory<Double> Z008 = ArrayAnyD.factory(ArrayZ008.FACTORY);
     public static final Factory<Double> Z016 = ArrayAnyD.factory(ArrayZ016.FACTORY);
     public static final Factory<Double> Z032 = ArrayAnyD.factory(ArrayZ032.FACTORY);

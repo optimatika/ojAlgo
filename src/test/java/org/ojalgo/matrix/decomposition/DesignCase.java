@@ -160,7 +160,7 @@ public class DesignCase extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.makeFilled(3, 9, new Normal());
         PhysicalStore<Double> tmpB = Primitive64Store.FACTORY.makeFilled(3, 1, new Normal());
 
-        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.R064.make(tmpA);
         tmpQR.decompose(tmpA);
 
         PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
@@ -217,7 +217,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testTridiagonal() {
 
-        Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
+        Tridiagonal<Double> tmpDecomposition = Tridiagonal.R064.make();
         //  Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
         PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
@@ -239,13 +239,13 @@ public class DesignCase extends MatrixDecompositionTests {
 
         NumberContext precision = NumberContext.of(14, 8);
 
-        QR<Double> decompPriQR = QR.PRIMITIVE.make(true);
+        QR<Double> decompPriQR = QR.R064.make(true);
         decompPriQR.decompose(mtrxAt);
         TestUtils.assertEquals(mtrxAt, decompPriQR, precision);
         TestUtils.assertEquals(3, decompPriQR.getQ().countRows());
         TestUtils.assertEquals(3, decompPriQR.getQ().countColumns());
 
-        SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
+        SingularValue<Double> decompPriSVD = SingularValue.R064.make(true);
         decompPriSVD.decompose(mtrxA);
         TestUtils.assertEquals(mtrxA, decompPriSVD, precision);
         TestUtils.assertEquals(3, decompPriSVD.getV().countRows());

@@ -34,7 +34,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public class ArrayC128 extends ScalarArray<ComplexNumber> {
+public final class ArrayC128 extends ScalarArray<ComplexNumber> {
 
     public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<>() {
 

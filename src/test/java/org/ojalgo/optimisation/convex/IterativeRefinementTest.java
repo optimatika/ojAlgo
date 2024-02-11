@@ -73,7 +73,7 @@ public class IterativeRefinementTest extends OptimisationConvexTests {
 
             MatrixStore<RationalNumber> body = mtrxQ.right(mtrxAE.transpose()).below(mtrxAE);
             MatrixStore<RationalNumber> rhs = mtrxC.below(mtrxBE); // C-matrix already negated
-            SolverTask<RationalNumber> solver = SolverTask.RATIONAL.make(body, rhs);
+            SolverTask<RationalNumber> solver = SolverTask.Q128.make(body, rhs);
 
             MatrixStore<RationalNumber> expected = solver.solve(body, rhs);
 

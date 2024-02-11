@@ -50,8 +50,8 @@ import org.ojalgo.type.context.NumberContext;
 
 public class CaseSingularValue extends MatrixDecompositionTests {
 
-    private static final SingularValue<RationalNumber> IMPL_BIG = SingularValue.RATIONAL.make();
-    private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
+    private static final SingularValue<RationalNumber> IMPL_BIG = SingularValue.Q128.make();
+    private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.C128.make();
     private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.R064();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
@@ -236,8 +236,8 @@ public class CaseSingularValue extends MatrixDecompositionTests {
         ComplexNumber[] tmpScales = { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, 4.0 * Math.PI / 3.0) };
 
-        Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
-        SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
+        Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.C128.make();
+        SingularValue<ComplexNumber> tmpSVD = SingularValue.C128.make();
 
         for (ComplexNumber tmpScale : tmpScales) {
 
@@ -379,7 +379,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         PhysicalStore<ComplexNumber> tmpOriginal = TestUtils.makeRandomComplexStore(4, 4);
 
-        SingularValue<ComplexNumber> tmpDecomposition = SingularValue.COMPLEX.make();
+        SingularValue<ComplexNumber> tmpDecomposition = SingularValue.C128.make();
 
         tmpDecomposition.decompose(tmpOriginal);
 

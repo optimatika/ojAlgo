@@ -71,7 +71,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
 
-        final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.PRIMITIVE.make();
+        final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.R064.make();
         tmpDecomposition.decompose(aMatrix);
 
         if (!Hessenberg.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {

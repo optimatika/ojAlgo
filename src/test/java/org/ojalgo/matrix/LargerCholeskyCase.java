@@ -52,7 +52,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
         mtrxB = LargerCholeskyCase.getOriginal();
 
-        Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
+        Cholesky<Double> tmpCholesky = Cholesky.R064.make();
         tmpCholesky.decompose(mtrxB);
 
         mtrxA = MatrixR064.FACTORY.copy(tmpCholesky.getL());
@@ -68,7 +68,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public void testData() {
 
         MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
-        Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        Cholesky<Double> tmpDecomp = Cholesky.R064.make();
         tmpDecomp.decompose(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }
@@ -77,7 +77,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public void testProblem() {
 
         MatrixR064 tmpMtrx = LargerCholeskyCase.getOriginal();
-        Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        Cholesky<Double> tmpDecomp = Cholesky.R064.make();
         tmpDecomp.decompose(tmpMtrx);
 
         TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, ACCURACY);

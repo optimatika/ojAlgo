@@ -97,16 +97,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     public static final DenseArray.Factory<Double> Z016 = new Factory(MathType.Z016, OffHeapZ016::new);
     public static final DenseArray.Factory<Double> Z032 = new Factory(MathType.Z032, OffHeapZ032::new);
     public static final DenseArray.Factory<Double> Z064 = new Factory(MathType.Z064, OffHeapZ064::new);
-    /**
-     * @deprecated Use {@link #R032} instead
-     */
-    @Deprecated
-    public static final DenseArray.Factory<Double> NATIVE32 = R032;
-    /**
-     * @deprecated Use {@link #R064} instead
-     */
-    @Deprecated
-    public static final DenseArray.Factory<Double> NATIVE64 = R064;
 
     /**
      * @deprecated Use {@link #R032} instead

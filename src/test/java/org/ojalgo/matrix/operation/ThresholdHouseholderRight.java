@@ -98,7 +98,7 @@ public class ThresholdHouseholderRight extends ThresholdTuner {
 
             matrix = Primitive64Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
 
-            decomposition = Bidiagonal.PRIMITIVE.make(matrix);
+            decomposition = Bidiagonal.R064.make(matrix);
         }
 
         Boolean tune() {

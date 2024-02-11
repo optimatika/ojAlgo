@@ -84,7 +84,7 @@ public class SimpleLUCase extends BasicMatrixTest {
 
         // PLDU
 
-        LU<RationalNumber> tmpLU = LU.RATIONAL.make();
+        LU<RationalNumber> tmpLU = LU.Q128.make();
         tmpLU.decompose(GenericStore.Q128.copy(SimpleLUCase.getOrginal()));
 
         TestUtils.assertEquals(GenericStore.Q128.copy(SimpleLUCase.getOrginal()), tmpLU, ACCURACY);

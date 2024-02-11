@@ -54,30 +54,6 @@ public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecompositio
 
     Factory<RationalNumber> Q128 = typical -> new DeferredTridiagonal.Q128();
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
-
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 
         boolean retVal = true;

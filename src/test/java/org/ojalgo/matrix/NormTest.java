@@ -40,7 +40,7 @@ public class NormTest extends MatrixTests {
 
         final double expected = cmplx.norm();
 
-        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(cmplx);
+        SingularValue<Double> svd = SingularValue.R064.make(cmplx);
         svd.decompose(cmplx);
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);
@@ -57,7 +57,7 @@ public class NormTest extends MatrixTests {
 
         final double expected = quat.norm();
 
-        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(quat);
+        SingularValue<Double> svd = SingularValue.R064.make(quat);
         svd.decompose(quat);
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);

@@ -101,7 +101,7 @@ public class P20061119Case extends BasicMatrixTest {
 
         MatrixR064 tmpMatrix = P20061119Case.getProblematic();
 
-        Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> tmpEigenvalue = Eigenvalue.R064.make();
         PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 

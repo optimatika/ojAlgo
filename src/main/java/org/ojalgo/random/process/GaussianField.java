@@ -133,7 +133,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         if (cleanCovariances) {
 
-            Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
+            Eigenvalue<Double> tmpEvD = Eigenvalue.R064.make(true);
             tmpEvD.decompose(tmpCovariances);
 
             MatrixStore<Double> tmpV = tmpEvD.getV();
@@ -225,7 +225,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
             }
         }
 
-        SingularValue<Double> retVal = SingularValue.PRIMITIVE.make();
+        SingularValue<Double> retVal = SingularValue.R064.make();
 
         retVal.decompose(tmpMatrix);
 

@@ -92,34 +92,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public static final SparseStore.Factory<Double> R064 = SparseStore.factory(Primitive64Store.FACTORY);
     public static final SparseStore.Factory<Quadruple> R128 = SparseStore.factory(GenericStore.R128);
     public static final SparseStore.Factory<ComplexNumber> C128 = SparseStore.factory(GenericStore.C128);
-    /**
-     * @deprecated v53 Use {@link #C128} instead
-     */
-    @Deprecated
-    public static final SparseStore.Factory<ComplexNumber> COMPLEX = C128;
     public static final SparseStore.Factory<Quaternion> H256 = SparseStore.factory(GenericStore.H256);
-    /**
-     * @deprecated v53 Use {@link #R032} instead
-     */
-    @Deprecated
-    public static final SparseStore.Factory<Double> PRIMITIVE32 = R032;
-    /**
-     * @deprecated v53 Use {@link #R064} instead
-     */
-    @Deprecated
-    public static final SparseStore.Factory<Double> PRIMITIVE64 = R064;
     public static final SparseStore.Factory<RationalNumber> Q128 = SparseStore.factory(GenericStore.Q128);
-
-    /**
-     * @deprecated v53 Use {@link #H256} instead
-     */
-    @Deprecated
-    public static final SparseStore.Factory<Quaternion> QUATERNION = H256;
-    /**
-     * @deprecated v53 Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static final SparseStore.Factory<RationalNumber> RATIONAL = Q128;
 
     public static <N extends Comparable<N>> SparseStore.Factory<N> factory(final PhysicalStore.Factory<N, ?> physicalFactory) {
         return new SparseStore.Factory<>(physicalFactory);

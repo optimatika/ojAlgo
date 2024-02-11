@@ -89,7 +89,7 @@ abstract class AbstractScedasticity implements ScedasticityModel {
             body.fillDiagonal(i + 1, 0, squared);
         }
 
-        QR<Double> qr = QR.PRIMITIVE.make(nbEquations, nbVars);
+        QR<Double> qr = QR.R064.make(nbEquations, nbVars);
 
         qr.compute(body.offsets(q, -1));
 

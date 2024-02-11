@@ -54,7 +54,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     static void fullQR(final MatrixStore<Double> matrix) {
 
         // Initialize the QR decomposition object.
-        QR<Double> qr = QR.PRIMITIVE.make(matrix.transpose(), true);
+        QR<Double> qr = QR.R064.make(matrix.transpose(), true);
         // Set it to full size and confirm the setting.
         TestUtils.assertTrue("Full size flag is set to ", qr.isFullSize());
 
@@ -104,7 +104,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      */
     static void fullSVD(final MatrixStore<Double> matrix) {
         // Initialize the SVD object.
-        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(matrix, true);
+        SingularValue<Double> svd = SingularValue.R064.make(matrix, true);
         // Set it to full size and confirm the setting.
         TestUtils.assertTrue("Full size flag is set to ", svd.isFullSize());
         // Perform the decomposition.
@@ -205,7 +205,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         double[] observationVector = { 26.0, 12.0, 9.0, 18.0, 16.0, 17.0, 24.0, 32.0, 30.0, 21.0, 16.0, 12.0, 21.0, 16.0 };
 
         final Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(olsColumns);
-        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpOriginal);
+        SingularValue<Double> tmpSVD = SingularValue.R064.make(tmpOriginal);
         tmpSVD.decompose(tmpOriginal);
         Primitive64Store rhs = Primitive64Store.FACTORY.column(observationVector);
         tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
@@ -222,7 +222,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpA = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make();
+        SingularValue<Double> tmpSVD = SingularValue.R064.make();
         tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -242,7 +242,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
 
-        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.R064.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, NumberContext.of(7, 6));
@@ -259,7 +259,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                         { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
                         { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
-        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.R064.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, NumberContext.of(7, 6));
@@ -271,7 +271,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpA = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
-        Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> tmpPrimitive = Eigenvalue.R064.make();
         tmpPrimitive.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpPrimitive, TOP_ACCURACY);
@@ -285,7 +285,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         PhysicalStore<Double> tmpI = Primitive64Store.FACTORY.makeEye(tmpDim, tmpDim);
 
-        LU<Double> tmpDecomp = LU.PRIMITIVE.make();
+        LU<Double> tmpDecomp = LU.R064.make();
 
         tmpDecomp.decompose(tmpA);
 
@@ -317,7 +317,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         tmpRefDecomps.decompose(tmpRandom);
         MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
-        LU<Double> tmpTestDecomp = LU.PRIMITIVE.make();
+        LU<Double> tmpTestDecomp = LU.R064.make();
         tmpTestDecomp.decompose(tmpRandom);
         MatrixStore<Double> tmpActual = tmpTestDecomp.getInverse();
 
@@ -350,15 +350,15 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
-        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
-                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
+        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.C128.make(), Cholesky.C128.make(),
+                Eigenvalue.C128.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()
                               */,
-                LU.COMPLEX.make(), QR.COMPLEX.make(),
-                SingularValue.COMPLEX.make() /*
-                                              * , TridiagonalDecomposition . makeComplex ( )
-                                              */ };
+                LU.C128.make(), QR.C128.make(),
+                SingularValue.C128.make() /*
+                                           * , TridiagonalDecomposition . makeComplex ( )
+                                           */ };
 
         for (MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
@@ -391,8 +391,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")
-        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
-                Bidiagonal.COMPLEX.make() };
+        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.C128.make(), SingularValue.C128.make(),
+                Bidiagonal.C128.make() };
 
         for (MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
 

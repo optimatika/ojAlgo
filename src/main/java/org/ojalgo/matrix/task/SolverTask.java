@@ -111,12 +111,6 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    /**
-     * @deprecated Use {@link #C128} instead.
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
-
     Factory<Quaternion> H256 = new Factory<>() {
 
         @Override
@@ -156,12 +150,6 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
     };
-
-    /**
-     * @deprecated Use {@link #H256} instead.
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
 
     Factory<Double> R064 = new Factory<>() {
 
@@ -236,22 +224,6 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
     };
-
-    /**
-     * @deprecated Use {@link #Q128} instead.
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
-    /**
-     * @deprecated Use {@link #R064} instead.
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-    /**
-     * @deprecated Use {@link #R128} instead.
-     */
-    @Deprecated
-    Factory<Quadruple> QUADRUPLE = R128;
 
     default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
 

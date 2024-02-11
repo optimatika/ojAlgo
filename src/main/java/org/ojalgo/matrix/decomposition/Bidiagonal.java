@@ -50,6 +50,7 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
             return this.make(TYPICAL, fullSize);
         }
 
+        @Override
         default Bidiagonal<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
@@ -60,37 +61,13 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
 
     Factory<ComplexNumber> C128 = (typical, fullSize) -> new BidiagonalDecomposition.C128(fullSize);
 
-    Factory<Quadruple> R128 = (typical, fullSize) -> new BidiagonalDecomposition.R128(fullSize);
-
-    Factory<Double> R064 = (typical, fullSize) -> new BidiagonalDecomposition.R064(fullSize);
-
     Factory<Quaternion> H256 = (typical, fullSize) -> new BidiagonalDecomposition.H256(fullSize);
 
     Factory<RationalNumber> Q128 = (typical, fullSize) -> new BidiagonalDecomposition.Q128(fullSize);
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
+    Factory<Double> R064 = (typical, fullSize) -> new BidiagonalDecomposition.R064(fullSize);
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
+    Factory<Quadruple> R128 = (typical, fullSize) -> new BidiagonalDecomposition.R128(fullSize);
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 
@@ -107,7 +84,7 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
 
-        boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
+        boolean retVal = tmpRowDim == tmpQ1.countRows() && tmpQ2.countRows() == tmpColDim;
 
         // Check that it's possible to reconstruct the original matrix.
         if (retVal) {
@@ -119,7 +96,7 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
         }
 
         // If Q1 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
+        if (retVal && tmpQ1.countRows() == tmpQ1.countColumns()) {
 
             tmpThis = tmpQ1;
             tmpThat = tmpQ1.multiply(tmpConjugatedQ1).multiply(tmpQ1);
@@ -128,7 +105,7 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
         }
 
         // If Q2 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
+        if (retVal && tmpQ2.countRows() == tmpQ2.countColumns()) {
 
             tmpThis = tmpQ2;
             tmpThat = tmpQ2.multiply(tmpConjugatedQ2).multiply(tmpQ2);
@@ -147,6 +124,7 @@ public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition
 
     boolean isUpper();
 
+    @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ1 = this.getLQ();
         MatrixStore<N> mtrxD = this.getD();

@@ -109,9 +109,9 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> complexA = GenericStore.C128.copy(tmpSymmetricRandoml);
         final MatrixStore<RationalNumber> rationalA = GenericStore.Q128.copy(tmpSymmetricRandoml);
 
-        final Tridiagonal<Double> primitiveDecomp = Tridiagonal.PRIMITIVE.make();
-        final Tridiagonal<ComplexNumber> complexDecomp = Tridiagonal.COMPLEX.make();
-        final Tridiagonal<RationalNumber> rationalDecomp = Tridiagonal.RATIONAL.make();
+        final Tridiagonal<Double> primitiveDecomp = Tridiagonal.R064.make();
+        final Tridiagonal<ComplexNumber> complexDecomp = Tridiagonal.C128.make();
+        final Tridiagonal<RationalNumber> rationalDecomp = Tridiagonal.Q128.make();
 
         primitiveDecomp.decompose(primitiveA);
         complexDecomp.decompose(complexA);
@@ -160,7 +160,7 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
 
     private void doTheTest(final MatrixStore<Double> aMtrxA, final MatrixStore<Double> aMtrxD) {
 
-        final Tridiagonal<Double> tmpDecomp = Tridiagonal.PRIMITIVE.make();
+        final Tridiagonal<Double> tmpDecomp = Tridiagonal.R064.make();
         // final Tridiagonal<Double> tmpDecomp = new TridiagonalAltDecomp();
 
         tmpDecomp.decompose(aMtrxA);

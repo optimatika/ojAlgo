@@ -54,7 +54,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         MatrixR064 square = SimpleEquationCase.getBody();
         GenericStore<ComplexNumber> degenerate = GenericStore.C128.copy(square.below(square).below(square));
 
-        LU<ComplexNumber> decomp = LU.COMPLEX.make();
+        LU<ComplexNumber> decomp = LU.C128.make();
         decomp.decompose(degenerate);
 
         TestUtils.assertEquals(degenerate, decomp, ACCURACY);
@@ -66,7 +66,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         MatrixR064 square = SimpleEquationCase.getBody();
         Primitive32Store degenerate = Primitive32Store.FACTORY.copy(square.below(square).below(square));
 
-        LU<Double> decomp = LU.PRIMITIVE.make();
+        LU<Double> decomp = LU.R064.make();
         decomp.decompose(degenerate);
 
         TestUtils.assertEquals(degenerate, decomp, ACCURACY);
@@ -78,7 +78,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         MatrixR064 square = SimpleEquationCase.getBody();
         Primitive64Store degenerate = Primitive64Store.FACTORY.copy(square.below(square).below(square));
 
-        LU<Double> decomp = LU.PRIMITIVE.make();
+        LU<Double> decomp = LU.R064.make();
         decomp.decompose(degenerate);
 
         TestUtils.assertEquals(degenerate, decomp, ACCURACY);
@@ -90,7 +90,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         MatrixR064 square = SimpleEquationCase.getBody();
         MatrixQ128 degenerate = MatrixQ128.FACTORY.copy(square.below(square).below(square));
 
-        LU<RationalNumber> decomp = LU.RATIONAL.make();
+        LU<RationalNumber> decomp = LU.Q128.make();
         decomp.decompose(degenerate);
 
         TestUtils.assertEquals(GenericStore.Q128.copy(degenerate), decomp, ACCURACY);

@@ -41,7 +41,7 @@ public class AnyDTest extends ArrayTests {
 
         ArrayAnyD<Double> array = ArrayAnyD.R064.makeFilled(shape, Uniform.standard());
 
-        Eigenvalue<Double> evd = Eigenvalue.PRIMITIVE.make(false);
+        Eigenvalue<Double> evd = Eigenvalue.R064.make(false);
 
         // Just verify that this compiles and runs without any (class cast) exceptions
         for (MatrixView<Double> matrix : array.matrices()) {

@@ -234,17 +234,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     public static final Factory Z064 = new Factory(MathType.Z064, BufferZ064::new);
 
     /**
-     * @deprecated Use {@link #R032} instead
-     */
-    @Deprecated
-    public static final Factory DIRECT32 = R032;
-    /**
-     * @deprecated Use {@link #R064} instead
-     */
-    @Deprecated
-    public static final Factory DIRECT64 = R064;
-
-    /**
      * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
      */
     @Deprecated

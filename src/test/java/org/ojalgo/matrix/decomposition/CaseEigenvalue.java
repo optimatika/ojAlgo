@@ -163,7 +163,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         matrix.set(0, 1, ComplexNumber.of(-2.0, 1.0));
         matrix.set(1, 1, ComplexNumber.of(5.0, 0.0));
 
-        Eigenvalue<ComplexNumber> evd = Eigenvalue.COMPLEX.make(matrix, true);
+        Eigenvalue<ComplexNumber> evd = Eigenvalue.C128.make(matrix, true);
         evd.decompose(matrix);
 
         MatrixStore<ComplexNumber> mtrxD = evd.getD();
@@ -218,7 +218,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("B", mtrxB);
         }
 
-        Eigenvalue.Generalised<ComplexNumber> evd = Eigenvalue.COMPLEX.makeGeneralised(mtrxA, Generalisation.A_B);
+        Eigenvalue.Generalised<ComplexNumber> evd = Eigenvalue.C128.makeGeneralised(mtrxA, Generalisation.A_B);
         evd.decompose(mtrxA, mtrxB); // [A][V]=[B][V][D]
 
         MatrixStore<ComplexNumber> mtrxD = evd.getD();
@@ -362,7 +362,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
-        Eigenvalue<Double> tmpDecomposition = Eigenvalue.PRIMITIVE.make(tmpOriginalMatrix);
+        Eigenvalue<Double> tmpDecomposition = Eigenvalue.R064.make(tmpOriginalMatrix);
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
         Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
@@ -408,7 +408,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 1, ComplexNumber.of(ONE, PrimitiveMath.SQRT.invoke(THREE)));
 
-        Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
+        Eigenvalue<Double> tmpEvD = Eigenvalue.R064.make(tmpA, false);
         tmpEvD.decompose(tmpA);
 
         MatrixStore<Double> tmpD = tmpEvD.getD();
@@ -458,7 +458,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         int tmpLength = tmpData.length;
 
-        Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
+        Eigenvalue<Double> tmpEvD = Eigenvalue.R064.make(tmpA, false);
 
         tmpEvD.decompose(tmpA);
 
@@ -513,15 +513,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
             Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
-            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
 
             MatrixStore<Double> compL = cholesky.getL();
             MatrixStore<Double> compU = cholesky.getR();
 
-            MatrixStore<Double> mtrxC = SolverTask.PRIMITIVE.solve(compL, SolverTask.PRIMITIVE.solve(compL, mtrxA).transpose());
+            MatrixStore<Double> mtrxC = SolverTask.R064.solve(compL, SolverTask.R064.solve(compL, mtrxA).transpose());
 
-            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            Eigenvalue<Double> eigenvalue = Eigenvalue.R064.make(mtrxC, true);
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
@@ -535,13 +535,13 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(Primitive64Store.FACTORY);
             TestUtils.assertEquals(values, averages, accuracy);
 
-            MatrixStore<Double> vectorsZ = SolverTask.PRIMITIVE.solve(compU, vectorsY);
+            MatrixStore<Double> vectorsZ = SolverTask.R064.solve(compU, vectorsY);
 
             MatrixStore<Double> leftZ = mtrxA.multiply(vectorsZ);
             MatrixStore<Double> rightZ = mtrxB.multiply(vectorsZ);
             TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
 
-            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA);
             generalised.decompose(mtrxA, mtrxB);
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
@@ -560,7 +560,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
             Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
-            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
 
             MatrixStore<Double> compL = cholesky.getL();
@@ -568,7 +568,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             MatrixStore<Double> mtrxC = compL.transpose().multiply(mtrxA).multiply(compL);
 
-            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            Eigenvalue<Double> eigenvalue = Eigenvalue.R064.make(mtrxC, true);
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
@@ -582,13 +582,13 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(Primitive64Store.FACTORY);
             TestUtils.assertEquals(values, averages, accuracy);
 
-            MatrixStore<Double> vectorsZ = SolverTask.PRIMITIVE.solve(compU, vectorsY);
+            MatrixStore<Double> vectorsZ = SolverTask.R064.solve(compU, vectorsY);
 
             MatrixStore<Double> leftZ = mtrxA.multiply(mtrxB).multiply(vectorsZ);
             MatrixStore<Double> rightZ = vectorsZ;
             TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
 
-            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.AB);
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA, Generalisation.AB);
             generalised.decompose(mtrxA, mtrxB);
 
             if (DEBUG) {
@@ -611,7 +611,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
             Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
-            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
 
             MatrixStore<Double> compL = cholesky.getL();
@@ -619,7 +619,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             MatrixStore<Double> mtrxC = compL.transpose().multiply(mtrxA).multiply(compL);
 
-            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            Eigenvalue<Double> eigenvalue = Eigenvalue.R064.make(mtrxC, true);
             eigenvalue.decompose(mtrxC);
             TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
 
@@ -639,7 +639,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> rightZ = vectorsZ;
             TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
 
-            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.BA);
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA, Generalisation.BA);
             generalised.decompose(mtrxA, mtrxB);
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
@@ -657,11 +657,11 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
 
-            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxA, true);
+            Eigenvalue<Double> eigenvalue = Eigenvalue.R064.make(mtrxA, true);
             eigenvalue.decompose(mtrxA);
             TestUtils.assertEquals(mtrxA, eigenvalue, accuracy);
 
-            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA);
             generalised.decompose(mtrxA);
             TestUtils.assertEquals(mtrxA, generalised, accuracy);
 

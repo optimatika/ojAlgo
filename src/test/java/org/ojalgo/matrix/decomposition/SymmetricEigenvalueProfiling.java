@@ -29,7 +29,7 @@ public class SymmetricEigenvalueProfiling {
 
         final Primitive64Store tmpOrg = Primitive64Store.FACTORY.makeSPD(200);
         //final Eigenvalue<Double> tmpEvD = new RawEigenvalue.Symmetric();
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpOrg, true);
+        final Eigenvalue<Double> tmpEvD = Eigenvalue.R064.make(tmpOrg, true);
 
         for (int l = 0; l < 1000000; l++) {
             tmpEvD.decompose(tmpOrg);

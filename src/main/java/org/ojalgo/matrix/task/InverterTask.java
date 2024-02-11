@@ -90,12 +90,6 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    /**
-     * @deprecated Use {@link #C128} instead.
-     */
-    @Deprecated
-    Factory<ComplexNumber> COMPLEX = C128;
-
     Factory<Double> R064 = new Factory<>() {
 
         @Override
@@ -140,12 +134,6 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    /**
-     * @deprecated Use {@link #R064} instead.
-     */
-    @Deprecated
-    Factory<Double> PRIMITIVE = R064;
-
     Factory<Quadruple> R128 = new Factory<>() {
 
         @Override
@@ -164,12 +152,6 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
     };
-
-    /**
-     * @deprecated Use {@link #R128} instead.
-     */
-    @Deprecated
-    Factory<Quadruple> QUADRUPLE = R128;
 
     Factory<Quaternion> H256 = new Factory<>() {
 
@@ -190,12 +172,6 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    /**
-     * @deprecated Use {@link #H256} instead.
-     */
-    @Deprecated
-    Factory<Quaternion> QUATERNION = H256;
-
     Factory<RationalNumber> Q128 = new Factory<>() {
 
         @Override
@@ -214,12 +190,6 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
         }
 
     };
-
-    /**
-     * @deprecated Use {@link #Q128} instead.
-     */
-    @Deprecated
-    Factory<RationalNumber> RATIONAL = Q128;
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".

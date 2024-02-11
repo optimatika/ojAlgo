@@ -110,7 +110,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                     }
                     original.modifyAll(MULTIPLY.by(scale));
 
-                    ExtremeElementsCase.performInvertTest(original, InverterTask.PRIMITIVE.make(original), accuracy);
+                    ExtremeElementsCase.performInvertTest(original, InverterTask.R064.make(original), accuracy);
 
                     List<MatrixDecomposition<Double>> allDecomps = MatrixDecompositionTests.getPrimitiveAll();
                     for (MatrixDecomposition<Double> decomp : allDecomps) {
@@ -138,7 +138,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 Primitive64Store matrix = Primitive64Store.FACTORY.makeSPD(dim);
                 matrix.modifyAll(MULTIPLY.by(scale));
 
-                SingularValue<Double> reference = SingularValue.PRIMITIVE.make(matrix);
+                SingularValue<Double> reference = SingularValue.R064.make(matrix);
                 reference.decompose(matrix);
 
                 if (DEBUG) {
@@ -188,7 +188,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                     tmpBody.modifyAll(tmpModifier);
                     tmpRHS.modifyAll(tmpModifier);
 
-                    ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, SolverTask.PRIMITIVE.make(tmpBody, tmpRHS), tmpContext);
+                    ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, SolverTask.R064.make(tmpBody, tmpRHS), tmpContext);
 
                     List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getPrimitiveAll();
                     for (MatrixDecomposition<Double> decomp : tmpAllDecomps) {
@@ -225,7 +225,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                     }
                     original.modifyAll(MULTIPLY.by(scale));
 
-                    ExtremeElementsCase.performInvertTest(original, InverterTask.PRIMITIVE.make(original), accuracy);
+                    ExtremeElementsCase.performInvertTest(original, InverterTask.R064.make(original), accuracy);
 
                     SingularValue<Double>[] allDecomps = MatrixDecompositionTests.getPrimitiveSingularValue();
                     for (SingularValue<Double> decomp : allDecomps) {
@@ -273,9 +273,9 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
-        Eigenvalue<RationalNumber> tmpBig = Eigenvalue.RATIONAL.make(true);
-        Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.COMPLEX.make(true);
-        Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<RationalNumber> tmpBig = Eigenvalue.Q128.make(true);
+        Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.C128.make(true);
+        Eigenvalue<Double> tmpPrimitive = Eigenvalue.R064.make();
         Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
 
         TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
@@ -401,7 +401,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
-        InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
+        InverterTask<Double> tmpAlgorithm = InverterTask.R064.make(tmpOriginal);
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -411,9 +411,9 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
-        LU<RationalNumber> tmpRational = LU.RATIONAL.make();
-        LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
+        LU<RationalNumber> tmpRational = LU.Q128.make();
+        LU<ComplexNumber> tmpComplex = LU.C128.make();
+        LU<Double> tmpPrimitive = LU.R064.make();
         LU<Double> tmpRaw = new RawLU();
 
         TestUtils.assertTrue("Rational.compute()", tmpRational.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));
@@ -475,9 +475,9 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
-        QR<RationalNumber> tmpBig = QR.RATIONAL.make();
-        QR<ComplexNumber> tmpComplex = QR.COMPLEX.make();
-        QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
+        QR<RationalNumber> tmpBig = QR.Q128.make();
+        QR<ComplexNumber> tmpComplex = QR.C128.make();
+        QR<Double> tmpPrimitive = QR.R064.make();
         QR<Double> tmpJama = new RawQR();
 
         TestUtils.assertTrue("Rational.compute()", tmpBig.decompose(GenericStore.Q128.makeWrapper(tmpProblematic)));

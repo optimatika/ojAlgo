@@ -72,7 +72,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
         // Just want to verify that this compiles and runs without throwing exceptions
 
-        QR<Double> tmpDecomp = QR.PRIMITIVE.make();
+        QR<Double> tmpDecomp = QR.R064.make();
 
         Array2D<Double> a2d = Array2D.R064.makeFilled(3, 3, Normal.standard());
 
@@ -98,7 +98,7 @@ public class CaseQR extends MatrixDecompositionTests {
         PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
-        final QR<Double> tmpDecomp = QR.PRIMITIVE.make();
+        final QR<Double> tmpDecomp = QR.R064.make();
         tmpDecomp.decompose(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -123,7 +123,7 @@ public class CaseQR extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Original", tmpOriginal);
         }
 
-        final QR<ComplexNumber> tmpDecomposition = QR.COMPLEX.make();
+        final QR<ComplexNumber> tmpDecomposition = QR.C128.make();
         tmpDecomposition.decompose(tmpOriginal);
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
@@ -227,9 +227,9 @@ public class CaseQR extends MatrixDecompositionTests {
 
         final MatrixQ128 tmpOriginal = P20030422Case.getProblematic();
 
-        final QR<RationalNumber> tmpBigDecomp = QR.RATIONAL.make();
-        final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
-        final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
+        final QR<RationalNumber> tmpBigDecomp = QR.Q128.make();
+        final QR<ComplexNumber> tmpComplexDecomp = QR.C128.make();
+        final QR<Double> tmpPrimitiveDecomp = QR.R064.make();
 
         tmpBigDecomp.decompose(GenericStore.Q128.copy(tmpOriginal));
         tmpComplexDecomp.decompose(GenericStore.C128.copy(tmpOriginal));

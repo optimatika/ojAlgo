@@ -1391,7 +1391,7 @@ public class NextGenSysModTest {
 
         if (clean) {
 
-            Eigenvalue<Double> evd = Eigenvalue.PRIMITIVE.make(covarianceMtrx, true);
+            Eigenvalue<Double> evd = Eigenvalue.R064.make(covarianceMtrx, true);
             evd.decompose(covarianceMtrx);
 
             MatrixStore<Double> mtrxV = evd.getV();
