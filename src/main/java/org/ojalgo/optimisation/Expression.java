@@ -973,7 +973,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     private AffineFunction<Double> makeAffineFunction() {
 
-        AffineFunction<Double> retVal = AffineFunction.makePrimitive(myModel.countVariables());
+        AffineFunction<Double> retVal = AffineFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyLinearFactorNonZero()) {
             for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
@@ -987,12 +987,12 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     private ConstantFunction<Double> makeConstantFunction() {
-        return ConstantFunction.makePrimitive(myModel.countVariables(), this.getConstant());
+        return ConstantFunction.factory(Primitive64Store.FACTORY).constant((Comparable<?>) this.getConstant()).make(myModel.countVariables());
     }
 
     private PureQuadraticFunction<Double> makePureQuadraticFunction() {
 
-        PureQuadraticFunction<Double> retVal = PureQuadraticFunction.makePrimitive(myModel.countVariables());
+        PureQuadraticFunction<Double> retVal = PureQuadraticFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
@@ -1007,7 +1007,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     private QuadraticFunction<Double> makeQuadraticFunction() {
 
-        QuadraticFunction<Double> retVal = QuadraticFunction.makePrimitive(myModel.countVariables());
+        QuadraticFunction<Double> retVal = QuadraticFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {

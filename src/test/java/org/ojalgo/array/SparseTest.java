@@ -24,8 +24,11 @@ package org.ojalgo.array;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.ElementView2D;
 
 public class SparseTest extends ArrayTests {
 
@@ -36,7 +39,7 @@ public class SparseTest extends ArrayTests {
         long dim2 = dim * dim;
         final long count = dim2;
 
-        SparseArray<Double> plain = SparseArray.factory(ArrayR064.FACTORY).limit(count).make();
+        SparseArray<Double> plain = SparseArray.factory(ArrayR064.FACTORY).make(count);
         Array1D<Double> array1D = Array1D.R064.make(dim2);
         Array2D<Double> array2D = Array2D.R064.make(dim, dim);
 
@@ -47,10 +50,10 @@ public class SparseTest extends ArrayTests {
             array2D.set(index, 1.0);
         }
 
-        double expected = plain.nonzeros().stream().mapToDouble(nz -> nz.doubleValue()).sum();
+        double expected = plain.nonzeros().stream().mapToDouble(NonzeroView::doubleValue).sum();
 
-        double stream1D = array1D.nonzeros().stream().mapToDouble(nz -> nz.doubleValue()).sum();
-        double stream2D = array2D.nonzeros().stream().mapToDouble(nz -> nz.doubleValue()).sum();
+        double stream1D = array1D.nonzeros().stream().mapToDouble(ElementView1D::doubleValue).sum();
+        double stream2D = array2D.nonzeros().stream().mapToDouble(ElementView2D::doubleValue).sum();
 
         TestUtils.assertEquals(expected, stream1D);
         TestUtils.assertEquals(expected, stream2D);
@@ -82,7 +85,7 @@ public class SparseTest extends ArrayTests {
 
         long dim = 100_000L;
 
-        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).limit(dim * dim).make();
+        SparseArray<Double> array = SparseArray.factory(ArrayR064.FACTORY).make(dim * dim);
 
         for (long i = 0L; i < dim; i++) {
             array.set(Uniform.randomInteger(dim * dim), 1.0);

@@ -29,14 +29,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
         return (SB) this;
     }
 
-    /**
-     * @deprecated v53 Irrelevant. Maybe call {@link #initial(long)}, otherwise just don't call anything.
-     */
-    @Deprecated
-    public SB fixed(final long fixed) {
-        return this.initial(fixed).limit(fixed);
-    }
-
     public FunctionSet<N> function() {
         return myDenseFactory.function();
     }
@@ -51,14 +43,6 @@ public abstract class StrategyBuildingFactory<N extends Comparable<N>, I extends
      */
     public SB initial(final long initial) {
         myStrategyBuilder.initial(initial);
-        return (SB) this;
-    }
-
-    /**
-     * @deprecated v53 Doesn't do anything. No need to call. Will be removed.
-     */
-    @Deprecated
-    public SB limit(final long limit) {
         return (SB) this;
     }
 

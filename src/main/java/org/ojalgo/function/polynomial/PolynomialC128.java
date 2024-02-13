@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
 
-public class PolynomialC128 extends ScalarPolynomial<ComplexNumber, PolynomialC128> {
+public final class PolynomialC128 extends ScalarPolynomial<ComplexNumber, PolynomialC128> {
 
     public static final PolynomialC128 ONE = PolynomialC128.wrap(ComplexNumber.ONE);
 

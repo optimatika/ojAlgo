@@ -28,7 +28,7 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 
-public class PolynomialR064 extends AbstractPolynomial<Double, PolynomialR064> {
+public final class PolynomialR064 extends AbstractPolynomial<Double, PolynomialR064> {
 
     public static final PolynomialR064 ONE = PolynomialR064.wrap(PrimitiveMath.ONE);
 

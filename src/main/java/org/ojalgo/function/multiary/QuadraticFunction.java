@@ -69,60 +69,6 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         return new Factory<>(factory);
     }
 
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> quadratic, final Access1D<?> linear) {
-        // return new QuadraticFunction<>(GenericStore.C128.copy(quadratic), GenericStore.C128.columns(linear));
-        return QuadraticFunction.factory(GenericStore.C128).quadratic(quadratic).linear(linear).make(linear.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        // return new QuadraticFunction<>(GenericStore.C128.make(arity, arity), GenericStore.C128.make(arity, 1));
-        return QuadraticFunction.factory(GenericStore.C128).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<Double> makePrimitive(final Access2D<?> quadratic, final Access1D<?> linear) {
-        // return new QuadraticFunction<>(Primitive64Store.FACTORY.copy(quadratic), Primitive64Store.FACTORY.columns(linear));
-        return QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<Double> makePrimitive(final int arity) {
-        // return new QuadraticFunction<>(Primitive64Store.FACTORY.make(arity, arity), Primitive64Store.FACTORY.make(arity, 1));
-        return QuadraticFunction.factory(Primitive64Store.FACTORY).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<RationalNumber> makeRational(final Access2D<?> quadratic, final Access1D<?> linear) {
-        // return new QuadraticFunction<>(GenericStore.Q128.copy(quadratic), GenericStore.Q128.columns(linear));
-        return QuadraticFunction.factory(GenericStore.Q128).quadratic(quadratic).linear(linear).make(linear.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static QuadraticFunction<RationalNumber> makeRational(final int arity) {
-        // return new QuadraticFunction<>(GenericStore.Q128.make(arity, arity), GenericStore.Q128.make(arity, 1));
-        return QuadraticFunction.factory(GenericStore.Q128).make(arity);
-    }
-
     public static <N extends Comparable<N>> QuadraticFunction<N> wrap(final PhysicalStore<N> quadratic, final PhysicalStore<N> linear) {
         return new QuadraticFunction<>(quadratic, linear);
     }
@@ -143,10 +89,12 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         }
     }
 
+    @Override
     public int arity() {
         return myLinear.arity();
     }
 
+    @Override
     public N getConstant() {
         return myPureQuadratic.getConstant();
     }
@@ -163,6 +111,7 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         return myPureQuadratic.getHessian(point);
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myLinear.getLinearFactors(negated);
     }
@@ -172,14 +121,17 @@ public final class QuadraticFunction<N extends Comparable<N>> implements Multiar
         return this.getScalarValue(arg).get();
     }
 
+    @Override
     public PhysicalStore<N> linear() {
         return myLinear.linear();
     }
 
+    @Override
     public PhysicalStore<N> quadratic() {
         return myPureQuadratic.quadratic();
     }
 
+    @Override
     public void setConstant(final Comparable<?> constant) {
         myPureQuadratic.setConstant(constant);
     }

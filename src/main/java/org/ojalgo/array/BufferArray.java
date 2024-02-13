@@ -233,46 +233,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
     public static final Factory Z032 = new Factory(MathType.Z032, BufferZ032::new);
     public static final Factory Z064 = new Factory(MathType.Z064, BufferZ064::new);
 
-    /**
-     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
-     */
-    @Deprecated
-    public static Array1D<Double> make(final File file, final long count) {
-        return R064.newMapped(file).make(count).wrapInArray1D();
-    }
-
-    /**
-     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
-     */
-    @Deprecated
-    public static ArrayAnyD<Double> make(final File file, final long... structure) {
-        return R064.newMapped(file).make(StructureAnyD.count(structure)).wrapInArrayAnyD(structure);
-    }
-
-    /**
-     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
-     */
-    @Deprecated
-    public static Array2D<Double> make(final File file, final long rows, final long columns) {
-        return R064.newMapped(file).make(rows * columns).wrapInArray2D(rows);
-    }
-
-    /**
-     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
-     */
-    @Deprecated
-    public static DenseArray<Double> make(final int capacity) {
-        return R064.make(capacity);
-    }
-
-    /**
-     * @deprecated v52 Use {@link #R064} and {@link MappedFileFactory#make(long)} instead.
-     */
-    @Deprecated
-    public static BufferArray wrap(final ByteBuffer data) {
-        return new BufferR064(BufferArray.R064, data, null);
-    }
-
     private final Buffer myBuffer;
     private final AutoCloseable myFile;
 

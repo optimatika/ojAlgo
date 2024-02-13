@@ -21,9 +21,6 @@
  */
 package org.ojalgo.machine;
 
-import org.ojalgo.concurrent.Parallelism;
-import org.ojalgo.type.IntCount;
-
 /**
  * Stuff common to {@link Hardware} and {@link VirtualMachine}.
  *
@@ -96,30 +93,6 @@ public abstract class CommonMachine extends BasicMachine {
         return cache * units;
     }
 
-    /**
-     * @deprecated v53 Use {@link Parallelism#CORES} instead.
-     */
-    @Deprecated
-    public final IntCount countCores() {
-        return new IntCount(cores);
-    }
-
-    /**
-     * @deprecated v53 Use {@link Parallelism#THREADS} instead.
-     */
-    @Deprecated
-    public final IntCount countThreads() {
-        return new IntCount(threads);
-    }
-
-    /**
-     * @deprecated v53 Use {@link Parallelism#UNITS} instead.
-     */
-    @Deprecated
-    public final IntCount countUnits() {
-        return new IntCount(units);
-    }
-
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -140,22 +113,6 @@ public abstract class CommonMachine extends BasicMachine {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @deprecated v53
-     */
-    @Deprecated
-    public final long getCacheElements(final long elementSize) {
-        return CommonMachine.elements(cache, elementSize);
-    }
-
-    /**
-     * @deprecated v53
-     */
-    @Deprecated
-    public final long getMemoryElements(final long elementSize) {
-        return CommonMachine.elements(memory, elementSize);
     }
 
     @Override

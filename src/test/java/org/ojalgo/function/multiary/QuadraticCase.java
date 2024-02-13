@@ -45,8 +45,8 @@ public class QuadraticCase extends MultiaryFunctionTests {
         PhysicalStore<Double> quadratic = Primitive64Store.FACTORY.makeFilled(arity, arity, new Uniform());
         PhysicalStore<Double> linear = Primitive64Store.FACTORY.make(arity, 1);
 
-        myPureQuadraticFunction = PureQuadraticFunction.makePrimitive(quadratic);
-        myQuadraticFunction = QuadraticFunction.makePrimitive(quadratic, linear);
+        myPureQuadraticFunction = PureQuadraticFunction.factory(Primitive64Store.FACTORY).coefficients(quadratic).make(quadratic.getMaxDim());
+        myQuadraticFunction = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
 
         myArg1 = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
         myArg2 = myArg1.transpose();

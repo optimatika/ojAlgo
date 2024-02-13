@@ -62,60 +62,6 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
         return new Factory<>(factory);
     }
 
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        // return new ConstantFunction<>(arity, GenericStore.C128);
-        return ConstantFunction.factory(GenericStore.C128).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Comparable<?> constant) {
-        // return new ConstantFunction<>(arity, GenericStore.C128, constant);
-        return ConstantFunction.factory(GenericStore.C128).constant(constant).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<Double> makePrimitive(final int arity) {
-        // return new ConstantFunction<>(arity, Primitive64Store.FACTORY);
-        return ConstantFunction.factory(Primitive64Store.FACTORY).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<Double> makePrimitive(final int arity, final Comparable<?> constant) {
-        // return new ConstantFunction<>(arity, Primitive64Store.FACTORY, constant);
-        return ConstantFunction.factory(Primitive64Store.FACTORY).constant(constant).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<RationalNumber> makeRational(final int arity) {
-        // return new ConstantFunction<>(arity, GenericStore.Q128);
-        return ConstantFunction.factory(GenericStore.Q128).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static ConstantFunction<RationalNumber> makeRational(final int arity, final Comparable<?> constant) {
-        // return new ConstantFunction<>(arity, GenericStore.Q128, constant);
-        return ConstantFunction.factory(GenericStore.Q128).constant(constant).make(arity);
-    }
-
     private final int myArity;
     private Scalar<N> myConstant = null;
     private final PhysicalStore.Factory<N, ?> myFactory;
@@ -135,30 +81,37 @@ public final class ConstantFunction<N extends Comparable<N>> implements Multiary
         myFactory = factory;
     }
 
+    @Override
     public int arity() {
         return myArity;
     }
 
+    @Override
     public N getConstant() {
         return this.getScalarConstant().get();
     }
 
+    @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
         return this.getLinearFactors(false);
     }
 
+    @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myFactory.makeZero(myArity, myArity);
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myFactory.makeZero(myArity, 1);
     }
 
+    @Override
     public N invoke(final Access1D<N> arg) {
         return this.getConstant();
     }
 
+    @Override
     public void setConstant(final Comparable<?> constant) {
         myConstant = constant != null ? myFactory.scalar().convert(constant) : null;
     }

@@ -67,60 +67,6 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
         return new Factory<>(factory);
     }
 
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> coefficients) {
-        // return new PureQuadraticFunction<>(GenericStore.C128.copy(coefficients));
-        return PureQuadraticFunction.factory(GenericStore.C128).coefficients(coefficients).make(coefficients.getMaxDim());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        // return new PureQuadraticFunction<>(GenericStore.C128.make(arity, arity));
-        return PureQuadraticFunction.factory(GenericStore.C128).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<Double> makePrimitive(final Access2D<?> coefficients) {
-        // return new PureQuadraticFunction<>(Primitive64Store.FACTORY.copy(coefficients));
-        return PureQuadraticFunction.factory(Primitive64Store.FACTORY).coefficients(coefficients).make(coefficients.getMaxDim());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<Double> makePrimitive(final int arity) {
-        // return new PureQuadraticFunction<>(Primitive64Store.FACTORY.make(arity, arity));
-        return PureQuadraticFunction.factory(Primitive64Store.FACTORY).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<RationalNumber> makeRational(final Access2D<?> coefficients) {
-        // return new PureQuadraticFunction<>(GenericStore.Q128.copy(coefficients));
-        return PureQuadraticFunction.factory(GenericStore.Q128).coefficients(coefficients).make(coefficients.getMaxDim());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static PureQuadraticFunction<RationalNumber> makeRational(final int arity) {
-        // return new PureQuadraticFunction<>(GenericStore.Q128.make(arity, arity));
-        return PureQuadraticFunction.factory(GenericStore.Q128).make(arity);
-    }
-
     public static <N extends Comparable<N>> PureQuadraticFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new PureQuadraticFunction<>(coefficients);
     }
@@ -140,10 +86,12 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
         myConstant = new ConstantFunction<>(coefficients.countRows(), coefficients.physical());
     }
 
+    @Override
     public int arity() {
         return (int) myCoefficients.countColumns();
     }
 
+    @Override
     public N getConstant() {
         return myConstant.getConstant();
     }
@@ -163,6 +111,7 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
         return myCoefficients.add(myCoefficients.conjugate());
     }
 
+    @Override
     public MatrixStore<N> getLinearFactors(final boolean negated) {
         return myCoefficients.physical().makeZero(this.arity(), 1L);
     }
@@ -172,10 +121,12 @@ public final class PureQuadraticFunction<N extends Comparable<N>> implements Mul
         return this.getScalarValue(arg).get();
     }
 
+    @Override
     public PhysicalStore<N> quadratic() {
         return (PhysicalStore<N>) myCoefficients;
     }
 
+    @Override
     public void setConstant(final Comparable<?> constant) {
         myConstant.setConstant(constant);
     }

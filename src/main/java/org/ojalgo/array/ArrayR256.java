@@ -42,7 +42,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
+public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
 
     public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<>() {
 

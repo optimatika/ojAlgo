@@ -33,7 +33,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public class PolynomialR256 extends AbstractPolynomial<BigDecimal, PolynomialR256> {
+public final class PolynomialR256 extends AbstractPolynomial<BigDecimal, PolynomialR256> {
 
     public static final PolynomialR256 ONE = PolynomialR256.wrap(BigDecimal.ONE);
 

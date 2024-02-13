@@ -49,13 +49,13 @@ public class LinearCase extends MultiaryFunctionTests {
         PhysicalStore<Double> quadratic = Primitive64Store.FACTORY.make(arity, arity);
         PhysicalStore<Double> linear = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-        myLinearFunction1 = LinearFunction.makePrimitive(linear);
-        myAffineFunction1 = AffineFunction.makePrimitive(linear);
-        myQuadraticFunction1 = QuadraticFunction.makePrimitive(quadratic, linear);
+        myLinearFunction1 = LinearFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
+        myAffineFunction1 = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
+        myQuadraticFunction1 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
 
-        myLinearFunction2 = LinearFunction.makePrimitive(linear.transpose());
-        myAffineFunction2 = AffineFunction.makePrimitive(linear.transpose());
-        myQuadraticFunction2 = QuadraticFunction.makePrimitive(quadratic, linear.transpose());
+        myLinearFunction2 = LinearFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
+        myAffineFunction2 = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
+        myQuadraticFunction2 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear.transpose()).make(linear.transpose().size());
 
         myArg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
     }

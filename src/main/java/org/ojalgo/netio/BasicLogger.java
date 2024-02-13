@@ -365,36 +365,12 @@ public interface BasicLogger {
         NotNull.println(DEBUG);
     }
 
-    /**
-     * @deprecated Use {@link #debugColumns(int,Object...)} instead
-     */
-    @Deprecated
-    static void debug(final int width, final Object... columns) {
-        BasicLogger.debugColumns(width, columns);
-    }
-
     static void debug(final int tabs, final String message, final Object... arguments) {
         NotNull.println(DEBUG, tabs, message, arguments);
     }
 
     static void debug(final Object message) {
         NotNull.println(DEBUG, message);
-    }
-
-    /**
-     * @deprecated Use {@link #debugMatrix(String,Access2D<?>)} instead
-     */
-    @Deprecated
-    static void debug(final String message, final Access2D<?> matrix) {
-        BasicLogger.debugMatrix(message, matrix);
-    }
-
-    /**
-     * @deprecated Use {@link #debugMatrix(String,Access2D<?>,NumberContext)} instead
-     */
-    @Deprecated
-    static void debug(final String message, final Access2D<?> matrix, final NumberContext context) {
-        BasicLogger.debugMatrix(message, matrix, context);
     }
 
     static void debug(final String message, final Object... arguments) {
@@ -425,36 +401,12 @@ public interface BasicLogger {
         NotNull.println(ERROR);
     }
 
-    /**
-     * @deprecated Use {@link #errorColumns(int,Object...)} instead
-     */
-    @Deprecated
-    static void error(final int width, final Object... columns) {
-        BasicLogger.errorColumns(width, columns);
-    }
-
     static void error(final int tabs, final String message, final Object... arguments) {
         NotNull.println(ERROR, tabs, message, arguments);
     }
 
     static void error(final Object message) {
         NotNull.println(ERROR, message);
-    }
-
-    /**
-     * @deprecated Use {@link #errorMatrix(String,Access2D<?>)} instead
-     */
-    @Deprecated
-    static void error(final String message, final Access2D<?> matrix) {
-        BasicLogger.errorMatrix(message, matrix);
-    }
-
-    /**
-     * @deprecated Use {@link #errorMatrix(String,Access2D<?>,NumberContext)} instead
-     */
-    @Deprecated
-    static void error(final String message, final Access2D<?> matrix, final NumberContext context) {
-        BasicLogger.errorMatrix(message, matrix, context);
     }
 
     static void error(final String message, final Object... arguments) {

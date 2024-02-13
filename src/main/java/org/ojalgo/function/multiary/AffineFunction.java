@@ -66,60 +66,6 @@ public final class AffineFunction<N extends Comparable<N>> implements MultiaryFu
         return new Factory<>(factory);
     }
 
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        // return new AffineFunction<>(GenericStore.C128.rows(coefficients));
-        return AffineFunction.factory(GenericStore.C128).coefficients(coefficients).make(coefficients.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<ComplexNumber> makeComplex(final int arity) {
-        // return new AffineFunction<>(GenericStore.C128.make(1, arity));
-        return AffineFunction.factory(GenericStore.C128).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        // return new AffineFunction<>(Primitive64Store.FACTORY.rows(coefficients));
-        return AffineFunction.factory(Primitive64Store.FACTORY).coefficients(coefficients).make(coefficients.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<Double> makePrimitive(final int arity) {
-        // return new AffineFunction<>(Primitive64Store.FACTORY.make(1, arity));
-        return AffineFunction.factory(Primitive64Store.FACTORY).make(arity);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        // return new AffineFunction<>(GenericStore.Q128.rows(coefficients));
-        return AffineFunction.factory(GenericStore.Q128).coefficients(coefficients).make(coefficients.size());
-    }
-
-    /**
-     * @deprecated v53 Use {@link #factory(PhysicalStore.Factory)} instead.
-     */
-    @Deprecated
-    public static AffineFunction<RationalNumber> makeRational(final int arity) {
-        // return new AffineFunction<>(GenericStore.Q128.make(1, arity));
-        return AffineFunction.factory(GenericStore.Q128).make(arity);
-    }
-
     public static <N extends Comparable<N>> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new AffineFunction<>(coefficients);
     }

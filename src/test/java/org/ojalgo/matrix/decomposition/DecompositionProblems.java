@@ -391,8 +391,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")
-        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.C128.make(), SingularValue.C128.make(),
-                Bidiagonal.C128.make() };
+        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.C128.make(), SingularValue.C128.make(), Bidiagonal.C128.make() };
 
         for (MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
 

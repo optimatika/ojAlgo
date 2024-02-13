@@ -55,7 +55,7 @@ public class SparsePerformance {
     @Setup
     public void setup() {
 
-        array = SparseArray.factory(ArrayR064.FACTORY).limit(DIM * DIM).make();
+        array = SparseArray.factory(ArrayR064.FACTORY).make(DIM * DIM);
 
         for (long i = 0L; i < DIM; i++) {
             array.set(Uniform.randomInteger(DIM * DIM), 1.0);

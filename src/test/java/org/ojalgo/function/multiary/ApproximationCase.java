@@ -42,7 +42,7 @@ public class ApproximationCase extends MultiaryFunctionTests {
             PhysicalStore<Double> zero = Primitive64Store.FACTORY.make(arity, 1);
             PhysicalStore<Double> point = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-            AffineFunction<Double> orgFunc = AffineFunction.makePrimitive(linear);
+            AffineFunction<Double> orgFunc = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
 
             PhysicalStore<Double> arg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
@@ -72,7 +72,7 @@ public class ApproximationCase extends MultiaryFunctionTests {
             PhysicalStore<Double> zero = Primitive64Store.FACTORY.make(arity, 1);
             PhysicalStore<Double> point = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-            QuadraticFunction<Double> orgFunc = QuadraticFunction.makePrimitive(quadratic, linear);
+            QuadraticFunction<Double> orgFunc = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
 
             PhysicalStore<Double> arg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 

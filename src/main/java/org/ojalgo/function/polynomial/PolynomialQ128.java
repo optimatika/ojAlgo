@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
 
-public class PolynomialQ128 extends ScalarPolynomial<RationalNumber, PolynomialQ128> {
+public final class PolynomialQ128 extends ScalarPolynomial<RationalNumber, PolynomialQ128> {
 
     public static final PolynomialQ128 ONE = PolynomialQ128.wrap(RationalNumber.ONE);
 

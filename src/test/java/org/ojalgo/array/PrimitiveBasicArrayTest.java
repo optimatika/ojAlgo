@@ -67,7 +67,7 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testHugeSparse() {
-        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(Long.MAX_VALUE).initial(COUNT).make());
+        this.doTest(SparseArray.factory(ArrayR064.FACTORY).initial(COUNT).make(COUNT));
     }
 
     @Test
@@ -126,7 +126,7 @@ public abstract class PrimitiveBasicArrayTest extends ArrayTests {
 
     @Test
     public void testSparse() {
-        this.doTest(SparseArray.factory(ArrayR064.FACTORY).limit(COUNT).initial(PrimitiveBasicArrayTest.capacity(COUNT)).make());
+        this.doTest(SparseArray.factory(ArrayR064.FACTORY).initial(PrimitiveBasicArrayTest.capacity(COUNT)).make(COUNT));
     }
 
     abstract void doTest(final BasicArray<Double> array);

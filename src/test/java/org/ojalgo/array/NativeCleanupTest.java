@@ -36,18 +36,18 @@ public class NativeCleanupTest {
 
     public static void main(final String[] args) {
 
-        OffHeapArray tmpOrg = OffHeapArray.makeNative64(SIZE);
-        tmpOrg.fillAll(new Uniform());
+        DenseArray<Double> org = OffHeapArray.R064.make(SIZE);
+        org.fillAll(new Uniform());
 
         Stopwatch watch = new Stopwatch();
 
         while (true) {
 
-            OffHeapArray tmpCopy = OffHeapArray.makeNative64(SIZE);
+            DenseArray<Double> copy = OffHeapArray.R064.make(SIZE);
 
-            tmpCopy.fillMatching(tmpOrg);
+            copy.fillMatching(org);
 
-            tmpOrg = tmpCopy;
+            org = copy;
 
             BasicLogger.debug("Copied {} times. Last copy took {}", COUNTER.incrementAndGet(), watch.restart(CalendarDateUnit.SECOND));
 

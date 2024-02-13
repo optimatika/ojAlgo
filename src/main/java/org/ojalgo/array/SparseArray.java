@@ -211,15 +211,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
             super(denseFactory);
         }
 
-        /**
-         * @deprecated v53 This will create an array of maximum/infinite length. That's probably not what you
-         *             want. Use {@link #make(long)} instead.
-         */
-        @Deprecated
-        public SparseArray<N> make() {
-            return this.make(Long.MAX_VALUE);
-        }
-
         @Override
         public SparseArray<N> make(final int size) {
             return new SparseArray<>(this.getDenseFactory(), this.getGrowthStrategy(), size);
