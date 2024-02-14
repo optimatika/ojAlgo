@@ -56,19 +56,19 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillColumn(final long row, final long col, final Access1D<N> values) {
             for (long i = row, limit = this.countRows(); i < limit; i++) {
-                this.fillOne(i, col, values.get(i - row));
+                this.set(i, col, values.get(i - row));
             }
         }
 
         default void fillColumn(final long row, final long col, final N value) {
             for (long i = row, limit = this.countRows(); i < limit; i++) {
-                this.fillOne(i, col, value);
+                this.set(i, col, value);
             }
         }
 
         default void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             for (long i = row, limit = this.countRows(); i < limit; i++) {
-                this.fillOne(i, col, supplier);
+                this.set(i, col, supplier.get());
             }
         }
 
@@ -86,19 +86,19 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
             for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
-                this.fillOne(row + ij, col + ij, values.get(ij));
+                this.set(row + ij, col + ij, values.get(ij));
             }
         }
 
         default void fillDiagonal(final long row, final long col, final N value) {
             for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
-                this.fillOne(row + ij, col + ij, value);
+                this.set(row + ij, col + ij, value);
             }
         }
 
         default void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             for (long ij = 0L, limit = Math.min(this.countRows() - row, this.countColumns() - col); ij < limit; ij++) {
-                this.fillOne(row + ij, col + ij, supplier);
+                this.set(row + ij, col + ij, supplier.get());
             }
         }
 
@@ -110,79 +110,25 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillDiagonal(0L, 0L, supplier);
         }
 
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        @Override
-        default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-            long structure = this.countRows();
-            this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), values, valueIndex);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            this.fillOne(row, col, (N) values.get(valueIndex));
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long row, final long col, final N value) {
-            this.set(row, col, value);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            this.set(row, col, supplier.get());
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        @Override
-        default void fillOne(final long index, final N value) {
-            long structure = this.countRows();
-            this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), value);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        @Override
-        default void fillOne(final long index, final NullaryFunction<?> supplier) {
-            long structure = this.countRows();
-            this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), supplier);
-        }
-
         default void fillRow(final long row, final Access1D<N> values) {
             this.fillRow(row, 0L, values);
         }
 
         default void fillRow(final long row, final long col, final Access1D<N> values) {
             for (long j = col, limit = this.countColumns(); j < limit; j++) {
-                this.fillOne(row, j, values.get(j - col));
+                this.set(row, j, values.get(j - col));
             }
         }
 
         default void fillRow(final long row, final long col, final N value) {
             for (long j = col, limit = this.countColumns(); j < limit; j++) {
-                this.fillOne(row, j, value);
+                this.set(row, j, value);
             }
         }
 
         default void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             for (long j = col, limit = this.countColumns(); j < limit; j++) {
-                this.fillOne(row, j, supplier);
+                this.set(row, j, supplier.get());
             }
         }
 

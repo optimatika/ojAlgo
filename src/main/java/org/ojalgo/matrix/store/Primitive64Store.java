@@ -651,21 +651,6 @@ public final class Primitive64Store extends ArrayR064 implements PhysicalStore<D
     }
 
     @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.doubleValue(valueIndex));
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Double value) {
-        myUtility.fillOne(row, col, value);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myUtility.fillOne(row, col, supplier);
-    }
-
-    @Override
     public void fillRow(final long row, final long col, final Access1D<Double> values) {
         myUtility.fillRow(row, col, values);
     }

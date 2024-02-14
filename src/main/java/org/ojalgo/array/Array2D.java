@@ -360,7 +360,7 @@ public final class Array2D<N extends Comparable<N>>
             }
         } else {
             for (long i = 0L; i < limit; i++) {
-                this.fillOne(offset + i, values.get(i));
+                this.set(offset + i, values.get(i));
             }
         }
     }
@@ -388,36 +388,6 @@ public final class Array2D<N extends Comparable<N>>
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOne(index, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final N value) {
-        myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), value);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), supplier);
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        myDelegate.fillOne(index, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myDelegate.fillOne(index, supplier);
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
     }
@@ -439,7 +409,7 @@ public final class Array2D<N extends Comparable<N>>
             }
         } else {
             for (long i = 0L; i < limit; i++) {
-                this.fillOne(offset + i * myRowsCount, values.get(i));
+                this.set(offset + i * myRowsCount, values.get(i));
             }
         }
     }

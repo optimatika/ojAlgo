@@ -103,15 +103,6 @@ public interface MultiaryFunction<N extends Comparable<N>> extends BasicFunction
 
         /**
          * @return The gradient at origin (0-vector), negated or not
-         * @deprecated v53 Use {@link #getLinearFactors(boolean)} instead.
-         */
-        @Deprecated
-        default MatrixStore<N> getLinearFactors() {
-            return this.getLinearFactors(false);
-        }
-
-        /**
-         * @return The gradient at origin (0-vector), negated or not
          */
         MatrixStore<N> getLinearFactors(boolean negated);
 

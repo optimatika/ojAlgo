@@ -134,21 +134,6 @@ public abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> 
     }
 
     @Override
-    public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        this.fillOne(Math.toIntExact(index), values, valueIndex);
-    }
-
-    @Override
-    public final void fillOne(final long index, final N value) {
-        this.fillOne(Math.toIntExact(index), value);
-    }
-
-    @Override
-    public final void fillOne(final long index, final NullaryFunction<?> supplier) {
-        this.fillOne(Math.toIntExact(index), supplier);
-    }
-
-    @Override
     public final void fillRange(final long first, final long limit, final N number) {
         this.fill(first, limit, 1L, number);
     }

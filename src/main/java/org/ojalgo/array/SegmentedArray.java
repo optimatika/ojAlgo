@@ -151,21 +151,6 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
 
         int tmpFirstSegment = (int) (first / mySegmentSize);

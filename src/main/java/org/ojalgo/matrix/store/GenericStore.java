@@ -634,21 +634,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.get(valueIndex));
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final N value) {
-        myUtility.fillOne(row, col, value);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myUtility.fillOne(row, col, supplier);
-    }
-
-    @Override
     public void fillRow(final long row, final long col, final Access1D<N> values) {
         myUtility.fillRow(row, col, values);
     }

@@ -442,21 +442,6 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     }
 
     @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        myUtility.fillOne(row, col, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Double value) {
-        myUtility.fillOne(row, col, value);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myUtility.fillOne(row, col, supplier);
-    }
-
-    @Override
     public void fillRow(final long row, final Access1D<Double> values) {
         myUtility.fillRow(row, values);
     }

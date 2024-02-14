@@ -38,48 +38,6 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Fillable<N extends Comparable<N>> extends MutateAnyD, Mutate1D.Fillable<N> {
 
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Override
-        @Deprecated
-        default void fillOne(final long index, final N value) {
-            this.fillOne(StructureAnyD.reference(index, this.shape()), value);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Override
-        @Deprecated
-        default void fillOne(final long index, final NullaryFunction<?> supplier) {
-            this.fillOne(StructureAnyD.reference(index, this.shape()), supplier);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long[] reference, final Access1D<?> values, final long valueIndex) {
-            this.fillOne(reference, (N) values.get(valueIndex));
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long[], Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long[] reference, final N value) {
-            this.set(reference, value);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long[], Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
-            this.set(reference, supplier.get());
-        }
-
         void fillSet(int dimension, long dimensionalIndex, N value);
 
         void fillSet(int dimension, long dimensionalIndex, NullaryFunction<?> supplier);

@@ -56,7 +56,7 @@ abstract class ShadingStore<N extends Comparable<N>> extends LogicalStore<N> {
                 int first = this.firstInColumn(j);
                 int limit = this.limitOfColumn(j);
                 for (int i = first; i < limit; i++) {
-                    consumer.fillOne(i, j, this.get(i, j));
+                    consumer.set(i, j, this.get(i, j));
                 }
             }
         }

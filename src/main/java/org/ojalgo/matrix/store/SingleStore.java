@@ -110,7 +110,7 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
-        receiver.fillOne(0L, 0L, myNumber);
+        receiver.set(0L, 0L, myNumber);
     }
 
     @Override

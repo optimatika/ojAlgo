@@ -30,7 +30,6 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -97,46 +96,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public static <N extends Comparable<N>> SparseStore.Factory<N> factory(final PhysicalStore.Factory<N, ?> physicalFactory) {
         return new SparseStore.Factory<>(physicalFactory);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #C128} instead
-     */
-    @Deprecated
-    public static SparseStore<ComplexNumber> makeComplex(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.C128, rowsCount, columnsCount);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #R064} instead
-     */
-    @Deprecated
-    public static SparseStore<Double> makePrimitive(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(Primitive64Store.FACTORY, rowsCount, columnsCount);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #R032} instead
-     */
-    @Deprecated
-    public static SparseStore<Double> makePrimitive32(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(Primitive32Store.FACTORY, rowsCount, columnsCount);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #H256} instead
-     */
-    @Deprecated
-    public static SparseStore<Quaternion> makeQuaternion(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.H256, rowsCount, columnsCount);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #Q128} instead
-     */
-    @Deprecated
-    public static SparseStore<RationalNumber> makeRational(final long rowsCount, final long columnsCount) {
-        return SparseStore.makeSparse(GenericStore.Q128, rowsCount, columnsCount);
     }
 
     private static <N extends Scalar<N>> void doGenericColumnAXPY(final SparseArray<N> elements, final long colX, final long colY, final N a,
@@ -290,27 +249,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
 
         myMultiplier.invoke(this, left, complexity, right);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.get(valueIndex));
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final N value) {
-        synchronized (myElements) {
-            myElements.fillOne(Structure2D.index(myFirsts.length, row, col), value);
-        }
-        this.updateNonZeros(row, col);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        synchronized (myElements) {
-            myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
-        }
-        this.updateNonZeros(row, col);
     }
 
     @Override

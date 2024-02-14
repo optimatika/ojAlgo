@@ -381,25 +381,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        if (this.isPrimitive()) {
-            this.set(index, values.doubleValue(valueIndex));
-        } else {
-            this.set(index, values.get(valueIndex));
-        }
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        this.set(index, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        this.set(index, supplier.get());
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);
     }
@@ -731,14 +712,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     @Override
     protected void fill(final long first, final long limit, final long step, final N value) {
         for (long i = first; i < limit; i += step) {
-            this.fillOne(i, value);
+            this.set(i, value);
         }
     }
 
     @Override
     protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
         for (long i = first; i < limit; i += step) {
-            this.fillOne(i, supplier);
+            this.set(i, supplier.get());
         }
     }
 

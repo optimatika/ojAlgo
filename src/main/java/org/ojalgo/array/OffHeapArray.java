@@ -25,7 +25,6 @@ import java.util.function.LongFunction;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -145,21 +144,6 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     @Override
     public void fillAll(final Double value) {
         this.fill(0L, this.count(), 1L, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        this.set(index, values.doubleValue(valueIndex));
-    }
-
-    @Override
-    public void fillOne(final long index, final Double value) {
-        this.set(index, value.doubleValue());
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        this.set(index, supplier.doubleValue());
     }
 
     @Override

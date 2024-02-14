@@ -57,10 +57,12 @@ public class ComposingStoreTest extends MatrixStoreTests {
         PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
         return storeFactory.makeFilled(rowCount, colCount, new NullaryFunction<Double>() {
 
+            @Override
             public double doubleValue() {
                 return ONE;
             }
 
+            @Override
             public Double invoke() {
                 return ONE;
             }
@@ -73,7 +75,7 @@ public class ComposingStoreTest extends MatrixStoreTests {
     }
 
     private MatrixStore<Double> sparseMatrix(final int rowCount, final int colCount, final int nonzeroCount) {
-        SparseStore<Double> matrix = SparseStore.makePrimitive(rowCount, colCount);
+        SparseStore<Double> matrix = SparseStore.R064.make(rowCount, colCount);
         for (int i = 0; i < nonzeroCount; i++) {
             int row = (int) Math.floor(Math.random() * rowCount);
             int col = (int) Math.floor(Math.random() * colCount);

@@ -336,31 +336,6 @@ public final class ArrayAnyD<N extends Comparable<N>> implements AccessAnyD.Visi
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOne(index, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        myDelegate.fillOne(index, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myDelegate.fillOne(index, supplier);
-    }
-
-    @Override
-    public void fillOne(final long[] reference, final N value) {
-        myDelegate.fillOne(StructureAnyD.index(myStructure, reference), value);
-    }
-
-    @Override
-    public void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
-        myDelegate.fillOne(StructureAnyD.index(myStructure, reference), supplier);
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
     }

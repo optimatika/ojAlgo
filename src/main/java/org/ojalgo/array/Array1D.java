@@ -405,21 +405,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOne(this.convert(index), values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        myDelegate.fillOne(this.convert(index), value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        myDelegate.fillOne(this.convert(index), supplier);
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(this.convert(first), this.convert(limit), myStep, value);
     }

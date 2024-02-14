@@ -102,9 +102,9 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testMultiplySparseDenseComplex() {
 
-        SparseStore<ComplexNumber> sparseA = SparseStore.makeComplex(7, 8);
-        SparseStore<ComplexNumber> sparseB = SparseStore.makeComplex(8, 9);
-        SparseStore<ComplexNumber> sparseC = SparseStore.makeComplex(7, 9);
+        SparseStore<ComplexNumber> sparseA = SparseStore.C128.make(7, 8);
+        SparseStore<ComplexNumber> sparseB = SparseStore.C128.make(8, 9);
+        SparseStore<ComplexNumber> sparseC = SparseStore.C128.make(7, 9);
 
         SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.C128);
     }
@@ -112,9 +112,9 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testMultiplySparseDensePrimitive() {
 
-        SparseStore<Double> sparseA = SparseStore.makePrimitive(7, 8);
-        SparseStore<Double> sparseB = SparseStore.makePrimitive(8, 9);
-        SparseStore<Double> sparseC = SparseStore.makePrimitive(7, 9);
+        SparseStore<Double> sparseA = SparseStore.R064.make(7, 8);
+        SparseStore<Double> sparseB = SparseStore.R064.make(8, 9);
+        SparseStore<Double> sparseC = SparseStore.R064.make(7, 9);
 
         SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, Primitive64Store.FACTORY);
     }
@@ -122,9 +122,9 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testMultiplySparseDenseQuaternion() {
 
-        SparseStore<Quaternion> sparseA = SparseStore.makeQuaternion(7, 8);
-        SparseStore<Quaternion> sparseB = SparseStore.makeQuaternion(8, 9);
-        SparseStore<Quaternion> sparseC = SparseStore.makeQuaternion(7, 9);
+        SparseStore<Quaternion> sparseA = SparseStore.H256.make(7, 8);
+        SparseStore<Quaternion> sparseB = SparseStore.H256.make(8, 9);
+        SparseStore<Quaternion> sparseC = SparseStore.H256.make(7, 9);
 
         SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.H256);
     }
@@ -132,9 +132,9 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testMultiplySparseDenseRational() {
 
-        SparseStore<RationalNumber> sparseA = SparseStore.makeRational(7, 8);
-        SparseStore<RationalNumber> sparseB = SparseStore.makeRational(8, 9);
-        SparseStore<RationalNumber> sparseC = SparseStore.makeRational(7, 9);
+        SparseStore<RationalNumber> sparseA = SparseStore.Q128.make(7, 8);
+        SparseStore<RationalNumber> sparseB = SparseStore.Q128.make(8, 9);
+        SparseStore<RationalNumber> sparseC = SparseStore.Q128.make(7, 9);
 
         SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, GenericStore.Q128);
     }

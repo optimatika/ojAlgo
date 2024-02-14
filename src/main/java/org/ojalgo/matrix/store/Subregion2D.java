@@ -111,21 +111,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(row, myColumns[Math.toIntExact(col)], values, valueIndex);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final N value) {
-            myBase.fillOne(row, myColumns[Math.toIntExact(col)], value);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillOne(row, myColumns[Math.toIntExact(col)], supplier);
-        }
-
-        @Override
         public N get(final long row, final long col) {
             return myBase.get(row, myColumns[Math.toIntExact(col)]);
         }
@@ -227,21 +212,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
                 return false;
             }
             return true;
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(row, col, values, valueIndex);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final N value) {
-            myBase.fillOne(row, col, value);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillOne(row, col, supplier);
         }
 
         @Override
@@ -382,21 +352,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         }
 
         @Override
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + col, values, valueIndex);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final N value) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + col, value);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + col, supplier);
-        }
-
-        @Override
         public void fillRow(final long row, final long col, final N value) {
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, value);
         }
@@ -525,21 +480,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
                 return false;
             }
             return true;
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(myRows[Math.toIntExact(row)], col, values, valueIndex);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final N value) {
-            myBase.fillOne(myRows[Math.toIntExact(row)], col, value);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillOne(myRows[Math.toIntExact(row)], col, supplier);
         }
 
         @Override
@@ -673,21 +613,6 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(col, row, supplier);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(col, row, values, valueIndex);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final N value) {
-            myBase.fillOne(col, row, value);
-        }
-
-        @Override
-        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-            myBase.fillOne(col, row, supplier);
         }
 
         @Override

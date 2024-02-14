@@ -269,54 +269,6 @@ abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, M
     }
 
     @Override
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(index, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(row, col, values, valueIndex);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final N value) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(row, col, value);
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(row, col, supplier);
-    }
-
-    @Override
-    public void fillOne(final long index, final N value) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(index, value);
-    }
-
-    @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        if (!mySafe) {
-            throw new IllegalStateException();
-        }
-        myDelegate.fillOne(index, supplier);
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         if (!mySafe) {
             throw new IllegalStateException();

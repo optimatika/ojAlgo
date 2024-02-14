@@ -478,21 +478,6 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.doubleValue(valueIndex));
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final Double value) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = value.doubleValue();
-    }
-
-    @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = supplier.doubleValue();
-    }
-
-    @Override
     public void fillRange(final long first, final long limit, final Double value) {
         FillMatchingDual.fillRange(data, (int) first, (int) limit, value.doubleValue());
     }

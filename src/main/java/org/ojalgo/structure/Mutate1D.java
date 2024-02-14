@@ -62,55 +62,31 @@ public interface Mutate1D extends Structure1D {
          */
         default void fillMatching(final Access1D<?> values) {
             for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {
-                this.fillOne(i, values, i);
+                this.set(i, values.get(i));
             }
         }
 
         default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
             for (long i = 0L, limit = Math.min(left.count(), right.count()); i < limit; i++) {
-                this.fillOne(i, function.invoke(left.get(i), right.get(i)));
+                this.set(i, function.invoke(left.get(i), right.get(i)));
             }
         }
 
         default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
             for (long i = 0L, limit = Math.min(this.count(), arguments.count()); i < limit; i++) {
-                this.fillOne(i, function.invoke(arguments.get(i)));
+                this.set(i, function.invoke(arguments.get(i)));
             }
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-            this.set(index, values.get(valueIndex));
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long index, final N value) {
-            this.set(index, value);
-        }
-
-        /**
-         * @deprecated v52 Use {@link #set(long, Comparable)} instead.
-         */
-        @Deprecated
-        default void fillOne(final long index, final NullaryFunction<?> supplier) {
-            this.set(index, supplier.get());
         }
 
         default void fillRange(final long first, final long limit, final N value) {
             for (long i = first; i < limit; i++) {
-                this.fillOne(i, value);
+                this.set(i, value);
             }
         }
 
         default void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
             for (long i = first; i < limit; i++) {
-                this.fillOne(i, supplier);
+                this.set(i, supplier.get());
             }
         }
     }

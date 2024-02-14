@@ -60,14 +60,6 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
 
         DenseArray.Factory<N> array();
 
-        /**
-         * @deprecated v50 No need to call this.
-         */
-        @Deprecated
-        default PhysicalStore.Factory<N, I> builder() {
-            return this;
-        }
-
         I conjugate(Access2D<?> source);
 
         @Override
