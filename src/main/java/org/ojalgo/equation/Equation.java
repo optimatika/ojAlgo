@@ -126,14 +126,6 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     private double myPivot = ZERO;
     private double myRHS;
 
-    /**
-     * @deprecated v49 Use one of the factory methods instead
-     */
-    @Deprecated
-    public Equation(final int row, final long numberOfColumns, final double rhs) {
-        this(SparseArray.factory(ArrayR064.FACTORY).make(numberOfColumns), row, rhs);
-    }
-
     Equation(final BasicArray<?> body, final int pivot, final double rhs) {
 
         super();
