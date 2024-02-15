@@ -94,34 +94,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
-        /**
-         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
-         */
-        @Deprecated
-        public Builder() {
+        Builder() {
             super();
-        }
-
-        /**
-         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
-         */
-        @Deprecated
-        public Builder(final MatrixStore<Double> C) {
-
-            super();
-
-            this.objective(C);
-        }
-
-        /**
-         * @deprecated v50 Use {@link ConvexSolver#newBuilder()} instead.
-         */
-        @Deprecated
-        public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-
-            super();
-
-            this.objective(Q, C);
         }
 
         Builder(final int nbVariables) {
@@ -141,7 +115,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 if (matrices[2] != null) {
                     this.objective(matrices[2], matrices[3]);
                 } else if (matrices[3] != null) {
-                    this.objective(matrices[3]);
+                    this.objective(null, matrices[3]);
                 }
             }
 
@@ -212,16 +186,6 @@ public abstract class ConvexSolver extends GenericSolver {
          */
         public Builder objective(final int row, final int col, final double value) {
             this.getObjective().quadratic().set(row, col, value);
-            return this;
-        }
-
-        /**
-         * @deprecated v50 Use {@link #objective(MatrixStore, MatrixStore)} instead, or build a
-         *             {@link LinearSolver}.
-         */
-        @Deprecated
-        public Builder objective(final MatrixStore<?> mtrxC) {
-            this.setObjective(BasePrimitiveSolver.toObjectiveFunction(null, mtrxC));
             return this;
         }
 

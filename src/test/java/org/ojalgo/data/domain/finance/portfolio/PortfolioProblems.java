@@ -145,7 +145,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         MatrixStore<Double> tmpX = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
 
-        ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        ConvexSolver.Builder tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
         ConvexSolver tmpSolver = tmpBuilder.build();
         // tmpSolver.options.debug(ConvexSolver.class);
@@ -163,7 +163,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
 
-        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 
@@ -176,7 +176,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
                 .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 

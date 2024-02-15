@@ -231,24 +231,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      */
     public static final class StandardBuilder extends LinearSolver.Builder<StandardBuilder> {
 
-        /**
-         * @deprecated v50 Use {@link LinearSolver#newBuilder()} instead.
-         */
-        @Deprecated
-        public StandardBuilder() {
+        StandardBuilder() {
             super();
         }
 
-        /**
-         * @deprecated v50 Use {@link LinearSolver#newBuilder()} instead.
-         */
-        @Deprecated
-        public StandardBuilder(final MatrixStore<Double> mtrxC) {
 
-            super();
-
-            this.objective(mtrxC);
-        }
 
     }
 
