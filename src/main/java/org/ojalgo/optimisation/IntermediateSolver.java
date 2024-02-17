@@ -194,7 +194,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return integration.getIndexInSolver(myModel, variable);
     }
 
-    protected ExpressionsBasedModel getModel() {
+    public ExpressionsBasedModel getModel() {
         return myModel;
     }
 

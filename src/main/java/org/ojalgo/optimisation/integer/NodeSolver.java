@@ -71,7 +71,7 @@ public final class NodeSolver extends IntermediateSolver {
 
     boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
 
-        if (!this.isSolved()) {
+        if (true || !this.isSolved()) {
             return false;
         }
 
