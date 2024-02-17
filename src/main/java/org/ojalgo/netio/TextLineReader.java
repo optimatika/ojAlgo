@@ -49,10 +49,10 @@ public final class TextLineReader implements FromFileReader<String> {
     }
 
     /**
-     * not null, not empty and is not a comment (starts with '#')
+     * not null, not empty, not blank and not a comment (starts with '#')
      */
     public static boolean isLineOK(final String line) {
-        return line != null && line.length() > 0 && !line.startsWith("#");
+        return line != null && line.length() > 0 && !line.isBlank() && !line.startsWith("#");
     }
 
     public static TextLineReader of(final File file) {
@@ -87,10 +87,12 @@ public final class TextLineReader implements FromFileReader<String> {
         myReader = new BufferedReader(delegate);
     }
 
+    @Override
     public void close() throws IOException {
         myReader.close();
     }
 
+    @Override
     public String read() {
         try {
             return myReader.readLine();

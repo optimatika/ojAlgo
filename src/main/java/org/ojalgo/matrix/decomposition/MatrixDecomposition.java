@@ -113,25 +113,53 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
             return retVal;
         }
 
+        /**
+         * Will create a new decomposition instance suitable for typical/most cases.
+         * <p>
+         * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
+         * method.
+         * 
+         * @return A "decomposer" ready to decompose matrices.
+         */
         default D make() {
             return this.make(TYPICAL);
         }
 
-        default D make(final int numberOfRows, final int numberOfColumns) {
+        /**
+         * Will create a new decomposition instance suitable for matrices of the specified size.
+         * <p>
+         * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
+         * method.
+         * 
+         * @param nbRows The expected number of rows in the matrices to decompose
+         * @param nbCols The expected number of columns in the matrices to decompose
+         * @return A "decomposer" ready to decompose matrices.
+         */
+        default D make(final int nbRows, final int nbCols) {
             return this.make(new Structure2D() {
 
                 @Override
                 public int getColDim() {
-                    return numberOfColumns;
+                    return nbCols;
                 }
 
                 @Override
                 public int getRowDim() {
-                    return numberOfRows;
+                    return nbRows;
                 }
             });
         }
 
+        /**
+         * Will create a new decomposition instance suitable for matrices of the specified size.
+         * <p>
+         * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
+         * method.
+         * 
+         * @param typical A 2D structure of roughly the expected size with which this decomposition will be
+         *        used.
+         * @return A "decomposer" ready to decompose matrices.
+         */
         D make(Structure2D typical);
 
     }

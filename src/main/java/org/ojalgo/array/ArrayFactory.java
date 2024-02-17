@@ -80,7 +80,7 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
     /**
      * There are several requirements on the segments:
      * <ol>
-     * <li>All segements, except possibly the last, must have the same length/size/count.</li>
+     * <li>All segments, except possibly the last, must have the same length/size/count.</li>
      * <li>That size must be a power of 2.</li>
      * <li>The size of the last segment must be <= "the segment size".</li>
      * </ol>

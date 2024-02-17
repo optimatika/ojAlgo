@@ -22,8 +22,6 @@
 package org.ojalgo.data.domain.finance.series;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.netio.TextLineReader.Parser;
@@ -35,7 +33,8 @@ public interface DataFetcher {
     InputStream getInputStream();
 
     default <T> AutoSupplier<T> getReader(final Parser<T> parser) {
-        TextLineReader reader = new TextLineReader(this.getInputStream());
+        InputStream stream = this.getInputStream();
+        TextLineReader reader = new TextLineReader(stream);
         return reader.withFilteredParser(parser);
     }
 
@@ -43,15 +42,6 @@ public interface DataFetcher {
      * @return Typically DAY(ly), WEEK(ly) or MONTH(ly)
      */
     CalendarDateUnit getResolution();
-
-    /**
-     * @return A stream reader that can be sent to a CSV parser
-     * @deprecated v52 Use {@link #getInputStream()} or {@link #getReader(Parser)} instead.
-     */
-    @Deprecated
-    default Reader getStreamOfCSV() {
-        return new InputStreamReader(this.getInputStream());
-    }
 
     /**
      * @return Data identifier
