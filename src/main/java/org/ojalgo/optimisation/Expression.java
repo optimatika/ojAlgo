@@ -992,7 +992,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     private ConstantFunction<Double> makeConstantFunction() {
-        return ConstantFunction.factory(Primitive64Store.FACTORY).constant((Comparable<?>) this.getConstant()).make(myModel.countVariables());
+        return ConstantFunction.factory(Primitive64Store.FACTORY).constant(this.getConstant()).make(myModel.countVariables());
     }
 
     private PureQuadraticFunction<Double> makePureQuadraticFunction() {
@@ -1403,6 +1403,13 @@ public final class Expression extends ModelEntity<Expression> {
 
     void setRedundant() {
         myRedundant = true;
+    }
+
+    public void reset() {
+        myRedundant = false;
+        myInfeasible = false;
+        // TODO Auto-generated method stub
+
     }
 
 }

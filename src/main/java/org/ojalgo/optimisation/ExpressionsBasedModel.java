@@ -1919,4 +1919,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myOptimisationSense = optimisationSense;
     }
 
+    public void reset() {
+        for (Expression variable : myExpressions.values()) {
+            variable.reset();
+        }
+        // TODO Auto-generated method stub
+
+    }
+
 }
