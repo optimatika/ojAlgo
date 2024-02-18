@@ -815,6 +815,11 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         myShallowCopy = shallow || modelToCopy.isShallowCopy();
         myRelaxed = modelToCopy.isRelaxed();
+
+        Result knownSolution = modelToCopy.getKnownSolution();
+        if (knownSolution != null) {
+            this.setKnownSolution(knownSolution);
+        }
     }
 
     public Expression addExpression() {

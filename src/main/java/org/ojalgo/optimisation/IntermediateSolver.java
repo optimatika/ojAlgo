@@ -114,6 +114,10 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
         Optimisation.Solver solver = this.getSolver();
 
+        if (myModel.options.validate && solver instanceof GenericSolver && !((GenericSolver) solver).validate(myModel)) {
+            throw new IllegalStateException("Model is invalid");
+        }
+
         Optimisation.Result retVal = candidate != null ? candidate : myModel.getVariableValues();
         retVal = integration.toSolverState(retVal, myModel);
         retVal = solver.solve(retVal);
@@ -169,6 +173,14 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      * {@link ExpressionsBasedModel#validate(Access1D, BasicLogger)}.
      */
     public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
+        if (mySolver != null && mySolver instanceof GenericSolver) {
+            boolean valid = ((GenericSolver) mySolver).validate(myModel);
+            if (!valid) {
+                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
+            }
+            // return valid;
+        } else {
+        }
         return myModel.validate(solution, appender);
     }
 

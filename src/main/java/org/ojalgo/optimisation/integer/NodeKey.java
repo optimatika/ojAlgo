@@ -160,6 +160,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         mySignChanged = false;
     }
 
+    @Override
     public int compareTo(final NodeKey ref) {
         return Long.compare(sequence, ref.sequence);
     }
