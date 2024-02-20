@@ -301,7 +301,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return myCount;
     }
 
-    public long countNonzeros() {
+    public int countNonzeros() {
         return myActualLength;
     }
 

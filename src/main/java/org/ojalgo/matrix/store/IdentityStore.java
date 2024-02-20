@@ -95,7 +95,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> multiply(final double scalar) {
 
-        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
+        SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim(), Math::min);
 
         retVal.fillDiagonal(this.physical().scalar().cast(scalar));
 
@@ -110,7 +110,7 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> multiply(final N scalar) {
 
-        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
+        SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim(), Math::min);
 
         retVal.fillDiagonal(scalar);
 
