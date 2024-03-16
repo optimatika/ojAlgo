@@ -21,7 +21,8 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.HALF;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.CombinatorialFunctions;

@@ -49,7 +49,6 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D;
-import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
 

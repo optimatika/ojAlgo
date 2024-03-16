@@ -21,7 +21,8 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.SQRT;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.random.Exponential;

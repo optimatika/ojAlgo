@@ -235,8 +235,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             super();
         }
 
-
-
     }
 
     static abstract class Builder<B extends LinearSolver.Builder<B>> extends GenericSolver.Builder<B, LinearSolver> {

@@ -21,8 +21,10 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SIGMOID;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.SOFTMAX;
+import static org.ojalgo.function.constant.PrimitiveMath.FIVE;
+import static org.ojalgo.function.constant.PrimitiveMath.ONE;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,7 +21,8 @@
  */
 package org.ojalgo.random.scedasticity;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.TWELVE;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 

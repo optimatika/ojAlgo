@@ -13,7 +13,6 @@ import org.ojalgo.optimisation.Optimisation.Result;
 @Tag("network")
 public class OptimisationServiceTest {
 
-
     private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
     private static final String PATH_TEST = "/optimisation/v01/test";
     private static final String HOST = "http://51.20.44.70:8080";

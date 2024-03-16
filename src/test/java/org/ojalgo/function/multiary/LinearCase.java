@@ -55,7 +55,8 @@ public class LinearCase extends MultiaryFunctionTests {
 
         myLinearFunction2 = LinearFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
         myAffineFunction2 = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
-        myQuadraticFunction2 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear.transpose()).make(linear.transpose().size());
+        myQuadraticFunction2 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear.transpose())
+                .make(linear.transpose().size());
 
         myArg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
     }

@@ -21,7 +21,8 @@
  */
 package org.ojalgo.type;
 
-import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoField.INSTANT_SECONDS;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 
 import java.time.*;
 import java.time.temporal.*;
