@@ -23,6 +23,7 @@ package org.ojalgo.structure;
 
 import java.util.List;
 
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.type.NumberDefinition;
@@ -293,6 +294,10 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         }
     }
 
+    /**
+     * @deprecated v54 Use {@link Primitive1D#of(double...)} or {@link ArrayR064#wrap(double...)} instead
+     */
+    @Deprecated
     static Access1D<Double> wrap(final double... target) {
         return Primitive1D.of(target);
     }
