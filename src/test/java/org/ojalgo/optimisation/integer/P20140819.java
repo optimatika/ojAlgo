@@ -113,7 +113,7 @@ public class P20140819 extends OptimisationIntegerTests {
                 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
 
         for (int v = 0; v < weights.length; v++) {
-            retVal.addVariable(Variable.make("x" + v).integer(true).lower(0).upper(414).weight(weights[v]));
+            retVal.newVariable("x" + v).integer(true).lower(0).upper(414).weight(weights[v]);
         }
 
         // 117 <= 30 30 30 30 0 4 0 0 0 4 0 0 0 4 0 0 <= 14868

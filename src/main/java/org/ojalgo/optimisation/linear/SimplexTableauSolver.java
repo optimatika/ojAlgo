@@ -343,17 +343,17 @@ final class SimplexTableauSolver extends LinearSolver {
 
         structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
 
-        for (IntIndex tmpKey : objective.getLinearKeySet()) {
+        for (IntIndex key : objective.getLinearKeySet()) {
 
-            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.getAdjustedLinearFactor(tmpKey)
-                    : objective.getAdjustedLinearFactor(tmpKey);
+            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.doubleValue(key, true)
+                    : objective.doubleValue(key, true);
 
-            int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
+            int tmpPosInd = model.indexOfPositiveVariable(key);
             if (tmpPosInd >= 0) {
                 retObjective.set(basePosVars + tmpPosInd, tmpFactor);
             }
 
-            int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
+            int tmpNegInd = model.indexOfNegativeVariable(key);
             if (tmpNegInd >= 0) {
                 retObjective.set(baseNegVars + tmpNegInd, -tmpFactor);
             }
@@ -367,13 +367,13 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprUpPos) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = expression.getAdjustedLinearFactor(key);
+                double factor = expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = expression.getAdjustedUpperLimit();
+            double rhs = expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, false);
@@ -386,13 +386,13 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprLoNeg) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = -expression.getAdjustedLinearFactor(key);
+                double factor = -expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = -expression.getAdjustedLowerLimit();
+            double rhs = -expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, false);
@@ -409,7 +409,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = variable.getAdjustedUpperLimit();
+            double rhs = variable.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, false);
@@ -426,7 +426,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = -variable.getAdjustedLowerLimit();
+            double rhs = -variable.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, false);
@@ -441,13 +441,13 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprLoPos) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = expression.getAdjustedLinearFactor(key);
+                double factor = expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = expression.getAdjustedLowerLimit();
+            double rhs = expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, true);
@@ -460,13 +460,13 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprUpNeg) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = -expression.getAdjustedLinearFactor(key);
+                double factor = -expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = -expression.getAdjustedUpperLimit();
+            double rhs = -expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, true);
@@ -483,7 +483,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = variable.getAdjustedLowerLimit();
+            double rhs = variable.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, true);
@@ -500,7 +500,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = -variable.getAdjustedUpperLimit();
+            double rhs = -variable.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, true);
@@ -515,11 +515,11 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprEqPos) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = expression.getAdjustedLinearFactor(key);
+                double factor = expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
-            double rhs = expression.getAdjustedUpperLimit();
+            double rhs = expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.EQUALITY, false);
@@ -532,11 +532,11 @@ final class SimplexTableauSolver extends LinearSolver {
         for (Expression expression : exprEqNeg) {
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                double factor = -expression.getAdjustedLinearFactor(key);
+                double factor = -expression.doubleValue(key, true);
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
-            double rhs = -expression.getAdjustedLowerLimit();
+            double rhs = -expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.EQUALITY, true);

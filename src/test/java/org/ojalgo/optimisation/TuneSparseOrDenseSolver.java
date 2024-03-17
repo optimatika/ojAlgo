@@ -202,12 +202,12 @@ public class TuneSparseOrDenseSolver extends OptimisationTests {
 
     public static ExpressionsBasedModel generateModelQP(final int numberOfVariables) {
 
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
         Variable[] variables = new Variable[numberOfVariables];
         for (int i = 0; i < numberOfVariables; i++) {
-            variables[i] = Variable.make("V" + Integer.toString(i)).lower(ZERO).weight(-UNIFORM_20.doubleValue());
+            variables[i] = retVal.newVariable("V" + Integer.toString(i)).lower(ZERO).weight(-UNIFORM_20.doubleValue());
         }
-
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
 
         Expression exp100P = retVal.newExpression("Balance");
         for (Variable tmpVariable : variables) {

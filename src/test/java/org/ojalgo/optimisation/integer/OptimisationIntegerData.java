@@ -31,16 +31,17 @@ public abstract class OptimisationIntegerData {
 
     public static ExpressionsBasedModel buildModelForP20100412() {
 
-        final KnapsackItem[] tmpItems = { new KnapsackItem(20, 2), new KnapsackItem(30, 4) };
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        final Variable[] tmpVariables = new Variable[tmpItems.length];
+        KnapsackItem[] tmpItems = { new KnapsackItem(20, 2), new KnapsackItem(30, 4) };
+
+        Variable[] tmpVariables = new Variable[tmpItems.length];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("Var" + String.valueOf(i));
+            tmpVariables[i] = retVal.newVariable("Var" + String.valueOf(i));
             tmpVariables[i].lower(ZERO).upper(ONE).weight(tmpItems[i].value).integer(true);
         }
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-        final Expression tmpTotalWeightExpr = retVal.newExpression("Total Weight");
+        Expression tmpTotalWeightExpr = retVal.newExpression("Total Weight");
         for (int i = 0; i < tmpItems.length; i++) {
             tmpTotalWeightExpr.set(i, tmpItems[i].weight);
         }

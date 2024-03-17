@@ -39,26 +39,29 @@ public class TestOjAlgo {
     }
 
     public static void testBug1() {
-        final Variable[] objective = new Variable[] { new Variable("X").weight(ONE), new Variable("Y").weight(ZERO), new Variable("Z").weight(ZERO) };
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable[] objective = new Variable[] { model.newVariable("X").weight(ONE), model.newVariable("Y").weight(ZERO), model.newVariable("Z").weight(ZERO) };
 
         objective[1].setInteger(true);
 
-        final ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
+
 
         // c1: X =0
-        final Expression c1 = model.newExpression("c1");
+        Expression c1 = model.newExpression("c1");
         c1.level(ZERO);
         c1.set(0, ONE);
 
         // c2: -X +5Y =0
-        final Expression c2 = model.newExpression("c2");
+        Expression c2 = model.newExpression("c2");
         c2.level(ZERO);
 
         c2.set(0, new BigDecimal(-1));
         c2.set(1, ONE);
 
         // c3: X -Z =0
-        final Expression c3 = model.newExpression("c3");
+        Expression c3 = model.newExpression("c3");
         c3.level(ZERO);
         // bugs with this constraint
         c3.set(0, ONE);
@@ -67,7 +70,7 @@ public class TestOjAlgo {
         //c3.setLinearFactor(0, new BigDecimal(-1));
         //c3.setLinearFactor(2, ONE);
 
-        final Optimisation.Result tmpResult = model.minimise();
+        Optimisation.Result tmpResult = model.minimise();
 
         BasicLogger.debug(tmpResult.toString());
     }

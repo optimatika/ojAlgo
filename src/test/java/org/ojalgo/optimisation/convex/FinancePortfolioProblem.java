@@ -69,22 +69,22 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
         ProgrammingError.throwIfNotSquare(covariances);
         ProgrammingError.throwIfNotEqualRowDimensions(covariances, returns);
 
-        final int numberOfVariables = (int) returns.countRows();
+        int numberOfVariables = (int) returns.countRows();
 
-        final Variable[] tmpVariables = new Variable[numberOfVariables];
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
+        Variable[] tmpVariables = new Variable[numberOfVariables];
         for (int i = 0; i < numberOfVariables; i++) {
-            tmpVariables[i] = Variable.make("Asset_" + Integer.toString(i)).lower(ZERO).upper(ONE).weight(-returns.doubleValue(i));
+            tmpVariables[i] = retVal.newVariable("Asset_" + Integer.toString(i)).lower(ZERO).upper(ONE).weight(-returns.doubleValue(i));
         }
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-
-        final Expression tmp100P = retVal.newExpression("Balance");
+        Expression tmp100P = retVal.newExpression("Balance");
         for (int i = 0; i < numberOfVariables; i++) {
             tmp100P.set(i, ONE);
         }
         tmp100P.level(ONE);
 
-        final Expression tmpVar = retVal.newExpression("Variance");
+        Expression tmpVar = retVal.newExpression("Variance");
         for (int i = 0; i < numberOfVariables; i++) {
             for (int j = 0; j < numberOfVariables; j++) {
                 tmpVar.set(i, j, covariances.doubleValue(i, j));

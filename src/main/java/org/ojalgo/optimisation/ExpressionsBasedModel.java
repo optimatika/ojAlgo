@@ -739,19 +739,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this(new Optimisation.Options());
     }
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
-
-        this();
-
-        for (Variable variable : variables) {
-            this.addVariable(variable);
-        }
-    }
-
     public ExpressionsBasedModel(final Optimisation.Options optimisationOptions) {
 
         super();
@@ -764,19 +751,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myRelaxed = false;
     }
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public ExpressionsBasedModel(final Variable... variables) {
-
-        this();
-
-        for (Variable variable : variables) {
-            this.addVariable(variable);
-        }
-    }
-
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean shallow, final boolean prune) {
 
         super();
@@ -787,7 +761,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         this.addObjectiveConstant(modelToCopy.getObjectiveConstant());
 
         for (Variable tmpVar : modelToCopy.getVariables()) {
-            myVariables.add(tmpVar.clone());
+            myVariables.add(tmpVar.copy());
         }
 
         Set<IntIndex> fixedVariables = modelToCopy.getFixedVariables();
@@ -881,7 +855,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             if (variable == null || variable.getIndex() == null || !variable.isBinary()) {
                 throw new ProgrammingError("Variables must be binary and already inserted in the model!");
             }
-            expression.set(variable.getIndex(), ONE);
+            expression.doSet(variable.getIndex(), ONE);
         }
 
         expression.upper(BigDecimal.valueOf(max));
@@ -898,38 +872,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public Variable addVariable(final String name) {
         return this.newVariable(name);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public void addVariable(final Variable variable) {
-        if (myShallowCopy) {
-            throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
-        }
-        myVariables.add(variable);
-        variable.setIndex(new IntIndex(myVariables.size() - 1));
-    }
-
-    /**
-     * @deprecated v53 Use {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public void addVariables(final Collection<? extends Variable> variables) {
-        for (final Variable tmpVariable : variables) {
-            this.addVariable(tmpVariable);
-        }
-    }
-
-    /**
-     * @deprecated v53 Use {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public void addVariables(final Variable[] variables) {
-        for (final Variable tmpVariable : variables) {
-            this.addVariable(tmpVariable);
-        }
     }
 
     /**
@@ -1337,8 +1279,13 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     public Variable newVariable(final String name) {
-        final Variable retVal = new Variable(name);
-        this.addVariable(retVal);
+
+        if (myShallowCopy) {
+            throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
+        }
+
+        Variable retVal = new Variable(name, myVariables.size());
+        myVariables.add(retVal);
         return retVal;
     }
 
@@ -1381,7 +1328,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        retVal.set(tmpKey, tmpNewVal);
+                        retVal.doSet(tmpKey, tmpNewVal);
                     }
                 }
 
@@ -1390,7 +1337,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        retVal.set(tmpKey, tmpNewVal);
+                        retVal.doSet(tmpKey, tmpNewVal);
                     }
                 }
             }
@@ -1900,6 +1847,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void setOptimisationSense(final Optimisation.Sense optimisationSense) {
         myOptimisationSense = optimisationSense;
+    }
+
+    IntIndex toIntIndex(final int index) {
+        return myVariables.get(index).getIndex();
+    }
+
+    IntRowColumn toIntRowColumn(final int row, final int column) {
+        return new IntRowColumn(myVariables.get(row).getIndex(), myVariables.get(column).getIndex());
     }
 
 }

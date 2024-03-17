@@ -91,10 +91,12 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         //          MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances, BigMath.PI.multiply(BigMath.E));
 
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
         // create asset variables - cost and weighting constraints
         Variable[] tmpVariables = new Variable[(int) tmpReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i] = model.newVariable("VAR" + i);
             int row = i;
             tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
@@ -104,7 +106,6 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.80"));
         }
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
 
         Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
@@ -218,11 +219,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         int tmpNumberOfVariables = matrices[3].size(); // c
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
-            Variable tmpVariable = Variable.make("X" + v);
+            Variable tmpVariable = retVal.newVariable("X" + v);
             if (expectedSolution != null) {
                 tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
             }
-            retVal.addVariable(tmpVariable);
         }
         if (matrices[0] != null && matrices[1] != null) {
             for (int e = 0; e < matrices[0].countRows(); e++) {
@@ -265,10 +265,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testInfeasibleCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ONE).upper(TWO).weight(ONE), new Variable("X2").lower(ONE).upper(TWO).weight(TWO),
-                new Variable("X3").lower(ONE).upper(TWO).weight(THREE) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ONE).upper(TWO).weight(ONE), tmpModel.newVariable("X2").lower(ONE).upper(TWO).weight(TWO),
+                tmpModel.newVariable("X3").lower(ONE).upper(TWO).weight(THREE) };
+
 
         Expression tmpExprQ = tmpModel.newExpression("Q1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -338,21 +339,13 @@ public class ConvexProblems extends OptimisationConvexTests {
         // model.options.debug(ConvexSolver.class);
 
         // Create the variables
-        model.addVariable(Variable.make("w0"));
-        model.getVariable(0).lower(null);
-        model.getVariable(0).upper(null);
+        model.newVariable("w0").lower(null).upper(null);
 
-        model.addVariable(Variable.make("w1"));
-        model.getVariable(1).lower(null);
-        model.getVariable(1).upper(null);
+        model.newVariable("w1").lower(null).upper(null);
 
-        model.addVariable(Variable.make("w2"));
-        model.getVariable(2).lower(null);
-        model.getVariable(2).upper(null);
+        model.newVariable("w2").lower(null).upper(null);
 
-        model.addVariable(Variable.make("slack"));
-        model.getVariable(3).lower(0);
-        model.getVariable(3).upper(null);
+        model.newVariable("slack").lower(0).upper(null);
 
         // Add the objective: 0.5 * w0 * w0 + 0.5 * w1 * w1 + 0.5 * w2 * w2 + 1000 * slack
         Expression objectiveFunction = model.addExpression();
@@ -444,10 +437,12 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -2.4861043894946935E-4, 1.4766450293395405E-4, 4.841458106181396E-4, 7.58419663970477E-4, -5.3976919759028745E-5, 0.0012421132342988626,
                         7.550465994733837E-4, -4.763223568683059E-5, 3.2083564921169634E-4, 0.0017093327832123186 } });
 
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
         // create asset variables - cost and weighting constraints
         Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i] = model.newVariable("VAR" + i);
             int row = i;
             tmpVariables[i].weight(TypeUtils.toBigDecimal(expectedReturnsMatrix.get(row, 0)).negate());
             // set the constraints on the asset weights
@@ -461,7 +456,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 MatrixQ128.FACTORY.rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
+
 
         Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
@@ -546,10 +541,12 @@ public class ConvexProblems extends OptimisationConvexTests {
                         2.4519847977412686E-4, 5.182632389125651E-4, 5.841470978796527E-4, -1.5046975508620905E-4, 1.2448218299234062E-5, -4.113641419540392E-5,
                         1.231995848356005E-4, 0.0011885193322126312 } });
 
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
         // create asset variables - cost and weighting constraints
         Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i] = model.newVariable("VAR" + i);
             int row = i;
             tmpVariables[i].weight(TypeUtils.toBigDecimal(expectedReturnsMatrix.get(row, 0)).negate());
             // set the constraints on the asset weights
@@ -566,7 +563,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                         { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
+
 
         Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), covarianceMatrix);
@@ -630,10 +627,12 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { 6.902267133060073E-5, -2.4226694503921645E-5, -1.359858314115312E-4, 0.0010866808807429532, 0.002481787652249504, -1.703972415991329E-5,
                         -6.615640978331292E-4, -2.2401086720669167E-5, 0.0011464293217708277, 0.007398229661528494 } });
 
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
         // create asset variables - cost and weighting constraints
         Variable[] tmpVariables = new Variable[(int) tmpExpectedReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i] = model.newVariable("VAR" + i);
             int row = i;
             tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpExpectedReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
@@ -648,7 +647,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                         { 0.11999999999979595 }, { 0.09356767510776097 }, { 0.11999999999998154 }, { 0.07999999999999653 }, { 0.08000000000000498 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
+
 
         Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
@@ -713,10 +712,12 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -0.0027421673864628264, -0.0010605923775744853, -0.001709517941787044, -0.0018693519327569541, 0.002160537177809949, -1.814362059740286E-4,
                         0.001201578905822851, 5.298368056593439E-4, 5.437156659657787E-4, 0.007359495478781133 } });
 
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
         // create asset variables - cost and weighting constraints
         Variable[] tmpVariables = new Variable[(int) tmpExpectedReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i] = model.newVariable("VAR" + i);
             int row = i;
             tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpExpectedReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
@@ -731,7 +732,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                         { 0.12000000000018606 }, { 0.11999999999996151 }, { 0.12000000000000167 }, { 0.08000000000001738 }, { 0.08000000000005617 } }));
         Access1D<BigDecimal> expected = tmpExpected;
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
+
 
         Expression tmpVariance = model.newExpression("Variance");
         tmpVariance.setQuadraticFactors(model.getVariables(), tmpCovariances);
@@ -1194,13 +1195,15 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20111129() {
 
-        Variable x1 = new Variable("X1");
-        Variable x2 = new Variable("X2").lower(BigMath.HUNDRED.negate()).upper(BigMath.HUNDRED);
-        Variable x3 = new Variable("X3").lower(BigMath.ZERO);
-        Variable x4 = new Variable("X4").lower(BigMath.ZERO);
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("X1");
+        Variable x2 = model.newVariable("X2").lower(BigMath.HUNDRED.negate()).upper(BigMath.HUNDRED);
+        Variable x3 = model.newVariable("X3").lower(BigMath.ZERO);
+        Variable x4 = model.newVariable("X4").lower(BigMath.ZERO);
 
         Variable[] tmpVariables = { x1, x2, x3, x4 };
-        ExpressionsBasedModel model = new ExpressionsBasedModel(tmpVariables);
+
 
         Expression tmpObjExpr = model.newExpression("Objective");
 

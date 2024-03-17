@@ -67,13 +67,14 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
         //
         // variables
         //
+        linearModel = new ExpressionsBasedModel();
+
         vars = new Variable[numberOfVars];
-        vars[0] = new Variable("x0").lower(BigMath.ZERO).upper(BigMath.HUNDRED);
-        vars[1] = new Variable("x1").lower(BigMath.ZERO).upper(BigMath.HUNDRED);
+        vars[0] = linearModel.newVariable("x0").lower(BigMath.ZERO).upper(BigMath.HUNDRED);
+        vars[1] = linearModel.newVariable("x1").lower(BigMath.ZERO).upper(BigMath.HUNDRED);
         //
         // model
         //
-        linearModel = new ExpressionsBasedModel(vars);
         {
             //
             // x0 = 2*x1, i.e. x0 - 2*x1 = 0

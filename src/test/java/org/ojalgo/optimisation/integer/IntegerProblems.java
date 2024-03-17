@@ -158,32 +158,34 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20111010() {
 
-        Variable[] tmpVariables = { Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE), Variable.makeBinary("Z").weight(ONE) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        model.newVariable("X").binary().weight(ONE);
+        model.newVariable("Y").binary().weight(ONE);
+        model.newVariable("Z").binary().weight(ONE);
 
-        Expression tmpC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC1.set(i, ONE);
         }
 
         tmpC1.level(ONE);
 
-        Expression tmpC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC2 = model.newExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC2.set(i, ONE);
         }
         tmpC2.level(TWO);
 
-        Expression tmpC3 = tmpModel.newExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC3 = model.newExpression("C3");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC3.set(i, ONE);
         }
         tmpC3.level(THREE);
 
         // tmpModel.options.progress(IntegerSolver.class);
 
-        Optimisation.Result tmpResult = tmpModel.minimise();
+        Optimisation.Result tmpResult = model.minimise();
 
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
@@ -215,10 +217,10 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20130409a() {
 
-        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
-                new Variable("x2014").lower(BigMath.ZERO).integer() };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
+        Variable[] variables = { model.newVariable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), model.newVariable("x2013").lower(BigMath.ZERO).integer(),
+                model.newVariable("x2014").lower(BigMath.ZERO).integer() };
 
         Expression expr1 = model.newExpression("Expr1");
         expr1.set(0, -1);
@@ -255,16 +257,12 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20130409b() {
 
-        Variable x1 = Variable.make("x1");
-        Variable x2013 = Variable.makeInteger("x2013");
-        Variable x2014 = Variable.makeInteger("x2014");
-        Variable x2015 = Variable.makeInteger("x2015");
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x1);
-        model.addVariable(x2013);
-        model.addVariable(x2014);
-        model.addVariable(x2015);
+
+        Variable x1 = model.newVariable("x1");
+        Variable x2013 = model.newVariable("x2013").integer();
+        Variable x2014 = model.newVariable("x2014").integer();
+        Variable x2015 = model.newVariable("x2015").integer();
 
         Expression obj = model.newExpression("obj");
         obj.set(x1, 1);

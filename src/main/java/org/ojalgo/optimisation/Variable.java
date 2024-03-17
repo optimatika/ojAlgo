@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -43,48 +42,23 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class Variable extends ModelEntity<Variable> {
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public static Variable make(final String name) {
-        return new Variable(name);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public static Variable makeBinary(final String name) {
-        return Variable.make(name).binary();
-    }
-
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public static Variable makeInteger(final String name) {
-        return Variable.make(name).integer();
-    }
-
-    private IntIndex myIndex = null;
+    private final IntIndex myIndex;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;
     private BigDecimal myValue = null;
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public Variable(final String name) {
+    Variable(final String name, final int index) {
+
         super(name);
+
+        myIndex = new IntIndex(index);
     }
 
-    protected Variable(final Variable variableToCopy) {
+    Variable(final Variable variableToCopy) {
 
         super(variableToCopy);
 
-        myIndex = null;
+        myIndex = variableToCopy.getIndex();
         myInteger = variableToCopy.isInteger();
         myValue = variableToCopy.getValue();
     }
@@ -105,15 +79,9 @@ public final class Variable extends ModelEntity<Variable> {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
 
+    @Override
     public int compareTo(final Variable obj) {
         return this.getIndex().compareTo(obj.getIndex());
-    }
-
-    /**
-     * @return A copy that can be used with other models
-     */
-    public Variable copy() {
-        return new Variable(this);
     }
 
     public BigDecimal getLowerSlack() {
@@ -262,6 +230,11 @@ public final class Variable extends ModelEntity<Variable> {
         return retVal;
     }
 
+    public Variable value(final BigDecimal value) {
+        this.setValue(value);
+        return this;
+    }
+
     private void assertFixedValue() {
         if (this.isLowerLimitSet() && this.isUpperLimitSet() && this.getLowerLimit().compareTo(this.getUpperLimit()) == 0) {
             myValue = this.getLowerLimit();
@@ -285,31 +258,24 @@ public final class Variable extends ModelEntity<Variable> {
         }
     }
 
-    /**
-     * Internal copy that includes the index
-     */
-    @Override
-    protected Variable clone() {
-
-        Variable retVal = this.copy();
-
-        retVal.setIndex(myIndex);
-
-        return retVal;
-    }
-
     @Override
     protected void destroy() {
 
         super.destroy();
 
-        myIndex = null;
         myValue = null;
     }
 
     @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger appender) {
         return this.validate(value, context, appender, false);
+    }
+
+    /**
+     * Internal copy that includes the index
+     */
+    Variable copy() {
+        return new Variable(this);
     }
 
     @Override
@@ -376,14 +342,6 @@ public final class Variable extends ModelEntity<Variable> {
 
     void setFixed(final BigDecimal value) {
         this.level(value).setValue(value);
-    }
-
-    void setIndex(final IntIndex index) {
-        Objects.requireNonNull(index, "The index cannot be null!");
-        if (myIndex != null && myIndex.index != index.index) {
-            throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
-        }
-        myIndex = index;
     }
 
     void setUnbounded(final boolean uncorrelated) {

@@ -119,18 +119,20 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             throw new IllegalArgumentException("numberOfVars must be >= 6 !!!");
         }
 
+        model = new ExpressionsBasedModel();
+
         //
         // variables
         //
         vars = new Variable[numberOfVars];
-        vars[0] = new Variable("x0").lower(new BigDecimal(00.0)).upper(new BigDecimal(15.0));
-        vars[1] = new Variable("x1").lower(new BigDecimal(17.0)).upper(new BigDecimal(27.0));
-        vars[2] = new Variable("x2").lower(new BigDecimal(19.0)).upper(new BigDecimal(34.0));
-        vars[3] = new Variable("x3").lower(new BigDecimal(25.0)).upper(new BigDecimal(48.0));
-        vars[4] = new Variable("x4").lower(new BigDecimal(05.0)).upper(new BigDecimal(18.0));
-        vars[5] = new Variable("x5").lower(new BigDecimal(02.0)).upper(new BigDecimal(09.0));
+        vars[0] = model.newVariable("x0").lower(new BigDecimal(00.0)).upper(new BigDecimal(15.0));
+        vars[1] = model.newVariable("x1").lower(new BigDecimal(17.0)).upper(new BigDecimal(27.0));
+        vars[2] = model.newVariable("x2").lower(new BigDecimal(19.0)).upper(new BigDecimal(34.0));
+        vars[3] = model.newVariable("x3").lower(new BigDecimal(25.0)).upper(new BigDecimal(48.0));
+        vars[4] = model.newVariable("x4").lower(new BigDecimal(05.0)).upper(new BigDecimal(18.0));
+        vars[5] = model.newVariable("x5").lower(new BigDecimal(02.0)).upper(new BigDecimal(09.0));
         for (int i = 6; i < numberOfVars; ++i) {
-            vars[i] = new Variable("x" + i).level(BigMath.ZERO);
+            vars[i] = model.newVariable("x" + i).level(BigMath.ZERO);
         }
         //
         // minimise distance to this point
@@ -148,7 +150,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         //
         // model
         //
-        model = new ExpressionsBasedModel(vars);
+
         //
         // objective function
         //

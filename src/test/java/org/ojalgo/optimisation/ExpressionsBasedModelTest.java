@@ -59,9 +59,9 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testCompensate() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(Variable.make("X1").lower(0).upper(5).weight(1));
-        model.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
-        model.addVariable(Variable.make("X3").level(4).weight(1));
+        model.newVariable("X1").lower(0).upper(5).weight(1);
+        model.newVariable("X2").lower(0).upper(5).weight(1);
+        model.newVariable("X3").level(4).weight(1);
 
         Expression expression = model.newExpression("MAX5").upper(5);
         expression.set(0, 1).set(1, 1).set(2, 1);
@@ -113,9 +113,9 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testFixedVariables() {
 
         ExpressionsBasedModel test = new ExpressionsBasedModel();
-        test.addVariable(Variable.make("V1").level(0.5));
-        test.addVariable(Variable.make("V2").lower(0).upper(5).weight(2));
-        test.addVariable(Variable.make("V3").lower(0).upper(1).weight(1));
+        test.newVariable("V1").level(0.5);
+        test.newVariable("V2").lower(0).upper(5).weight(2);
+        test.newVariable("V3").lower(0).upper(1).weight(1);
         Expression expressions = test.newExpression("E1").lower(0).upper(2);
         expressions.set(1, 1).set(2, 1);
 
@@ -145,10 +145,10 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Tag("unstable")
     public void testGitHubIssue2() {
 
-        Variable[] objective = { new Variable("X1").weight(0.8), new Variable("X2").weight(0.2), new Variable("X3").weight(0.7), new Variable("X4").weight(0.3),
-                new Variable("X5").weight(0.6), new Variable("X6").weight(0.4) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(objective);
+        Variable[] objective = { model.newVariable("X1").weight(0.8), model.newVariable("X2").weight(0.2), model.newVariable("X3").weight(0.7),
+                model.newVariable("X4").weight(0.3), model.newVariable("X5").weight(0.6), model.newVariable("X6").weight(0.4) };
 
         model.newExpression("C1").set(0, 1).set(2, 1).set(4, 1).level(23);
         model.newExpression("C2").set(1, 1).set(3, 1).set(5, 1).level(23);
@@ -204,13 +204,13 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     @Test
     public void testMPStestprob() {
 
-        Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
-        Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
-        Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+
+        Variable tmpXONE = tmpModel.newVariable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
+        Variable tmpYTWO = tmpModel.newVariable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
+        Variable tmpZTHREE = tmpModel.newVariable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
         Variable[] tmpVariables = { tmpXONE, tmpYTWO, tmpZTHREE };
-
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         BigDecimal[] tmpFactorsLIM1 = { ONE, ONE, ZERO };
         Expression tmpLIM1 = tmpModel.newExpression("LIM1");

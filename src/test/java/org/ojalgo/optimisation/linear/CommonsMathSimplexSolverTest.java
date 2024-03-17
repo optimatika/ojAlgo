@@ -218,13 +218,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
             super();
 
+            myModel = new ExpressionsBasedModel();
+
             Variable[] tmpVariables = new Variable[weights.length];
             for (int v = 0; v < tmpVariables.length; v++) {
-                tmpVariables[v] = new Variable("VAR" + v);
+                tmpVariables[v] = myModel.newVariable("VAR" + v);
                 tmpVariables[v].weight(new BigDecimal(weights[v]));
             }
 
-            myModel = new ExpressionsBasedModel(tmpVariables);
             myConstant = constant;
         }
 

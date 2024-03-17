@@ -76,8 +76,7 @@ final class FileFormatMPS {
 
             super();
 
-            myVariable = new Variable(name);
-            myModel.addVariable(myVariable);
+            myVariable = myModel.newVariable(name);
 
             this.bound(BoundType.PL, null);
         }

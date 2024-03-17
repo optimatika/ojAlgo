@@ -53,55 +53,56 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Variable tmpVar;
         Variable[] tmpVariables = new Variable[8];
 
-        tmpVar = new Variable("QRHEDGE");
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
+        tmpVar = retVal.newVariable("QRHEDGE");
         tmpVar.weight(BigMath.ZERO);
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ZERO);
         tmpVariables[0] = tmpVar;
 
-        tmpVar = new Variable("QKORT");
+        tmpVar = retVal.newVariable("QKORT");
         tmpVar.weight(new BigDecimal("0.0345"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ONE);
         tmpVariables[1] = tmpVar;
 
-        tmpVar = new Variable("QHEDGE");
+        tmpVar = retVal.newVariable("QHEDGE");
         tmpVar.weight(new BigDecimal("0.04"));
         tmpVar.lower(new BigDecimal("0.1846"));
         tmpVar.upper(new BigDecimal("0.1846"));
         tmpVariables[2] = tmpVar;
 
-        tmpVar = new Variable("QLÅNG");
+        tmpVar = retVal.newVariable("QLÅNG");
         tmpVar.weight(new BigDecimal("0.0412"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ONE);
         tmpVariables[3] = tmpVar;
 
-        tmpVar = new Variable("QFF");
+        tmpVar = retVal.newVariable("QFF");
         tmpVar.weight(new BigDecimal("0.069575"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ZERO);
         tmpVariables[4] = tmpVar;
 
-        tmpVar = new Variable("QGLOBAL");
+        tmpVar = retVal.newVariable("QGLOBAL");
         tmpVar.weight(new BigDecimal("0.0738"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ONE);
         tmpVariables[5] = tmpVar;
 
-        tmpVar = new Variable("QSVERIGE");
+        tmpVar = retVal.newVariable("QSVERIGE");
         tmpVar.weight(new BigDecimal("0.1288"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ONE);
         tmpVariables[6] = tmpVar;
 
-        tmpVar = new Variable("QFF2");
+        tmpVar = retVal.newVariable("QFF2");
         tmpVar.weight(new BigDecimal("2.3"));
         tmpVar.lower(BigMath.ZERO);
         tmpVar.upper(BigMath.ZERO);
         tmpVariables[7] = tmpVar;
 
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
         int tmpLength = retVal.countVariables();
 
         Expression retVal2 = retVal.newExpression("100%");
@@ -169,10 +170,10 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test2LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(THREE), new Variable("X2").lower(ZERO).weight(ZERO),
-                new Variable("X3").lower(ZERO).weight(ONE) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(THREE), tmpModel.newVariable("X2").lower(ZERO).weight(ZERO),
+                tmpModel.newVariable("X3").lower(ZERO).weight(ONE) };
 
         Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -201,9 +202,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test3LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(TEN.add(FIVE)), new Variable("X2").lower(ZERO).weight(TEN) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(TEN.add(FIVE)), tmpModel.newVariable("X2").lower(ZERO).weight(TEN) };
 
         Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -238,10 +239,10 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test4LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(ONE.negate()), new Variable("X2").lower(ZERO).weight(ONE),
-                new Variable("X3").lower(ZERO).weight(ZERO) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(ONE.negate()), tmpModel.newVariable("X2").lower(ZERO).weight(ONE),
+                tmpModel.newVariable("X3").lower(ZERO).weight(ZERO) };
 
         Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -277,9 +278,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test5LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(TWO), tmpModel.newVariable("X2").lower(ZERO).weight(THREE) };
 
         Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -314,10 +315,10 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test6LinearModelCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ZERO).weight(ONE), new Variable("X2").lower(ZERO).weight(TWO),
-                new Variable("X3").lower(ZERO).weight(THREE) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(ONE), tmpModel.newVariable("X2").lower(ZERO).weight(TWO),
+                tmpModel.newVariable("X3").lower(ZERO).weight(THREE) };
 
         Optimisation.Result tmpResult = tmpModel.maximise();
 
@@ -330,9 +331,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test7LinearModelCase() {
 
-        Variable[] variables = { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
+        Variable[] variables = { model.newVariable("X1").lower(ZERO).weight(TWO), model.newVariable("X2").lower(ZERO).weight(THREE) };
 
         BigDecimal[] paramC1 = { ONE, ONE };
         Expression exprC1 = model.newExpression("C1");
@@ -398,10 +399,10 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testInfeasibleCase() {
 
-        Variable[] tmpVariables = { new Variable("X1").lower(ONE).weight(ONE), new Variable("X2").lower(ONE).weight(TWO),
-                new Variable("X3").lower(ONE).weight(THREE) };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ONE).weight(ONE), tmpModel.newVariable("X2").lower(ONE).weight(TWO),
+                tmpModel.newVariable("X3").lower(ONE).weight(THREE) };
 
         Expression tmpExprC1 = tmpModel.newExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -455,21 +456,17 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testP20130409b() {
 
-        Variable x1 = Variable.make("x1");
-        Variable x2013 = Variable.make("x2013");
-        Variable x2014 = Variable.make("x2014");
-        Variable x2015 = Variable.make("x2015");
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("x1");
+        Variable x2013 = model.newVariable("x2013");
+        Variable x2014 = model.newVariable("x2014");
+        Variable x2015 = model.newVariable("x2015");
         //      x2013.setInteger(true);
         //      x2014.setInteger(true);
         //      x2015.setInteger(true);
         x2013.lower(BigDecimal.valueOf(1245L));
         x2014.lower(BigDecimal.valueOf(1269L));
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x1);
-        model.addVariable(x2013);
-        model.addVariable(x2014);
-        model.addVariable(x2015);
 
         Expression obj = model.newExpression("obj");
         obj.set(x1, 1);

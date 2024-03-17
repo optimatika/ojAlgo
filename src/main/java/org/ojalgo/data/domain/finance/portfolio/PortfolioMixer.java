@@ -61,10 +61,10 @@ public final class PortfolioMixer {
 
         myTarget = target;
 
-        final int tmpSize = myTarget.getWeights().size();
+        int tmpSize = myTarget.getWeights().size();
 
         myComponents = new ArrayList<>();
-        for (final FinancePortfolio tmpCompPortf : components) {
+        for (FinancePortfolio tmpCompPortf : components) {
             if (tmpCompPortf.getWeights().size() != tmpSize) {
                 throw new IllegalArgumentException(DIMENSION_MISMATCH);
             } else {
@@ -83,17 +83,20 @@ public final class PortfolioMixer {
 
     public List<BigDecimal> mix(final int aNumber) {
 
-        final int tmpNumberOfAssets = myTarget.getWeights().size();
-        final int tmpNumberOfComponents = myComponents.size();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        final Variable[] tmpVariables = new Variable[2 * tmpNumberOfComponents];
+        int nbAssets = myTarget.getWeights().size();
+        int nbComponents = myComponents.size();
 
-        for (int c = 0; c < tmpNumberOfComponents; c++) {
+        Variable[] wVars = new Variable[nbComponents];
+        Variable[] aVars = new Variable[nbComponents];
 
-            final Variable tmpVariable = new Variable(C + c);
+        for (int c = 0; c < nbComponents; c++) {
+
+            Variable tmpVariable = model.newVariable(C + c);
 
             BigDecimal tmpVal = ZERO;
-            for (int i = 0; i < tmpNumberOfAssets; i++) {
+            for (int i = 0; i < nbAssets; i++) {
                 tmpVal = tmpVal.add(myTarget.getWeights().get(i).multiply(myComponents.get(c).getWeights().get(i)));
             }
             tmpVal = tmpVal.multiply(TWO).negate();
@@ -103,59 +106,59 @@ public final class PortfolioMixer {
             tmpVariable.lower(ZERO);
             tmpVariable.upper(ONE);
 
-            tmpVariables[c] = tmpVariable;
-            tmpVariables[tmpNumberOfComponents + c] = Variable.makeBinary(B + c);
+            wVars[c] = tmpVariable;
+            aVars[c] = model.newVariable(B + c).binary();
         }
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        final Expression tmpQuadObj = tmpModel.newExpression(QUADRATIC_OBJECTIVE_PART);
+
+        Expression tmpQuadObj = model.newExpression(QUADRATIC_OBJECTIVE_PART);
         tmpQuadObj.weight(ONE);
-        for (int row = 0; row < tmpNumberOfComponents; row++) {
-            for (int col = 0; col < tmpNumberOfComponents; col++) {
+        for (int row = 0; row < nbComponents; row++) {
+            for (int col = 0; col < nbComponents; col++) {
 
                 BigDecimal tmpVal = ZERO;
-                for (int i = 0; i < tmpNumberOfAssets; i++) {
+                for (int i = 0; i < nbAssets; i++) {
                     tmpVal = tmpVal.add(myComponents.get(row).getWeights().get(i).multiply(myComponents.get(col).getWeights().get(i)));
                 }
-                tmpQuadObj.set(row, col, tmpVal);
-                tmpQuadObj.set(tmpNumberOfComponents + row, tmpNumberOfComponents + col, tmpVal.multiply(THOUSANDTH));
+                tmpQuadObj.set(wVars[row], wVars[col], tmpVal);
+                tmpQuadObj.set(aVars[row], aVars[col], tmpVal.multiply(THOUSANDTH));
             }
 
-            final Expression tmpActive = tmpModel.newExpression(tmpVariables[row].getName() + ACTIVE);
-            tmpActive.set(row, NEG);
-            tmpActive.set(tmpNumberOfComponents + row, ONE);
+            Expression tmpActive = model.newExpression(wVars[row].getName() + ACTIVE);
+            tmpActive.set(wVars[row], NEG);
+            tmpActive.set(aVars[row], ONE);
             tmpActive.lower(ZERO);
             //            BasicLogger.logDebug(tmpActive.toString());
             //            BasicLogger.logDebug(tmpActive.getName(), tmpActive.getLinear().getFactors());
         }
         //        BasicLogger.logDebug(QUADRATIC_OBJECTIVE_PART, tmpQuadObj.getQuadratic().getFactors());
 
-        final Expression tmpHundredPercent = tmpModel.newExpression("100%");
+        Expression tmpHundredPercent = model.newExpression("100%");
         tmpHundredPercent.level(ONE);
-        for (int c = 0; c < tmpNumberOfComponents; c++) {
-            tmpHundredPercent.set(c, ONE);
+        for (int c = 0; c < nbComponents; c++) {
+            tmpHundredPercent.set(wVars[c], ONE);
         }
         //        BasicLogger.logDebug(tmpHundredPercent.toString());
         //        BasicLogger.logDebug(tmpHundredPercent.getName(), tmpHundredPercent.getLinear().getFactors());
 
-        final Expression tmpStrategyCount = tmpModel.newExpression(STRATEGY_COUNT);
+        Expression tmpStrategyCount = model.newExpression(STRATEGY_COUNT);
         tmpStrategyCount.upper(TypeUtils.toBigDecimal(aNumber));
-        for (int c = 0; c < tmpNumberOfComponents; c++) {
-            tmpStrategyCount.set(tmpNumberOfComponents + c, ONE);
+        for (int c = 0; c < nbComponents; c++) {
+            tmpStrategyCount.set(aVars[c], ONE);
         }
         //        BasicLogger.logDebug(tmpStrategyCount.toString());
         //        BasicLogger.logDebug(tmpStrategyCount.getName(), tmpStrategyCount.getLinear().getFactors());
 
-        for (final Entry<int[], LowerUpper> tmpEntry : myAssetConstraints.entrySet()) {
+        for (Entry<int[], LowerUpper> tmpEntry : myAssetConstraints.entrySet()) {
 
-            final int tmpIndex = tmpEntry.getKey()[0]; // For now I assume there is only 1 index
-            final BigDecimal tmpLower = tmpEntry.getValue().lower;
-            final BigDecimal tmpUpper = tmpEntry.getValue().upper;
+            int tmpIndex = tmpEntry.getKey()[0]; // For now I assume there is only 1 index
+            BigDecimal tmpLower = tmpEntry.getValue().lower;
+            BigDecimal tmpUpper = tmpEntry.getValue().upper;
 
-            final Expression tmpExpr = tmpModel.newExpression("AC" + Arrays.toString(tmpEntry.getKey()));
+            Expression tmpExpr = model.newExpression("AC" + Arrays.toString(tmpEntry.getKey()));
 
-            for (int c = 0; c < tmpNumberOfComponents; c++) {
+            for (int c = 0; c < nbComponents; c++) {
                 tmpExpr.set(c, myComponents.get(c).getWeights().get(tmpIndex));
             }
             if (tmpLower != null) {
@@ -166,17 +169,17 @@ public final class PortfolioMixer {
             }
         }
 
-        for (final Entry<int[], LowerUpper> tmpEntry : myComponentConstraints.entrySet()) {
+        for (Entry<int[], LowerUpper> tmpEntry : myComponentConstraints.entrySet()) {
 
-            final int tmpIndex = tmpEntry.getKey()[0]; // For now I assume there is only 1 index
-            final BigDecimal tmpLower = tmpEntry.getValue().lower;
-            final BigDecimal tmpUpper = tmpEntry.getValue().upper;
+            int tmpIndex = tmpEntry.getKey()[0]; // For now I assume there is only 1 index
+            BigDecimal tmpLower = tmpEntry.getValue().lower;
+            BigDecimal tmpUpper = tmpEntry.getValue().upper;
 
-            final Expression tmpExpr = tmpModel.newExpression("CC" + Arrays.toString(tmpEntry.getKey()));
+            Expression tmpExpr = model.newExpression("CC" + Arrays.toString(tmpEntry.getKey()));
 
             tmpExpr.set(tmpIndex, BigMath.ONE);
 
-            for (int c = 0; c < tmpNumberOfComponents; c++) {
+            for (int c = 0; c < nbComponents; c++) {
             }
             if (tmpLower != null) {
                 tmpExpr.lower(tmpLower);
@@ -186,11 +189,11 @@ public final class PortfolioMixer {
             }
         }
 
-        tmpModel.minimise();
+        model.minimise();
 
-        final ArrayList<BigDecimal> retVal = new ArrayList<>(tmpNumberOfComponents);
-        for (int v = 0; v < tmpNumberOfComponents; v++) {
-            retVal.add(tmpVariables[v].getValue());
+        ArrayList<BigDecimal> retVal = new ArrayList<>(nbComponents);
+        for (int v = 0; v < nbComponents; v++) {
+            retVal.add(wVars[v].getValue());
         }
         return retVal;
     }

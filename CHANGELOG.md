@@ -28,6 +28,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Vector space method like "add" and "subtract" have been redefined to no longer throw exceptions if dimensions are not equal, but instead broadcast/repeat rows or columns. (Inspired by MATLAB's concept of compatible array sizes for binary operation.)
 
+#### org.ojalgo.optimisation
+
+- Refactored, cleaned up deprecations, primarily regarding how model variables are created. They can no longer be instantiated independent of a model. You have to first create the model, and then use that as the variable (and expression) factory.
+
 #### org.ojalgo.structure
 
 - Refactored the builder/factory interfaces to better support creating immutable 1D, 2D or AnyD structures. This has implications for most ojAlgo data structures. There are deprecations in all factory classes, but everything that worked before still works (I believe).

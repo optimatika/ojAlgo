@@ -235,20 +235,18 @@ public class DesignCase extends OptimisationIntegerTests {
     @Test
     public void testFacilityLocation() {
 
-        ArrayList<Variable> variables = new ArrayList<>();
-        variables.add(Variable.makeBinary("Factory in LA").weight(9));
-        variables.add(Variable.makeBinary("Factory in SF").weight(5));
-        variables.add(Variable.makeBinary("Warehouse in LA").weight(6));
-        variables.add(Variable.makeBinary("Warehouse in SF").weight(4));
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariables(variables);
+
+        model.newVariable("Factory in LA").binary().weight(9);
+        model.newVariable("Factory in SF").binary().weight(5);
+        model.newVariable("Warehouse in LA").binary().weight(6);
+        model.newVariable("Warehouse in SF").binary().weight(4);
 
         Expression budgetCost = model.newExpression("Budget").upper(10);
-        budgetCost.set(variables.get(0), 6);
-        budgetCost.set(variables.get(1), 3);
-        budgetCost.set(variables.get(2), 5);
-        budgetCost.set(variables.get(3), 2);
+        budgetCost.set(0, 6);
+        budgetCost.set(1, 3);
+        budgetCost.set(2, 5);
+        budgetCost.set(3, 2);
 
         if (DEBUG) {
             BasicLogger.debug(model);
