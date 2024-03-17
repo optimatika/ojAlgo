@@ -63,6 +63,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<Double> {
+
+        default Double invoke() {
+            return Double.valueOf(this.doubleValue());
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<Double> {
 
         @Override
@@ -85,8 +94,8 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     public static final class SampleDomain {
 
         private final double myIncrement;
-        private final double myPeriod;
         private final int myNumberOfSamples;
+        private final double myPeriod;
 
         public SampleDomain(final double period, final int nbSamples) {
             super();
@@ -143,6 +152,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     public static PrimitiveFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final double value) {
+        return () -> value;
     }
 
     private PrimitiveFunction() {

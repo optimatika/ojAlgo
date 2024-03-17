@@ -27,7 +27,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.ComparableNumber;
 
@@ -36,7 +36,7 @@ import org.ojalgo.type.ComparableNumber;
  *
  * @author apete
  */
-public abstract class RandomNumber implements Distribution, NullaryFunction<Double>, ComparableNumber<RandomNumber> {
+public abstract class RandomNumber implements Distribution, PrimitiveFunction.Nullary, ComparableNumber<RandomNumber> {
 
     private Random myRandom = null;
 

@@ -37,14 +37,17 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     @FunctionalInterface
     public interface Binary extends BinaryFunction<Quadruple> {
 
+        @Override
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(Quadruple.valueOf(arg1), Quadruple.valueOf(arg2)).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg1, final float arg2) {
             return this.invoke(Quadruple.valueOf(arg1), Quadruple.valueOf(arg2)).floatValue();
         }
 
+        @Override
         default Quadruple invoke(final Quadruple arg1, final double arg2) {
             return this.invoke(arg1, Quadruple.valueOf(arg2));
         }
@@ -54,10 +57,12 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     @FunctionalInterface
     public interface Consumer extends VoidFunction<Quadruple> {
 
+        @Override
         default void invoke(final double arg) {
             this.invoke(Quadruple.valueOf(arg));
         }
 
+        @Override
         default void invoke(final float arg) {
             this.invoke(Quadruple.valueOf(arg));
         }
@@ -65,12 +70,24 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<Quadruple> {
+
+        @Override
+        default double doubleValue() {
+            return this.invoke().doubleValue();
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<Quadruple> {
 
+        @Override
         default double invoke(final double arg, final int param) {
             return this.invoke(Quadruple.valueOf(arg), param).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg, final int param) {
             return this.invoke(Quadruple.valueOf(arg), param).floatValue();
         }
@@ -80,10 +97,12 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<Quadruple> {
 
+        @Override
         default boolean invoke(final double arg) {
             return this.invoke(Quadruple.valueOf(arg));
         }
 
+        @Override
         default boolean invoke(final float arg) {
             return this.invoke(Quadruple.valueOf(arg));
         }
@@ -93,10 +112,12 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
     @FunctionalInterface
     public interface Unary extends UnaryFunction<Quadruple> {
 
+        @Override
         default double invoke(final double arg) {
             return this.invoke(Quadruple.valueOf(arg)).doubleValue();
         }
 
+        @Override
         default float invoke(final float arg) {
             return this.invoke(Quadruple.valueOf(arg)).floatValue();
         }
@@ -107,6 +128,10 @@ public final class QuadrupleFunction extends FunctionSet<Quadruple> {
 
     public static QuadrupleFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final Quadruple value) {
+        return () -> value;
     }
 
     private QuadrupleFunction() {

@@ -29,6 +29,7 @@ import java.util.function.IntSupplier;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
@@ -153,6 +154,10 @@ public abstract class TestUtils /* extends Assertions */ {
         for (int p = 0; p < expected.length; p++) {
             TestUtils.assertEquals(expected[p], actual.doubleValue(p), accuracy);
         }
+    }
+
+    public static void assertEquals(final double[] expected, final double[] actual) {
+        TestUtils.assertEquals(ArrayR064.wrap(expected), ArrayR064.wrap(actual));
     }
 
     public static void assertEquals(final int expected, final int actual) {

@@ -60,6 +60,15 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<ComplexNumber> {
+
+        default double doubleValue() {
+            return this.invoke().doubleValue();
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<ComplexNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -102,6 +111,10 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     public static ComplexFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final ComplexNumber value) {
+        return () -> value;
     }
 
     private ComplexFunction() {

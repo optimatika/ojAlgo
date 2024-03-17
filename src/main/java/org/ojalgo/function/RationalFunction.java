@@ -65,6 +65,15 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<RationalNumber> {
+
+        default double doubleValue() {
+            return this.invoke().doubleValue();
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<RationalNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -107,6 +116,10 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     public static RationalFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final RationalNumber value) {
+        return () -> value;
     }
 
     private RationalFunction() {

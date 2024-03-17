@@ -70,6 +70,15 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<BigDecimal> {
+
+        default double doubleValue() {
+            return this.invoke().doubleValue();
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<BigDecimal> {
 
         default double invoke(final double arg, final int param) {
@@ -112,6 +121,10 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     public static BigFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final BigDecimal value) {
+        return () -> value;
     }
 
     private BigFunction() {

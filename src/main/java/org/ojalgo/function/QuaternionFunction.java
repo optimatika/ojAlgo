@@ -60,6 +60,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
+    public interface Nullary extends NullaryFunction<Quaternion> {
+
+        default double doubleValue() {
+            return this.invoke().doubleValue();
+        }
+
+    }
+
+    @FunctionalInterface
     public interface Parameter extends ParameterFunction<Quaternion> {
 
         default double invoke(final double arg, final int param) {
@@ -102,6 +111,10 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     public static QuaternionFunction getSet() {
         return SET;
+    }
+
+    public static Nullary nullary(final Quaternion value) {
+        return () -> value;
     }
 
     private QuaternionFunction() {
