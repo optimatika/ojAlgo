@@ -881,7 +881,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             if (variable == null || variable.getIndex() == null || !variable.isBinary()) {
                 throw new ProgrammingError("Variables must be binary and already inserted in the model!");
             }
-            expression.set(variable.getIndex(), ONE);
+            expression.doSet(variable.getIndex(), ONE);
         }
 
         expression.upper(BigDecimal.valueOf(max));
@@ -1381,7 +1381,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        retVal.set(tmpKey, tmpNewVal);
+                        retVal.doSet(tmpKey, tmpNewVal);
                     }
                 }
 
@@ -1390,7 +1390,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        retVal.set(tmpKey, tmpNewVal);
+                        retVal.doSet(tmpKey, tmpNewVal);
                     }
                 }
             }
@@ -1900,6 +1900,14 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     void setOptimisationSense(final Optimisation.Sense optimisationSense) {
         myOptimisationSense = optimisationSense;
+    }
+
+    IntIndex toIntIndex(final int index) {
+        return myVariables.get(index).getIndex();
+    }
+
+    IntRowColumn toIntRowColumn(final int row, final int column) {
+        return new IntRowColumn(myVariables.get(row).getIndex(), myVariables.get(column).getIndex());
     }
 
 }
