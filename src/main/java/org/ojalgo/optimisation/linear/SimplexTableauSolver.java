@@ -373,7 +373,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = expression.getAdjustedUpperLimit();
+            double rhs = expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, false);
@@ -392,7 +392,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = -expression.getAdjustedLowerLimit();
+            double rhs = -expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, false);
@@ -409,7 +409,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = variable.getAdjustedUpperLimit();
+            double rhs = variable.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, false);
@@ -426,7 +426,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, ONE);
 
-            double rhs = -variable.getAdjustedLowerLimit();
+            double rhs = -variable.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, false);
@@ -447,7 +447,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = expression.getAdjustedLowerLimit();
+            double rhs = expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.LOWER, true);
@@ -466,7 +466,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = -expression.getAdjustedUpperLimit();
+            double rhs = -expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.UPPER, true);
@@ -483,7 +483,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = variable.getAdjustedLowerLimit();
+            double rhs = variable.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.LOWER, true);
@@ -500,7 +500,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             retConstraintsBdy.set(indCnstr, indSlack, NEG);
 
-            double rhs = -variable.getAdjustedUpperLimit();
+            double rhs = -variable.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, variable, ConstraintType.UPPER, true);
@@ -519,7 +519,7 @@ final class SimplexTableauSolver extends LinearSolver {
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
-            double rhs = expression.getAdjustedUpperLimit();
+            double rhs = expression.getUpperLimit(true, Double.POSITIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.EQUALITY, false);
@@ -536,7 +536,7 @@ final class SimplexTableauSolver extends LinearSolver {
                 SimplexTableauSolver.set(model, retConstraintsBdy, indCnstr, basePosVars, baseNegVars, key, factor);
             }
 
-            double rhs = -expression.getAdjustedLowerLimit();
+            double rhs = -expression.getLowerLimit(true, Double.NEGATIVE_INFINITY);
             retConstraintsRHS.set(indCnstr, rhs);
 
             structure.setConstraintMap(indCnstr, expression, ConstraintType.EQUALITY, true);

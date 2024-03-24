@@ -145,22 +145,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     /**
-     * @deprecated v52 Use {@link #getLowerLimit(boolean, double)} instead.
-     */
-    @Deprecated
-    public final double getAdjustedLowerLimit() {
-        return this.getLowerLimit(true, Double.NEGATIVE_INFINITY);
-    }
-
-    /**
-     * @deprecated v52 Use {@link #getUpperLimit(boolean, double)} instead.
-     */
-    @Deprecated
-    public final double getAdjustedUpperLimit() {
-        return this.getUpperLimit(true, Double.POSITIVE_INFINITY);
-    }
-
-    /**
      * @return Adjusted "1"
      */
     public final double getAdjustmentFactor() {
@@ -201,22 +185,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     public final String getName() {
         return myName;
-    }
-
-    /**
-     * @deprecated v52 Use {@link #getLowerLimit(boolean, double)} instead.
-     */
-    @Deprecated
-    public final double getUnadjustedLowerLimit() {
-        return this.getLowerLimit(false, Double.NEGATIVE_INFINITY);
-    }
-
-    /**
-     * @deprecated v52 Use {@link #getUpperLimit(boolean, double)} instead.
-     */
-    @Deprecated
-    public final double getUnadjustedUpperLimit() {
-        return this.getUpperLimit(false, Double.POSITIVE_INFINITY);
     }
 
     @Override
