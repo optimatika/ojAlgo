@@ -422,18 +422,18 @@ public final class Expression extends ModelEntity<Expression> {
         BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
         UnaryFunction<Double> tmpModFunc;
-        for (IntRowColumn tmpKey : this.getQuadraticKeySet()) {
-            tmpAdjustedFactor = this.getAdjustedQuadraticFactor(tmpKey);
-            tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor * point.doubleValue(tmpKey.column));
-            retVal.modifyOne(tmpKey.row, 0, tmpModFunc);
-            tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor * point.doubleValue(tmpKey.row));
-            retVal.modifyOne(tmpKey.column, 0, tmpModFunc);
+        for (IntRowColumn key : this.getQuadraticKeySet()) {
+            tmpAdjustedFactor = this.doubleValue(key, true);
+            tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor * point.doubleValue(key.column));
+            retVal.modifyOne(key.row, 0, tmpModFunc);
+            tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor * point.doubleValue(key.row));
+            retVal.modifyOne(key.column, 0, tmpModFunc);
         }
 
-        for (IntIndex tmpKey : this.getLinearKeySet()) {
-            tmpAdjustedFactor = this.getAdjustedLinearFactor(tmpKey);
+        for (IntIndex key : this.getLinearKeySet()) {
+            tmpAdjustedFactor = this.doubleValue(key, true);
             tmpModFunc = tmpBaseFunc.second(tmpAdjustedFactor);
-            retVal.modifyOne(tmpKey.index, 0, tmpModFunc);
+            retVal.modifyOne(key.index, 0, tmpModFunc);
         }
 
         return retVal;
@@ -446,61 +446,13 @@ public final class Expression extends ModelEntity<Expression> {
 
         BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
-        for (IntRowColumn tmpKey : this.getQuadraticKeySet()) {
-            tmpModFunc = tmpBaseFunc.second(this.getAdjustedQuadraticFactor(tmpKey));
-            retVal.modifyOne(tmpKey.row, tmpKey.column, tmpModFunc);
-            retVal.modifyOne(tmpKey.column, tmpKey.row, tmpModFunc);
+        for (IntRowColumn key : this.getQuadraticKeySet()) {
+            tmpModFunc = tmpBaseFunc.second(this.doubleValue(key, true));
+            retVal.modifyOne(key.row, key.column, tmpModFunc);
+            retVal.modifyOne(key.column, key.row, tmpModFunc);
         }
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedLinearFactor(final int aVar) {
-        return this.getAdjustedLinearFactor(new IntIndex(aVar));
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedLinearFactor(final IntIndex key) {
-        return this.get(key, true).doubleValue();
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntIndex, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedLinearFactor(final Variable aVar) {
-        return this.getAdjustedLinearFactor(this.toIntIndex(aVar));
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedQuadraticFactor(final int aVar1, final int aVar2) {
-        return this.getAdjustedQuadraticFactor(new IntRowColumn(aVar1, aVar2));
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedQuadraticFactor(final IntRowColumn key) {
-        return this.get(key, true).doubleValue();
-    }
-
-    /**
-     * @deprecated v52 Use {@link #doubleValue(IntRowColumn, boolean)} instead.
-     */
-    @Deprecated
-    public double getAdjustedQuadraticFactor(final Variable aVar1, final Variable aVar2) {
-        return this.getAdjustedQuadraticFactor(myModel.indexOf(aVar1), myModel.indexOf(aVar2));
     }
 
     public Set<Entry<IntIndex, BigDecimal>> getLinearEntrySet() {
