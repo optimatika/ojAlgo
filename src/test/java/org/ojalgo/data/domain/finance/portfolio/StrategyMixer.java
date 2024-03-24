@@ -46,21 +46,21 @@ public class StrategyMixer extends FinancePortfolioTests {
     @Test
     public void testStratCombPortfolioMixer() {
 
-        final FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
+        FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
 
-        final FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
-        final FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
-        final FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
+        FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
+        FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
+        FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
 
-        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
+        PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 
-        final int tmpExpectedNumberOfStrategies = 2;
-        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
+        int tmpExpectedNumberOfStrategies = 2;
+        List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
 
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
+        for (BigDecimal tmpWeight : tmpStrategyWeights) {
             if (tmpWeight.signum() != 0) {
                 tmpUseCount++;
                 tmpTotalWeight += tmpWeight.doubleValue();
@@ -75,26 +75,23 @@ public class StrategyMixer extends FinancePortfolioTests {
     @Tag("unstable")
     public void testStratCombPortfolioMixerRandom() {
 
-        final FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
+        FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
 
-        final Uniform tmpGen = new Uniform();
+        Uniform tmpGen = new Uniform();
 
-        final FinancePortfolio tmpStrat1 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
-        final FinancePortfolio tmpStrat2 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
-        final FinancePortfolio tmpStrat3 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
+        FinancePortfolio tmpStrat1 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat2 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
+        FinancePortfolio tmpStrat3 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue()).normalise();
 
-        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
+        PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 
-        final int tmpExpectedNumberOfStrategies = 2;
-        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
+        int tmpExpectedNumberOfStrategies = 2;
+        List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
 
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
+        for (BigDecimal tmpWeight : tmpStrategyWeights) {
             if (tmpWeight.signum() != 0) {
                 tmpUseCount++;
                 tmpTotalWeight += tmpWeight.doubleValue();
@@ -111,16 +108,18 @@ public class StrategyMixer extends FinancePortfolioTests {
     @Test
     public void testStratCombQuadraticExpressionModel() {
 
-        final BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        final BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
-        final BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
-        final BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
+        BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
 
-        final BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+        BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
+        BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
+        BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
 
-        final Variable[] tmpVars = new Variable[] { new Variable("S1"), new Variable("S2"), new Variable("S3"), Variable.makeBinary("B1"),
-                Variable.makeBinary("B2"), Variable.makeBinary("B3") };
+        BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+
+        Variable[] tmpVars = new Variable[] { model.newVariable("S1"), model.newVariable("S2"), model.newVariable("S3"), model.newVariable("B1").binary(),
+                model.newVariable("B2").binary(), model.newVariable("B3").binary() };
 
         for (int s = 0; s < 3; s++) {
 
@@ -138,12 +137,10 @@ public class StrategyMixer extends FinancePortfolioTests {
 
         }
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVars);
-
         // tmpModel.options.debug(IntegerSolver.class);
         // tmpModel.options.validate = false;
 
-        final Expression tmpQuadObj = tmpModel.newExpression("Quadratic Objective Part");
+        Expression tmpQuadObj = model.newExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);
         for (int row = 0; row < 3; row++) {
 
@@ -159,7 +156,7 @@ public class StrategyMixer extends FinancePortfolioTests {
                 tmpQuadObj.set(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
             }
 
-            final Expression tmpActive = tmpModel.newExpression(tmpVars[row].getName() + " Active");
+            Expression tmpActive = model.newExpression(tmpVars[row].getName() + " Active");
             tmpActive.set(3 + row, ONE);
             tmpActive.set(row, NEG);
             tmpActive.lower(ZERO);
@@ -168,7 +165,7 @@ public class StrategyMixer extends FinancePortfolioTests {
             }
         }
 
-        final Expression tmpHundredPercent = tmpModel.newExpression("100%");
+        Expression tmpHundredPercent = model.newExpression("100%");
         tmpHundredPercent.level(ONE);
         tmpHundredPercent.set(0, ONE);
         tmpHundredPercent.set(1, ONE);
@@ -177,7 +174,7 @@ public class StrategyMixer extends FinancePortfolioTests {
             BasicLogger.debug(tmpHundredPercent.toString());
         }
 
-        final Expression tmpStrategyCount = tmpModel.newExpression("Strategy Count");
+        Expression tmpStrategyCount = model.newExpression("Strategy Count");
         tmpStrategyCount.upper(TWO);
         tmpStrategyCount.set(3, ONE);
         tmpStrategyCount.set(4, ONE);
@@ -186,18 +183,18 @@ public class StrategyMixer extends FinancePortfolioTests {
             BasicLogger.debug(tmpStrategyCount.toString());
         }
 
-        tmpModel.minimise();
+        model.minimise();
 
         if (DEBUG) {
-            BasicLogger.debug(tmpModel.toString());
+            BasicLogger.debug(model.toString());
             BasicLogger.debug(Arrays.toString(tmpVars));
         }
 
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        final Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
-        for (final Variable tmpWeight : tmpSolution) {
+        Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
+        for (Variable tmpWeight : tmpSolution) {
             if (tmpWeight.getValue().signum() != 0) {
                 tmpUseCount++;
                 tmpTotalWeight += tmpWeight.getValue().doubleValue();

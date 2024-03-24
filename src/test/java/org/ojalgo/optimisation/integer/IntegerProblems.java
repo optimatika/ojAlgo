@@ -158,32 +158,34 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20111010() {
 
-        Variable[] tmpVariables = { Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE), Variable.makeBinary("Z").weight(ONE) };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+        model.newVariable("X").binary().weight(ONE);
+        model.newVariable("Y").binary().weight(ONE);
+        model.newVariable("Z").binary().weight(ONE);
 
-        Expression tmpC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC1.set(i, ONE);
         }
 
         tmpC1.level(ONE);
 
-        Expression tmpC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC2 = model.newExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC2.set(i, ONE);
         }
         tmpC2.level(TWO);
 
-        Expression tmpC3 = tmpModel.newExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpC3 = model.newExpression("C3");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpC3.set(i, ONE);
         }
         tmpC3.level(THREE);
 
         // tmpModel.options.progress(IntegerSolver.class);
 
-        Optimisation.Result tmpResult = tmpModel.minimise();
+        Optimisation.Result tmpResult = model.minimise();
 
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }

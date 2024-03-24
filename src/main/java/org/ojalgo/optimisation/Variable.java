@@ -43,22 +43,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class Variable extends ModelEntity<Variable> {
 
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public static Variable makeBinary(final String name) {
-        return new Variable(name).binary();
-    }
-
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
-    public static Variable makeInteger(final String name) {
-        return new Variable(name).integer();
-    }
-
     private IntIndex myIndex = null;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;

@@ -42,16 +42,18 @@ public class StrategyMixer {
     @Test
     public void testStratCombQuadraticExpressionModel() {
 
-        final BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
+        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        final BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
-        final BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
-        final BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
+        BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
 
-        final BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+        BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
+        BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
+        BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
 
-        final Variable[] tmpVars = new Variable[] { new Variable("S1"), new Variable("S2"), new Variable("S3"), Variable.makeBinary("B1"),
-                Variable.makeBinary("B2"), Variable.makeBinary("B3") };
+        BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+
+        Variable[] tmpVars = new Variable[] { tmpModel.newVariable("S1"), tmpModel.newVariable("S2"), tmpModel.newVariable("S3"),
+                tmpModel.newVariable("B1").binary(), tmpModel.newVariable("B2").binary(), tmpModel.newVariable("B3").binary() };
 
         for (int s = 0; s < 3; s++) {
 
@@ -69,12 +71,12 @@ public class StrategyMixer {
 
         }
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVars);
+
 
         // tmpModel.options.debug(IntegerSolver.class);
         // tmpModel.options.validate = false;
 
-        final Expression tmpQuadObj = tmpModel.newExpression("Quadratic Objective Part");
+        Expression tmpQuadObj = tmpModel.newExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);
         for (int row = 0; row < 3; row++) {
 
@@ -90,7 +92,7 @@ public class StrategyMixer {
                 tmpQuadObj.set(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
             }
 
-            final Expression tmpActive = tmpModel.newExpression(tmpVars[row].getName() + " Active");
+            Expression tmpActive = tmpModel.newExpression(tmpVars[row].getName() + " Active");
             tmpActive.set(3 + row, ONE);
             tmpActive.set(row, NEG);
             tmpActive.lower(ZERO);
@@ -99,7 +101,7 @@ public class StrategyMixer {
             }
         }
 
-        final Expression tmpHundredPercent = tmpModel.newExpression("100%");
+        Expression tmpHundredPercent = tmpModel.newExpression("100%");
         tmpHundredPercent.level(ONE);
         tmpHundredPercent.set(0, ONE);
         tmpHundredPercent.set(1, ONE);
@@ -108,7 +110,7 @@ public class StrategyMixer {
             BasicLogger.debug(tmpHundredPercent.toString());
         }
 
-        final Expression tmpStrategyCount = tmpModel.newExpression("Strategy Count");
+        Expression tmpStrategyCount = tmpModel.newExpression("Strategy Count");
         tmpStrategyCount.upper(TWO);
         tmpStrategyCount.set(3, ONE);
         tmpStrategyCount.set(4, ONE);
@@ -128,8 +130,8 @@ public class StrategyMixer {
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        final Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
-        for (final Variable tmpWeight : tmpSolution) {
+        Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
+        for (Variable tmpWeight : tmpSolution) {
             if (tmpWeight.getValue().signum() != 0) {
                 tmpUseCount++;
                 tmpTotalWeight += tmpWeight.getValue().doubleValue();
