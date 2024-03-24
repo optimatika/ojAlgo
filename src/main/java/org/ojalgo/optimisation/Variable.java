@@ -47,16 +47,8 @@ public final class Variable extends ModelEntity<Variable> {
      * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
      */
     @Deprecated
-    public static Variable make(final String name) {
-        return new Variable(name);
-    }
-
-    /**
-     * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
-     */
-    @Deprecated
     public static Variable makeBinary(final String name) {
-        return Variable.make(name).binary();
+        return new Variable(name).binary();
     }
 
     /**
@@ -64,7 +56,7 @@ public final class Variable extends ModelEntity<Variable> {
      */
     @Deprecated
     public static Variable makeInteger(final String name) {
-        return Variable.make(name).integer();
+        return new Variable(name).integer();
     }
 
     private IntIndex myIndex = null;
@@ -105,6 +97,7 @@ public final class Variable extends ModelEntity<Variable> {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
 
+    @Override
     public int compareTo(final Variable obj) {
         return this.getIndex().compareTo(obj.getIndex());
     }

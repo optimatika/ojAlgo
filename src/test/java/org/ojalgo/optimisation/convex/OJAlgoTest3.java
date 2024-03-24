@@ -154,8 +154,7 @@ public class OJAlgoTest3 {
          */
         BasicLogger.debug("---- Variable creation ------");
         variablesName.forEach(name -> {
-            final Variable var = Variable.make(name).lower(0.0).weight(1.0);
-            model.addVariable(var);
+            Variable var = model.newVariable(name).lower(0.0).weight(1.0);
             variables.add(var);
             BasicLogger.debug(var);
         });
@@ -205,7 +204,7 @@ public class OJAlgoTest3 {
          */
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
-            if (!linked.isEmpty() && (entry.getValue().doubleValue() > 0)) {
+            if (!linked.isEmpty() && entry.getValue().doubleValue() > 0) {
                 final double demand = entry.getValue();
                 final double ratio = demand / demandTotal;
                 final double target = stockTotal * ratio;
@@ -213,7 +212,7 @@ public class OJAlgoTest3 {
                     linked.forEach(v2 -> {
                         objective.set(v1, v2, ratio / (target * target));
                     });
-                    objective.set(v1, (-2.0 * ratio) / target);
+                    objective.set(v1, -2.0 * ratio / target);
                 });
             }
         });

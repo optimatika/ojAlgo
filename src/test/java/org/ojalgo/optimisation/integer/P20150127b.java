@@ -19,14 +19,12 @@ public class P20150127b {
 
     public static ExpressionsBasedModel getModel(final boolean branch, final boolean old) {
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        final Variable x = Variable.make("x").integer(true);
-        final Variable y = Variable.make("y").integer(true);
-        retVal.addVariable(x);
-        retVal.addVariable(y);
+        Variable x = retVal.newVariable("x").integer(true);
+        Variable y = retVal.newVariable("y").integer(true);
 
-        final List<int[]> coefficients = P20150127b.getCoefficients();
+        List<int[]> coefficients = P20150127b.getCoefficients();
         int counter = 0;
         for (final int[] coeff : coefficients) {
             final Expression c = retVal.newExpression("inequality_" + ++counter);

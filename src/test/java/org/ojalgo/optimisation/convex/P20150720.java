@@ -82,8 +82,7 @@ public abstract class P20150720 {
         //Create All Variables:
         //BasicLogger.debug("---- Variable creation ------");
         variablesName.forEach(name -> {
-            final Variable var = Variable.make(name).integer(true).lower(0.0);
-            model.addVariable(var);
+            Variable var = model.newVariable(name).integer(true).lower(0.0);
             variables.add(var);
             //BasicLogger.debug(var);
         });
@@ -124,8 +123,7 @@ public abstract class P20150720 {
         constraintsCustomer.entrySet().forEach(entry -> {
             final List<Variable> linked = variables.stream().filter(v -> v.getName().startsWith(entry.getKey())).collect(Collectors.toList());
             if (!linked.isEmpty() && entry.getValue().doubleValue() > 0) {
-                final Variable error = Variable.make("ERROR:" + entry.getKey());
-                model.addVariable(error);
+                Variable error = model.newVariable("ERROR:" + entry.getKey());
                 errors.add(error);
 
                 final Expression errorExp = model.newExpression("ERROR_EXP:" + entry.getKey()).level(stockTotal / demandTotal);
@@ -195,8 +193,7 @@ public abstract class P20150720 {
         //Create All Variables:
         //BasicLogger.debug("---- Variable creation ------");
         variablesName.forEach(name -> {
-            final Variable var = Variable.make(name).lower(0.0);
-            model.addVariable(var);
+            Variable var = model.newVariable(name).lower(0.0);
             variables.add(var);
             //BasicLogger.debug(var);
         });
@@ -389,8 +386,7 @@ public abstract class P20150720 {
          */
         // BasicLogger.debug("---- Variable creation ------");
         variablesName.forEach(name -> {
-            final Variable var = Variable.make(name).lower(0.0).weight(1.0);
-            model.addVariable(var);
+            Variable var = model.newVariable(name).lower(0.0).weight(1.0);
             variables.add(var);
             //BasicLogger.debug(var);
         });

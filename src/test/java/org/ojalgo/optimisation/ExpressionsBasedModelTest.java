@@ -59,9 +59,9 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testCompensate() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(Variable.make("X1").lower(0).upper(5).weight(1));
-        model.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
-        model.addVariable(Variable.make("X3").level(4).weight(1));
+        model.newVariable("X1").lower(0).upper(5).weight(1);
+        model.newVariable("X2").lower(0).upper(5).weight(1);
+        model.newVariable("X3").level(4).weight(1);
 
         Expression expression = model.newExpression("MAX5").upper(5);
         expression.set(0, 1).set(1, 1).set(2, 1);
@@ -113,9 +113,9 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
     public void testFixedVariables() {
 
         ExpressionsBasedModel test = new ExpressionsBasedModel();
-        test.addVariable(Variable.make("V1").level(0.5));
-        test.addVariable(Variable.make("V2").lower(0).upper(5).weight(2));
-        test.addVariable(Variable.make("V3").lower(0).upper(1).weight(1));
+        test.newVariable("V1").level(0.5);
+        test.newVariable("V2").lower(0).upper(5).weight(2);
+        test.newVariable("V3").lower(0).upper(1).weight(1);
         Expression expressions = test.newExpression("E1").lower(0).upper(2);
         expressions.set(1, 1).set(2, 1);
 

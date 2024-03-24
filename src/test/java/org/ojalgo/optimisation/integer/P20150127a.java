@@ -50,12 +50,11 @@ public class P20150127a {
 
     public static ExpressionsBasedModel getModel() {
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
-        final Variable x = Variable.make("x").integer(true);
-        final Variable y = Variable.make("y").integer(true);
-        retVal.addVariable(x);
-        retVal.addVariable(y);
+        Variable x = retVal.newVariable("x").integer(true);
+        Variable y = retVal.newVariable("y").integer(true);
+
 
         int counter = 0;
         for (final int[] coeff : P20150127a.getCoefficients()) {
@@ -97,7 +96,7 @@ public class P20150127a {
 
         // Verify solution
         for (final int[] coeff : coefficients) {
-            final int value = (coeff[0] * intX) + (coeff[1] * intY);
+            final int value = coeff[0] * intX + coeff[1] * intY;
             final BigDecimal exact = valX.multiply(BigDecimal.valueOf(coeff[0])).add(valY.multiply(BigDecimal.valueOf(coeff[1])));
             if (value >= 0) {
                 throw new Exception(coeff[0] + "*x + " + coeff[1] + "*y = " + value + " must be negative (exact: " + exact + ")");
@@ -110,7 +109,7 @@ public class P20150127a {
         final List<int[]> result = new LinkedList<>();
         result.add(new int[] { 0, 1 });
         for (int i = 0; i < 200; i++) {
-            result.add(new int[] { -1 - (i / 20), -i });
+            result.add(new int[] { -1 - i / 20, -i });
         }
         result.add(new int[] { -10, -200 });
         return result;

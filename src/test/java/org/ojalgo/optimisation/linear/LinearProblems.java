@@ -330,12 +330,10 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180310_61() {
 
-        Variable x = Variable.make("x").lower(0);
-        Variable y = Variable.make("y").lower(0);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
+
+        Variable x = model.newVariable("x").lower(0);
+        Variable y = model.newVariable("y").lower(0);
 
         model.newExpression("first").set(x, 2).set(y, 3).upper(1);
         model.newExpression("second").set(x, -2).set(y, 3).lower(1);
@@ -354,12 +352,11 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180310_62() {
 
-        Variable x = Variable.make("x").lower(0).weight(1);
-        Variable y = Variable.make("y").lower(0).weight(0);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
+
+
+        Variable x = model.newVariable("x").lower(0).weight(1);
+        Variable y = model.newVariable("y").lower(0).weight(0);
 
         model.newExpression("first").set(x, 0).set(y, 1).lower(1);
         model.newExpression("second").set(x, 0).set(y, 1).upper(-1);
@@ -374,12 +371,11 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180311_64() {
 
-        Variable x = Variable.make("x").lower(0).weight(3);
-        Variable y = Variable.make("y").lower(0).weight(-2);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
+
+        Variable x = model.newVariable("x").lower(0).weight(3);
+        Variable y = model.newVariable("y").lower(0).weight(-2);
+
 
         model.addExpression().set(x, -1).set(y, 0).lower(0);
         model.addExpression().set(x, -1).set(y, 3).level(2);
@@ -398,14 +394,12 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180311_66() {
 
-        Variable x = Variable.make("x").lower(0).weight(2);
-        Variable y = Variable.make("y").lower(0).weight(-1);
-        Variable z = Variable.make("z").lower(0).weight(4);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
-        model.addVariable(z);
+
+        Variable x = model.newVariable("x").lower(0).weight(2);
+        Variable y = model.newVariable("y").lower(0).weight(-1);
+        Variable z = model.newVariable("z").lower(0).weight(4);
+
 
         model.addExpression().set(x, 3).set(y, 2).set(z, 2).upper(0);
         model.addExpression().set(x, 0).set(y, 3).set(z, -2).lower(2);
@@ -422,14 +416,12 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180312_69() {
 
-        Variable x = Variable.make("x").lower(0).weight(3);
-        Variable y = Variable.make("y").lower(0).weight(2);
-        Variable z = Variable.make("z").lower(0).weight(-2);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
-        model.addVariable(z);
+
+        Variable x = model.newVariable("x").lower(0).weight(3);
+        Variable y = model.newVariable("y").lower(0).weight(2);
+        Variable z = model.newVariable("z").lower(0).weight(-2);
+
 
         model.addExpression().set(x, 0).set(y, 1).set(z, -2).level(4);
         model.addExpression().set(x, 0).set(y, 4).set(z, -2).upper(1);
@@ -449,12 +441,10 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20180314_70() {
 
-        Variable x = Variable.make("x").lower(0).weight(-2);
-        Variable y = Variable.make("y").lower(0).weight(-2);
-
         ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x);
-        model.addVariable(y);
+
+        Variable x = model.newVariable("x").lower(0).weight(-2);
+        Variable y = model.newVariable("y").lower(0).weight(-2);
 
         model.addExpression().set(x, 3).set(y, 0).lower(2);
         model.addExpression().set(x, 1).set(y, 2).lower(-5);

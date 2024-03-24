@@ -218,11 +218,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         int tmpNumberOfVariables = matrices[3].size(); // c
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
-            Variable tmpVariable = Variable.make("X" + v);
+            Variable tmpVariable = retVal.newVariable("X" + v);
             if (expectedSolution != null) {
                 tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
             }
-            retVal.addVariable(tmpVariable);
         }
         if (matrices[0] != null && matrices[1] != null) {
             for (int e = 0; e < matrices[0].countRows(); e++) {
@@ -338,21 +337,13 @@ public class ConvexProblems extends OptimisationConvexTests {
         // model.options.debug(ConvexSolver.class);
 
         // Create the variables
-        model.addVariable(Variable.make("w0"));
-        model.getVariable(0).lower(null);
-        model.getVariable(0).upper(null);
+        model.newVariable("w0").lower(null).upper(null);
 
-        model.addVariable(Variable.make("w1"));
-        model.getVariable(1).lower(null);
-        model.getVariable(1).upper(null);
+        model.newVariable("w1").lower(null).upper(null);
 
-        model.addVariable(Variable.make("w2"));
-        model.getVariable(2).lower(null);
-        model.getVariable(2).upper(null);
+        model.newVariable("w2").lower(null).upper(null);
 
-        model.addVariable(Variable.make("slack"));
-        model.getVariable(3).lower(0);
-        model.getVariable(3).upper(null);
+        model.newVariable("slack").lower(0).upper(null);
 
         // Add the objective: 0.5 * w0 * w0 + 0.5 * w1 * w1 + 0.5 * w2 * w2 + 1000 * slack
         Expression objectiveFunction = model.addExpression();

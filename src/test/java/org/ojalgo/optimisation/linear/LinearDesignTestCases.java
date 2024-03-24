@@ -455,21 +455,17 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testP20130409b() {
 
-        Variable x1 = Variable.make("x1");
-        Variable x2013 = Variable.make("x2013");
-        Variable x2014 = Variable.make("x2014");
-        Variable x2015 = Variable.make("x2015");
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("x1");
+        Variable x2013 = model.newVariable("x2013");
+        Variable x2014 = model.newVariable("x2014");
+        Variable x2015 = model.newVariable("x2015");
         //      x2013.setInteger(true);
         //      x2014.setInteger(true);
         //      x2015.setInteger(true);
         x2013.lower(BigDecimal.valueOf(1245L));
         x2014.lower(BigDecimal.valueOf(1269L));
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-        model.addVariable(x1);
-        model.addVariable(x2013);
-        model.addVariable(x2014);
-        model.addVariable(x2015);
 
         Expression obj = model.newExpression("obj");
         obj.set(x1, 1);
