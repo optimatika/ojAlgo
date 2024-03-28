@@ -217,10 +217,10 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testP20130409a() {
 
-        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
-                new Variable("x2014").lower(BigMath.ZERO).integer() };
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
+        Variable[] variables = { model.newVariable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), model.newVariable("x2013").lower(BigMath.ZERO).integer(),
+                model.newVariable("x2014").lower(BigMath.ZERO).integer() };
 
         Expression expr1 = model.newExpression("Expr1");
         expr1.set(0, -1);

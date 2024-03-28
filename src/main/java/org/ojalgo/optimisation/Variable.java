@@ -52,7 +52,7 @@ public final class Variable extends ModelEntity<Variable> {
      * @deprecated v53 Use {@link #ExpressionsBasedModel()} and {@link #newVariable(String)} instead.
      */
     @Deprecated
-    public Variable(final String name) {
+    Variable(final String name) {
         super(name);
     }
 
@@ -148,6 +148,11 @@ public final class Variable extends ModelEntity<Variable> {
 
     public Variable integer() {
         return this.integer(true);
+    }
+
+    public Variable value(final BigDecimal value) {
+        this.setValue(value);
+        return this;
     }
 
     /**

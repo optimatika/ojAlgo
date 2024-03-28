@@ -128,7 +128,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     }
 
     public void setLowerLimit(final int assetIndex, final BigDecimal lowerLimit) {
-        this.getVariable(assetIndex).lower(lowerLimit);
+        this.getVariable(assetIndex).lower = lowerLimit;
         this.reset();
     }
 
@@ -182,7 +182,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     }
 
     public void setUpperLimit(final int assetIndex, final BigDecimal upperLimit) {
-        this.getVariable(assetIndex).upper(upperLimit);
+        this.getVariable(assetIndex).upper = upperLimit;
         this.reset();
     }
 

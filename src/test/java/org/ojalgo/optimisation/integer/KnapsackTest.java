@@ -61,13 +61,15 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
         ExpressionsBasedModel build() {
 
+            ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
             Variable[] variables = new Variable[items.size()];
             for (int i = 0; i < variables.length; i++) {
-                variables[i] = new Variable("Var" + String.valueOf(i));
+                variables[i] = retVal.newVariable("Var" + String.valueOf(i));
                 variables[i].lower(ZERO).upper(ONE).weight(items.get(i).value).integer(true);
             }
 
-            ExpressionsBasedModel retVal = new ExpressionsBasedModel(variables);
+
             Expression totalWeightExpr = retVal.newExpression("Total Weight");
             for (int i = 0; i < items.size(); i++) {
                 totalWeightExpr.set(i, items.get(i).weight);

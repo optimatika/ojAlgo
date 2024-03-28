@@ -169,13 +169,15 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doTest("testprob.mps", "54", "80");
 
-        Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
-        Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
-        Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
+        ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel();
+
+
+        Variable tmpXONE = reimplementedModel.newVariable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
+        Variable tmpYTWO = reimplementedModel.newVariable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
+        Variable tmpZTHREE = reimplementedModel.newVariable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
         Variable[] tmpVariables = { tmpXONE, tmpYTWO, tmpZTHREE };
 
-        ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 
         Expression tmpLIM1 = reimplementedModel.newExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {

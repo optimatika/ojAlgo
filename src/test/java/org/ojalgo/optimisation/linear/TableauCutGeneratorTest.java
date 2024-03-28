@@ -133,12 +133,13 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
     @Test
     public void testExploreP20130409a() {
 
+        ExpressionsBasedModel originalModel = new ExpressionsBasedModel();
+
         NumberContext accuracy = NumberContext.of(7);
 
-        Variable[] variables = { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE), new Variable("x2013").lower(BigMath.ZERO).integer(),
-                new Variable("x2014").lower(BigMath.ZERO).integer() };
+        Variable[] variables = { originalModel.newVariable("x1").lower(BigMath.ZERO).weight(BigMath.ONE),
+                originalModel.newVariable("x2013").lower(BigMath.ZERO).integer(), originalModel.newVariable("x2014").lower(BigMath.ZERO).integer() };
 
-        ExpressionsBasedModel originalModel = new ExpressionsBasedModel(variables);
 
         Expression expr1 = originalModel.newExpression("Expr1");
         expr1.set(0, -1);
