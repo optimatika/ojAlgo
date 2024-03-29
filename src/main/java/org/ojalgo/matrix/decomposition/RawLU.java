@@ -29,7 +29,7 @@ import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -232,7 +232,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
 
-            Primitive64Store.FACTORY.makeWrapper(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
+            R064Store.FACTORY.makeWrapper(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
 
             return this.doSolve(preallocated);
 

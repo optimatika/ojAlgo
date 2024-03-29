@@ -71,8 +71,6 @@ public class StrategyMixer {
 
         }
 
-
-
         // tmpModel.options.debug(IntegerSolver.class);
         // tmpModel.options.validate = false;
 

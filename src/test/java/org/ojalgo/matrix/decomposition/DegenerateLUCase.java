@@ -28,8 +28,8 @@ import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -64,7 +64,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     public void testDensePrimitive32() {
 
         MatrixR064 square = SimpleEquationCase.getBody();
-        Primitive32Store degenerate = Primitive32Store.FACTORY.copy(square.below(square).below(square));
+        R032Store degenerate = R032Store.FACTORY.copy(square.below(square).below(square));
 
         LU<Double> decomp = LU.R064.make();
         decomp.decompose(degenerate);
@@ -76,7 +76,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
     public void testDensePrimitive64() {
 
         MatrixR064 square = SimpleEquationCase.getBody();
-        Primitive64Store degenerate = Primitive64Store.FACTORY.copy(square.below(square).below(square));
+        R064Store degenerate = R064Store.FACTORY.copy(square.below(square).below(square));
 
         LU<Double> decomp = LU.R064.make();
         decomp.decompose(degenerate);

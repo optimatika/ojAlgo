@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 
 public class LinearCase extends MultiaryFunctionTests {
@@ -46,19 +46,18 @@ public class LinearCase extends MultiaryFunctionTests {
 
         int arity = 9;
 
-        PhysicalStore<Double> quadratic = Primitive64Store.FACTORY.make(arity, arity);
-        PhysicalStore<Double> linear = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+        PhysicalStore<Double> quadratic = R064Store.FACTORY.make(arity, arity);
+        PhysicalStore<Double> linear = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-        myLinearFunction1 = LinearFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
-        myAffineFunction1 = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
-        myQuadraticFunction1 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
+        myLinearFunction1 = LinearFunction.factory(R064Store.FACTORY).coefficients(linear).make(linear.size());
+        myAffineFunction1 = AffineFunction.factory(R064Store.FACTORY).coefficients(linear).make(linear.size());
+        myQuadraticFunction1 = QuadraticFunction.factory(R064Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
 
-        myLinearFunction2 = LinearFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
-        myAffineFunction2 = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
-        myQuadraticFunction2 = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear.transpose())
-                .make(linear.transpose().size());
+        myLinearFunction2 = LinearFunction.factory(R064Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
+        myAffineFunction2 = AffineFunction.factory(R064Store.FACTORY).coefficients(linear.transpose()).make(linear.transpose().size());
+        myQuadraticFunction2 = QuadraticFunction.factory(R064Store.FACTORY).quadratic(quadratic).linear(linear.transpose()).make(linear.transpose().size());
 
-        myArg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+        myArg = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
     }
 
     @Test

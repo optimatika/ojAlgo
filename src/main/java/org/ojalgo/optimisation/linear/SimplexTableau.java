@@ -38,7 +38,7 @@ import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ProblemStructure;
@@ -639,7 +639,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
     static final class TransposedTableau extends DenseTableau {
 
         private final int myColDim;
-        private final Primitive64Store myTransposed;
+        private final R064Store myTransposed;
 
         TransposedTableau(final LinearStructure linearStructure) {
 
@@ -648,7 +648,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
             int nbRows = m + 2;
             int nbCols = n + 1;
 
-            myTransposed = Primitive64Store.FACTORY.make(nbCols, nbRows);
+            myTransposed = R064Store.FACTORY.make(nbCols, nbRows);
             myColDim = myTransposed.getRowDim();
         }
 
@@ -656,7 +656,7 @@ abstract class SimplexTableau implements Access2D<Double>, Mutate2D {
 
             super(toCopy.structure);
 
-            myTransposed = Primitive64Store.FACTORY.transpose(toCopy);
+            myTransposed = R064Store.FACTORY.transpose(toCopy);
             myColDim = myTransposed.getRowDim();
         }
 

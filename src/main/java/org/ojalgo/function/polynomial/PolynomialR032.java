@@ -25,7 +25,7 @@ import org.ojalgo.array.ArrayR032;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.Primitive32Store;
+import org.ojalgo.matrix.store.R032Store;
 import org.ojalgo.structure.Access1D;
 
 public final class PolynomialR032 extends AbstractPolynomial<Double, PolynomialR032> {
@@ -68,7 +68,7 @@ public final class PolynomialR032 extends AbstractPolynomial<Double, PolynomialR
 
     @Override
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
-        this.estimate(x, y, Primitive32Store.FACTORY, QR.R064);
+        this.estimate(x, y, R032Store.FACTORY, QR.R064);
     }
 
     @Override

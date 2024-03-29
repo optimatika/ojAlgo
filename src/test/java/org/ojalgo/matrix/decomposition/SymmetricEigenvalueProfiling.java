@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 
 public class SymmetricEigenvalueProfiling {
 
     public static void main(final String[] args) {
 
-        final Primitive64Store tmpOrg = Primitive64Store.FACTORY.makeSPD(200);
+        final R064Store tmpOrg = R064Store.FACTORY.makeSPD(200);
         //final Eigenvalue<Double> tmpEvD = new RawEigenvalue.Symmetric();
         final Eigenvalue<Double> tmpEvD = Eigenvalue.R064.make(tmpOrg, true);
 

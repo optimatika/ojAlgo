@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
@@ -772,14 +772,14 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(this);
+        final R064Store retVal = R064Store.FACTORY.make(this);
         this.supplyTo(retVal);
         return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(4L, 1L);
+        final R064Store retVal = R064Store.FACTORY.make(4L, 1L);
 
         retVal.set(0L, myScalar);
         retVal.set(1L, i);
@@ -791,7 +791,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public MatrixStore<Double> toRotationMatrix() {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(3L, 3L);
+        final R064Store retVal = R064Store.FACTORY.make(3L, 3L);
 
         final double s = myScalar;
 
@@ -999,7 +999,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public PhysicalStore<Double> vector() {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(3L, 1L);
+        final R064Store retVal = R064Store.FACTORY.make(3L, 1L);
 
         retVal.set(0L, i);
         retVal.set(1L, j);
@@ -1031,7 +1031,7 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     MatrixStore<Double> toRotationMatrixVersor() {
 
-        final Primitive64Store retVal = Primitive64Store.FACTORY.make(3L, 3L);
+        final R064Store retVal = R064Store.FACTORY.make(3L, 3L);
 
         final double s = this.doubleValue();
 

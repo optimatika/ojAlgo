@@ -25,7 +25,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.QuadrupleMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.Quadruple;
 
@@ -53,7 +53,7 @@ final class IterativeRefinementSolver extends ConvexSolver {
         int nbEqus = BE.getRowDim();
         int nbIneq = BI.getRowDim();
 
-        ConvexData<Double> data = new ConvexData<>(false, Primitive64Store.FACTORY, nbVars, nbEqus, nbIneq);
+        ConvexData<Double> data = new ConvexData<>(false, R064Store.FACTORY, nbVars, nbEqus, nbIneq);
 
         data.getObjective().quadratic().fillMatching(H);
         data.getObjective().linear().fillMatching(g);

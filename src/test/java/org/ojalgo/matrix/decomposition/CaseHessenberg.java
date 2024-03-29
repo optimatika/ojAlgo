@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
@@ -45,7 +45,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
     @Test
     public void testSquareEye() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.makeEye(5, 5);
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.makeEye(5, 5);
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -53,7 +53,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
     @Test
     public void testSquareRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -95,8 +95,8 @@ public class CaseHessenberg extends MatrixDecompositionTests {
         TestUtils.assertEquals(aMatrix, tmpDecomposition, NumberContext.of(7, 6));
     }
 
-    private Primitive64Store makeEye(final int aRowDim, final int aColDim) {
-        return Primitive64Store.FACTORY.makeEye(aRowDim, aColDim);
+    private R064Store makeEye(final int aRowDim, final int aColDim) {
+        return R064Store.FACTORY.makeEye(aRowDim, aColDim);
     }
 
 }

@@ -20,7 +20,7 @@ public class RepeatCase extends NonPhysicalTest {
 
         rationalStore = GenericStore.Q128.copy(base).repeat(rowsRep, colsRep);
         complexStore = GenericStore.C128.copy(base).repeat(rowsRep, colsRep);
-        primitiveStore = Primitive64Store.FACTORY.copy(base).repeat(rowsRep, colsRep);
+        primitiveStore = R064Store.FACTORY.copy(base).repeat(rowsRep, colsRep);
 
         numberOfRows = baseRowDim * rowsRep;
         numberOfColumns = baseColDim * colsRep;

@@ -31,7 +31,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.MatrixR064.DenseReceiver;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -134,16 +134,16 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // As the Markowitz model built it the problem
 
-        MatrixStore<Double> tmpQ = Primitive64Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
-        MatrixStore<Double> tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
+        MatrixStore<Double> tmpQ = R064Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
+        MatrixStore<Double> tmpC = R064Store.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
 
-        MatrixStore<Double> tmpAE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
-        MatrixStore<Double> tmpBE = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 } });
+        MatrixStore<Double> tmpAE = R064Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
+        MatrixStore<Double> tmpBE = R064Store.FACTORY.rows(new double[][] { { 1.0 } });
 
-        MatrixStore<Double> tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
-        MatrixStore<Double> tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
+        MatrixStore<Double> tmpAI = R064Store.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
+        MatrixStore<Double> tmpBI = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
 
-        MatrixStore<Double> tmpX = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
+        MatrixStore<Double> tmpX = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
 
         ConvexSolver.Builder tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
@@ -160,8 +160,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         // on the portfolio weights, which you have to do. No problem with
         // ojAlgo.
 
-        tmpAI = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
-        tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
+        tmpAI = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpBI = R064Store.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
 
         tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
@@ -172,9 +172,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // No problem with both the lower and upper limits set.
 
-        tmpAI = Primitive64Store.FACTORY
+        tmpAI = R064Store.FACTORY
                 .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
-        tmpBI = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
+        tmpBI = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
         tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();

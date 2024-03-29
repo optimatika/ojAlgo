@@ -37,10 +37,10 @@ public class MultiplicationTest extends MatrixStoreTests {
     @Test
     public void testPower() {
 
-        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+        Factory<Double, R064Store> factory = R064Store.FACTORY;
 
         int dim = 9;
-        Primitive64Store random = factory.makeSPD(dim);
+        R064Store random = factory.makeSPD(dim);
         MatrixStore<Double> expected = factory.makeEye(dim, dim);
 
         for (int p = 0; p < 20; p++) {
@@ -59,21 +59,21 @@ public class MultiplicationTest extends MatrixStoreTests {
         for (int s = 0; s < sizes.length; s++) {
             int dim = sizes[s];
 
-            Primitive64Store result = Primitive64Store.FACTORY.make(dim, dim);
-            MatrixStore<Double> matA = Primitive64Store.FACTORY.makeFilled(dim, dim, new Normal());
-            MatrixStore<Double> matB = Primitive64Store.FACTORY.makeFilled(dim, dim, new Uniform());
+            R064Store result = R064Store.FACTORY.make(dim, dim);
+            MatrixStore<Double> matA = R064Store.FACTORY.makeFilled(dim, dim, new Normal());
+            MatrixStore<Double> matB = R064Store.FACTORY.makeFilled(dim, dim, new Uniform());
 
             result.fillByMultiplying(matA, matB);
-            Primitive64Store pp = result.copy();
+            R064Store pp = result.copy();
 
             result.fillByMultiplying(matA, matB.transpose());
-            Primitive64Store pt = result.copy();
+            R064Store pt = result.copy();
 
             result.fillByMultiplying(matA.transpose(), matB);
-            Primitive64Store tp = result.copy();
+            R064Store tp = result.copy();
 
             result.fillByMultiplying(matA.transpose(), matB.transpose());
-            Primitive64Store tt = result.copy();
+            R064Store tt = result.copy();
 
             for (long i = 0; i < 3; i++) {
 

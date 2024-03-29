@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -65,7 +65,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
         for (Data triplet : this.getTestCases()) {
 
-            ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
+            ArtificialNeuralNetwork network = this.getInitialNetwork(R064Store.FACTORY);
 
             network.setActivator(0, activator);
 

@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -37,7 +37,7 @@ abstract class MultiplyThresholdTuner extends ThresholdTuner {
 
         final MatrixStore<Double> left;
         final MatrixStore<Double> right;
-        final Primitive64Store target;
+        final R064Store target;
 
         CodeAndData(final int dim) {
             this(dim, false, false);
@@ -45,16 +45,16 @@ abstract class MultiplyThresholdTuner extends ThresholdTuner {
 
         CodeAndData(final int dim, final boolean transposeLeft, final boolean transposeRight) {
 
-            Primitive64Store tmpL = Primitive64Store.FACTORY.makeFilled(dim, dim, UNIFORM);
+            R064Store tmpL = R064Store.FACTORY.makeFilled(dim, dim, UNIFORM);
             left = transposeLeft ? tmpL.transpose() : tmpL;
 
-            Primitive64Store tmpR = Primitive64Store.FACTORY.makeFilled(dim, dim, UNIFORM);
+            R064Store tmpR = R064Store.FACTORY.makeFilled(dim, dim, UNIFORM);
             right = transposeRight ? tmpR.transpose() : tmpR;
 
-            target = Primitive64Store.FACTORY.make(dim, dim);
+            target = R064Store.FACTORY.make(dim, dim);
         }
 
-        Primitive64Store execute() {
+        R064Store execute() {
             target.fillByMultiplying(left, right);
             return target;
         }
@@ -65,7 +65,7 @@ abstract class MultiplyThresholdTuner extends ThresholdTuner {
 
     @Override
     @Benchmark
-    public final Primitive64Store tune() {
+    public final R064Store tune() {
         return benchmark.execute();
     }
 

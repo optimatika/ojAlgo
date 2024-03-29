@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.context.NumberContext;
@@ -35,7 +35,7 @@ public abstract class OptimisationConvexTests {
     static boolean DEBUG = false;
 
     public static ConvexData<Double> getOptimisationData(final ConvexSolver.Builder convexSolverBuilder) {
-        return convexSolverBuilder.getConvexData(Primitive64Store.FACTORY);
+        return convexSolverBuilder.getConvexData(R064Store.FACTORY);
     }
 
     protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, Optimisation.Options options) {
@@ -51,10 +51,10 @@ public abstract class OptimisationConvexTests {
         if (builder.countInequalityConstraints() > 0) {
             // ActiveSetSolver (ASS)
 
-            DirectASS directASS = new DirectASS(builder.getConvexData(Primitive64Store.FACTORY), options);
+            DirectASS directASS = new DirectASS(builder.getConvexData(R064Store.FACTORY), options);
             Optimisation.Result direct = directASS.solve();
 
-            IterativeASS iterativeASS = new IterativeASS(builder.getConvexData(Primitive64Store.FACTORY), options);
+            IterativeASS iterativeASS = new IterativeASS(builder.getConvexData(R064Store.FACTORY), options);
             Optimisation.Result iterative = iterativeASS.solve();
 
             if (!direct.getState().isFeasible()) {

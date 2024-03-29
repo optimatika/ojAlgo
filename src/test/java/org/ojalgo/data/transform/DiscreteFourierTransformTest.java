@@ -31,7 +31,7 @@ import org.ojalgo.matrix.MatrixC128;
 import org.ojalgo.matrix.MatrixC128.DenseReceiver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -63,7 +63,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
             int dim = PowerOf2.powerOfInt2(power);
 
-            PhysicalStore<Double> input = Primitive64Store.FACTORY.makeFilled(dim, 1, Uniform.of(-2, 4));
+            PhysicalStore<Double> input = R064Store.FACTORY.makeFilled(dim, 1, Uniform.of(-2, 4));
 
             DiscreteFourierTransform full = new DiscreteFourierTransform.FullMatrix(dim);
             DiscreteFourierTransform fast = new DiscreteFourierTransform.FFT(dim);
@@ -280,7 +280,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
 
         for (int dimension = 2; dimension <= 16; dimension++) {
 
-            PhysicalStore<Double> input = Primitive64Store.FACTORY.makeFilled(dimension, 1, Uniform.of(-2, 4));
+            PhysicalStore<Double> input = R064Store.FACTORY.makeFilled(dimension, 1, Uniform.of(-2, 4));
 
             DiscreteFourierTransform transformer = DiscreteFourierTransform.newInstance(dimension);
 
@@ -303,7 +303,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
         for (int c = 2; c < 10; c += 2) {
             for (int r = 2; r < 10; r += 2) {
 
-                Primitive64Store original = Primitive64Store.FACTORY.make(r, c);
+                R064Store original = R064Store.FACTORY.make(r, c);
 
                 for (int j = 0; j < c; j++) {
                     for (int i = 0; i < r; i++) {
@@ -343,7 +343,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
         for (int c = 3; c < 10; c++) {
             for (int r = 3; r < 10; r++) {
 
-                Primitive64Store original = Primitive64Store.FACTORY.make(r, c);
+                R064Store original = R064Store.FACTORY.make(r, c);
 
                 for (int j = 0; j < c; j++) {
                     for (int i = 0; i < r; i++) {

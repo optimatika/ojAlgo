@@ -27,7 +27,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
@@ -54,15 +54,15 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         if (body instanceof MatrixStore<?> && body.get(0L) instanceof Double) {
             tmpBody = (MatrixStore<Double>) body;
         } else {
-            tmpBody = Primitive64Store.FACTORY.makeWrapper(body);
+            tmpBody = R064Store.FACTORY.makeWrapper(body);
         }
-        MatrixStore<Double> tmpBodyDiagonal = Primitive64Store.FACTORY.column(tmpBody.sliceDiagonal());
+        MatrixStore<Double> tmpBodyDiagonal = R064Store.FACTORY.column(tmpBody.sliceDiagonal());
 
         MatrixStore<Double> tmpRHS = null;
         if (rhs instanceof MatrixStore<?> && rhs.get(0L) instanceof Double) {
             tmpRHS = (MatrixStore<Double>) rhs;
         } else {
-            tmpRHS = Primitive64Store.FACTORY.makeWrapper(rhs);
+            tmpRHS = R064Store.FACTORY.makeWrapper(rhs);
         }
 
         PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);

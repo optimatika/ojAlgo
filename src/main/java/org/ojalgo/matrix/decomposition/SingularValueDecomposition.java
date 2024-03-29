@@ -34,7 +34,7 @@ import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
@@ -92,7 +92,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         }
 
         R064(final boolean fullSize) {
-            super(Primitive64Store.FACTORY, new BidiagonalDecomposition.R064(fullSize), fullSize);
+            super(R064Store.FACTORY, new BidiagonalDecomposition.R064(fullSize), fullSize);
         }
 
     }

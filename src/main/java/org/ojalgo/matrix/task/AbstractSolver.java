@@ -25,7 +25,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
@@ -433,14 +433,14 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
-        final Primitive64Store tmpTranspBody = Primitive64Store.FACTORY.transpose(body);
+        final R064Store tmpTranspBody = R064Store.FACTORY.transpose(body);
 
         final int tmpCountRows = (int) tmpTranspBody.countRows();
 
-        final Primitive64Store tmpBody = Primitive64Store.FACTORY.make(tmpCountRows, tmpCountRows);
+        final R064Store tmpBody = R064Store.FACTORY.make(tmpCountRows, tmpCountRows);
         tmpTranspBody.multiply(tmpTranspBody.transpose(), tmpBody);
 
-        final Primitive64Store tmpRHS = Primitive64Store.FACTORY.make(tmpCountRows, solution.countColumns());
+        final R064Store tmpRHS = R064Store.FACTORY.make(tmpCountRows, solution.countColumns());
         tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
@@ -706,7 +706,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
     }
 
     public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return Primitive64Store.FACTORY.make(templateBody.countColumns(), 1L);
+        return R064Store.FACTORY.make(templateBody.countColumns(), 1L);
     }
 
 }

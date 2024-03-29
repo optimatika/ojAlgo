@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -84,9 +84,9 @@ public class PrimitiveOrRawLU extends AbstractPrimitiveOrRaw<LU<Double>> {
     @Param({ "100", "200", "500", "1000", "2000" })
     public int dim;
 
-    Primitive64Store matrix;
+    R064Store matrix;
 
-    Primitive64Store preallocated;
+    R064Store preallocated;
 
     @Override
     @Benchmark
@@ -108,9 +108,9 @@ public class PrimitiveOrRawLU extends AbstractPrimitiveOrRaw<LU<Double>> {
 
         super.setup();
 
-        matrix = Primitive64Store.FACTORY.makeSPD(dim);
+        matrix = R064Store.FACTORY.makeSPD(dim);
 
-        preallocated = Primitive64Store.FACTORY.make(dim, dim);
+        preallocated = R064Store.FACTORY.make(dim, dim);
     }
 
     @Override

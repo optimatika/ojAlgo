@@ -38,7 +38,7 @@ public class ConjugatedCase extends NonPhysicalTest {
 
         rationalStore = new ConjugatedStore<>(GenericStore.Q128.copy(base));
         complexStore = new ConjugatedStore<>(GenericStore.C128.copy(base));
-        primitiveStore = new ConjugatedStore<>(Primitive64Store.FACTORY.copy(base));
+        primitiveStore = new ConjugatedStore<>(R064Store.FACTORY.copy(base));
 
         numberOfRows = tmpColDim;
         numberOfColumns = tmpRowDim;

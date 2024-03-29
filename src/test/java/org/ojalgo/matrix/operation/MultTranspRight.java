@@ -23,7 +23,7 @@ package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -87,45 +87,45 @@ public class MultTranspRight {
     @Param({ "2", "3", "4", "5", "10" })
     public int complexity;
 
-    public Primitive64Store left;
-    public Primitive64Store product;
+    public R064Store left;
+    public R064Store product;
     public MatrixStore<Double> rightD;
     public MatrixStore<Double> rightT;
 
     MultiplyRight.Primitive64 MR;
 
     @Benchmark
-    public Primitive64Store multiplyRightDynamicInt() {
+    public R064Store multiplyRightDynamicInt() {
         product.fillByMultiplying(left, rightD.transpose());
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRightDynamicPre() {
+    public R064Store multiplyRightDynamicPre() {
         product.fillByMultiplying(left, rightT);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRightFixedInt() {
+    public R064Store multiplyRightFixedInt() {
         MR.invoke(product.data, left.data, complexity, rightD.transpose());
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRightFixedPre() {
+    public R064Store multiplyRightFixedPre() {
         MR.invoke(product.data, left.data, complexity, rightT);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRightStandardInt() {
+    public R064Store multiplyRightStandardInt() {
         MultiplyRight.addMxC(product.data, 0, complexity, left.data, complexity, rightD.transpose());
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRightStandardPre() {
+    public R064Store multiplyRightStandardPre() {
         MultiplyRight.addMxC(product.data, 0, complexity, left.data, complexity, rightT);
         return product;
     }
@@ -133,10 +133,10 @@ public class MultTranspRight {
     @Setup
     public void setup() {
 
-        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
-        rightD = Primitive64Store.FACTORY.makeFilled(complexity, complexity, new Normal());
+        left = R064Store.FACTORY.makeFilled(complexity, complexity, new Normal());
+        rightD = R064Store.FACTORY.makeFilled(complexity, complexity, new Normal());
         rightT = rightD.transpose();
-        product = Primitive64Store.FACTORY.make(complexity, complexity);
+        product = R064Store.FACTORY.make(complexity, complexity);
 
         MR = MultiplyRight.newPrimitive64(complexity, complexity);
     }

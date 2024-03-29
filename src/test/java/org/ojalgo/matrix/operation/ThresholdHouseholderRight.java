@@ -24,7 +24,7 @@ package org.ojalgo.matrix.operation;
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -96,7 +96,7 @@ public class ThresholdHouseholderRight extends ThresholdTuner {
 
             super();
 
-            matrix = Primitive64Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
+            matrix = R064Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
 
             decomposition = Bidiagonal.R064.make(matrix);
         }

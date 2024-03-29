@@ -25,7 +25,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -39,7 +39,7 @@ class SimultaneousTridiagonal extends TridiagonalDecomposition<Double> {
     private BasicArray<Double> myDiagE;
 
     SimultaneousTridiagonal() {
-        super(Primitive64Store.FACTORY);
+        super(R064Store.FACTORY);
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {

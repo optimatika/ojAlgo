@@ -116,7 +116,7 @@ public class SparseCase extends NonPhysicalTest {
         SparseStore<Double> sparseB = SparseStore.R064.make(8, 9);
         SparseStore<Double> sparseC = SparseStore.R064.make(7, 9);
 
-        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, Primitive64Store.FACTORY);
+        SparseCase.doTestMultiplication(sparseA, sparseB, sparseC, R064Store.FACTORY);
     }
 
     @Test

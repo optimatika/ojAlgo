@@ -26,6 +26,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.matrix
 
+- The classes `Primitive64Store` and `Primitive32Store` have been renamed `R064Store` and `R032Store`. These classes are central to ojAlgo. The effect of this name change is widespread. ojAlgo has been transitioning to a new naming scheme over several versions now, but these classes were left untouched so far (in part because of how central they are). Now, to complete the work, it's done! No deprecations, just did it. Apart from the name change the classes are identical.
 - Vector space method like "add" and "subtract" have been redefined to no longer throw exceptions if dimensions are not equal, but instead broadcast/repeat rows or columns. (Inspired by MATLAB's concept of compatible array sizes for binary operation.)
 
 #### org.ojalgo.optimisation

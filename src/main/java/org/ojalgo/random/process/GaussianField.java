@@ -35,7 +35,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal1D;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
@@ -65,7 +65,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
     }
 
-    private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
+    private static final Factory<Double, R064Store> FACTORY = R064Store.FACTORY;
 
     private static <K extends Comparable<? super K>> Mean<K> mean() {
         return new Mean<K>() {
@@ -122,13 +122,13 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
         MatrixStore<Double> tmpM1 = this.getM1(evaluationPoint);
         MatrixStore<Double> tmpM2differenses = this.getM2differenses();
 
-        Primitive64Store tmpLocations = FACTORY.make(tmpM1.countRows(), tmpM1.countColumns());
+        R064Store tmpLocations = FACTORY.make(tmpM1.countRows(), tmpM1.countColumns());
         tmpLocations.fillMatching(tmpM1, PrimitiveMath.ADD, tmpRegCoef.multiply(tmpM2differenses));
 
         MatrixStore<Double> tmpC11 = this.getC11(evaluationPoint);
         MatrixStore<Double> tmpC21 = this.getC21(evaluationPoint);
 
-        Primitive64Store tmpCovariances = FACTORY.make(tmpC11.countRows(), tmpC11.countColumns());
+        R064Store tmpCovariances = FACTORY.make(tmpC11.countRows(), tmpC11.countColumns());
         tmpCovariances.fillMatching(tmpC11, PrimitiveMath.SUBTRACT, tmpRegCoef.multiply(tmpC21));
 
         if (cleanCovariances) {
@@ -163,7 +163,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         int tmpLength = args.length;
 
-        Primitive64Store retVal = FACTORY.make(tmpLength, tmpLength);
+        R064Store retVal = FACTORY.make(tmpLength, tmpLength);
 
         for (int j = 0; j < tmpLength; j++) {
             for (int i = 0; i < tmpLength; i++) {
@@ -181,7 +181,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
         int tmpRowDim = args.length;
         int tmpColDim = tmpObservations.size();
 
-        Primitive64Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
+        R064Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -199,7 +199,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
         int tmpRowDim = tmpObservations.size();
         int tmpColDim = args.length;
 
-        Primitive64Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
+        R064Store retVal = FACTORY.make(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -216,7 +216,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         int tmpSize = tmpObservations.size();
 
-        Primitive64Store tmpMatrix = FACTORY.make(tmpSize, tmpSize);
+        R064Store tmpMatrix = FACTORY.make(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             K tmpColumnKey = tmpObservations.get(j).getKey();
@@ -236,7 +236,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         int tmpLength = args.length;
 
-        Primitive64Store retVal = FACTORY.make(tmpLength, 1);
+        R064Store retVal = FACTORY.make(tmpLength, 1);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(args[i]));
@@ -251,7 +251,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         int tmpSize = tmpObservations.size();
 
-        Primitive64Store retVal = FACTORY.make(tmpSize, 1);
+        R064Store retVal = FACTORY.make(tmpSize, 1);
 
         for (int i = 0; i < tmpSize; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(tmpObservations.get(i).getKey()));
@@ -266,7 +266,7 @@ public final class GaussianField<K extends Comparable<? super K>> extends Random
 
         int tmpSize = tmpObservations.size();
 
-        Primitive64Store retVal = FACTORY.make(tmpSize, 1);
+        R064Store retVal = FACTORY.make(tmpSize, 1);
 
         KeyedPrimitive<K> tmpObservation;
         double tmpDiff;

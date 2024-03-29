@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.matrix.store.Primitive64Store.FACTORY;
+import static org.ojalgo.matrix.store.R064Store.FACTORY;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -48,22 +48,22 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         NumberContext accuracy = NumberContext.of(2); // Example solutions are very much rounded
 
-        Primitive64Store mtrxQ = FACTORY.rows(new double[][] { { 2, 3 }, { 3, 10 } });
-        Primitive64Store mtrxC = FACTORY.column(-0.5, 0); // Defined negated the ojAlgo way
+        R064Store mtrxQ = FACTORY.rows(new double[][] { { 2, 3 }, { 3, 10 } });
+        R064Store mtrxC = FACTORY.column(-0.5, 0); // Defined negated the ojAlgo way
 
         ConvexSolver unconstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).build();
 
-        Primitive64Store unconstrainedX = FACTORY.column(-0.45, 0.14);
+        R064Store unconstrainedX = FACTORY.column(-0.45, 0.14);
 
         TestUtils.assertEquals(unconstrainedX, unconstrainedSolver.solve(), accuracy);
 
-        Primitive64Store mtrxAI = FACTORY.rows(new double[][] { { 3, 2 }, { 15, -3 } });
-        Primitive64Store mtrxBI = FACTORY.column(-2, 1);
+        R064Store mtrxAI = FACTORY.rows(new double[][] { { 3, 2 }, { 15, -3 } });
+        R064Store mtrxBI = FACTORY.column(-2, 1);
 
         ConvexSolver equalityConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).equalities(mtrxAI, mtrxBI).build();
 
-        Primitive64Store equalityX = FACTORY.column(-0.10, -0.85);
-        Primitive64Store equalityL = FACTORY.column(3.55, -0.56);
+        R064Store equalityX = FACTORY.column(-0.10, -0.85);
+        R064Store equalityL = FACTORY.column(3.55, -0.56);
 
         Result equalitySolution = equalityConstrainedSolver.solve();
         Access1D<?> equalityMultipliers = equalitySolution.getMultipliers().get();
@@ -73,8 +73,8 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         ConvexSolver inequalityConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).inequalities(mtrxAI, mtrxBI).build();
 
-        Primitive64Store inequalityX = FACTORY.column(-0.81, 0.21);
-        Primitive64Store inequalityL = FACTORY.column(0.16, 0);
+        R064Store inequalityX = FACTORY.column(-0.81, 0.21);
+        R064Store inequalityL = FACTORY.column(0.16, 0);
 
         if (DEBUG) {
             inequalityConstrainedSolver.options.debug(Optimisation.Solver.class);
@@ -121,13 +121,13 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         NumberContext accuracy = NumberContext.of(12);
 
-        Primitive64Store mtrxQ = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
-        Primitive64Store mtrxC = FACTORY.column(8, 3, 3); // Negated, because that how ojAgo expects it
-        Primitive64Store mtrxAE = FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
-        Primitive64Store mtrxBE = FACTORY.column(3, 0);
+        R064Store mtrxQ = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+        R064Store mtrxC = FACTORY.column(8, 3, 3); // Negated, because that how ojAgo expects it
+        R064Store mtrxAE = FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
+        R064Store mtrxBE = FACTORY.column(3, 0);
 
-        Primitive64Store expectedX = FACTORY.column(2, -1, 1);
-        Primitive64Store expectedDual = FACTORY.column(-3, 2); // Negated, because N&W defined the KKT that way. Don't know why.
+        R064Store expectedX = FACTORY.column(2, -1, 1);
+        R064Store expectedDual = FACTORY.column(-3, 2); // Negated, because N&W defined the KKT that way. Don't know why.
 
         MatrixStore<Double> bodyKKT = mtrxQ.right(mtrxAE.transpose()).below(mtrxAE);
         MatrixStore<Double> rhsKKT = mtrxC.below(mtrxBE);
@@ -173,7 +173,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         Optional<Access1D<?>> altMultipliers = altResult.getMultipliers();
         TestUtils.assertTrue("No multipliers present", altMultipliers.isPresent());
 
-        Primitive64Store expectedInequalityDual = FACTORY.column(0, 2, 3, 0);
+        R064Store expectedInequalityDual = FACTORY.column(0, 2, 3, 0);
         TestUtils.assertEquals(expectedInequalityDual, altMultipliers.get(), accuracy);
 
     }

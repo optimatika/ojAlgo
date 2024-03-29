@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.ApplyLU;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -77,7 +77,7 @@ public class ThresholdApplyLU extends AbstractThresholdTuner {
 
     LU<Double> decomposition = new LUDecomposition.R064();
 
-    Primitive64Store matrix;
+    R064Store matrix;
 
     @Override
     @Setup
@@ -85,7 +85,7 @@ public class ThresholdApplyLU extends AbstractThresholdTuner {
 
         ApplyLU.THRESHOLD = dim / z;
 
-        matrix = Primitive64Store.FACTORY.makeSPD(dim);
+        matrix = R064Store.FACTORY.makeSPD(dim);
     }
 
     @Override

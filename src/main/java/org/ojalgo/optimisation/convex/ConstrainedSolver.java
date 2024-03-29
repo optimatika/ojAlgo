@@ -23,15 +23,15 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends BasePrimitiveSolver {
 
-    private final Primitive64Store mySlackE;
-    private final Primitive64Store mySolutionL;
+    private final R064Store mySlackE;
+    private final R064Store mySolutionL;
 
     protected ConstrainedSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
@@ -136,7 +136,7 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
         return mySlackE;
     }
 
-    Primitive64Store getSolutionL() {
+    R064Store getSolutionL() {
         return mySolutionL;
     }
 

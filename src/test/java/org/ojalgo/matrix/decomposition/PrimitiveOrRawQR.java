@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -107,16 +107,16 @@ public class PrimitiveOrRawQR extends AbstractPrimitiveOrRaw<QR<Double>> {
             return new RawQR();
         }
 
-        final Primitive64Store body;
+        final R064Store body;
         transient PhysicalStore<Double> preallocated = null;
-        final Primitive64Store rhs;
+        final R064Store rhs;
 
         public CodeAndData(final int dim) {
 
             super();
 
-            body = Primitive64Store.FACTORY.makeFilled(2 * dim, dim, Uniform.standard());
-            rhs = Primitive64Store.FACTORY.makeFilled(2 * dim, 1, Uniform.standard());
+            body = R064Store.FACTORY.makeFilled(2 * dim, dim, Uniform.standard());
+            rhs = R064Store.FACTORY.makeFilled(2 * dim, 1, Uniform.standard());
         }
 
         public MatrixStore<Double> execute(final QR<Double> decomposition) {

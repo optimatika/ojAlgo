@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 
 class MatrixReader {
 
@@ -17,7 +17,7 @@ class MatrixReader {
     static MatrixStore<Double> readMatrix(final String resourceName) throws IOException {
         try (BufferedReader r = new BufferedReader(new InputStreamReader(GitHubIssue300.class.getResourceAsStream(resourceName)))) {
             final double[][] rows = r.lines().map(MatrixReader::parseLine).toArray(double[][]::new);
-            return Primitive64Store.FACTORY.rows(rows).get();
+            return R064Store.FACTORY.rows(rows).get();
         }
     }
 

@@ -3,7 +3,7 @@ package org.ojalgo.data.transform;
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -47,7 +47,7 @@ public class DFTBenchmark {
     public int power;
 
     DiscreteFourierTransform.FFT fft;
-    Primitive64Store input;
+    R064Store input;
     DiscreteFourierTransform.FullMatrix matrix;
 
     @Benchmark
@@ -63,7 +63,7 @@ public class DFTBenchmark {
     @Setup
     public void setup() {
         int size = PowerOf2.powerOfInt2(power);
-        input = Primitive64Store.FACTORY.makeFilled(size, 1, Uniform.of(-2, 4));
+        input = R064Store.FACTORY.makeFilled(size, 1, Uniform.of(-2, 4));
         fft = new DiscreteFourierTransform.FFT(input.size());
         matrix = new DiscreteFourierTransform.FullMatrix(input.size());
 

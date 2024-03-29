@@ -32,7 +32,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -112,28 +112,28 @@ public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
     public MatrixR064 getArgument() {
-        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.store()));
+        return MatrixR064.FACTORY.instantiate(R064Store.getComplexArgument(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
     public MatrixR064 getImaginary() {
-        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.store()));
+        return MatrixR064.FACTORY.instantiate(R064Store.getComplexImaginary(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
     public MatrixR064 getModulus() {
-        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.store()));
+        return MatrixR064.FACTORY.instantiate(R064Store.getComplexModulus(this.store()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
     public MatrixR064 getReal() {
-        return MatrixR064.FACTORY.instantiate(Primitive64Store.getComplexReal(this.store()));
+        return MatrixR064.FACTORY.instantiate(R064Store.getComplexReal(this.store()));
     }
 
     @Override

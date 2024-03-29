@@ -29,7 +29,7 @@ import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,8 +51,8 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
         int dim = 99;
 
-        PhysicalStore<Double> random = Primitive64Store.FACTORY.makeSPD(dim);
-        PhysicalStore<Double> identity = Primitive64Store.FACTORY.makeEye(dim, dim);
+        PhysicalStore<Double> random = R064Store.FACTORY.makeSPD(dim);
+        PhysicalStore<Double> identity = R064Store.FACTORY.makeEye(dim, dim);
 
         LU<Double> refDecomp = new RawLU();
         refDecomp.decompose(random); // Just pick one to use as a reference
@@ -78,9 +78,9 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
     @Test
     public void testSimpleEquationCase() {
 
-        MatrixStore<Double> body = Primitive64Store.FACTORY.copy(SimpleEquationCase.getBody());
-        MatrixStore<Double> rhs = Primitive64Store.FACTORY.copy(SimpleEquationCase.getRHS());
-        MatrixStore<Double> solution = Primitive64Store.FACTORY.copy(SimpleEquationCase.getSolution());
+        MatrixStore<Double> body = R064Store.FACTORY.copy(SimpleEquationCase.getBody());
+        MatrixStore<Double> rhs = R064Store.FACTORY.copy(SimpleEquationCase.getRHS());
+        MatrixStore<Double> solution = R064Store.FACTORY.copy(SimpleEquationCase.getSolution());
 
         for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
             String name = decomp.getClass().getName();
@@ -114,8 +114,8 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         MatrixR064 body = SimpleCholeskyCase.getOriginal();
         MatrixR064 rhs = SimpleEquationCase.getRHS();
 
-        Primitive64Store expected = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
-        Primitive64Store actual = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
+        R064Store expected = R064Store.FACTORY.make(rhs.getRowDim(), 1);
+        R064Store actual = R064Store.FACTORY.make(rhs.getRowDim(), 1);
 
         for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
             String name = decomp.getClass().getName();
@@ -144,8 +144,8 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         MatrixR064 rhs = SimpleEquationCase.getRHS();
         MatrixR064 solution = SimpleEquationCase.getSolution();
 
-        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
-        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store expected = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store actual = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
 
         for (MatrixDecomposition.Solver<Double> decomp : MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver()) {
             String name = decomp.getClass().getName();

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -80,7 +80,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         Cholesky<Double> tmpDecomp = Cholesky.R064.make();
         tmpDecomp.decompose(tmpMtrx);
 
-        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, ACCURACY);
+        TestUtils.assertEquals(R064Store.FACTORY.copy(tmpMtrx), tmpDecomp, ACCURACY);
     }
 
 }

@@ -46,8 +46,6 @@ public class TestOjAlgo {
 
         objective[1].setInteger(true);
 
-
-
         // c1: X =0
         Expression c1 = model.newExpression("c1");
         c1.level(ZERO);

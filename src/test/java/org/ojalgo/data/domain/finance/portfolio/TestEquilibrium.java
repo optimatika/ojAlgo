@@ -32,7 +32,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
@@ -146,7 +146,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         Uniform uniformRiskAversionExponent = new Uniform(-1.0, 3.0);
         Uniform uniformWeight = new Uniform(0.0, 1.0);
 
-        PhysicalStore<Double> covarianceMatrix = Primitive64Store.FACTORY.makeFilled(dim, dim, uniformCorrelation);
+        PhysicalStore<Double> covarianceMatrix = R064Store.FACTORY.makeFilled(dim, dim, uniformCorrelation);
         covarianceMatrix.fillDiagonal(1.0);
         covarianceMatrix.modifyAll(PrimitiveMath.DIVIDE.by(2.0));
         covarianceMatrix.modifyMatching(PrimitiveMath.ADD, covarianceMatrix.transpose());

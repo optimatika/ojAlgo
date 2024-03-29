@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -62,7 +62,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class R064 extends HessenbergDecomposition<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY);
+            super(R064Store.FACTORY);
         }
 
     }

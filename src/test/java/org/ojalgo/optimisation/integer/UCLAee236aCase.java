@@ -58,8 +58,6 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         Variable[] variables = new Variable[] { retVal.newVariable("X1").lower(ZERO).weight(TWO.negate()).integer(),
                 retVal.newVariable("X2").lower(ZERO).weight(THREE.negate()).integer() };
 
-
-
         Expression exprC1 = retVal.newExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
             exprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);

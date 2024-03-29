@@ -39,7 +39,7 @@ public class AboveBelowCase extends NonPhysicalTest {
 
         rationalStore = new AboveBelowStore<>(GenericStore.Q128.copy(above), GenericStore.Q128.copy(below));
         complexStore = new AboveBelowStore<>(GenericStore.C128.copy(above), GenericStore.C128.copy(below));
-        primitiveStore = new AboveBelowStore<>(Primitive64Store.FACTORY.copy(above), Primitive64Store.FACTORY.copy(below));
+        primitiveStore = new AboveBelowStore<>(R064Store.FACTORY.copy(above), R064Store.FACTORY.copy(below));
 
         numberOfRows = tmpRowDim + tmpRowDim;
         numberOfColumns = tmpColDim;

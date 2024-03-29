@@ -28,7 +28,7 @@ import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.matrix.MatrixC128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -45,7 +45,7 @@ public class ZtransformTest extends DataTransformTests {
 
             int dim = PowerOf2.powerOfInt2(exp);
 
-            PhysicalStore<Double> input = Primitive64Store.FACTORY.makeFilled(dim, 1, Uniform.of(-2, 4));
+            PhysicalStore<Double> input = R064Store.FACTORY.makeFilled(dim, 1, Uniform.of(-2, 4));
 
             DiscreteFourierTransform transformer = DiscreteFourierTransform.newInstance(input.size());
             MatrixStore<ComplexNumber> expected = transformer.transform(input);

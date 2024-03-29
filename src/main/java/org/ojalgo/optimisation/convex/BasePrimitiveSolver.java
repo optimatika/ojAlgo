@@ -32,7 +32,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
@@ -46,7 +46,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
     private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
-    static final Factory<Double, Primitive64Store> MATRIX_FACTORY = Primitive64Store.FACTORY;
+    static final Factory<Double, R064Store> MATRIX_FACTORY = R064Store.FACTORY;
 
     static BasePrimitiveSolver.Builder builder(final MatrixStore<Double>[] matrices) {
         return new BasePrimitiveSolver.Builder(matrices);
@@ -77,23 +77,23 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             ProgrammingError.throwWithMessage("Both parameters can't be null!");
         }
 
-        Primitive64Store tmpQ = null;
-        Primitive64Store tmpC = null;
+        R064Store tmpQ = null;
+        R064Store tmpC = null;
 
         if (mtrxQ == null) {
-            tmpQ = Primitive64Store.FACTORY.make(mtrxC.count(), mtrxC.count());
-        } else if (mtrxQ instanceof Primitive64Store) {
-            tmpQ = (Primitive64Store) mtrxQ;
+            tmpQ = R064Store.FACTORY.make(mtrxC.count(), mtrxC.count());
+        } else if (mtrxQ instanceof R064Store) {
+            tmpQ = (R064Store) mtrxQ;
         } else {
-            tmpQ = Primitive64Store.FACTORY.copy(mtrxQ);
+            tmpQ = R064Store.FACTORY.copy(mtrxQ);
         }
 
         if (mtrxC == null) {
-            tmpC = Primitive64Store.FACTORY.make(tmpQ.countRows(), 1L);
-        } else if (mtrxC instanceof Primitive64Store) {
-            tmpC = (Primitive64Store) mtrxC;
+            tmpC = R064Store.FACTORY.make(tmpQ.countRows(), 1L);
+        } else if (mtrxC instanceof R064Store) {
+            tmpC = (R064Store) mtrxC;
         } else {
-            tmpC = Primitive64Store.FACTORY.copy(mtrxC);
+            tmpC = R064Store.FACTORY.copy(mtrxC);
         }
 
         return new ConvexObjectiveFunction(tmpQ, tmpC);
@@ -101,7 +101,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
 
     private final ConvexData<Double> myMatrices;
     private boolean myPatchedQ = false;
-    private final Primitive64Store mySolutionX;
+    private final R064Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final MatrixDecomposition.Solver<Double> mySolverQ;
     private boolean myZeroQ = false;
@@ -377,8 +377,8 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         }
         if (this.isLogDebug()) {
             this.log("KKT system unsolvable!");
-            this.log("KKT", this.getIterationKKT().collect(Primitive64Store.FACTORY));
-            this.log("RHS", this.getIterationRHS().collect(Primitive64Store.FACTORY));
+            this.log("KKT", this.getIterationKKT().collect(R064Store.FACTORY));
+            this.log("RHS", this.getIterationRHS().collect(R064Store.FACTORY));
         }
         return false;
     }

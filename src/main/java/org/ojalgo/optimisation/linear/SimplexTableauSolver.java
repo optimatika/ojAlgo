@@ -37,7 +37,7 @@ import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Expression;
@@ -345,8 +345,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         for (IntIndex key : objective.getLinearKeySet()) {
 
-            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.doubleValue(key, true)
-                    : objective.doubleValue(key, true);
+            double tmpFactor = model.getOptimisationSense() == Optimisation.Sense.MAX ? -objective.doubleValue(key, true) : objective.doubleValue(key, true);
 
             int tmpPosInd = model.indexOfPositiveVariable(key);
             if (tmpPosInd >= 0) {
@@ -628,8 +627,7 @@ final class SimplexTableauSolver extends LinearSolver {
         Primitive1D constraintsRHS = retVal.constraintsRHS();
         Primitive1D objective = retVal.objective();
 
-        MatrixStore<Double> convexC = checkFeasibility ? Primitive64Store.FACTORY.makeZero(convex.countVariables(), 1)
-                : convex.getObjective().getLinearFactors(true);
+        MatrixStore<Double> convexC = checkFeasibility ? R064Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getObjective().getLinearFactors(true);
 
         for (int v = 0; v < nbVars; v++) {
             double valC = convexC.doubleValue(v);
@@ -941,7 +939,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         int colRHS = myTableau.n;
 
-        Primitive64Store solution = Primitive64Store.FACTORY.make(myTableau.structure.countVariables(), 1);
+        R064Store solution = R064Store.FACTORY.make(myTableau.structure.countVariables(), 1);
 
         int numberOfConstraints = myTableau.m;
         for (int row = 0; row < numberOfConstraints; row++) {

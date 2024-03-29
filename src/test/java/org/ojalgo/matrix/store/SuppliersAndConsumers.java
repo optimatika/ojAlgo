@@ -29,10 +29,10 @@ public class SuppliersAndConsumers extends MatrixStoreTests {
     @Test
     public void testMultiplyingAndTransposing() {
 
-        final Primitive64Store tmpMtrxA = Primitive64Store.FACTORY.make(10, 5);
-        final MatrixStore<Double> tmpMtrxB = Primitive64Store.FACTORY.makeEye(5, 5).multiply(2.0);
-        final Primitive64Store tmpMtrxC = Primitive64Store.FACTORY.make(5, 10);
-        final Primitive64Store tmpMtrxD = Primitive64Store.FACTORY.make(5, 10);
+        final R064Store tmpMtrxA = R064Store.FACTORY.make(10, 5);
+        final MatrixStore<Double> tmpMtrxB = R064Store.FACTORY.makeEye(5, 5).multiply(2.0);
+        final R064Store tmpMtrxC = R064Store.FACTORY.make(5, 10);
+        final R064Store tmpMtrxD = R064Store.FACTORY.make(5, 10);
 
         for (int j = 0; j < 5; j++) {
             tmpMtrxA.fillColumn(0L, j, j + 1.0);

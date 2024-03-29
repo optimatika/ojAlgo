@@ -36,7 +36,7 @@ import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -52,7 +52,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     public static abstract class Builder<B extends Builder<B, S>, S extends GenericSolver> implements Optimisation.ProblemStructure {
 
-        private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
+        private static final Factory<Double, R064Store> FACTORY = R064Store.FACTORY;
 
         private static MatrixStore<Double> add(final RowsSupplier<Double> baseA, final MatrixStore<Double> baseB, final Access2D<?> addA,
                 final Access1D<?> addB) {
@@ -84,7 +84,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
                 }
             }
 
-            Primitive64Store retB = FACTORY.make(baseRowDim + addRowDim, 1);
+            R064Store retB = FACTORY.make(baseRowDim + addRowDim, 1);
             retB.fillMatching(baseB);
             retB.regionByOffsets(baseRowDim, 0).fillMatching(addB);
 
@@ -108,10 +108,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
         private RowsSupplier<Double> myAI = null;
         private MatrixStore<Double> myBE = null;
         private MatrixStore<Double> myBI = null;
-        private Primitive64Store myLowerBounds = null;
+        private R064Store myLowerBounds = null;
         private transient int myNumberOfVariables = -1;
         private MultiaryFunction.TwiceDifferentiable<Double> myObjective = null;
-        private Primitive64Store myUpperBounds = null;
+        private R064Store myUpperBounds = null;
 
         protected Builder() {
             super();
@@ -227,7 +227,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected B equality(final double rhs, final double... factors) {
 
-            Primitive64Store mBody = FACTORY.make(1, this.countVariables());
+            R064Store mBody = FACTORY.make(1, this.countVariables());
             for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
                 mBody.set(i, factors[i]);
             }
@@ -314,11 +314,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return this.getObjective().getLinearFactors(false);
         }
 
-        protected PhysicalStore.Factory<Double, Primitive64Store> getFactory() {
+        protected PhysicalStore.Factory<Double, R064Store> getFactory() {
             return FACTORY;
         }
 
-        protected Primitive64Store getLowerBounds(final double defaultValue) {
+        protected R064Store getLowerBounds(final double defaultValue) {
             if (myLowerBounds == null) {
                 myLowerBounds = FACTORY.make(this.countVariables(), 1);
                 myLowerBounds.fillAll(defaultValue);
@@ -342,7 +342,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myAI.rows();
         }
 
-        protected Primitive64Store getUpperBounds(final double defaultValue) {
+        protected R064Store getUpperBounds(final double defaultValue) {
             if (myUpperBounds == null) {
                 myUpperBounds = FACTORY.make(this.countVariables(), 1);
                 myUpperBounds.fillAll(defaultValue);
@@ -357,7 +357,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected B inequality(final double rhs, final double... factors) {
 
-            Primitive64Store mBody = FACTORY.make(1, this.countVariables());
+            R064Store mBody = FACTORY.make(1, this.countVariables());
             for (int i = 0, limit = Math.min(factors.length, this.countVariables()); i < limit; i++) {
                 mBody.set(i, factors[i]);
             }
@@ -440,14 +440,14 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
             ProgrammingError.throwIfNull(lower, upper);
 
-            if (lower instanceof Primitive64Store) {
-                myLowerBounds = (Primitive64Store) lower;
+            if (lower instanceof R064Store) {
+                myLowerBounds = (R064Store) lower;
             } else {
                 myLowerBounds = FACTORY.column(lower);
             }
 
-            if (upper instanceof Primitive64Store) {
-                myUpperBounds = (Primitive64Store) upper;
+            if (upper instanceof R064Store) {
+                myUpperBounds = (R064Store) upper;
             } else {
                 myUpperBounds = FACTORY.column(upper);
             }

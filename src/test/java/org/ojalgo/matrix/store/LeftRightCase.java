@@ -39,7 +39,7 @@ public class LeftRightCase extends NonPhysicalTest {
 
         rationalStore = new LeftRightStore<>(GenericStore.Q128.copy(left), GenericStore.Q128.copy(right));
         complexStore = new LeftRightStore<>(GenericStore.C128.copy(left), GenericStore.C128.copy(right));
-        primitiveStore = new LeftRightStore<>(Primitive64Store.FACTORY.copy(left), Primitive64Store.FACTORY.copy(right));
+        primitiveStore = new LeftRightStore<>(R064Store.FACTORY.copy(left), R064Store.FACTORY.copy(right));
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpColDim + tmpColDim;

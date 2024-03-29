@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -86,7 +86,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<Double> product = matrix.multiply(q);
         int kernelCount = 0;
         for (int i = 0; i < product.countColumns(); i++) {
-            double norm = Primitive64Store.FACTORY.column(product.sliceColumn(i)).norm();
+            double norm = R064Store.FACTORY.column(product.sliceColumn(i)).norm();
             if (norm < ZERO) {
                 if (DEBUG) {
                     System.out.println(String.format("Column %d of Q belongs to the " + "kernel of A.", i));
@@ -135,7 +135,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<Double> product = matrix.multiply(q2);
         int kernelCount = 0;
         for (int i = 0; i < product.countColumns(); i++) {
-            double norm = Primitive64Store.FACTORY.column(product.sliceColumn(i)).norm();
+            double norm = R064Store.FACTORY.column(product.sliceColumn(i)).norm();
             if (norm < ZERO) {
                 if (DEBUG) {
                     System.out.println(String.format("Column %d of Q2 belongs to the " + "kernel of A.", i));
@@ -161,8 +161,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
 
-        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
-        Primitive64Store m = storeFactory.rows(data);
+        PhysicalStore.Factory<Double, R064Store> storeFactory = R064Store.FACTORY;
+        R064Store m = storeFactory.rows(data);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("Original", m);
@@ -204,10 +204,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         double[] observationVector = { 26.0, 12.0, 9.0, 18.0, 16.0, 17.0, 24.0, 32.0, 30.0, 21.0, 16.0, 12.0, 21.0, 16.0 };
 
-        final Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(olsColumns);
+        final R064Store tmpOriginal = R064Store.FACTORY.rows(olsColumns);
         SingularValue<Double> tmpSVD = SingularValue.R064.make(tmpOriginal);
         tmpSVD.decompose(tmpOriginal);
-        Primitive64Store rhs = Primitive64Store.FACTORY.column(observationVector);
+        R064Store rhs = R064Store.FACTORY.column(observationVector);
         tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
 
         // Simply test that we can run this program without getting an exception
@@ -219,7 +219,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20090923() {
 
-        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpA = R064Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         SingularValue<Double> tmpSVD = SingularValue.R064.make();
@@ -240,7 +240,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012() {
 
-        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
+        PhysicalStore<Double> tmpA = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
 
         QR<Double> tmpQR = QR.R064.make(tmpA);
         tmpQR.decompose(tmpA);
@@ -254,7 +254,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012fixed() {
 
-        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpA = R064Store.FACTORY
                 .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
                         { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
                         { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
@@ -268,7 +268,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20100512() {
 
-        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpA = R064Store.FACTORY
                 .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         Eigenvalue<Double> tmpPrimitive = Eigenvalue.R064.make();
@@ -282,8 +282,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         int tmpDim = 5;
 
-        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        PhysicalStore<Double> tmpI = Primitive64Store.FACTORY.makeEye(tmpDim, tmpDim);
+        PhysicalStore<Double> tmpA = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpI = R064Store.FACTORY.makeEye(tmpDim, tmpDim);
 
         LU<Double> tmpDecomp = LU.R064.make();
 
@@ -310,8 +310,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         NumberContext tmpEqualsNumberContext = NumberContext.of(7, 11);
 
         int tmpDim = 99;
-        PhysicalStore<Double> tmpRandom = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        PhysicalStore<Double> tmpIdentity = Primitive64Store.FACTORY.makeEye(tmpDim, tmpDim);
+        PhysicalStore<Double> tmpRandom = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpIdentity = R064Store.FACTORY.makeEye(tmpDim, tmpDim);
 
         LU<Double> tmpRefDecomps = new RawLU();
         tmpRefDecomps.decompose(tmpRandom);
@@ -422,7 +422,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Tag("slow")
     public void testP20160419() {
 
-        Primitive64Store tmpOrg = Primitive64Store.FACTORY.makeFilled(2000, 2000, new Normal());
+        R064Store tmpOrg = R064Store.FACTORY.makeFilled(2000, 2000, new Normal());
 
         SingularValue<Double> tmpRaw = new RawSingularValue();
 
@@ -477,7 +477,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20180614() {
 
-        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+        Factory<Double, R064Store> factory = R064Store.FACTORY;
 
         // We start by creating a 5 x 7 matrix with rank 4.
         double[][] data = new double[][] { { 3, -6, 6, 9, 1, 3, 2 }, { -2, 4, 5, 3, 2, 7, 5 }, { -7, 14, 3, -4, 0, 0, 0 }, { 0, 0, -2, -2, 3, -5, -8 },
@@ -533,7 +533,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         NumberContext precision = NumberContext.of(12, 8);
 
-        Primitive64Store matrix = Primitive64Store.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
+        R064Store matrix = R064Store.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
                 { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });
 
         for (Eigenvalue<Double> evd : MatrixDecompositionTests.getPrimitiveEigenvalue()) {

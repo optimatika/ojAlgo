@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.series.BasicSeries;
 
 public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
@@ -136,7 +136,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
     }
 
     public MatrixStore<Double> getSamples() {
-        return this.getData(Primitive64Store.FACTORY);
+        return this.getData(R064Store.FACTORY);
     }
 
     public MatrixStore<Double> getSamples(final UnaryOperator<PrimitiveSeries> operator) {
@@ -144,7 +144,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
         for (int i = 0; i < operated.length; i++) {
             operated[i] = operator.apply(myCoordinated[i]);
         }
-        return Primitive64Store.FACTORY.columns(operated);
+        return R064Store.FACTORY.columns(operated);
     }
 
     public PrimitiveSeries getSeries(final int index) {

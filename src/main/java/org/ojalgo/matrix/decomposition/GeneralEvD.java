@@ -29,7 +29,7 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -51,7 +51,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     static final class R064 extends GeneralEvD<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY);
+            super(R064Store.FACTORY);
         }
 
     }

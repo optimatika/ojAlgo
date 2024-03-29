@@ -38,7 +38,7 @@ public class TransposedCase extends NonPhysicalTest {
 
         rationalStore = new TransposedStore<>(GenericStore.Q128.copy(tmpBase));
         complexStore = new TransposedStore<>(GenericStore.C128.copy(tmpBase));
-        primitiveStore = new TransposedStore<>(Primitive64Store.FACTORY.copy(tmpBase));
+        primitiveStore = new TransposedStore<>(R064Store.FACTORY.copy(tmpBase));
 
         numberOfRows = tmpColDim;
         numberOfColumns = tmpRowDim;

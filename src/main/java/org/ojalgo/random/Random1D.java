@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 
 public final class Random1D {
@@ -49,7 +49,7 @@ public final class Random1D {
         super();
 
         Cholesky<Double> cholesky = Cholesky.R064.make();
-        cholesky.decompose(Primitive64Store.FACTORY.makeWrapper(correlations));
+        cholesky.decompose(R064Store.FACTORY.makeWrapper(correlations));
         myCholeskiedCorrelations = cholesky.getL();
 
         cholesky.reset();
@@ -79,14 +79,14 @@ public final class Random1D {
      */
     public Array1D<Double> nextDouble() {
 
-        Primitive64Store uncorrelated = Primitive64Store.FACTORY.make(length, 1);
+        R064Store uncorrelated = R064Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             uncorrelated.set(i, 0, Random1D.random().nextDouble());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((Primitive64Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
+            return ((R064Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
         } else {
             return uncorrelated.asList();
         }
@@ -97,14 +97,14 @@ public final class Random1D {
      */
     public Array1D<Double> nextGaussian() {
 
-        Primitive64Store uncorrelated = Primitive64Store.FACTORY.make(length, 1);
+        R064Store uncorrelated = R064Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             uncorrelated.set(i, 0, Random1D.random().nextGaussian());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((Primitive64Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
+            return ((R064Store) myCholeskiedCorrelations.multiply(uncorrelated)).asList();
         } else {
             return uncorrelated.asList();
         }

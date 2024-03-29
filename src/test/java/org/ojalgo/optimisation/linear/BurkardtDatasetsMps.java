@@ -171,13 +171,11 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel();
 
-
         Variable tmpXONE = reimplementedModel.newVariable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
         Variable tmpYTWO = reimplementedModel.newVariable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         Variable tmpZTHREE = reimplementedModel.newVariable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
         Variable[] tmpVariables = { tmpXONE, tmpYTWO, tmpZTHREE };
-
 
         Expression tmpLIM1 = reimplementedModel.newExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {

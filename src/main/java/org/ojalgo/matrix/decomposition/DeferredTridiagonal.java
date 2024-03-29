@@ -27,7 +27,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
@@ -129,7 +129,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class R064 extends DeferredTridiagonal<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY);
+            super(R064Store.FACTORY);
         }
 
         @Override

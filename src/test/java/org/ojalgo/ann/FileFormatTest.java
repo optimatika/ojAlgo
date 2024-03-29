@@ -32,8 +32,8 @@ import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 
 public class FileFormatTest extends ANNTest {
 
@@ -70,12 +70,12 @@ public class FileFormatTest extends ANNTest {
 
     @Test
     public void testWriteAndReadBack32() {
-        this.doTestWriteAndReadBack(Primitive32Store.FACTORY);
+        this.doTestWriteAndReadBack(R032Store.FACTORY);
     }
 
     @Test
     public void testWriteAndReadBack64() {
-        this.doTestWriteAndReadBack(Primitive64Store.FACTORY);
+        this.doTestWriteAndReadBack(R064Store.FACTORY);
     }
 
     private void doTestWriteAndReadBack(final PhysicalStore.Factory<Double, ?> factory) {

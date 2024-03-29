@@ -29,7 +29,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.data.domain.finance.portfolio.SimpleAsset;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.random.process.Process1D;
 import org.ojalgo.series.CalendarDateSeries;
@@ -48,7 +48,7 @@ public class MultidimensionalSimulatorTest extends PortfolioSimulatorTests {
     @Test
     public void testStepping() {
 
-        Primitive64Store correlation = Primitive64Store.FACTORY.makeEye(3, 3);
+        R064Store correlation = R064Store.FACTORY.makeEye(3, 3);
 
         GeometricBrownianMotion orgProc1 = new SimpleAsset(ZERO, 0.01, THIRD).forecast();
         GeometricBrownianMotion orgProc2 = new SimpleAsset(ZERO, 0.02, THIRD).forecast();

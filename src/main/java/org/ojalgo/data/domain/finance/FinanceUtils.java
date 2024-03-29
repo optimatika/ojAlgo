@@ -39,7 +39,7 @@ import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Deterministic;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.random.SampleSet;
@@ -358,7 +358,7 @@ public abstract class FinanceUtils {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
+        MatrixStore<Double> covarianceMtrx = R064Store.FACTORY.makeWrapper(covariances);
 
         if (clean) {
 
@@ -479,7 +479,7 @@ public abstract class FinanceUtils {
 
         if (clean) {
 
-            MatrixStore<Double> covarianceMtrx = Primitive64Store.FACTORY.makeWrapper(covariances);
+            MatrixStore<Double> covarianceMtrx = R064Store.FACTORY.makeWrapper(covariances);
 
             double largest = covarianceMtrx.aggregateDiagonal(Aggregator.LARGEST).doubleValue();
             double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;

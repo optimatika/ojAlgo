@@ -69,7 +69,6 @@ public class KnapsackTest extends OptimisationIntegerTests {
                 variables[i].lower(ZERO).upper(ONE).weight(items.get(i).value).integer(true);
             }
 
-
             Expression totalWeightExpr = retVal.newExpression("Total Weight");
             for (int i = 0; i < items.size(); i++) {
                 totalWeightExpr.set(i, items.get(i).weight);

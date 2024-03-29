@@ -32,7 +32,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -72,7 +72,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     static final class R064 extends LUDecomposition<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY);
+            super(R064Store.FACTORY);
         }
 
     }

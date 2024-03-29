@@ -35,7 +35,7 @@ import org.ojalgo.matrix.operation.HouseholderLeft;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -70,7 +70,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     public void btran(final PhysicalStore<Double> arg) {
 
-        Primitive64Store preallocated = (Primitive64Store) arg;
+        R064Store preallocated = (R064Store) arg;
 
         double[] dataRHS = preallocated.data;
 
@@ -116,7 +116,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         double[][] retVal = this.reset(matrix, true);
 
-        Primitive64Store.FACTORY.makeWrapper(matrix).transpose().supplyTo(this.getInternalStore());
+        R064Store.FACTORY.makeWrapper(matrix).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(retVal);
 
@@ -175,7 +175,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((Primitive64Store) preallocated);
+        return this.doGetInverse((R064Store) preallocated);
     }
 
     /**
@@ -262,15 +262,15 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         rhs.supplyTo(preallocated);
 
-        return this.doSolve((Primitive64Store) preallocated);
+        return this.doSolve((R064Store) preallocated);
     }
 
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        double[][] tmpData = this.reset(Primitive64Store.FACTORY.makeWrapper(original), true);
+        double[][] tmpData = this.reset(R064Store.FACTORY.makeWrapper(original), true);
 
-        Primitive64Store.FACTORY.makeWrapper(original).transpose().supplyTo(this.getInternalStore());
+        R064Store.FACTORY.makeWrapper(original).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(tmpData);
 
@@ -314,7 +314,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         double[][] tmpData = this.reset(body, true);
 
-        Primitive64Store.FACTORY.makeWrapper(body).transpose().supplyTo(this.getInternalStore());
+        R064Store.FACTORY.makeWrapper(body).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(tmpData);
 
@@ -322,7 +322,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             preallocated.fillMatching(rhs);
 
-            return this.doSolve((Primitive64Store) preallocated);
+            return this.doSolve((R064Store) preallocated);
 
         }
         throw RecoverableCondition.newEquationSystemNotSolvable();
@@ -373,14 +373,14 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
      */
-    private MatrixStore<Double> doGetInverse(final Primitive64Store preallocated) {
+    private MatrixStore<Double> doGetInverse(final R064Store preallocated) {
 
-        Primitive64Store.FACTORY.makeIdentity(this.getRowDim()).supplyTo(preallocated);
+        R064Store.FACTORY.makeIdentity(this.getRowDim()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }
 
-    private MatrixStore<Double> doSolve(final Primitive64Store preallocated) {
+    private MatrixStore<Double> doSolve(final R064Store preallocated) {
 
         double[] dataRHS = preallocated.data;
 

@@ -41,7 +41,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
@@ -219,7 +219,7 @@ public abstract class ConvexSolver extends GenericSolver {
             int nbIneq = this.countInequalityConstraints();
             int nbVars = this.countVariables();
 
-            MatrixStore<Double> rhs = Primitive64Store.FACTORY.makeZero(nbVars, 1);
+            MatrixStore<Double> rhs = R064Store.FACTORY.makeZero(nbVars, 1);
 
             if (nbEqus > 0) {
 
@@ -308,7 +308,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
             } else {
 
-                ConvexData<Double> data = this.getConvexData(Primitive64Store.FACTORY);
+                ConvexData<Double> data = this.getConvexData(R064Store.FACTORY);
                 return BasePrimitiveSolver.newSolver(data, options);
             }
         }
@@ -468,7 +468,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
             } else {
 
-                ConvexData<Double> data = ConvexSolver.copy(model, Primitive64Store.FACTORY);
+                ConvexData<Double> data = ConvexSolver.copy(model, R064Store.FACTORY);
                 BasePrimitiveSolver solver = BasePrimitiveSolver.newSolver(data, options);
 
                 if (model.options.validate) {
@@ -544,7 +544,7 @@ public abstract class ConvexSolver extends GenericSolver {
         if (nbEqExpr > 0) {
 
             SparseStore<Double> mtrxAE = SparseStore.R064.make(nbEqExpr, nbVariables);
-            PhysicalStore<Double> mtrxBE = Primitive64Store.FACTORY.make(nbEqExpr, 1);
+            PhysicalStore<Double> mtrxBE = R064Store.FACTORY.make(nbEqExpr, 1);
 
             for (int i = 0; i < nbEqExpr; i++) {
 
@@ -567,7 +567,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            mtrxQ = Primitive64Store.FACTORY.make(nbVariables, nbVariables);
+            mtrxQ = R064Store.FACTORY.make(nbVariables, nbVariables);
 
             for (IntRowColumn key : tmpObjExpr.getQuadraticKeySet()) {
                 int row = sourceModel.indexOfFreeVariable(key.row);
@@ -582,7 +582,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            mtrxC = Primitive64Store.FACTORY.make(nbVariables, 1);
+            mtrxC = R064Store.FACTORY.make(nbVariables, 1);
             if (max) {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
                     mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.get(key, true));
@@ -600,7 +600,7 @@ public abstract class ConvexSolver extends GenericSolver {
             // part of the objective function - then we would end up here.
             // Rather than always having to do very expensive checks we simply
             // generate a well-behaved objective function here.
-            mtrxQ = Primitive64Store.FACTORY.makeEye(nbVariables, nbVariables);
+            mtrxQ = R064Store.FACTORY.makeEye(nbVariables, nbVariables);
         }
 
         destinationBuilder.objective(mtrxQ, mtrxC);
@@ -623,8 +623,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
         if (nbUpExpr + nbUpVar + nbLoExpr + nbLoVar > 0) {
 
-            RowsSupplier<Double> mtrxAI = Primitive64Store.FACTORY.makeRowsSupplier(nbVariables);
-            PhysicalStore<Double> mtrxBI = Primitive64Store.FACTORY.make(nbUpExpr + nbUpVar + nbLoExpr + nbLoVar, 1);
+            RowsSupplier<Double> mtrxAI = R064Store.FACTORY.makeRowsSupplier(nbVariables);
+            PhysicalStore<Double> mtrxBI = R064Store.FACTORY.make(nbUpExpr + nbUpVar + nbLoExpr + nbLoVar, 1);
 
             if (nbUpExpr > 0) {
                 for (int i = 0; i < nbUpExpr; i++) {

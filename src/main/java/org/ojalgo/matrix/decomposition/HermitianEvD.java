@@ -38,7 +38,7 @@ import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -98,7 +98,7 @@ abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposi
     static final class R064 extends HermitianEvD<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
+            super(R064Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }

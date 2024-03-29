@@ -39,8 +39,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
@@ -151,7 +151,7 @@ public final class ArtificialNeuralNetwork {
     }
 
     public static NetworkBuilder builder(final int numberOfNetworkInputNodes) {
-        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfNetworkInputNodes);
+        return ArtificialNeuralNetwork.builder(R064Store.FACTORY, numberOfNetworkInputNodes);
     }
 
     /**
@@ -159,7 +159,7 @@ public final class ArtificialNeuralNetwork {
      */
     @Deprecated
     public static NetworkTrainer builder(final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
-        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfInputNodes, nodesPerCalculationLayer);
+        return ArtificialNeuralNetwork.builder(R064Store.FACTORY, numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     public static NetworkBuilder builder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfNetworkInputNodes) {
@@ -242,7 +242,7 @@ public final class ArtificialNeuralNetwork {
 
     static void doSoftMax(final PhysicalStore<Double> output) {
         output.modifyAll(EXP);
-        Primitive64Store totals = output.reduceRows(Aggregator.SUM).collect(Primitive64Store.FACTORY);
+        R064Store totals = output.reduceRows(Aggregator.SUM).collect(R064Store.FACTORY);
         output.onRows(DIVIDE, totals).supplyTo(output);
     }
 
@@ -409,7 +409,7 @@ public final class ArtificialNeuralNetwork {
      * {@link #from(DataInput)}.
      */
     public void writeTo(final DataOutput output) throws IOException {
-        int version = myFactory == Primitive32Store.FACTORY ? 2 : 1;
+        int version = myFactory == R032Store.FACTORY ? 2 : 1;
         FileFormat.write(this, version, output);
     }
 

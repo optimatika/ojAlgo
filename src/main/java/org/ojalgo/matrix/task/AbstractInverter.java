@@ -27,7 +27,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -739,11 +739,11 @@ public abstract class AbstractInverter implements InverterTask<Double> {
     }
 
     public final MatrixStore<Double> invert(final Access2D<?> original) throws RecoverableCondition {
-        return this.invert(original, Primitive64Store.FACTORY.make(this.dim(), this.dim()));
+        return this.invert(original, R064Store.FACTORY.make(this.dim(), this.dim()));
     }
 
     public final PhysicalStore<Double> preallocate(final Structure2D template) {
-        return Primitive64Store.FACTORY.make(this.dim(), this.dim());
+        return R064Store.FACTORY.make(this.dim(), this.dim());
     }
 
     abstract long dim();

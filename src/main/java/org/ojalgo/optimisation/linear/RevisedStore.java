@@ -31,7 +31,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
@@ -43,18 +43,18 @@ import org.ojalgo.type.context.NumberContext;
 
 final class RevisedStore extends SimplexStore {
 
-    private static Primitive64Store newColumn(final int nbRows) {
-        return Primitive64Store.FACTORY.make(nbRows, 1);
+    private static R064Store newColumn(final int nbRows) {
+        return R064Store.FACTORY.make(nbRows, 1);
     }
 
     private static ColumnsSupplier<Double> newMatrix(final int nbRows, final int nbCols) {
-        ColumnsSupplier<Double> retVal = Primitive64Store.FACTORY.makeColumnsSupplier(nbRows);
+        ColumnsSupplier<Double> retVal = R064Store.FACTORY.makeColumnsSupplier(nbRows);
         retVal.addColumns(nbCols);
         return retVal;
     }
 
-    private static Primitive64Store newRow(final int nbCols) {
-        return Primitive64Store.FACTORY.make(1, nbCols);
+    private static R064Store newRow(final int nbCols) {
+        return R064Store.FACTORY.make(1, nbCols);
     }
 
     static RevisedStore build(final ExpressionsBasedModel model) {
@@ -77,10 +77,10 @@ final class RevisedStore extends SimplexStore {
     private final MatrixStore<Double> myBasis;
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
-    private final Primitive64Store myConstraintsRHS;
-    private Primitive64Store myCopiedObjective = null;
+    private final R064Store myConstraintsRHS;
+    private R064Store myCopiedObjective = null;
     private final ProductFormInverse myInvBasis;
-    private final Primitive64Store myObjective;
+    private final R064Store myObjective;
     /**
      * cost reducer
      */

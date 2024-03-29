@@ -140,7 +140,6 @@ public class TableauCutGeneratorTest extends OptimisationLinearTests {
         Variable[] variables = { originalModel.newVariable("x1").lower(BigMath.ZERO).weight(BigMath.ONE),
                 originalModel.newVariable("x2013").lower(BigMath.ZERO).integer(), originalModel.newVariable("x2014").lower(BigMath.ZERO).integer() };
 
-
         Expression expr1 = originalModel.newExpression("Expr1");
         expr1.set(0, -1);
         expr1.set(1, 5100);

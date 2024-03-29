@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -39,15 +39,15 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
-    private Primitive64Store myAE;
-    private Primitive64Store myAI;
-    private Primitive64Store myBE;
-    private Primitive64Store myBI;
-    private Primitive64Store myC;
+    private R064Store myAE;
+    private R064Store myAI;
+    private R064Store myBE;
+    private R064Store myBI;
+    private R064Store myC;
     private final NumberContext myEvaluationContext = NumberContext.of(7, 8);
-    private Primitive64Store myQ;
-    private Primitive64Store myXE;
-    private Primitive64Store myXI;
+    private R064Store myQ;
+    private R064Store myXE;
+    private R064Store myXI;
 
     public final MatrixStore<Double> getSolutionE() {
         return myXE.copy();
@@ -63,42 +63,42 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         final MatrixQ128[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
-            myAE = Primitive64Store.FACTORY.copy(tmpMatrices[0]);
+            myAE = R064Store.FACTORY.copy(tmpMatrices[0]);
         } else {
             myAE = null;
         }
         if (tmpMatrices[1] != null) {
-            myBE = Primitive64Store.FACTORY.copy(tmpMatrices[1]);
+            myBE = R064Store.FACTORY.copy(tmpMatrices[1]);
         } else {
             myBE = null;
         }
         if (tmpMatrices[2] != null) {
-            myQ = Primitive64Store.FACTORY.copy(tmpMatrices[2]);
+            myQ = R064Store.FACTORY.copy(tmpMatrices[2]);
         } else {
             myQ = null;
         }
         if (tmpMatrices[3] != null) {
-            myC = Primitive64Store.FACTORY.copy(tmpMatrices[3].negate());
+            myC = R064Store.FACTORY.copy(tmpMatrices[3].negate());
         } else {
             myC = null;
         }
         if (tmpMatrices[4] != null) {
-            myAI = Primitive64Store.FACTORY.copy(tmpMatrices[4]);
+            myAI = R064Store.FACTORY.copy(tmpMatrices[4]);
         } else {
             myAI = null;
         }
         if (tmpMatrices[5] != null) {
-            myBI = Primitive64Store.FACTORY.copy(tmpMatrices[5]);
+            myBI = R064Store.FACTORY.copy(tmpMatrices[5]);
         } else {
             myBI = null;
         }
         if (tmpMatrices[6] != null) {
-            myXE = Primitive64Store.FACTORY.copy(tmpMatrices[6]);
+            myXE = R064Store.FACTORY.copy(tmpMatrices[6]);
         } else {
             myXE = null;
         }
         if (tmpMatrices[7] != null) {
-            myXI = Primitive64Store.FACTORY.copy(tmpMatrices[7]);
+            myXI = R064Store.FACTORY.copy(tmpMatrices[7]);
         } else {
             myXI = null;
         }
@@ -130,11 +130,11 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     @Test
     public void testSolverResults() {
 
-        Primitive64Store[] tmpMatricesI = new Primitive64Store[] { myAE, myBE, myQ, myC, myAI, myBI };
+        R064Store[] tmpMatricesI = new R064Store[] { myAE, myBE, myQ, myC, myAI, myBI };
 
         ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, false);
 
-        Primitive64Store[] tmpMatricesE = new Primitive64Store[] { myAE, myBE, myQ, myC, null, null };
+        R064Store[] tmpMatricesE = new R064Store[] { myAE, myBE, myQ, myC, null, null };
 
         ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, false);
     }

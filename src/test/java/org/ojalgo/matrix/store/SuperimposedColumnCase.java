@@ -40,7 +40,7 @@ public class SuperimposedColumnCase extends NonPhysicalTest {
 
         rationalStore = new SuperimposedStore<>(GenericStore.Q128.copy(tmpBase), 0, tmpIndex, GenericStore.Q128.copy(tmpColumn));
         complexStore = new SuperimposedStore<>(GenericStore.C128.copy(tmpBase), 0, tmpIndex, GenericStore.C128.copy(tmpColumn));
-        primitiveStore = new SuperimposedStore<>(Primitive64Store.FACTORY.copy(tmpBase), 0, tmpIndex, Primitive64Store.FACTORY.copy(tmpColumn));
+        primitiveStore = new SuperimposedStore<>(R064Store.FACTORY.copy(tmpBase), 0, tmpIndex, R064Store.FACTORY.copy(tmpColumn));
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpColDim;

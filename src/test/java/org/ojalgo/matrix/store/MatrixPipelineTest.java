@@ -17,9 +17,9 @@ public class MatrixPipelineTest extends MatrixStoreTests {
     private static ElementsSupplier<Double> initialise() {
 
         // Assume you have the matrices [A],[B] and[C]
-        Primitive64Store mtrxA = Primitive64Store.FACTORY.make(5, 7);
-        Primitive64Store mtrxB = Primitive64Store.FACTORY.make(7, 3);
-        Primitive64Store mtrxC = Primitive64Store.FACTORY.make(5, 3);
+        R064Store mtrxA = R064Store.FACTORY.make(5, 7);
+        R064Store mtrxB = R064Store.FACTORY.make(7, 3);
+        R064Store mtrxC = R064Store.FACTORY.make(5, 3);
         mtrxA.fillAll(UNIFORM);
         mtrxB.fillAll(NORMAL);
         mtrxC.fillAll(UNIFORM);
@@ -28,7 +28,7 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         MatrixStore<Double> expD = mtrxA.multiply(mtrxB);
 
         ElementsSupplier<Double> placeholderD = mtrxB.premultiply(mtrxA);
-        Primitive64Store actD = placeholderD.collect(Primitive64Store.FACTORY);
+        R064Store actD = placeholderD.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expD", expD);
@@ -43,7 +43,7 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         expE.modifyMatching(SUBTRACT, mtrxC);
 
         ElementsSupplier<Double> placeholderE = placeholderD.onMatching(SUBTRACT, mtrxC);
-        Primitive64Store actE = placeholderE.collect(Primitive64Store.FACTORY);
+        R064Store actE = placeholderE.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expE", expE);
@@ -57,7 +57,7 @@ public class MatrixPipelineTest extends MatrixStoreTests {
         MatrixStore<Double> expF = expE.transpose();
 
         ElementsSupplier<Double> placeholderF = placeholderE.transpose();
-        Primitive64Store actF = placeholderF.collect(Primitive64Store.FACTORY);
+        R064Store actF = placeholderF.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expF", expF);
@@ -75,11 +75,11 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyAll(DIVIDE.by(2.0));
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onAll(DIVIDE.by(2.0));
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -95,11 +95,11 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyAny(DataProcessors.CENTER);
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onAny(DataProcessors.CENTER);
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -115,13 +115,13 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store args = Primitive64Store.FACTORY.makeFilled(1, 5, NORMAL);
+        R064Store args = R064Store.FACTORY.makeFilled(1, 5, NORMAL);
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyMatchingInRows(MULTIPLY, args);
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onColumns(MULTIPLY, args);
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -137,13 +137,13 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store left = Primitive64Store.FACTORY.makeFilled(3, 5, UNIFORM);
+        R064Store left = R064Store.FACTORY.makeFilled(3, 5, UNIFORM);
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyMatching(left, MULTIPLY);
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onMatching(left, MULTIPLY);
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -159,13 +159,13 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store right = Primitive64Store.FACTORY.makeFilled(3, 5, NORMAL);
+        R064Store right = R064Store.FACTORY.makeFilled(3, 5, NORMAL);
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyMatching(DIVIDE, right);
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onMatching(DIVIDE, right);
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -181,13 +181,13 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        Primitive64Store args = Primitive64Store.FACTORY.makeFilled(3, 1, NORMAL);
+        R064Store args = R064Store.FACTORY.makeFilled(3, 1, NORMAL);
 
-        Primitive64Store expected = startingPoint.collect(Primitive64Store.FACTORY);
+        R064Store expected = startingPoint.collect(R064Store.FACTORY);
         expected.modifyMatchingInColumns(MULTIPLY, args);
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.onRows(MULTIPLY, args);
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);
@@ -203,10 +203,10 @@ public class MatrixPipelineTest extends MatrixStoreTests {
 
         ElementsSupplier<Double> startingPoint = MatrixPipelineTest.initialise();
 
-        MatrixStore<Double> expected = startingPoint.collect(Primitive64Store.FACTORY).transpose();
+        MatrixStore<Double> expected = startingPoint.collect(R064Store.FACTORY).transpose();
 
         ElementsSupplier<Double> nextPlaceholder = startingPoint.transpose();
-        Primitive64Store actual = nextPlaceholder.collect(Primitive64Store.FACTORY);
+        R064Store actual = nextPlaceholder.collect(R064Store.FACTORY);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("expected", expected);

@@ -27,7 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -88,7 +88,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         BasicMatrix<?, ?> expMtrx;
 
         Eigenvalue<Double> tmpEigen = Eigenvalue.R064.make();
-        tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
+        tmpEigen.decompose(R064Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
         MatrixStore<Double> tmpV = tmpEigen.getV();
         MatrixStore<Double> tmpD = tmpEigen.getD();

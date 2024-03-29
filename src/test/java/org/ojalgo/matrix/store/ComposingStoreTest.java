@@ -54,7 +54,7 @@ public class ComposingStoreTest extends MatrixStoreTests {
     }
 
     private MatrixStore<Double> filledMatrix(final int rowCount, final int colCount, final double value) {
-        PhysicalStore.Factory<Double, Primitive64Store> storeFactory = Primitive64Store.FACTORY;
+        PhysicalStore.Factory<Double, R064Store> storeFactory = R064Store.FACTORY;
         return storeFactory.makeFilled(rowCount, colCount, new NullaryFunction<Double>() {
 
             @Override

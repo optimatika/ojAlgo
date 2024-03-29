@@ -35,7 +35,7 @@ import org.ojalgo.concurrent.MultiviewSet;
 import org.ojalgo.concurrent.ProcessingService;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.netio.CharacterRing.RingLogger;
@@ -297,7 +297,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> extractSolution() {
-        return Primitive64Store.FACTORY.column(this.getBestResultSoFar());
+        return R064Store.FACTORY.column(this.getBestResultSoFar());
     }
 
     protected Optimisation.Result getBestEstimate() {
@@ -314,7 +314,7 @@ public final class IntegerSolver extends GenericSolver {
 
         State tmpSate = State.INVALID;
         double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.makeZero(myIntegerModel.countVariables(), 1);
+        MatrixStore<Double> tmpSolution = R064Store.FACTORY.makeZero(myIntegerModel.countVariables(), 1);
 
         return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
     }

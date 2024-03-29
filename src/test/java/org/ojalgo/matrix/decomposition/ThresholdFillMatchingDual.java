@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -76,9 +76,9 @@ public class ThresholdFillMatchingDual extends AbstractThresholdTuner {
     @Param({ "1", "2" })
     public int z;
 
-    Primitive64Store left;
-    Primitive64Store right;
-    Primitive64Store target;
+    R064Store left;
+    R064Store right;
+    R064Store target;
 
     @Override
     @Setup
@@ -88,9 +88,9 @@ public class ThresholdFillMatchingDual extends AbstractThresholdTuner {
 
         final Uniform tmpSupplier = new Uniform();
 
-        left = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        right = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
-        target = Primitive64Store.FACTORY.make(dim, dim);
+        left = R064Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
+        right = R064Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
+        target = R064Store.FACTORY.make(dim, dim);
     }
 
     @Override

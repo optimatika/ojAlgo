@@ -25,8 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.ojalgo.type.context.NumberContext;
 
@@ -53,10 +53,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MultiplyBoth.fillMxN_P64(expected, left, c, right);
                     MultiplyBoth.newPrimitive32(m, n).invoke(actual, left, c, right);
@@ -74,10 +74,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MultiplyBoth.fillMxN_P64(expected, left, c, right);
                     MultiplyBoth.newPrimitive64(m, n).invoke(actual, left, c, right);
@@ -95,10 +95,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> l = left.tridiagonal();
                     MatrixStore<Double> r = right.tridiagonal();
@@ -119,10 +119,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> l = left.tridiagonal();
                     MatrixStore<Double> r = right.tridiagonal();
@@ -143,10 +143,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MultiplyLeft.fillMxN(expected.data, left, c, right.data);
                     MultiplyLeft.newPrimitive32(m, n).invoke(actual.data, left, c, right.data);
@@ -164,10 +164,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MultiplyLeft.fillMxN(expected.data, left, c, right.data);
                     MultiplyLeft.newPrimitive64(m, n).invoke(actual.data, left, c, right.data);
@@ -185,10 +185,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> l = left.tridiagonal();
 
@@ -208,10 +208,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> l = left.tridiagonal();
 
@@ -231,10 +231,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MultiplyNeither.fillMxN(expected.data, left.data, c, right.data);
                     MultiplyNeither.newPrimitive32(m, n).invoke(actual.data, left.data, c, right.data);
@@ -252,10 +252,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MultiplyNeither.fillMxN(expected.data, left.data, c, right.data);
                     MultiplyNeither.newPrimitive64(m, n).invoke(actual.data, left.data, c, right.data);
@@ -273,10 +273,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MultiplyRight.fillMxN(expected.data, left.data, c, right);
                     MultiplyRight.newPrimitive32(m, n).invoke(actual.data, left.data, c, right);
@@ -294,10 +294,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MultiplyRight.fillMxN(expected.data, left.data, c, right);
                     MultiplyRight.newPrimitive64(m, n).invoke(actual.data, left.data, c, right);
@@ -315,10 +315,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive32Store left = Primitive32Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive32Store right = Primitive32Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive32Store expected = Primitive32Store.FACTORY.make(m, n);
-                    Primitive32Store actual = Primitive32Store.FACTORY.make(m, n);
+                    R032Store left = R032Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R032Store right = R032Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R032Store expected = R032Store.FACTORY.make(m, n);
+                    R032Store actual = R032Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> r = right.tridiagonal();
 
@@ -338,10 +338,10 @@ public class TestSpecificSizeImplementationPrimitive {
             for (int c : DIMS) {
                 for (int n : DIMS) {
 
-                    Primitive64Store left = Primitive64Store.FACTORY.makeFilled(m, c, Normal.standard());
-                    Primitive64Store right = Primitive64Store.FACTORY.makeFilled(c, n, Normal.standard());
-                    Primitive64Store expected = Primitive64Store.FACTORY.make(m, n);
-                    Primitive64Store actual = Primitive64Store.FACTORY.make(m, n);
+                    R064Store left = R064Store.FACTORY.makeFilled(m, c, Normal.standard());
+                    R064Store right = R064Store.FACTORY.makeFilled(c, n, Normal.standard());
+                    R064Store expected = R064Store.FACTORY.make(m, n);
+                    R064Store actual = R064Store.FACTORY.make(m, n);
 
                     MatrixStore<Double> r = right.tridiagonal();
 

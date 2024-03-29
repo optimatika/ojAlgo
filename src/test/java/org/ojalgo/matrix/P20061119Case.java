@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -102,7 +102,7 @@ public class P20061119Case extends BasicMatrixTest {
         MatrixR064 tmpMatrix = P20061119Case.getProblematic();
 
         Eigenvalue<Double> tmpEigenvalue = Eigenvalue.R064.make();
-        PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
+        PhysicalStore<Double> tmpPrimitiveStore = R064Store.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 
         TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, ACCURACY);

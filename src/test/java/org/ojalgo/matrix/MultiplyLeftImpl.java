@@ -22,7 +22,7 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.array.operation.DOT;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
@@ -261,28 +261,28 @@ public class MultiplyLeftImpl {
     public int columns;
     @Param({ "100", "1000" })
     public int complexity;
-    public Primitive64Store left;
-    public Primitive64Store product;
-    public Primitive64Store right;
+    public R064Store left;
+    public R064Store product;
+    public R064Store right;
     @Param({ "100", "1000" })
     public int rows;
 
     @Benchmark
-    public Primitive64Store changed() {
+    public R064Store changed() {
         MultiplyLeftImpl.invoke2(product.data, 0, rows, left, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store defined() {
+    public R064Store defined() {
         MultiplyLeftImpl.invoke1(product.data, 0, rows, left, complexity, right.data);
         return product;
     }
 
     @Setup
     public void setup() {
-        left = Primitive64Store.FACTORY.makeFilled(rows, complexity, new Normal());
-        right = Primitive64Store.FACTORY.makeFilled(complexity, columns, new Normal());
-        product = Primitive64Store.FACTORY.makeFilled(rows, columns, new Normal());
+        left = R064Store.FACTORY.makeFilled(rows, complexity, new Normal());
+        right = R064Store.FACTORY.makeFilled(complexity, columns, new Normal());
+        product = R064Store.FACTORY.makeFilled(rows, columns, new Normal());
     }
 }

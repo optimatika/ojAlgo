@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -89,13 +89,13 @@ public class GitHubIssue300 extends OptimisationConvexTests {
 
     @BeforeEach
     public void prepareModel() throws Exception {
-        q = Primitive64Store.FACTORY.rows(Q);
-        c = Primitive64Store.FACTORY.rows(C);
+        q = R064Store.FACTORY.rows(Q);
+        c = R064Store.FACTORY.rows(C);
 
         // to ensure the result will have all its elements positive, we set ai
         // to negative identity and bi to zero
-        ai = Primitive64Store.FACTORY.makeIdentity(c.countRows()).negate();
-        bi = Primitive64Store.FACTORY.makeZero(c.countRows(), 1);
+        ai = R064Store.FACTORY.makeIdentity(c.countRows()).negate();
+        bi = R064Store.FACTORY.makeZero(c.countRows(), 1);
     }
 
     @Test

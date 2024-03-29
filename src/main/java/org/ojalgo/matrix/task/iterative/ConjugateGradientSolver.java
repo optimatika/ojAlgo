@@ -29,7 +29,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
@@ -45,10 +45,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ConjugateGradientSolver extends KrylovSubspaceSolver implements IterativeSolverTask.SparseDelegate {
 
-    private transient Primitive64Store myDirection = null;
-    private transient Primitive64Store myPreconditioned = null;
-    private transient Primitive64Store myResidual = null;
-    private transient Primitive64Store myVector = null;
+    private transient R064Store myDirection = null;
+    private transient R064Store myPreconditioned = null;
+    private transient R064Store myResidual = null;
+    private transient R064Store myVector = null;
 
     public ConjugateGradientSolver() {
         super();
@@ -65,10 +65,10 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double normErr = POSITIVE_INFINITY;
         double normRHS = ONE;
 
-        Primitive64Store residual = this.residual(solution);
-        Primitive64Store direction = this.direction(solution);
-        Primitive64Store preconditioned = this.preconditioned(solution);
-        Primitive64Store vector = this.vector(solution);
+        R064Store residual = this.residual(solution);
+        R064Store direction = this.direction(solution);
+        R064Store preconditioned = this.preconditioned(solution);
+        R064Store vector = this.vector(solution);
 
         double stepLength; // alpha
         double gradientCorrectionFactor; // beta
@@ -149,36 +149,36 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         return preallocated;
     }
 
-    private Primitive64Store direction(final Structure1D structure) {
+    private R064Store direction(final Structure1D structure) {
         if ((myDirection == null) || (myDirection.count() != structure.count())) {
-            myDirection = Primitive64Store.FACTORY.make(structure.count(), 1L);
+            myDirection = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myDirection.fillAll(ZERO);
         }
         return myDirection;
     }
 
-    private Primitive64Store preconditioned(final Structure1D structure) {
+    private R064Store preconditioned(final Structure1D structure) {
         if ((myPreconditioned == null) || (myPreconditioned.count() != structure.count())) {
-            myPreconditioned = Primitive64Store.FACTORY.make(structure.count(), 1L);
+            myPreconditioned = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myPreconditioned.fillAll(ZERO);
         }
         return myPreconditioned;
     }
 
-    private Primitive64Store residual(final Structure1D structure) {
+    private R064Store residual(final Structure1D structure) {
         if ((myResidual == null) || (myResidual.count() != structure.count())) {
-            myResidual = Primitive64Store.FACTORY.make(structure.count(), 1L);
+            myResidual = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myResidual.fillAll(ZERO);
         }
         return myResidual;
     }
 
-    private Primitive64Store vector(final Structure1D structure) {
+    private R064Store vector(final Structure1D structure) {
         if ((myVector == null) || (myVector.count() != structure.count())) {
-            myVector = Primitive64Store.FACTORY.make(structure.count(), 1L);
+            myVector = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myVector.fillAll(ZERO);
         }

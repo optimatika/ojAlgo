@@ -36,7 +36,7 @@ import org.ojalgo.matrix.operation.MatrixOperation;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
@@ -95,7 +95,7 @@ public class CaseQR extends MatrixDecompositionTests {
     @Test
     public void testDiagonalCase() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY
                 .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.R064.make();
@@ -109,7 +109,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, ACCURACY);
         // TODO Fix so that Q == I when the original A is already triangular, even for RawQR
-        TestUtils.assertEquals(Primitive64Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), ACCURACY);
+        TestUtils.assertEquals(R064Store.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), ACCURACY);
         TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), ACCURACY);
     }
 
@@ -196,7 +196,7 @@ public class CaseQR extends MatrixDecompositionTests {
         MatrixOperation.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.makeSPD(tmpDim).below(Primitive64Store.FACTORY.makeIdentity(tmpDim));
+        final MatrixStore<Double> tmpA = R064Store.FACTORY.makeSPD(tmpDim).below(R064Store.FACTORY.makeIdentity(tmpDim));
 
         final QR<Double> tmpDenseQR = new QRDecomposition.R064();
         final QR<Double> tmpRawQR = new RawQR();
@@ -211,7 +211,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
 
-            final MatrixStore<Double> tmpIdentity = Primitive64Store.FACTORY.makeIdentity(tmpDim);
+            final MatrixStore<Double> tmpIdentity = R064Store.FACTORY.makeIdentity(tmpDim);
             TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
             TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
 
@@ -233,7 +233,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
         tmpBigDecomp.decompose(GenericStore.Q128.copy(tmpOriginal));
         tmpComplexDecomp.decompose(GenericStore.C128.copy(tmpOriginal));
-        tmpPrimitiveDecomp.decompose(Primitive64Store.FACTORY.copy(tmpOriginal));
+        tmpPrimitiveDecomp.decompose(R064Store.FACTORY.copy(tmpOriginal));
 
         final MatrixStore<RationalNumber> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();
@@ -257,7 +257,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(GenericStore.Q128.copy(tmpOriginal), tmpBigDecomp, NumberContext.of(7, 14));
         TestUtils.assertEquals(GenericStore.C128.copy(tmpOriginal), tmpComplexDecomp, NumberContext.of(7, 14));
-        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
+        TestUtils.assertEquals(R064Store.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, NumberContext.of(7, 14));
     }
 
     @Test
@@ -267,8 +267,8 @@ public class CaseQR extends MatrixDecompositionTests {
         MatrixR064 rhs = SimpleEquationCase.getRHS();
         MatrixR064 solution = SimpleEquationCase.getSolution();
 
-        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
-        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store expected = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store actual = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
 
         for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
 
@@ -316,8 +316,8 @@ public class CaseQR extends MatrixDecompositionTests {
         MatrixR064 body = SimpleCholeskyCase.getOriginal();
         MatrixR064 rhs = SimpleEquationCase.getRHS();
 
-        Primitive64Store expected = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
-        Primitive64Store actual = Primitive64Store.FACTORY.make(rhs.getRowDim(), 1);
+        R064Store expected = R064Store.FACTORY.make(rhs.getRowDim(), 1);
+        R064Store actual = R064Store.FACTORY.make(rhs.getRowDim(), 1);
 
         for (QR<Double> decomp : MatrixDecompositionTests.getPrimitiveQR()) {
 

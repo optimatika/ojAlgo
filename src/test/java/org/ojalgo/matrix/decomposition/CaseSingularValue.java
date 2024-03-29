@@ -40,7 +40,7 @@ import org.ojalgo.matrix.P20071019Case;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
@@ -68,12 +68,12 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         PhysicalStore<RationalNumber> tmpBigStore = GenericStore.Q128.copy(original);
         PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.C128.copy(original);
-        PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(original);
+        PhysicalStore<Double> tmpPrimitiveStore = R064Store.FACTORY.copy(original);
 
         IMPL_BIG.decompose(GenericStore.Q128.copy(original));
         IMPL_COMPLEX.decompose(GenericStore.C128.copy(original));
-        IMPL_RAW.decompose(Primitive64Store.FACTORY.copy(original));
-        IMPL_PRIMITIVE.decompose(Primitive64Store.FACTORY.copy(original));
+        IMPL_RAW.decompose(R064Store.FACTORY.copy(original));
+        IMPL_PRIMITIVE.decompose(R064Store.FACTORY.copy(original));
 
         Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
         Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();
@@ -227,7 +227,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testComplexNumberVersionOfWikipediaCase() {
 
-        PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
+        PhysicalStore<Double> tmpBaseMtrx = R064Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         double[] data = { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 };
@@ -291,7 +291,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testGetCovariance() {
 
-        Primitive64Store original = Primitive64Store.FACTORY.makeFilled(9, 3, new Normal());
+        R064Store original = R064Store.FACTORY.makeFilled(9, 3, new Normal());
 
         for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
 
@@ -324,13 +324,13 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 } };
-        Primitive64Store body = Primitive64Store.FACTORY.rows(olsColumns);
+        R064Store body = R064Store.FACTORY.rows(olsColumns);
 
         double[] observationVector = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        Primitive64Store rhs = Primitive64Store.FACTORY.column(observationVector);
+        R064Store rhs = R064Store.FACTORY.column(observationVector);
 
         double expected = 0.0161290322580645;
         MatrixStore<Double> actual;
@@ -428,7 +428,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationFat() {
 
-        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_FAT);
+        PhysicalStore<Double> tmpOriginal = R064Store.FACTORY.copy(MTRX_FAT);
 
         this.testRecreation(tmpOriginal);
     }
@@ -436,7 +436,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationSquare() {
 
-        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_SQUARE);
+        PhysicalStore<Double> tmpOriginal = R064Store.FACTORY.copy(MTRX_SQUARE);
 
         this.testRecreation(tmpOriginal);
     }
@@ -444,7 +444,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationTall() {
 
-        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_TALL);
+        PhysicalStore<Double> tmpOriginal = R064Store.FACTORY.copy(MTRX_TALL);
 
         this.testRecreation(tmpOriginal);
     }

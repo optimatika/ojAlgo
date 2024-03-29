@@ -31,7 +31,7 @@ import org.ojalgo.array.ArrayR256;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.MatrixR064;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -190,7 +190,7 @@ public class LinearProblems extends OptimisationLinearTests {
 
         TestUtils.assertEquals("Claimed solution not valid!", true, modFull.validate(ArrayR256.FACTORY.copy(claimedSolutionFull), ACCURACY));
 
-        Double tmpActualValue = modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(claimedSolutionFull));
+        Double tmpActualValue = modFull.objective().toFunction().invoke(R064Store.FACTORY.copy(claimedSolutionFull));
         //  BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
         //JUnitUtils.assertEquals("Claimed objective value wrong!", 0, tmpClaimedValue.compareTo(tmpActualValue));
         TestUtils.assertEquals(claimedValue, tmpActualValue, ACCURACY);
@@ -213,14 +213,14 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(claimedSolutionFull, MatrixQ128.FACTORY.column(tmpFullResult).rows(someRows4), ACCURACY);
         int[] someRows5 = { 0, 1, 2 };
 
-        BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
-                modEven.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpEvenResult).rows(someRows5)))));
+        BigDecimal tmpEvenValue = ACCURACY.enforce(TypeUtils
+                .toBigDecimal(modEven.objective().toFunction().invoke(R064Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpEvenResult).rows(someRows5)))));
         int[] someRows6 = { 0, 1, 2 };
         BigDecimal tmpOddValue = ACCURACY.enforce(TypeUtils
-                .toBigDecimal(modOdd.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpOddResult).rows(someRows6)))));
+                .toBigDecimal(modOdd.objective().toFunction().invoke(R064Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpOddResult).rows(someRows6)))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
-        BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils.toBigDecimal(
-                modFull.objective().toFunction().invoke(Primitive64Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpFullResult).rows(someRows7)))));
+        BigDecimal tmpFullValue = ACCURACY.enforce(TypeUtils
+                .toBigDecimal(modFull.objective().toFunction().invoke(R064Store.FACTORY.copy(MatrixR064.FACTORY.column(tmpFullResult).rows(someRows7)))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, claimedValue.compareTo(tmpFullValue));

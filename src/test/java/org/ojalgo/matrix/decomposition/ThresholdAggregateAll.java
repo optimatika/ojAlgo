@@ -25,7 +25,7 @@ import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.AggregateAll;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -81,7 +81,7 @@ public class ThresholdAggregateAll extends AbstractThresholdTuner {
 
         final Uniform tmpSupplier = new Uniform();
 
-        target = Primitive64Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
+        target = R064Store.FACTORY.makeFilled(dim, dim, tmpSupplier);
     }
 
     @Override

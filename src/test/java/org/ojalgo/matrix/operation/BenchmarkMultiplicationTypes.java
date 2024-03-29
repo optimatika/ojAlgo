@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -42,9 +42,9 @@ public class BenchmarkMultiplicationTypes {
     @Param({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" })
     public int complexity;
 
-    public Primitive64Store left;
-    public Primitive64Store product;
-    public Primitive64Store right;
+    public R064Store left;
+    public R064Store product;
+    public R064Store right;
 
     MultiplyBoth.Primitive MB;
     MultiplyLeft.Primitive64 ML;
@@ -52,25 +52,25 @@ public class BenchmarkMultiplicationTypes {
     MultiplyRight.Primitive64 MR;
 
     @Benchmark
-    public Primitive64Store multiplyBoth() {
+    public R064Store multiplyBoth() {
         MB.invoke(product, left, complexity, right);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyLeft() {
+    public R064Store multiplyLeft() {
         ML.invoke(product.data, left, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyNeither() {
+    public R064Store multiplyNeither() {
         MN.invoke(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store multiplyRight() {
+    public R064Store multiplyRight() {
         MR.invoke(product.data, left.data, complexity, right);
         return product;
     }
@@ -78,9 +78,9 @@ public class BenchmarkMultiplicationTypes {
     @Setup
     public void setup() {
 
-        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
-        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
-        product = Primitive64Store.FACTORY.make(complexity, complexity);
+        left = R064Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        right = R064Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        product = R064Store.FACTORY.make(complexity, complexity);
 
         ML = MultiplyLeft.newPrimitive64(complexity, complexity);
         MR = MultiplyRight.newPrimitive64(complexity, complexity);

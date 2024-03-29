@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -216,51 +216,51 @@ public class MultiplyLeftRight {
     @Param({ "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" })
     public int complexity;
 
-    public Primitive64Store left;
-    public Primitive64Store product;
-    public Primitive64Store right;
+    public R064Store left;
+    public R064Store product;
+    public R064Store right;
 
     @Benchmark
-    public Primitive64Store invokeCIJ() {
+    public R064Store invokeCIJ() {
         MultiplyLeftRight.invokeCIJ(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store invokeCJI() {
+    public R064Store invokeCJI() {
         MultiplyLeftRight.invokeCJI(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store invokeICJ() {
+    public R064Store invokeICJ() {
         MultiplyLeftRight.invokeICJ(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store invokeIJC() {
+    public R064Store invokeIJC() {
         MultiplyLeftRight.invokeIJC(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store invokeJCI() {
+    public R064Store invokeJCI() {
         MultiplyLeftRight.invokeJCI(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store invokeJIC() {
+    public R064Store invokeJIC() {
         MultiplyLeftRight.invokeJIC(product.data, left.data, complexity, right.data);
         return product;
     }
 
     @Setup
     public void setup() {
-        left = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
-        right = Primitive64Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
-        product = Primitive64Store.FACTORY.make(complexity, complexity);
+        left = R064Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        right = R064Store.FACTORY.makeFilled(complexity, complexity, Normal.standard());
+        product = R064Store.FACTORY.make(complexity, complexity);
 
     }
 }

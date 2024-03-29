@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.LineSplittingParser;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -60,7 +60,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
+        ArtificialNeuralNetwork network = this.getInitialNetwork(R064Store.FACTORY);
 
         NetworkTrainer trainer = network.newTrainer();
         NetworkInvoker invoker = network.newInvoker();
@@ -78,8 +78,8 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 double R2C2 = Double.parseDouble(columns[4]);
                 int IsStairs = Integer.parseInt(columns[5]);
 
-                Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
-                Primitive64Store output_csv = Primitive64Store.FACTORY.row(IsStairs, ONE - IsStairs);
+                R064Store input_csv = R064Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
+                R064Store output_csv = R064Store.FACTORY.row(IsStairs, ONE - IsStairs);
 
                 trainer.rate(0.01).train(input_csv, output_csv);
             });
@@ -98,7 +98,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
             double R2C2 = Double.parseDouble(columns[4]);
             int IsStairs = Integer.parseInt(columns[5]);
 
-            Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
+            R064Store input_csv = R064Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
 
             Access1D<Double> output_net = invoker.invoke(input_csv);
 

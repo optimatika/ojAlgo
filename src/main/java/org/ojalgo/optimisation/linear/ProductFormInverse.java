@@ -33,7 +33,7 @@ import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.type.ObjectPool;
 
@@ -136,7 +136,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
     private final List<ElementaryFactor> myFactors = new ArrayList<>();
     private final LU<Double> myRoot;
     private final double myScalingThreshold;
-    private final Primitive64Store myWork;
+    private final R064Store myWork;
 
     ProductFormInverse(final int dim, final double scalingThreshold) {
 
@@ -144,7 +144,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
 
         myDim = dim;
         myRoot = LU.R064.make(dim, dim);
-        myWork = Primitive64Store.FACTORY.make(dim, 1);
+        myWork = R064Store.FACTORY.make(dim, 1);
         myArrayPool = new ArrayPool(dim);
         myScalingThreshold = scalingThreshold;
     }
@@ -186,7 +186,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         myFactors.clear();
     }
 
-    private ElementaryFactor newFactor(final Primitive64Store values, final int col, final double diagonalElement) {
+    private ElementaryFactor newFactor(final R064Store values, final int col, final double diagonalElement) {
 
         SparseArray<Double> sparse = myArrayPool.borrow();
 

@@ -27,7 +27,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.QuaternionMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 
 public class QuaternionTest extends ScalarTests {
 
@@ -124,7 +124,7 @@ public class QuaternionTest extends ScalarTests {
 
         Quaternion rotQuat = Quaternion.of(nmbr, nmbr, 0.0, 0.0);
 
-        Primitive64Store expected = Primitive64Store.FACTORY.columns(new double[][] { { 1, 0, 0 }, { 0, 0, 1 }, { 0, -1, 0 } });
+        R064Store expected = R064Store.FACTORY.columns(new double[][] { { 1, 0, 0 }, { 0, 0, 1 }, { 0, -1, 0 } });
 
         MatrixStore<Double> actual = rotQuat.toRotationMatrix();
 

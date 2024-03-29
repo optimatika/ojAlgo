@@ -26,7 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 
 abstract class AbstractScedasticity implements ScedasticityModel {
@@ -75,8 +75,8 @@ abstract class AbstractScedasticity implements ScedasticityModel {
             throw new IllegalArgumentException();
         }
 
-        Primitive64Store body = Primitive64Store.FACTORY.make(nbEquations, nbVars);
-        Primitive64Store rhs = Primitive64Store.FACTORY.make(nbEquations, 1);
+        R064Store body = R064Store.FACTORY.make(nbEquations, nbVars);
+        R064Store rhs = R064Store.FACTORY.make(nbEquations, 1);
 
         for (int i = 0; i < nbEquations; i++) {
 

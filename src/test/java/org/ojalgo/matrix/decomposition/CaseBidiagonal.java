@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
@@ -39,7 +39,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testCaseFromMatrixComputations() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -79,7 +79,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testFatEye() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.makeEye(4, 6);
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.makeEye(4, 6);
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -87,7 +87,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testFatRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(4, 6));
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(4, 6));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -95,8 +95,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testSquareBidiagonal() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY
-                .rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -104,7 +103,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testSquareEye() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.makeEye(5, 5);
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.makeEye(5, 5);
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -112,7 +111,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testSquareRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -120,7 +119,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testTallEye() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.makeEye(6, 4);
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.makeEye(6, 4);
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -128,7 +127,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testTallRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(6, 4));
+        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(6, 4));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -167,8 +166,8 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         TestUtils.assertEquals(aMatrix, tmpDecomposition, NumberContext.of(7, 6));
     }
 
-    private Primitive64Store makeEye(final int aRowDim, final int aColDim) {
-        return Primitive64Store.FACTORY.makeEye(aRowDim, aColDim);
+    private R064Store makeEye(final int aRowDim, final int aColDim) {
+        return R064Store.FACTORY.makeEye(aRowDim, aColDim);
     }
 
 }

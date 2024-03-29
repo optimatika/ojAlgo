@@ -27,7 +27,7 @@ import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -169,7 +169,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         }
 
         R064(final boolean fullSize) {
-            super(Primitive64Store.FACTORY, fullSize);
+            super(R064Store.FACTORY, fullSize);
         }
 
         @Override

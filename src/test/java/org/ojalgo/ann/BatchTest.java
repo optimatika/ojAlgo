@@ -30,7 +30,7 @@ import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.data.DataBatch;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 
 public class BatchTest extends ANNTest {
@@ -40,7 +40,7 @@ public class BatchTest extends ANNTest {
     private static final int NB_OUTPUTS = 2;
 
     static ArtificialNeuralNetwork generate() {
-        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, NB_INPUTS).layer(3, Activator.RELU).layer(5, Activator.SIGMOID)
+        return ArtificialNeuralNetwork.builder(R064Store.FACTORY, NB_INPUTS).layer(3, Activator.RELU).layer(5, Activator.SIGMOID)
                 .layer(NB_OUTPUTS, Activator.SOFTMAX).get();
     }
 

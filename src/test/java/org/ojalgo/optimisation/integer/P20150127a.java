@@ -55,7 +55,6 @@ public class P20150127a {
         Variable x = retVal.newVariable("x").integer(true);
         Variable y = retVal.newVariable("y").integer(true);
 
-
         int counter = 0;
         for (final int[] coeff : P20150127a.getCoefficients()) {
             final Expression tmpExpression = retVal.newExpression("inequality_" + ++counter);

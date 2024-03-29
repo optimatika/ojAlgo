@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -127,7 +127,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
         super.setup();
         final int dim1 = dim;
 
-        matrix = Primitive64Store.FACTORY.makeSPD(dim1);
+        matrix = R064Store.FACTORY.makeSPD(dim1);
     }
 
     @Benchmark

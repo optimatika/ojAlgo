@@ -39,8 +39,8 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
@@ -195,7 +195,7 @@ public class ImageData implements MatrixStore<Double>, Mutate2D.Receiver<Double>
      */
     public static ImageData ofPowerSpectrum(final Access2D<ComplexNumber> transformed) {
 
-        PhysicalStore<Double> magnitudes = Primitive64Store.getComplexModulus(transformed);
+        PhysicalStore<Double> magnitudes = R064Store.getComplexModulus(transformed);
 
         magnitudes.modifyAll(PrimitiveMath.POWER.parameter(2).andThen(PrimitiveMath.LOG10));
 
@@ -373,7 +373,7 @@ public class ImageData implements MatrixStore<Double>, Mutate2D.Receiver<Double>
 
     @Override
     public Factory<Double, ?> physical() {
-        return Primitive32Store.FACTORY;
+        return R032Store.FACTORY;
     }
 
     /**

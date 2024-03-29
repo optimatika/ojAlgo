@@ -49,7 +49,7 @@ import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
@@ -78,13 +78,13 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         int dim = eigenvalues.length;
 
-        Primitive64Store seed = Primitive64Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
+        R064Store seed = R064Store.FACTORY.makeFilled(dim, dim, Uniform.standard());
         QR<Double> qr = QR.R064.make(seed);
         qr.decompose(seed);
 
         MatrixStore<Double> mtrxQ = qr.getQ();
 
-        DiagonalStore<Double, ArrayR064> mtrxD = Primitive64Store.FACTORY.makeDiagonal(ArrayR064.wrap(eigenvalues)).get();
+        DiagonalStore<Double, ArrayR064> mtrxD = R064Store.FACTORY.makeDiagonal(ArrayR064.wrap(eigenvalues)).get();
 
         return mtrxQ.multiply(mtrxD).multiply(mtrxQ.conjugate());
     }
@@ -127,7 +127,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         CaseEigenvalue.doTestEigenvalues(generated, NumberContext.of(8), expected);
     }
 
-    private static void doVerifyGeneral(final Primitive64Store matrix) {
+    private static void doVerifyGeneral(final R064Store matrix) {
 
         for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
 
@@ -286,7 +286,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         String path = "src/test/resources/org/ojalgo/matrix/decomposition/GitHubIssue366_Mat.txt";
         List<String> lines = Files.lines(Paths.get(path)).collect(Collectors.toList());
 
-        Primitive64Store problematic = Primitive64Store.FACTORY.make(lines.size(), lines.size());
+        R064Store problematic = R064Store.FACTORY.make(lines.size(), lines.size());
 
         for (int r = 0; r < lines.size(); r++) {
             String[] line_vec = lines.get(r).split(" ");
@@ -305,7 +305,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testJamaProblem() throws IOException {
 
-        Primitive64Store problematic = Primitive64Store.FACTORY
+        R064Store problematic = R064Store.FACTORY
                 .rows(new double[][] { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 1 }, { 0, 0, 0, 1, 0 }, { 1, 1, 0, 0, 1 }, { 1, 0, 1, 0, 1 } });
 
         CaseEigenvalue.doVerifyGeneral(problematic);
@@ -314,7 +314,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testP20050125Case() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY.copy(P20050125Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY.copy(P20050125Case.getProblematic());
 
         TestUtils.assertTrue(tmpOriginalMatrix.isHermitian());
 
@@ -332,12 +332,12 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             BasicLogger.debug("D");
             for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
-                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + Primitive64Store.FACTORY.copy(tmpDecomp.getD()));
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + R064Store.FACTORY.copy(tmpDecomp.getD()));
             }
 
             BasicLogger.debug("V");
             for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
-                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + Primitive64Store.FACTORY.copy(tmpDecomp.getV()));
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + R064Store.FACTORY.copy(tmpDecomp.getV()));
             }
         }
 
@@ -349,7 +349,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testP20061119Case() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY.copy(P20061119Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY.copy(P20061119Case.getProblematic());
 
         ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
         ComplexNumber tmp11 = ComplexNumber.of(2.727890580857718, 3.6223578444417908);
@@ -395,7 +395,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPaulsMathNote() {
 
         double[][] tmpData = { { 3, -9 }, { 4, -3 } };
-        Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
+        R064Store tmpA = R064Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
         Array1D<ComplexNumber> tmpExpVals = Array1D.C128.make(2);
@@ -454,7 +454,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPrimitiveAsComplex() {
 
         double[][] tmpData = { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
-        Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
+        R064Store tmpA = R064Store.FACTORY.rows(tmpData);
 
         int tmpLength = tmpData.length;
 
@@ -498,7 +498,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testProblemFoundInTheWild() {
 
-        Primitive64Store matrix = Primitive64Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+        R064Store matrix = R064Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
         CaseEigenvalue.doVerifyGeneral(matrix);
     }
@@ -510,8 +510,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
-            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
+            R064Store mtrxA = R064Store.FACTORY.makeSPD(dim);
+            R064Store mtrxB = R064Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -531,15 +531,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(Primitive64Store.FACTORY);
-            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(Primitive64Store.FACTORY);
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(R064Store.FACTORY);
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(R064Store.FACTORY);
             TestUtils.assertEquals(values, averages, accuracy);
 
             MatrixStore<Double> vectorsZ = SolverTask.R064.solve(compU, vectorsY);
 
             MatrixStore<Double> leftZ = mtrxA.multiply(vectorsZ);
             MatrixStore<Double> rightZ = mtrxB.multiply(vectorsZ);
-            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(R064Store.FACTORY), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA);
             generalised.decompose(mtrxA, mtrxB);
@@ -557,8 +557,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
-            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
+            R064Store mtrxA = R064Store.FACTORY.makeSPD(dim);
+            R064Store mtrxB = R064Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -578,15 +578,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(Primitive64Store.FACTORY);
-            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(Primitive64Store.FACTORY);
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(R064Store.FACTORY);
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(R064Store.FACTORY);
             TestUtils.assertEquals(values, averages, accuracy);
 
             MatrixStore<Double> vectorsZ = SolverTask.R064.solve(compU, vectorsY);
 
             MatrixStore<Double> leftZ = mtrxA.multiply(mtrxB).multiply(vectorsZ);
             MatrixStore<Double> rightZ = vectorsZ;
-            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(R064Store.FACTORY), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA, Generalisation.AB);
             generalised.decompose(mtrxA, mtrxB);
@@ -608,8 +608,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
-            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
+            R064Store mtrxA = R064Store.FACTORY.makeSPD(dim);
+            R064Store mtrxB = R064Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.R064.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -629,15 +629,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             MatrixStore<Double> vectorsY = eigenvalue.getV();
 
             MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
-            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(Primitive64Store.FACTORY);
-            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(Primitive64Store.FACTORY);
+            MatrixStore<Double> scales = leftY.onMatching(DIVIDE, vectorsY).collect(R064Store.FACTORY);
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).collect(R064Store.FACTORY);
             TestUtils.assertEquals(values, averages, accuracy);
 
             MatrixStore<Double> vectorsZ = compL.multiply(vectorsY);
 
             MatrixStore<Double> leftZ = mtrxB.multiply(mtrxA).multiply(vectorsZ);
             MatrixStore<Double> rightZ = vectorsZ;
-            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(Primitive64Store.FACTORY), accuracy);
+            TestUtils.assertEquals(scales, leftZ.onMatching(DIVIDE, rightZ).collect(R064Store.FACTORY), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.R064.makeGeneralised(mtrxA, Generalisation.BA);
             generalised.decompose(mtrxA, mtrxB);
@@ -655,7 +655,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
+            R064Store mtrxA = R064Store.FACTORY.makeSPD(dim);
 
             Eigenvalue<Double> eigenvalue = Eigenvalue.R064.make(mtrxA, true);
             eigenvalue.decompose(mtrxA);
@@ -679,7 +679,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         for (int dim = 1; dim < 10; dim++) {
 
             int dim1 = dim;
-            Primitive64Store matrix = Primitive64Store.FACTORY.makeSPD(dim1);
+            R064Store matrix = R064Store.FACTORY.makeSPD(dim1);
 
             for (Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
 

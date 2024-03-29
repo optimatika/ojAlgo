@@ -33,7 +33,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -240,7 +240,7 @@ final class IterativeASS extends ActiveSetSolver {
             this.addConstraint(constrIndex, constrBody, constrRHS);
         }
 
-        Primitive64Store iterX = this.getIterationX();
+        R064Store iterX = this.getIterationX();
 
         if (this.countIterationConstraints() <= this.countVariables() && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -274,7 +274,7 @@ final class IterativeASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            Primitive64Store tmpXL = MATRIX_FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
+            R064Store tmpXL = MATRIX_FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 

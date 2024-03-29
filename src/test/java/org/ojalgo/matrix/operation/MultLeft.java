@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.operation;
 
 import org.ojalgo.BenchmarkUtils;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Normal;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -64,18 +64,18 @@ public class MultLeft {
     @Param({ "10", "20", "50", "100", "200", "500", "1000" })
     public int dim;
 
-    public Primitive64Store left;
-    public Primitive64Store product;
-    public Primitive64Store right;
+    public R064Store left;
+    public R064Store product;
+    public R064Store right;
 
     @Benchmark
-    public Primitive64Store fillMxN() {
+    public R064Store fillMxN() {
         MultiplyLeft.fillMxN(product.data, left, dim, right.data);
         return product;
     }
 
     @Benchmark
-    public Primitive64Store fillRxN() {
+    public R064Store fillRxN() {
         MultiplyLeft.fillRxN(product.data, 0, dim, left, dim, right.data);
         return product;
     }
@@ -83,9 +83,9 @@ public class MultLeft {
     @Setup
     public void setup() {
 
-        left = Primitive64Store.FACTORY.makeFilled(dim, dim, Normal.standard());
-        right = Primitive64Store.FACTORY.makeFilled(dim, dim, Normal.standard());
-        product = Primitive64Store.FACTORY.make(dim, dim);
+        left = R064Store.FACTORY.makeFilled(dim, dim, Normal.standard());
+        right = R064Store.FACTORY.makeFilled(dim, dim, Normal.standard());
+        product = R064Store.FACTORY.make(dim, dim);
 
     }
 }

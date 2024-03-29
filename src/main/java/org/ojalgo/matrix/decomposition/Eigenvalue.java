@@ -34,7 +34,7 @@ import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -319,7 +319,7 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         @Override
         public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
+            PhysicalStore.Factory<Double, R064Store> factory = R064Store.FACTORY;
             Cholesky<Double> cholesky = Cholesky.R064.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
 

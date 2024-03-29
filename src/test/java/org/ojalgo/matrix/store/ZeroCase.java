@@ -35,7 +35,7 @@ public class ZeroCase extends NonPhysicalTest {
 
         rationalStore = new ZeroStore<>(GenericStore.Q128, tmpRowDim, tmpColDim);
         complexStore = new ZeroStore<>(GenericStore.C128, tmpRowDim, tmpColDim);
-        primitiveStore = new ZeroStore<>(Primitive64Store.FACTORY, tmpRowDim, tmpColDim);
+        primitiveStore = new ZeroStore<>(R064Store.FACTORY, tmpRowDim, tmpColDim);
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpColDim;

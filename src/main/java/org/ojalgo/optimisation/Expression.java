@@ -47,7 +47,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
@@ -417,7 +417,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        Primitive64Store retVal = Primitive64Store.FACTORY.make(myModel.countVariables(), 1);
+        R064Store retVal = R064Store.FACTORY.make(myModel.countVariables(), 1);
 
         BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
@@ -442,7 +442,7 @@ public final class Expression extends ModelEntity<Expression> {
     public MatrixStore<Double> getAdjustedHessian() {
 
         int tmpCountVariables = myModel.countVariables();
-        Primitive64Store retVal = Primitive64Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
+        R064Store retVal = R064Store.FACTORY.make(tmpCountVariables, tmpCountVariables);
 
         BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
@@ -761,7 +761,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     private AffineFunction<Double> makeAffineFunction() {
 
-        AffineFunction<Double> retVal = AffineFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
+        AffineFunction<Double> retVal = AffineFunction.factory(R064Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyLinearFactorNonZero()) {
             for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
@@ -775,12 +775,12 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     private ConstantFunction<Double> makeConstantFunction() {
-        return ConstantFunction.factory(Primitive64Store.FACTORY).constant(this.getConstant()).make(myModel.countVariables());
+        return ConstantFunction.factory(R064Store.FACTORY).constant(this.getConstant()).make(myModel.countVariables());
     }
 
     private PureQuadraticFunction<Double> makePureQuadraticFunction() {
 
-        PureQuadraticFunction<Double> retVal = PureQuadraticFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
+        PureQuadraticFunction<Double> retVal = PureQuadraticFunction.factory(R064Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
@@ -795,7 +795,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     private QuadraticFunction<Double> makeQuadraticFunction() {
 
-        QuadraticFunction<Double> retVal = QuadraticFunction.factory(Primitive64Store.FACTORY).make(myModel.countVariables());
+        QuadraticFunction<Double> retVal = QuadraticFunction.factory(R064Store.FACTORY).make(myModel.countVariables());
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {

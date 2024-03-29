@@ -33,7 +33,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.SolverTask;
@@ -193,7 +193,7 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         if (templateRHS.countColumns() != 1L) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
-        return Primitive64Store.FACTORY.make(templateBody.countColumns(), 1L);
+        return R064Store.FACTORY.make(templateBody.countColumns(), 1L);
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {

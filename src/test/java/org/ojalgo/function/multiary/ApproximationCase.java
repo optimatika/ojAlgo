@@ -24,7 +24,7 @@ package org.ojalgo.function.multiary;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
@@ -37,14 +37,14 @@ public class ApproximationCase extends MultiaryFunctionTests {
 
         for (int arity = 1; arity < 10; arity++) {
 
-            PhysicalStore<Double> linear = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+            PhysicalStore<Double> linear = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-            PhysicalStore<Double> zero = Primitive64Store.FACTORY.make(arity, 1);
-            PhysicalStore<Double> point = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> zero = R064Store.FACTORY.make(arity, 1);
+            PhysicalStore<Double> point = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-            AffineFunction<Double> orgFunc = AffineFunction.factory(Primitive64Store.FACTORY).coefficients(linear).make(linear.size());
+            AffineFunction<Double> orgFunc = AffineFunction.factory(R064Store.FACTORY).coefficients(linear).make(linear.size());
 
-            PhysicalStore<Double> arg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> arg = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
             Double expected = orgFunc.invoke(arg);
 
@@ -66,15 +66,15 @@ public class ApproximationCase extends MultiaryFunctionTests {
 
         for (int arity = 1; arity < 10; arity++) {
 
-            PhysicalStore<Double> quadratic = Primitive64Store.FACTORY.makeFilled(arity, arity, new Uniform());
-            PhysicalStore<Double> linear = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+            PhysicalStore<Double> quadratic = R064Store.FACTORY.makeFilled(arity, arity, new Uniform());
+            PhysicalStore<Double> linear = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-            PhysicalStore<Double> zero = Primitive64Store.FACTORY.make(arity, 1);
-            PhysicalStore<Double> point = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> zero = R064Store.FACTORY.make(arity, 1);
+            PhysicalStore<Double> point = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-            QuadraticFunction<Double> orgFunc = QuadraticFunction.factory(Primitive64Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
+            QuadraticFunction<Double> orgFunc = QuadraticFunction.factory(R064Store.FACTORY).quadratic(quadratic).linear(linear).make(linear.size());
 
-            PhysicalStore<Double> arg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> arg = R064Store.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
             Double expected = orgFunc.invoke(arg);
 

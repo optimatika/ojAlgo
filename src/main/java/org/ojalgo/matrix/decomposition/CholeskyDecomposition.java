@@ -30,7 +30,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -68,7 +68,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class R064 extends CholeskyDecomposition<Double> {
 
         R064() {
-            super(Primitive64Store.FACTORY);
+            super(R064Store.FACTORY);
         }
 
     }

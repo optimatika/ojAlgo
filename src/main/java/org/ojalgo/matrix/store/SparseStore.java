@@ -101,8 +101,8 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public static final SparseStore.Factory<ComplexNumber> C128 = SparseStore.factory(GenericStore.C128);
     public static final SparseStore.Factory<Quaternion> H256 = SparseStore.factory(GenericStore.H256);
     public static final SparseStore.Factory<RationalNumber> Q128 = SparseStore.factory(GenericStore.Q128);
-    public static final SparseStore.Factory<Double> R032 = SparseStore.factory(Primitive32Store.FACTORY);
-    public static final SparseStore.Factory<Double> R064 = SparseStore.factory(Primitive64Store.FACTORY);
+    public static final SparseStore.Factory<Double> R032 = SparseStore.factory(R032Store.FACTORY);
+    public static final SparseStore.Factory<Double> R064 = SparseStore.factory(R064Store.FACTORY);
     public static final SparseStore.Factory<Quadruple> R128 = SparseStore.factory(GenericStore.R128);
 
     public static <N extends Comparable<N>> SparseStore.Factory<N> factory(final PhysicalStore.Factory<N, ?> physicalFactory) {

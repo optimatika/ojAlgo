@@ -27,8 +27,8 @@ import java.io.IOException;
 
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive32Store;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R032Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Structure2D;
 
 abstract class FileFormat {
@@ -51,7 +51,7 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : Primitive64Store.FACTORY, numberOfInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : R064Store.FACTORY, numberOfInputs, layerOutputs);
 
             int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {
@@ -125,7 +125,7 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : Primitive32Store.FACTORY, numberOfInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : R032Store.FACTORY, numberOfInputs, layerOutputs);
 
             int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {

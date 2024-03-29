@@ -29,7 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -41,7 +41,7 @@ public class CaseLDL extends MatrixDecompositionTests {
 
     private static void doTest(final MatrixStore<Double> mtrxA, final RawStore mtrxL, final RawStore mtrxD) {
 
-        MatrixStore<Double> mtrxIdentity = Primitive64Store.FACTORY.makeIdentity((int) mtrxA.countRows());
+        MatrixStore<Double> mtrxIdentity = R064Store.FACTORY.makeIdentity((int) mtrxA.countRows());
 
         RawStore reconstructed = mtrxL.multiply(mtrxD.multiply(mtrxL.transpose()));
         TestUtils.assertEquals(mtrxA, reconstructed);

@@ -43,7 +43,7 @@ public class RowsCase extends NonPhysicalTest {
 
         rationalStore = new RowsStore<>(GenericStore.Q128.copy(tmpBase), tmpRows);
         complexStore = new RowsStore<>(GenericStore.C128.copy(tmpBase), tmpRows);
-        primitiveStore = new RowsStore<>(Primitive64Store.FACTORY.copy(tmpBase), tmpRows);
+        primitiveStore = new RowsStore<>(R064Store.FACTORY.copy(tmpBase), tmpRows);
 
         numberOfRows = tmpRows.length;
         numberOfColumns = tmpColDim;

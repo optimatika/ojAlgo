@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.BenchmarkUtils;
 import org.ojalgo.array.operation.DOT;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -69,14 +69,14 @@ public class TuneRawCholesky {
 
     private boolean mySPD;
 
-    Primitive64Store matrix;
+    R064Store matrix;
     double[][] rawInPlace;
 
     @Setup
     public void setup() {
 
         final int dim1 = dim;
-        matrix = Primitive64Store.FACTORY.makeSPD(dim1);
+        matrix = R064Store.FACTORY.makeSPD(dim1);
 
         rawInPlace = new double[dim][dim];
     }
@@ -181,7 +181,7 @@ public class TuneRawCholesky {
 
     }
 
-    private double[][] setRawInPlace(final Primitive64Store matrix2, final boolean transpose) {
+    private double[][] setRawInPlace(final R064Store matrix2, final boolean transpose) {
         return rawInPlace;
     }
 

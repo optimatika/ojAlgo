@@ -50,7 +50,7 @@ public class SuperimposedElementCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> aBase1 = GenericStore.C128.copy(tmpBase);
         complexStore = new SuperimposedStore<>(aBase1, tmpRowIndex, tmpColumnIndex,
                 new SingleStore<>(aBase1.physical(), ComplexNumber.valueOf(tmpElement.doubleValue())));
-        MatrixStore<Double> aBase2 = Primitive64Store.FACTORY.copy(tmpBase);
+        MatrixStore<Double> aBase2 = R064Store.FACTORY.copy(tmpBase);
         primitiveStore = new SuperimposedStore<>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase2.physical(), tmpElement.doubleValue()));
 
         numberOfRows = tmpRowDim;

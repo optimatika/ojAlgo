@@ -65,9 +65,9 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public final class Primitive32Store extends ArrayR032 implements PhysicalStore<Double>, Factory2D.Builder<Primitive32Store> {
+public final class R032Store extends ArrayR032 implements PhysicalStore<Double>, Factory2D.Builder<R032Store> {
 
-    public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PrimitiveFactory<>() {
+    public static final PhysicalStore.Factory<Double, R032Store> FACTORY = new PrimitiveFactory<>() {
 
         @Override
         public DenseArray.Factory<Double> array() {
@@ -75,12 +75,12 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         }
 
         @Override
-        public Primitive32Store copy(final Access2D<?> source) {
+        public R032Store copy(final Access2D<?> source) {
 
             final int tmpRowDim = (int) source.countRows();
             final int tmpColDim = (int) source.countColumns();
 
-            final Primitive32Store retVal = new Primitive32Store(tmpRowDim, tmpColDim);
+            final R032Store retVal = new R032Store(tmpRowDim, tmpColDim);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -109,13 +109,13 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         }
 
         @Override
-        public Primitive32Store make(final int rows, final int columns) {
-            return new Primitive32Store(rows, columns);
+        public R032Store make(final int rows, final int columns) {
+            return new R032Store(rows, columns);
         }
 
         @Override
-        public Primitive32Store make(final long rows, final long columns) {
-            return new Primitive32Store((int) rows, (int) columns);
+        public R032Store make(final long rows, final long columns) {
+            return new R032Store((int) rows, (int) columns);
         }
 
         @Override
@@ -124,9 +124,9 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         }
 
         @Override
-        public Primitive32Store transpose(final Access2D<?> source) {
+        public R032Store transpose(final Access2D<?> source) {
 
-            final Primitive32Store retVal = new Primitive32Store((int) source.countColumns(), (int) source.countRows());
+            final R032Store retVal = new R032Store((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -154,9 +154,9 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
     };
 
-    static Primitive32Store cast(final Access1D<?> matrix) {
-        if (matrix instanceof Primitive32Store) {
-            return (Primitive32Store) matrix;
+    static R032Store cast(final Access1D<?> matrix) {
+        if (matrix instanceof R032Store) {
+            return (R032Store) matrix;
         } else if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
         } else {
@@ -191,7 +191,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
     private transient float[] myWorkerColumn;
 
-    Primitive32Store(final int numbRows, final int numbCols, final float[] dataArray) {
+    R032Store(final int numbRows, final int numbCols, final float[] dataArray) {
 
         super(dataArray);
 
@@ -206,7 +206,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         multiplyNeither = MultiplyNeither.newPrimitive32(myRowDim, myColDim);
     }
 
-    Primitive32Store(final long numbRows, final long numbCols) {
+    R032Store(final long numbRows, final long numbCols) {
 
         super(Math.toIntExact(numbRows * numbCols));
 
@@ -282,7 +282,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     }
 
     @Override
-    public Primitive32Store build() {
+    public R032Store build() {
         return this;
     }
 
@@ -331,10 +331,10 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj) || !(obj instanceof Primitive32Store)) {
+        if (!super.equals(obj) || !(obj instanceof R032Store)) {
             return false;
         }
-        Primitive32Store other = (Primitive32Store) obj;
+        R032Store other = (R032Store) obj;
         if (myColDim != other.myColDim || myRowDim != other.myRowDim) {
             return false;
         }
@@ -364,14 +364,14 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        if (left instanceof Primitive32Store) {
-            if (right instanceof Primitive32Store) {
-                multiplyNeither.invoke(data, Primitive32Store.cast(left).data, complexity, Primitive32Store.cast(right).data);
+        if (left instanceof R032Store) {
+            if (right instanceof R032Store) {
+                multiplyNeither.invoke(data, R032Store.cast(left).data, complexity, R032Store.cast(right).data);
             } else {
-                multiplyRight.invoke(data, Primitive32Store.cast(left).data, complexity, right);
+                multiplyRight.invoke(data, R032Store.cast(left).data, complexity, right);
             }
-        } else if (right instanceof Primitive32Store) {
-            multiplyLeft.invoke(data, left, complexity, Primitive32Store.cast(right).data);
+        } else if (right instanceof R032Store) {
+            multiplyLeft.invoke(data, left, complexity, R032Store.cast(right).data);
         } else {
             multiplyBoth.invoke(this, left, complexity, right);
         }
@@ -657,10 +657,10 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
     @Override
     public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
 
-        Primitive32Store retVal = FACTORY.make(myRowDim, right.countColumns());
+        R032Store retVal = FACTORY.make(myRowDim, right.countColumns());
 
-        if (right instanceof Primitive32Store) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, Primitive32Store.cast(right).data);
+        if (right instanceof R032Store) {
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, R032Store.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }
@@ -782,7 +782,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteBackwards.invoke(Primitive32Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
+                    SubstituteBackwards.invoke(R032Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -807,7 +807,7 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteForwards.invoke(Primitive32Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
+                    SubstituteForwards.invoke(R032Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
                 }
 
             };
@@ -837,13 +837,13 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
     @Override
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
-        HouseholderLeft.call(data, myRowDim, firstColumn, Primitive32Store.cast(transformation));
+        HouseholderLeft.call(data, myRowDim, firstColumn, R032Store.cast(transformation));
     }
 
     @Override
     public void transformLeft(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
+        final Rotation.Primitive tmpTransf = R064Store.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -865,13 +865,13 @@ public final class Primitive32Store extends ArrayR032 implements PhysicalStore<D
 
     @Override
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
-        HouseholderRight.call(data, myRowDim, firstRow, Primitive32Store.cast(transformation), this.getWorkerColumn());
+        HouseholderRight.call(data, myRowDim, firstRow, R032Store.cast(transformation), this.getWorkerColumn());
     }
 
     @Override
     public void transformRight(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
+        final Rotation.Primitive tmpTransf = R064Store.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;

@@ -31,7 +31,7 @@ import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -60,10 +60,10 @@ public class CaseLU extends MatrixDecompositionTests {
         tmpComplex.decompose(GenericStore.C128.copy(tmpProblematic));
 
         LU<Double> tmpPrimitive = LU.R064.make();
-        tmpPrimitive.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
+        tmpPrimitive.decompose(R064Store.FACTORY.copy(tmpProblematic));
 
         LU<Double> tmpJama = new RawLU();
-        tmpJama.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
+        tmpJama.decompose(R064Store.FACTORY.copy(tmpProblematic));
 
         NumberContext tmpPrintContext = NumberContext.ofScale(20);
 
@@ -82,7 +82,7 @@ public class CaseLU extends MatrixDecompositionTests {
         }
 
         SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
+        tmpSVD.decompose(R064Store.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
@@ -116,8 +116,8 @@ public class CaseLU extends MatrixDecompositionTests {
         MatrixR064 rhs = SimpleEquationCase.getRHS();
         MatrixR064 solution = SimpleEquationCase.getSolution();
 
-        Primitive64Store expected = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
-        Primitive64Store actual = Primitive64Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store expected = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
+        R064Store actual = R064Store.FACTORY.make(solution.getRowDim(), solution.getColDim());
 
         for (LU<Double> decomp : MatrixDecompositionTests.getPrimitiveLU()) {
 

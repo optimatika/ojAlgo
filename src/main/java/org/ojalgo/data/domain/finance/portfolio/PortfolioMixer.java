@@ -110,8 +110,6 @@ public final class PortfolioMixer {
             aVars[c] = model.newVariable(B + c).binary();
         }
 
-
-
         Expression tmpQuadObj = model.newExpression(QUADRATIC_OBJECTIVE_PART);
         tmpQuadObj.weight(ONE);
         for (int row = 0; row < nbComponents; row++) {

@@ -31,7 +31,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive32Store;
+import org.ojalgo.matrix.store.R032Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -62,7 +62,7 @@ public final class MatrixR032 extends BasicMatrix<Double, MatrixR032> {
     public static final class Factory extends MatrixFactory<Double, MatrixR032, MatrixR032.DenseReceiver, MatrixR032.SparseReceiver> {
 
         Factory() {
-            super(MatrixR032.class, Primitive32Store.FACTORY);
+            super(MatrixR032.class, R032Store.FACTORY);
         }
 
         @Override

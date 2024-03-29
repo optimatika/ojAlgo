@@ -26,7 +26,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -72,9 +72,9 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     @Override
-    protected Primitive64Store allocate(final long numberOfRows, final long numberOfColumns) {
+    protected R064Store allocate(final long numberOfRows, final long numberOfColumns) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
-        return Primitive64Store.FACTORY.make(numberOfRows, numberOfColumns);
+        return R064Store.FACTORY.make(numberOfRows, numberOfColumns);
     }
 
     protected boolean checkSymmetry() {
@@ -94,9 +94,9 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
             return (MatrixStore<Double>) source;
         }
         if (source instanceof Access2D) {
-            return Primitive64Store.FACTORY.makeWrapper((Access2D<?>) source);
+            return R064Store.FACTORY.makeWrapper((Access2D<?>) source);
         }
-        return source.collect(Primitive64Store.FACTORY);
+        return source.collect(R064Store.FACTORY);
     }
 
     @Override
@@ -118,7 +118,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
-        return Primitive64Store.FACTORY.makeWrapper(matrix);
+        return R064Store.FACTORY.makeWrapper(matrix);
     }
 
     RawStore newRawStore(final int m, final int n) {

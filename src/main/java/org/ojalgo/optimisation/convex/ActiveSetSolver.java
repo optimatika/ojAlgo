@@ -31,7 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
@@ -49,9 +49,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private transient int[] myExcluded = null;
     private transient int[] myIncluded = null;
     private MatrixStore<Double> myInvQC;
-    private final Primitive64Store myIterationX;
+    private final R064Store myIterationX;
     private boolean myShrinkSwitch = true;
-    private final Primitive64Store mySlackI;
+    private final R064Store mySlackI;
 
     ActiveSetSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
 
@@ -68,7 +68,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         mySlackI = MATRIX_FACTORY.make(nbInes, 1L);
     }
 
-    private void handleIterationSolution(final Primitive64Store iterX, final int[] excluded) {
+    private void handleIterationSolution(final R064Store iterX, final int[] excluded) {
         // Subproblem solved successfully
 
         PhysicalStore<Double> soluX = this.getSolutionX();
@@ -206,7 +206,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         int[] incl = this.getIncluded();
 
-        Primitive64Store soluL = this.getSolutionL();
+        R064Store soluL = this.getSolutionL();
         int numbEqus = this.countEqualityConstraints();
 
         int toExclude = incl[0];
@@ -414,7 +414,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         double tmpVal;
 
         int nbEqus = this.countEqualityConstraints();
-        Primitive64Store soluL = this.getSolutionL();
+        R064Store soluL = this.getSolutionL();
 
         if (this.isLogDebug() && included.length > 0) {
             double[] multipliers = soluL.offsets(nbEqus, 0).rows(included).toRawCopy1D();
@@ -577,7 +577,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.getMatrixC();
     }
 
-    Primitive64Store getIterationX() {
+    R064Store getIterationX() {
         return myIterationX;
     }
 
@@ -599,7 +599,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.getSlackI().rows(rows);
     }
 
-    void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {
+    void handleIterationResults(final boolean solved, final R064Store iterX, final int[] included, final int[] excluded) {
 
         this.incrementIterationsCount();
 
