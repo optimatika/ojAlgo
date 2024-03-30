@@ -156,8 +156,8 @@ final class LeftRightStore<N extends Comparable<N>> extends ComposingStore<N> {
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
-        return column >= mySplit ? myRight.toScalar(row, column - mySplit) : this.base().toScalar(row, column);
+    public Scalar<N> toScalar(final int row, final int col) {
+        return col >= mySplit ? myRight.toScalar(row, col - mySplit) : this.base().toScalar(row, col);
     }
 
 }

@@ -114,7 +114,7 @@ final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
+    public Scalar<N> toScalar(final int row, final int col) {
         return this.physical().scalar().convert(myNumber);
     }
 

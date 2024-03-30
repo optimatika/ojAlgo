@@ -127,12 +127,12 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
+    public Scalar<N> toScalar(final int row, final int col) {
 
-        Scalar<N> retVal = this.base().toScalar(row, column);
+        Scalar<N> retVal = this.base().toScalar(row, col);
 
-        if (this.isCovered(row, column)) {
-            retVal = retVal.add(myDiff.get(row - myRowFirst, column - myColFirst));
+        if (this.isCovered(row, col)) {
+            retVal = retVal.add(myDiff.get(row - myRowFirst, col - myColFirst));
         }
 
         return retVal;

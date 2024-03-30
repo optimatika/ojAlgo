@@ -82,8 +82,8 @@ final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.base().toScalar(column, row);
+    public Scalar<N> toScalar(final int row, final int col) {
+        return this.base().toScalar(col, row);
     }
 
     @Override

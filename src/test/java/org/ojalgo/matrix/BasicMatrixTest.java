@@ -992,13 +992,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toScalar(long, long)
+     * @see org.ojalgo.matrix.BasicMatrix#toScalar(int, int)
      */
     @Test
     public void testToScalarIntInt() {
 
-        long row = Uniform.randomInteger(mtrxA.countRows());
-        long col = Uniform.randomInteger(mtrxA.countColumns());
+        int row = Uniform.randomInteger(mtrxA.getRowDim());
+        int col = Uniform.randomInteger(mtrxA.getColDim());
 
         Scalar<?> expected = mtrxA.toScalar(row, col);
 

@@ -904,8 +904,8 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N>
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
-        return myUtility.get(row, column);
+    public Scalar<N> toScalar(final int row, final int col) {
+        return myUtility.get(row, col);
     }
 
     @Override

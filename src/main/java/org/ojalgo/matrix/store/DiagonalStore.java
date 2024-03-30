@@ -258,7 +258,7 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long col) {
+    public Scalar<N> toScalar(final int row, final int col) {
         if (myMainDiagonal != null && row == col) {
             return myScalarFactory.convert(myMainDiagonal.get(row));
         } else if (mySuperdiagonal != null && col - row == 1L) {

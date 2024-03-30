@@ -97,7 +97,7 @@ final class RowsStore<N extends Comparable<N>> extends SelectingStore<N> {
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long col) {
+    public Scalar<N> toScalar(final int row, final int col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
             return this.base().toScalar(rowIndex, col);

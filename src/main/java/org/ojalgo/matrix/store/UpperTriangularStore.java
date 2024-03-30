@@ -70,7 +70,7 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long col) {
+    public Scalar<N> toScalar(final int row, final int col) {
         if (row > col) {
             return this.zero();
         }

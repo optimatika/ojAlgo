@@ -23,7 +23,6 @@ package org.ojalgo.optimisation;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -515,12 +514,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
 
     }
-
-    /**
-     * @deprecated Don't use/depend on this. Define new instances independent of this.
-     */
-    @Deprecated
-    protected static final NumberContext ACCURACY = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
 
     public final Optimisation.Options options;
 

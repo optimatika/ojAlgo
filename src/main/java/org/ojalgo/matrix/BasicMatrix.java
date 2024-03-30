@@ -759,16 +759,8 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
         return this.newInstance(this.store().symmetric(upper));
     }
 
-    /**
-     * Extracts one element of this matrix as a Scalar.
-     *
-     * @param row A row index.
-     * @param col A column index.
-     * @return One matrix element
-     * @deprecated v50 Use {@link #get(long, long)} instead
-     */
-    @Deprecated
-    public Scalar<N> toScalar(final long row, final long col) {
+    @Override
+    public Scalar<N> toScalar(final int row, final int col) {
         return this.store().toScalar(row, col);
     }
 

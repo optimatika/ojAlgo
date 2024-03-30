@@ -1019,15 +1019,15 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
 
     default double[][] toRawCopy2D() {
 
-        int tmpRowDim = (int) this.countRows();
-        int tmpColDim = (int) this.countColumns();
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
 
-        double[][] retVal = new double[tmpRowDim][tmpColDim];
+        double[][] retVal = new double[nbRows][nbCols];
 
         double[] tmpRow;
-        for (int i = 0; i < tmpRowDim; i++) {
+        for (int i = 0; i < nbRows; i++) {
             tmpRow = retVal[i];
-            for (int j = 0; j < tmpColDim; j++) {
+            for (int j = 0; j < nbCols; j++) {
                 tmpRow[j] = this.doubleValue(i, j);
             }
         }

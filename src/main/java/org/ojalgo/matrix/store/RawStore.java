@@ -720,8 +720,8 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
-    public PrimitiveScalar toScalar(final long row, final long column) {
-        return PrimitiveScalar.of(this.doubleValue(row, column));
+    public PrimitiveScalar toScalar(final int row, final int col) {
+        return PrimitiveScalar.of(this.doubleValue(row, col));
     }
 
     @Override

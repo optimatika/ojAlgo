@@ -138,11 +138,12 @@ final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
-        if (row == column) {
+    public Scalar<N> toScalar(final int row, final int col) {
+        if (row == col) {
             return this.one();
+        } else {
+            return this.zero();
         }
-        return this.zero();
     }
 
     @Override

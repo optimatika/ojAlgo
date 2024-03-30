@@ -25,6 +25,7 @@ import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -48,5 +49,14 @@ public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
     }
 
     M transpose();
+
+    /**
+     * Extracts one element of this matrix as a Scalar.
+     *
+     * @param row A row index.
+     * @param col A column index.
+     * @return One matrix element as a Scalar.
+     */
+    Scalar<N> toScalar(final int row, final int col);
 
 }

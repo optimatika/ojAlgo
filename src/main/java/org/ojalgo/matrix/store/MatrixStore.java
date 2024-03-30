@@ -388,7 +388,7 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     }
 
     default boolean isSmall(final long row, final long col, final double comparedTo) {
-        return this.toScalar(row, col).isSmall(comparedTo);
+        return this.toScalar(Math.toIntExact(row), Math.toIntExact(col)).isSmall(comparedTo);
     }
 
     @Override
@@ -845,8 +845,9 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
         return new LowerSymmetricStore<>(this, false);
     }
 
-    default Scalar<N> toScalar(final long row, final long column) {
-        return this.physical().scalar().convert(this.get(row, column));
+    @Override
+    default Scalar<N> toScalar(final int row, final int col) {
+        return this.physical().scalar().convert(this.get(row, col));
     }
 
     /**

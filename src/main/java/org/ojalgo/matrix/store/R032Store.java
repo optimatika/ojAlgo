@@ -50,6 +50,7 @@ import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
@@ -924,6 +925,11 @@ public final class R032Store extends ArrayR032 implements PhysicalStore<Double>,
     @Override
     public void visitRow(final long row, final VoidFunction<Double> visitor) {
         myUtility.visitRow(row, visitor);
+    }
+
+    @Override
+    public PrimitiveScalar toScalar(final int row, final int col) {
+        return PrimitiveScalar.of(this.doubleValue(row, col));
     }
 
     private float[] getWorkerColumn() {

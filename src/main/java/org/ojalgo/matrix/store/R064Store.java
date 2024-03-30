@@ -919,8 +919,8 @@ public final class R064Store extends ArrayR064 implements PhysicalStore<Double>,
     }
 
     @Override
-    public PrimitiveScalar toScalar(final long row, final long column) {
-        return PrimitiveScalar.of(this.doubleValue(row, column));
+    public PrimitiveScalar toScalar(final int row, final int col) {
+        return PrimitiveScalar.of(this.doubleValue(row, col));
     }
 
     @Override

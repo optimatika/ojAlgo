@@ -164,8 +164,8 @@ final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
     }
 
     @Override
-    public Scalar<N> toScalar(final long row, final long column) {
-        return row >= mySplit ? myBelow.toScalar(row - mySplit, column) : this.base().toScalar(row, column);
+    public Scalar<N> toScalar(final int row, final int col) {
+        return row >= mySplit ? myBelow.toScalar(row - mySplit, col) : this.base().toScalar(row, col);
     }
 
 }
