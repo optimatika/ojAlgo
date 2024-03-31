@@ -109,6 +109,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
     }
 
+    /**
+     * ≈ 1.6E-291
+     */
+    private static final double TINY = Math.pow(2.0, -966.0);
+
     private static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight q2RotR) {
 
         double f = e[p - 2];

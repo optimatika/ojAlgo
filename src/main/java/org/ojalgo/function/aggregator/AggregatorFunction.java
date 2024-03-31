@@ -39,84 +39,101 @@ public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunctio
             myAggregator = aggregator;
         }
 
+        @Override
         public boolean booleanValue() {
             return myAggregator.booleanValue();
         }
 
+        @Override
         public byte byteValue() {
             return myAggregator.byteValue();
         }
 
+        @Override
         public double doubleValue() {
             return myAggregator.doubleValue();
         }
 
+        @Override
         public float floatValue() {
             return myAggregator.floatValue();
         }
 
+        @Override
         public N get() {
             return myAggregator.get();
         }
 
+        @Override
         public int intValue() {
             return myAggregator.intValue();
         }
 
+        @Override
         public void invoke(final byte arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final double arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final float arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final int arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final long arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final N arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public void invoke(final short arg) {
             if (myPredicate.test(arg)) {
                 myAggregator.invoke(arg);
             }
         }
 
+        @Override
         public long longValue() {
             return myAggregator.longValue();
         }
 
+        @Override
         public AggregatorFunction<N> reset() {
             return myAggregator.reset();
         }
 
+        @Override
         public short shortValue() {
             return myAggregator.shortValue();
         }
 
+        @Override
         public Scalar<N> toScalar() {
             return myAggregator.toScalar();
         }
@@ -132,10 +149,6 @@ public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunctio
 
     AggregatorFunction<N> reset();
 
-    /**
-     * @deprecated v53 Will be removed
-     */
-    @Deprecated
     Scalar<N> toScalar();
 
 }
