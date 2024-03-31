@@ -1,0 +1,48 @@
+==========================================================================================
+
+CVXQP1_M              Hipparchus            FAILED                TIMEOUT               
+CVXQP1_M              JOptimizer            OPTIMAL               5303.007416ms         
+CVXQP1_M              ojAlgo                FAILED                TIMEOUT               
+
+CVXQP2_M              Hipparchus            FAILED                TIMEOUT               
+CVXQP2_M              JOptimizer            OPTIMAL               2640.924959ms         
+CVXQP2_M              ojAlgo                FAILED                TIMEOUT               
+
+CVXQP3_M              Hipparchus            FAILED                TIMEOUT               
+CVXQP3_M              JOptimizer            OPTIMAL               7752.700375ms         
+CVXQP3_M              ojAlgo                FAILED                TIMEOUT               
+
+MOSARQP2              Hipparchus            FAILED                TIMEOUT               
+MOSARQP2              JOptimizer            FAILED                WRONG                 
+MOSARQP2              ojAlgo                FAILED                TIMEOUT               
+
+QPCBOEI1              Hipparchus            FAILED                TIMEOUT               
+QPCBOEI1              JOptimizer            FAILED                WRONG                 
+QPCBOEI1              ojAlgo                FAILED                WRONG                 
+
+==========================================================================================
+
+CVXQP1_M              ojAlgo                FAILED                TIMEOUT
+CVXQP2_M              ojAlgo                FAILED                TIMEOUT
+CVXQP3_M              ojAlgo                FAILED                TIMEOUT
+MOSARQP2              ojAlgo                FAILED                TIMEOUT
+QPCBOEI1              ojAlgo                WRONG                 6.281741763049888E7   != 11503914
+
+==========================================================================================
+
+NAME           M       N      NZ      QN      QNZ       OPT
+cvxqp1m      500    1000    1498    1000     2984    1.0875116e+06
+cvxqp2m      250    1000     749    1000     2984    8.2015543e+05
+cvxqp3m      750    1000    2247    1000     2984    1.3628287e+06
+mosarqp2     600     900    2930     900       45   -1.5974821e+03
+qpcboei1     351     384    3485     384        0    1.1503914e+07
+
+NAME  name of the problem
+M     number of rows in A
+N     number of variables
+NZ    number of nonzeros in A
+QN    number of quadratic variables
+QNZ   number of off-diagonal entries in the lower triangular part of Q
+OPT   solution value obtained by the default settings of BPMPD solver
+
+==========================================================================================

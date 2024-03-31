@@ -150,7 +150,7 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateDualDirection(final ExitInfo exit) {
 
-        //        PhysicalStore<Double> zRHS = Primitive64Store.FACTORY.make(included.length, 1);
+        //        PhysicalStore<Double> zRHS = R064Store.FACTORY.make(included.length, 1);
         //        zRHS.set(exit.index, -1);
 
         z.reset();

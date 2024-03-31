@@ -307,28 +307,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial)
-     * calculation results. Calling this method should flush any cached calculation results.
-     *
-     * @deprecated v50 Caching, if necessary, is handled for you. If you want control of this then use the
-     *             lower level stuff in org.ojagl.matrix.store and org.ojagl.matrix.decomposition instead.
-     */
-    @Deprecated
-    public void flushCache() {
-
-        myHashCode = 0;
-
-        if (myDecomposition != null) {
-            myDecomposition.reset();
-            myDecomposition = null;
-        }
-
-        myHermitian = null;
-        mySymmetric = null;
-        mySPD = null;
-    }
-
-    /**
      * @deprecated v50 No need for this!
      */
     @Deprecated
@@ -506,11 +484,6 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
     }
 
     /**
-     * Compared to {@link #copy()} this does not create a copy – not initially anyway. The returned instance
-     * is a starting point for logically composing a new matrix.
-     *
-     * @return A logical builder that tries to avoid unnecessary copying.
-     * @see #copy()
      * @deprecated v50 No need for this!
      */
     @Deprecated

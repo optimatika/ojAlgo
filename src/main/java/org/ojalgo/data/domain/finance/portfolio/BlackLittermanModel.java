@@ -161,39 +161,35 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
     public void addViewWithBalancedConfidence(final List<BigDecimal> someWeights, final Comparable<?> aReturn) {
 
-        final View tmpView = new View(this, someWeights);
+        View view = new View(this, someWeights);
 
-        tmpView.setMeanReturn(TypeUtils.toBigDecimal(aReturn));
-        tmpView.setReturnVariance(null);
-        tmpView.setScale(null);
+        view.setMeanReturn(TypeUtils.toBigDecimal(aReturn));
+        view.setReturnVariance(null);
+        view.setScale(null);
 
-        myViews.add(tmpView);
+        myViews.add(view);
     }
 
     public void addViewWithScaledConfidence(final List<BigDecimal> someWeights, final Comparable<?> aReturn, final Comparable<?> aScale) {
 
-        final View tmpView = new View(this, someWeights);
+        View view = new View(this, someWeights);
 
-        tmpView.setMeanReturn(TypeUtils.toBigDecimal(aReturn));
-        tmpView.setReturnVariance(null);
-        tmpView.setScale(TypeUtils.toBigDecimal(aScale));
+        view.setMeanReturn(TypeUtils.toBigDecimal(aReturn));
+        view.setReturnVariance(null);
+        view.setScale(TypeUtils.toBigDecimal(aScale));
 
-        myViews.add(tmpView);
+        myViews.add(view);
     }
 
-    /**
-     * @deprecated v30
-     */
-    @Deprecated
-    public void addViewWithStandardDeviation(final List<BigDecimal> someWeights, final BigDecimal aReturn, final BigDecimal aStdDev) {
+    public void addViewWithStandardDeviation(final List<BigDecimal> weights, final BigDecimal expected, final BigDecimal stdDev) {
 
-        final View tmpView = new View(this, someWeights);
+        View view = new View(this, weights);
 
-        tmpView.setMeanReturn(aReturn);
-        tmpView.setReturnVariance(aStdDev.multiply(aStdDev));
-        tmpView.setScale(null);
+        view.setMeanReturn(expected);
+        view.setReturnVariance(stdDev.multiply(stdDev));
+        view.setScale(null);
 
-        myViews.add(tmpView);
+        myViews.add(view);
     }
 
     /**
