@@ -243,6 +243,10 @@ abstract class SimplexSolver extends LinearSolver {
             }
         }
 
+        int column() {
+            return enter.column();
+        }
+
         /**
          * Normal basis update – one variable leaves the basis and another enters.
          */
@@ -278,6 +282,10 @@ abstract class SimplexSolver extends LinearSolver {
             enter.reset();
             ratioPrimal = MACHINE_LARGEST;
             ratioDual = MACHINE_LARGEST;
+        }
+
+        int row() {
+            return exit.row();
         }
 
     }

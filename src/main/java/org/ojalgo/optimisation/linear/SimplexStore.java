@@ -203,7 +203,7 @@ abstract class SimplexStore {
         if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
             return new RevisedStore(structure);
         } else {
-            return new TableauStore(structure);
+            return new NewTableau(structure);
         }
     }
 
@@ -212,6 +212,7 @@ abstract class SimplexStore {
     private transient int[] myExcludedUpper = null;
     private final double[] myLowerBounds;
     private final EnumPartition<SimplexStore.ColumnState> myPartition;
+    private int myRemainingArtificials;
     private final List<String> myToStringList = new ArrayList<>();
     private final double[] myUpperBounds;
 
@@ -237,6 +238,8 @@ abstract class SimplexStore {
 
         super();
 
+        structure = linearStructure;
+
         m = linearStructure.countConstraints();
         n = linearStructure.countVariablesTotally();
 
@@ -251,11 +254,11 @@ abstract class SimplexStore {
             myPartition.update(included[j], ColumnState.BASIS);
         }
 
-        structure = linearStructure;
+        myRemainingArtificials = linearStructure.nbArti;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
 
         myToStringList.clear();
 
@@ -266,7 +269,7 @@ abstract class SimplexStore {
         return myToStringList.toString();
     }
 
-    private SimplexStore basis(final int index) {
+    private final SimplexStore basis(final int index) {
         myPartition.update(index, ColumnState.BASIS);
         return this;
     }
@@ -306,7 +309,14 @@ abstract class SimplexStore {
 
     abstract void copyObjective();
 
-    double[] extractSolution() {
+    /**
+     * The number of artificial variables in the basis.
+     */
+    final int countRemainingArtificials() {
+        return myRemainingArtificials;
+    }
+
+    final double[] extractSolution() {
 
         double[] retVal = new double[n];
 
@@ -351,7 +361,7 @@ abstract class SimplexStore {
      */
     abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, boolean[] negated, NumberContext tolerance, double fractionality);
 
-    ColumnState getColumnState(final int index) {
+    final ColumnState getColumnState(final int index) {
         return myPartition.get(index);
     }
 
@@ -360,7 +370,7 @@ abstract class SimplexStore {
     /**
      * Indices of columns/variables at their lower bounds.
      */
-    int[] getExcludedLower() {
+    final int[] getExcludedLower() {
         int count = myPartition.count(ColumnState.LOWER);
         if (myExcludedLower == null || myExcludedLower.length != count) {
             myExcludedLower = new int[count];
@@ -372,7 +382,7 @@ abstract class SimplexStore {
     /**
      * Indices of unbounded columns/variables.
      */
-    int[] getExcludedUnbounded() {
+    final int[] getExcludedUnbounded() {
         int count = myPartition.count(ColumnState.UNBOUNDED);
         if (myExcludedUnbounded == null || myExcludedUnbounded.length != count) {
             myExcludedUnbounded = new int[count];
@@ -384,7 +394,7 @@ abstract class SimplexStore {
     /**
      * Indices of columns/variables at their upper bounds.
      */
-    int[] getExcludedUpper() {
+    final int[] getExcludedUpper() {
         int count = myPartition.count(ColumnState.UPPER);
         if (myExcludedUpper == null || myExcludedUpper.length != count) {
             myExcludedUpper = new int[count];
@@ -395,11 +405,11 @@ abstract class SimplexStore {
 
     abstract double getInfeasibility(int i);
 
-    double getLowerBound(final int index) {
+    final double getLowerBound(final int index) {
         return myLowerBounds[index];
     }
 
-    double[] getLowerBounds() {
+    final double[] getLowerBounds() {
         return myLowerBounds;
     }
 
@@ -421,7 +431,7 @@ abstract class SimplexStore {
     /**
      * {@link #getUpperBound(int)} minus {@link #getLowerBound(int)}
      */
-    double getRange(final int index) {
+    final double getRange(final int index) {
         return myUpperBounds[index] - myLowerBounds[index];
     }
 
@@ -433,11 +443,11 @@ abstract class SimplexStore {
 
     abstract double getTableauRHS(int i);
 
-    double getUpperBound(final int index) {
+    final double getUpperBound(final int index) {
         return myUpperBounds[index];
     }
 
-    double[] getUpperBounds() {
+    final double[] getUpperBounds() {
         return myUpperBounds;
     }
 
@@ -456,7 +466,19 @@ abstract class SimplexStore {
         }
     }
 
-    boolean isNegated(final int j) {
+    final boolean isArtificial(final int col) {
+        return structure.isArtificialVariable(col);
+    }
+
+    final boolean isExcluded(final int index) {
+        return !myPartition.is(index, ColumnState.BASIS);
+    }
+
+    final boolean isIncluded(final int index) {
+        return myPartition.is(index, ColumnState.BASIS);
+    }
+
+    final boolean isNegated(final int j) {
         if (myUpperBounds[j] <= ZERO && myLowerBounds[j] < ZERO) {
             return true;
         } else {
@@ -468,11 +490,18 @@ abstract class SimplexStore {
      * The problem is small enough to be explicitly printed/logged – log the entire tableau at each iteration
      * when debugging.
      */
-    boolean isPrintable() {
+    final boolean isPrintable() {
         return structure.countVariablesTotally() <= 32;
     }
 
-    SimplexStore lower(final int index) {
+    /**
+     * Are there any artificial variables in the basis?
+     */
+    final boolean isRemainingArtificials() {
+        return myRemainingArtificials > 0;
+    }
+
+    final SimplexStore lower(final int index) {
         myPartition.update(index, ColumnState.LOWER);
         return this;
     }
@@ -529,12 +558,34 @@ abstract class SimplexStore {
 
     abstract Primitive1D sliceDualVariables();
 
-    SimplexStore unbounded(final int index) {
+    final SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);
         return this;
     }
 
-    void updateBasis(final int exit, final ColumnState exitToBound, final int enter) {
+    final void update(final int exit, final int exclEnter) {
+
+        int inclExit = included[exit];
+        if (inclExit >= 0) {
+            this.lower(inclExit);
+        }
+        if (this.isArtificial(inclExit)) {
+            --myRemainingArtificials;
+        }
+
+        if (exclEnter >= 0) {
+            this.basis(exclEnter);
+        }
+
+        included[exit] = exclEnter;
+        myPartition.extract(ColumnState.BASIS, true, excluded);
+    }
+
+    final void update(final SimplexTableauSolver.IterationPoint point) {
+        this.update(point.row, point.col);
+    }
+
+    final void updateBasis(final int exit, final ColumnState exitToBound, final int enter) {
 
         int inclExit = included[exit];
         int exclEnter = excluded[enter];
@@ -553,7 +604,7 @@ abstract class SimplexStore {
         excluded[enter] = inclExit;
     }
 
-    SimplexStore upper(final int index) {
+    final SimplexStore upper(final int index) {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }

@@ -38,25 +38,14 @@ import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.optimisation.linear.SimplexTableauSolver.IterationPoint;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-final class TableauStore extends SimplexStore implements Access2D<Double>, Mutate2D {
-
-    static enum FeatureSet {
-        /**
-         * Used by {@link SimplexTableauSolver}.
-         */
-        CLASSIC,
-        /**
-         * Used by {@link SimplexSolver}.
-         */
-        COMPACT;
-    }
+final class NewTableau extends SimplexTableau {
 
     private static void pivotRow(final double[] dataRow, final int col, final double[] pivotRow, final int length) {
         double dataElement = dataRow[col];
@@ -65,39 +54,33 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         }
     }
 
-    static TableauStore build(final ExpressionsBasedModel model) {
-        return SimplexStore.build(model, TableauStore::new);
+    static NewTableau build(final ExpressionsBasedModel model) {
+        return SimplexStore.build(model, NewTableau::new);
     }
 
-    static TableauStore build(final LinearSolver.GeneralBuilder builder, final int... basis) {
-        return SimplexStore.build(builder, TableauStore::new, basis);
+    static NewTableau build(final LinearSolver.GeneralBuilder builder, final int... basis) {
+        return SimplexStore.build(builder, NewTableau::new, basis);
     }
 
     private final int myColDim;
-    private transient Primitive2D myConstraintsBody = null;
-    private transient Primitive1D myConstraintsRHS = null;
     private double[] myCopiedObjectiveRow = null;
-    private final FeatureSet myFeatureSet;
-    private transient Primitive1D myObjective = null;
     private final double[][] myTableau;
 
-    TableauStore(final int mm, final int nn) {
-        this(new LinearStructure(mm, nn), FeatureSet.COMPACT);
+    NewTableau(final int mm, final int nn) {
+        this(SimplexTableau.FeatureSet.COMPACT, new LinearStructure(mm, nn));
     }
 
-    TableauStore(final LinearStructure linearStructure) {
-        this(linearStructure, FeatureSet.COMPACT);
+    NewTableau(final LinearStructure linearStructure) {
+        this(SimplexTableau.FeatureSet.COMPACT, linearStructure);
     }
 
-    TableauStore(final LinearStructure linearStructure, final FeatureSet featureSet) {
+    NewTableau(final SimplexTableau.FeatureSet featureSet, final LinearStructure linearStructure) {
 
-        super(linearStructure);
+        super(featureSet, linearStructure);
 
         myTableau = new double[m + 1][n + 1];
 
         myColDim = n + 1;
-
-        myFeatureSet = featureSet;
     }
 
     @Override
@@ -140,103 +123,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
-    private Primitive2D newConstraintsBody() {
-
-        double[][] store = myTableau;
-
-        return new Primitive2D() {
-
-            @Override
-            public double doubleValue(final int row, final int col) {
-                return store[row][col];
-            }
-
-            @Override
-            public int getColDim() {
-                return n;
-            }
-
-            @Override
-            public int getRowDim() {
-                return m;
-            }
-
-            @Override
-            public void set(final int row, final int col, final double value) {
-                store[row][col] = value;
-            }
-
-        };
-    }
-
-    private Primitive1D newConstraintsRHS() {
-
-        double[][] store = myTableau;
-
-        return new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return store[index][n];
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                store[index][n] = value;
-            }
-
-            @Override
-            public int size() {
-                return m;
-            }
-
-        };
-    }
-
-    private Primitive1D newObjective() {
-
-        double[][] store = myTableau;
-
-        return new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return store[m][index];
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                store[m][index] = value;
-            }
-
-            @Override
-            public int size() {
-                return structure.countModelVariables();
-            }
-
-        };
-    }
-
-    private void pivot(final int row, final int col) {
-
-        double[] pivotRow = myTableau[row];
-        double pivotElement = pivotRow[col];
-
-        if (pivotElement != ONE) {
-            CorePrimitiveOperation.divide(pivotRow, 0, myColDim, 1, pivotRow, pivotElement);
-        }
-
-        for (int i = 0, limit = myTableau.length; i < limit; i++) {
-            if (i != row) {
-                TableauStore.pivotRow(myTableau[i], col, pivotRow, myColDim);
-            }
-        }
-
-        if (myCopiedObjectiveRow != null) {
-            TableauStore.pivotRow(myCopiedObjectiveRow, col, pivotRow, myColDim);
-        }
-    }
-
     @Override
     protected void pivot(final IterDescr iteration) {
 
@@ -254,52 +140,6 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         for (int i = 0; i < m; i++) {
             myTableau[i][n] -= shift * myTableau[i][col];
         }
-    }
-
-    @Override
-    void calculateDualDirection(final ExitInfo exit) {
-        // With a tableau all calculations are continuously done when pivoting
-    }
-
-    @Override
-    void calculateIteration() {
-        // With a tableau all calculations are continuously done when pivoting
-    }
-
-    @Override
-    void calculateIteration(final IterDescr iteration) {
-        // With a tableau all calculations are continuously done when pivoting
-    }
-
-    @Override
-    void calculatePrimalDirection(final EnterInfo enter) {
-        // With a tableau all calculations are continuously done when pivoting
-    }
-
-    /**
-     * The area of the tableau corresponding to the constraints' body.
-     *
-     * @see org.ojalgo.optimisation.linear.SimplexStore#constraintsBody()
-     */
-    @Override
-    Primitive2D constraintsBody() {
-        if (myConstraintsBody == null) {
-            myConstraintsBody = this.newConstraintsBody();
-        }
-        return myConstraintsBody;
-    }
-
-    /**
-     * The area of the tableau corresponding to the constraints' RHS.
-     *
-     * @see org.ojalgo.optimisation.linear.SimplexStore#constraintsRHS()
-     */
-    @Override
-    Primitive1D constraintsRHS() {
-        if (myConstraintsRHS == null) {
-            myConstraintsRHS = this.newConstraintsRHS();
-        }
-        return myConstraintsRHS;
     }
 
     @Override
@@ -336,6 +176,18 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         }
 
         return retVal;
+    }
+
+    @Override
+    boolean fixVariable(final int index, final double value) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext integralityTolerance, final double fractionality) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -437,17 +289,116 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         return myTableau[i][n];
     }
 
-    /**
-     * The area of the tableau corresponding to the objective function.
-     *
-     * @see org.ojalgo.optimisation.linear.SimplexStore#objective()
-     */
     @Override
-    Primitive1D objective() {
-        if (myObjective == null) {
-            myObjective = this.newObjective();
+    boolean isAbleToExtractDual() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    Primitive2D newConstraintsBody() {
+
+        double[][] store = myTableau;
+
+        return new Primitive2D() {
+
+            @Override
+            public double doubleValue(final int row, final int col) {
+                return store[row][col];
+            }
+
+            @Override
+            public int getColDim() {
+                return n;
+            }
+
+            @Override
+            public int getRowDim() {
+                return m;
+            }
+
+            @Override
+            public void set(final int row, final int col, final double value) {
+                store[row][col] = value;
+            }
+
+        };
+    }
+
+    @Override
+    Primitive1D newConstraintsRHS() {
+
+        double[][] store = myTableau;
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return store[index][n];
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                store[index][n] = value;
+            }
+
+            @Override
+            public int size() {
+                return m;
+            }
+
+        };
+    }
+
+    @Override
+    Primitive1D newObjective() {
+
+        double[][] store = myTableau;
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return store[m][index];
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                store[m][index] = value;
+            }
+
+            @Override
+            public int size() {
+                return structure.countModelVariables();
+            }
+
+        };
+    }
+
+    void pivot(final int row, final int col) {
+
+        double[] pivotRow = myTableau[row];
+        double pivotElement = pivotRow[col];
+
+        if (pivotElement != ONE) {
+            CorePrimitiveOperation.divide(pivotRow, 0, myColDim, 1, pivotRow, pivotElement);
         }
-        return myObjective;
+
+        for (int i = 0, limit = myTableau.length; i < limit; i++) {
+            if (i != row) {
+                NewTableau.pivotRow(myTableau[i], col, pivotRow, myColDim);
+            }
+        }
+
+        if (myCopiedObjectiveRow != null) {
+            NewTableau.pivotRow(myCopiedObjectiveRow, col, pivotRow, myColDim);
+        }
+    }
+
+    @Override
+    void pivot(final IterationPoint pivot) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -466,26 +417,38 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
         myCopiedObjectiveRow = null;
     }
 
+    @Override
+    Access1D<Double> sliceBodyColumn(final int numerCol) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     Primitive1D sliceBodyRow(final int row) {
 
         return new Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
-                return TableauStore.this.doubleValue(row, index);
+                return NewTableau.this.doubleValue(row, index);
             }
 
             @Override
             public void set(final int index, final double value) {
-                TableauStore.this.set(row, index, value);
+                NewTableau.this.set(row, index, value);
             }
 
             @Override
             public int size() {
-                return TableauStore.this.n;
+                return NewTableau.this.n;
             }
 
         };
+    }
+
+    @Override
+    Access1D<Double> sliceConstraintsRHS() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -494,26 +457,39 @@ final class TableauStore extends SimplexStore implements Access2D<Double>, Mutat
     @Override
     final Primitive1D sliceDualVariables() {
 
+        Primitive1D slice = NewTableau.this.objective();
         int base = n - m;
 
         return new Primitive1D() {
 
             @Override
             public double doubleValue(final int index) {
-                return myObjective.doubleValue(base + index);
+                return slice.doubleValue(base + index);
             }
 
             @Override
             public void set(final int index, final double value) {
-                myObjective.set(base + index, value);
+                slice.set(base + index, value);
             }
 
             @Override
             public int size() {
-                return n - base;
+                return m;
             }
 
         };
+    }
+
+    @Override
+    Access1D<Double> sliceTableauRow(final int row) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    double value(final boolean b) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

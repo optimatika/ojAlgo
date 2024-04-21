@@ -99,6 +99,14 @@ final class SimplexTableauSolver extends LinearSolver {
             myPhase1 = false;
         }
 
+        int row() {
+            return row;
+        }
+
+        int column() {
+            return col;
+        }
+
     }
 
     private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
@@ -322,7 +330,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, model.options);
+        SimplexTableau retVal = OldTableau.make(structure, model.options);
 
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
@@ -556,7 +564,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, options);
+        SimplexTableau retVal = OldTableau.make(structure, options);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
@@ -621,7 +629,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, options);
+        SimplexTableau retVal = OldTableau.make(structure, options);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
@@ -815,7 +823,7 @@ final class SimplexTableauSolver extends LinearSolver {
     private void cleanUpPhase1Artificials() {
 
         int[] basis = myTableau.included;
-        int[] excluded = myTableau.excluded();
+        int[] excluded = myTableau.excluded;
 
         int colRHS = myTableau.n;
 
@@ -1051,7 +1059,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                int[] excluded = myTableau.excluded();
+                int[] excluded = myTableau.excluded;
                 Access1D<Double> sliceTableauRow = myTableau.sliceTableauRow(row);
                 double[] exclVals = new double[excluded.length];
                 for (int i = 0; i < exclVals.length; i++) {

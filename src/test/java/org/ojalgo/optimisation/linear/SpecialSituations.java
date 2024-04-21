@@ -27,7 +27,6 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
-import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 /**
  * Examples from LP10-Special-Situations.pdf (Special Situations in the Simplex Algorithm)
@@ -58,8 +57,8 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = OldTableau.newDense(builder);
+        SimplexTableau sparse = OldTableau.newSparse(builder);
 
         // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
@@ -125,8 +124,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = OldTableau.newDense(builder);
+        SimplexTableau sparse = OldTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 
@@ -165,8 +164,8 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = SimplexTableau.newDense(builder);
-        SparseTableau sparse = SimplexTableau.newSparse(builder);
+        SimplexTableau dense = OldTableau.newDense(builder);
+        SimplexTableau sparse = OldTableau.newSparse(builder);
 
         TestUtils.assertEquals(dense, sparse);
 

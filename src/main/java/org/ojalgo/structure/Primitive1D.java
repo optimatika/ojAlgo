@@ -53,7 +53,7 @@ public abstract class Primitive1D implements Access1D<Double>, Mutate1D {
 
         private final Structure1D myDelegate;
 
-        Wrapper(Structure1D delegate) {
+        Wrapper(final Structure1D delegate) {
             myDelegate = delegate;
         }
 
@@ -103,7 +103,6 @@ public abstract class Primitive1D implements Access1D<Double>, Mutate1D {
     @Override
     public final void set(final long index, final Comparable<?> value) {
         this.set(index, NumberDefinition.doubleValue(value));
-
     }
 
     @Override

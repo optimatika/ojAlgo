@@ -61,7 +61,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        DualSimplexSolver tableauSolver = TableauStore.build(simplified).newDualSimplexSolver(options);
+        DualSimplexSolver tableauSolver = NewTableau.build(simplified).newDualSimplexSolver(options);
         RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
 
         DualSimplexSolver revisedSolver = RevisedStore.build(simplified).newDualSimplexSolver(options);
@@ -76,7 +76,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        DualSimplexSolver tableauSolver = TableauStore.build(builder, basis).newDualSimplexSolver(options, basis);
+        DualSimplexSolver tableauSolver = NewTableau.build(builder, basis).newDualSimplexSolver(options, basis);
         RevisedSimplexSolverTest.doTestOneVariant(expected, tableauSolver);
 
         DualSimplexSolver revisedSolver = RevisedStore.build(builder, basis).newDualSimplexSolver(options, basis);
@@ -124,7 +124,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PhasedSimplexSolver tableauSolver = TableauStore.build(simplified).newPhasedSimplexSolver(options);
+        PhasedSimplexSolver tableauSolver = NewTableau.build(simplified).newPhasedSimplexSolver(options);
         RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
 
         PhasedSimplexSolver revisedSolver = RevisedStore.build(simplified).newPhasedSimplexSolver(options);
@@ -156,7 +156,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PrimalSimplexSolver tableauSolver = TableauStore.build(simplified).newPrimalSimplexSolver(options);
+        PrimalSimplexSolver tableauSolver = NewTableau.build(simplified).newPrimalSimplexSolver(options);
         RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
 
         PrimalSimplexSolver revisedSolver = RevisedStore.build(simplified).newPrimalSimplexSolver(options);
@@ -171,7 +171,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PrimalSimplexSolver tableauSolver = TableauStore.build(builder, basis).newPrimalSimplexSolver(options, basis);
+        PrimalSimplexSolver tableauSolver = NewTableau.build(builder, basis).newPrimalSimplexSolver(options, basis);
         RevisedSimplexSolverTest.doTestOneVariant(expected, tableauSolver);
 
         PrimalSimplexSolver revisedSolver = RevisedStore.build(builder, basis).newPrimalSimplexSolver(options, basis);
