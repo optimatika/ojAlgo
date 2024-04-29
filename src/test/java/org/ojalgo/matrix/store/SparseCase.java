@@ -25,10 +25,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.QuadrupleMath;
+import org.ojalgo.matrix.store.SparseStore.Builder;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Structure2D;
 
 public class SparseCase extends NonPhysicalTest {
@@ -77,6 +81,49 @@ public class SparseCase extends NonPhysicalTest {
 
         numberOfRows = dim;
         numberOfColumns = dim;
+    }
+
+    @Test
+    public void testBuilderAndCopy() {
+
+        int dim = 50_000;
+
+        Builder<Quadruple> builder = SparseStore.R128.newBuilder(dim, dim);
+
+        builder.set(Uniform.randomInteger(dim), 0, QuadrupleMath.E);
+        builder.set(0, Uniform.randomInteger(dim), QuadrupleMath.PI);
+
+        Quadruple expected = QuadrupleMath.PI.add(QuadrupleMath.E);
+
+        SparseStore<Quadruple> sparse1 = builder.build();
+
+        int count = 0;
+        Quadruple value = Quadruple.ZERO;
+
+        for (ElementView2D<Quadruple, ?> element : sparse1.nonzeros()) {
+            count++;
+            value = value.add(element.get());
+        }
+        TestUtils.assertEquals(2, count);
+        TestUtils.assertEquals(expected, value);
+
+        SparseStore<Quadruple> sparse2 = SparseStore.R128.copy(sparse1);
+
+        count = 0;
+        value = Quadruple.ZERO;
+
+        for (ElementView2D<Quadruple, ?> element : sparse2.nonzeros()) {
+            count++;
+            value = value.add(element.get());
+        }
+        TestUtils.assertEquals(2, count);
+        TestUtils.assertEquals(expected, value);
+
+        TestUtils.assertEquals(builder.getRowDim(), sparse1.getRowDim());
+        TestUtils.assertEquals(sparse2.getRowDim(), sparse1.getRowDim());
+
+        TestUtils.assertEquals(builder.getColDim(), sparse1.getColDim());
+        TestUtils.assertEquals(sparse2.getColDim(), sparse1.getColDim());
     }
 
     @Test

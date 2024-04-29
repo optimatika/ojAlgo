@@ -25,6 +25,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.E;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntBinaryOperator;
 
 import org.ojalgo.ProgrammingError;
@@ -49,11 +51,72 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 import org.ojalgo.type.math.MathType;
 
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
 
-    public static final class Factory<N extends Comparable<N>> implements Factory2D<SparseStore<N>> {
+    /**
+     * May be a preferable way to build a sparse matrix if:
+     * <ul>
+     * <li>You don't know the number of nonzero elements in advance.
+     * <li>Setting elements in strictly increasing column major order is not possible.
+     * <li>Multiple threads are used to set elements.
+     * </ul>
+     * This builder uses separate/additional memory to store the elements before they are copied to the actual
+     * sparse matrix. The actual sparse matrix is built when the {@link #build()} method is called.
+     */
+    public static final class Builder<N extends Comparable<N>> implements Factory2D.Builder<SparseStore<N>> {
+
+        private final int myColDim;
+        private final Set<KeyedPrimitive<Comparable<?>>> myElements = ConcurrentHashMap.newKeySet();
+        private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
+        private final int myRowDim;
+
+        Builder(final PhysicalStore.Factory<N, ?> physicalFactory, final int rowDim, final int colDim) {
+            super();
+            myPhysicalFactory = physicalFactory;
+            myRowDim = rowDim;
+            myColDim = colDim;
+        }
+
+        @Override
+        public SparseStore<N> build() {
+
+            SparseStore<N> retVal = new SparseStore<>(myPhysicalFactory, myRowDim, myColDim, (r, c) -> myElements.size());
+            SparseArray<N> destination = retVal.getElements();
+
+            myElements.stream().sorted().forEach(element -> destination.set(element.longValue(), element.getKey()));
+
+            myElements.clear();
+
+            return retVal;
+        }
+
+        @Override
+        public int getColDim() {
+            return myColDim;
+        }
+
+        @Override
+        public int getRowDim() {
+            return myRowDim;
+        }
+
+        @Override
+        public void set(final int row, final int col, final double value) {
+            myElements.add(EntryPair.of(Double.valueOf(value), Structure2D.index(myRowDim, row, col)));
+        }
+
+        @Override
+        public void set(final long row, final long col, final Comparable<?> value) {
+            myElements.add(EntryPair.of(value, Structure2D.index(myRowDim, row, col)));
+        }
+
+    }
+
+    public static final class Factory<N extends Comparable<N>> implements Factory2D<SparseStore<N>>, Factory2D.TwoStep<SparseStore<N>, SparseStore.Builder<N>> {
 
         private final IntBinaryOperator myInitial;
         private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
@@ -66,6 +129,31 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             super();
             myPhysicalFactory = physicalFactory;
             myInitial = initial;
+        }
+
+        @Override
+        public SparseStore<N> copy(final Access2D<?> source) {
+
+            if (source instanceof SparseStore) {
+
+                SparseArray<N> elements = ((SparseStore<N>) source).getElements();
+
+                SparseStore<N> retVal = new SparseStore<>(myPhysicalFactory, source.getRowDim(), source.getColDim(), (r, c) -> elements.countNonzeros());
+
+                SparseArray<N> destination = retVal.getElements();
+
+                if (myPhysicalFactory.getMathType().isPrimitive()) {
+                    elements.nonzeros().stream().forEach(element -> destination.set(element.index(), element.doubleValue()));
+                } else {
+                    elements.nonzeros().stream().forEach(element -> destination.set(element.index(), element.get()));
+                }
+
+                return retVal;
+
+            } else {
+
+                return TwoStep.super.copy(source);
+            }
         }
 
         @Override
@@ -89,6 +177,11 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         @Override
         public SparseStore<N> make(final int nbRows, final int nbCols) {
             return new SparseStore<>(myPhysicalFactory, nbRows, nbCols, myInitial);
+        }
+
+        @Override
+        public SparseStore.Builder<N> newBuilder(final long nbRows, final long nbCols) {
+            return new SparseStore.Builder<>(myPhysicalFactory, Math.toIntExact(nbRows), Math.toIntExact(nbCols));
         }
 
         @Override
