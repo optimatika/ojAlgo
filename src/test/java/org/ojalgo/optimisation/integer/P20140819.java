@@ -377,6 +377,10 @@ public class P20140819 extends OptimisationIntegerTests {
         // model.options.mip_defer = 0.0;
         // model.options.progress(IntegerSolver.class);
 
+        if (DEBUG) {
+            model.setKnownSolution(CPLEX_RESULTS);
+        }
+
         P20140819.doTestToMatchExpected(model);
     }
 

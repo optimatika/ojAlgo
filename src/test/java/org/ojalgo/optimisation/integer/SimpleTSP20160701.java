@@ -1,0 +1,182 @@
+package org.ojalgo.optimisation.integer;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
+import org.ojalgo.optimisation.Expression;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
+
+public class SimpleTSP20160701 extends OptimisationIntegerTests {
+
+    static ExpressionsBasedModel makeModel() {
+
+        int n = 6;
+        double[][] c = new double[n][n];
+        c[0][0] = 1.7976931348623157E308;
+        c[0][1] = 141.4213562373095;
+        c[0][2] = 223.60679774997897;
+        c[0][3] = 223.60679774997897;
+        c[0][4] = 141.4213562373095;
+        c[0][5] = 156.63604262201076;
+        c[1][0] = 141.4213562373095;
+        c[1][1] = 1.7976931348623157E308;
+        c[1][2] = 100.0;
+        c[1][3] = 223.60679774997897;
+        c[1][4] = 200.0;
+        c[1][5] = 219.25609608009617;
+        c[2][0] = 223.60679774997897;
+        c[2][1] = 100.0;
+        c[2][2] = 1.7976931348623157E308;
+        c[2][3] = 200.0;
+        c[2][4] = 223.60679774997897;
+        c[2][5] = 319.2543607976003;
+        c[3][0] = 223.60679774997897;
+        c[3][1] = 223.60679774997897;
+        c[3][2] = 200.0;
+        c[3][3] = 1.7976931348623157E308;
+        c[3][4] = 100.0;
+        c[3][5] = 377.5537017276938;
+        c[4][0] = 141.4213562373095;
+        c[4][1] = 200.0;
+        c[4][2] = 223.60679774997897;
+        c[4][3] = 100.0;
+        c[4][4] = 1.7976931348623157E308;
+        c[4][5] = 297.81988930943544;
+        c[5][0] = 156.63604262201076;
+        c[5][1] = 219.25609608009617;
+        c[5][2] = 319.2543607976003;
+        c[5][3] = 377.5537017276938;
+        c[5][4] = 297.81988930943544;
+        c[5][5] = 1.7976931348623157E308;
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        //DECISION VARIABLES
+        Variable[][] x = new Variable[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                x[i][j] = model.newVariable("x" + i + "_" + j).binary().weight(c[i][j]);
+            }
+        }
+        Variable[] u = new Variable[n];
+        for (int i = 1; i < n; i++) {
+            u[i] = model.newVariable("u" + i);
+        }
+
+        //CONSTRAINTS
+        //forall(i in cities)
+        //flow_out:
+        //sum(j in cities : i!=j) x[i][j]==1;
+        for (int i = 0; i < n; i++) {
+            Expression constraint_line = model.newExpression("constraint_line_" + i).lower(1).upper(1);
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    constraint_line.set(x[i][j], 1);
+                }
+            }
+        }
+
+        //forall(j in cities)
+        //flow_in:
+        //sum(i in cities : i!=j) x[i][j]==1;
+        for (int j = 0; j < n; j++) {
+            Expression constraint_column = model.newExpression("constraint_column_" + j).lower(1).upper(1);
+            for (int i = 0; i < n; i++) {
+                if (i != j) {
+                    constraint_column.set(x[i][j], 1);
+                }
+            }
+        }
+
+        //forall(i in cities: i>=1, j in cities: j>=1)
+        //subroute:
+        //u[i]-u[j]+n*x[i][j] <= n-1;
+        for (int i = 1; i < n; i++) {
+            for (int j = 1; j < n; j++) {
+                if (i != j) {
+                    Expression constraint_subroute = model.newExpression("constraint_subroute_" + i + "_" + j).upper(n - 1);
+                    constraint_subroute.set(u[i], 1);
+                    constraint_subroute.set(u[j], -1);
+                    constraint_subroute.set(x[i][j], n);
+                }
+            }
+        }
+
+        return model;
+    }
+
+    /**
+     * <p>
+     * I am trying to call Ojalgo 40 from AnyLogic 7.3.2 (http://www.anylogic..com/downloads) on Ubuntu 16.04
+     * in order to solve a Traveling Salesman Problem, but Ojalgo sometimes stops on a feasible solution
+     * before the optimum. The following code works well without Anylogic and always finds 917.31 as optimal
+     * solution: (Simply copy/paste the following code in a file called "Tsp.java" in order to test it.)
+     * </p>
+     * <p>
+     * Next, I try to run the same code in the "On startup" section of the "Agent actions" of the "Main" agent
+     * in an AnyLogic model. (Click on the project name "Ojalgo" to change the location of ojalgo-40.0.0.jar,
+     * like in the attached file.) Unfortunately, the obtained result is not always 917.31, but also sometimes
+     * 1099.22 and 1161.84. I do not understand why the solution randomly changes. I also call Cplex from
+     * AnyLogic to solve this same problem, which always returns the optimal solution, hence the problem seems
+     * not to be due to AnyLogic. As shown by the above Java code, the problem is not due to Ojalgo as well,
+     * but only related to the coupling of AnyLogic and Ojalgo. Thank you very much for Ojalgo and your help!
+     * </p>
+     * <p>
+     * apete: ExpressionsBasedModel has a feature that automatically rescales model parameters (to maximize
+     * numerical accuracy) before invoking the solver. The current implementation of that feature (apparently)
+     * doesn?t work very well with extremely large parameters in the model. I have now modified the behavior
+     * of that feature to not scale anything when/if there are extremely large or small parameters present. As
+     * far as I can see that solves the problem with your model.
+     * </p>
+     * <p>
+     * apete (later): Have also improved the presolve functionality to fix (not-include) uncorrelated and/or
+     * unbounded variables. (Doesn't handle every case, but this one a a few more.) This was the real fix for
+     * this problem!
+     * </p>
+     */
+    @Test
+    public void testSimpleTSP20160701() {
+
+
+        ExpressionsBasedModel model = SimpleTSP20160701.makeModel();
+
+        int n = 6;
+
+        if (OptimisationIntegerTests.DEBUG) {
+            model.options.debug(IntegerSolver.class);
+        }
+
+        Optimisation.Result result = model.minimise();
+
+        List<Variable> variables = model.getVariables();
+
+
+        if (OptimisationIntegerTests.DEBUG) {
+            System.out.print("u=\n\t  ");
+            for (int i = 1; i < n; i++) {
+                System.out.print(variables.get(35 + i).getValue().intValue() + " ");
+            }
+            System.out.print("\nx=\n\t");
+            for (int i = 0; i < n; i++) {
+                System.out.print(i + " ");
+            }
+            System.out.println();
+            for (int i = 0; i < n; i++) {
+                System.out.print(i + "\t");
+                for (int j = 0; j < n; j++) {
+                    System.out.print(variables.get(j + i * 6).getValue().intValue() + " ");
+                }
+                System.out.println();
+            }
+            System.out.println("\nResult = " + result);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertTrue(model.validate(result));
+        TestUtils.assertEquals(917.31349493942, result.getValue());
+    }
+
+}
