@@ -191,30 +191,26 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         /**
          * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
-         * artificial variables.)
-         * <p>
-         * This defines the range of the indices that can be used with the {@link #indexOf(int)} and
-         * {@link #isNegated(int)} methods.
+         * artificial variables.) This defines the range of the indices that can be used with the indexOf
+         * method.
          */
         int countModelVariables();
 
         /**
-         * The number of slack variables.
-         * <p>
-         * This defines the range of the indices that can be used with the {@link #getSlack(int)} method.
+         * The number of slack variables
          */
         int countSlackVariables();
 
-        EntryPair<ModelEntity<?>, ConstraintType> getConstraint(int idc);
+        EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(int i);
 
         /**
          * Returns which model entity, and constraint type, that corresponds to the slack variable at the
          * supplied index.
          *
-         * @param ids Index of solver slack variable (If there are 3 slack variables this input argument
+         * @param idx Index of solver slack variable (If there are 3 slack variables this input argument
          *        should be in the range [0.2].)
          */
-        EntryPair<ModelEntity<?>, ConstraintType> getSlack(int ids);
+        EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx);
 
         /**
          * Converts from a solver specific variable index to the corresponding index of the variable in the
@@ -222,18 +218,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * variable may result in multiple solver variables. Further, slack variables, artificial variables
          * and such are typically not represented in the model.
          *
-         * @param idm Index of solver variable
+         * @param idx Index of solver variable
          * @return Index of model variable (negative if no map)
          */
-        int indexOf(int idm);
+        int indexOf(int idx);
 
         /**
          * Is this solver variable negated relative to the corresponding model variable?
          *
-         * @param idm Index of solver variable
+         * @param idx Index of solver variable
          * @return true if this solver variable represents a negated model variable
          */
-        boolean isNegated(int idm);
+        boolean isNegated(int idx);
 
     }
 
@@ -618,27 +614,27 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
             for (int i = 0; i < nbVariables; i++) {
 
-                Variable tmpVariable = variables.get(i);
+                Variable variable = variables.get(i);
 
-                if (!tmpVariable.isFixed()) {
+                boolean positive = variable.isPositive();
+                boolean negative = variable.isNegative();
+                boolean integer = variable.isInteger();
 
-                    myFreeVariables.add(tmpVariable);
+                if (positive) {
+                    myPositiveVariables.add(variable);
+                    myPositiveIndices[i] = myPositiveVariables.size() - 1;
+                }
+                if (negative) {
+                    myNegativeVariables.add(variable);
+                    myNegativeIndices[i] = myNegativeVariables.size() - 1;
+                }
+                if (positive || negative) {
+                    myFreeVariables.add(variable);
                     myFreeIndices[i] = myFreeVariables.size() - 1;
-
-                    if (!tmpVariable.isUpperLimitSet() || tmpVariable.getUpperLimit().signum() == 1) {
-                        myPositiveVariables.add(tmpVariable);
-                        myPositiveIndices[i] = myPositiveVariables.size() - 1;
-                    }
-
-                    if (!tmpVariable.isLowerLimitSet() || tmpVariable.getLowerLimit().signum() == -1) {
-                        myNegativeVariables.add(tmpVariable);
-                        myNegativeIndices[i] = myNegativeVariables.size() - 1;
-                    }
-
-                    if (tmpVariable.isInteger()) {
-                        myIntegerVariables.add(tmpVariable);
-                        myIntegerIndices[i] = myIntegerVariables.size() - 1;
-                    }
+                }
+                if (integer) {
+                    myIntegerVariables.add(variable);
+                    myIntegerIndices[i] = myIntegerVariables.size() - 1;
                 }
             }
         }
@@ -731,6 +727,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * Expression parameters.
      */
     private final boolean myShallowCopy;
+    private final Set<IntIndex> myShiftedVariables = new HashSet<>();
     /**
      * Temporary storage for some expression specific subset of variables
      */
@@ -792,6 +789,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         myShallowCopy = shallow || modelToCopy.isShallowCopy();
         myRelaxed = modelToCopy.isRelaxed();
+
         myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
         myValidationFailureHandler = modelToCopy.getValidationFailureHandler();
     }
@@ -984,6 +982,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myVariables.clear();
 
         myFixedVariables.clear();
+        myShiftedVariables.clear();
 
         myVariablesCategorisation.reset();
     }
@@ -1047,6 +1046,16 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      */
     public List<Variable> getPositiveVariables() {
         return Collections.unmodifiableList(myVariablesCategorisation.getPositiveVariables(myVariables));
+    }
+
+    public Set<IntIndex> getShiftedVariables() {
+        myShiftedVariables.clear();
+        for (Variable tmpVar : myVariables) {
+            if (tmpVar.isShifted()) {
+                myShiftedVariables.add(tmpVar.getIndex());
+            }
+        }
+        return Collections.unmodifiableSet(myShiftedVariables);
     }
 
     public Variable getVariable(final int index) {
@@ -1865,6 +1874,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     IntRowColumn toIntRowColumn(final int row, final int column) {
         return new IntRowColumn(myVariables.get(row).getIndex(), myVariables.get(column).getIndex());
+    }
+    
+    public void reset() {
+        for (Expression variable : myExpressions.values()) {
+            variable.reset();
+        }
     }
 
 }
