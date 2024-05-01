@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class TableauCutGenerator {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final NumberContext ACCURACY = NumberContext.of(4, 16);
 

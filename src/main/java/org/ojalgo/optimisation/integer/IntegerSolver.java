@@ -420,6 +420,9 @@ public final class IntegerSolver extends GenericSolver {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");
             nodePrinter.println(nodeKey.toString());
+            nodePrinter.println("Integer indices: {}", strategy);
+            nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.copyLowerBounds()));
+            nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.copyUpperBounds()));
             nodePrinter.println(this.toString());
         }
 

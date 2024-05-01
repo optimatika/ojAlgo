@@ -44,7 +44,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", modelName, false);
 
         // model.options.debug(Optimisation.Solver.class);
-        // model.options.debug(IntegerSolver.class);
+        model.options.debug(IntegerSolver.class);
         // model.options.debug(ConvexSolver.class);
         // model.options.debug(LinearSolver.class);
         // model.options.progress(IntegerSolver.class);
