@@ -31,7 +31,7 @@ import org.ojalgo.optimisation.integer.IntegerStrategy.ConfigurableStrategy;
  */
 abstract class OptimisationIntegerTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     static final ConfigurableStrategy SIMPLE_FIFO_STRATEGY = IntegerStrategy.DEFAULT.withPriorityDefinitions(NodeKey.FIFO_SEQUENCE)
             .withParallelism(Parallelism.ONE);
