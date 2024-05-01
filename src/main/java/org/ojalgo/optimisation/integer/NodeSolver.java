@@ -71,7 +71,7 @@ public final class NodeSolver extends IntermediateSolver {
 
     boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
 
-        if (!this.isSolved()) {
+        if (true || !this.isSolved()) {
             return false;
         }
 
@@ -151,7 +151,7 @@ public final class NodeSolver extends IntermediateSolver {
                                 if (ConstraintType.LOWER.equals(type)) {
 
                                     BigDecimal factor = adjusted;
-                                    BigDecimal limit = entity.getLowerLimit();
+                                    BigDecimal limit = entity.getLowerLimit(true, BigMath.SMALLEST_NEGATIVE_INFINITY);
 
                                     BigDecimal shift = limit.multiply(factor);
                                     cut.shift(shift);
@@ -162,7 +162,7 @@ public final class NodeSolver extends IntermediateSolver {
                                 if (ConstraintType.UPPER.equals(type)) {
 
                                     BigDecimal factor = adjusted.negate();
-                                    BigDecimal limit = entity.getUpperLimit();
+                                    BigDecimal limit = entity.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY);
 
                                     BigDecimal shift = limit.multiply(factor);
                                     cut.shift(shift);

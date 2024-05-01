@@ -279,9 +279,13 @@ public final class Expression extends ModelEntity<Expression> {
                 // Fixed
 
                 Variable variable = tmpModel.getVariable(tmpKey.index);
-                BigDecimal tmpValue = variable.getValue();
+                BigDecimal tmpValue = variable.getBaseValue();
 
                 tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpValue));
+
+                if (!variable.isFixed()) {
+                    retVal.set(variable, tmpFactor);
+                }
 
             } else {
                 // Not fixed
@@ -303,12 +307,12 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (fixedVariables.contains(tmpRowKey)) {
 
-                BigDecimal tmpRowValue = tmpRowVariable.getValue();
+                BigDecimal tmpRowValue = tmpRowVariable.getBaseValue();
 
                 if (fixedVariables.contains(tmpColKey)) {
                     // Both fixed
 
-                    BigDecimal tmpColValue = tmpColVariable.getValue();
+                    BigDecimal tmpColValue = tmpColVariable.getBaseValue();
 
                     tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
 
@@ -321,7 +325,7 @@ public final class Expression extends ModelEntity<Expression> {
             } else if (fixedVariables.contains(tmpColKey)) {
                 // Column fixed
 
-                BigDecimal tmpColValue = tmpColVariable.getValue();
+                BigDecimal tmpColValue = tmpColVariable.getBaseValue();
 
                 retVal.doAdd(tmpRowKey, tmpFactor.multiply(tmpColValue));
 
@@ -1099,6 +1103,11 @@ public final class Expression extends ModelEntity<Expression> {
 
         return this;
     }
+    
+    @Override
+    BigDecimal doShift(final BigDecimal value) {
+        return value;
+    }
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
 
@@ -1222,6 +1231,13 @@ public final class Expression extends ModelEntity<Expression> {
 
     void setRedundant() {
         myRedundant = true;
+    }
+
+    public void reset() {
+        myRedundant = false;
+        myInfeasible = false;
+        // TODO Auto-generated method stub
+
     }
 
 }

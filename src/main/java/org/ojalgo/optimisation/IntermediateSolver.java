@@ -66,6 +66,8 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      */
     public void reset() {
 
+        myModel.reset();
+
         myResult = null;
 
         if (mySolver != null) {
@@ -114,12 +116,20 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
         Optimisation.Solver solver = this.getSolver();
 
+
         Optimisation.Result retVal = candidate != null ? candidate : myModel.getVariableValues();
         retVal = integration.toSolverState(retVal, myModel);
         retVal = solver.solve(retVal);
         retVal = integration.toModelState(retVal, myModel);
 
+
         myResult = retVal;
+
+        if (myModel.options.validate && myResult.getState().isFeasible()) {
+            if (myModel.options.validate && solver instanceof GenericSolver && !((GenericSolver) solver).validate(myModel)) {
+                BasicLogger.debug("Investigate this node!");
+            }
+        }
 
         return retVal;
     }
@@ -169,6 +179,14 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
      * {@link ExpressionsBasedModel#validate(Access1D, BasicLogger)}.
      */
     public boolean validate(final Access1D<BigDecimal> solution, final BasicLogger appender) {
+        //        if (mySolver != null && mySolver instanceof GenericSolver) {
+        //            boolean valid = ((GenericSolver) mySolver).validate(myModel);
+        //            if (!valid) {
+        //                ((GenericSolver) mySolver).setState(State.FAILED); // TODO Should it be INVALID instead?
+        //            }
+        //            // return valid;
+        //        } else {
+        //        }
         return myModel.validate(solution, appender);
     }
 
@@ -194,7 +212,7 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         return integration.getIndexInSolver(myModel, variable);
     }
 
-    protected ExpressionsBasedModel getModel() {
+    public ExpressionsBasedModel getModel() {
         return myModel;
     }
 

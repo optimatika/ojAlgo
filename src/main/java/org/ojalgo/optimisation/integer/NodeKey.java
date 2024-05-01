@@ -160,6 +160,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         mySignChanged = false;
     }
 
+    @Override
     public int compareTo(final NodeKey ref) {
         return Long.compare(sequence, ref.sequence);
     }
@@ -375,7 +376,8 @@ public final class NodeKey implements Comparable<NodeKey> {
     }
 
     boolean isSignChanged() {
-        return mySignChanged;
+        // return mySignChanged;
+        return true;
     }
 
     void setNodeState(final ExpressionsBasedModel model, final ModelStrategy strategy) {
