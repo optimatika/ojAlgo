@@ -66,20 +66,20 @@ public class SpecialSituations extends OptimisationLinearTests {
         SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
-        pivot.row = 1;
-        pivot.col = 0;
+        pivot.row(1);
+        pivot.column(0);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
 
-        pivot.row = 2;
-        pivot.col = 1;
+        pivot.row(2);
+        pivot.column(1);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
 
-        pivot.row = 2;
-        pivot.col = 3;
+        pivot.row(2);
+        pivot.column(3);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
@@ -93,8 +93,8 @@ public class SpecialSituations extends OptimisationLinearTests {
         TestUtils.assertEquals(dense, sparse);
 
         // Make optimal again
-        pivot.row = 1;
-        pivot.col = 1;
+        pivot.row(1);
+        pivot.column(1);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
@@ -132,14 +132,14 @@ public class SpecialSituations extends OptimisationLinearTests {
         SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
-        pivot.row = 0;
-        pivot.col = 1;
+        pivot.row(0);
+        pivot.column(1);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
 
-        pivot.row = 1;
-        pivot.col = 0;
+        pivot.row(1);
+        pivot.column(0);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
@@ -172,14 +172,14 @@ public class SpecialSituations extends OptimisationLinearTests {
         SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
         pivot.switchToPhase2();
 
-        pivot.row = 0;
-        pivot.col = 0;
+        pivot.row(0);
+        pivot.column(0);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
 
-        pivot.row = 1;
-        pivot.col = 1;
+        pivot.row(1);
+        pivot.column(1);
         dense.pivot(pivot);
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);

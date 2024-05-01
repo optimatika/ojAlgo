@@ -38,7 +38,6 @@ import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.ProblemStructure;
@@ -56,24 +55,17 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class OldTableau extends SimplexTableau {
 
-    static abstract class Dense extends OldTableau {
-
-        Dense(final SimplexTableau.FeatureSet featureSet, final LinearStructure linearStructure) {
-            super(featureSet, linearStructure);
-        }
-
-    }
-
-    static final class Raw extends Dense {
+    static final class Dense extends OldTableau {
 
         private final int myColDim;
         private final double[][] myTableau;
+        private double[] myAlternativeObjective = null;
 
-        Raw(final LinearStructure linearStructure) {
+        Dense(final LinearStructure linearStructure) {
             this(FeatureSet.CLASSIC, linearStructure);
         }
 
-        Raw(final OldTableau toCopy) {
+        Dense(final OldTableau toCopy) {
 
             super(toCopy.features, toCopy.structure);
 
@@ -81,20 +73,28 @@ abstract class OldTableau extends SimplexTableau {
             myColDim = toCopy.getColDim();
         }
 
-        Raw(final SimplexTableau.FeatureSet featureSet, final LinearStructure linearStructure) {
+        Dense(final SimplexTableau.FeatureSet featureSet, final LinearStructure linearStructure) {
 
             super(featureSet, linearStructure);
 
-            int nbRows = m + 2;
+            int nbRows = m + 1;
             int nbCols = n + 1;
 
             myTableau = new double[nbRows][nbCols];
             myColDim = nbCols;
+
+            if (featureSet == FeatureSet.CLASSIC) {
+                myAlternativeObjective = new double[nbCols];
+            }
         }
 
         @Override
         public double doubleValue(final int row, final int col) {
-            return myTableau[row][col];
+            if (features == FeatureSet.CLASSIC && row == m + 1) {
+                return myAlternativeObjective[col];
+            } else {
+                return myTableau[row][col];
+            }
         }
 
         @Override
@@ -104,7 +104,11 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         public int getRowDim() {
-            return myTableau.length;
+            if (myAlternativeObjective != null) {
+                return myTableau.length + 1;
+            } else {
+                return myTableau.length;
+            }
         }
 
         @Override
@@ -123,6 +127,10 @@ abstract class OldTableau extends SimplexTableau {
                     }
                 }
             }
+
+            if (features == FeatureSet.CLASSIC) {
+                AXPY.invoke(myAlternativeObjective, 0, -myAlternativeObjective[col], pivotRow, 0, 0, myColDim);
+            }
         }
 
         private void scale(final double[] pivotRow, final int col) {
@@ -134,20 +142,38 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         void copyBasicSolution(final double[] solution) {
-            // TODO Auto-generated method stub
-
+            for (int i = 0; i < included.length; i++) {
+                solution[included[i]] = myTableau[i][n];
+            }
         }
 
         @Override
         void copyObjective() {
-            // TODO Auto-generated method stub
-
+            myAlternativeObjective = Arrays.copyOf(myTableau[m], myColDim);
         }
 
         @Override
         double extractValue() {
-            // TODO Auto-generated method stub
-            return 0;
+
+            double retVal = -myTableau[m][n];
+
+            int[] lower = this.getExcludedLower();
+            for (int i = 0; i < lower.length; i++) {
+                double bound = this.getLowerBound(lower[i]);
+                if (bound != ZERO) {
+                    retVal += bound * myTableau[m][lower[i]];
+                }
+            }
+
+            int[] upper = this.getExcludedUpper();
+            for (int i = 0; i < upper.length; i++) {
+                double bound = this.getUpperBound(upper[i]);
+                if (bound != ZERO) {
+                    retVal += bound * myTableau[m][upper[i]];
+                }
+            }
+
+            return retVal;
         }
 
         @Override
@@ -213,51 +239,58 @@ abstract class OldTableau extends SimplexTableau {
         }
 
         @Override
-        Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-                final double fractionality) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        double getCost(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+        double getCost(final int j) {
+            return myTableau[m][j];
         }
 
         @Override
         double getInfeasibility() {
-            return myTableau[m + 1][n];
+            if (features == FeatureSet.CLASSIC) {
+                return myAlternativeObjective[n];
+            } else {
+                // TODO
+                return 0.0;
+            }
         }
 
         @Override
         double getInfeasibility(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+
+            int ii = included[i];
+
+            double xi = myTableau[i][n];
+            double lb = this.getLowerBound(ii);
+            double ub = this.getUpperBound(ii);
+
+            // BasicLogger.debug(1, "{}({}): {} < {} < {}", ii, i, lb, xi, ub);
+
+            if (xi < lb) {
+                return xi - lb; // Negative, lower bound infeasibility
+            } else if (xi > ub) {
+                return xi - ub; // Positive, upper bound infeasibility
+            } else {
+                return ZERO; // No infeasibility
+            }
         }
 
         @Override
         double getReducedCost(final int je) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myTableau[m][excluded[je]];
         }
 
         @Override
         double getTableauElement(final ExitInfo exit, final int je) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myTableau[exit.index][excluded[je]];
         }
 
         @Override
         double getTableauElement(final int i, final EnterInfo enter) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myTableau[i][enter.column()];
         }
 
         @Override
         double getTableauRHS(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myTableau[i][n];
         }
 
         @Override
@@ -290,12 +323,8 @@ abstract class OldTableau extends SimplexTableau {
 
                     myTableau[row][col] = value;
 
-                    if (row < structure.nbIdty) {
-                        if (col >= n - m && value == 1D) {
-                            Raw.this.update(row, col);
-                        }
-                    } else {
-                        myTableau[m + 1][col] -= value;
+                    if (row >= structure.nbIdty) {
+                        myAlternativeObjective[col] -= value;
                     }
                 }
 
@@ -322,7 +351,7 @@ abstract class OldTableau extends SimplexTableau {
                     myTableau[index][n] = value;
 
                     if (index >= structure.nbIdty) {
-                        myTableau[m + 1][n] -= value;
+                        myAlternativeObjective[n] -= value;
                     }
                 }
 
@@ -360,8 +389,8 @@ abstract class OldTableau extends SimplexTableau {
         @Override
         void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
 
-            int row = iterationPoint.row;
-            int col = iterationPoint.col;
+            int row = iterationPoint.row();
+            int col = iterationPoint.column();
 
             double[] pivotRow = myTableau[row];
 
@@ -374,8 +403,8 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         void restoreObjective() {
-            // TODO Auto-generated method stub
-
+            myTableau[m] = myAlternativeObjective;
+            myAlternativeObjective = null;
         }
 
         @Override
@@ -451,7 +480,11 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         public int getRowDim() {
-            return m + 2;
+            if (myPhase1Weights != null) {
+                return m + 2;
+            } else {
+                return m + 1;
+            }
         }
 
         @Override
@@ -519,18 +552,38 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         void copyBasicSolution(final double[] solution) {
-            // TODO Auto-generated method stub
+            for (int i = 0; i < included.length; i++) {
+                solution[included[i]] = myRHS.doubleValue(i);
+            }
         }
 
         @Override
         void copyObjective() {
-            // TODO Auto-generated method stub
+            myPhase1Weights.fillMatching(myObjectiveWeights);
         }
 
         @Override
         double extractValue() {
-            // TODO Auto-generated method stub
-            return 0;
+
+            double retVal = -myValue;
+
+            int[] lower = this.getExcludedLower();
+            for (int i = 0; i < lower.length; i++) {
+                double bound = this.getLowerBound(lower[i]);
+                if (bound != ZERO) {
+                    retVal += bound * myObjectiveWeights.doubleValue(lower[i]);
+                }
+            }
+
+            int[] upper = this.getExcludedUpper();
+            for (int i = 0; i < upper.length; i++) {
+                double bound = this.getUpperBound(upper[i]);
+                if (bound != ZERO) {
+                    retVal += bound * myObjectiveWeights.doubleValue(lower[i]);
+                }
+            }
+
+            return retVal;
         }
 
         @Override
@@ -597,16 +650,8 @@ abstract class OldTableau extends SimplexTableau {
         }
 
         @Override
-        Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-                final double fractionality) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
         double getCost(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myObjectiveWeights.doubleValue(i);
         }
 
         /**
@@ -619,32 +664,42 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         double getInfeasibility(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+
+            int ii = included[i];
+
+            double xi = myRHS.doubleValue(i);
+            double lb = this.getLowerBound(ii);
+            double ub = this.getUpperBound(ii);
+
+            // BasicLogger.debug(1, "{}({}): {} < {} < {}", ii, i, lb, xi, ub);
+
+            if (xi < lb) {
+                return xi - lb; // Negative, lower bound infeasibility
+            } else if (xi > ub) {
+                return xi - ub; // Positive, upper bound infeasibility
+            } else {
+                return ZERO; // No infeasibility
+            }
         }
 
         @Override
         double getReducedCost(final int je) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myPhase1Weights.doubleValue(excluded[je]);
         }
 
         @Override
         double getTableauElement(final ExitInfo exit, final int je) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myRows[exit.index].doubleValue(excluded[je]);
         }
 
         @Override
         double getTableauElement(final int i, final EnterInfo enter) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myRows[i].doubleValue(enter.column());
         }
 
         @Override
         double getTableauRHS(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
+            return myRHS.doubleValue(i);
         }
 
         @Override
@@ -677,11 +732,7 @@ abstract class OldTableau extends SimplexTableau {
 
                     myRows[row].set(col, value);
 
-                    if (row < structure.nbIdty) {
-                        if (col >= n - m && value == 1D) {
-                            Sparse.this.update(row, col);
-                        }
-                    } else {
+                    if (row >= structure.nbIdty) {
                         myPhase1Weights.add(col, -value);
                     }
                 }
@@ -747,8 +798,8 @@ abstract class OldTableau extends SimplexTableau {
         @Override
         void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
 
-            int row = iterationPoint.row;
-            int col = iterationPoint.col;
+            int row = iterationPoint.row();
+            int col = iterationPoint.column();
 
             SparseArray<Double> pivotRowBody = myRows[row];
             double pivotRowRHS = myRHS.doubleValue(row);
@@ -763,335 +814,14 @@ abstract class OldTableau extends SimplexTableau {
 
         @Override
         void restoreObjective() {
-            // TODO Auto-generated method stub
-
+            myObjectiveWeights.fillMatching(myPhase1Weights);
+            myPhase1Weights.fillAll(ZERO);
+            // myPhase1Weights = null;
         }
 
         @Override
         Dense toDense() {
-            return new Transposed(this);
-        }
-
-    }
-
-    static final class Transposed extends Dense {
-
-        private final int myColDim;
-        private final R064Store myTransposed;
-
-        Transposed(final LinearStructure linearStructure) {
-            this(FeatureSet.CLASSIC, linearStructure);
-        }
-
-        Transposed(final OldTableau toCopy) {
-
-            super(toCopy.features, toCopy.structure);
-
-            myTransposed = R064Store.FACTORY.transpose(toCopy);
-            myColDim = myTransposed.getRowDim();
-        }
-
-        Transposed(final SimplexTableau.FeatureSet featureSet, final LinearStructure linearStructure) {
-
-            super(featureSet, linearStructure);
-
-            int nbRows = m + 2;
-            int nbCols = n + 1;
-
-            myTransposed = R064Store.FACTORY.make(nbCols, nbRows);
-            myColDim = myTransposed.getRowDim();
-        }
-
-        @Override
-        public double doubleValue(final int row, final int col) {
-            return myTransposed.doubleValue(col, row);
-        }
-
-        @Override
-        public int getColDim() {
-            return myColDim;
-        }
-
-        @Override
-        public int getRowDim() {
-            return myTransposed.getColDim();
-        }
-
-        @Override
-        public void set(final int row, final int col, final double value) {
-            myTransposed.set(col, row, value);
-        }
-
-        private void doPivot(final int row, final int col, final double[] pivotRowData, final int pivotRowIndexBase) {
-
-            double[] data = myTransposed.data;
-
-            for (int i = 0, limit = myTransposed.getColDim(); i < limit; i++) {
-                if (i != row) {
-                    int dataIndexBase = i * myColDim;
-                    double colVal = data[dataIndexBase + col];
-                    if (colVal != ZERO) {
-                        AXPY.invoke(data, dataIndexBase, -colVal, pivotRowData, pivotRowIndexBase, 0, myColDim);
-                    }
-                }
-            }
-        }
-
-        private void scale(final double[] pivotRowData, final int pivotRowIndexBase, final int col) {
-            double pivotElement = pivotRowData[pivotRowIndexBase + col];
-            if (pivotElement != ONE) {
-                CorePrimitiveOperation.divide(pivotRowData, pivotRowIndexBase, pivotRowIndexBase + myColDim, 1, pivotRowData, pivotElement);
-            }
-        }
-
-        @Override
-        void copyBasicSolution(final double[] solution) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        void copyObjective() {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        double extractValue() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        boolean fixVariable(final int index, final double value) {
-
-            int row = IndexOf.indexOf(included, index);
-
-            if (row < 0) {
-                return false;
-            }
-
-            // Diff begin
-
-            Array1D<Double> currentRow = myTransposed.sliceColumn(row);
-            double currentRHS = currentRow.doubleValue(myColDim - 1);
-
-            final ArrayR064 auxiliaryRow = ArrayR064.make(myColDim);
-            if (currentRHS > value) {
-                currentRow.axpy(NEG, auxiliaryRow);
-                auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myColDim - 1, value - currentRHS);
-            } else if (currentRHS < value) {
-                currentRow.axpy(ONE, auxiliaryRow);
-                auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myColDim - 1, currentRHS - value);
-            } else {
-                return true;
-            }
-
-            // Diff end
-
-            Access1D<Double> objectiveRow = this.sliceTableauRow(m);
-
-            int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
-
-            if (pivotCol < 0) {
-                // TODO Problem infeasible?
-                // Probably better to return true here, and have the subsequest solver.solve() return INFEASIBLE
-                return false;
-            }
-
-            // Diff begin
-
-            this.scale(auxiliaryRow.data, 0, pivotCol);
-
-            this.doPivot(-1, pivotCol, auxiliaryRow.data, 0);
-
-            myTransposed.fillColumn(row, auxiliaryRow);
-
-            // Diff end
-
-            for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
-                if (elem.doubleValue() < ZERO) {
-                    return false;
-                }
-            }
-
-            this.update(row, pivotCol);
-
-            return true;
-        }
-
-        @Override
-        Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-                final double fractionality) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        double getCost(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getInfeasibility() {
-            return myTransposed.doubleValue(n, m + 1);
-        }
-
-        @Override
-        double getInfeasibility(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getReducedCost(final int je) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getTableauElement(final ExitInfo exit, final int je) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getTableauElement(final int i, final EnterInfo enter) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getTableauRHS(final int i) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        double getValue() {
-            return myTransposed.doubleValue(n, m);
-        }
-
-        @Override
-        Primitive2D newConstraintsBody() {
-
-            return new Primitive2D() {
-
-                @Override
-                public double doubleValue(final int row, final int col) {
-                    return myTransposed.doubleValue(col, row);
-                }
-
-                @Override
-                public int getColDim() {
-                    return structure.countVariables();
-                }
-
-                @Override
-                public int getRowDim() {
-                    return m;
-                }
-
-                @Override
-                public void set(final int row, final int col, final double value) {
-
-                    myTransposed.set(col, row, value);
-
-                    if (row < structure.nbIdty) {
-                        if (col >= n - m && value == 1D) {
-                            Transposed.this.update(row, col);
-                        }
-                    } else {
-                        myTransposed.add(col, m + 1, -value);
-                    }
-                }
-
-            };
-        }
-
-        @Override
-        Primitive1D newConstraintsRHS() {
-
-            return new Primitive1D() {
-
-                @Override
-                public double doubleValue(final int index) {
-                    return myTransposed.doubleValue(n, index);
-                }
-
-                @Override
-                public void set(final int index, final double value) {
-
-                    if (structure.nbArti > 0) {
-                        myTransposed.set(n - m + index, index, ONE);
-                    }
-
-                    myTransposed.set(n, index, value);
-
-                    if (index >= structure.nbIdty) {
-                        myTransposed.add(n, m + 1, -value);
-                    }
-                }
-
-                @Override
-                public int size() {
-                    return m;
-                }
-
-            };
-        }
-
-        @Override
-        Primitive1D newObjective() {
-
-            return new Primitive1D() {
-
-                @Override
-                public double doubleValue(final int index) {
-                    return myTransposed.doubleValue(index, m);
-                }
-
-                @Override
-                public void set(final int index, final double value) {
-                    myTransposed.set(index, m, value);
-                }
-
-                @Override
-                public int size() {
-                    return structure.countModelVariables();
-                }
-
-            };
-        }
-
-        @Override
-        void pivot(final SimplexTableauSolver.IterationPoint iterationPoint) {
-
-            int row = iterationPoint.row;
-            int col = iterationPoint.col;
-
-            double[] data = myTransposed.data;
-            int pivotRowIndexBase = row * myColDim;
-
-            this.scale(data, pivotRowIndexBase, col);
-
-            this.doPivot(row, col, data, pivotRowIndexBase);
-
-            this.update(iterationPoint);
-        }
-
-        @Override
-        void restoreObjective() {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        Dense toDense() {
-            return this;
+            return new Dense(this);
         }
 
     }
@@ -1143,32 +873,28 @@ abstract class OldTableau extends SimplexTableau {
         if (OldTableau.isSparse(options)) {
             return new Sparse(FeatureSet.CLASSIC, structure);
         } else {
-            return new Raw(FeatureSet.CLASSIC, structure);
+            return new Dense(FeatureSet.CLASSIC, structure);
         }
     }
 
-    static OldTableau newDense(final ConvexData<?> matrices) {
+    static SimplexTableau newDense(final ConvexData<?> matrices) {
 
         int constrEq = matrices.countConstraints();
 
         LinearStructure structure = new LinearStructure(false, 0, constrEq, matrices.countVariables(), 0, 0, 0);
 
-        OldTableau tableau = new Transposed(FeatureSet.CLASSIC, structure);
+        OldTableau tableau = new Dense(FeatureSet.CLASSIC, structure);
 
         OldTableau.copy(matrices, tableau);
 
         return tableau;
     }
 
-    static Transposed newDense(final LinearSolver.Builder<?> builder) {
-        return builder.newSimplexTableau(Transposed::new);
+    static SimplexTableau newDense(final LinearSolver.Builder<?> builder) {
+        return builder.newSimplexTableau(Dense::new);
     }
 
-    static Raw newRaw(final LinearSolver.Builder<?> builder) {
-        return builder.newSimplexTableau(Raw::new);
-    }
-
-    static Sparse newSparse(final ConvexData<?> matrices) {
+    static SimplexTableau newSparse(final ConvexData<?> matrices) {
 
         int constrEq = matrices.countConstraints();
 
@@ -1181,11 +907,9 @@ abstract class OldTableau extends SimplexTableau {
         return tableau;
     }
 
-    static Sparse newSparse(final LinearSolver.Builder<?> builder) {
+    static SimplexTableau newSparse(final LinearSolver.Builder<?> builder) {
         return builder.newSimplexTableau(Sparse::new);
     }
-
-
 
     /**
      * @param nbConstraints The number of constraints.
@@ -1208,16 +932,7 @@ abstract class OldTableau extends SimplexTableau {
         // mySelector = new IndexSelector(n, included);
 
         // myRemainingArtificials = linearStructure.nbArti;
-    }
 
-    @Override
-    public long countColumns() {
-        return this.getColDim();
-    }
-
-    @Override
-    public long countRows() {
-        return this.getRowDim();
     }
 
     @Override
@@ -1229,10 +944,6 @@ abstract class OldTableau extends SimplexTableau {
     public void set(final long row, final long col, final Comparable<?> value) {
         this.set(row, col, NumberDefinition.doubleValue(value));
     }
-
-
-
-
 
     int findNextPivotColumn(final Access1D<Double> auxiliaryRow, final Access1D<Double> objectiveRow) {
 
@@ -1292,8 +1003,7 @@ abstract class OldTableau extends SimplexTableau {
 
             if (j >= 0 && j < nbModVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated,
-                        excluded);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated, excluded);
 
                 if (maybe != null) {
                     retVal.add(maybe);
@@ -1313,17 +1023,6 @@ abstract class OldTableau extends SimplexTableau {
      * @return The (phase 2) objective function value
      */
     abstract double getValue();
-
-    @Override
-    boolean isAbleToExtractDual() {
-        return structure.nbIdty + structure.nbArti == structure.countConstraints();
-    }
-
-
-
-
-
-
 
     @Override
     abstract Primitive2D newConstraintsBody();
@@ -1461,10 +1160,6 @@ abstract class OldTableau extends SimplexTableau {
     }
 
     abstract Dense toDense();
-
-
-
-
 
     /**
      * The current, phase 1 or 2, objective function value

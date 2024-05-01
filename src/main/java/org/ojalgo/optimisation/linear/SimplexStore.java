@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -349,18 +350,6 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
-    /**
-     * Generate a collection of cut candidates, from the current state (of the tableau).
-     *
-     * @param solution Current (iteration) solution
-     * @param integer Are the variables defined as integer or not?
-     * @param tolerance To determine if an ineteger variable value actually is integer or not.
-     * @param fractionality How far "away" from an integer value a tableau row (variable value) must be to be
-     *        used as a potential cut
-     * @return A collection of potential cuts
-     */
-    abstract Collection<Equation> generateCutCandidates(double[] solution, boolean[] integer, boolean[] negated, NumberContext tolerance, double fractionality);
-
     final ColumnState getColumnState(final int index) {
         return myPartition.get(index);
     }
@@ -582,7 +571,7 @@ abstract class SimplexStore {
     }
 
     final void update(final SimplexTableauSolver.IterationPoint point) {
-        this.update(point.row, point.col);
+        this.update(point.row(), point.column());
     }
 
     final void updateBasis(final int exit, final ColumnState exitToBound, final int enter) {
@@ -609,4 +598,19 @@ abstract class SimplexStore {
         return this;
     }
 
+
+    /**
+     * Generate a collection of cut candidates, from the current state (of the tableau).
+     *
+     * @param solution Current (iteration) solution
+     * @param integer Are the variables defined as integer or not?
+     * @param tolerance To determine if an ineteger variable value actually is integer or not.
+     * @param fractionality How far "away" from an integer value a tableau row (variable value) must be to be
+     *        used as a potential cut
+     * @return A collection of potential cuts
+     */
+    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
+            final double fractionality) {
+        return Collections.emptySet();
+    }
 }

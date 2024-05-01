@@ -38,15 +38,15 @@ import org.ojalgo.type.context.NumberContext;
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
     /**
-     * For which (type of) solver is this store intended?
+     * Which (type of) solver is using this store?
      */
     static enum FeatureSet {
         /**
-         * Used by the old {@link SimplexTableauSolver}.
+         * The old {@link SimplexTableauSolver}.
          */
         CLASSIC,
         /**
-         * Used by the new {@link SimplexSolver}.
+         * The new {@link SimplexSolver}.
          */
         COMPACT;
     }
@@ -108,13 +108,9 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         return myConstraintsRHS;
     }
 
-
-
     abstract boolean fixVariable(int index, double value);
 
     abstract Collection<Equation> generateCutCandidates(boolean[] integer, NumberContext integralityTolerance, double fractionality);
-
-    abstract boolean isAbleToExtractDual();
 
     abstract Primitive2D newConstraintsBody();
 

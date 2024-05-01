@@ -62,8 +62,8 @@ final class NewTableau extends SimplexTableau {
         return SimplexStore.build(builder, NewTableau::new, basis);
     }
 
+    private double[] myAlternativeObjective = null;
     private final int myColDim;
-    private double[] myCopiedObjectiveRow = null;
     private final double[][] myTableau;
 
     NewTableau(final int mm, final int nn) {
@@ -84,16 +84,6 @@ final class NewTableau extends SimplexTableau {
     }
 
     @Override
-    public long countColumns() {
-        return this.getColDim();
-    }
-
-    @Override
-    public long countRows() {
-        return this.getRowDim();
-    }
-
-    @Override
     public double doubleValue(final int row, final int col) {
         return myTableau[row][col];
     }
@@ -110,7 +100,11 @@ final class NewTableau extends SimplexTableau {
 
     @Override
     public int getRowDim() {
-        return myTableau.length;
+        if (myAlternativeObjective != null) {
+            return myTableau.length + 1;
+        } else {
+            return myTableau.length;
+        }
     }
 
     @Override
@@ -151,7 +145,7 @@ final class NewTableau extends SimplexTableau {
 
     @Override
     void copyObjective() {
-        myCopiedObjectiveRow = Arrays.copyOf(myTableau[m], myColDim);
+        myAlternativeObjective = Arrays.copyOf(myTableau[m], myColDim);
     }
 
     @Override
@@ -290,12 +284,6 @@ final class NewTableau extends SimplexTableau {
     }
 
     @Override
-    boolean isAbleToExtractDual() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     Primitive2D newConstraintsBody() {
 
         double[][] store = myTableau;
@@ -390,8 +378,8 @@ final class NewTableau extends SimplexTableau {
             }
         }
 
-        if (myCopiedObjectiveRow != null) {
-            NewTableau.pivotRow(myCopiedObjectiveRow, col, pivotRow, myColDim);
+        if (myAlternativeObjective != null) {
+            NewTableau.pivotRow(myAlternativeObjective, col, pivotRow, myColDim);
         }
     }
 
@@ -413,8 +401,8 @@ final class NewTableau extends SimplexTableau {
 
     @Override
     void restoreObjective() {
-        myTableau[m] = myCopiedObjectiveRow;
-        myCopiedObjectiveRow = null;
+        myTableau[m] = myAlternativeObjective;
+        myAlternativeObjective = null;
     }
 
     @Override

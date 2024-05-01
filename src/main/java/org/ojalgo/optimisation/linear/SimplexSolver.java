@@ -27,6 +27,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ConstraintsMap;
@@ -110,6 +111,10 @@ abstract class SimplexSolver extends LinearSolver {
             return index >= 0 ? myExcluded[index] : index;
         }
 
+        int indexOf(final int column) {
+            return IndexOf.indexOf(myExcluded, column);
+        }
+
         void reset() {
             index = -1;
             from = ColumnState.BASIS;
@@ -171,6 +176,10 @@ abstract class SimplexSolver extends LinearSolver {
 
         int column() {
             return index >= 0 ? myIncluded[index] : index;
+        }
+
+        int indexOf(final int column) {
+            return IndexOf.indexOf(myIncluded, column);
         }
 
         void reset() {
