@@ -395,6 +395,11 @@ public class IntegerProblems extends OptimisationIntegerTests {
     @Test
     public void testSimpleTSP20160701() {
 
+        //  OPTIMAL 917.3134949394164 @ { 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 4, 5, 0 }
+
+        Result expected = Result.of(917.3134949394164, State.OPTIMAL, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+                0, 1, 0, 0, 0, 0, 1, 2, 4, 5, 0);
+
         int n = 6;
         double[][] c = new double[n][n];
         c[0][0] = 1.7976931348623157E308;
@@ -489,6 +494,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         if (OptimisationIntegerTests.DEBUG) {
             model.options.debug(IntegerSolver.class);
+            model.setKnownSolution(expected);
         }
 
         Optimisation.Result result = model.minimise();
