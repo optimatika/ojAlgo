@@ -24,12 +24,15 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.Map.Entry;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
@@ -48,16 +51,40 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("burkardt", modelName, false);
 
-        // model.options.debug(Optimisation.Solver.class);
-        // model.options.debug(IntegerSolver.class);
-        // model.options.debug(ConvexSolver.class);
-        // model.options.debug(LinearSolver.class);
-        // model.options.progress(IntegerSolver.class);
-        // model.options.validate = false;
-        // model.options.mip_defer = 0.25;
-        // model.options.mip_gap = 1.0E-5;
+        for (Entry<String, Integration<LinearSolver>> entry : INTEGRATIONS.entrySet()) {
 
-        ModelFileTest.assertValues(model, expMinValString, expMaxValString, BurkardtDatasetsMps.ACCURACY);
+            String key = entry.getKey();
+            Integration<LinearSolver> integration = entry.getValue();
+
+            if (DEBUG) {
+                BasicLogger.debug();
+                BasicLogger.debug("########################################################################################");
+                BasicLogger.debug(key);
+                BasicLogger.debug("########################################################################################");
+            }
+
+            ExpressionsBasedModel.clearIntegrations();
+            ExpressionsBasedModel.addIntegration(integration);
+
+            if (DEBUG) {
+                // model.options.debug(Optimisation.Solver.class);
+                // model.options.debug(IntegerSolver.class);
+                // model.options.debug(ConvexSolver.class);
+                // model.options.debug(LinearSolver.class);
+                // model.options.progress(IntegerSolver.class);
+                // model.options.validate = false;
+                // model.options.mip_defer = 0.25;
+                // model.options.mip_gap = 1.0E-5;
+            }
+
+            ModelFileTest.assertValues(model, expMinValString, expMaxValString, BurkardtDatasetsMps.ACCURACY);
+            ExpressionsBasedModel.clearIntegrations();
+
+            if (DEBUG) {
+                BasicLogger.debug(model);
+                BasicLogger.debug();
+            }
+        }
 
         return model;
     }

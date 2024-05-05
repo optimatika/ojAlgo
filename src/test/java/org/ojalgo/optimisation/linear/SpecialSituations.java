@@ -21,11 +21,14 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.linear.LinearSolver.Builder;
 import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
 
 /**
@@ -34,10 +37,6 @@ import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
  * @author apete
  */
 public class SpecialSituations extends OptimisationLinearTests {
-
-    public SpecialSituations() {
-        super();
-    }
 
     @Test
     public void testDegeneracy() {
@@ -57,54 +56,58 @@ public class SpecialSituations extends OptimisationLinearTests {
         // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = OldTableau.newDense(builder);
-        SimplexTableau sparse = OldTableau.newSparse(builder);
+        Function<LinearStructure, SimplexTableau> factory1 = OptimisationLinearTests.TABLEAU_FACTORIES.get(0);
+        for (Function<LinearStructure, SimplexTableau> factory2 : OptimisationLinearTests.TABLEAU_FACTORIES) {
 
-        // Dense and spare tableau implementations behave equal
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableau tableau1 = builder.newSimplexTableau(factory1);
+            SimplexTableau tableau2 = builder.newSimplexTableau(factory2);
 
-        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
-        pivot.switchToPhase2();
+            // Dense and spare tableau implementations behave equal
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        pivot.row(1);
-        pivot.column(0);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
+            pivot.switchToPhase2();
 
-        pivot.row(2);
-        pivot.column(1);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            pivot.row = 1;
+            pivot.col = 0;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        pivot.row(2);
-        pivot.column(3);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            pivot.row = 2;
+            pivot.col = 1;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        // Correct optimal value
-        TestUtils.assertEquals(4.0, dense.doubleValue(3, 5 + 3));
+            pivot.row = 2;
+            pivot.col = 3;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        // Same fix result
-        dense.fixVariable(0, 1.5);
-        sparse.fixVariable(0, 1.5);
-        TestUtils.assertEquals(dense, sparse);
+            // Correct optimal value
+            TestUtils.assertEquals(4.0, tableau1.doubleValue(3, 5 + 3));
 
-        // Make optimal again
-        pivot.row(1);
-        pivot.column(1);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            // Same fix result
+            tableau1.fixVariable(0, 1.5);
+            tableau2.fixVariable(0, 1.5);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        // Correct when fixing on the solver
-        lp.fixVariable(0, 1.5);
-        Result fixed = lp.solve();
-        TestUtils.assertEquals(-4.0, fixed.getValue());
-        TestUtils.assertEquals(1.5, fixed.doubleValue(0));
-        TestUtils.assertEquals(1.0, fixed.doubleValue(1));
+            // Make optimal again
+            pivot.row = 1;
+            pivot.col = 1;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
+
+            // Correct when fixing on the solver
+            lp.fixVariable(0, 1.5);
+            Result fixed = lp.solve();
+            TestUtils.assertEquals(-4.0, fixed.getValue());
+            TestUtils.assertEquals(1.5, fixed.doubleValue(0));
+            TestUtils.assertEquals(1.0, fixed.doubleValue(1));
+        }
     }
 
     @Test
@@ -124,27 +127,31 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = OldTableau.newDense(builder);
-        SimplexTableau sparse = OldTableau.newSparse(builder);
+        Function<LinearStructure, SimplexTableau> factory1 = OptimisationLinearTests.TABLEAU_FACTORIES.get(0);
+        for (Function<LinearStructure, SimplexTableau> factory2 : OptimisationLinearTests.TABLEAU_FACTORIES) {
 
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableau tableau1 = builder.newSimplexTableau(factory1);
+            SimplexTableau tableau2 = ((Builder<?>) builder).newSimplexTableau(factory2);
 
-        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
-        pivot.switchToPhase2();
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        pivot.row(0);
-        pivot.column(1);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
+            pivot.switchToPhase2();
 
-        pivot.row(1);
-        pivot.column(0);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            pivot.row = 0;
+            pivot.col = 1;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        TestUtils.assertEquals(42.0, dense.doubleValue(2, 4 + 2));
+            pivot.row = 1;
+            pivot.col = 0;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
+
+            TestUtils.assertEquals(42.0, tableau2.doubleValue(2, 4 + 2));
+        }
     }
 
     @Test
@@ -164,27 +171,31 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         TestUtils.assertStateAndSolution(expected, actual);
 
-        SimplexTableau dense = OldTableau.newDense(builder);
-        SimplexTableau sparse = OldTableau.newSparse(builder);
+        Function<LinearStructure, SimplexTableau> factory1 = OptimisationLinearTests.TABLEAU_FACTORIES.get(0);
+        for (Function<LinearStructure, SimplexTableau> factory2 : OptimisationLinearTests.TABLEAU_FACTORIES) {
 
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableau tableau1 = builder.newSimplexTableau(factory1);
+            SimplexTableau tableau2 = builder.newSimplexTableau(factory2);
 
-        SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
-        pivot.switchToPhase2();
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        pivot.row(0);
-        pivot.column(0);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            SimplexTableauSolver.IterationPoint pivot = new SimplexTableauSolver.IterationPoint();
+            pivot.switchToPhase2();
 
-        pivot.row(1);
-        pivot.column(1);
-        dense.pivot(pivot);
-        sparse.pivot(pivot);
-        TestUtils.assertEquals(dense, sparse);
+            pivot.row = 0;
+            pivot.col = 0;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
 
-        TestUtils.assertEquals(80.0, dense.doubleValue(2, 4 + 2));
+            pivot.row = 1;
+            pivot.col = 1;
+            tableau1.pivot(pivot);
+            tableau2.pivot(pivot);
+            TestUtils.assertEquals(tableau1, tableau2);
+
+            TestUtils.assertEquals(80.0, tableau2.doubleValue(2, 4 + 2));
+        }
     }
 
 }

@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation.linear;
 
 import java.util.Random;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -61,11 +62,11 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        DualSimplexSolver tableauSolver = NewTableau.build(simplified).newDualSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
-
-        DualSimplexSolver revisedSolver = RevisedStore.build(simplified).newDualSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            DualSimplexSolver solver = simplex.newDualSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
+        }
     }
 
     static void doTestDualVariants(final LinearSolver.GeneralBuilder builder, final Result expected, final int... basis) {
@@ -76,21 +77,22 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        DualSimplexSolver tableauSolver = NewTableau.build(builder, basis).newDualSimplexSolver(options, basis);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, tableauSolver);
-
-        DualSimplexSolver revisedSolver = RevisedStore.build(builder, basis).newDualSimplexSolver(options, basis);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(builder, factory, basis);
+            DualSimplexSolver solver = simplex.newDualSimplexSolver(options, basis);
+            RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
+        }
     }
 
-    static void doTestOneVariant(final ExpressionsBasedModel model, final Result expected, final SimplexSolver solver) {
+    static void doTestOneVariant(final ExpressionsBasedModel model, final Result expected, final SimplexSolver solver,
+            final Class<? extends SimplexStore> simplexType) {
 
-        String solverClassSimpleName = solver.getClass().getSimpleName();
+        String solverName = solver.getClass().getSimpleName() + "-" + simplexType.getSimpleName();
 
         if (DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug("==================================================");
-            BasicLogger.debug(solverClassSimpleName);
+            BasicLogger.debug(solverName);
             BasicLogger.debug("==================================================");
             BasicLogger.debug();
         }
@@ -99,7 +101,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
         if (DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug(solverClassSimpleName + ": " + actual);
+            BasicLogger.debug(solverName + ": " + actual);
             BasicLogger.debug();
         }
 
@@ -110,8 +112,8 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         RevisedSimplexSolverTest.assertEquals(expected, actual);
     }
 
-    static void doTestOneVariant(final Result expected, final SimplexSolver solver) {
-        RevisedSimplexSolverTest.doTestOneVariant(null, expected, solver);
+    static void doTestOneVariant(final Result expected, final SimplexSolver solver, final Class<? extends SimplexStore> simplexType) {
+        RevisedSimplexSolverTest.doTestOneVariant(null, expected, solver, simplexType);
     }
 
     static void doTestPhasedVariants(final ExpressionsBasedModel model, final Result expected) {
@@ -124,11 +126,11 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PhasedSimplexSolver tableauSolver = NewTableau.build(simplified).newPhasedSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
-
-        PhasedSimplexSolver revisedSolver = RevisedStore.build(simplified).newPhasedSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
+        }
     }
 
     static void doTestPhasedVariants(final LinearSolver.GeneralBuilder builder, final Result expected) {
@@ -139,11 +141,11 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PhasedSimplexSolver tableauSolver = SimplexStore.build(builder).newPhasedSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, tableauSolver);
-
-        PhasedSimplexSolver revisedSolver = SimplexStore.build(builder).newPhasedSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(builder, factory);
+            PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
+        }
     }
 
     static void doTestPrimalVariants(final ExpressionsBasedModel model, final Result expected) {
@@ -155,12 +157,11 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         if (DEBUG) {
             options.debug(LinearSolver.class);
         }
-
-        PrimalSimplexSolver tableauSolver = NewTableau.build(simplified).newPrimalSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, tableauSolver);
-
-        PrimalSimplexSolver revisedSolver = RevisedStore.build(simplified).newPrimalSimplexSolver(options);
-        RevisedSimplexSolverTest.doTestOneVariant(model, expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            PrimalSimplexSolver solver = simplex.newPrimalSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
+        }
     }
 
     static void doTestPrimalVariants(final LinearSolver.GeneralBuilder builder, final Result expected, final int... basis) {
@@ -171,11 +172,11 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
 
-        PrimalSimplexSolver tableauSolver = NewTableau.build(builder, basis).newPrimalSimplexSolver(options, basis);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, tableauSolver);
-
-        PrimalSimplexSolver revisedSolver = RevisedStore.build(builder, basis).newPrimalSimplexSolver(options, basis);
-        RevisedSimplexSolverTest.doTestOneVariant(expected, revisedSolver);
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexStore.build(builder, factory, basis);
+            PrimalSimplexSolver solver = simplex.newPrimalSimplexSolver(options, basis);
+            RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
+        }
     }
 
     /**
@@ -443,13 +444,13 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         c2.set(x1, -1);
         c2.set(x2013, 5100);
         c2.set(x2014, -5000);
-        c2.upper(0 - (5100 * 1245) - (-5000 * 1269));
+        c2.upper(0 - 5100 * 1245 - -5000 * 1269);
 
         Expression c3 = model.addExpression("c3");
         c3.set(x1, 1);
         c3.set(x2013, 5100);
         c3.set(x2014, -5000);
-        c3.lower(0 - (5100 * 1245) - (-5000 * 1269));
+        c3.lower(0 - 5100 * 1245 - -5000 * 1269);
 
         Expression c4 = model.addExpression("c4");
         c4.set(x1, -1);
@@ -457,7 +458,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         c4.set(x2014, 150);
         c4.set(x2015p, -5000);
         c4.set(x2015n, 5000);
-        c4.upper(0 - (5100 * 1245) - (150 * 1269));
+        c4.upper(0 - 5100 * 1245 - 150 * 1269);
 
         Expression c5 = model.addExpression("c5");
         c5.set(x1, 1);
@@ -465,14 +466,14 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         c5.set(x2014, 150);
         c5.set(x2015p, -5000);
         c5.set(x2015n, 5000);
-        c5.lower(0 - (5100 * 1245) - (150 * 1269));
+        c5.lower(0 - 5100 * 1245 - 150 * 1269);
 
         Expression c6 = model.addExpression("c6");
         c6.set(x2013, 5000);
         c6.set(x2014, 5000);
         c6.set(x2015p, 5000);
         c6.set(x2015n, -5000);
-        c6.level(19_105_000 - (5000 * 1245) - (5000 * 1269));
+        c6.level(19_105_000 - 5000 * 1245 - 5000 * 1269);
 
         Result expected = Result.of(4850, State.OPTIMAL, 4850, 0, 0, 1307, 0);
 
@@ -552,8 +553,8 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         double b1 = 10.0 * random.nextDouble();
         double b2 = -10.0 * random.nextDouble();
 
-        double a1 = (2.0 * random.nextDouble()) - 1.0;
-        double a2 = (2.0 * random.nextDouble()) - 1.0;
+        double a1 = 2.0 * random.nextDouble() - 1.0;
+        double a2 = 2.0 * random.nextDouble() - 1.0;
 
         model.addExpression().add(x, a1).add(y, 1.0).upper(b1);
         model.addExpression().add(x, a2).add(y, 1.0).lower(b2);

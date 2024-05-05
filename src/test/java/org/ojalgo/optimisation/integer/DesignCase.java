@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
@@ -97,6 +98,7 @@ public class DesignCase extends OptimisationIntegerTests {
      * bc_hao.pdf
      */
     @Test
+    @Tag("new_lp_problem")
     public void testBranchAndCutSimpleExample() {
 
         // Eg0

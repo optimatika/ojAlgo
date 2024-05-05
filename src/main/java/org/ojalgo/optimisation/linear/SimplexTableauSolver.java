@@ -68,21 +68,20 @@ final class SimplexTableauSolver extends LinearSolver {
 
     static final class IterationPoint {
 
-        private int col;
         private boolean myPhase1 = true;
-        private int row;
+
+        int col;
+        int row;
 
         IterationPoint() {
             super();
             this.reset();
         }
 
-        int column() {
-            return col;
-        }
-
-        void column(final int column) {
-            col = column;
+        @Override
+        public String toString() {
+            int phase = myPhase1 ? 1 : 2;
+            return phase + "-[row=" + row + ", col=" + col + "]";
         }
 
         boolean isPhase1() {
@@ -100,14 +99,6 @@ final class SimplexTableauSolver extends LinearSolver {
 
         void returnToPhase1() {
             myPhase1 = true;
-        }
-
-        int row() {
-            return row;
-        }
-
-        void row(final int row) {
-            this.row = row;
         }
 
         void switchToPhase2() {
@@ -337,7 +328,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
-        SimplexTableau retVal = OldTableau.make(structure, model.options);
+        SimplexTableau retVal = SimplexTableau.make(structure, model.options);
 
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
@@ -571,7 +562,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0);
 
-        SimplexTableau retVal = OldTableau.make(structure, options);
+        SimplexTableau retVal = SimplexTableau.make(structure, options);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
@@ -636,7 +627,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0);
 
-        SimplexTableau retVal = OldTableau.make(structure, options);
+        SimplexTableau retVal = SimplexTableau.make(structure, options);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
@@ -856,8 +847,8 @@ final class SimplexTableauSolver extends LinearSolver {
                 }
 
                 if (enter >= 0) {
-                    myPoint.row(i);
-                    myPoint.column(enter);
+                    myPoint.row = i;
+                    myPoint.col = enter;
                     this.performIteration(myPoint);
                 }
             }
@@ -1000,13 +991,13 @@ final class SimplexTableauSolver extends LinearSolver {
             this.setState(Optimisation.State.FEASIBLE);
         }
 
-        myPoint.column(this.findNextPivotCol());
+        myPoint.col = this.findNextPivotCol();
 
-        if (myPoint.column() >= 0) {
+        if (myPoint.col >= 0) {
 
-            myPoint.row(this.findNextPivotRow());
+            myPoint.row = this.findNextPivotRow();
 
-            if (myPoint.row() >= 0) {
+            if (myPoint.row >= 0) {
 
                 retVal = true;
 
@@ -1034,7 +1025,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (this.isLogDebug()) {
             if (retVal) {
-                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row(), myTableau.included[myPoint.row()], myPoint.column());
+                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.included[myPoint.row], myPoint.col);
             } else {
                 this.log("\n==>>\tNo more iterations needed/possible.\n");
             }
@@ -1098,7 +1089,7 @@ final class SimplexTableauSolver extends LinearSolver {
     int findNextPivotRow() {
 
         int numerCol = myTableau.n;
-        int denomCol = myPoint.column();
+        int denomCol = myPoint.col;
 
         boolean phase1 = myPoint.isPhase1();
         boolean phase2 = myPoint.isPhase2();
@@ -1161,15 +1152,15 @@ final class SimplexTableauSolver extends LinearSolver {
 
     void performIteration(final SimplexTableauSolver.IterationPoint pivot) {
 
-        double tmpPivotElement = myTableau.doubleValue(pivot.row(), pivot.column());
+        double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
         int tmpColRHS = myTableau.n;
-        double tmpPivotRHS = myTableau.doubleValue(pivot.row(), tmpColRHS);
+        double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
 
         myTableau.pivot(pivot);
 
         if (this.isLogDebug()) {
-            this.log("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row(), pivot.column(), tmpPivotElement,
-                    myTableau.doubleValue(pivot.row(), pivot.column()), tmpPivotRHS, myTableau.doubleValue(pivot.row(), tmpColRHS));
+            this.log("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row, pivot.col, tmpPivotElement,
+                    myTableau.doubleValue(pivot.row, pivot.col), tmpPivotRHS, myTableau.doubleValue(pivot.row, tmpColRHS));
         }
 
         if (this.isLogDebug() && options.validate) {

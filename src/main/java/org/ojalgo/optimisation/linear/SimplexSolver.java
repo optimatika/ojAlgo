@@ -111,6 +111,10 @@ abstract class SimplexSolver extends LinearSolver {
             return index >= 0 ? myExcluded[index] : index;
         }
 
+        void column(final int column) {
+            index = this.indexOf(column);
+        }
+
         int indexOf(final int column) {
             return IndexOf.indexOf(myExcluded, column);
         }
@@ -328,8 +332,11 @@ abstract class SimplexSolver extends LinearSolver {
                 negated[j] = true;
             }
         }
+        
+        return mySimplex.generateCutCandidates(integer, ALGORITHM, fractionality);
 
-        return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
+
+       // return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
     }
 
     @Override
@@ -749,7 +756,7 @@ abstract class SimplexSolver extends LinearSolver {
             int j = excluded[je];
             if (j < n) {
 
-                denom = mySimplex.getTableauElement(exit, je);
+                denom = mySimplex.getCurrentElement(exit, je);
 
                 if (!ALGORITHM.isZero(denom)) {
 
@@ -832,7 +839,7 @@ abstract class SimplexSolver extends LinearSolver {
         for (int ji = 0; ji < included.length; ji++) {
             int j = included[ji];
 
-            denom = mySimplex.getTableauElement(ji, enter);
+            denom = mySimplex.getCurrentElement(ji, enter);
 
             if (!ALGORITHM.isZero(denom)) {
 

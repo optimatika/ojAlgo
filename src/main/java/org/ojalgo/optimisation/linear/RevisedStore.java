@@ -23,18 +23,22 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
+import org.ojalgo.type.context.NumberContext;
 
 final class RevisedStore extends SimplexStore {
 
@@ -50,14 +54,6 @@ final class RevisedStore extends SimplexStore {
 
     private static R064Store newRow(final int nbCols) {
         return R064Store.FACTORY.make(1, nbCols);
-    }
-
-    static RevisedStore build(final ExpressionsBasedModel model) {
-        return SimplexStore.build(model, RevisedStore::new);
-    }
-
-    static RevisedStore build(final LinearSolver.GeneralBuilder builder, final int... basis) {
-        return SimplexStore.build(builder, RevisedStore::new, basis);
     }
 
     /**
@@ -258,6 +254,21 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    double getCurrentElement(final ExitInfo exit, final int je) {
+        return a.doubleValue(je);
+    }
+
+    @Override
+    double getCurrentElement(final int i, final EnterInfo enter) {
+        return y.doubleValue(i);
+    }
+
+    @Override
+    double getCurrentRHS(final int i) {
+        return x.doubleValue(i);
+    }
+
+    @Override
     double getInfeasibility(final int i) {
 
         int ii = included[i];
@@ -280,21 +291,6 @@ final class RevisedStore extends SimplexStore {
     @Override
     double getReducedCost(final int je) {
         return d.doubleValue(je);
-    }
-
-    @Override
-    double getTableauElement(final ExitInfo exit, final int je) {
-        return a.doubleValue(je);
-    }
-
-    @Override
-    double getTableauElement(final int i, final EnterInfo enter) {
-        return y.doubleValue(i);
-    }
-
-    @Override
-    double getTableauRHS(final int i) {
-        return x.doubleValue(i);
     }
 
     @Override
@@ -336,6 +332,11 @@ final class RevisedStore extends SimplexStore {
             }
 
         };
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+        return Collections.emptySet();
     }
 
 }

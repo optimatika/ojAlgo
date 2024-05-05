@@ -21,32 +21,39 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 
 abstract class OptimisationLinearTests {
 
-    public static final ExpressionsBasedModel.Integration<LinearSolver> DEFAULT_DENSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-        opt.experimental = false;
-        opt.sparse = Boolean.FALSE;
-    });
-    public static final ExpressionsBasedModel.Integration<LinearSolver> DEFAULT_SPARSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-        opt.experimental = false;
-        opt.sparse = Boolean.TRUE;
-    });
-    public static final ExpressionsBasedModel.Integration<LinearSolver> EXPERIMENTAL_DENSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-        opt.experimental = true;
-        opt.sparse = Boolean.FALSE;
-    });
-    public static final ExpressionsBasedModel.Integration<LinearSolver> EXPERIMENTAL_SPARSE = LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-        opt.experimental = true;
-        opt.sparse = Boolean.TRUE;
-    });
-
-    public static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Def-Dense", DEFAULT_DENSE, "Def-Sparse",
-            DEFAULT_SPARSE, "Exp-Dense", EXPERIMENTAL_DENSE, "Exp-Sparse", EXPERIMENTAL_SPARSE);
-
     static final boolean DEBUG = false;
+
+    static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Standard-Default",
+            LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = false;
+                opt.sparse = null;
+            }), "Standard-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = false;
+                opt.sparse = Boolean.FALSE;
+            }), "Standard-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = false;
+                opt.sparse = Boolean.TRUE;
+            }), "Experimental-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = true;
+                opt.sparse = null;
+            }), "Experimental-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = true;
+                opt.sparse = Boolean.FALSE;
+            }), "Experimental-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.experimental = true;
+                opt.sparse = Boolean.TRUE;
+            }));
+
+    static final List<Function<LinearStructure, SimplexStore>> STORE_FACTORIES = List.of(DenseTableau::new, RevisedStore::new, SparseTableau::new);
+
+    static final List<Function<LinearStructure, SimplexTableau>> TABLEAU_FACTORIES = List.of(DenseTableau::new, SparseTableau::new);
 
 }

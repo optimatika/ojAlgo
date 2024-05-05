@@ -335,7 +335,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables);
 
-            SimplexTableau tableau = OldTableau.make(structure, options);
+            SimplexTableau tableau = SimplexTableau.make(structure, options);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -473,7 +473,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return simplex;
         }
 
-        <T extends OldTableau> T newSimplexTableau(final Function<LinearStructure, T> tableauFactory) {
+        <T extends SimplexTableau> T newSimplexTableau(final Function<LinearStructure, T> tableauFactory) {
 
             int nbVars = this.countVariables();
             int nbEqus = this.countEqualityConstraints();
@@ -577,7 +577,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 if (Boolean.TRUE.equals(model.options.sparse)) {
                     return new RevisedStore(structure);
                 } else if (Boolean.FALSE.equals(model.options.sparse)) {
-                    return new NewTableau(structure);
+                    return new DenseTableau(structure);
                 } else {
                     return SimplexStore.newInstance(structure);
                 }

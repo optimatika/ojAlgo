@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -204,7 +203,7 @@ abstract class SimplexStore {
         if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
             return new RevisedStore(structure);
         } else {
-            return new NewTableau(structure);
+            return new DenseTableau(structure);
         }
     }
 
@@ -350,11 +349,28 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
+
+
     final ColumnState getColumnState(final int index) {
         return myPartition.get(index);
     }
 
     abstract double getCost(int i);
+
+    /**
+     * The current (tableau) constraint body element.
+     */
+    abstract double getCurrentElement(ExitInfo exit, int je);
+
+    /**
+     * The current (tableau) constraint body element.
+     */
+    abstract double getCurrentElement(int i, EnterInfo enter);
+
+    /**
+     * The current (tableau) constraint RHS.
+     */
+    abstract double getCurrentRHS(int i);
 
     /**
      * Indices of columns/variables at their lower bounds.
@@ -407,7 +423,7 @@ abstract class SimplexStore {
      */
     final double getLowerGap(final int i) {
 
-        double xi = this.getTableauRHS(i);
+        double xi = this.getCurrentRHS(i);
         double lb = this.getLowerBound(included[i]);
 
         if (xi > lb) {
@@ -426,12 +442,6 @@ abstract class SimplexStore {
 
     abstract double getReducedCost(int je);
 
-    abstract double getTableauElement(ExitInfo exit, int je);
-
-    abstract double getTableauElement(int i, EnterInfo enter);
-
-    abstract double getTableauRHS(int i);
-
     final double getUpperBound(final int index) {
         return myUpperBounds[index];
     }
@@ -445,7 +455,7 @@ abstract class SimplexStore {
      */
     final double getUpperGap(final int i) {
 
-        double xi = this.getTableauRHS(i);
+        double xi = this.getCurrentRHS(i);
         double ub = this.getUpperBound(included[i]);
 
         if (ub > xi) {
@@ -570,10 +580,6 @@ abstract class SimplexStore {
         myPartition.extract(ColumnState.BASIS, true, excluded);
     }
 
-    final void update(final SimplexTableauSolver.IterationPoint point) {
-        this.update(point.row(), point.column());
-    }
-
     final void updateBasis(final int exit, final ColumnState exitToBound, final int enter) {
 
         int inclExit = included[exit];
@@ -598,19 +604,6 @@ abstract class SimplexStore {
         return this;
     }
 
+    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
 
-    /**
-     * Generate a collection of cut candidates, from the current state (of the tableau).
-     *
-     * @param solution Current (iteration) solution
-     * @param integer Are the variables defined as integer or not?
-     * @param tolerance To determine if an ineteger variable value actually is integer or not.
-     * @param fractionality How far "away" from an integer value a tableau row (variable value) must be to be
-     *        used as a potential cut
-     * @return A collection of potential cuts
-     */
-    Collection<Equation> generateCutCandidates(final double[] solution, final boolean[] integer, final boolean[] negated, final NumberContext tolerance,
-            final double fractionality) {
-        return Collections.emptySet();
-    }
 }

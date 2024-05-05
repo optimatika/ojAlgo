@@ -240,37 +240,36 @@ public interface BasicLogger {
 
         private static void printmtrx(final BasicLogger appender, final Access2D<?> matrix, final NumberContext context, final boolean plain) {
 
-            final int tmpRowDim = (int) matrix.countRows();
-            final int tmpColDim = (int) matrix.countColumns();
+            int nbRows = matrix.getRowDim();
+            int nbCols = matrix.getColDim();
 
-            final String[][] tmpElements = new String[tmpRowDim][tmpColDim];
+            String[][] elements = new String[nbRows][nbCols];
 
-            int tmpWidth = 0;
-            Comparable<?> tmpElementNumber;
-            String tmpElementString;
-            for (int j = 0; j < tmpColDim; j++) {
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpElementNumber = matrix.get(i, j);
-                    tmpElementString = PrivateDetails.toString(tmpElementNumber, context, plain);
-                    tmpWidth = Math.max(tmpWidth, tmpElementString.length());
-                    tmpElements[i][j] = tmpElementString;
+            int width = 0;
+            Comparable<?> elementNumber;
+            String elementString;
+            for (int j = 0; j < nbCols; j++) {
+                for (int i = 0; i < nbRows; i++) {
+                    elementNumber = matrix.get(i, j);
+                    elementString = PrivateDetails.toString(elementNumber, context, plain);
+                    width = Math.max(width, elementString.length());
+                    elements[i][j] = elementString;
                 }
             }
-            tmpWidth++;
+            width++;
 
-            int tmpPadding;
-            for (int i = 0; i < tmpRowDim; i++) {
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpElementString = tmpElements[i][j];
-                    tmpPadding = tmpWidth - tmpElementString.length();
-                    for (int p = 0; p < tmpPadding; p++) {
+            int padding;
+            for (int i = 0; i < nbRows; i++) {
+                for (int j = 0; j < nbCols; j++) {
+                    elementString = elements[i][j];
+                    padding = width - elementString.length();
+                    for (int p = 0; p < padding; p++) {
                         appender.print(ASCII.SP);
                     }
-                    appender.print(tmpElementString);
+                    appender.print(elementString);
                 }
                 appender.println();
             }
-
         }
 
         private static String toString(final Comparable<?> number, final NumberContext context, final boolean plain) {
