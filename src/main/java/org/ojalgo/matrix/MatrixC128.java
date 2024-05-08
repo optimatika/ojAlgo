@@ -50,7 +50,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
 
-    public static final class DenseReceiver extends Mutator2D<ComplexNumber, MatrixC128, PhysicalStore<ComplexNumber>> {
+    public static final class DenseReceiver extends DenseMutator2D<ComplexNumber, MatrixC128> {
 
         DenseReceiver(final PhysicalStore<ComplexNumber> delegate) {
             super(delegate);
@@ -70,20 +70,20 @@ public final class MatrixC128 extends BasicMatrix<ComplexNumber, MatrixC128> {
         }
 
         @Override
-        MatrixC128.DenseReceiver dense(final PhysicalStore<ComplexNumber> store) {
-            return new MatrixC128.DenseReceiver(store);
+        MatrixC128.DenseReceiver dense(final PhysicalStore<ComplexNumber> delegate) {
+            return new MatrixC128.DenseReceiver(delegate);
         }
 
         @Override
-        MatrixC128.SparseReceiver sparse(final SparseStore<ComplexNumber> store) {
-            return new MatrixC128.SparseReceiver(store);
+        MatrixC128.SparseReceiver sparse(final SparseStore.Builder<ComplexNumber> delegate) {
+            return new MatrixC128.SparseReceiver(delegate);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<ComplexNumber, MatrixC128, SparseStore<ComplexNumber>> {
+    public static final class SparseReceiver extends SparseMutator2D<ComplexNumber, MatrixC128> {
 
-        SparseReceiver(final SparseStore<ComplexNumber> delegate) {
+        SparseReceiver(final SparseStore.Builder<ComplexNumber> delegate) {
             super(delegate);
         }
 

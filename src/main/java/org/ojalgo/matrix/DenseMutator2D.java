@@ -27,6 +27,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -34,13 +35,13 @@ import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
-abstract class Mutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>, MR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>>
+abstract class DenseMutator2D<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         implements Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, TransformableRegion<N>>, Factory2D.Builder<M> {
 
-    private final MR myDelegate;
+    private final PhysicalStore<N> myDelegate;
     private boolean mySafe = true;
 
-    Mutator2D(final MR delegate) {
+    DenseMutator2D(final PhysicalStore<N> delegate) {
 
         super();
 

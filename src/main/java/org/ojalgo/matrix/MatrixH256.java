@@ -49,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
 
-    public static final class DenseReceiver extends Mutator2D<Quaternion, MatrixH256, PhysicalStore<Quaternion>> {
+    public static final class DenseReceiver extends DenseMutator2D<Quaternion, MatrixH256> {
 
         DenseReceiver(final PhysicalStore<Quaternion> delegate) {
             super(delegate);
@@ -69,20 +69,20 @@ public final class MatrixH256 extends BasicMatrix<Quaternion, MatrixH256> {
         }
 
         @Override
-        MatrixH256.DenseReceiver dense(final PhysicalStore<Quaternion> store) {
-            return new MatrixH256.DenseReceiver(store);
+        MatrixH256.DenseReceiver dense(final PhysicalStore<Quaternion> delegate) {
+            return new MatrixH256.DenseReceiver(delegate);
         }
 
         @Override
-        MatrixH256.SparseReceiver sparse(final SparseStore<Quaternion> store) {
-            return new MatrixH256.SparseReceiver(store);
+        MatrixH256.SparseReceiver sparse(final SparseStore.Builder<Quaternion> delegate) {
+            return new MatrixH256.SparseReceiver(delegate);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<Quaternion, MatrixH256, SparseStore<Quaternion>> {
+    public static final class SparseReceiver extends SparseMutator2D<Quaternion, MatrixH256> {
 
-        SparseReceiver(final SparseStore<Quaternion> delegate) {
+        SparseReceiver(final SparseStore.Builder<Quaternion> delegate) {
             super(delegate);
         }
 

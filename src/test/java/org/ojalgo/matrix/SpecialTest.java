@@ -27,39 +27,39 @@ import org.ojalgo.TestUtils;
 public class SpecialTest extends MatrixTests {
 
     @Test
-    public void testDenseReceiver() {
+    public void testCompareReceivers1() {
 
-        MatrixQ128.DenseReceiver rDR = MatrixQ128.FACTORY.newDenseBuilder(5, 7);
-        MatrixR032.DenseReceiver p32DR = MatrixR032.FACTORY.newDenseBuilder(5, 7);
+        MatrixQ128.DenseReceiver dense = MatrixQ128.FACTORY.newDenseBuilder(5, 7);
+        MatrixR032.SparseReceiver sparse = MatrixR032.FACTORY.newSparseBuilder(5, 7);
 
-        rDR.set(1, 1, 1D);
-        p32DR.set(1, 1, 1D);
+        dense.set(1, 1, 1D);
+        sparse.set(1, 1, 1D);
 
-        rDR.set(3, 5, 1D);
-        p32DR.set(3, 5, 1D);
+        dense.set(3, 5, 1D);
+        sparse.set(3, 5, 1D);
 
-        rDR.set(4, 2, 1D);
-        p32DR.set(4, 2, 1D);
+        dense.set(4, 2, 1D);
+        sparse.set(4, 2, 1D);
 
-        TestUtils.assertEquals(rDR.get(), p32DR.get());
+        TestUtils.assertEquals(dense.build(), sparse.build());
     }
 
     @Test
-    public void testSparseReceiver() {
+    public void testCompareReceivers2() {
 
-        MatrixQ128.SparseReceiver rSR = MatrixQ128.FACTORY.newSparseBuilder(5, 7);
-        MatrixR032.SparseReceiver p32SR = MatrixR032.FACTORY.newSparseBuilder(5, 7);
+        MatrixR064.DenseReceiver dense = MatrixR064.FACTORY.newDenseBuilder(5, 7);
+        MatrixR128.SparseReceiver sparse = MatrixR128.FACTORY.newSparseBuilder(5, 7);
 
-        rSR.set(1, 1, 1D);
-        p32SR.set(1, 1, 1D);
+        dense.set(1, 1, 1D);
+        sparse.set(1, 1, 1D);
 
-        rSR.set(3, 5, 1D);
-        p32SR.set(3, 5, 1D);
+        dense.set(3, 5, 1D);
+        sparse.set(3, 5, 1D);
 
-        rSR.set(4, 2, 1D);
-        p32SR.set(4, 2, 1D);
+        dense.set(4, 2, 1D);
+        sparse.set(4, 2, 1D);
 
-        TestUtils.assertEquals(rSR.get(), p32SR.get());
+        TestUtils.assertEquals(dense.build(), sparse.build());
     }
 
 }

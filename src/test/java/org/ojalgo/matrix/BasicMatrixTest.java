@@ -82,7 +82,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.Mutator2D#add(long, long, Comparable)
+     * @see org.ojalgo.matrix.DenseMutator2D#add(long, long, Comparable)
      */
     @Test
     public void testAddElement() {
@@ -90,7 +90,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         long row = Uniform.randomInteger(mtrxA.countRows());
         long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        Mutator2D mutator = mtrxA.copy();
+        DenseMutator2D mutator = mtrxA.copy();
         mutator.add(row, col, scalar);
         BasicMatrix expected = mutator.get();
 
@@ -216,7 +216,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDivideElementsBasicMatrix() {
 
-        Mutator2D mutator = mtrxA.copy();
+        DenseMutator2D mutator = mtrxA.copy();
         mutator.modifyMatching(PrimitiveMath.DIVIDE, mtrxSafe);
         BasicMatrix expected = mutator.get();
 
@@ -686,7 +686,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyElementsBasicMatrix() {
 
-        Mutator2D mutator = mtrxA.copy();
+        DenseMutator2D mutator = mtrxA.copy();
         mutator.modifyMatching(PrimitiveMath.MULTIPLY, mtrxSafe);
         BasicMatrix expected = mutator.get();
 
@@ -841,7 +841,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         long row = Uniform.randomInteger(mtrxA.countRows());
         long col = Uniform.randomInteger(mtrxA.countColumns());
 
-        Mutator2D mutator = mtrxA.copy();
+        DenseMutator2D mutator = mtrxA.copy();
         mutator.set(row, col, scalar);
         BasicMatrix expected = mutator.get();
 

@@ -50,7 +50,7 @@ import org.ojalgo.type.math.MathType;
  *
  * @author apete
  */
-public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Factory2D.Builder<M>, SR extends Mutate2D.ModifiableReceiver<N> & Factory2D.Builder<M>>
+public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, DR extends Mutate2D.ModifiableReceiver<N> & Factory2D.Builder<M>, SR extends Factory2D.Builder<M>>
         implements Factory2D.MayBeSparse<M, DR, SR> {
 
     private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> template) {
@@ -154,7 +154,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
     @Override
     public SR newSparseBuilder(final long nbRows, final long nbCols) {
-        return this.sparse(myPhysicalFactory.makeSparse(nbRows, nbCols));
+        return this.sparse(SparseStore.factory(myPhysicalFactory).newBuilder(nbRows, nbCols));
     }
 
     @Override
@@ -224,7 +224,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         });
     }
 
-    abstract DR dense(final PhysicalStore<N> store);
+    abstract DR dense(final PhysicalStore<N> delegate);
 
     final PhysicalStore.Factory<N, ?> getPhysicalFactory() {
         return myPhysicalFactory;
@@ -241,6 +241,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         }
     }
 
-    abstract SR sparse(final SparseStore<N> store);
+    abstract SR sparse(final SparseStore.Builder<N> delegate);
 
 }

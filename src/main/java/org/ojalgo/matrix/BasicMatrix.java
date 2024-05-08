@@ -237,7 +237,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
      *         always creates a full dense copy.
      * @see #logical()
      */
-    public abstract Mutator2D<N, M, PhysicalStore<N>> copy();
+    public abstract DenseMutator2D<N, M> copy();
 
     @Override
     public long count() {

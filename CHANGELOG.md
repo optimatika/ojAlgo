@@ -18,6 +18,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Added the ability to specify the initial capacity of a `SparseStore`.
 - More efficient sparse to sparse copying of `SparseStore`.
 - New option to use a builder when initially setting the elements of a `SparseStore`.
+- The sparse `BasicMatrix` builder no longer has all the methods that really only made sense with dense implementation. The sparse builder implementation changed to use that new `SparseStore.Builder`.
 
 #### org.ojalgo.structure
 

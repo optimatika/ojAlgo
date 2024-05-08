@@ -46,7 +46,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class MatrixR032 extends BasicMatrix<Double, MatrixR032> {
 
-    public static final class DenseReceiver extends Mutator2D<Double, MatrixR032, PhysicalStore<Double>> {
+    public static final class DenseReceiver extends DenseMutator2D<Double, MatrixR032> {
 
         DenseReceiver(final PhysicalStore<Double> delegate) {
             super(delegate);
@@ -66,20 +66,20 @@ public final class MatrixR032 extends BasicMatrix<Double, MatrixR032> {
         }
 
         @Override
-        MatrixR032.DenseReceiver dense(final PhysicalStore<Double> store) {
-            return new MatrixR032.DenseReceiver(store);
+        MatrixR032.DenseReceiver dense(final PhysicalStore<Double> delegate) {
+            return new MatrixR032.DenseReceiver(delegate);
         }
 
         @Override
-        MatrixR032.SparseReceiver sparse(final SparseStore<Double> store) {
-            return new MatrixR032.SparseReceiver(store);
+        MatrixR032.SparseReceiver sparse(final SparseStore.Builder<Double> delegate) {
+            return new MatrixR032.SparseReceiver(delegate);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<Double, MatrixR032, SparseStore<Double>> {
+    public static final class SparseReceiver extends SparseMutator2D<Double, MatrixR032> {
 
-        SparseReceiver(final SparseStore<Double> delegate) {
+        SparseReceiver(final SparseStore.Builder<Double> delegate) {
             super(delegate);
         }
 

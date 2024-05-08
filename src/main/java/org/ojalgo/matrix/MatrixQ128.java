@@ -49,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
 
-    public static final class DenseReceiver extends Mutator2D<RationalNumber, MatrixQ128, PhysicalStore<RationalNumber>> {
+    public static final class DenseReceiver extends DenseMutator2D<RationalNumber, MatrixQ128> {
 
         DenseReceiver(final PhysicalStore<RationalNumber> delegate) {
             super(delegate);
@@ -69,20 +69,20 @@ public final class MatrixQ128 extends BasicMatrix<RationalNumber, MatrixQ128> {
         }
 
         @Override
-        MatrixQ128.DenseReceiver dense(final PhysicalStore<RationalNumber> store) {
-            return new MatrixQ128.DenseReceiver(store);
+        MatrixQ128.DenseReceiver dense(final PhysicalStore<RationalNumber> delegate) {
+            return new MatrixQ128.DenseReceiver(delegate);
         }
 
         @Override
-        MatrixQ128.SparseReceiver sparse(final SparseStore<RationalNumber> store) {
-            return new MatrixQ128.SparseReceiver(store);
+        MatrixQ128.SparseReceiver sparse(final SparseStore.Builder<RationalNumber> delegate) {
+            return new MatrixQ128.SparseReceiver(delegate);
         }
 
     }
 
-    public static final class SparseReceiver extends Mutator2D<RationalNumber, MatrixQ128, SparseStore<RationalNumber>> {
+    public static final class SparseReceiver extends SparseMutator2D<RationalNumber, MatrixQ128> {
 
-        SparseReceiver(final SparseStore<RationalNumber> delegate) {
+        SparseReceiver(final SparseStore.Builder<RationalNumber> delegate) {
             super(delegate);
         }
 

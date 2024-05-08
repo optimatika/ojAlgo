@@ -48,8 +48,6 @@ public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
         return Access2D.equals(this, another, accuracy);
     }
 
-    M transpose();
-
     /**
      * Extracts one element of this matrix as a Scalar.
      *
@@ -58,5 +56,7 @@ public interface Matrix2D<N extends Comparable<N>, M extends Matrix2D<N, M>>
      * @return One matrix element as a Scalar.
      */
     Scalar<N> toScalar(final int row, final int col);
+
+    M transpose();
 
 }
