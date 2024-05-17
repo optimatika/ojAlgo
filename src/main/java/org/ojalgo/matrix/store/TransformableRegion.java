@@ -106,4 +106,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Modifiable
      */
     TransformableRegion<N> regionByTransposing();
 
+    /**
+     * Creates a wrapper that ensures all access to the target is synchronized.
+     */
+    default TransformableRegion<N> synchronised() {
+        return new Subregion2D.SynchronizedRegion<>(this);
+    }
+
 }

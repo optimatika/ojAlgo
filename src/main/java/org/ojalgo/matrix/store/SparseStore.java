@@ -55,6 +55,16 @@ import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 import org.ojalgo.type.math.MathType;
 
+/**
+ * A sparse matrix (this implementation) is not thread safe. Mutating the matrix (in particular creating
+ * new/more non-zero elements) from multiple threads will result in unpredictable behaviour (even if the
+ * threads update different elements). To mutate the matrix in a concurrent/multi-threaded environment you
+ * need to do one of the following:
+ * <ul>
+ * <li>Use the {@link #synchronised()} method to create a synchronised wrapper of the matrix.
+ * <li>Use the {@link Builder} to build the matrix.
+ * </ul>
+ */
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
 
     /**
@@ -294,17 +304,13 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @Override
     public void add(final long row, final long col, final Comparable<?> addend) {
-        synchronized (myElements) {
-            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
-        }
+        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
     }
 
     @Override
     public void add(final long row, final long col, final double addend) {
-        synchronized (myElements) {
-            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
-        }
+        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
     }
 
@@ -343,7 +349,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        myMultiplier.invoke(this, left, complexity, right);
+        myMultiplier.invoke(this.synchronised(), left, complexity, right);
     }
 
     @Override
@@ -676,27 +682,27 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @Override
     public TransformableRegion<N> regionByColumns(final int... columns) {
-        return new Subregion2D.ColumnsRegion<>(this, myMultiplier, columns);
+        return new Subregion2D.ColumnsRegion<>(this.synchronised(), myMultiplier, columns);
     }
 
     @Override
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new Subregion2D.LimitRegion<>(this, myMultiplier, rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this.synchronised(), myMultiplier, rowLimit, columnLimit);
     }
 
     @Override
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new Subregion2D.OffsetRegion<>(this, myMultiplier, rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this.synchronised(), myMultiplier, rowOffset, columnOffset);
     }
 
     @Override
     public TransformableRegion<N> regionByRows(final int... rows) {
-        return new Subregion2D.RowsRegion<>(this, myMultiplier, rows);
+        return new Subregion2D.RowsRegion<>(this.synchronised(), myMultiplier, rows);
     }
 
     @Override
     public TransformableRegion<N> regionByTransposing() {
-        return new Subregion2D.TransposedRegion<>(this, myMultiplier);
+        return new Subregion2D.TransposedRegion<>(this.synchronised(), myMultiplier);
     }
 
     @Override
@@ -708,17 +714,13 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     @Override
     public void set(final int row, final int col, final double value) {
-        synchronized (myElements) {
-            myElements.set(Structure2D.index(myFirsts.length, row, col), value);
-        }
+        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 
     @Override
     public void set(final long row, final long col, final Comparable<?> value) {
-        synchronized (myElements) {
-            myElements.set(Structure2D.index(myFirsts.length, row, col), value);
-        }
+        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 

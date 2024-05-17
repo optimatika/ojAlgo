@@ -22,13 +22,14 @@
 package org.ojalgo.matrix.store;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.operation.MultiplyBoth;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.*;
 
 abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegion<N> {
 
@@ -538,6 +539,802 @@ abstract class Subregion2D<N extends Comparable<N>> implements TransformableRegi
         @Override
         public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRows[Math.toIntExact(row)], col, value);
+        }
+
+    }
+
+    static final class SynchronizedRegion<N extends Comparable<N>> extends Subregion2D<N> {
+
+        private final TransformableRegion<N> myDelegate;
+
+        SynchronizedRegion(final TransformableRegion<N> base) {
+            super(Subregion2D.findMultiplier(base.get(0, 0).getClass(), base.getRowDim(), base.getColDim()), base.getRowDim(), base.getColDim());
+            myDelegate = base;
+        }
+
+        @Override
+        public synchronized void accept(final Access2D<?> supplied) {
+            myDelegate.accept(supplied);
+        }
+
+        @Override
+        public synchronized void add(final long index, final byte addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final Comparable<?> addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final double addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final float addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final int addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final long addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final byte addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final Comparable<?> addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final double addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final float addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final int addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final long addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long row, final long col, final short addend) {
+            myDelegate.add(row, col, addend);
+        }
+
+        @Override
+        public synchronized void add(final long index, final short addend) {
+            myDelegate.add(index, addend);
+        }
+
+        @Override
+        public synchronized Consumer<Access2D<?>> andThen(final Consumer<? super Access2D<?>> after) {
+            return myDelegate.andThen(after);
+        }
+
+        @Override
+        public synchronized <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Access1D.Collectable<NN, R> asCollectable1D() {
+            return myDelegate.asCollectable1D();
+        }
+
+        @Override
+        public synchronized <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
+            return myDelegate.asCollectable2D();
+        }
+
+        @Override
+        public synchronized <K> Keyed1D<K, N> asKeyed1D(final IndexMapper<K> indexMapper) {
+            return myDelegate.asKeyed1D(indexMapper);
+        }
+
+        @Override
+        public synchronized <R, C> Keyed2D<R, C, N> asKeyed2D(final IndexMapper<R> rowMapper, final IndexMapper<C> columnMapper) {
+            return myDelegate.asKeyed2D(rowMapper, columnMapper);
+        }
+
+        @Override
+        public synchronized void axpy(final double a, final org.ojalgo.structure.Mutate1D.Modifiable<?> y) {
+            myDelegate.axpy(a, y);
+        }
+
+        @Override
+        public synchronized byte byteValue(final int index) {
+            return myDelegate.byteValue(index);
+        }
+
+        @Override
+        public synchronized byte byteValue(final int row, final int col) {
+            return myDelegate.byteValue(row, col);
+        }
+
+        @Override
+        public synchronized byte byteValue(final long index) {
+            return myDelegate.byteValue(index);
+        }
+
+        @Override
+        public synchronized byte byteValue(final long row, final long col) {
+            return myDelegate.byteValue(row, col);
+        }
+
+        @Override
+        public synchronized ColumnView<N> columns() {
+            return myDelegate.columns();
+        }
+
+        @Override
+        public synchronized Access2D<N> columns(final int... columns) {
+            return myDelegate.columns(columns);
+        }
+
+        @Override
+        public synchronized Access2D<N> columns(final long... columns) {
+            return myDelegate.columns(columns);
+        }
+
+        @Override
+        public synchronized long count() {
+            return myDelegate.count();
+        }
+
+        @Override
+        public synchronized long countColumns() {
+            return myDelegate.countColumns();
+        }
+
+        @Override
+        public synchronized long countRows() {
+            return myDelegate.countRows();
+        }
+
+        @Override
+        public synchronized double dot(final Access1D<?> vector) {
+            return myDelegate.dot(vector);
+        }
+
+        @Override
+        public synchronized double doubleValue(final int index) {
+            return myDelegate.doubleValue(index);
+        }
+
+        @Override
+        public synchronized double doubleValue(final int row, final int col) {
+            return myDelegate.doubleValue(row, col);
+        }
+
+        @Override
+        public synchronized double doubleValue(final long index) {
+            return myDelegate.doubleValue(index);
+        }
+
+        @Override
+        public synchronized double doubleValue(final long row, final long col) {
+            return myDelegate.doubleValue(row, col);
+        }
+
+        @Override
+        public synchronized ElementView2D<N, ?> elements() {
+            return myDelegate.elements();
+        }
+
+        @Override
+        public synchronized void exchangeColumns(final long colA, final long colB) {
+            myDelegate.exchangeColumns(colA, colB);
+        }
+
+        @Override
+        public synchronized void exchangeRows(final long rowA, final long rowB) {
+            myDelegate.exchangeRows(rowA, rowB);
+        }
+
+        @Override
+        public synchronized void fillAll(final N value) {
+            myDelegate.fillAll(value);
+        }
+
+        @Override
+        public synchronized void fillAll(final NullaryFunction<?> supplier) {
+            myDelegate.fillAll(supplier);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long col, final Access1D<N> values) {
+            myDelegate.fillColumn(col, values);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long row, final long col, final Access1D<N> values) {
+            myDelegate.fillColumn(row, col, values);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long row, final long col, final N value) {
+            myDelegate.fillColumn(row, col, value);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
+            myDelegate.fillColumn(row, col, supplier);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long col, final N value) {
+            myDelegate.fillColumn(col, value);
+        }
+
+        @Override
+        public synchronized void fillColumn(final long col, final NullaryFunction<?> supplier) {
+            myDelegate.fillColumn(col, supplier);
+        }
+
+        @Override
+        public synchronized void fillCompatible(final Access1D<N> left, final BinaryFunction<N> operator, final Access1D<N> right) {
+            myDelegate.fillCompatible(left, operator, right);
+        }
+
+        @Override
+        public synchronized void fillCompatible(final Access2D<N> left, final BinaryFunction<N> operator, final Access2D<N> right) {
+            myDelegate.fillCompatible(left, operator, right);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final Access1D<N> values) {
+            myDelegate.fillDiagonal(values);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final long row, final long col, final Access1D<N> values) {
+            myDelegate.fillDiagonal(row, col, values);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final long row, final long col, final N value) {
+            myDelegate.fillDiagonal(row, col, value);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
+            myDelegate.fillDiagonal(row, col, supplier);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final N value) {
+            myDelegate.fillDiagonal(value);
+        }
+
+        @Override
+        public synchronized void fillDiagonal(final NullaryFunction<?> supplier) {
+            myDelegate.fillDiagonal(supplier);
+        }
+
+        @Override
+        public synchronized void fillMatching(final Access1D<?> values) {
+            myDelegate.fillMatching(values);
+        }
+
+        @Override
+        public synchronized void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+            myDelegate.fillMatching(left, function, right);
+        }
+
+        @Override
+        public synchronized void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+            myDelegate.fillMatching(function, arguments);
+        }
+
+        @Override
+        public synchronized void fillRange(final long first, final long limit, final N value) {
+            myDelegate.fillRange(first, limit, value);
+        }
+
+        @Override
+        public synchronized void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
+            myDelegate.fillRange(first, limit, supplier);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final Access1D<N> values) {
+            myDelegate.fillRow(row, values);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final long col, final Access1D<N> values) {
+            myDelegate.fillRow(row, col, values);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final long col, final N value) {
+            myDelegate.fillRow(row, col, value);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
+            myDelegate.fillRow(row, col, supplier);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final N value) {
+            myDelegate.fillRow(row, value);
+        }
+
+        @Override
+        public synchronized void fillRow(final long row, final NullaryFunction<?> supplier) {
+            myDelegate.fillRow(row, supplier);
+        }
+
+        @Override
+        public synchronized int firstInColumn(final int col) {
+            return myDelegate.firstInColumn(col);
+        }
+
+        @Override
+        public synchronized int firstInRow(final int row) {
+            return myDelegate.firstInRow(row);
+        }
+
+        @Override
+        public synchronized float floatValue(final int index) {
+            return myDelegate.floatValue(index);
+        }
+
+        @Override
+        public synchronized float floatValue(final int row, final int col) {
+            return myDelegate.floatValue(row, col);
+        }
+
+        @Override
+        public synchronized float floatValue(final long index) {
+            return myDelegate.floatValue(index);
+        }
+
+        @Override
+        public synchronized float floatValue(final long row, final long col) {
+            return myDelegate.floatValue(row, col);
+        }
+
+        @Override
+        public synchronized N get(final long index) {
+            return myDelegate.get(index);
+        }
+
+        @Override
+        public synchronized N get(final long row, final long col) {
+            return myDelegate.get(row, col);
+        }
+
+        @Override
+        public synchronized int getColDim() {
+            return myDelegate.getColDim();
+        }
+
+        @Override
+        public synchronized int getMaxDim() {
+            return myDelegate.getMaxDim();
+        }
+
+        @Override
+        public synchronized int getMinDim() {
+            return myDelegate.getMinDim();
+        }
+
+        @Override
+        public synchronized int getRowDim() {
+            return myDelegate.getRowDim();
+        }
+
+        @Override
+        public synchronized int intValue(final int index) {
+            return myDelegate.intValue(index);
+        }
+
+        @Override
+        public synchronized int intValue(final int row, final int col) {
+            return myDelegate.intValue(row, col);
+        }
+
+        @Override
+        public synchronized int intValue(final long index) {
+            return myDelegate.intValue(index);
+        }
+
+        @Override
+        public synchronized int intValue(final long row, final long col) {
+            return myDelegate.intValue(row, col);
+        }
+
+        @Override
+        public synchronized boolean isAcceptable(final Structure2D supplier) {
+            return myDelegate.isAcceptable(supplier);
+        }
+
+        @Override
+        public synchronized boolean isEmpty() {
+            return myDelegate.isEmpty();
+        }
+
+        @Override
+        public synchronized boolean isFat() {
+            return myDelegate.isFat();
+        }
+
+        @Override
+        public synchronized boolean isScalar() {
+            return myDelegate.isScalar();
+        }
+
+        @Override
+        public synchronized boolean isSquare() {
+            return myDelegate.isSquare();
+        }
+
+        @Override
+        public synchronized boolean isTall() {
+            return myDelegate.isTall();
+        }
+
+        @Override
+        public synchronized boolean isVector() {
+            return myDelegate.isVector();
+        }
+
+        @Override
+        public synchronized int limitOfColumn(final int col) {
+            return myDelegate.limitOfColumn(col);
+        }
+
+        @Override
+        public synchronized int limitOfRow(final int row) {
+            return myDelegate.limitOfRow(row);
+        }
+
+        @Override
+        public synchronized long longValue(final int index) {
+            return myDelegate.longValue(index);
+        }
+
+        @Override
+        public synchronized long longValue(final int row, final int col) {
+            return myDelegate.longValue(row, col);
+        }
+
+        @Override
+        public synchronized long longValue(final long index) {
+            return myDelegate.longValue(index);
+        }
+
+        @Override
+        public synchronized long longValue(final long row, final long col) {
+            return myDelegate.longValue(row, col);
+        }
+
+        @Override
+        public synchronized void modifyAll(final UnaryFunction<N> modifier) {
+            myDelegate.modifyAll(modifier);
+        }
+
+        @Override
+        public synchronized void modifyAny(final Transformation2D<N> modifier) {
+            myDelegate.modifyAny(modifier);
+        }
+
+        @Override
+        public synchronized void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
+            myDelegate.modifyColumn(row, col, modifier);
+        }
+
+        @Override
+        public synchronized void modifyColumn(final long col, final UnaryFunction<N> modifier) {
+            myDelegate.modifyColumn(col, modifier);
+        }
+
+        @Override
+        public synchronized void modifyCompatible(final Access2D<N> left, final BinaryFunction<N> operator) {
+            myDelegate.modifyCompatible(left, operator);
+        }
+
+        @Override
+        public synchronized void modifyCompatible(final BinaryFunction<N> operator, final Access2D<N> right) {
+            myDelegate.modifyCompatible(operator, right);
+        }
+
+        @Override
+        public synchronized void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
+            myDelegate.modifyDiagonal(row, col, modifier);
+        }
+
+        @Override
+        public synchronized void modifyDiagonal(final UnaryFunction<N> modifier) {
+            myDelegate.modifyDiagonal(modifier);
+        }
+
+        @Override
+        public synchronized void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+            myDelegate.modifyMatching(left, function);
+        }
+
+        @Override
+        public synchronized void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+            myDelegate.modifyMatching(function, right);
+        }
+
+        @Override
+        public synchronized void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
+            myDelegate.modifyMatchingInColumns(left, function);
+        }
+
+        @Override
+        public synchronized void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
+            myDelegate.modifyMatchingInColumns(function, right);
+        }
+
+        @Override
+        public synchronized void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
+            myDelegate.modifyMatchingInRows(left, function);
+        }
+
+        @Override
+        public synchronized void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
+            myDelegate.modifyMatchingInRows(function, right);
+        }
+
+        @Override
+        public synchronized void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myDelegate.modifyOne(row, col, modifier);
+        }
+
+        @Override
+        public synchronized void modifyOne(final long index, final UnaryFunction<N> modifier) {
+            myDelegate.modifyOne(index, modifier);
+        }
+
+        @Override
+        public synchronized void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
+            myDelegate.modifyRange(first, limit, modifier);
+        }
+
+        @Override
+        public synchronized void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+            myDelegate.modifyRow(row, col, modifier);
+        }
+
+        @Override
+        public synchronized void modifyRow(final long row, final UnaryFunction<N> modifier) {
+            myDelegate.modifyRow(row, modifier);
+        }
+
+        @Override
+        public synchronized ElementView2D<N, ?> nonzeros() {
+            return myDelegate.nonzeros();
+        }
+
+        @Override
+        public synchronized TransformableRegion<N> regionByTransposing() {
+            return myDelegate.regionByTransposing();
+        }
+
+        @Override
+        public synchronized void reset() {
+            myDelegate.reset();
+        }
+
+        @Override
+        public synchronized RowView<N> rows() {
+            return myDelegate.rows();
+        }
+
+        @Override
+        public synchronized Access2D<N> rows(final int... rows) {
+            return myDelegate.rows(rows);
+        }
+
+        @Override
+        public synchronized Access2D<N> rows(final long... rows) {
+            return myDelegate.rows(rows);
+        }
+
+        @Override
+        public synchronized Access2D<N> select(final int[] rows, final int[] columns) {
+            return myDelegate.select(rows, columns);
+        }
+
+        @Override
+        public synchronized Access1D<N> select(final long... selection) {
+            return myDelegate.select(selection);
+        }
+
+        @Override
+        public synchronized Access2D<N> select(final long[] rows, final long[] columns) {
+            return myDelegate.select(rows, columns);
+        }
+
+        @Override
+        public synchronized void set(final int index, final byte value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final int index, final double value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final int index, final float value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final int index, final int value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final byte value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final double value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final float value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final int value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final long value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int row, final int col, final short value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final int index, final long value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final int index, final short value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final byte value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final Comparable<?> value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final double value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final float value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final int value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final long value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final byte value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final Comparable<?> value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final double value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final float value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final int value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final long value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long row, final long col, final short value) {
+            myDelegate.set(row, col, value);
+        }
+
+        @Override
+        public synchronized void set(final long index, final short value) {
+            myDelegate.set(index, value);
+        }
+
+        @Override
+        public synchronized short shortValue(final int index) {
+            return myDelegate.shortValue(index);
+        }
+
+        @Override
+        public synchronized short shortValue(final int row, final int col) {
+            return myDelegate.shortValue(row, col);
+        }
+
+        @Override
+        public synchronized short shortValue(final long index) {
+            return myDelegate.shortValue(index);
+        }
+
+        @Override
+        public synchronized short shortValue(final long row, final long col) {
+            return myDelegate.shortValue(row, col);
+        }
+
+        @Override
+        public synchronized int size() {
+            return myDelegate.size();
+        }
+
+        @Override
+        public synchronized void supplyTo(final double[] receiver) {
+            myDelegate.supplyTo(receiver);
+        }
+
+        @Override
+        public synchronized double[] toRawCopy1D() {
+            return myDelegate.toRawCopy1D();
+        }
+
+        @Override
+        public synchronized double[][] toRawCopy2D() {
+            return myDelegate.toRawCopy2D();
         }
 
     }
