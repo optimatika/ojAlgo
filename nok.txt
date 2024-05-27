@@ -1,0 +1,104 @@
+Will inlcude ineq 1 with slack=0.0
+Will inlcude ineq 2 with slack=0.0
+Will inlcude ineq 3 with slack=0.0
+Will inlcude ineq 4 with slack=0.0
+Will inlcude ineq 5 with slack=0.0
+I-slack: { 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 25.0 }
+Initial solution: { -0.0, -0.0, -0.0, -0.0, 25.0 }
+
+PerformIteration 1
+Last Incl/Excl: 5/-1 => [1, 2, 3, 4, 5] / [0, 6, 7, 8]
+RHS=[31.0, 31.0, 31.0, -27.999999999999996, -28.0]
+Relative error 5.085907214844117E-13 in solution for L=[20.999938823666678, 5.600001747580038E-9, 5.600001747580038E-9, -55.99999999999999, 20.999938818066678]
+Current: 25.0 - { -0.0, -0.0, -0.0, -0.0, 25.0 }
+Step: 0.0 - { 0.0, 0.0, 0.0, 0.0, 0.0 }
+Included-change: { 0.0, 0.0, 0.0, 0.0, 0.0 }
+Step too small!
+Post iteration
+	Solution: { -0.0, -0.0, -0.0, -0.0, 25.0 }
+	L: { 0.0, 20.9999999888, 5.6000000000000005E-9, 5.600000000000001E-9, -56.0, 20.9999999832, 0.0, 0.0, 0.0 }
+I-slack: { 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 25.0 }
+
+NeedsAnotherIteration?
+Looking for the largest negative lagrange multiplier among these: [20.9999999888, 5.6000000000000005E-9, 5.600000000000001E-9, -56.0, 20.9999999832].
+	Best so far: -56.0 @ 3 (4).
+Suggest to exclude: -56.0 @ 3 (4).
+Suggested to exclude: 4
+
+PerformIteration 2
+Last Incl/Excl: 5/4 => [1, 2, 3, 5] / [0, 4, 6, 7, 8]
+RHS=[31.0, 31.0, 31.0, -28.0]
+Relative error 6.785719864926303E-16 in solution for L=[20.999893177463257, 5.6000030517524796E-9, 5.600003051752479E-9, 20.999893171863256]
+Current: 25.0 - { -0.0, -0.0, -0.0, -0.0, 25.0 }
+Step: 27.999999999999996 - { 27.999999999999996, -2.3167303854034653E-6, -1.5258762395264484E-5, -1.5258762391128581E-5, 1.52587623887257E-5 }
+Included-change: { 1.2942032003322234E-5, -6.5387843387445035E-15, -2.4028816994958388E-15, 2.3167303854034653E-6 }
+Nonzero Included-change! 1.2942032003322234E-5
+Numer/slack: [3.0, 0.0, 0.0, 0.0, 25.0]
+Denom/chang: [28.000015258762385, -27.999999999999996, 1.5258762395264484E-5, 1.5258762391128581E-5, -1.52587623887257E-5]
+Looking for the largest possible step length (smallest positive scalar) among these: [0.1071427987547676, -0.0, 0.0, 0.0, -1638402.8640797138]).
+	Best so far: 0.1071427987547676 @ 0 (0) ––– 3.0 / 28.000015258762385.
+	Best so far: 0.0 @ 2 (6) ––– 0.0 / 1.5258762395264484E-5.
+Do nothing because step length 0.0 and size 27.999999999999996 but add constraint 6
+Post iteration
+	Solution: { -0.0, -0.0, -0.0, -0.0, 25.0 }
+	L: { 0.0, 20.999893177463257, 5.6000030517524796E-9, 5.600003051752479E-9, 0.0, 20.999893171863256, 0.0, 0.0, 0.0 }
+I-slack: { 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 25.0 }
+
+NeedsAnotherIteration?
+Suggested to include: 6
+
+PerformIteration 3
+Last Incl/Excl: 6/4 => [1, 2, 3, 5, 6] / [0, 4, 7, 8]
+RHS=[31.0, 31.0, 31.0, -28.0, -28.0]
+Relative error 1.6930045638061901E-13 in solution for L=[20.9999465817062, 5.341254958899126E-5, 5.600000000004109E-9, 20.999946576106197, 5.340694958899126E-5]
+KKT system unsolvable!
+KKT
+  2  0  0  0  0  0  0  0  0  0
+  0  0  0  0  0  1  0  0 -1  0
+  0  0  0  0  0  0  1  0  0 -1
+  0  0  0  0  0  0  0  1  0  0
+  0  0  0  0  7  1  1  1  0  0
+  0  1  0  0  1  0  0  0  0  0
+  0  0  1  0  1  0  0  0  0  0
+  0  0  0  1  1  0  0  0  0  0
+  0 -1  0  0  0  0  0  0  0  0
+  0  0 -1  0  0  0  0  0  0  0
+RHS
+  56
+   0
+   0
+   0
+ 196
+  25
+  25
+  25
+   0
+   0
+Constraints problem!
+Looking for the largest negative lagrange multiplier among these: [20.9999465817062, 5.341254958899126E-5, 5.600000000004109E-9, 20.999946576106197, 5.340694958899126E-5].
+Nothing to exclude
+Will remove 1
+
+PerformIteration 4
+Last Incl/Excl: 6/1 => [2, 3, 5, 6] / [0, 1, 4, 7, 8]
+RHS=[31.0, 31.0, -28.0, -28.0]
+Relative error 8.681594437092437E-18 in solution for L=[20.999882662782408, 5.600003352331932E-9, -5.600000463346077E-9, 20.9998826571824]
+Current: 25.0 - { -0.0, -0.0, -0.0, -0.0, 25.0 }
+Step: 27.999999999999996 - { 27.999999999999996, -2.3167303812675622E-6, -3.784386717340847E-5, -1.6761659657876653E-5, 1.676165965491805E-5 }
+Included-change: { -2.108220751849042E-5, -2.9586047695963347E-15, 2.3167303812675622E-6, 3.784386717340847E-5 }
+Nonzero Included-change! 3.784386717340847E-5
+Numer/slack: [3.0, 0.0, 0.0, 0.0, 25.0]
+Denom/chang: [28.00001676165965, 1.4444929273650486E-5, -27.999999999999996, 1.6761659657876653E-5, -1.676165965491805E-5]
+Looking for the largest possible step length (smallest positive scalar) among these: [0.10714279300389178, 0.0, -0.0, 0.0, -1491499.0827095534]).
+	Best so far: 0.10714279300389178 @ 0 (0) ––– 3.0 / 28.00001676165965.
+	Best so far: 0.0 @ 1 (1) ––– 0.0 / 1.4444929273650486E-5.
+Break cycle on redundant constraints because step length 0.0 on constraint 1
+Post iteration
+	Solution: { -0.0, -0.0, -0.0, -0.0, 25.0 }
+	L: { 0.0, 0.0, 20.999882662782408, 5.600003352331932E-9, 0.0, -5.600000463346077E-9, 20.9998826571824, 0.0, 0.0 }
+I-slack: { 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 25.0 }
+
+NeedsAnotherIteration?
+Looking for the largest negative lagrange multiplier among these: [20.999882662782408, 5.600003352331932E-9, -5.600000463346077E-9, 20.9998826571824].
+Nothing to exclude
+Stop!
