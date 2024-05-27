@@ -41,7 +41,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext FEASIBILITY = NumberContext.of(12, 8);
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);
-    private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext SLACK = NumberContext.of(6, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SOLUTION = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
 
     private final IndexSelector myActivator;
@@ -128,7 +128,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     double currentSlack = slack.doubleValue(i);
                     double slackChange = excludedInequalityRow.dot(iterX);
-                    double fraction = Math.abs(currentSlack) / slackChange;
+                    double fraction = Math.max(currentSlack, ZERO) / slackChange;
                     // If the current slack is negative something has already gone wrong.
                     // Taking the abs value is to handle small negative values due to rounding errors
                     if (slackChange > ZERO && !SLACK.isZero(slackChange) && SLACK.isSmall(slackChange, currentSlack)) {
@@ -400,8 +400,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     /**
-     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to
-     * potentially deactivate.
+     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to potentially
+     * deactivate.
      */
     protected int suggestConstraintToExclude() {
 
@@ -468,8 +468,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     /**
      * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
-     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating
-     * it.
+     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
      */
     protected int suggestConstraintToInclude() {
         return this.getConstraintToInclude();
