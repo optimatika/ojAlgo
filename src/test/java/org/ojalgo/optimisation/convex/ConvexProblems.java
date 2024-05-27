@@ -258,6 +258,39 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/559
+     */
+    @Test
+    public void testGitHubIssue559() {
+
+        R064Store Q = R064Store.FACTORY.rows(new double[][] { { 2.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0000000002, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0000000002, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0000000002, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 7.0 } });
+
+        R064Store C = R064Store.FACTORY.column(56.0, 5.6E-9, 5.6E-9, 5.6E-9, 196.0);
+        R064Store C_issue = R064Store.FACTORY.column(56.0, 5.6000000000000005E-9, 5.6000000000000005E-9, 5.6000000000000005E-9, 196.0);
+
+        R064Store AI = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 1.0 }, { 0.0, 1.0, 0.0, 0.0, 1.0 },
+                { 0.0, 0.0, 1.0, 0.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0, 1.0 }, { -1.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0 },
+                { -0.0, -0.0, -1.0, -0.0, -0.0 }, { -0.0, -0.0, -0.0, -1.0, -0.0 }, { -0.0, -0.0, -0.0, -0.0, -1.0 } });
+        R064Store BI = R064Store.FACTORY.column(28.0, 25.0, 25.0, 25.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        Optimisation.Options options = new Optimisation.Options();
+        options.convex().extendedPrecision(true);
+        options.convex().iterative(NumberContext.of(8));
+
+        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build(options);
+        Result resultOk = solverOk.solve();
+
+        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build(options);
+        Result resultNOk = solverNOk.solve();
+
+        System.out.println("Result OK: " + resultOk);
+        System.out.println("Result NOK: " + resultNOk);
+
+        BasicLogger.debug(R064Store.FACTORY.row(resultOk));
+    }
+
+    /**
      * Just make sure an obviously infeasible problem is recognised as such - this has been a problem in the
      * past
      */
