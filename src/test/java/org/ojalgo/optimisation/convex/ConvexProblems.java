@@ -276,7 +276,6 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Optimisation.Options options = new Optimisation.Options();
         options.convex().extendedPrecision(true);
-        options.convex().iterative(NumberContext.of(8));
 
         ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build(options);
         Result resultOk = solverOk.solve();
@@ -284,10 +283,41 @@ public class ConvexProblems extends OptimisationConvexTests {
         ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build(options);
         Result resultNOk = solverNOk.solve();
 
-        System.out.println("Result OK: " + resultOk);
-        System.out.println("Result NOK: " + resultNOk);
+        BasicLogger.debug("Result OK: " + resultOk);
+        BasicLogger.debug("Result NOK: " + resultNOk);
 
         BasicLogger.debug(R064Store.FACTORY.row(resultOk));
+
+        BasicLogger.debug(R064Store.FACTORY.row(resultNOk));
+
+        TestUtils.assertTrue(resultOk.getState().isOptimal());
+        TestUtils.assertTrue(resultNOk.getState().isOptimal());
+
+        //        TestUtils.assertEquals(-2918.222222222222, resultOk.getValue(), NumberContext.of(8));
+        //        TestUtils.assertEquals(-2918.222222222222, resultNOk.getValue(), NumberContext.of(8));
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x0 = model.addVariable().lower(0).weight(-56);
+        Variable x1 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x2 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x3 = model.addVariable().lower(0).weight(-5.6000000000000005E-9);
+        Variable x4 = model.addVariable().lower(0).weight(-196);
+
+        model.addExpression().set(x0, 1).set(x4, 1).upper(28);
+        model.addExpression().set(x1, 1).set(x4, 1).upper(25);
+        model.addExpression().set(x2, 1).set(x4, 1).upper(25);
+        model.addExpression().set(x3, 1).set(x4, 1).upper(25);
+
+        model.addExpression("Q").set(x0, x0, 2).set(x1, x1, 2E-10).set(x2, x2, 2E-10).set(x3, x3, 2E-10).set(x4, x4, 7)
+                .weight(0.5);
+
+        // model.options.convex().extendedPrecision(true);
+
+        Result result = model.minimise();
+
+        BasicLogger.debug("Result EBM: " + result);
+        BasicLogger.debug("Model EBM: " + model);
     }
 
     /**
