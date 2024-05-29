@@ -275,12 +275,14 @@ public class ConvexProblems extends OptimisationConvexTests {
         R064Store BI = R064Store.FACTORY.column(28.0, 25.0, 25.0, 25.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
         Optimisation.Options options = new Optimisation.Options();
+        options.debug(ConvexSolver.class);
+        options.sparse = Boolean.FALSE;
         // options.convex().extendedPrecision(true);
 
-        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build();
+        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build(options);
         Result resultOk = solverOk.solve();
 
-        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build();
+        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build(options);
         Result resultNOk = solverNOk.solve();
 
         BasicLogger.debug("Result OK: " + resultOk);
