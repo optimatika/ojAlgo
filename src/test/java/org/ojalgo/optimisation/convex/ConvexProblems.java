@@ -275,12 +275,12 @@ public class ConvexProblems extends OptimisationConvexTests {
         R064Store BI = R064Store.FACTORY.column(28.0, 25.0, 25.0, 25.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
         Optimisation.Options options = new Optimisation.Options();
-        options.convex().extendedPrecision(true);
+        // options.convex().extendedPrecision(true);
 
-        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build(options);
+        ConvexSolver solverOk = ConvexSolver.newBuilder().objective(Q, C).inequalities(AI, BI).build();
         Result resultOk = solverOk.solve();
 
-        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build(options);
+        ConvexSolver solverNOk = ConvexSolver.newBuilder().objective(Q, C_issue).inequalities(AI, BI).build();
         Result resultNOk = solverNOk.solve();
 
         BasicLogger.debug("Result OK: " + resultOk);
@@ -293,8 +293,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertTrue(resultOk.getState().isOptimal());
         TestUtils.assertTrue(resultNOk.getState().isOptimal());
 
-        //        TestUtils.assertEquals(-2918.222222222222, resultOk.getValue(), NumberContext.of(8));
-        //        TestUtils.assertEquals(-2918.222222222222, resultNOk.getValue(), NumberContext.of(8));
+        TestUtils.assertEquals(-2918.222222222222, resultOk.getValue(), NumberContext.of(8));
+        TestUtils.assertEquals(-2918.222222222222, resultNOk.getValue(), NumberContext.of(8));
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
