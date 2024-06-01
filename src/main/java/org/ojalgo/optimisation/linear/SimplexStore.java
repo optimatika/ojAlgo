@@ -80,18 +80,7 @@ abstract class SimplexStore {
         }
     }
 
-    @FunctionalInterface
-    interface SimplexStoreFactory {
-
-        SimplexStore newInstance(LinearStructure structure);
-
-    }
-
-    static SimplexStore build(final ExpressionsBasedModel model) {
-        return SimplexStore.build(model, SimplexStore::newInstance);
-    }
-
-    static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> storeFactory) {
+    static SimplexStore build(final ExpressionsBasedModel model, final Function<LinearStructure, SimplexStore> storeFactory) {
 
         Set<IntIndex> fixedVariables = model.getFixedVariables();
         List<Variable> freeVariables = model.getFreeVariables();
@@ -124,7 +113,7 @@ abstract class SimplexStore {
 
         LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
-        S simplex = storeFactory.apply(structure);
+        SimplexStore simplex = storeFactory.apply(structure);
         double[] lowerBounds = simplex.getLowerBounds();
         double[] upperBounds = simplex.getUpperBounds();
 
@@ -191,20 +180,17 @@ abstract class SimplexStore {
         return simplex;
     }
 
-    static SimplexStore build(final LinearSolver.GeneralBuilder builder) {
-        return SimplexStore.build(builder, SimplexStore::newInstance);
-    }
+    static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
-    static <S extends SimplexStore> S build(final LinearSolver.GeneralBuilder builder, final Function<LinearStructure, S> storeFactory, final int... basis) {
-        return builder.newSimplexStore(storeFactory, basis);
-    }
+        return structure -> {
 
-    static SimplexStore newInstance(final LinearStructure structure) {
-        if (Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
-            return new RevisedStore(structure);
-        } else {
-            return new DenseTableau(structure);
-        }
+            if (Boolean.TRUE.equals(options.sparse)
+                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
+                return new RevisedStore(structure);
+            } else {
+                return new DenseTableau(structure);
+            }
+        };
     }
 
     private transient int[] myExcludedLower = null;
@@ -349,7 +335,7 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
-
+    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
 
     final ColumnState getColumnState(final int index) {
         return myPartition.get(index);
@@ -604,6 +590,6 @@ abstract class SimplexStore {
         return this;
     }
 
-    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
+    abstract void setupDualPhaseOneObjective();
 
 }

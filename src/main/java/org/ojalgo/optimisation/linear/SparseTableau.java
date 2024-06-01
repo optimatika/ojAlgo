@@ -203,6 +203,11 @@ final class SparseTableau extends SimplexTableau {
 
     @Override
     void copyObjective() {
+
+        if (myAuxiliaryObjective == null) {
+            myAuxiliaryObjective = SparseTableau.DENSE_FACTORY.make(n);
+        }
+
         myAuxiliaryObjective.fillMatching(myObjective);
         myAuxiliaryValue = myValue;
     }
@@ -407,5 +412,28 @@ final class SparseTableau extends SimplexTableau {
 
         myValue = myAuxiliaryValue;
         myAuxiliaryValue = NaN;
+    }
+
+    @Override
+    void setupDualPhaseOneObjective() {
+
+        for (int j = 0; j < n; j++) {
+
+            double p2 = myObjective.doubleValue(j);
+            double p1 = myAuxiliaryObjective.doubleValue(j);
+
+            ColumnState columnState = this.getColumnState(j);
+
+            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
+
+                myObjective.set(j, ZERO);
+            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
+                myObjective.set(j, p1 != ZERO ? Math.abs(p1) : ONE);
+            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
+                myObjective.set(j, p1 != ZERO ? -Math.abs(p1) : NEG);
+            }
+
+            myAuxiliaryObjective.set(j, p1);
+        }
     }
 }

@@ -78,7 +78,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(builder, factory, basis);
+            SimplexStore simplex = builder.newSimplexStore(factory, basis);
             DualSimplexSolver solver = simplex.newDualSimplexSolver(options, basis);
             RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
         }
@@ -142,7 +142,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(builder, factory);
+            SimplexStore simplex = builder.newSimplexStore(factory);
             PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
         }
@@ -173,7 +173,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(builder, factory, basis);
+            SimplexStore simplex = builder.newSimplexStore(factory, basis);
             PrimalSimplexSolver solver = simplex.newPrimalSimplexSolver(options, basis);
             RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
         }

@@ -328,7 +328,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, model.options);
+        SimplexTableau retVal = SimplexTableau.newTableauFactory(model.options).apply(structure);
 
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
@@ -562,7 +562,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, options);
+        SimplexTableau retVal = SimplexTableau.newTableauFactory(options).apply(structure);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();
@@ -627,7 +627,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0);
 
-        SimplexTableau retVal = SimplexTableau.make(structure, options);
+        SimplexTableau retVal = SimplexTableau.newTableauFactory(options).apply(structure);
 
         Primitive2D constraintsBody = retVal.constraintsBody();
         Primitive1D constraintsRHS = retVal.constraintsRHS();

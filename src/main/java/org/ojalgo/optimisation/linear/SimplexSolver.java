@@ -1101,7 +1101,7 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    void initiatePhase1() {
+    final void initiatePhase1() {
         mySimplex.copyObjective();
     }
 
@@ -1116,6 +1116,10 @@ abstract class SimplexSolver extends LinearSolver {
     final IterDescr prepareToIterate(final boolean prioritiseFeasibility, final boolean modifyObjective) {
 
         this.shiftBounds(prioritiseFeasibility, modifyObjective);
+
+        if (false) {
+            mySimplex.setupDualPhaseOneObjective();
+        }
 
         if (mySimplex.m == 0) {
             this.solveUnconstrained(); // TODO return?

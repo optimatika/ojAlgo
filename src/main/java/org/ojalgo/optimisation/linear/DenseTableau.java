@@ -136,7 +136,11 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     void copyObjective() {
-        myAuxiliaryRow = Arrays.copyOf(myTableau[m], myColDim);
+        if (myAuxiliaryRow == null) {
+            myAuxiliaryRow = Arrays.copyOf(myTableau[m], myColDim);
+        } else {
+            System.arraycopy(myTableau[m], 0, myAuxiliaryRow, 0, myColDim);
+        }
     }
 
     @Override
@@ -331,6 +335,28 @@ final class DenseTableau extends SimplexTableau {
     void restoreObjective() {
         myTableau[m] = myAuxiliaryRow;
         myAuxiliaryRow = null;
+    }
+
+    @Override
+    void setupDualPhaseOneObjective() {
+
+        for (int j = 0; j < n; j++) {
+
+            double p2 = myTableau[m][j];
+            double p1 = myAuxiliaryRow[j];
+
+            ColumnState columnState = this.getColumnState(j);
+
+            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
+                myTableau[m][j] = ZERO;
+            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
+                myTableau[m][j] = p1 != ZERO ? Math.abs(p1) : ONE;
+            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
+                myTableau[m][j] = p1 != ZERO ? -Math.abs(p1) : NEG;
+            }
+
+            myAuxiliaryRow[j] = p1;
+        }
     }
 
 }

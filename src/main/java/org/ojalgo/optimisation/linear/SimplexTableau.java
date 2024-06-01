@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
@@ -47,6 +47,15 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
+
+    static Function<LinearStructure, SimplexTableau> newTableauFactory(final Optimisation.Options options) {
+
+        if (options.sparse != null && options.sparse.booleanValue()) {
+            return SparseTableau::new;
+        } else {
+            return DenseTableau::new;
+        }
+    }
 
     private transient Primitive2D myConstraintsBody = null;
     private transient Primitive1D myConstraintsRHS = null;
@@ -429,15 +438,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             return this.getInfeasibility();
         } else {
             return this.getValue();
-        }
-    }
-
-    static SimplexTableau make(final LinearStructure structure, final Optimisation.Options options) {
-    
-        if (options.sparse != null && options.sparse.booleanValue()) {
-            return new SparseTableau(structure);
-        } else {
-            return new DenseTableau(structure);
         }
     }
 

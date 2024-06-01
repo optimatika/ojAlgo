@@ -28,6 +28,7 @@ import java.util.Collections;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.equation.Equation;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -231,7 +232,11 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     void copyObjective() {
-        myAlternativeObjective = myObjective.copy();
+        if (myAlternativeObjective == null) {
+            myAlternativeObjective = myObjective.copy();
+        } else {
+            myAlternativeObjective.fillMatching(myObjective);
+        }
     }
 
     @Override
@@ -246,6 +251,11 @@ final class RevisedStore extends SimplexStore {
         }
 
         return retVal;
+    }
+
+    @Override
+    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+        return Collections.emptySet();
     }
 
     @Override
@@ -335,8 +345,29 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
-        return Collections.emptySet();
+    void setupDualPhaseOneObjective() {
+
+        if (myAlternativeObjective == null) {
+            myAlternativeObjective = RevisedStore.newColumn(n);
+        }
+
+        for (int j = 0; j < n; j++) {
+
+            double p2 = myObjective.doubleValue(j);
+            double p1 = myConstraintsBody.column(j).aggregateAll(Aggregator.SUM).doubleValue();
+
+            ColumnState columnState = this.getColumnState(j);
+
+            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
+                myObjective.set(j, ZERO);
+            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
+                myObjective.set(j, p1 != ZERO ? Math.abs(p1) : ONE);
+            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
+                myObjective.set(j, p1 != ZERO ? -Math.abs(p1) : NEG);
+            }
+
+            myAlternativeObjective.set(j, p1);
+        }
     }
 
 }

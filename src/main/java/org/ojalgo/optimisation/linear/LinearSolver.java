@@ -335,7 +335,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             LinearStructure structure = new LinearStructure(false, nbInequalites, nbEqualites, nbVariables, 0, nbSlackVariables, nbIdentitySlackVariables);
 
-            SimplexTableau tableau = SimplexTableau.make(structure, options);
+            SimplexTableau tableau = SimplexTableau.newTableauFactory(options).apply(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -408,7 +408,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return super.getUpperBounds(POSITIVE_INFINITY).data;
         }
 
-        <S extends SimplexStore> S newSimplexStore(final Function<LinearStructure, S> storeFactory, final int... basis) {
+        SimplexStore newSimplexStore(final Function<LinearStructure, SimplexStore> storeFactory, final int... basis) {
 
             MatrixStore<Double> builderC = this.getObjective().getLinearFactors(false);
             MatrixStore<Double> builderAE = this.getAE();
@@ -429,7 +429,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             LinearStructure structure = new LinearStructure(false, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
-            S simplex = storeFactory.apply(structure);
+            SimplexStore simplex = storeFactory.apply(structure);
 
             double[] lowerBounds = simplex.getLowerBounds();
             double[] upperBounds = simplex.getUpperBounds();
@@ -473,7 +473,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return simplex;
         }
 
-        <T extends SimplexTableau> T newSimplexTableau(final Function<LinearStructure, T> tableauFactory) {
+        SimplexTableau newSimplexTableau(final Function<LinearStructure, SimplexTableau> tableauFactory) {
 
             int nbVars = this.countVariables();
             int nbEqus = this.countEqualityConstraints();
@@ -500,7 +500,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars, 0, nbOtherSlackVars, nbIdentSlackVars);
 
-            T tableau = tableauFactory.apply(structure);
+            SimplexTableau tableau = tableauFactory.apply(structure);
             Primitive2D constraintsBody = tableau.constraintsBody();
             Primitive1D constraintsRHS = tableau.constraintsRHS();
             Primitive1D objective = tableau.objective();
@@ -573,17 +573,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public SimplexSolver build(final ExpressionsBasedModel model) {
 
-            PhasedSimplexSolver solver = SimplexStore.build(model, structure -> {
-                if (Boolean.TRUE.equals(model.options.sparse)) {
-                    return new RevisedStore(structure);
-                } else if (Boolean.FALSE.equals(model.options.sparse)) {
-                    return new DenseTableau(structure);
-                } else {
-                    return SimplexStore.newInstance(structure);
-                }
-            }).newPhasedSimplexSolver(model.options);
+            Options options = model.options;
 
-            if (model.options.validate) {
+            Function<LinearStructure, SimplexStore> storeFactory = SimplexStore.newStoreFactory(options);
+
+            PhasedSimplexSolver solver = SimplexStore.build(model, storeFactory).newPhasedSimplexSolver(options);
+
+            if (options.validate) {
                 solver.setValidator(this.newValidator(model));
             }
 
@@ -753,15 +749,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     /**
      * An integration to a new/alternative/experimental LP-solver. This solver is intended to replace the
-     * current solver, but is not yet ready to do that. You're welcome to try it - just add this integration
-     * by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
-     * <p>
-     * With the next major release this solver/integration is expected to be the default, and there will no
-     * longer be an integration constant named "NEW_INTEGRATION". Possibly there will instead be one named
-     * "OLD_INTEGRATION".
+     * current (old) solver, but is not yet ready to do that. You're welcome to try it - just add this
+     * integration by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
      */
     static final NewIntegration NEW_INTEGRATION = new NewIntegration();
 
+    /**
+     * An integration to a old/traditional/default LP-solver.
+     */
     static final OldIntegration OLD_INTEGRATION = new OldIntegration();
 
     public static LinearSolver.GeneralBuilder newGeneralBuilder() {
