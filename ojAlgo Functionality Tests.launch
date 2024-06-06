@@ -16,11 +16,11 @@
         <listEntry value="=ojAlgo/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=ojAlgo"/>
-    <stringAttribute key="org.eclipse.jdt.junit.EXCLUDE_TAGS" value="slow,unstable,network"/>
+    <stringAttribute key="org.eclipse.jdt.junit.EXCLUDE_TAGS" value="slow,unstable"/>
     <booleanAttribute key="org.eclipse.jdt.junit.HAS_EXCLUDE_TAGS" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.junit.HAS_INCLUDE_TAGS" value="false"/>
     <stringAttribute key="org.eclipse.jdt.junit.INCLUDE_TAGS" value="new_lp_problem"/>
-    <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
     <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
     <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit5"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
