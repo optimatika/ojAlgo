@@ -332,11 +332,10 @@ abstract class SimplexSolver extends LinearSolver {
                 negated[j] = true;
             }
         }
-        
+
         return mySimplex.generateCutCandidates(integer, ALGORITHM, fractionality);
 
-
-       // return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
+        // return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
     }
 
     @Override
