@@ -9,17 +9,18 @@ import org.ojalgo.netio.ServiceClient;
 import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.Variable;
 
 @Tag("network")
 public class OptimisationServiceTest {
 
     private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
     private static final String PATH_TEST = "/optimisation/v01/test";
-    // private static final String HOST = "http://51.20.187.183:8080";
-    private static final String HOST = "http://localhost:8080";
+    private static final String HOST = "http://16.171.2.10:8080";
+    // private static final String HOST = "http://localhost:8080";
     // private static final String HOST = "http://test-service.optimatika.se";
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     @AfterEach
     public void clearIntegrations() {
@@ -55,10 +56,10 @@ public class OptimisationServiceTest {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        model.newVariable("A").weight(10).lower(0);
-        model.newVariable("B").weight(-10).lower(0);
+        Variable varA = model.newVariable("A").weight(10).lower(0);
+        Variable varB = model.newVariable("B").weight(-10).lower(0);
 
-        model.newExpression("UM2").set(0, 1).set(1, 1).level(2);
+        model.newExpression("UM2").set(varA, 1).set(varB, 1).level(2);
 
         Result expMax = model.maximise();
         Result expMin = model.minimise();
