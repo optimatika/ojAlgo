@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_LARGEST;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -33,7 +32,6 @@ import java.util.function.Function;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
@@ -177,35 +175,31 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
 
-        int nbModVars = structure.countModelVariables();
+        int nbVars = integer.length;
+
+        if (nbVars != structure.countVariables()) {
+            BasicLogger.debug("generateCutCandidates: integer.length != structure.countVariables()");
+        }
 
         Primitive1D constraintsRHS = this.constraintsRHS();
 
-        double[] solRHS = new double[integer.length];
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-            if (j >= 0 && j < nbModVars) {
-                solRHS[j] = constraintsRHS.doubleValue(i);
-            }
-        }
-
-        if (ProblemStructure.DEBUG) {
-            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
-            BasicLogger.debug("Bas: {}", Arrays.toString(included));
-        }
-
         List<Equation> retVal = new ArrayList<>();
 
-        boolean[] negated = new boolean[integer.length];
+        boolean[] negated = new boolean[nbVars];
+        for (int i = 0; i < nbVars; i++) {
+            if (this.getColumnState(i) == ColumnState.UPPER) {
+                negated[i] = true;
+            }
+        }
 
         for (int i = 0; i < m; i++) {
             int j = included[i];
 
             double rhs = constraintsRHS.doubleValue(i);
 
-            if (j >= 0 && j < nbModVars && integer[j] && !accuracy.isInteger(rhs)) {
+            if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated, excluded);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, negated);
 
                 if (maybe != null) {
                     retVal.add(maybe);
