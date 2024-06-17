@@ -225,9 +225,9 @@ final class IterativeRefinementSolver extends ConvexSolver {
 
     private final ConvexData<Quadruple> myData;
 
-    IterativeRefinementSolver(final Options solverOptions, final ConvexData<Quadruple> data) {
-        super(solverOptions);
-        myData = data;
+    IterativeRefinementSolver(final Optimisation.Options optimisationOptions, final ConvexData<Quadruple> convexData) {
+        super(optimisationOptions);
+        myData = convexData;
     }
 
     @Override

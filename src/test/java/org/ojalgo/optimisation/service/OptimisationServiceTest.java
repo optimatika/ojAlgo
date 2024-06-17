@@ -15,9 +15,9 @@ public class OptimisationServiceTest {
 
     private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
     private static final String PATH_TEST = "/optimisation/v01/test";
-    private static final String HOST = "http://51.20.187.183:8080";
+    private static final String HOST = "http://13.51.250.152:8080";
     // private static final String HOST = "http://localhost:8080";
-    // private static final String HOST = "http://test-service.optimatika.se";
+    // private static final String HOST = "http://test-service.optimatika.se:8080";
 
     static final boolean DEBUG = false;
 

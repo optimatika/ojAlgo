@@ -206,6 +206,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return myBody;
     }
 
+    public double[] getCoefficients() {
+        return myBody.toRawCopy1D();
+    }
+
     /**
      * @return The element at {@link #index}
      */

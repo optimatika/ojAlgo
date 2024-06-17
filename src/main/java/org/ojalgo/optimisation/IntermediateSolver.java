@@ -57,8 +57,8 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
         Solver.super.dispose();
     }
 
-    public Variable getVariable(final int globalIndex) {
-        return myModel.getVariable(globalIndex);
+    public Variable getVariable(final int globalModelIndex) {
+        return myModel.getVariable(globalModelIndex);
     }
 
     /**

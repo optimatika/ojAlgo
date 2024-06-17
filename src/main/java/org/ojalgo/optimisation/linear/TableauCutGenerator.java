@@ -33,9 +33,9 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class TableauCutGenerator {
 
-    private static final boolean DEBUG = false;
-
     private static final NumberContext ACCURACY = NumberContext.of(4, 16);
+
+    private static final boolean DEBUG = false;
 
     private static double fraction(final double value) {
         return value - Math.floor(value);
@@ -50,9 +50,16 @@ abstract class TableauCutGenerator {
     }
 
     /**
-     * All variables must be integer.
+     * Calculates a Gomory cut – all variables must be integer.
+     * 
+     * @param body Simplex tableau row (excluding the RHS column)
+     * @param index The pivot index of the returned equation. Otherwise not used in the generation.
+     * @param rhs The right hand side value of the row – the value that should be an integer.
+     * @param fractionality The fractionality threshold. If the fractional part of the right hand side is less
+     *        than this value, no cut is generated.
+     * @return A Gomory cut equation, or null if no cut was generated.
      */
-    static Equation doGomory(final Primitive1D body, final int variableIndex, final double rhs, final double fractionality) {
+    static Equation doGomory(final Primitive1D body, final int index, final double rhs, final double fractionality) {
 
         int nbVariables = body.size();
 
@@ -76,28 +83,41 @@ abstract class TableauCutGenerator {
             }
         }
 
-        return Equation.of(ONE, variableIndex, cut);
+        return Equation.of(ONE, index, cut);
     }
 
-    static Equation doGomoryMixedInteger(final Primitive1D body, final int variableIndex, final double rhs, final boolean[] integer, final double fractionality,
-            final boolean[] negated, final int[] excluded) {
+    /**
+     * Calculates a Gomory Mixed Integer (GMI) cut.
+     * 
+     * @param body The equation body (simplex tableau row). The tableau is assumed to be in an optimal (phase
+     *        2) state. Any reference to an artificial variable will be ignored.
+     * @param index Index (tableau column) of the variable to be cut. A basic variable that should be integer,
+     *        but is not. The body value at this index must be integer (not 0) and if this actually is from a
+     *        tableau row it should be (will be) 1.
+     * @param rhs The equation right hand side value – the value that should be an integer.
+     * @param fractionality The fractionality threshold.
+     * @param excluded Indices of the non-basic variables (excluded from the basis).
+     * @param integer Which variables are integer? There must be one element for each variable - the length of
+     *        this array defines the number of variables.
+     * @param negated Which variables are negated? There must be one element for each variable – at least the
+     *        same length as the integer array.
+     * @return A GMI cut equation, or null if no cut was generated.
+     */
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final double fractionality, final int[] excluded,
+            final boolean[] integer, final boolean[] negated) {
 
-        int nbVariables = integer.length;
-        if (body.size() < nbVariables || negated.length != nbVariables) {
+        int nbVariables = integer.length; // Excluding artificial variables
+        if (body.size() < nbVariables || negated.length < nbVariables) {
             throw new IllegalArgumentException();
         }
 
         if (DEBUG) {
-            BasicLogger.debug(1, "{} {} = {}", variableIndex, rhs, body);
+            BasicLogger.debug(1, "{} {} = {}", index, rhs, body);
             BasicLogger.debug(1, "Integers: {}", Arrays.toString(integer));
             BasicLogger.debug(1, "Negated:  {}", Arrays.toString(negated));
         }
 
-        // boolean negateRHS = rhs < ZERO;
-        // boolean negateRHS = negated[variableIndex];
-        boolean negateRHS = false;
-
-        double f0 = TableauCutGenerator.fraction(negateRHS ? -rhs : rhs);
+        double f0 = TableauCutGenerator.fraction(rhs);
         if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
@@ -110,9 +130,9 @@ abstract class TableauCutGenerator {
 
             if (j < nbVariables) {
 
-                double aj = negateRHS ^ negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
+                double aj = negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
 
-                if (j != variableIndex && !ACCURACY.isZero(aj)) {
+                if (!ACCURACY.isZero(aj)) {
 
                     if (integer[j]) {
 
@@ -135,10 +155,16 @@ abstract class TableauCutGenerator {
                         cut[j] = -aj / cf0;
                     }
                 }
+
+            } else {
+
+                if (DEBUG) {
+                    BasicLogger.debug("Artificial variable: {} {}", j, body.doubleValue(j));
+                }
             }
         }
 
-        return Equation.of(ONE, variableIndex, cut);
+        return Equation.of(ONE, index, cut);
     }
 
 }

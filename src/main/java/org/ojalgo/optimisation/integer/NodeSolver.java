@@ -93,24 +93,10 @@ public final class NodeSolver extends IntermediateSolver {
             if (entityMap != null) {
 
                 int nbProblVars = entityMap.countModelVariables();
-                int nbProblInts = strategy.countIntegerVariables();
+
                 int nbSlackVars = entityMap.countSlackVariables();
 
-                boolean[] integers = new boolean[nbProblVars + nbSlackVars];
-
-                for (int i = 0; i < nbProblInts; i++) {
-                    int indexInModel = strategy.getIndex(i);
-                    int indexInSolver = this.getIndexInSolver(indexInModel);
-                    if (indexInSolver >= 0) {
-                        integers[indexInSolver] = true;
-                    }
-                }
-                for (int i = 0; i < nbSlackVars; i++) {
-                    EntryPair<ModelEntity<?>, ConstraintType> slack = entityMap.getSlack(i);
-                    ModelEntity<?> key = slack.getKey();
-                    boolean integer = key.isInteger();
-                    integers[nbProblVars + i] = integer;
-                }
+                boolean[] integers = updatable.integers(model);
 
                 Collection<Equation> potentialCuts = updatable.generateCutCandidates(strategy.getGMICutConfiguration().fractionality, integers);
 

@@ -63,6 +63,10 @@ public final class GomorySolver extends GenericSolver {
 
     private static final GMICutConfiguration GMI_CUT_CONFIGURATION = new GMICutConfiguration().withFractionality(0.01).withViolation(BigMath.HUNDRED);
 
+    public static GomorySolver newSolver(final ExpressionsBasedModel model) {
+        return INTEGRATION.build(model);
+    }
+
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final ExpressionsBasedModel myIntegerModel;
 

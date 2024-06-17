@@ -459,7 +459,7 @@ public interface Optimisation {
             return new Result(State.APPROXIMATE, Double.NaN, solution);
         }
 
-        private ConstraintsMap myConstraintsMap = null;
+        private ConstraintsMetaData myConstraintsMap = null;
         private List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> myMatchedMultipliers = null;
         private Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;
@@ -581,7 +581,7 @@ public interface Optimisation {
             return this;
         }
 
-        public Result multipliers(final ConstraintsMap constraintsMap, final Access1D<?> multipliers) {
+        public Result multipliers(final ConstraintsMetaData constraintsMap, final Access1D<?> multipliers) {
             myConstraintsMap = constraintsMap;
             myMultipliers = multipliers;
             return this;
@@ -668,7 +668,13 @@ public interface Optimisation {
     }
 
     public enum Sense implements Optimisation {
+
         MAX, MIN;
+
+        public Optimisation.Result solve(final ExpressionsBasedModel model) {
+            return this == MIN ? model.minimise() : model.maximise();
+        }
+
     }
 
     /**

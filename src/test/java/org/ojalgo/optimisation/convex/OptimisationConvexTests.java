@@ -38,7 +38,7 @@ public abstract class OptimisationConvexTests {
         return convexSolverBuilder.getConvexData(R064Store.FACTORY);
     }
 
-    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, Optimisation.Options options) {
+    protected static void assertDirectAndIterativeEquals(final ConvexData<Double> convexData, final NumberContext accuracy, Optimisation.Options options) {
 
         if (options == null) {
             options = new Optimisation.Options();
@@ -48,13 +48,13 @@ public abstract class OptimisationConvexTests {
             options.solution = accuracy;
         }
 
-        if (builder.countInequalityConstraints() > 0) {
+        if (convexData.countInequalityConstraints() > 0) {
             // ActiveSetSolver (ASS)
 
-            DirectASS directASS = new DirectASS(builder.getConvexData(R064Store.FACTORY), options);
+            DirectASS directASS = new DirectASS(convexData, options);
             Optimisation.Result direct = directASS.solve();
 
-            IterativeASS iterativeASS = new IterativeASS(builder.getConvexData(R064Store.FACTORY), options);
+            IterativeASS iterativeASS = new IterativeASS(convexData, options);
             Optimisation.Result iterative = iterativeASS.solve();
 
             if (!direct.getState().isFeasible()) {
@@ -67,13 +67,18 @@ public abstract class OptimisationConvexTests {
         }
     }
 
+    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, final Optimisation.Options options) {
+
+        ConvexData<Double> convexData = OptimisationConvexTests.getOptimisationData(builder);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(convexData, accuracy, options);
+    }
+
     protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model, final NumberContext accuracy) {
 
-        ConvexSolver.Builder builder = ConvexSolver.newBuilder();
+        ConvexData<Double> convexData = ConvexSolver.copy(model, R064Store.FACTORY);
 
-        ConvexSolver.copy(model, builder);
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy, model.options);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(convexData, accuracy, model.options);
     }
 
 }

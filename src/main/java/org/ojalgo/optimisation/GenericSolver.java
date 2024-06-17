@@ -528,13 +528,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
         this(new Optimisation.Options());
     }
 
-    protected GenericSolver(final Optimisation.Options solverOptions) {
+    protected GenericSolver(final Optimisation.Options optimisationOptions) {
 
         super();
 
-        ProgrammingError.throwIfNull(solverOptions);
+        ProgrammingError.throwIfNull(optimisationOptions);
 
-        options = solverOptions;
+        options = optimisationOptions;
     }
 
     protected final int countIterations() {

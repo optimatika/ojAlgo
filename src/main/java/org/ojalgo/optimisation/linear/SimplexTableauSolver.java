@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.ojalgo.array.Array1D;
@@ -39,7 +40,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.optimisation.ConstraintsMap;
+import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -113,34 +114,6 @@ final class SimplexTableauSolver extends LinearSolver {
     private static final NumberContext PIVOT = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext RATIO = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext WEIGHT = NumberContext.of(8, 10).withMode(RoundingMode.HALF_DOWN);
-
-    private static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
-            final int baseNegVars, final IntIndex key, final double factor) {
-
-        int tmpPosInd = model.indexOfPositiveVariable(key);
-        if (tmpPosInd >= 0) {
-            constraintsBdy.set(indCnstr, basePosVars + tmpPosInd, factor);
-        }
-
-        int tmpNegInd = model.indexOfNegativeVariable(key);
-        if (tmpNegInd >= 0) {
-            constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
-        }
-    }
-
-    private static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars,
-            final int baseNegVars, final Variable variable, final double factor) {
-
-        int tmpPosInd = model.indexOfPositiveVariable(variable);
-        if (tmpPosInd >= 0) {
-            constraintsBdy.set(indCnstr, basePosVars + tmpPosInd, factor);
-        }
-
-        int tmpNegInd = model.indexOfNegativeVariable(variable);
-        if (tmpNegInd >= 0) {
-            constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
-        }
-    }
 
     private static Optimisation.Result toConvexStateFromDual(final Optimisation.Result result, final ConvexData<Double> convex) {
 
@@ -233,7 +206,7 @@ final class SimplexTableauSolver extends LinearSolver {
         return result.withSolution(solution);
     }
 
-    static SimplexTableau build(final ExpressionsBasedModel model) {
+    static <T extends SimplexTableau> T build(final ExpressionsBasedModel model, final Function<LinearStructure, T> factory) {
 
         List<Variable> posVariables = model.getPositiveVariables();
         List<Variable> negVariables = model.getNegativeVariables();
@@ -328,7 +301,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
-        SimplexTableau retVal = SimplexTableau.newTableauFactory(model.options).apply(structure);
+        T retVal = factory.apply(structure);
 
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
@@ -696,6 +669,34 @@ final class SimplexTableauSolver extends LinearSolver {
         return SimplexTableauSolver.toConvexStateFromPrimal(result, convex);
     }
 
+    static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars, final int baseNegVars,
+            final IntIndex key, final double factor) {
+
+        int tmpPosInd = model.indexOfPositiveVariable(key);
+        if (tmpPosInd >= 0) {
+            constraintsBdy.set(indCnstr, basePosVars + tmpPosInd, factor);
+        }
+
+        int tmpNegInd = model.indexOfNegativeVariable(key);
+        if (tmpNegInd >= 0) {
+            constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
+        }
+    }
+
+    static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars, final int baseNegVars,
+            final Variable variable, final double factor) {
+
+        int tmpPosInd = model.indexOfPositiveVariable(variable);
+        if (tmpPosInd >= 0) {
+            constraintsBdy.set(indCnstr, basePosVars + tmpPosInd, factor);
+        }
+
+        int tmpNegInd = model.indexOfNegativeVariable(variable);
+        if (tmpNegInd >= 0) {
+            constraintsBdy.set(indCnstr, baseNegVars + tmpNegInd, -factor);
+        }
+    }
+
     static int sizeOfDual(final ConvexData<?> convex) {
 
         int nbCvxVars = convex.countVariables();
@@ -888,7 +889,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         Result result = new Optimisation.Result(state, value, solution);
 
-        ConstraintsMap constraints = this.getEntityMap().constraints;
+        ConstraintsMetaData constraints = this.getEntityMap().constraints;
 
         if (constraints.isEntityMap()) {
             return result.multipliers(constraints, this.extractMultipliers());

@@ -240,14 +240,12 @@ public class TuneSparseOrDenseSolver extends OptimisationTests {
 
     @Benchmark
     public ConvexSolver buildConvex() {
-        ConvexSolver.Builder convexBuilder = ConvexSolver.newBuilder();
-        ConvexSolver.copy(model, convexBuilder);
-        return convexBuilder.build(model.options);
+        return ConvexSolver.INTEGRATION.build(model);
     }
 
     @Benchmark
     public LinearSolver buildLinear() {
-        return LinearSolver.newSolver(model);
+        return LinearSolver.INTEGRATION.build(model);
     }
 
     @Setup

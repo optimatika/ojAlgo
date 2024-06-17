@@ -23,11 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.equation.Equation;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -39,7 +35,6 @@ import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
-import org.ojalgo.type.context.NumberContext;
 
 final class RevisedStore extends SimplexStore {
 
@@ -114,6 +109,15 @@ final class RevisedStore extends SimplexStore {
         myInvBasis = new ProductFormInverse(m, TWO_THIRDS); // TODO The scaling threshold should be much smaller
     }
 
+    private void doBodyRow(final int i, final PhysicalStore<Double> destination) {
+
+        z.reset();
+        z.set(i, ONE);
+        myInvBasis.btran(z); // i:th row of inv B
+
+        this.doExclTranspMult(z, destination);
+    }
+
     private void doExclTranspMult(final MatrixStore<Double> lambda, final PhysicalStore<Double> results) {
         for (int je = 0; je < excluded.length; je++) {
             myConstraintsColumn.goToColumn(excluded[je]);
@@ -141,20 +145,7 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     void calculateDualDirection(final ExitInfo exit) {
-
-        //        PhysicalStore<Double> zRHS = R064Store.FACTORY.make(included.length, 1);
-        //        zRHS.set(exit.index, -1);
-
-        z.reset();
-        // z.set(exit.index, -1);
-        z.set(exit.index, 1.0);
-
-        // this.btran(zRHS, z); // i:th row of inv B
-        myInvBasis.btran(z); // i:th row of inv B
-
-        // myDualDirection = this.exclTranspMult(z).negate();
-        // myDualDirection = this.exclTranspMult(z);
-        this.doExclTranspMult(z, a);
+        this.doBodyRow(exit.index, a);
     }
 
     @Override
@@ -254,11 +245,6 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
-        return Collections.emptySet();
-    }
-
-    @Override
     double getCost(final int j) {
         return myObjective.doubleValue(j);
     }
@@ -323,28 +309,6 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    Primitive1D sliceDualVariables() {
-        return new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return -l.doubleValue(index);
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int size() {
-                return m;
-            }
-
-        };
-    }
-
-    @Override
     void setupDualPhaseOneObjective() {
 
         if (myAlternativeObjective == null) {
@@ -368,6 +332,42 @@ final class RevisedStore extends SimplexStore {
 
             myAlternativeObjective.set(j, p1);
         }
+    }
+
+    @Override
+    Primitive1D sliceBodyRow(final int i) {
+
+        R064Store exclPart = RevisedStore.newColumn(n - m);
+
+        this.doBodyRow(i, exclPart);
+
+        Primitive1D retVal = Primitive1D.newInstance(n);
+        for (int je = 0; je < excluded.length; je++) {
+            retVal.set(excluded[je], exclPart.doubleValue(je));
+        }
+        return retVal;
+    }
+
+    @Override
+    Primitive1D sliceDualVariables() {
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return -l.doubleValue(index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int size() {
+                return m;
+            }
+
+        };
     }
 
 }

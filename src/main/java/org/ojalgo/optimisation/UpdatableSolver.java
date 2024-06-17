@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.ojalgo.equation.Equation;
+import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
 import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
@@ -60,6 +61,34 @@ public interface UpdatableSolver extends Optimisation.Solver {
      */
     default KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
         return null;
+    }
+
+    default boolean[] integers(final ExpressionsBasedModel model) {
+
+        EntityMap entityMap = this.getEntityMap();
+
+        int nbProblVars = entityMap.countModelVariables();
+        int nbSlackVars = entityMap.countSlackVariables();
+
+        boolean[] integers = new boolean[nbProblVars + nbSlackVars];
+
+        for (int i = 0; i < nbProblVars; i++) {
+            int indexInModel = entityMap.indexOf(i);
+            Variable variable = model.getVariable(indexInModel);
+            if (variable.isInteger()) {
+                integers[i] = true;
+            }
+        }
+
+        for (int i = 0; i < nbSlackVars; i++) {
+            EntryPair<ModelEntity<?>, ConstraintType> slack = entityMap.getSlack(i);
+            ModelEntity<?> entity = slack.getKey();
+            if (entity.isInteger()) {
+                integers[nbProblVars + i] = true;
+            }
+        }
+
+        return integers;
     }
 
     default boolean isMapped() {

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
@@ -43,7 +44,6 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.convex.OptimisationConvexTests;
 import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -103,10 +103,8 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         Result modResult = sense == Sense.MIN ? model.minimise() : model.maximise();
 
-        ConvexSolver.Builder convex = ConvexSolver.newBuilder();
-        ConvexSolver.copy(model, convex);
+        ConvexData<Double> convexData = ConvexSolver.copy(model, R064Store.FACTORY);
 
-        ConvexData<Double> convexData = OptimisationConvexTests.getOptimisationData(convex);
         Result primResult = SimplexTableauSolver.doSolvePrimal(convexData, model.options, false);
         Result dualResult = SimplexTableauSolver.doSolveDual(convexData, model.options, false);
 

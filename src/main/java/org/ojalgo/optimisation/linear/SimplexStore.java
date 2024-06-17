@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.ojalgo.equation.Equation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -80,7 +81,7 @@ abstract class SimplexStore {
         }
     }
 
-    static SimplexStore build(final ExpressionsBasedModel model, final Function<LinearStructure, SimplexStore> storeFactory) {
+    static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
         Set<IntIndex> fixedVariables = model.getFixedVariables();
         List<Variable> freeVariables = model.getFreeVariables();
@@ -113,7 +114,7 @@ abstract class SimplexStore {
 
         LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
 
-        SimplexStore simplex = storeFactory.apply(structure);
+        S simplex = factory.apply(structure);
         double[] lowerBounds = simplex.getLowerBounds();
         double[] upperBounds = simplex.getUpperBounds();
 
@@ -335,7 +336,40 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
-    abstract Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality);
+    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+
+        int nbVars = integer.length;
+
+        if (nbVars != structure.countVariables()) {
+            BasicLogger.debug("generateCutCandidates: integer.length != structure.countVariables()");
+        }
+
+        boolean[] negated = new boolean[nbVars];
+        for (int i = 0; i < nbVars; i++) {
+            if (this.getColumnState(i) == ColumnState.UPPER) {
+                negated[i] = true;
+            }
+        }
+
+        List<Equation> retVal = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            int j = included[i];
+
+            double rhs = this.getCurrentRHS(i);
+
+            if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
+
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, negated);
+
+                if (maybe != null) {
+                    retVal.add(maybe);
+                }
+            }
+        }
+
+        return retVal;
+    }
 
     final ColumnState getColumnState(final int index) {
         return myPartition.get(index);
@@ -541,6 +575,10 @@ abstract class SimplexStore {
 
     abstract void restoreObjective();
 
+    abstract void setupDualPhaseOneObjective();
+
+    abstract Primitive1D sliceBodyRow(final int row);
+
     abstract Primitive1D sliceDualVariables();
 
     final SimplexStore unbounded(final int index) {
@@ -589,7 +627,5 @@ abstract class SimplexStore {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }
-
-    abstract void setupDualPhaseOneObjective();
 
 }

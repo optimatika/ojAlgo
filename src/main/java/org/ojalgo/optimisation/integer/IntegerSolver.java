@@ -162,6 +162,10 @@ public final class IntegerSolver extends GenericSolver {
         return new IntegerSolver(model);
     }
 
+    public static IntegerSolver newSolver(final ExpressionsBasedModel model) {
+        return INTEGRATION.build(model);
+    }
+
     static void flush(final RingLogger buffer, final BasicLogger receiver) {
         if (buffer != null && receiver != null) {
             buffer.flush(receiver);

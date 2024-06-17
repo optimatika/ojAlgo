@@ -21,7 +21,10 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import org.ojalgo.optimisation.ConstraintsMap;
+import java.util.Arrays;
+import java.util.Objects;
+
+import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -33,7 +36,7 @@ import org.ojalgo.type.keyvalue.EntryPair;
  */
 final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
-    final ConstraintsMap constraints;
+    final ConstraintsMetaData constraints;
     /**
      * The number of artificial variables
      */
@@ -69,7 +72,7 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
         positivePartVariables = new int[varsPos];
         negativePartVariables = new int[varsNeg];
-        constraints = ConstraintsMap.newInstance(constrIn + constrEq, inclMap);
+        constraints = ConstraintsMetaData.newInstance(constrIn + constrEq, inclMap);
 
         nbInes = constrIn;
         nbEqus = constrEq;
@@ -121,17 +124,17 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     @Override
-    public EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(final int i) {
-        return constraints.getEntry(i);
+    public EntryPair<ModelEntity<?>, ConstraintType> getConstraint(final int idc) {
+        return constraints.getEntry(idc);
     }
 
     @Override
-    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
+    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int ids) {
 
-        if (idx < nbSlck) {
-            return this.getConstraintMap(nbIdty + idx);
+        if (ids < nbSlck) {
+            return this.getConstraint(nbIdty + ids);
         } else {
-            return this.getConstraintMap(idx - nbSlck);
+            return this.getConstraint(ids - nbSlck);
         }
     }
 
@@ -218,6 +221,35 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
     void setObjectiveAdjustmentFactor(final double multiplierScale) {
         constraints.setMultiplierScale(multiplierScale);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(negativePartVariables);
+        result = prime * result + Arrays.hashCode(positivePartVariables);
+        result = prime * result + Objects.hash(constraints, nbArti, nbEqus, nbIdty, nbInes, nbNegs, nbSlck, nbVars);
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof LinearStructure)) {
+            return false;
+        }
+        LinearStructure other = (LinearStructure) obj;
+        return Objects.equals(constraints, other.constraints) && nbArti == other.nbArti && nbEqus == other.nbEqus && nbIdty == other.nbIdty
+                && nbInes == other.nbInes && nbNegs == other.nbNegs && nbSlck == other.nbSlck && nbVars == other.nbVars
+                && Arrays.equals(negativePartVariables, other.negativePartVariables) && Arrays.equals(positivePartVariables, other.positivePartVariables);
+    }
+
+    @Override
+    public String toString() {
+        return this.countConstraints() + " x " + this.countVariables();
     }
 
 }

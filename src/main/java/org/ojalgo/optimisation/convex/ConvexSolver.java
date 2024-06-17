@@ -32,7 +32,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -42,10 +41,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
-import org.ojalgo.optimisation.ConstraintsMap;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -526,191 +522,49 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final ModelIntegration INTEGRATION = new ModelIntegration();
 
-    public static void copy(final ExpressionsBasedModel sourceModel, final Builder destinationBuilder) {
+    public static <N extends Comparable<N>> ConvexData<N> copy(final ExpressionsBasedModel model, final PhysicalStore.Factory<N, ?> factory) {
 
-        destinationBuilder.reset();
-
-        List<Variable> freeVariables = sourceModel.getFreeVariables();
-        Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
+        List<Variable> freeVariables = model.getFreeVariables();
+        Set<IntIndex> fixedVariables = model.getFixedVariables();
 
         int nbVariables = freeVariables.size();
 
-        // AE & BE
-
-        List<Expression> tmpEqExpr = sourceModel.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
+        List<Expression> tmpEqExpr = model.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
                 .collect(Collectors.toList());
         int nbEqExpr = tmpEqExpr.size();
 
-        if (nbEqExpr > 0) {
-
-            SparseStore<Double> mtrxAE = SparseStore.R064.make(nbEqExpr, nbVariables);
-            PhysicalStore<Double> mtrxBE = R064Store.FACTORY.make(nbEqExpr, 1);
-
-            for (int i = 0; i < nbEqExpr; i++) {
-
-                Expression expression = tmpEqExpr.get(i).compensate(fixedVariables);
-
-                for (IntIndex key : expression.getLinearKeySet()) {
-                    mtrxAE.set(i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
-                }
-
-                mtrxBE.set(i, 0, expression.getUpperLimit(true, Double.POSITIVE_INFINITY));
-            }
-
-            destinationBuilder.equalities(mtrxAE, mtrxBE);
-        }
-
-        // Q & C
-
-        Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
-        boolean max = sourceModel.getOptimisationSense() == Optimisation.Sense.MAX;
-
-        PhysicalStore<Double> mtrxQ = null;
-        if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            mtrxQ = R064Store.FACTORY.make(nbVariables, nbVariables);
-
-            for (IntRowColumn key : tmpObjExpr.getQuadraticKeySet()) {
-                int row = sourceModel.indexOfFreeVariable(key.row);
-                int col = sourceModel.indexOfFreeVariable(key.column);
-
-                BigDecimal factor = max ? tmpObjExpr.get(key, true).negate() : tmpObjExpr.get(key, true);
-
-                mtrxQ.add(row, col, factor);
-                mtrxQ.add(col, row, factor);
-            }
-        }
-
-        PhysicalStore<Double> mtrxC = null;
-        if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            mtrxC = R064Store.FACTORY.make(nbVariables, 1);
-            if (max) {
-                for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.get(key, true));
-                }
-            } else {
-                for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    mtrxC.set(sourceModel.indexOfFreeVariable(key.index), 0, tmpObjExpr.get(key, true).negate());
-                }
-            }
-        }
-
-        if (mtrxQ == null && mtrxC == null) {
-            // In some very rare case the model was verified to be a quadratic
-            // problem, but then the presolver eliminated/fixed all variables
-            // part of the objective function - then we would end up here.
-            // Rather than always having to do very expensive checks we simply
-            // generate a well-behaved objective function here.
-            mtrxQ = R064Store.FACTORY.makeEye(nbVariables, nbVariables);
-        }
-
-        destinationBuilder.objective(mtrxQ, mtrxC);
-
-        // AI & BI
-
-        List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
+        List<Expression> tmpUpExpr = model.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         int nbUpExpr = tmpUpExpr.size();
 
-        List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
+        List<Variable> tmpUpVar = model.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
         int nbUpVar = tmpUpVar.size();
 
-        List<Expression> tmpLoExpr = sourceModel.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero())
+        List<Expression> tmpLoExpr = model.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero())
                 .collect(Collectors.toList());
         int nbLoExpr = tmpLoExpr.size();
 
-        List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
+        List<Variable> tmpLoVar = model.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
         int nbLoVar = tmpLoVar.size();
 
-        if (nbUpExpr + nbUpVar + nbLoExpr + nbLoVar > 0) {
-
-            RowsSupplier<Double> mtrxAI = R064Store.FACTORY.makeRowsSupplier(nbVariables);
-            PhysicalStore<Double> mtrxBI = R064Store.FACTORY.make(nbUpExpr + nbUpVar + nbLoExpr + nbLoVar, 1);
-
-            if (nbUpExpr > 0) {
-                for (int i = 0; i < nbUpExpr; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
-                    Expression expression = tmpUpExpr.get(i).compensate(fixedVariables);
-                    for (IntIndex key : expression.getLinearKeySet()) {
-                        rowAI.set(sourceModel.indexOfFreeVariable(key.index), expression.doubleValue(key, true));
-                    }
-                    mtrxBI.set(i, 0, expression.getUpperLimit(true, Double.POSITIVE_INFINITY));
-                }
-            }
-
-            if (nbUpVar > 0) {
-                for (int i = 0; i < nbUpVar; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
-                    Variable variable = tmpUpVar.get(i);
-                    rowAI.set(sourceModel.indexOfFreeVariable(variable), ONE);
-                    mtrxBI.set(nbUpExpr + i, 0, variable.getUpperLimit(false, Double.POSITIVE_INFINITY));
-                }
-            }
-
-            if (nbLoExpr > 0) {
-                for (int i = 0; i < nbLoExpr; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
-                    Expression expression = tmpLoExpr.get(i).compensate(fixedVariables);
-                    for (IntIndex key : expression.getLinearKeySet()) {
-                        rowAI.set(sourceModel.indexOfFreeVariable(key.index), -expression.doubleValue(key, true));
-                    }
-                    mtrxBI.set(nbUpExpr + nbUpVar + i, 0, -expression.getLowerLimit(true, Double.NEGATIVE_INFINITY));
-                }
-            }
-
-            if (nbLoVar > 0) {
-                for (int i = 0; i < nbLoVar; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
-                    Variable variable = tmpLoVar.get(i);
-                    rowAI.set(sourceModel.indexOfFreeVariable(variable), NEG);
-                    mtrxBI.set(nbUpExpr + nbUpVar + nbLoExpr + i, 0, -variable.getLowerLimit(false, Double.NEGATIVE_INFINITY));
-                }
-            }
-
-            destinationBuilder.inequalities(mtrxAI, mtrxBI);
-        }
-    }
-
-    public static <N extends Comparable<N>> ConvexData<N> copy(final ExpressionsBasedModel sourceModel, final PhysicalStore.Factory<N, ?> factory) {
-
-        List<Variable> freeVariables = sourceModel.getFreeVariables();
-        Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
-
-        int nbVariables = freeVariables.size();
-
-        List<Expression> tmpEqExpr = sourceModel.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-        int nbEqExpr = tmpEqExpr.size();
-
-        List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-        int nbUpExpr = tmpUpExpr.size();
-
-        List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
-        int nbUpVar = tmpUpVar.size();
-
-        List<Expression> tmpLoExpr = sourceModel.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-        int nbLoExpr = tmpLoExpr.size();
-
-        List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
-        int nbLoVar = tmpLoVar.size();
-
-        // ConvexData<N> retVal = dataFactory.newInstance(nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
         ConvexData<N> retVal = new ConvexData<>(true, factory, nbVariables, nbEqExpr, nbUpExpr + nbUpVar + nbLoExpr + nbLoVar);
 
-        ConstraintsMap constraintsMap = retVal.getConstraintsMap();
+        // Variables
+
+        for (int i = 0; i < nbVariables; i++) {
+            retVal.setVariableIndices(i, model.indexOf(freeVariables.get(i)));
+        }
 
         // Q & C
 
-        Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
-        boolean max = sourceModel.getOptimisationSense() == Optimisation.Sense.MAX;
+        Expression tmpObjExpr = model.objective().compensate(fixedVariables);
+        boolean max = model.getOptimisationSense() == Optimisation.Sense.MAX;
         boolean didSet = false;
 
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
 
             for (IntRowColumn key : tmpObjExpr.getQuadraticKeySet()) {
-                int row = sourceModel.indexOfFreeVariable(key.row);
-                int col = sourceModel.indexOfFreeVariable(key.column);
+                int row = model.indexOfFreeVariable(key.row);
+                int col = model.indexOfFreeVariable(key.column);
 
                 BigDecimal factor = max ? tmpObjExpr.get(key, true).negate() : tmpObjExpr.get(key, true);
 
@@ -724,12 +578,12 @@ public abstract class ConvexSolver extends GenericSolver {
 
             if (max) {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    retVal.setObjective(sourceModel.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true));
+                    retVal.setObjective(model.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true));
                     didSet = true;
                 }
             } else {
                 for (IntIndex key : tmpObjExpr.getLinearKeySet()) {
-                    retVal.setObjective(sourceModel.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true).negate());
+                    retVal.setObjective(model.indexOfFreeVariable(key.index), tmpObjExpr.get(key, true).negate());
                     didSet = true;
                 }
             }
@@ -753,12 +607,12 @@ public abstract class ConvexSolver extends GenericSolver {
             Expression expression = tmpEqExpr.get(i).compensate(fixedVariables);
 
             for (IntIndex key : expression.getLinearKeySet()) {
-                retVal.setAE(i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
+                retVal.setAE(i, model.indexOfFreeVariable(key.index), expression.get(key, true));
             }
 
-            retVal.setBE(i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
+            retVal.setBE(i, expression, ConstraintType.EQUALITY, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY), false);
 
-            constraintsMap.setEntry(i, expression, ConstraintType.EQUALITY, false);
+            // constraintsMap.setEntry(i, expression, ConstraintType.EQUALITY, false);
         }
 
         // AI & BI
@@ -768,41 +622,33 @@ public abstract class ConvexSolver extends GenericSolver {
         for (int i = 0; i < nbUpExpr; i++) {
             Expression expression = tmpUpExpr.get(i).compensate(fixedVariables);
             for (IntIndex key : expression.getLinearKeySet()) {
-                retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true));
+                retVal.setAI(base + i, model.indexOfFreeVariable(key.index), expression.get(key, true));
             }
-            retVal.setBI(base + i, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY));
-            constraintsMap.setEntry(nbEqExpr + base + i, expression, ConstraintType.UPPER, false);
+            retVal.setBI(base + i, expression, ConstraintType.UPPER, expression.getUpperLimit(true, BigMath.SMALLEST_POSITIVE_INFINITY), false);
         }
-
         base += nbUpExpr;
 
         for (int i = 0; i < nbUpVar; i++) {
             Variable variable = tmpUpVar.get(i);
-            retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), ONE);
-            retVal.setBI(base + i, variable.getUpperLimit(false, BigMath.SMALLEST_POSITIVE_INFINITY));
-            constraintsMap.setEntry(nbEqExpr + base + i, variable, ConstraintType.UPPER, false);
+            retVal.setAI(base + i, model.indexOfFreeVariable(variable), ONE);
+            retVal.setBI(base + i, variable, ConstraintType.UPPER, variable.getUpperLimit(false, BigMath.SMALLEST_POSITIVE_INFINITY), false);
         }
-
         base += nbUpVar;
 
         for (int i = 0; i < nbLoExpr; i++) {
             Expression expression = tmpLoExpr.get(i).compensate(fixedVariables);
             for (IntIndex key : expression.getLinearKeySet()) {
-                retVal.setAI(base + i, sourceModel.indexOfFreeVariable(key.index), expression.get(key, true).negate());
+                retVal.setAI(base + i, model.indexOfFreeVariable(key.index), expression.get(key, true).negate());
             }
-            retVal.setBI(base + i, expression.getLowerLimit(true, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
-            constraintsMap.setEntry(nbEqExpr + base + i, expression, ConstraintType.UPPER, true);
+            retVal.setBI(base + i, expression, ConstraintType.LOWER, expression.getLowerLimit(true, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true);
         }
-
         base += nbLoExpr;
 
         for (int i = 0; i < nbLoVar; i++) {
             Variable variable = tmpLoVar.get(i);
-            retVal.setAI(base + i, sourceModel.indexOfFreeVariable(variable), NEG);
-            retVal.setBI(base + i, variable.getLowerLimit(false, BigMath.SMALLEST_NEGATIVE_INFINITY).negate());
-            constraintsMap.setEntry(nbEqExpr + base + i, variable, ConstraintType.UPPER, true);
+            retVal.setAI(base + i, model.indexOfFreeVariable(variable), NEG);
+            retVal.setBI(base + i, variable, ConstraintType.LOWER, variable.getLowerLimit(false, BigMath.SMALLEST_NEGATIVE_INFINITY).negate(), true);
         }
-
         base += nbLoVar;
 
         return retVal;
@@ -822,8 +668,12 @@ public abstract class ConvexSolver extends GenericSolver {
         return new Builder(nbVariables);
     }
 
-    protected ConvexSolver(final Options solverOptions) {
-        super(solverOptions);
+    public static ConvexSolver newSolver(final ExpressionsBasedModel model) {
+        return INTEGRATION.build(model);
+    }
+
+    protected ConvexSolver(final Optimisation.Options optimisationOptions) {
+        super(optimisationOptions);
     }
 
 }

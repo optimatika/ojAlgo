@@ -39,10 +39,10 @@ import org.ojalgo.type.context.NumberContext;
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private static final NumberContext ACC = NumberContext.of(12, 14).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext FEASIBILITY = NumberContext.of(12, 8);
     private static final NumberContext LAGRANGE = NumberContext.of(12, 6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SLACK = NumberContext.of(6, 10).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext SOLUTION = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
-    private static final NumberContext FEASIBILITY = NumberContext.of(12, 8);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -53,9 +53,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private boolean myShrinkSwitch = true;
     private final R064Store mySlackI;
 
-    ActiveSetSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    ActiveSetSolver(final ConvexData<Double> convexData, final Optimisation.Options optimisationOptions) {
 
-        super(convexSolverBuilder, optimisationOptions);
+        super(convexData, optimisationOptions);
 
         int nbVars = this.countVariables();
         int nbEqus = this.countEqualityConstraints();

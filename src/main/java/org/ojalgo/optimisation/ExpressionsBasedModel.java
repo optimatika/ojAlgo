@@ -191,26 +191,30 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         /**
          * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
-         * artificial variables.) This defines the range of the indices that can be used with the indexOf
-         * method.
+         * artificial variables.)
+         * <p>
+         * This defines the range of the indices that can be used with the {@link #indexOf(int)} and
+         * {@link #isNegated(int)} methods.
          */
         int countModelVariables();
 
         /**
-         * The number of slack variables
+         * The number of slack variables.
+         * <p>
+         * This defines the range of the indices that can be used with the {@link #getSlack(int)} method.
          */
         int countSlackVariables();
 
-        EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(int i);
+        EntryPair<ModelEntity<?>, ConstraintType> getConstraint(int idc);
 
         /**
          * Returns which model entity, and constraint type, that corresponds to the slack variable at the
          * supplied index.
          *
-         * @param idx Index of solver slack variable (If there are 3 slack variables this input argument
+         * @param ids Index of solver slack variable (If there are 3 slack variables this input argument
          *        should be in the range [0.2].)
          */
-        EntryPair<ModelEntity<?>, ConstraintType> getSlack(int idx);
+        EntryPair<ModelEntity<?>, ConstraintType> getSlack(int ids);
 
         /**
          * Converts from a solver specific variable index to the corresponding index of the variable in the
@@ -218,18 +222,18 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
          * variable may result in multiple solver variables. Further, slack variables, artificial variables
          * and such are typically not represented in the model.
          *
-         * @param idx Index of solver variable
+         * @param idm Index of solver variable
          * @return Index of model variable (negative if no map)
          */
-        int indexOf(int idx);
+        int indexOf(int idm);
 
         /**
          * Is this solver variable negated relative to the corresponding model variable?
          *
-         * @param idx Index of solver variable
+         * @param idm Index of solver variable
          * @return true if this solver variable represents a negated model variable
          */
-        boolean isNegated(int idx);
+        boolean isNegated(int idm);
 
     }
 

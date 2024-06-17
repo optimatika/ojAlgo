@@ -36,8 +36,8 @@ import org.ojalgo.optimisation.Optimisation;
  */
 final class UnconstrainedSolver extends BasePrimitiveSolver {
 
-    UnconstrainedSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
-        super(convexSolverBuilder, optimisationOptions);
+    UnconstrainedSolver(final ConvexData<Double> convexData, final Optimisation.Options optimisationOptions) {
+        super(convexData, optimisationOptions);
     }
 
     @Override

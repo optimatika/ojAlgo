@@ -386,10 +386,6 @@ public abstract class TestUtils /* extends Assertions */ {
         TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
     }
 
-    public static void assertEquivalent(final Optimisation.Result expected, final Optimisation.Result actual) {
-        TestUtils.assertOptimisationResult("Optimisation.Result != Optimisation.Result", expected, actual, EQUALS, true, true, true, true);
-    }
-
     public static void assertFalse(final boolean condition) {
         Assertions.assertFalse(condition);
     }

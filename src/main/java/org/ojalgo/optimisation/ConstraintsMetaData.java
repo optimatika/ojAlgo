@@ -30,29 +30,29 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
-public final class ConstraintsMap implements Structure1D {
+public final class ConstraintsMetaData implements Structure1D {
 
-    public static ConstraintsMap newEntityMap(final int nbConstraints) {
-        return new ConstraintsMap((EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints], new boolean[nbConstraints]);
+    public static ConstraintsMetaData newEntityMap(final int nbConstraints) {
+        return new ConstraintsMetaData((EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints], new boolean[nbConstraints]);
     }
 
-    public static ConstraintsMap newInstance(final int nbConstraints, final boolean inclMap) {
-        EntryPair<ModelEntity<?>, ConstraintType>[] map = inclMap ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints] : null;
+    public static ConstraintsMetaData newInstance(final int nbConstraints, final boolean inclDefs) {
+        EntryPair<ModelEntity<?>, ConstraintType>[] definitions = inclDefs ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints] : null;
         boolean[] negated = new boolean[nbConstraints];
-        return new ConstraintsMap(map, negated);
+        return new ConstraintsMetaData(definitions, negated);
     }
 
-    public static ConstraintsMap newSimple(final int nbConstraints) {
-        return new ConstraintsMap(null, new boolean[nbConstraints]);
+    public static ConstraintsMetaData newSimple(final int nbConstraints) {
+        return new ConstraintsMetaData(null, new boolean[nbConstraints]);
     }
 
     public final boolean[] negated;
-    private final EntryPair<ModelEntity<?>, ConstraintType>[] myMap;
+    private final EntryPair<ModelEntity<?>, ConstraintType>[] myDefinitions;
     private double myMultiplierScale = 1D;
 
-    private ConstraintsMap(final EntryPair<ModelEntity<?>, ConstraintType>[] map, final boolean[] negs) {
+    private ConstraintsMetaData(final EntryPair<ModelEntity<?>, ConstraintType>[] defs, final boolean[] negs) {
         super();
-        myMap = map;
+        myDefinitions = defs;
         negated = negs;
     }
 
@@ -62,21 +62,21 @@ public final class ConstraintsMap implements Structure1D {
     }
 
     public EntryPair<ModelEntity<?>, ConstraintType> getEntry(final int i) {
-        return myMap[i];
+        return myDefinitions[i];
     }
 
     public boolean isEntityMap() {
-        return myMap != null;
+        return myDefinitions != null;
     }
 
     public List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> match(final Access1D<?> multipliers) {
 
-        int length = myMap.length;
+        int length = myDefinitions.length;
 
         List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> retVal = new ArrayList<>(length);
 
         for (int i = 0; i < length; i++) {
-            EntryPair<ModelEntity<?>, ConstraintType> constraintKey = myMap[i];
+            EntryPair<ModelEntity<?>, ConstraintType> constraintKey = myDefinitions[i];
             double adjustmentFactor = constraintKey.left().getAdjustmentFactor();
             double multiplierValue = multipliers.doubleValue(i);
             retVal.add(constraintKey.asKeyTo(multiplierValue * adjustmentFactor / myMultiplierScale));
@@ -86,11 +86,11 @@ public final class ConstraintsMap implements Structure1D {
     }
 
     public void setEntry(final int i, final ModelEntity<?> entity, final ConstraintType type) {
-        myMap[i] = EntryPair.of(entity, type);
+        myDefinitions[i] = EntryPair.of(entity, type);
     }
 
     public void setEntry(final int i, final ModelEntity<?> entity, final ConstraintType type, final boolean neg) {
-        myMap[i] = EntryPair.of(entity, type);
+        myDefinitions[i] = EntryPair.of(entity, type);
         negated[i] = neg;
     }
 

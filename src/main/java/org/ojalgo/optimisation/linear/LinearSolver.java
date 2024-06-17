@@ -668,7 +668,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public SimplexTableauSolver build(final ExpressionsBasedModel model) {
 
-            SimplexTableau tableau = SimplexTableauSolver.build(model);
+            SimplexTableau tableau = SimplexTableauSolver.build(model, SimplexTableau.newTableauFactory(model.options));
 
             SimplexTableauSolver solver = new SimplexTableauSolver(tableau, model.options);
 
@@ -768,10 +768,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     }
 
     public static LinearSolver newSolver(final ExpressionsBasedModel model) {
-
-        SimplexTableau tableau = SimplexTableauSolver.build(model);
-
-        return new SimplexTableauSolver(tableau, model.options);
+        return INTEGRATION.build(model);
     }
 
     public static LinearSolver.StandardBuilder newStandardBuilder() {

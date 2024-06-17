@@ -30,7 +30,7 @@ import java.util.Collection;
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.optimisation.ConstraintsMap;
+import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Access1D;
@@ -318,24 +318,12 @@ abstract class SimplexSolver extends LinearSolver {
     @Override
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
 
-        double[] solution = this.extractSolution();
-
         if (this.isLogDebug()) {
-            BasicLogger.debug("Sol: {}", Arrays.toString(solution));
+            BasicLogger.debug("Sol: {}", Arrays.toString(this.extractSolution()));
             BasicLogger.debug("+++: {}", Arrays.toString(mySolutionShift));
         }
 
-        boolean[] negated = new boolean[integer.length];
-        for (int j = 0; j < negated.length; j++) {
-            //if (this.getEntityMap().isNegated(j)) {
-            if (this.isNegated(j)) {
-                negated[j] = true;
-            }
-        }
-
         return mySimplex.generateCutCandidates(integer, ALGORITHM, fractionality);
-
-        // return mySimplex.generateCutCandidates(solution, integer, negated, options.integer().getIntegralityTolerance(), fractionality);
     }
 
     @Override
@@ -575,14 +563,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
-    }
-
-    private boolean isNegated(final int j) {
-        if (this.getUpperBound(j) <= ZERO && this.getLowerBound(j) < ZERO) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private void logCurrentState() {
@@ -1092,7 +1072,7 @@ abstract class SimplexSolver extends LinearSolver {
             this.log("UB: {}", this.getUpperBounds());
         }
 
-        ConstraintsMap constraints = this.getEntityMap().constraints;
+        ConstraintsMetaData constraints = this.getEntityMap().constraints;
         if (constraints.isEntityMap()) {
             return result.multipliers(constraints, this.extractMultipliers());
         } else {

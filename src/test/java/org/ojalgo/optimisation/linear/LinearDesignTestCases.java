@@ -30,7 +30,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR256;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -43,8 +42,8 @@ import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
+import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 public class LinearDesignTestCases extends OptimisationLinearTests {
 
@@ -118,6 +117,28 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         return retVal;
     }
 
+    /**
+     * Small model with 3 variables and 3 constraints. The solution is:
+     * <P>
+     * OPTIMAL -1.29032258064516 @ { 1.74193548387097, 0.45161290322581, 1 }
+     */
+    static OptimisationCase makeModelPSmith338act14() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.newVariable("X1").lower(ZERO).weight(NEG);
+        Variable x2 = model.newVariable("X2").lower(ZERO).weight(ONE);
+        Variable x3 = model.newVariable("X3").lower(ZERO).weight(ZERO);
+
+        model.newExpression("C1").set(x1, SIX).set(x2, NEG).upper(TEN);
+        model.newExpression("C2").set(x1, ONE).set(x2, FIVE).lower(FOUR);
+        model.newExpression("C3").set(x1, ONE).set(x2, FIVE).set(x3, ONE).level(FIVE);
+
+        Optimisation.Result result = Optimisation.Result.of(-1.29032258064516, Optimisation.State.OPTIMAL, 1.74193548387097, 0.45161290322581, 1);
+
+        return OptimisationCase.of(model, Optimisation.Sense.MIN, result);
+    }
+
     @AfterEach
     public void reset() {
         ExpressionsBasedModel.clearIntegrations();
@@ -143,7 +164,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
             model.newVariable("X1").lower(ZERO).weight(ONE);
             model.newVariable("X2").lower(ZERO).weight(TWO);
-            model.newVariable("X3").lower(ZERO).weight(ONE.negate());
+            model.newVariable("X3").lower(ZERO).weight(NEG);
 
             model.newExpression("C1").set(0, TWO).set(1, ONE).set(2, ONE).upper(14);
             model.newExpression("C2").set(0, FOUR).set(1, TWO).set(2, THREE).upper(28);
@@ -239,37 +260,9 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test4LinearModelCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        OptimisationCase optimisationCase = LinearDesignTestCases.makeModelPSmith338act14();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(ONE.negate()), tmpModel.newVariable("X2").lower(ZERO).weight(ONE),
-                tmpModel.newVariable("X3").lower(ZERO).weight(ZERO) };
-
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.set(i, new BigDecimal[] { SIX, ONE.negate(), ZERO }[i]);
-        }
-        tmpExprC1.upper(TEN);
-
-        Expression tmpExprC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.set(i, new BigDecimal[] { ONE, FIVE, ZERO }[i]);
-        }
-        tmpExprC2.lower(FOUR);
-
-        Expression tmpExprC3 = tmpModel.newExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.set(i, new BigDecimal[] { ONE, FIVE, ONE }[i]);
-        }
-        tmpExprC3.level(FIVE);
-
-        Optimisation.Result tmpResult = tmpModel.minimise();
-        MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
-
-        PhysicalStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
-        PhysicalStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2));
-        tmpActX.modifyAll(NumberContext.of(7, 2).getFunction(PrimitiveFunction.getSet()));
-
-        TestUtils.assertEquals(tmpExpX, tmpActX);
+        optimisationCase.assertResult();
     }
 
     /**

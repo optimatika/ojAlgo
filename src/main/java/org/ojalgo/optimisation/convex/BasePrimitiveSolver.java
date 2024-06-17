@@ -106,11 +106,11 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     private final MatrixDecomposition.Solver<Double> mySolverQ;
     private boolean myZeroQ = false;
 
-    BasePrimitiveSolver(final ConvexData<Double> convexSolverBuilder, final Optimisation.Options optimisationOptions) {
+    BasePrimitiveSolver(final ConvexData<Double> convexData, final Optimisation.Options optimisationOptions) {
 
         super(optimisationOptions);
 
-        myMatrices = convexSolverBuilder;
+        myMatrices = convexData;
 
         mySolutionX = MATRIX_FACTORY.make(this.countVariables(), 1L);
 

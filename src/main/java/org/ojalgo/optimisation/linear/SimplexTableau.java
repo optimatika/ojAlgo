@@ -24,16 +24,9 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_LARGEST;
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
-import org.ojalgo.equation.Equation;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Optimisation.ProblemStructure;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
@@ -44,7 +37,6 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
@@ -175,48 +167,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     abstract boolean fixVariable(int index, double value);
 
     @Override
-    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
-
-        int nbModVars = structure.countModelVariables();
-
-        Primitive1D constraintsRHS = this.constraintsRHS();
-
-        double[] solRHS = new double[integer.length];
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-            if (j >= 0 && j < nbModVars) {
-                solRHS[j] = constraintsRHS.doubleValue(i);
-            }
-        }
-
-        if (ProblemStructure.DEBUG) {
-            BasicLogger.debug("RHS: {}", Arrays.toString(solRHS));
-            BasicLogger.debug("Bas: {}", Arrays.toString(included));
-        }
-
-        List<Equation> retVal = new ArrayList<>();
-
-        boolean[] negated = new boolean[integer.length];
-
-        for (int i = 0; i < m; i++) {
-            int j = included[i];
-
-            double rhs = constraintsRHS.doubleValue(i);
-
-            if (j >= 0 && j < nbModVars && integer[j] && !accuracy.isInteger(rhs)) {
-
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, integer, fractionality, negated, excluded);
-
-                if (maybe != null) {
-                    retVal.add(maybe);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
     final double getCost(final int j) {
         // return myTableau[m][j];
         return this.objective().doubleValue(j);
@@ -282,6 +232,10 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     abstract Primitive1D newObjective();
 
+    final SimplexTableauSolver newSimplexTableauSolver(final Optimisation.Options optimisationOptions) {
+        return new SimplexTableauSolver(this, optimisationOptions);
+    }
+
     /**
      * The area of the tableau corresponding to the objective function.
      *
@@ -329,6 +283,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         };
     }
 
+    @Override
     final Primitive1D sliceBodyRow(final int row) {
 
         Primitive2D body = this.constraintsBody();

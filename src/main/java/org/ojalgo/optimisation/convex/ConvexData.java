@@ -25,7 +25,7 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.optimisation.ConstraintsMap;
+import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.structure.Access2D.RowView;
@@ -44,8 +44,9 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     private final RowsSupplier<N> myAI;
     private final PhysicalStore<N> myBE;
     private final PhysicalStore<N> myBI;
-    private final ConstraintsMap myConstraintsMap;
+    private final ConstraintsMetaData myConstraintsMetaData;
     private final ConvexObjectiveFunction<N> myObjective;
+    private final int[] myVariableIndices;
 
     ConvexData(final boolean inclMap, final PhysicalStore.Factory<N, ?> factory, final int nbVars, final int nbEqus, final int nbIneq) {
 
@@ -61,7 +62,8 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         myAI.addRows(nbIneq);
         myBI = factory.make(nbIneq, 1);
 
-        myConstraintsMap = ConstraintsMap.newInstance(nbIneq + nbEqus, inclMap);
+        myVariableIndices = new int[nbVars];
+        myConstraintsMetaData = ConstraintsMetaData.newInstance(nbEqus + nbIneq, inclMap);
     }
 
     @Override
@@ -122,9 +124,8 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     }
 
     @Override
-    public EntryPair<ModelEntity<?>, ConstraintType> getConstraintMap(final int i) {
-        // TODO Auto-generated method stub
-        return null;
+    public EntryPair<ModelEntity<?>, ConstraintType> getConstraint(final int idc) {
+        return myConstraintsMetaData.getEntry(idc);
     }
 
     public ConvexObjectiveFunction<N> getObjective() {
@@ -140,20 +141,17 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
     }
 
     @Override
-    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int idx) {
-        // TODO Auto-generated method stub
+    public EntryPair<ModelEntity<?>, ConstraintType> getSlack(final int ids) {
         return null;
     }
 
     @Override
-    public int indexOf(final int idx) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int indexOf(final int idm) {
+        return myVariableIndices[idm];
     }
 
     @Override
-    public boolean isNegated(final int idx) {
-        // TODO Auto-generated method stub
+    public boolean isNegated(final int idm) {
         return false;
     }
 
@@ -203,8 +201,8 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         return myBI;
     }
 
-    ConstraintsMap getConstraintsMap() {
-        return myConstraintsMap;
+    ConstraintsMetaData getConstraintsMetaData() {
+        return myConstraintsMetaData;
     }
 
     void reset() {
@@ -227,20 +225,26 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         myAI.getRow(row).set(col, value);
     }
 
-    void setBE(final int row, final Comparable<?> value) {
-        myBE.set(row, 0, value);
-    }
-
     void setBE(final int row, final double value) {
         myBE.set(row, 0, value);
     }
 
-    void setBI(final int row, final Comparable<?> value) {
-        myBI.set(row, 0, value);
+    void setBE(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated) {
+        myBE.set(row, 0, value);
+        myConstraintsMetaData.setEntry(row, entity, type, negated);
     }
 
     void setBI(final int row, final double value) {
         myBI.set(row, 0, value);
+    }
+
+    void setBI(final int row, final ModelEntity<?> entity, final ConstraintType type, final Comparable<?> value, final boolean negated) {
+        myBI.set(row, 0, value);
+        myConstraintsMetaData.setEntry(myBE.getRowDim() + row, entity, type, negated);
+    }
+
+    void setEntry(final int row, final ModelEntity<?> entity, final ConstraintType type, final boolean neg) {
+        myConstraintsMetaData.setEntry(row, entity, type, neg);
     }
 
     void setObjective(final int row, final Comparable<?> value) {
@@ -257,6 +261,10 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     void setObjective(final int row, final int col, final double value) {
         myObjective.quadratic().set(row, col, value);
+    }
+
+    void setVariableIndices(final int indexInSolver, final int indexInModel) {
+        myVariableIndices[indexInSolver] = indexInModel;
     }
 
 }
