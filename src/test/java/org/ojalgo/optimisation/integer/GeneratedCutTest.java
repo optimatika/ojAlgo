@@ -54,16 +54,20 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
             // model.options.progress(IntegerSolver.class);
             // model.options.validate = false;
             // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
+
+            model.options.validate = true;
         }
 
         if (minSolution != null) {
 
             TestUtils.assertSolutionValid(model, minSolution, ACCURACY);
 
-            // BasicLogger.debug(model.minimise());
-
             model.setKnownSolution(minSolution, (m, s) -> {
-                throw new AssertionFailedError();
+                if (!DEBUG) {
+                    BasicLogger.error(s);
+                    BasicLogger.error(m);
+                    throw new AssertionFailedError();
+                }
             });
 
             Result result = model.minimise();
@@ -81,9 +85,13 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
             TestUtils.assertSolutionValid(model, maxSolution, ACCURACY);
 
-            // BasicLogger.debug(model.maximise());
-
-            model.setKnownSolution(maxSolution);
+            model.setKnownSolution(maxSolution, (m, s) -> {
+                if (!DEBUG) {
+                    BasicLogger.error(s);
+                    BasicLogger.error(m);
+                    throw new AssertionFailedError();
+                }
+            });
 
             Result result = model.maximise();
 
@@ -99,12 +107,11 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
     @Test
     @Tag("new_lp_problem")
-    public void testInitialCutsOfGr4x6() {
-
-        Optimisation.Result maxSolution = null;
+    public void testGr4x6() {
 
         String minStr = "OPTIMAL 202.35 @ { 20, 0, 25, 0, 0, 0, 0, 30, 0, 0, 0, 5, 15, 0, 0, 0, 5, 0, 0, 0, 0, 15, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0 }";
         Optimisation.Result minSolution = Optimisation.Result.parse(minStr);
+        Optimisation.Result maxSolution = null;
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", false);
 

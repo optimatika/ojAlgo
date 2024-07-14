@@ -283,22 +283,22 @@ public final class NodeSolver extends IntermediateSolver {
                         if (target.options.logger_detailed && target.options.logger_appender != null) {
                             target.options.logger_appender.println("{}: {} < {}", name, cut.getLowerLimit(), cut.getLinearEntrySet());
                         }
+
+                        if (target.options.validate) {
+                            if (!this.validate(target)) {
+                                BasicLogger.error("Modified target model cuts off the optimal solution!");
+                            }
+                            if (target.validate(result)) {
+                                BasicLogger.error("Result still valid, was NOT cut off!");
+                            }
+                        }
                     }
                 }
             }
 
         }
 
-        boolean didGenerate = nbConstr != target.constraints().count();
-        if (didGenerate && model.options.validate) {
-            if (!this.validate(target)) {
-                BasicLogger.error("Modified target model cuts off the optimal solution!");
-            }
-            if (target.validate(result)) {
-                BasicLogger.error("Result still valid, was NOT cut off!");
-            }
-        }
-        return didGenerate;
+        return nbConstr != target.constraints().count();
     }
 
 }

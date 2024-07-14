@@ -32,12 +32,13 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
+import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 
 public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
-    static void assertEquals(final Result expected, final Result actual) {
+    static void assertEquals(final Result expected, final Result actual, final double adjustmentFactor) {
 
         TestUtils.assertEquals(expected.getState(), actual.getState());
 
@@ -48,7 +49,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         if (Double.isFinite(expected.getValue())) {
-            TestUtils.assertEquals(expected.getValue(), actual.getValue());
+            TestUtils.assertEquals(expected.getValue(), actual.getValue() / adjustmentFactor);
         }
     }
 
@@ -63,7 +64,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            SimplexStore simplex = SimplexSolver.build(simplified, factory);
             DualSimplexSolver solver = simplex.newDualSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
         }
@@ -109,7 +110,9 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             TestUtils.assertSolutionValid(model, expected);
         }
 
-        RevisedSimplexSolverTest.assertEquals(expected, actual);
+        double adjustmentFactor = model != null ? model.objective().getAdjustmentFactor() : 1.0;
+
+        RevisedSimplexSolverTest.assertEquals(expected, actual, adjustmentFactor);
     }
 
     static void doTestOneVariant(final Result expected, final SimplexSolver solver, final Class<? extends SimplexStore> simplexType) {
@@ -127,7 +130,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
 
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            SimplexStore simplex = SimplexSolver.build(simplified, factory);
             PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
         }
@@ -158,7 +161,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             options.debug(LinearSolver.class);
         }
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
-            SimplexStore simplex = SimplexStore.build(simplified, factory);
+            SimplexStore simplex = SimplexSolver.build(simplified, factory);
             PrimalSimplexSolver solver = simplex.newPrimalSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
         }
@@ -276,6 +279,21 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         RevisedSimplexSolverTest.doTestDualVariants(builder, expected);
 
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
+    }
+
+    /**
+     * Somewhat larger model. This MIP is a previously existing test case that failed with the new LP solver
+     * implementation, when just about everything else worked. There is a problem with GMI cut generation.
+     * This test is just to verify that all variants of the new LP solver works.
+     */
+    @Test
+    public void testGr4x6() {
+
+        OptimisationCase testCase = LinearDesignTestCases.makeRelaxedGr4x6();
+
+        RevisedSimplexSolverTest.doTestDualVariants(testCase.model, testCase.result);
+
+        RevisedSimplexSolverTest.doTestPhasedVariants(testCase.model, testCase.result);
     }
 
     /**

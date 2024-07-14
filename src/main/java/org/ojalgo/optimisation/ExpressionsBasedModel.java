@@ -792,6 +792,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         myShallowCopy = shallow || modelToCopy.isShallowCopy();
         myRelaxed = modelToCopy.isRelaxed();
+        myKnownSolution = modelToCopy.getKnownSolution(); // TODO Should this be copied?
+        myValidationFailureHandler = modelToCopy.getValidationFailureHandler();
     }
 
     public Expression addExpression() {

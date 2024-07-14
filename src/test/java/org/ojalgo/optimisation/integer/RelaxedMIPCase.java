@@ -39,14 +39,16 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", name, true);
 
-        // model.options.debug(Optimisation.Solver.class);
-        // model.options.debug(IntegerSolver.class);
-        // model.options.debug(ConvexSolver.class);
-        // model.options.debug(LinearSolver.class);
-        // model.options.progress(IntegerSolver.class);
-        // model.options.validate = false;
-        // model.options.mip_defer = 0.25;
-        // model.options.mip_gap = 1.0E-5;
+        if (DEBUG) {
+            // model.options.debug(Optimisation.Solver.class);
+            // model.options.debug(IntegerSolver.class);
+            // model.options.debug(ConvexSolver.class);
+            // model.options.debug(LinearSolver.class);
+            // model.options.progress(IntegerSolver.class);
+            // model.options.validate = false;
+            // model.options.mip_defer = 0.25;
+            // model.options.mip_gap = 1.0E-5;
+        }
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }

@@ -242,7 +242,7 @@ public class UsageMIP extends OptimisationLinearTests {
 
             for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
 
-                SimplexStore store = SimplexStore.build(model, factory);
+                SimplexStore store = SimplexSolver.build(model, factory);
 
                 PhasedSimplexSolver solver = store.newPhasedSimplexSolver(options);
 

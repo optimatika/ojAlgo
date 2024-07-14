@@ -21,22 +21,16 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.optimisation.Expression;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Optimisation.ConstraintType;
 import org.ojalgo.optimisation.Optimisation.Options;
-import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
@@ -44,7 +38,6 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure1D;
-import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.EnumPartition;
 import org.ojalgo.type.context.NumberContext;
 
@@ -81,105 +74,6 @@ abstract class SimplexStore {
         }
     }
 
-    static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
-
-        Set<IntIndex> fixedVariables = model.getFixedVariables();
-        List<Variable> freeVariables = model.getFreeVariables();
-
-        List<Expression> equalityConstraints = new ArrayList<>();
-        List<Expression> lowerConstraints = new ArrayList<>();
-        List<Expression> upperConstraints = new ArrayList<>();
-
-        model.constraints().map(c -> c.compensate(fixedVariables)).forEach(constraint -> {
-            if (constraint.isEqualityConstraint()) {
-                equalityConstraints.add(constraint);
-            } else {
-                if (constraint.isLowerConstraint()) {
-                    lowerConstraints.add(constraint);
-                }
-                if (constraint.isUpperConstraint()) {
-                    upperConstraints.add(constraint);
-                }
-            }
-        });
-
-        Expression objective = model.objective().compensate(fixedVariables);
-
-        int nbUpConstr = upperConstraints.size();
-        int nbLoConstr = lowerConstraints.size();
-        int nbEqConstr = equalityConstraints.size();
-
-        int nbProbVars = freeVariables.size();
-        int nbSlckVars = nbUpConstr + nbLoConstr;
-
-        LinearStructure structure = new LinearStructure(true, nbUpConstr + nbLoConstr, nbEqConstr, nbProbVars, 0, 0, nbSlckVars);
-
-        S simplex = factory.apply(structure);
-        double[] lowerBounds = simplex.getLowerBounds();
-        double[] upperBounds = simplex.getUpperBounds();
-
-        Mutate2D mtrxA = simplex.constraintsBody();
-        Mutate1D mtrxB = simplex.constraintsRHS();
-        Mutate1D mtrxC = simplex.objective();
-
-        for (int i = 0; i < nbUpConstr; i++) {
-            Expression expression = upperConstraints.get(i);
-            for (IntIndex key : expression.getLinearKeySet()) {
-                int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
-                mtrxA.set(i, column, factor);
-            }
-            mtrxA.set(i, nbProbVars + i, ONE);
-            mtrxB.set(i, expression.getUpperLimit(true, POSITIVE_INFINITY));
-            lowerBounds[nbProbVars + i] = ZERO;
-            upperBounds[nbProbVars + i] = POSITIVE_INFINITY;
-            structure.setConstraintMap(i, expression, ConstraintType.UPPER, false);
-        }
-
-        for (int i = 0; i < nbLoConstr; i++) {
-            Expression expression = lowerConstraints.get(i);
-            for (IntIndex key : expression.getLinearKeySet()) {
-                int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
-                mtrxA.set(nbUpConstr + i, column, factor);
-            }
-            mtrxA.set(nbUpConstr + i, nbProbVars + nbUpConstr + i, ONE);
-            mtrxB.set(nbUpConstr + i, expression.getLowerLimit(true, NEGATIVE_INFINITY));
-            lowerBounds[nbProbVars + nbUpConstr + i] = NEGATIVE_INFINITY;
-            upperBounds[nbProbVars + nbUpConstr + i] = ZERO;
-            structure.setConstraintMap(nbUpConstr + i, expression, ConstraintType.LOWER, true);
-        }
-
-        for (int i = 0; i < nbEqConstr; i++) {
-            Expression expression = equalityConstraints.get(i);
-            for (IntIndex key : expression.getLinearKeySet()) {
-                int column = model.indexOfFreeVariable(key);
-                double factor = expression.doubleValue(key, true);
-                mtrxA.set(nbUpConstr + nbLoConstr + i, column, factor);
-            }
-            mtrxA.set(nbUpConstr + nbLoConstr + i, nbProbVars + nbSlckVars + i, ONE);
-            mtrxB.set(nbUpConstr + nbLoConstr + i, expression.getUpperLimit(true, ZERO));
-            lowerBounds[nbProbVars + nbSlckVars + i] = ZERO;
-            upperBounds[nbProbVars + nbSlckVars + i] = ZERO;
-            structure.setConstraintMap(nbUpConstr + nbLoConstr + i, expression, ConstraintType.EQUALITY, false);
-        }
-
-        for (int i = 0; i < nbProbVars; i++) {
-            Variable variable = freeVariables.get(i);
-            lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
-            upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
-            structure.positivePartVariables[i] = model.indexOf(variable);
-        }
-
-        structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
-        boolean negate = model.getOptimisationSense() == Optimisation.Sense.MAX;
-        for (IntIndex key : objective.getLinearKeySet()) {
-            double weight = objective.doubleValue(key, true);
-            mtrxC.set(model.indexOfFreeVariable(key), negate ? -weight : weight);
-        }
-
-        return simplex;
-    }
 
     static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
