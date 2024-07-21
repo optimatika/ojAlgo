@@ -313,7 +313,8 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    private static final NumberContext ALGORITHM = NumberContext.of(8).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext PIVOT = NumberContext.of(6).withMode(RoundingMode.HALF_DOWN);
+    private static final NumberContext RATIO = NumberContext.of(8).withMode(RoundingMode.HALF_DOWN);
 
     static <S extends SimplexStore> S build(final ExpressionsBasedModel model, final Function<LinearStructure, S> factory) {
 
@@ -433,7 +434,7 @@ abstract class SimplexSolver extends LinearSolver {
             BasicLogger.debug("+++: {}", Arrays.toString(mySolutionShift));
         }
 
-        return mySimplex.generateCutCandidates(integer, ALGORITHM, fractionality);
+        return mySimplex.generateCutCandidates(integer, options.feasibility, fractionality);
     }
 
     @Override
@@ -528,7 +529,6 @@ abstract class SimplexSolver extends LinearSolver {
 
         double largest = 1E-10;
         int[] included = mySimplex.included;
-        // for (int ji = 0, limit = included.length; ji < limit; ji++) {
         for (int ji = included.length - 1; ji >= 0; ji--) {
             int j = included[ji];
 
@@ -837,8 +837,10 @@ abstract class SimplexSolver extends LinearSolver {
         double numer = ZERO;
         double denom = ONE;
         double ratio = ZERO;
+        double scale = ONE;
 
         iteration.ratioDual = Double.MAX_VALUE;
+        double iterationScale = MACHINE_LARGEST;
 
         int n = mySimplex.structure.countVariables();
         int[] excluded = mySimplex.excluded;
@@ -847,8 +849,9 @@ abstract class SimplexSolver extends LinearSolver {
             if (j < n) {
 
                 denom = mySimplex.getCurrentElement(exit, je);
+                scale = Math.abs(denom);
 
-                if (!ALGORITHM.isZero(denom)) {
+                if (!PIVOT.isZero(denom)) {
 
                     ColumnState columnState = mySimplex.getColumnState(j);
 
@@ -881,7 +884,12 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, je, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioDual) {
+                    if (ratio < iteration.ratioDual
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioDual, ratio)) {
+
+                        if (ratio >= iteration.ratioDual) {
+                            this.log("It happened!");
+                        }
 
                         enter.index = je;
                         enter.from = columnState;
@@ -892,6 +900,7 @@ abstract class SimplexSolver extends LinearSolver {
                         }
 
                         iteration.ratioDual = ratio;
+                        iterationScale = scale;
                     }
                 }
             }
@@ -922,17 +931,19 @@ abstract class SimplexSolver extends LinearSolver {
         double numer = ZERO;
         double denom = ONE;
         double ratio = ZERO;
+        double scale = ONE;
 
         iteration.ratioPrimal = range;
+        double iterationScale = MACHINE_LARGEST;
 
         int[] included = mySimplex.included;
-        // for (int ji = 0; ji < included.length; ji++) {
         for (int ji = included.length - 1; ji >= 0; ji--) {
             int j = included[ji];
 
             denom = mySimplex.getCurrentElement(ji, enter);
+            scale = Math.abs(denom);
 
-            if (!ALGORITHM.isZero(denom)) {
+            if (!PIVOT.isZero(denom)) {
 
                 if (enterDirection == Direction.INCREASE) {
                     // Entering variable will increase
@@ -951,7 +962,8 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioPrimal) {
+                    if (ratio < iteration.ratioPrimal
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioPrimal, ratio)) {
 
                         exit.index = ji;
                         if (denom < ZERO) {
@@ -967,6 +979,7 @@ abstract class SimplexSolver extends LinearSolver {
                         }
 
                         iteration.ratioPrimal = ratio;
+                        iterationScale = scale;
                     }
 
                 } else if (enterDirection == Direction.DECREASE) {
@@ -986,7 +999,8 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioPrimal) {
+                    if (ratio < iteration.ratioPrimal
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioPrimal, ratio)) {
 
                         exit.index = ji;
                         if (denom > ZERO) {
@@ -1002,6 +1016,7 @@ abstract class SimplexSolver extends LinearSolver {
                         }
 
                         iteration.ratioPrimal = ratio;
+                        iterationScale = scale;
                     }
 
                 } else {
@@ -1035,6 +1050,9 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log();
                 this.log("Pivoting: {}", iteration);
                 this.log("==>> Row: {}, Exit: {}, Column/Enter: {}.", iteration.exit.index, iteration.exit.column(), iteration.enter.column());
+                this.log("Cost={}, Pivot1={}, Pivot2={}, RHS={}, Inf={}", mySimplex.getReducedCost(iteration.enter.index),
+                        mySimplex.getCurrentElement(iteration.exit, iteration.enter.index), mySimplex.getCurrentElement(iteration.exit.index, iteration.enter),
+                        mySimplex.getCurrentRHS(iteration.exit.row()), mySimplex.getInfeasibility(iteration.exit.index));
                 this.log("Shift Exit: {}, Enter: {}", mySolutionShift[iteration.exit.column()], mySolutionShift[iteration.enter.column()]);
             }
 
@@ -1114,7 +1132,7 @@ abstract class SimplexSolver extends LinearSolver {
                 done = true;
             }
 
-            if (this.isLogDebug()) {
+            if (this.isLogDebug() && mySimplex.isPrintable()) {
                 this.logCurrentState();
             }
         }
@@ -1156,7 +1174,7 @@ abstract class SimplexSolver extends LinearSolver {
                 done = true;
             }
 
-            if (this.isLogDebug()) {
+            if (this.isLogDebug() && mySimplex.isPrintable()) {
                 this.logCurrentState();
             }
 

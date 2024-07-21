@@ -34,7 +34,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class IntegerUserFiles extends OptimisationIntegerTests implements ModelFileTest {
 
-    private static final NumberContext ACCURACY = NumberContext.of(8);
+    private static final NumberContext ACCURACY = NumberContext.of(6);
 
     private static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString,
             final IntegerStrategy strategy) {

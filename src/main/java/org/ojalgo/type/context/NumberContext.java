@@ -355,17 +355,19 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public boolean isSmall(final BigDecimal comparedTo, final BigDecimal value) {
         if (this.isZero(comparedTo)) {
             return this.isZero(value);
+        } else {
+            BigDecimal reference = this.enforce(comparedTo);
+            return this.enforce(reference.add(value)).compareTo(reference) == 0;
         }
-        BigDecimal reference = this.enforce(comparedTo);
-        return this.enforce(reference.add(value)).compareTo(reference) == 0;
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
         if (NumberContext.isZero(comparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
+        } else {
+            double relative = value / comparedTo;
+            return NumberContext.isZero(relative, myEpsilon);
         }
-        double relative = value / comparedTo;
-        return NumberContext.isZero(relative, myEpsilon);
     }
 
     public boolean isZero(final BigDecimal value) {
