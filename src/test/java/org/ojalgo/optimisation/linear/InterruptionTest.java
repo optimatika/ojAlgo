@@ -37,11 +37,12 @@ public class InterruptionTest extends OptimisationLinearTests implements ModelFi
     }
 
     private static ExpressionsBasedModel makeModel() {
-        return ModelFileTest.makeModel("netlib", "D6CUBE.SIF", false);
+        return ModelFileTest.makeModel("netlib", "CRE-D.SIF", false);
     }
 
     private void launchSlowMinimization() {
-        Result result = InterruptionTest.makeModel().minimise();
+        ExpressionsBasedModel model = InterruptionTest.makeModel();
+        Result result = model.minimise();
         TestUtils.assertStateNotLessThanFeasible(result);
     }
 
