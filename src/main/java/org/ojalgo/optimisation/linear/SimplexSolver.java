@@ -33,7 +33,6 @@ import java.util.function.Function;
 
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -429,12 +428,9 @@ abstract class SimplexSolver extends LinearSolver {
     @Override
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
 
-        if (this.isLogDebug()) {
-            BasicLogger.debug("Sol: {}", Arrays.toString(this.extractSolution()));
-            BasicLogger.debug("+++: {}", Arrays.toString(mySolutionShift));
-        }
+        NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return mySimplex.generateCutCandidates(integer, options.feasibility, fractionality);
+        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality);
     }
 
     @Override
@@ -886,10 +882,6 @@ abstract class SimplexSolver extends LinearSolver {
 
                     if (ratio < iteration.ratioDual
                             || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioDual, ratio)) {
-
-                        if (ratio >= iteration.ratioDual) {
-                            this.log("It happened!");
-                        }
 
                         enter.index = je;
                         enter.from = columnState;

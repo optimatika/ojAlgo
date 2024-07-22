@@ -240,7 +240,7 @@ abstract class SimplexStore {
 
         boolean[] negated = new boolean[nbVars];
         for (int i = 0; i < nbVars; i++) {
-            if (this.getColumnState(i) == ColumnState.UPPER) {
+            if (this.getUpperBound(i) <= ZERO) {
                 negated[i] = true;
             }
         }

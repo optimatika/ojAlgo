@@ -87,6 +87,62 @@ abstract class TableauCutGenerator {
     }
 
     /**
+     * Assumes all variables positive [0,∞). Further, this method assumes:
+     * <ul>
+     * <li>body.length == integer.length
+     * <li>body[index] == 1.0
+     * <li>integer[index] == true
+     * <li>rhs > 0.0
+     * </ul>
+     * 
+     * @param body The equation body.
+     * @param index The index of the variable that should integer valued, but is not.
+     * @param rhs The equation right hand side – the value of the variable that should be integer, but is not.
+     * @param integer Which of the variables are integer?
+     * @return A GMI cut
+     */
+    static Equation doGomoryMixedInteger(final Primitive1D body, final int index, final double rhs, final boolean[] integer) {
+
+        int nbVariables = integer.length;
+        if (body.size() != nbVariables || ACCURACY.isDifferent(ONE, body.doubleValue(index)) || !integer[index] || rhs <= ZERO) {
+            throw new IllegalArgumentException();
+        }
+
+        if (DEBUG) {
+            BasicLogger.debug(1, "{} {} = {}", index, rhs, body);
+            BasicLogger.debug(1, "Integers: {}", Arrays.toString(integer));
+        }
+
+        double f0 = TableauCutGenerator.fraction(rhs);
+        double cf0 = ONE - f0;
+
+        double[] cut = new double[nbVariables];
+
+        for (int j = 0; j < nbVariables; j++) {
+
+            double aj = body.doubleValue(j);
+
+            if (integer[j]) {
+
+                double fj = TableauCutGenerator.fraction(aj);
+                if (fj <= f0) {
+                    cut[j] = fj / f0;
+                } else {
+                    double cfj = ONE - fj;
+                    cut[j] = cfj / cf0;
+                }
+
+            } else if (aj > ZERO) {
+                cut[j] = aj / f0;
+            } else {
+                cut[j] = -aj / cf0;
+            }
+        }
+
+        return Equation.of(ONE, index, cut);
+    }
+
+    /**
      * Calculates a Gomory Mixed Integer (GMI) cut.
      * 
      * @param body The equation body (simplex tableau row). The tableau is assumed to be in an optimal (phase
@@ -117,7 +173,9 @@ abstract class TableauCutGenerator {
             BasicLogger.debug(1, "Negated:  {}", Arrays.toString(negated));
         }
 
-        double f0 = TableauCutGenerator.fraction(rhs);
+        boolean negRHS = negated[index];
+
+        double f0 = TableauCutGenerator.fraction(negRHS ? -rhs : rhs);
         if (!TableauCutGenerator.isFractionalEnough(rhs, f0, fractionality)) {
             return null;
         }
@@ -130,7 +188,10 @@ abstract class TableauCutGenerator {
 
             if (j < nbVariables) {
 
-                double aj = negated[j] ? -body.doubleValue(j) : body.doubleValue(j);
+                double aj = body.doubleValue(j);
+                if (negRHS ^ negated[j]) {
+                    aj = -aj;
+                }
 
                 if (!ACCURACY.isZero(aj)) {
 

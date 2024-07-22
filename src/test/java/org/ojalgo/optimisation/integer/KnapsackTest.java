@@ -32,6 +32,9 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Sense;
+import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
@@ -84,59 +87,117 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
     }
 
+    private static void assertOne(final Variable v) {
+        TestUtils.assertEquals(BigMath.ONE, v.getValue(), NumberContext.of(7, 6));
+    }
+
+    private static void assertZero(final Variable v) {
+        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), NumberContext.of(7, 6));
+    }
+
+    static OptimisationCase makeCase0() {
+
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
+
+        Optimisation.Result expected = Optimisation.Result.parse("OPTIMAL 20.0 @ { 1, 0 }");
+
+        return OptimisationCase.of(model, Sense.MAX, expected);
+    }
+
+    static OptimisationCase makeCase1() {
+
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(1.1d).addItem(20, 2).addItem(30, 4).build();
+
+        Optimisation.Result expected = Optimisation.Result.parse("DISTINCT 0.0 @ { 0, 0 }");
+
+        return OptimisationCase.of(model, Sense.MAX, expected);
+    }
+
+    static OptimisationCase makeCase2() {
+
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(0d).addItem(20, 2).addItem(30, 4).build();
+
+        Optimisation.Result expected = Optimisation.Result.parse("DISTINCT 0.0 @ { 0, 0 }");
+
+        return OptimisationCase.of(model, Sense.MAX, expected);
+    }
+
+    static OptimisationCase makeCase3() {
+
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(10d).addItem(20, 2).addItem(30, 4).build();
+
+        Optimisation.Result expected = Optimisation.Result.parse("OPTIMAL 50.0 @ { 1, 1 }");
+
+        return OptimisationCase.of(model, Sense.MAX, expected);
+    }
+
+    static OptimisationCase makeCase4() {
+
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
+
+        Optimisation.Result expected = Optimisation.Result.parse("OPTIMAL 30.0 @ { 0, 1 }");
+
+        return OptimisationCase.of(model, Sense.MAX, expected);
+    }
+
     @Test
     public void testVaryingMaxWeight0() {
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
-        model.maximise();
+
+        OptimisationCase testCase = KnapsackTest.makeCase0();
+
+        testCase.assertResult();
+
         //Expected: just first item
-        this.assertOne(model.getVariables().get(0));
-        this.assertZero(model.getVariables().get(1));
+        KnapsackTest.assertOne(testCase.model.getVariable(0));
+        KnapsackTest.assertZero(testCase.model.getVariable(1));
     }
 
     @Test
     public void testVaryingMaxWeight1() {
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(1.1d).addItem(20, 2).addItem(30, 4).build();
-        model.maximise();
+
+        OptimisationCase testCase = KnapsackTest.makeCase1();
+
+        testCase.assertResult();
+
         //Expected: nothing
-        this.assertZero(model.getVariables().get(0));
-        this.assertZero(model.getVariables().get(1));
+        KnapsackTest.assertZero(testCase.model.getVariable(0));
+        KnapsackTest.assertZero(testCase.model.getVariable(1));
     }
 
     @Test
     public void testVaryingMaxWeight2() {
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(0d).addItem(20, 2).addItem(30, 4).build();
-        model.maximise();
+
+        OptimisationCase testCase = KnapsackTest.makeCase2();
+
+        testCase.assertResult();
+
         //Expected: nothing
-        this.assertZero(model.getVariables().get(0));
-        this.assertZero(model.getVariables().get(1));
+        KnapsackTest.assertZero(testCase.model.getVariable(0));
+        KnapsackTest.assertZero(testCase.model.getVariable(1));
     }
 
     @Test
     public void testVaryingMaxWeight3() {
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(10d).addItem(20, 2).addItem(30, 4).build();
-        model.maximise();
+
+        OptimisationCase testCase = KnapsackTest.makeCase3();
+
+        testCase.assertResult();
+
         //Expected: both
-        this.assertOne(model.getVariables().get(0));
-        this.assertOne(model.getVariables().get(1));
+        KnapsackTest.assertOne(testCase.model.getVariable(0));
+        KnapsackTest.assertOne(testCase.model.getVariable(1));
     }
 
     @Test
     public void testVaryingMaxWeight4() {
 
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
+        OptimisationCase testCase = KnapsackTest.makeCase4();
 
-        model.maximise();
+        testCase.assertResult();
+
         //Expected: just second item
-        this.assertZero(model.getVariables().get(0));
-        this.assertOne(model.getVariables().get(1));
-    }
-
-    private void assertOne(final Variable v) {
-        TestUtils.assertEquals(BigMath.ONE, v.getValue(), NumberContext.of(7, 6));
-    }
-
-    private void assertZero(final Variable v) {
-        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), NumberContext.of(7, 6));
+        KnapsackTest.assertZero(testCase.model.getVariable(0));
+        KnapsackTest.assertOne(testCase.model.getVariable(1));
     }
 
 }

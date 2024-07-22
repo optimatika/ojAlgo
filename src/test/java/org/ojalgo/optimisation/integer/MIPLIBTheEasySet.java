@@ -114,7 +114,6 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      * </ul>
      */
     @Test
-    @Tag("new_lp_problem")
     public void testGr4x6() {
         MIPLIBTheEasySet.doTest("gr4x6.mps", "202.35", null);
     }

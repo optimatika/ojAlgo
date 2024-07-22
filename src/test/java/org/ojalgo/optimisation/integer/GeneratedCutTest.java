@@ -29,6 +29,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileTest;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.type.context.NumberContext;
 import org.opentest4j.AssertionFailedError;
 
@@ -48,10 +49,10 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
         if (DEBUG) {
             // model.options.debug(Optimisation.Solver.class);
-            model.options.debug(IntegerSolver.class);
+            // model.options.debug(IntegerSolver.class);
             // model.options.debug(ConvexSolver.class);
             // model.options.debug(LinearSolver.class);
-            // model.options.progress(IntegerSolver.class);
+            model.options.progress(IntegerSolver.class);
             // model.options.validate = false;
             // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
 
@@ -116,6 +117,46 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", false);
 
         GeneratedCutTest.doTest(model, minSolution, maxSolution);
+    }
+
+    @Test
+    public void testKnapsackCase0() {
+
+        OptimisationCase testCase = KnapsackTest.makeCase0();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    @Test
+    public void testKnapsackCase1() {
+
+        OptimisationCase testCase = KnapsackTest.makeCase1();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    @Test
+    public void testKnapsackCase2() {
+
+        OptimisationCase testCase = KnapsackTest.makeCase2();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    @Test
+    public void testKnapsackCase3() {
+
+        OptimisationCase testCase = KnapsackTest.makeCase3();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    @Test
+    public void testKnapsackCase4() {
+
+        OptimisationCase testCase = KnapsackTest.makeCase4();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
     }
 
 }

@@ -302,6 +302,9 @@ final class SimplexTableauSolver extends LinearSolver {
         LinearStructure structure = new LinearStructure(true, constrIn, constrEq, nbPosProbVars, nbNegProbVars, nbOtherSlackVars, nbIdentitySlackVars);
 
         T retVal = factory.apply(structure);
+        double[] lowerBounds = retVal.getLowerBounds();
+        double[] upperBounds = retVal.getUpperBounds();
+        Arrays.fill(upperBounds, POSITIVE_INFINITY);
 
         Primitive2D retConstraintsBdy = retVal.constraintsBody();
         Primitive1D retConstraintsRHS = retVal.constraintsRHS();
@@ -774,12 +777,9 @@ final class SimplexTableauSolver extends LinearSolver {
     @Override
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
 
-        if (this.isLogDebug()) {
-            BasicLogger.debug("Sol: {}", Arrays.toString(this.extractSolution().toRawCopy1D()));
-            BasicLogger.debug("+++: {}", Arrays.toString(new double[integer.length]));
-        }
+        NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return myTableau.generateCutCandidates(integer, options.integer().getIntegralityTolerance(), fractionality);
+        return myTableau.generateCutCandidates(integer, integralityTolerance, fractionality);
     }
 
     @Override
