@@ -26,9 +26,7 @@ import java.util.Collections;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.optimisation.ExpressionsBasedModel.EntityMap;
-import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public interface UpdatableSolver extends Optimisation.Solver {
 
@@ -46,22 +44,6 @@ public interface UpdatableSolver extends Optimisation.Solver {
     }
 
     ExpressionsBasedModel.EntityMap getEntityMap();
-
-    /**
-     * Some solvers deal with variable bounds implicitly – they are not expressed as constraints. If so, then
-     * this method should return info about such implied bound slack variables.
-     * <p>
-     * The requirements are dictated by what's needed to create Gomory mixed integer cuts with solvers that
-     * handle variable bounds implicitly. Currently it returns the bounded variable index, a
-     * {@link ConstraintType} that indicates at which bound the variable is as well as the value at that bound
-     * – type, index & value – in that order.
-     * <p>
-     * For solvers that treat variable bounds as any other constraint, this method simply always return null.
-     * That's the default behaviour.
-     */
-    default KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
-        return null;
-    }
 
     default boolean[] integers(final ExpressionsBasedModel model) {
 

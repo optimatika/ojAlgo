@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -160,6 +161,10 @@ abstract class SimplexStore {
         ExitInfo exit = iteration.exit;
         EnterInfo enter = iteration.enter;
 
+        if (this.isArtificial(exit.column())) {
+            --myRemainingArtificials;
+        }
+
         this.updateBasis(exit.index, exit.to, enter.index);
     }
 
@@ -230,19 +235,16 @@ abstract class SimplexStore {
 
     abstract double extractValue();
 
-    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality) {
+    final Collection<Equation> generateCutCandidates(final boolean[] integer, final NumberContext accuracy, final double fractionality, final double[] shift) {
+
+        if (myRemainingArtificials > 0) {
+            return Collections.emptyList();
+        }
 
         int nbVars = integer.length;
 
         if (nbVars != structure.countVariables()) {
             BasicLogger.debug("generateCutCandidates: integer.length != structure.countVariables()");
-        }
-
-        boolean[] negated = new boolean[nbVars];
-        for (int i = 0; i < nbVars; i++) {
-            if (this.getUpperBound(i) <= ZERO) {
-                negated[i] = true;
-            }
         }
 
         List<Equation> retVal = new ArrayList<>();
@@ -254,7 +256,8 @@ abstract class SimplexStore {
 
             if (j >= 0 && j < nbVars && integer[j] && !accuracy.isInteger(rhs)) {
 
-                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, negated);
+                Equation maybe = TableauCutGenerator.doGomoryMixedInteger(this.sliceBodyRow(i), j, rhs, fractionality, excluded, integer, myLowerBounds,
+                        myUpperBounds, shift);
 
                 if (maybe != null) {
                     retVal.add(maybe);

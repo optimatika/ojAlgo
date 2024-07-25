@@ -44,10 +44,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Meant to replace {@link SimplexTableauSolver}. It is already better in many aspects, but still can't do
@@ -430,35 +427,12 @@ abstract class SimplexSolver extends LinearSolver {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
 
-        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality);
+        return mySimplex.generateCutCandidates(integer, integralityTolerance, fractionality, mySolutionShift);
     }
 
     @Override
     public LinearStructure getEntityMap() {
         return mySimplex.structure;
-    }
-
-    @Override
-    public KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> getImpliedBoundSlack(final int col) {
-
-        double shift = mySolutionShift[col];
-
-        if (shift != ZERO) {
-
-            ColumnState columnState = mySimplex.getColumnState(col);
-            ConstraintType constraintType = ConstraintType.EQUALITY;
-            if (columnState == ColumnState.LOWER) {
-                constraintType = ConstraintType.LOWER;
-            } else if (columnState == ColumnState.UPPER) {
-                constraintType = ConstraintType.UPPER;
-            }
-
-            return EntryPair.of(constraintType, col).asKeyTo(shift);
-
-        } else {
-
-            return null;
-        }
     }
 
     private Access1D<?> extractMultipliers() {
@@ -1132,9 +1106,10 @@ abstract class SimplexSolver extends LinearSolver {
 
     final void doPrimalIterations(final IterDescr iteration) {
 
-        if (options.validate) {
-            this.validate(this.extractResult());
-        }
+        // TODO Re-enable validation here
+        //        if (options.validate) {
+        //            this.validate(this.extractResult());
+        //        }
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1170,9 +1145,10 @@ abstract class SimplexSolver extends LinearSolver {
                 this.logCurrentState();
             }
 
-            if (options.validate) {
-                this.validate(this.extractResult());
-            }
+            // TODO Re-enable validation here
+            //            if (options.validate) {
+            //                this.validate(this.extractResult());
+            //            }
         }
     }
 

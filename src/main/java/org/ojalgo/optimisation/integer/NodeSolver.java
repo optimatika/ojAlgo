@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -38,13 +37,10 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.IntermediateSolver;
 import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.UpdatableSolver;
-import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.PrimitiveNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 public final class NodeSolver extends IntermediateSolver {
 
@@ -104,7 +100,7 @@ public final class NodeSolver extends IntermediateSolver {
 
                     Expression cut = target.newExpression(name);
 
-                    cut.lower(BigMath.ONE);
+                    cut.lower(BigDecimal.valueOf(equation.getRHS()));
 
                     for (int j = 0; j < nbProblVars; j++) {
                         double aj = equation.doubleValue(j);
@@ -112,59 +108,15 @@ public final class NodeSolver extends IntermediateSolver {
 
                             int mj = entityMap.indexOf(j);
 
-                            KeyedPrimitive<EntryPair<ConstraintType, PrimitiveNumber>> ibs = updatable.getImpliedBoundSlack(j);
-
-                            if (ibs != null) {
-
-                                ConstraintType type = ibs.left().left();
-                                if (ibs.left().right().intValue() != j || ibs.right().doubleValue() == PrimitiveMath.ZERO) {
-                                    throw new IllegalStateException();
-                                }
-
-                                Variable entity = target.getVariable(mj);
-
-                                BigDecimal coefficient = TypeUtils.toBigDecimal(aj, SCALE);
-                                BigDecimal adjusted = entity.adjust(coefficient);
-
-                                if (ConstraintType.LOWER.equals(type)) {
-
-                                    BigDecimal factor = adjusted;
-                                    BigDecimal limit = entity.getLowerLimit();
-
-                                    BigDecimal shift = limit.multiply(factor);
-                                    cut.shift(shift);
-
-                                    entity.addTo(cut, factor);
-                                }
-
-                                if (ConstraintType.UPPER.equals(type)) {
-
-                                    BigDecimal factor = adjusted.negate();
-                                    BigDecimal limit = entity.getUpperLimit();
-
-                                    BigDecimal shift = limit.multiply(factor);
-                                    cut.shift(shift);
-
-                                    entity.addTo(cut, factor);
-                                }
-
-                                if (DEBUG) {
-                                    BasicLogger.debug("Slack {} {} =->> Cut {}: {} < {}", type, entity, name, cut.getLowerLimit(), cut.getLinearEntrySet());
-                                }
-
+                            BigDecimal AJ = TypeUtils.toBigDecimal(aj, SCALE);
+                            if (entityMap.isNegated(j)) {
+                                cut.add(mj, AJ.negate());
                             } else {
+                                cut.add(mj, AJ);
+                            }
 
-                                BigDecimal AJ = TypeUtils.toBigDecimal(aj, SCALE);
-                                if (entityMap.isNegated(j)) {
-                                    cut.add(mj, AJ.negate());
-                                } else {
-                                    cut.add(mj, AJ);
-                                }
-
-                                if (DEBUG) {
-                                    BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", target.getVariable(mj), name, cut.getLowerLimit(),
-                                            cut.getLinearEntrySet());
-                                }
+                            if (DEBUG) {
+                                BasicLogger.debug("Var   {} =->> Cut {}: {} < {}", target.getVariable(mj), name, cut.getLowerLimit(), cut.getLinearEntrySet());
                             }
                         }
                     }
