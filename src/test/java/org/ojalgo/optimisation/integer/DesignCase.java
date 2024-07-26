@@ -32,9 +32,10 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.Optimisation.Sense;
 import org.ojalgo.optimisation.Optimisation.State;
+import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
@@ -47,6 +48,26 @@ public class DesignCase extends OptimisationIntegerTests {
         model.addExpression().upper(11).set(x1, 3).set(x2, 1);
         model.addExpression().upper(5).set(x1, -1).set(x2, 2);
         return model;
+    }
+
+    public static OptimisationCase makeFacilityLocationCase() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        model.newVariable("Factory in LA").binary().weight(9);
+        model.newVariable("Factory in SF").binary().weight(5);
+        model.newVariable("Warehouse in LA").binary().weight(6);
+        model.newVariable("Warehouse in SF").binary().weight(4);
+
+        Expression budgetCost = model.newExpression("Budget").upper(10);
+        budgetCost.set(0, 6);
+        budgetCost.set(1, 3);
+        budgetCost.set(2, 5);
+        budgetCost.set(3, 2);
+
+        Result result = Result.of(15.0, State.OPTIMAL, 0.0, 1.0, 1.0, 1.0);
+
+        return OptimisationCase.of(model, Sense.MAX, result);
     }
 
     /**
@@ -235,25 +256,9 @@ public class DesignCase extends OptimisationIntegerTests {
     @Test
     public void testFacilityLocation() {
 
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        OptimisationCase testCase = DesignCase.makeFacilityLocationCase();
 
-        model.newVariable("Factory in LA").binary().weight(9);
-        model.newVariable("Factory in SF").binary().weight(5);
-        model.newVariable("Warehouse in LA").binary().weight(6);
-        model.newVariable("Warehouse in SF").binary().weight(4);
-
-        Expression budgetCost = model.newExpression("Budget").upper(10);
-        budgetCost.set(0, 6);
-        budgetCost.set(1, 3);
-        budgetCost.set(2, 5);
-        budgetCost.set(3, 2);
-
-        if (DEBUG) {
-            BasicLogger.debug(model);
-            model.options.debug(Optimisation.Solver.class);
-        }
-
-        Result result = model.maximise();
+        Result result = testCase.assertResult();
 
         TestUtils.assertStateNotLessThanOptimal(result);
 

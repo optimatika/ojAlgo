@@ -34,7 +34,6 @@ import org.ojalgo.type.context.NumberContext;
 abstract class TableauCutGenerator {
 
     private static final NumberContext ACCURACY = NumberContext.of(4, 16);
-
     private static final boolean DEBUG = false;
 
     private static double fraction(final double value) {

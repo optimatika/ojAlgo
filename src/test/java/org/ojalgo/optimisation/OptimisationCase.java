@@ -21,8 +21,10 @@ public final class OptimisationCase {
         this.result = result;
     }
 
-    public void assertResult() {
-        TestUtils.assertResult(result, sense.solve(model));
+    public Optimisation.Result assertResult() {
+        Optimisation.Result actual = sense.solve(model);
+        TestUtils.assertResult(result, actual);
+        return actual;
     }
 
     public ExpressionsBasedModel model() {

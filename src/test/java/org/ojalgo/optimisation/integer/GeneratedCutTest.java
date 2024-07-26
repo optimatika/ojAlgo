@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
@@ -49,10 +48,10 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
 
         if (DEBUG) {
             // model.options.debug(Optimisation.Solver.class);
-            // model.options.debug(IntegerSolver.class);
+            model.options.debug(IntegerSolver.class);
             // model.options.debug(ConvexSolver.class);
             // model.options.debug(LinearSolver.class);
-            model.options.progress(IntegerSolver.class);
+            // model.options.progress(IntegerSolver.class);
             // model.options.validate = false;
             // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
 
@@ -107,7 +106,6 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     }
 
     @Test
-    @Tag("new_lp_problem")
     public void testGr4x6() {
 
         String minStr = "OPTIMAL 202.35 @ { 20, 0, 25, 0, 0, 0, 0, 30, 0, 0, 0, 5, 15, 0, 0, 0, 5, 0, 0, 0, 0, 15, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0 }";
@@ -115,6 +113,18 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
         Optimisation.Result maxSolution = null;
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", false);
+
+        GeneratedCutTest.doTest(model, minSolution, maxSolution);
+    }
+
+    @Test
+    public void testMarkshare_4_0() {
+
+        String minStr = "OPTIMAL 1.0 @ { 0, 1.0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0 }";
+        Optimisation.Result minSolution = Optimisation.Result.parse(minStr);
+        Optimisation.Result maxSolution = null;
+
+        ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "markshare_4_0.mps", false);
 
         GeneratedCutTest.doTest(model, minSolution, maxSolution);
     }
@@ -155,6 +165,14 @@ public class GeneratedCutTest extends OptimisationIntegerTests implements ModelF
     public void testKnapsackCase4() {
 
         OptimisationCase testCase = KnapsackTest.makeCase4();
+
+        GeneratedCutTest.doTest(testCase.model, null, testCase.result);
+    }
+
+    @Test
+    public void testFacilityLocationCase() {
+
+        OptimisationCase testCase = DesignCase.makeFacilityLocationCase();
 
         GeneratedCutTest.doTest(testCase.model, null, testCase.result);
     }

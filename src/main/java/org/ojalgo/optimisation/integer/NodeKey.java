@@ -91,7 +91,7 @@ public final class NodeKey implements Comparable<NodeKey> {
      */
     public final long parent;
     /**
-     * Node sequennce number to keep track of in which order the nodes were created.
+     * Node sequence number to keep track of in which order the nodes were created.
      */
     public final long sequence;
 
@@ -160,6 +160,7 @@ public final class NodeKey implements Comparable<NodeKey> {
         mySignChanged = false;
     }
 
+    @Override
     public int compareTo(final NodeKey ref) {
         return Long.compare(sequence, ref.sequence);
     }

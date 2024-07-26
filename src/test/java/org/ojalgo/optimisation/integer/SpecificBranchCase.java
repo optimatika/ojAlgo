@@ -43,7 +43,8 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
             30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66,
             67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99 };
 
-    private static void doTestNode(final String modelPath, final int[] index, final int[] lower, final int[] upper, final Optimisation.State expectedState) {
+    private static void doTestNode(final String modelPath, final int[] index, final int[] lower, final int[] upper, final Optimisation.State expectedStateLP,
+            final State expectedStateMIP) {
 
         ExpressionsBasedModel modelMIP = SpecificBranchCase.makeModel(modelPath);
 
@@ -67,38 +68,65 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
             }
         }
 
-        ExpressionsBasedModel relaxedModel = modelMIP;
-        relaxedModel.relax(true); // soft-relax only
-
         for (int i = 0; i < index.length; i++) { // Set up the node
-            relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
+            modelMIP.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
         }
 
-        if (DEBUG) {
-            relaxedModel.options.debug(LinearSolver.class);
-        }
+        ExpressionsBasedModel modelLP = modelMIP.copy(false);
+        modelLP.relax(true); // soft-relax
 
-        Optimisation.Result result = relaxedModel.minimise();
+        if (expectedStateLP != null) {
 
-        if (DEBUG) {
-            BasicLogger.debug(result);
-        }
+            if (DEBUG) {
+                modelLP.options.debug(LinearSolver.class);
+            }
 
-        if (expectedState != null) {
+            Optimisation.Result resultLP = modelLP.minimise();
 
-            if (expectedState.isFeasible()) {
-                TestUtils.assertStateNotLessThanFeasible(result);
+            if (DEBUG) {
+                BasicLogger.debug(resultLP);
+            }
+
+            if (expectedStateLP.isFeasible()) {
+                TestUtils.assertStateNotLessThanFeasible(resultLP);
             } else {
-                TestUtils.assertStateLessThanFeasible(result);
+                TestUtils.assertStateLessThanFeasible(resultLP);
             }
 
-            if (expectedState.isOptimal()) {
-                TestUtils.assertStateNotLessThanOptimal(result);
+            if (expectedStateLP.isOptimal()) {
+                TestUtils.assertStateNotLessThanOptimal(resultLP);
+            }
+
+            if (resultLP.getState().isFeasible()) {
+                TestUtils.assertTrue(modelLP.validate(resultLP, ACCURACY, BasicLogger.DEBUG));
             }
         }
 
-        if (result.getState().isFeasible()) {
-            TestUtils.assertTrue(relaxedModel.validate(result, ACCURACY, BasicLogger.DEBUG));
+        if (expectedStateMIP != null) {
+
+            if (DEBUG) {
+                modelLP.options.debug(IntegerSolver.class);
+            }
+
+            Optimisation.Result resultMIP = modelMIP.minimise();
+
+            if (DEBUG) {
+                BasicLogger.debug(resultMIP);
+            }
+
+            if (expectedStateMIP.isFeasible()) {
+                TestUtils.assertStateNotLessThanFeasible(resultMIP);
+            } else {
+                TestUtils.assertStateLessThanFeasible(resultMIP);
+            }
+
+            if (expectedStateMIP.isOptimal()) {
+                TestUtils.assertStateNotLessThanOptimal(resultMIP);
+            }
+
+            if (resultMIP.getState().isFeasible()) {
+                TestUtils.assertTrue(modelMIP.validate(resultMIP, ACCURACY, BasicLogger.DEBUG));
+            }
         }
 
     }
@@ -129,7 +157,21 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
         int[] lower = { 3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0 };
         int[] upper = { 18, 72, 5, 75, 18, 75, 18, 67, 18, 75, 18 };
 
-        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.INFEASIBLE);
+        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.INFEASIBLE, null);
+    }
+
+    /**
+     * Both the (soft) relaxed and the integer model should be feasible and optimal. The overall optimal value
+     * is not obtainable from this node. (Verifying that is the reason this test exists.)
+     */
+    @Test
+    public void testMarkshare_4_0N1() {
+
+        int[] integers = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 };
+        int[] lower = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1 };
+        int[] upper = { 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+        SpecificBranchCase.doTestNode("markshare_4_0.mps", integers, lower, upper, State.OPTIMAL, State.OPTIMAL);
     }
 
     /**
@@ -147,7 +189,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
                 100000 };
 
-        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
+        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL, null);
     }
 
     /**
@@ -165,7 +207,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
                 100000 };
 
-        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
+        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL, null);
     }
 
     /**
@@ -183,7 +225,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
                 100000 };
 
-        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
+        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL, null);
     }
 
     /**
@@ -201,7 +243,7 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
                 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1, 100000, 1,
                 100000 };
 
-        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL);
+        SpecificBranchCase.doTestNode("noswot.mps", NOSWOT_INTEGERS, lower, upper, State.OPTIMAL, null);
     }
 
     @Test

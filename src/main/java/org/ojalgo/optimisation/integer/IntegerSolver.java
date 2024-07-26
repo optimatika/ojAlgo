@@ -523,7 +523,7 @@ public final class IntegerSolver extends GenericSolver {
         if (strategy.cutting && nodeKey.sequence % 10L == 0L) {
             double displacement = nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue);
             if (strategy.isCutRatherThanBranch(displacement, myBestResultSoFar != null)) {
-                if (nodeSolver.generateCuts(strategy)) {
+                if (nodeSolver.generateCuts(strategy, nodeKey)) {
                     return this.compute(nodeKey, nodeSolver, nodePrinter, strategy);
                 }
                 strategy.cutting = false;

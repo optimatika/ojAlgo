@@ -61,15 +61,7 @@ public final class NodeSolver extends IntermediateSolver {
         super(model);
     }
 
-    boolean generateCuts(final ModelStrategy strategy) {
-        boolean retVal = this.generateCuts(strategy, this.getModel());
-        if (retVal) {
-            this.reset();
-        }
-        return retVal;
-    }
-
-    boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
+    private boolean doGenerateCuts(final ModelStrategy strategy, final NodeKey nodeKey, final ExpressionsBasedModel target) {
 
         if (!this.isSolved()) {
             return false;
@@ -285,7 +277,7 @@ public final class NodeSolver extends IntermediateSolver {
                         }
 
                         if (target.options.validate) {
-                            if (!this.validate(target)) {
+                            if ((nodeKey == null || nodeKey.sequence == 0) && !this.validate(target)) {
                                 BasicLogger.error("Modified target model cuts off the optimal solution!");
                             }
                             if (target.validate(result)) {
@@ -299,6 +291,26 @@ public final class NodeSolver extends IntermediateSolver {
         }
 
         return nbConstr != target.constraints().count();
+    }
+
+    boolean generateCuts(final ModelStrategy strategy) {
+        boolean retVal = this.doGenerateCuts(strategy, null, this.getModel());
+        if (retVal) {
+            this.reset();
+        }
+        return retVal;
+    }
+
+    boolean generateCuts(final ModelStrategy strategy, final ExpressionsBasedModel target) {
+        return this.doGenerateCuts(strategy, null, target);
+    }
+
+    boolean generateCuts(final ModelStrategy strategy, final NodeKey nodeKey) {
+        boolean retVal = this.doGenerateCuts(strategy, nodeKey, this.getModel());
+        if (retVal) {
+            this.reset();
+        }
+        return retVal;
     }
 
 }

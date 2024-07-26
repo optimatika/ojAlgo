@@ -1,0 +1,27 @@
+    0 0.8333333333333334 = { 1.0, 0.0, 0.8333333333333334, 0.0, 0.16666666666666669, 0.0, -0.5, 0.0, -0.33333333333333337 }
+    Integers: [true, true, true, true, true, true, true, true, true]
+    Lower:  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    Upper:  [Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity]
+    5 0.16666666666666663 = { 0.0, 0.0, -0.8333333333333334, 0.0, -0.16666666666666669, 1.0, 0.5, 0.0, 0.33333333333333337 }
+    Integers: [true, true, true, true, true, true, true, true, true]
+    Lower:  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    Upper:  [Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity]
+
+Equat: CUT_GMI_0_1 0: { 0.0, 0.0, 1.0, 0.0, 0.2, 0.0, 0.6, 0.0, 0.7999999999999999 } = 1.0
+
+Var   0 <= Warehouse in LA (6) <= 1 =->> Cut CUT_GMI_0_1: 1.0 < [2=1]
+Slack UPPER Budget <= 10 =->> Cut CUT_GMI_0_1: -1.0 < [0=-1.2, 1=-0.6, 3=-0.4]
+Slack UPPER 0 <= Factory in SF (5) <= 1 =->> Cut CUT_GMI_0_1: -1.6 < [0=-1.2, 1=-1.2, 3=-0.4]
+Slack UPPER 0 <= Warehouse in SF (4) <= 1 =->> Cut CUT_GMI_0_1: -2.4 < [0=-1.2, 1=-1.2, 3=-1.2]
+    Largest=1.2, Smallest=1.2, Ratio=1: -2.4 < -3.40000000000000008
+    -2.4 <= CUT_GMI_0_1
+    -2.4 < [0=-1.2, 1=-1.2, 3=-1.2]
+
+Equat: CUT_GMI_5_2 5: { 0.0, 0.0, 1.0, 0.0, 0.20000000000000007, 0.0, 0.6, 0.0, 0.7999999999999999 } = 1.0
+
+Var   0 <= Warehouse in LA (6) <= 1 =->> Cut CUT_GMI_5_2: 1.0 < [2=1]
+Slack UPPER Budget <= 10 =->> Cut CUT_GMI_5_2: -1.0 < [0=-1.2, 1=-0.6, 3=-0.4]
+Slack UPPER 0 <= Factory in SF (5) <= 1 =->> Cut CUT_GMI_5_2: -1.6 < [0=-1.2, 1=-1.2, 3=-0.4]
+Slack UPPER 0 <= Warehouse in SF (4) <= 1 =->> Cut CUT_GMI_5_2: -2.4 < [0=-1.2, 1=-1.2, 3=-1.2]
+    Largest=1.2, Smallest=1.2, Ratio=1: -2.4 < -3.40000000000000008
+    Cut similar to current constraint!
