@@ -816,6 +816,16 @@ final class SimplexTableauSolver extends LinearSolver {
         return this.buildResult();
     }
 
+    @Override
+    public boolean updateRange(final int index, final double lower, final double upper) {
+
+        if (lower == upper) {
+            return this.fixVariable(index, lower);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * https://math.stackexchange.com/questions/3254444/artificial-variables-in-two-phase-simplex-method
      */

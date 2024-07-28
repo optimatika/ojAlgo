@@ -423,6 +423,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     @Override
+    public boolean fixVariable(final int index, final double value) {
+        return this.updateRange(index, value, value);
+    }
+
+    @Override
     public final Collection<Equation> generateCutCandidates(final double fractionality, final boolean... integer) {
 
         NumberContext integralityTolerance = options.integer().getIntegralityTolerance();
@@ -433,6 +438,13 @@ abstract class SimplexSolver extends LinearSolver {
     @Override
     public LinearStructure getEntityMap() {
         return mySimplex.structure;
+    }
+
+    @Override
+    public boolean updateRange(final int index, final double lower, final double upper) {
+        double shift = mySolutionShift[index];
+        this.setState(State.UNEXPLORED);
+        return mySimplex.updateRange(index, lower - shift, upper - shift);
     }
 
     private Access1D<?> extractMultipliers() {
@@ -714,12 +726,12 @@ abstract class SimplexSolver extends LinearSolver {
             if (rc > ZERO && Double.isFinite(lb)) {
                 mySimplex.lower(j);
                 mySimplex.shiftColumn(j, lb);
-                mySolutionShift[j] = lb;
+                mySolutionShift[j] += lb;
                 myValueShift += rc * lb;
             } else if (rc < ZERO && Double.isFinite(ub)) {
                 mySimplex.upper(j);
                 mySimplex.shiftColumn(j, ub);
-                mySolutionShift[j] = ub;
+                mySolutionShift[j] += ub;
                 myValueShift += rc * ub;
             } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 mySimplex.unbounded(j);
@@ -729,7 +741,7 @@ abstract class SimplexSolver extends LinearSolver {
             } else if (Math.abs(lb) <= Math.abs(ub)) {
                 mySimplex.lower(j);
                 mySimplex.shiftColumn(j, lb);
-                mySolutionShift[j] = lb;
+                mySolutionShift[j] += lb;
                 myValueShift += rc * lb;
                 if (modifyObjective) {
                     mySimplex.objective().set(j, ONE);
@@ -737,7 +749,7 @@ abstract class SimplexSolver extends LinearSolver {
             } else if (Math.abs(lb) >= Math.abs(ub)) {
                 mySimplex.upper(j);
                 mySimplex.shiftColumn(j, ub);
-                mySolutionShift[j] = ub;
+                mySolutionShift[j] += ub;
                 myValueShift += rc * ub;
                 if (modifyObjective) {
                     mySimplex.objective().set(j, NEG);

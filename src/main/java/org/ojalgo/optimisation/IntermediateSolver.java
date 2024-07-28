@@ -23,6 +23,7 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.structure.Access1D;
@@ -131,16 +132,30 @@ public abstract class IntermediateSolver implements Optimisation.Solver {
 
     public void update(final Variable variable) {
 
-        if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver && variable.isFixed()) {
+        if (myInPlaceUpdatesOK && mySolver instanceof UpdatableSolver) {
             UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
-
             int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
-            double fixedValue = variable.getValue().doubleValue();
 
-            if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
-                // Solver updated in-place
-                return;
+            if (variable.isFixed()) {
+
+                double fixedValue = variable.getValue().doubleValue();
+
+                if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
+                    // Solver updated in-place
+                    return;
+                }
+
+            } else {
+
+                double lowerBound = variable.getLowerLimit(false, PrimitiveMath.NEGATIVE_INFINITY);
+                double upperBound = variable.getUpperLimit(false, PrimitiveMath.POSITIVE_INFINITY);
+
+                if (updatableSolver.updateRange(indexInSolver, lowerBound, upperBound)) {
+                    // Solver updated in-place
+                    return;
+                }
             }
+
             myInPlaceUpdatesOK = false;
         }
 

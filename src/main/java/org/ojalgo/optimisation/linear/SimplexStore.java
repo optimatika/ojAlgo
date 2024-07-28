@@ -525,4 +525,10 @@ abstract class SimplexStore {
         return this;
     }
 
+    boolean updateRange(final int index, final double lower, final double upper) {
+        myLowerBounds[index] = lower;
+        myUpperBounds[index] = upper;
+        return true;
+    }
+
 }

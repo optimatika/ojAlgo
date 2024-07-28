@@ -72,12 +72,14 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>v51.1.0 (WIP) ≈1min (times halved with every digit less required – gap)
      * <li>v51.2.0 ≈ [gap 6 => 66s, gap 5 => 29s, gap 4 => 7s (sometimes wrong), gap 3 => wrong]
+     * <li>v55.0.0-SNAPSHOT (New LP subsolver) ≈ [gap 6 => 5.4s, gap 5 => 2.9s, gap 4 => 0.5s, gap 3 => 0.5s
+     * (no longer see a problem with coarse mip gap)]
      * </ul>
      */
     @Test
     public void testEnergyApp() {
 
-        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(5));
+        ConfigurableStrategy strategy = IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(4));
 
         IntegerUserFiles.doTest("EnergyApp.ebm", "2316538.192374359", null, strategy);
     }
