@@ -44,7 +44,6 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
@@ -170,12 +169,12 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
 
-        GeneralBuilder primBuilder = LinearSolver.newGeneralBuilder(-2.0, -3.0); // Negated, since max
+        LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-2.0, -3.0); // Negated, since max
         primBuilder.inequality(12.0, 4.0, 8.0);
         primBuilder.inequality(3.0, 2.0, 1.0);
         primBuilder.inequality(4.0, 3.0, 2.0);
 
-        GeneralBuilder dualBuilder = LinearSolver.newGeneralBuilder(12.0, 3.0, 4.0);
+        LinearSolver.Builder dualBuilder = LinearSolver.newBuilder(12.0, 3.0, 4.0);
         dualBuilder.inequality(-2.0, -4.0, -2.0, -3.0); // Negated, since lower
         dualBuilder.inequality(-3.0, -8.0, -1.0, -2.0); // Negated, since lower
 
@@ -239,12 +238,12 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
 
-        GeneralBuilder primBuilder = LinearSolver.newGeneralBuilder(-4.0, -3.0); // Negated, since max
+        LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-4.0, -3.0); // Negated, since max
         primBuilder.inequality(30.0, 2.0, 3.0);
         primBuilder.inequality(6.0, 1.0, 0.0);
         primBuilder.inequality(50.0, 6.0, 4.0);
 
-        GeneralBuilder dualBuilder = LinearSolver.newGeneralBuilder(30.0, 6.0, 50.0);
+        LinearSolver.Builder dualBuilder = LinearSolver.newBuilder(30.0, 6.0, 50.0);
         dualBuilder.inequality(-4.0, -2.0, -1.0, -6.0); // Negated, since lower
         dualBuilder.inequality(-3.0, -3.0, -0.0, -4.0); // Negated, since lower
 
@@ -313,11 +312,11 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
 
-        GeneralBuilder primBuilder = LinearSolver.newGeneralBuilder(-6.0, -14.0, -13.0); // Negated, since max
+        LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-6.0, -14.0, -13.0); // Negated, since max
         primBuilder.inequality(24.0, 0.5, 2.0, 1.0);
         primBuilder.inequality(60.0, 1.0, 2.0, 4.0);
 
-        GeneralBuilder dualBuilder = LinearSolver.newGeneralBuilder(24.0, 60.0);
+        LinearSolver.Builder dualBuilder = LinearSolver.newBuilder(24.0, 60.0);
         dualBuilder.inequality(-6.0, -0.5, -1.0); // Negated, since lower
         dualBuilder.inequality(-14.0, -2.0, -2.0); // Negated, since lower
         dualBuilder.inequality(-13.0, -1.0, -4.0); // Negated, since lower
@@ -378,7 +377,7 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         PrimalDualTest.comparePrimalAndDualSolvers(dualModel, Sense.MIN);
 
-        GeneralBuilder primBuilder = LinearSolver.newGeneralBuilder(-3.0, -4.0); // Negated, since max
+        LinearSolver.Builder primBuilder = LinearSolver.newBuilder(-3.0, -4.0); // Negated, since max
         primBuilder.equality(7.0, 5.0, 6.0);
 
         // dual builder skipped since unbounded variable

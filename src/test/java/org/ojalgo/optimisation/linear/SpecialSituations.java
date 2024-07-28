@@ -28,8 +28,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.optimisation.linear.LinearSolver.Builder;
-import org.ojalgo.optimisation.linear.LinearSolver.StandardBuilder;
 
 /**
  * Examples from LP10-Special-Situations.pdf (Special Situations in the Simplex Algorithm)
@@ -47,7 +45,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         R064Store x = R064Store.FACTORY.column(new double[] { 2, 0, 4, 0, 0 });
 
-        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
+        LinearSolver.Builder builder = LinearSolver.newBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.OPTIMAL, x);
@@ -119,7 +117,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         R064Store x = R064Store.FACTORY.column(new double[] { 7.0 / 3.0, 7.0 / 3.0, 0, 0 });
 
-        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
+        LinearSolver.Builder builder = LinearSolver.newBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.OPTIMAL, x);
@@ -131,7 +129,7 @@ public class SpecialSituations extends OptimisationLinearTests {
         for (Function<LinearStructure, SimplexTableau> factory2 : OptimisationLinearTests.TABLEAU_FACTORIES) {
 
             SimplexTableau tableau1 = builder.newSimplexTableau(factory1);
-            SimplexTableau tableau2 = ((Builder<?>) builder).newSimplexTableau(factory2);
+            SimplexTableau tableau2 = builder.newSimplexTableau(factory2);
 
             TestUtils.assertEquals(tableau1, tableau2);
 
@@ -163,7 +161,7 @@ public class SpecialSituations extends OptimisationLinearTests {
 
         R064Store x = R064Store.FACTORY.column(new double[] { 30, 20, 0, 0 });
 
-        StandardBuilder builder = LinearSolver.newStandardBuilder().objective(c).equalities(A, b);
+        LinearSolver.Builder builder = LinearSolver.newBuilder().objective(c).equalities(A, b);
         LinearSolver lp = builder.build();
 
         Result expected = new Optimisation.Result(Optimisation.State.UNBOUNDED, x);

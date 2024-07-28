@@ -54,10 +54,6 @@ import org.ojalgo.type.IndexSelector;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
-    public static final class Configuration {
-
-    }
-
     /**
      * <p>
      * Compared to {@link LinearSolver.StandardBuilder} this builder: <br>
@@ -71,32 +67,105 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      *
      * @author apete
      */
-    public static final class GeneralBuilder extends LinearSolver.Builder<LinearSolver.GeneralBuilder> {
+    public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
-        GeneralBuilder() {
+        Builder() {
             super();
         }
 
         @Override
-        public LinearSolver.GeneralBuilder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
+        public LinearSolver.Builder equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
+            return super.equalities(mtrxAE, mtrxBE);
+        }
+
+        @Override
+        public LinearSolver.Builder equality(final double rhs, final double... factors) {
+            return super.equality(rhs, factors);
+        }
+
+        @Override
+        public final LinearFunction<Double> getObjective() {
+            LinearFunction<Double> retVal = this.getObjective(LinearFunction.class);
+            if (retVal == null) {
+                retVal = LinearFunction.factory(this.getFactory()).make(this.countVariables());
+                super.setObjective(retVal);
+            }
+            return retVal;
+        }
+
+        @Override
+        public LinearSolver.Builder inequalities(final Access2D<?> mtrxAI, final Access1D<?> mtrxBI) {
             return super.inequalities(mtrxAI, mtrxBI);
         }
 
         @Override
-        public LinearSolver.GeneralBuilder inequality(final double rhs, final double... factors) {
+        public LinearSolver.Builder inequality(final double rhs, final double... factors) {
             return super.inequality(rhs, factors);
+        }
+
+        public final LinearSolver.Builder lower(final double... bounds) {
+            double[] lowerBounds = this.getLowerBounds(ZERO).data;
+            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
+                lowerBounds[i] = bounds[i];
+            }
+            return this;
+        }
+
+        public final LinearSolver.Builder lower(final double bound) {
+            double[] lowerBounds = this.getLowerBounds(ZERO).data;
+            Arrays.fill(lowerBounds, bound);
+            return this;
+        }
+
+        public final LinearSolver.Builder objective(final double... factors) {
+            this.setNumberOfVariables(factors.length);
+            this.getObjective().linear().fillMatching(this.getFactory().column(factors));
+            return this;
+        }
+
+        public final LinearSolver.Builder objective(final int index, final double value) {
+            this.getObjective().linear().set(index, value);
+            return this;
+        }
+
+        public final LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
+            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
+            return this;
         }
 
         /**
          * Convert inequalities to equalities (adding slack variables) and make sure all RHS are non-negative.
+         * <p>
+         * Defines optimisation problems on the LP standard form:
+         * <p>
+         * min [C]<sup>T</sup>[X] <br>
+         * when [AE][X] == [BE] <br>
+         * and 0 <= [X] <br>
+         * and 0 <= [BE] <br>
+         * <p>
+         * A Linear Program is in Standard Form if:
+         * <ul>
+         * <li>All constraints are equality constraints.
+         * <li>All variables have a nonnegativity sign restriction.
+         * </ul>
+         * <p>
+         * Further it is required that the constraint right hand sides are nonnegative (nonnegative elements
+         * in [BE]). Don't think that's an actual LP standard form requirement, but it is commonly required,
+         * and also here.
+         * <p>
+         * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it
+         * should be a minimisation.
+         * <p>
+         *
+         * @author apete
          */
-        public StandardBuilder toStandardForm() {
+        public LinearSolver.Builder toStandardForm() {
 
             int nbInequalites = this.countInequalityConstraints();
             int nbEqualites = this.countEqualityConstraints();
             int nbVariables = this.countVariables();
 
-            StandardBuilder retVal = LinearSolver.newStandardBuilder();
+            LinearSolver.Builder retVal = LinearSolver.newBuilder();
 
             PhysicalStore<Double> mtrxC = null;
 
@@ -152,159 +221,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return retVal;
         }
 
-    }
-
-    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
-
-        @Override
-        public LinearSolver build(final ExpressionsBasedModel model) {
-
-            boolean alternative = !model.options.experimental;
-
-            this.setSwitch(model, alternative);
-
-            if (alternative) {
-                return NEW_INTEGRATION.build(model);
-            } else {
-                return OLD_INTEGRATION.build(model);
-            }
-        }
-
-        @Override
-        public boolean isCapable(final ExpressionsBasedModel model) {
-            return OLD_INTEGRATION.isCapable(model) || NEW_INTEGRATION.isCapable(model);
-        }
-
-        @Override
-        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.toModelState(solverState, model);
-            } else {
-                return OLD_INTEGRATION.toModelState(solverState, model);
-            }
-        }
-
-        @Override
-        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.toSolverState(modelState, model);
-            } else {
-                return OLD_INTEGRATION.toSolverState(modelState, model);
-            }
-        }
-
-        @Override
-        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.getIndexInSolver(model, variable);
-            } else {
-                return OLD_INTEGRATION.getIndexInSolver(model, variable);
-            }
-        }
-
-    }
-
-    /**
-     * <p>
-     * Defines optimisation problems on the LP standard form:
-     * <p>
-     * min [C]<sup>T</sup>[X] <br>
-     * when [AE][X] == [BE] <br>
-     * and 0 <= [X] <br>
-     * and 0 <= [BE] <br>
-     * <p>
-     * A Linear Program is in Standard Form if:
-     * <ul>
-     * <li>All constraints are equality constraints.
-     * <li>All variables have a nonnegativity sign restriction.
-     * </ul>
-     * <p>
-     * Further it is required that the constraint right hand sides are nonnegative (nonnegative elements in
-     * [BE]). Don't think that's an actual LP standard form requirement, but it is commonly required, and also
-     * here.
-     * <p>
-     * The LP standard form does not dictate if expressed on minimisation or maximisation form. Here it should
-     * be a minimisation.
-     * <p>
-     *
-     * @author apete
-     */
-    public static final class StandardBuilder extends LinearSolver.Builder<StandardBuilder> {
-
-        StandardBuilder() {
-            super();
-        }
-
-    }
-
-    static abstract class Builder<B extends LinearSolver.Builder<B>> extends GenericSolver.Builder<B, LinearSolver> {
-
-        Builder() {
-            super();
-        }
-
-        @Override
-        public B equalities(final Access2D<?> mtrxAE, final Access1D<?> mtrxBE) {
-            return super.equalities(mtrxAE, mtrxBE);
-        }
-
-        @Override
-        public B equality(final double rhs, final double... factors) {
-            return super.equality(rhs, factors);
-        }
-
-        @Override
-        public final LinearFunction<Double> getObjective() {
-            LinearFunction<Double> retVal = this.getObjective(LinearFunction.class);
-            if (retVal == null) {
-                retVal = LinearFunction.factory(this.getFactory()).make(this.countVariables());
-                super.setObjective(retVal);
-            }
-            return retVal;
-        }
-
-        public final B lower(final double... bounds) {
-            double[] lowerBounds = this.getLowerBounds(ZERO).data;
-            for (int i = 0, limit = Math.min(lowerBounds.length, bounds.length); i < limit; i++) {
-                lowerBounds[i] = bounds[i];
-            }
-            return (B) this;
-        }
-
-        public final B lower(final double bound) {
-            double[] lowerBounds = this.getLowerBounds(ZERO).data;
-            Arrays.fill(lowerBounds, bound);
-            return (B) this;
-        }
-
-        public final B objective(final double... factors) {
-            this.setNumberOfVariables(factors.length);
-            this.getObjective().linear().fillMatching(this.getFactory().column(factors));
-            return (B) this;
-        }
-
-        public final B objective(final int index, final double value) {
-            this.getObjective().linear().set(index, value);
-            return (B) this;
-        }
-
-        public final B objective(final MatrixStore<Double> mtrxC) {
-            this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
-            return (B) this;
-        }
-
-        public final B upper(final double... bounds) {
+        public final LinearSolver.Builder upper(final double... bounds) {
             double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY).data;
             for (int i = 0, limit = Math.min(upperBounds.length, bounds.length); i < limit; i++) {
                 upperBounds[i] = bounds[i];
             }
-            return (B) this;
+            return this;
         }
 
-        public final B upper(final double bound) {
+        public final LinearSolver.Builder upper(final double bound) {
             double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY).data;
             Arrays.fill(upperBounds, bound);
-            return (B) this;
+            return this;
         }
 
         @Override
@@ -563,6 +491,60 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    public static final class Configuration {
+
+    }
+
+    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
+
+        @Override
+        public LinearSolver build(final ExpressionsBasedModel model) {
+
+            boolean alternative = !model.options.experimental;
+
+            this.setSwitch(model, alternative);
+
+            if (alternative) {
+                return NEW_INTEGRATION.build(model);
+            } else {
+                return OLD_INTEGRATION.build(model);
+            }
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return OLD_INTEGRATION.isCapable(model) || NEW_INTEGRATION.isCapable(model);
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.toModelState(solverState, model);
+            } else {
+                return OLD_INTEGRATION.toModelState(solverState, model);
+            }
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.toSolverState(modelState, model);
+            } else {
+                return OLD_INTEGRATION.toSolverState(modelState, model);
+            }
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            if (this.isSwitch(model)) {
+                return NEW_INTEGRATION.getIndexInSolver(model, variable);
+            } else {
+                return OLD_INTEGRATION.getIndexInSolver(model, variable);
+            }
+        }
+
+    }
+
     /**
      * An integration to a new/alternative/experimental LP-solver. That solver is intended to replace the
      * current solver, but is not yet ready to do that. You're welcome to try it - just add this integration
@@ -759,24 +741,48 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
      */
     static final OldIntegration OLD_INTEGRATION = new OldIntegration();
 
-    public static LinearSolver.GeneralBuilder newGeneralBuilder() {
-        return new LinearSolver.GeneralBuilder();
+    public static LinearSolver.Builder newBuilder() {
+        return new LinearSolver.Builder();
     }
 
-    public static LinearSolver.GeneralBuilder newGeneralBuilder(final double... objective) {
-        return LinearSolver.newGeneralBuilder().objective(objective);
+    public static LinearSolver.Builder newBuilder(final double... objective) {
+        return LinearSolver.newBuilder().objective(objective);
+    }
+
+    /**
+     * @deprecated v55 Use {@link #newBuilder()} instead
+     */
+    @Deprecated
+    public static LinearSolver.Builder newGeneralBuilder() {
+        return LinearSolver.newBuilder();
+    }
+
+    /**
+     * @deprecated v55 Use {@link #newBuilder(double...)} instead
+     */
+    @Deprecated
+    public static LinearSolver.Builder newGeneralBuilder(final double... objective) {
+        return LinearSolver.newBuilder(objective);
     }
 
     public static LinearSolver newSolver(final ExpressionsBasedModel model) {
         return INTEGRATION.build(model);
     }
 
-    public static LinearSolver.StandardBuilder newStandardBuilder() {
-        return new LinearSolver.StandardBuilder();
+    /**
+     * @deprecated v55 Use {@link #newBuilder()} instead
+     */
+    @Deprecated
+    public static LinearSolver.Builder newStandardBuilder() {
+        return LinearSolver.newBuilder();
     }
 
-    public static LinearSolver.StandardBuilder newStandardBuilder(final double... objective) {
-        return LinearSolver.newStandardBuilder().objective(objective);
+    /**
+     * @deprecated v55 Use {@link #newBuilder(double...)} instead
+     */
+    @Deprecated
+    public static LinearSolver.Builder newStandardBuilder(final double... objective) {
+        return LinearSolver.newBuilder(objective);
     }
 
     public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {

@@ -34,7 +34,6 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.OptimisationCase;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.linear.LinearSolver.GeneralBuilder;
 
 public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
@@ -70,7 +69,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
     }
 
-    static void doTestDualVariants(final LinearSolver.GeneralBuilder builder, final Result expected, final int... basis) {
+    static void doTestDualVariants(final LinearSolver.Builder builder, final Result expected, final int... basis) {
 
         Optimisation.Options options = new Optimisation.Options();
 
@@ -136,7 +135,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
     }
 
-    static void doTestPhasedVariants(final LinearSolver.GeneralBuilder builder, final Result expected) {
+    static void doTestPhasedVariants(final LinearSolver.Builder builder, final Result expected) {
 
         Optimisation.Options options = new Optimisation.Options();
 
@@ -167,7 +166,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         }
     }
 
-    static void doTestPrimalVariants(final LinearSolver.GeneralBuilder builder, final Result expected, final int... basis) {
+    static void doTestPrimalVariants(final LinearSolver.Builder builder, final Result expected, final int... basis) {
 
         Optimisation.Options options = new Optimisation.Options();
 
@@ -188,7 +187,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualCarletonKcheungInfeasible() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(-4, -2, 0, 1, 3).equality(0, 2, -1, 1, 2, 0).equality(-1, 1, 1, -1, -2, 0).equality(5, 1, 2, 0,
+        LinearSolver.Builder builder = LinearSolver.newBuilder(-4, -2, 0, 1, 3).equality(0, 2, -1, 1, 2, 0).equality(-1, 1, 1, -1, -2, 0).equality(5, 1, 2, 0,
                 0, 1);
 
         Optimisation.Result expected = Result.of(State.INFEASIBLE);
@@ -207,7 +206,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualCarletonKcheungWE1() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(0, 0, 0).equality(2, 1, 1, -1).equality(3, 1, -1, 2);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(0, 0, 0).equality(2, 1, 1, -1).equality(3, 1, -1, 2);
 
         Optimisation.Result expected = Result.of(0.0, State.OPTIMAL, 7.0 / 3.0, 0.0, 1.0 / 3.0);
 
@@ -222,7 +221,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualCarletonKcheungWE2() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(4, 3, 0, -1).equality(1, 3, -1, -1, 0).equality(3, -1, 2, 1, -1);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(4, 3, 0, -1).equality(1, 3, -1, -1, 0).equality(3, -1, 2, 1, -1);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 2.0, 0.0, 5.0, 0.0);
 
@@ -237,7 +236,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualCarletonKcheungWE3() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(-3, -4, 0, 0, 0, 0).equality(6, 1, 1, 0, 1, 0, 0).equality(10, 2, 1, 1, 0, 0, 0)
+        LinearSolver.Builder builder = LinearSolver.newBuilder(-3, -4, 0, 0, 0, 0).equality(6, 1, 1, 0, 1, 0, 0).equality(10, 2, 1, 1, 0, 0, 0)
                 .equality(4, -1, 1, 0, 0, 1, 0).equality(5, 1, 1, 0, 0, 0, 1);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 0.5, 4.5, 4.5, 1.0, 0.0, 0.0);
@@ -253,7 +252,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualIllinoisMlavrov() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(1, 1).inequality(-6, -2, -1).inequality(-7, -3, -1).inequality(-8, -1, -3);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(1, 1).inequality(-6, -2, -1).inequality(-7, -3, -1).inequality(-8, -1, -3);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 2.0, 2.0);
 
@@ -272,7 +271,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testDualIsraelM340() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(1, 2, 1, 0).inequality(-3, 3, -1, -1, 0).inequality(-2, 1, 0, 0, -4).inequality(6, -3, 2, 1, 2);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(1, 2, 1, 0).inequality(-3, 3, -1, -1, 0).inequality(-2, 1, 0, 0, -4).inequality(6, -3, 2, 1, 2);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 0.0, 0.0, 3.0, 0.5);
 
@@ -318,7 +317,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
         RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
 
-        LinearSolver.GeneralBuilder builder = LinearSolver.newGeneralBuilder(0.0, 0.0, 1.0);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(0.0, 0.0, 1.0);
         builder.equality(5, 1, 1, 0).inequality(10, 0, 0, -1).lower(Double.NEGATIVE_INFINITY);
         // Set up with all variables unbounded and then an inequality to limit "lower(-10)"
         // That's different from what the EBM would result in.
@@ -504,7 +503,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testPrimalBrownCsci2580() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(-60, -30, -20).inequality(48, 8, 6, 1).inequality(20, 4, 2, 1.5).inequality(8, 2, 0.5, 0.5);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(-60, -30, -20).inequality(48, 8, 6, 1).inequality(20, 4, 2, 1.5).inequality(8, 2, 0.5, 0.5);
 
         Optimisation.Result expected = Optimisation.Result.of(-300, State.OPTIMAL, 3, 4, 0);
 
@@ -519,7 +518,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testPrimalCarletonKcheung() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(1, 3, -1, 3).equality(4, 1, 1, 1, 1).equality(2, 1, -1, 2, -1);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(1, 3, -1, 3).equality(4, 1, 1, 1, 1).equality(2, 1, -1, 2, -1);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 0.0, 2.0, 2.0, 0.0);
 
@@ -534,7 +533,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testPrimalMitchellBounds() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(0, 0, -2, -3).equality(4, 1, 0, 1, 1).equality(1, 0, 1, -1, -2).upper(10, 4, 5, 1);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(0, 0, -2, -3).equality(4, 1, 0, 1, 1).equality(1, 0, 1, -1, -2).upper(10, 4, 5, 1);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 1.0, 4.0, 3.0, 0.0);
 
@@ -551,7 +550,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
     @Test
     public void testPrimalWikipedia() {
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder().objective(-2, -3, -4).inequality(10, 3, 2, 1).inequality(15, 2, 5, 3);
+        LinearSolver.Builder builder = LinearSolver.newBuilder().objective(-2, -3, -4).inequality(10, 3, 2, 1).inequality(15, 2, 5, 3);
 
         Optimisation.Result expected = Result.of(State.OPTIMAL, 0.0, 0.0, 5.0, 5.0, 0.0);
 
@@ -614,7 +613,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
 
         RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
 
-        GeneralBuilder builder = LinearSolver.newGeneralBuilder(-3);
+        LinearSolver.Builder builder = LinearSolver.newBuilder(-3);
         builder.inequality(10, 1);
 
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);

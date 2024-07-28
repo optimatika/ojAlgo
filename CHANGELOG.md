@@ -11,6 +11,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The new LP solver implementation is now the default alternative.
+- The two classes `LinearSolver.GeneralBuilder` and `LinearSolver.StandardBuilder` are replaced by a common `LinearSolver.Builder`. Consequently the methods `newGeneralBuilder()` and `newStandardBuilder()` are deprecated and replaced by `newBuilder()`.
+
 ## [54.0.0] – 2024-06-06
 
 ### Added

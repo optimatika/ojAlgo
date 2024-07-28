@@ -201,7 +201,7 @@ public abstract class ConvexSolver extends GenericSolver {
         /**
          * Disregard the objective function (set it to zero) and form the dual LP.
          */
-        public LinearSolver.GeneralBuilder toFeasibilityChecker() {
+        public LinearSolver.Builder toFeasibilityChecker() {
 
             MatrixStore<Double> mtrxAE = this.getAE();
             MatrixStore<Double> mtrxBE = this.getBE();
@@ -209,7 +209,7 @@ public abstract class ConvexSolver extends GenericSolver {
             MatrixStore<Double> mtrxAI = this.getAI();
             MatrixStore<Double> mtrxBI = this.getBI();
 
-            LinearSolver.GeneralBuilder retVal = LinearSolver.newGeneralBuilder();
+            LinearSolver.Builder retVal = LinearSolver.newBuilder();
 
             int nbEqus = this.countEqualityConstraints();
             int nbIneq = this.countInequalityConstraints();
@@ -253,7 +253,7 @@ public abstract class ConvexSolver extends GenericSolver {
          *
          * @see #toLinearApproximation(Access1D)
          */
-        public LinearSolver.GeneralBuilder toLinearApproximation() {
+        public LinearSolver.Builder toLinearApproximation() {
             return this.toLinearApproximation(ArrayR064.make(this.countVariables()));
         }
 
@@ -261,7 +261,7 @@ public abstract class ConvexSolver extends GenericSolver {
          * Linearise the objective function (at the specified point) and duplicate all variables to handle the
          * (potential) positive and negative parts separately.
          */
-        public LinearSolver.GeneralBuilder toLinearApproximation(final Access1D<Double> point) {
+        public LinearSolver.Builder toLinearApproximation(final Access1D<Double> point) {
 
             MatrixStore<Double> mtrxC = this.getObjective().toFirstOrderApproximation(point).getLinearFactors(false);
 
@@ -271,7 +271,7 @@ public abstract class ConvexSolver extends GenericSolver {
             MatrixStore<Double> mtrxAI = this.getAI();
             MatrixStore<Double> mtrxBI = this.getBI();
 
-            LinearSolver.GeneralBuilder retVal = LinearSolver.newGeneralBuilder();
+            LinearSolver.Builder retVal = LinearSolver.newBuilder();
 
             retVal.objective(mtrxC.below(mtrxC.negate()));
 

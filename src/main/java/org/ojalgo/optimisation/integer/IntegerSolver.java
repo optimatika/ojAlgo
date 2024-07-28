@@ -204,10 +204,12 @@ public final class IntegerSolver extends GenericSolver {
 
         this.resetIterationsCount();
 
-        ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
-        NodeSolver cutSolver = cutModel.prepare(NodeSolver::new);
-        Result cutResult = cutSolver.solve();
-        cutSolver.generateCuts(strategy, myIntegerModel);
+        if (strategy.cutting) {
+            ExpressionsBasedModel cutModel = myIntegerModel.snapshot();
+            NodeSolver cutSolver = cutModel.prepare(NodeSolver::new);
+            Result cutResult = cutSolver.solve();
+            cutSolver.generateCuts(strategy, myIntegerModel);
+        }
 
         NodeKey rootNode = new NodeKey(myIntegerModel);
         ExpressionsBasedModel rootModel = myIntegerModel.snapshot();
@@ -520,7 +522,7 @@ public final class IntegerSolver extends GenericSolver {
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
         }
 
-        if (strategy.cutting && nodeKey.sequence % 10L == 0L) {
+        if (strategy.cutting && nodeKey.sequence % 100L == 0L) {
             double displacement = nodeKey.getMinimumDisplacement(branchIntegerIndex, variableValue);
             if (strategy.isCutRatherThanBranch(displacement, myBestResultSoFar != null)) {
                 if (nodeSolver.generateCuts(strategy, nodeKey)) {

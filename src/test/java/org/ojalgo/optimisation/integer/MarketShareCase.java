@@ -243,7 +243,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
         R064Store tmpC = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        LinearSolver.StandardBuilder tmpBuilder = LinearSolver.newStandardBuilder().objective(tmpC);
+        LinearSolver.Builder tmpBuilder = LinearSolver.newBuilder().objective(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
         Optimisation.Options tmpOptions = new Optimisation.Options();
