@@ -216,7 +216,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     final double getCurrentElement(final ExitInfo exit, final int je) {
-        // return myTableau[exit.index][excluded[je]];    
+        // return myTableau[exit.index][excluded[je]];
         return this.constraintsBody().doubleValue(exit.index, excluded[je]);
     }
 
@@ -257,11 +257,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         }
     }
 
-    @Override
-    final double getReducedCost(final int je) {
-        // return myTableau[m][excluded[je]];
-        return this.objective().doubleValue(excluded[je]);
-    }
+
 
     /**
      * @return The (phase 2) objective function value
@@ -273,6 +269,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     abstract Primitive1D newConstraintsRHS();
 
     abstract Primitive1D newObjective();
+
+    abstract Primitive1D newPhase1();
 
     final SimplexTableauSolver newSimplexTableauSolver(final Optimisation.Options optimisationOptions) {
         return new SimplexTableauSolver(this, optimisationOptions);
@@ -289,6 +287,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             myObjective = this.newObjective();
         }
         return myObjective;
+    }
+
+    @Override
+    final Primitive1D phase1() {
+        return this.newPhase1();
     }
 
     @Override

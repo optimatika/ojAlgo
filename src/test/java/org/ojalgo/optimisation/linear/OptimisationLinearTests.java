@@ -29,7 +29,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 
 abstract class OptimisationLinearTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Standard-Default",
             LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
