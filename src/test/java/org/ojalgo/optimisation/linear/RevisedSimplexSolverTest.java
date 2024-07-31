@@ -133,6 +133,12 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
             PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
         }
+
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = SimplexSolver.build(simplified, factory);
+            ClassicSimplexSolver solver = simplex.newClassicSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(model, expected, solver, simplex.getClass());
+        }
     }
 
     static void doTestPhasedVariants(final LinearSolver.Builder builder, final Result expected) {
@@ -146,6 +152,12 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
             SimplexStore simplex = builder.newSimplexStore(factory);
             PhasedSimplexSolver solver = simplex.newPhasedSimplexSolver(options);
+            RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
+        }
+
+        for (Function<LinearStructure, SimplexStore> factory : OptimisationLinearTests.STORE_FACTORIES) {
+            SimplexStore simplex = builder.newSimplexStore(factory);
+            ClassicSimplexSolver solver = simplex.newClassicSimplexSolver(options);
             RevisedSimplexSolverTest.doTestOneVariant(expected, solver, simplex.getClass());
         }
     }

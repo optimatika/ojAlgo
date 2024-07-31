@@ -273,6 +273,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     abstract Primitive1D newObjective();
 
+    abstract Primitive1D newPhase1();
+
     final SimplexTableauSolver newSimplexTableauSolver(final Optimisation.Options optimisationOptions) {
         return new SimplexTableauSolver(this, optimisationOptions);
     }
@@ -288,6 +290,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
             myObjective = this.newObjective();
         }
         return myObjective;
+    }
+
+    @Override
+    final Primitive1D phase1() {
+        return this.newPhase1();
     }
 
     @Override
