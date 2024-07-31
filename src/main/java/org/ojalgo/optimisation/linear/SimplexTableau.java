@@ -275,6 +275,8 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     abstract Primitive1D newObjective();
 
+    abstract Primitive1D newPhase1();
+
     final SimplexTableauSolver newSimplexTableauSolver(final Optimisation.Options optimisationOptions) {
         return new SimplexTableauSolver(this, optimisationOptions);
     }
@@ -295,6 +297,10 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     void prepareToIterate() {
         // TODO Auto-generated method stub
+            }
+
+    final Primitive1D phase1() {
+        return this.newPhase1();
     }
 
     @Override
