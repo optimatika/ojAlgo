@@ -61,13 +61,13 @@ final class RevisedStore extends SimplexStore {
      */
     private final PhysicalStore<Double> d;
     private final PhysicalStore<Double> l;
-    private R064Store myAlternativeObjective = null;
     private final MatrixStore<Double> myBasis;
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
     private final R064Store myConstraintsRHS;
     private final ProductFormInverse myInvBasis;
     private final R064Store myObjective;
+    private R064Store myPhase1Objective = null;
     /**
      * cost reducer
      */
@@ -151,6 +151,8 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateIteration() {
 
+        R064Store currentObjective = myPhase1Objective != null ? myPhase1Objective : myObjective;
+
         //        PhysicalStore<Double> x0 = x.copy();
         //        PhysicalStore<Double> d0 = d.copy();
 
@@ -159,11 +161,11 @@ final class RevisedStore extends SimplexStore {
         // d += a
         // ...and then move the setup/prepare/update outside of the loop
 
-        myInvBasis.btran(myObjective.rows(included), l);
+        myInvBasis.btran(currentObjective.rows(included), l);
 
         this.doExclTranspMult(l, r);
 
-        d.fillMatching(myObjective.rows(excluded), SUBTRACT, r);
+        d.fillMatching(currentObjective.rows(excluded), SUBTRACT, r);
 
         myInvBasis.ftran(myConstraintsRHS, x);
 
@@ -206,15 +208,6 @@ final class RevisedStore extends SimplexStore {
         for (int ji = 0; ji < included.length; ji++) {
             int j = included[ji];
             solution[j] = x.doubleValue(ji);
-        }
-    }
-
-    @Override
-    void copyObjective() {
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = myObjective.copy();
-        } else {
-            myAlternativeObjective.fillMatching(myObjective);
         }
     }
 
@@ -278,8 +271,18 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    boolean isPhase1() {
+        return myPhase1Objective != null;
+    }
+
+    @Override
     Mutate1D objective() {
         return myObjective;
+    }
+
+    @Override
+    Mutate1D phase1() {
+        return myPhase1Objective;
     }
 
     @Override
@@ -291,25 +294,19 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void restoreObjective() {
-        myObjective.fillMatching(myAlternativeObjective);
-        myAlternativeObjective = null;
-    }
-
-    @Override
     void setupClassicPhase1Objective() {
 
         int base = structure.nbIdty;
 
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = RevisedStore.newRow(myObjective.size());
+        if (myPhase1Objective == null) {
+            myPhase1Objective = RevisedStore.newRow(myObjective.size());
         }
 
         int nbVariables = structure.countVariables();
 
         for (int j = 0; j < nbVariables; j++) {
             double sum = myConstraintsBody.aggregateColumn(base, j, Aggregator.SUM).doubleValue();
-            myAlternativeObjective.set(j, -sum);
+            myPhase1Objective.set(j, -sum);
         }
 
         //        double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
@@ -353,16 +350,8 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void switchObjective() {
-
-        if (myAlternativeObjective != null) {
-
-            R064Store copy = myObjective.copy();
-
-            myObjective.fillMatching(myAlternativeObjective);
-
-            myAlternativeObjective = copy;
-        }
+    void switchToPhase2() {
+        myPhase1Objective = null;
     }
 
 }
