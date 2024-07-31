@@ -41,8 +41,6 @@ final class PhasedSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        this.initiatePhase1();
-
         IterDescr iteration = this.prepareToIterate();
 
         this.doDualIterations(iteration); // Phase-1

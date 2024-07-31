@@ -1164,7 +1164,15 @@ abstract class SimplexSolver extends LinearSolver {
 
             } else {
 
-                this.setState(State.OPTIMAL);
+                if (mySimplex.isPhase1()) {
+                    if (PIVOT.isZero(mySimplex.extractValue())) {
+                        this.setState(State.FEASIBLE);
+                    } else {
+                        this.setState(State.INFEASIBLE);
+                    }
+                } else {
+                    this.setState(State.OPTIMAL);
+                }
                 done = true;
             }
 
@@ -1202,10 +1210,6 @@ abstract class SimplexSolver extends LinearSolver {
         } else {
             return result.multipliers(this.extractMultipliers());
         }
-    }
-
-    final void initiatePhase1() {
-        mySimplex.copyObjective();
     }
 
     final boolean isDualFeasible() {
@@ -1251,7 +1255,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     void switchToPhase2() {
-        mySimplex.restoreObjective();
+        mySimplex.switchToPhase2();
         mySimplex.calculateIteration();
     }
 

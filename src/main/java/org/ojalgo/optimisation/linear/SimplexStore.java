@@ -200,10 +200,6 @@ abstract class SimplexStore {
 
     abstract void copyBasicSolution(double[] solution);
 
-    abstract void copyObjective();
-
-    abstract void switchObjective();
-
     /**
      * The number of artificial variables in the basis.
      */
@@ -412,6 +408,11 @@ abstract class SimplexStore {
     }
 
     /**
+     * true if currently iterating on a (temporarily) modified instance of the original problem.
+     */
+    abstract boolean isPhase1();
+
+    /**
      * The problem is small enough to be explicitly printed/logged – log the entire tableau at each iteration
      * when debugging.
      */
@@ -429,6 +430,10 @@ abstract class SimplexStore {
     final SimplexStore lower(final int index) {
         myPartition.update(index, ColumnState.LOWER);
         return this;
+    }
+
+    final ClassicSimplexSolver newClassicSimplexSolver(final Optimisation.Options options, final int... basis) {
+        return this.newSolver(ClassicSimplexSolver::new, options, basis);
     }
 
     final DualSimplexSolver newDualSimplexSolver(final Optimisation.Options options, final int... basis) {
@@ -451,6 +456,11 @@ abstract class SimplexStore {
     abstract Mutate1D objective();
 
     /**
+     * The simplex' phase 1 objective function.
+     */
+    abstract Mutate1D phase1();
+
+    /**
      * Everything that is not in the basis is set to be in at lower bound.
      */
     void resetBasis(final int[] newBasis) {
@@ -469,11 +479,13 @@ abstract class SimplexStore {
         myPartition.extract(ColumnState.BASIS, true, excluded);
     }
 
-    abstract void restoreObjective();
+    abstract void setupClassicPhase1Objective();
 
     abstract Primitive1D sliceBodyRow(final int row);
 
     abstract Primitive1D sliceDualVariables();
+
+    abstract void switchToPhase2();
 
     final SimplexStore unbounded(final int index) {
         myPartition.update(index, ColumnState.UNBOUNDED);
@@ -527,7 +539,5 @@ abstract class SimplexStore {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }
-
-    abstract void setupClassicPhase1Objective();
 
 }
