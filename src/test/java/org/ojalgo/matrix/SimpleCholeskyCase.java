@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -44,15 +45,15 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
      * @return The data00 value
      */
     public static MatrixR064 getOriginal() {
-        return MatrixR064.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+        return MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } })).enforce(DEFINITION);
     }
 
     private static MatrixR064 getFactorL() {
-        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
+        return MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } })).enforce(DEFINITION);
     }
 
     private static MatrixR064 getFactorR() {
-        return MatrixR064.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
+        return MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } })).enforce(DEFINITION);
     }
 
     @Override

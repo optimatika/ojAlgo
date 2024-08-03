@@ -26,6 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
@@ -39,7 +40,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testCaseFromMatrixComputations() {
 
-        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
+        PhysicalStore<Double> tmpMatrix = RawStore.wrap(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -95,7 +96,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
     @Test
     public void testSquareBidiagonal() {
 
-        final PhysicalStore<Double> tmpMatrix = R064Store.FACTORY.rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
+        PhysicalStore<Double> tmpMatrix = RawStore.wrap(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
 
         this.doTestCorrect(tmpMatrix);
     }

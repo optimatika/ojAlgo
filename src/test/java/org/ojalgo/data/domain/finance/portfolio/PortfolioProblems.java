@@ -31,7 +31,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.MatrixR064.DenseReceiver;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -134,16 +134,16 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // As the Markowitz model built it the problem
 
-        MatrixStore<Double> tmpQ = R064Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
-        MatrixStore<Double> tmpC = R064Store.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
+        MatrixStore<Double> tmpQ = RawStore.wrap(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
+        MatrixStore<Double> tmpC = RawStore.wrap(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
 
-        MatrixStore<Double> tmpAE = R064Store.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
-        MatrixStore<Double> tmpBE = R064Store.FACTORY.rows(new double[][] { { 1.0 } });
+        MatrixStore<Double> tmpAE = RawStore.wrap(new double[][] { { 1.0, 1.0, 1.0 } });
+        MatrixStore<Double> tmpBE = RawStore.wrap(new double[][] { { 1.0 } });
 
-        MatrixStore<Double> tmpAI = R064Store.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
-        MatrixStore<Double> tmpBI = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
+        MatrixStore<Double> tmpAI = RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
+        MatrixStore<Double> tmpBI = RawStore.wrap(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
 
-        MatrixStore<Double> tmpX = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
+        MatrixStore<Double> tmpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
 
         ConvexSolver.Builder tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
@@ -160,8 +160,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
         // on the portfolio weights, which you have to do. No problem with
         // ojAlgo.
 
-        tmpAI = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
-        tmpBI = R064Store.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
+        tmpAI = RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpBI = RawStore.wrap(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
 
         tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
@@ -172,9 +172,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // No problem with both the lower and upper limits set.
 
-        tmpAI = R064Store.FACTORY
-                .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
-        tmpBI = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
+        tmpAI = RawStore
+                .wrap(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpBI = RawStore.wrap(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
         tmpBuilder = ConvexSolver.newBuilder().objective(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
@@ -194,7 +194,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     @Test
     public void testP20130329() {
 
-        MatrixR064 tmpCovariances = MatrixR064.FACTORY.rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
+        MatrixR064 tmpCovariances = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } }));
 
         //         Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
         //        tmpEvD.compute(tmpCovariances, true);
@@ -326,7 +326,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
     public void testP20160608() {
 
         MatrixR064.Factory matrixFactory = MatrixR064.FACTORY;
-        MatrixR064 cov = matrixFactory.rows(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } });
+        MatrixR064 cov = matrixFactory.copy(RawStore.wrap(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } }));
         MatrixR064 ret = matrixFactory.column(0.0427, 0.0015, 0.0285);
 
         MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
@@ -475,12 +475,11 @@ public class PortfolioProblems extends FinancePortfolioTests {
     public void testP20200821() {
 
         MatrixR064.Factory matrixFactory = MatrixR064.FACTORY;
-        MatrixR064 cov = matrixFactory.rows(new double[][] { { 0.19828575384387814, 0.19939590712485014, 0.04848819110209297, 0.001060547131952715 },
-                { 0.19939590712485014, 0.17420946085220315, 0.05503998250848539, 0.09756310857237219 },
-                { 0.04848819110209297, 0.05503998250848539, 0.03544331442632964, 0.08244505440089961 },
-                { 0.001060547131952715, 0.09756310857237219, 0.08244505440089961, 0.18516185344938874 } });
-        MatrixR064 ret = matrixFactory
-                .rows(new double[][] { { 0.16373354541629026 }, { 0.007304578002244022 }, { 0.05247478842401128 }, { 0.12286070470561875 } });
+        MatrixR064 cov = matrixFactory.copy(RawStore.wrap(new double[][] { { 0.19828575384387814, 0.19939590712485014, 0.04848819110209297, 0.001060547131952715 },
+        { 0.19939590712485014, 0.17420946085220315, 0.05503998250848539, 0.09756310857237219 },
+        { 0.04848819110209297, 0.05503998250848539, 0.03544331442632964, 0.08244505440089961 },
+        { 0.001060547131952715, 0.09756310857237219, 0.08244505440089961, 0.18516185344938874 } }));
+        MatrixR064 ret = matrixFactory.copy(RawStore.wrap(new double[][] { { 0.16373354541629026 }, { 0.007304578002244022 }, { 0.05247478842401128 }, { 0.12286070470561875 } }));
 
         MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
 

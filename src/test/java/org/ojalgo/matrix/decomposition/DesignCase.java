@@ -35,6 +35,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -220,7 +221,7 @@ public class DesignCase extends MatrixDecompositionTests {
         Tridiagonal<Double> tmpDecomposition = Tridiagonal.R064.make();
         //  Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
-        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY.rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 }, { 1, 1, 1, 2 } });
+        PhysicalStore<Double> tmpOriginalMatrix = RawStore.wrap(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 }, { 1, 1, 1, 2 } });
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
@@ -233,7 +234,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testWikipediaNullspace() {
 
-        PhysicalStore<Double> mtrxA = R064Store.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
+        PhysicalStore<Double> mtrxA = RawStore.wrap(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
         MatrixStore<Double> mtrxAt = mtrxA.transpose();
 
         NumberContext precision = NumberContext.of(14, 8);
@@ -271,8 +272,8 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testWikipediaSVD() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY
-                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+        PhysicalStore<Double> tmpOriginalMatrix = RawStore
+                .wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.R064();

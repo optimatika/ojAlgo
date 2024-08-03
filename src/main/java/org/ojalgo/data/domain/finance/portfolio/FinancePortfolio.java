@@ -65,6 +65,7 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         super();
     }
 
+    @Override
     public final int compareTo(final FinancePortfolio reference) {
         return NumberContext.compare(this.getSharpeRatio(), reference.getSharpeRatio());
     }
@@ -81,8 +82,8 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
     public final double getConformance(final FinancePortfolio reference) {
 
-        final MatrixR064 tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
-        final MatrixR064 tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
+        final MatrixR064 tmpMyWeights = MATRIX_FACTORY.column(this.getWeights());
+        final MatrixR064 tmpRefWeights = MATRIX_FACTORY.column(reference.getWeights());
 
         final double tmpNumerator = tmpMyWeights.dot(tmpRefWeights);
         final double tmpDenom1 = PrimitiveMath.SQRT.invoke(tmpMyWeights.dot(tmpMyWeights));

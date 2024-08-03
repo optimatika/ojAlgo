@@ -59,7 +59,17 @@ public class SeriesSet {
      * Return a {@link Structure2D} with variables in columns and matching samples in rows.
      */
     public <M extends Access2D<?>> M getData(final Factory2D.TwoStep<M, ?> factory) {
-        return factory.columns(mySet);
+
+        int nbCols = mySet.length;
+        int nbRows = mySet[0].size();
+        Factory2D.Builder<M> builder = factory.newBuilder(nbRows, nbCols);
+        for (int j = 0; j < nbCols; j++) {
+            PrimitiveSeries tmpSet = mySet[j];
+            for (int i = 0; i < nbRows; i++) {
+                builder.set(i, j, tmpSet.doubleValue(i));
+            }
+        }
+        return builder.build();
     }
 
     public SeriesSet log() {

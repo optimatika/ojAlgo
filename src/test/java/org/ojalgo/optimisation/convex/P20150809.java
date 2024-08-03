@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.optimisation.Optimisation;
 
@@ -89,10 +90,10 @@ class P20150809 {
         ConvexSolver.Builder builder = ConvexSolver.newBuilder().objective(cov, linPart);
 
         if (addDummyConstraints) {
-            final RawStore ineq = RawStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0 },
+            final RawStore ineq = RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0 },
                     { 0.0, 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
-            final RawStore coeff = RawStore.FACTORY.columns(new double[][] { { 99999, 99999, 99999, 99999, 99999, 99999, 99999, 99999 } });
+            final MatrixStore<Double> coeff = RawStore.wrap(new double[][] { { 99999, 99999, 99999, 99999, 99999, 99999, 99999, 99999 } }).transpose();
 
             builder = builder.inequalities(ineq, coeff);
         }

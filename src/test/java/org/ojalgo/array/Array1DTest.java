@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.RawStore;
 
 /**
  * @author apete
@@ -34,7 +35,7 @@ public class Array1DTest extends ArrayTests {
 
         final double[][] tmpRows = { { 4, 5, 6, 7, 8, 9 }, { 9, 8, 7, 6, 5, 4 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
 
-        this.doSortTest(tmpRows);
+        Array1DTest.doSortTest(tmpRows);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class Array1DTest extends ArrayTests {
 
         final double[][] tmpRows = { { 9, 8, 7, 6, 5, 4 }, { 4, 5, 6, 7, 8, 9 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
 
-        this.doSortTest(tmpRows);
+        Array1DTest.doSortTest(tmpRows);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class Array1DTest extends ArrayTests {
                 { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 }, { 2, 3, 4, 5, 6, 7, 8, 1, 9 },
                 { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
 
-        this.doSortTest(tmpRows);
+        Array1DTest.doSortTest(tmpRows);
     }
 
     @Test
@@ -62,16 +63,16 @@ public class Array1DTest extends ArrayTests {
                 { 5, 6, 7, 8, 1, 2, 3, 4, 9 }, { 4, 5, 6, 7, 8, 1, 2, 3, 9 }, { 3, 4, 5, 6, 7, 8, 1, 2, 9 }, { 2, 3, 4, 5, 6, 7, 8, 1, 9 },
                 { 1, 6, 7, 8, 2, 3, 4, 5, 9 }, { 4, 5, 6, 7, 1, 2, 3, 8, 9 } };
 
-        this.doSortTest(tmpRows);
+        Array1DTest.doSortTest(tmpRows);
     }
 
-    private void doSortTest(final double[][] rows) {
+    private static void doSortTest(final double[][] rows) {
 
         final Array1D<Double> tmpExpexted = Array1D.R064.copy(rows[0]);
 
         final boolean tmpAscending = tmpExpexted.doubleValue(tmpExpexted.count() - 1L) > tmpExpexted.doubleValue(0L);
 
-        final Array2D<Double> tmpAll = Array2D.R064.rows(rows);
+        final Array2D<Double> tmpAll = Array2D.R064.copy(RawStore.wrap(rows));
 
         for (int i = 0; i < tmpAll.countRows(); i++) {
 

@@ -140,11 +140,13 @@ public class CoordinatedSet<K extends Comparable<? super K>> extends SeriesSet {
     }
 
     public MatrixStore<Double> getSamples(final UnaryOperator<PrimitiveSeries> operator) {
-        PrimitiveSeries[] operated = new PrimitiveSeries[myCoordinated.length];
-        for (int i = 0; i < operated.length; i++) {
-            operated[i] = operator.apply(myCoordinated[i]);
+        int nbCols = myCoordinated.length;
+        int nbRows = myCoordinated[0].size();
+        R064Store builder = R064Store.FACTORY.newBuilder(nbRows, nbCols);
+        for (int j = 0; j < nbCols; j++) {
+            builder.fillColumn(j, operator.apply(myCoordinated[j]));
         }
-        return R064Store.FACTORY.columns(operated);
+        return builder.build();
     }
 
     public PrimitiveSeries getSeries(final int index) {

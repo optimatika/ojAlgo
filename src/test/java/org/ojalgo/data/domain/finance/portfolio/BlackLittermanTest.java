@@ -28,6 +28,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.MatrixR064;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -186,7 +187,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     }
 
     private static MatrixR064 make(final double[][] anArray) {
-        return MatrixR064.FACTORY.rows(anArray).enforce(BlackLittermanTest.DEF_CNTXT);
+        return MatrixR064.FACTORY.copy(RawStore.wrap(anArray)).enforce(BlackLittermanTest.DEF_CNTXT);
     }
 
     public BlackLittermanTest() {

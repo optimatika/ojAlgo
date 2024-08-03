@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
@@ -55,10 +56,9 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
     @Test
     public void testFullertonExample1and2() {
 
-        final PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY
-                .rows(new double[][] { { 4.0, 2.0, 2.0, 1.0 }, { 2.0, -3.0, 1.0, 1.0 }, { 2.0, 1.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 2.0 } });
-        final PhysicalStore<Double> tmpMtrxD = R064Store.FACTORY
-                .rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 2.0, 3.16227766, 0.0 }, { 0.0, 3.16227766, -1.4, -0.2 }, { 0.0, 0.0, -0.2, 1.4 } });
+        final PhysicalStore<Double> tmpMtrxA = RawStore.wrap(new double[][] { { 4.0, 2.0, 2.0, 1.0 }, { 2.0, -3.0, 1.0, 1.0 }, { 2.0, 1.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 2.0 } });
+        final PhysicalStore<Double> tmpMtrxD = RawStore
+                .wrap(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 2.0, 3.16227766, 0.0 }, { 0.0, 3.16227766, -1.4, -0.2 }, { 0.0, 0.0, -0.2, 1.4 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -70,11 +70,10 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
     @Test
     public void testFullertonExercise3() {
 
-        final PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY.rows(new double[][] { { 5.0, 1.0, 2.0, 2.0, 4.0 }, { 1.0, 1.0, 2.0, 1.0, 0.0 },
-                { 2.0, 2.0, 0.0, 2.0, 1.0 }, { 2.0, 1.0, 2.0, 1.0, 2.0 }, { 4.0, 0.0, 1.0, 2.0, 4.0 } });
-        final PhysicalStore<Double> tmpMtrxD = R064Store.FACTORY.rows(
-                new double[][] { { 5.0, -5.0, 0.0, 0.0, 0.0 }, { -5.0, 5.8, -0.8246211251, 0.0, 0.0 }, { 0.0, -0.8246211251, -0.8823529412, -1.577874704, 0.0 },
-                        { 0.0, 0.0, -1.577874704, 1.373213515, 1.279015421 }, { 0.0, 0.0, 0.0, 1.279015421, -0.2908605737 } });
+        final PhysicalStore<Double> tmpMtrxA = RawStore.wrap(new double[][] { { 5.0, 1.0, 2.0, 2.0, 4.0 }, { 1.0, 1.0, 2.0, 1.0, 0.0 },
+        { 2.0, 2.0, 0.0, 2.0, 1.0 }, { 2.0, 1.0, 2.0, 1.0, 2.0 }, { 4.0, 0.0, 1.0, 2.0, 4.0 } });
+        final PhysicalStore<Double> tmpMtrxD = RawStore.wrap(new double[][] { { 5.0, -5.0, 0.0, 0.0, 0.0 }, { -5.0, 5.8, -0.8246211251, 0.0, 0.0 }, { 0.0, -0.8246211251, -0.8823529412, -1.577874704, 0.0 },
+                { 0.0, 0.0, -1.577874704, 1.373213515, 1.279015421 }, { 0.0, 0.0, 0.0, 1.279015421, -0.2908605737 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -87,12 +86,11 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
     @Test
     public void testFullertonExercise4and5() {
 
-        final PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0, -5.0, 1.0, 4.0 }, { 1.0, 2.0, 0.0, 4.0, 5.0, 3.0 },
-                { 2.0, 0.0, 3.0, -1.0, 2.0, 1.0 }, { -5.0, 4.0, -1.0, 1.0, 5.0, 2.0 }, { 1.0, 5.0, 2.0, 5.0, -2.0, 4.0 }, { 4.0, 3.0, 1.0, 2.0, 4.0, 1.0 } });
-        final PhysicalStore<Double> tmpMtrxD = R064Store.FACTORY
-                .rows(new double[][] { { 4.0, -6.8556546, 0.0, 0.0, 0.0, 0.0 }, { -6.8556546, -0.1489361702, 2.924429193, 0.0, 0.0, 0.0 },
-                        { 0.0, 2.924429193, 1.268510593, 4.758239905, 0.0, 0.0 }, { 0.0, 0.0, 4.758239905, 2.664908905, -7.994421195, 0.0 },
-                        { 0.0, 0.0, 0.0, -7.994421195, 3.358186868, 1.759360415 }, { 0.0, 0.0, 0.0, 0.0, 1.759360415, -2.142670196 } });
+        final PhysicalStore<Double> tmpMtrxA = RawStore.wrap(new double[][] { { 4.0, 1.0, 2.0, -5.0, 1.0, 4.0 }, { 1.0, 2.0, 0.0, 4.0, 5.0, 3.0 },
+        { 2.0, 0.0, 3.0, -1.0, 2.0, 1.0 }, { -5.0, 4.0, -1.0, 1.0, 5.0, 2.0 }, { 1.0, 5.0, 2.0, 5.0, -2.0, 4.0 }, { 4.0, 3.0, 1.0, 2.0, 4.0, 1.0 } });
+        final PhysicalStore<Double> tmpMtrxD = RawStore.wrap(new double[][] { { 4.0, -6.8556546, 0.0, 0.0, 0.0, 0.0 }, { -6.8556546, -0.1489361702, 2.924429193, 0.0, 0.0, 0.0 },
+        { 0.0, 2.924429193, 1.268510593, 4.758239905, 0.0, 0.0 }, { 0.0, 0.0, 4.758239905, 2.664908905, -7.994421195, 0.0 },
+                { 0.0, 0.0, 0.0, -7.994421195, 3.358186868, 1.759360415 }, { 0.0, 0.0, 0.0, 0.0, 1.759360415, -2.142670196 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -149,9 +147,8 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
     @Test
     public void testWikipediaExample() {
 
-        final PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY
-                .rows(new double[][] { { 4.0, 1.0, -2.0, 2.0 }, { 1.0, 2.0, 0.0, 1.0 }, { -2.0, 0.0, 3.0, -2.0 }, { 2.0, 1.0, -2.0, -1.0 } });
-        final PhysicalStore<Double> tmpMtrxD = R064Store.FACTORY.rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 10.0 / 3.0, -5.0 / 3.0, 0.0 },
+        final PhysicalStore<Double> tmpMtrxA = RawStore.wrap(new double[][] { { 4.0, 1.0, -2.0, 2.0 }, { 1.0, 2.0, 0.0, 1.0 }, { -2.0, 0.0, 3.0, -2.0 }, { 2.0, 1.0, -2.0, -1.0 } });
+        final PhysicalStore<Double> tmpMtrxD = RawStore.wrap(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 10.0 / 3.0, -5.0 / 3.0, 0.0 },
                 { 0.0, -5.0 / 3.0, -33.0 / 25.0, 68.0 / 75.0 }, { 0.0, 0.0, 68.0 / 75.0, 149.0 / 75.0 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);

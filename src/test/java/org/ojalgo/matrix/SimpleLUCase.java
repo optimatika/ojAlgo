@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -39,17 +40,17 @@ public class SimpleLUCase extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static MatrixR064 getOrginal() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getMtrxL() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getMtrxU() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

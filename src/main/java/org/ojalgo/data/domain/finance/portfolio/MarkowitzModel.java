@@ -232,7 +232,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
 
         Optimisation.Result tmpResult;
 
-        if ((myTargetReturn != null) || (myTargetVariance != null)) {
+        if (myTargetReturn != null || myTargetVariance != null) {
 
             final double tmpTargetValue;
             if (myTargetVariance != null) {
@@ -319,11 +319,11 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     }
 
     Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final MatrixR064 returnsVctr) {
-        return super.calculatePortfolioReturn(MATRIX_FACTORY.columns(weightsVctr), returnsVctr);
+        return super.calculatePortfolioReturn(MATRIX_FACTORY.column(weightsVctr), returnsVctr);
     }
 
     Scalar<?> calculatePortfolioVariance(final Access1D<?> weightsVctr) {
-        return super.calculatePortfolioVariance(MATRIX_FACTORY.columns(weightsVctr));
+        return super.calculatePortfolioVariance(MATRIX_FACTORY.column(weightsVctr));
     }
 
 }

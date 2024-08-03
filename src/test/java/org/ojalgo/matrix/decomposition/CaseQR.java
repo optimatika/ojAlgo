@@ -37,6 +37,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
@@ -95,8 +96,8 @@ public class CaseQR extends MatrixDecompositionTests {
     @Test
     public void testDiagonalCase() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = R064Store.FACTORY
-                .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
+        PhysicalStore<Double> tmpOriginalMatrix = RawStore
+                .wrap(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.R064.make();
         tmpDecomp.decompose(tmpOriginalMatrix);

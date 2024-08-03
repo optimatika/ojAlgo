@@ -41,38 +41,6 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
      */
     interface MayBeSparse<I extends StructureAnyD, DENSE extends Builder<I>, SPARSE extends Builder<I>> extends TwoStep<I, DENSE> {
 
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(long...)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final long... shape) {
-            return this.newDenseBuilder(shape);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(StructureAnyD)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final StructureAnyD shape) {
-            return this.newDenseBuilder(shape.shape());
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(long...)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final long... shape) {
-            return this.newSparseBuilder(shape);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(StructureAnyD)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final StructureAnyD shape) {
-            return this.newSparseBuilder(shape.shape());
-        }
-
         @Override
         default DENSE newBuilder(final long... shape) {
             return this.newDenseBuilder(shape);
@@ -119,14 +87,6 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
                 builder.set(i, supplier.get());
             }
             return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #makeFilled(StructureAnyD, NullaryFunction)} instead
-         */
-        @Deprecated
-        default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
-            return this.makeFilled(shape.shape(), supplier);
         }
 
         B newBuilder(long... shape);

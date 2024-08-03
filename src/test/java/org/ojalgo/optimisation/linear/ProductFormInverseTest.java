@@ -27,6 +27,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Uniform;
 
 public class ProductFormInverseTest extends OptimisationLinearTests {
@@ -62,9 +63,9 @@ public class ProductFormInverseTest extends OptimisationLinearTests {
         TestUtils.assertEquals(col1, arr1);
         TestUtils.assertEquals(col2, arr2);
 
-        R064Store expBase0 = R064Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
-        R064Store expBase1 = R064Store.FACTORY.rows(new double[][] { { 1, 0, 8 }, { 0, 1, 4 }, { 0, 0, 2 } });
-        R064Store expBase2 = R064Store.FACTORY.rows(new double[][] { { 1, 1, 8 }, { 0, 1.5, 4 }, { 0, 0.5, 2 } });
+        RawStore expBase0 = RawStore.wrap(new double[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
+        RawStore expBase1 = RawStore.wrap(new double[][] { { 1, 0, 8 }, { 0, 1, 4 }, { 0, 0, 2 } });
+        RawStore expBase2 = RawStore.wrap(new double[][] { { 1, 1, 8 }, { 0, 1.5, 4 }, { 0, 0.5, 2 } });
 
         R064Store random = R064Store.FACTORY.makeFilled(3, 1, Uniform.standard());
         R064Store exp = R064Store.FACTORY.make(3, 1);

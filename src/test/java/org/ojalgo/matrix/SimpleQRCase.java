@@ -28,6 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -41,18 +42,18 @@ public class SimpleQRCase extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.ofScale(9).withScale(18);
 
     public static MatrixR064 getOriginal() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getFactorQ() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
-                { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
+        { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getFactorR() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

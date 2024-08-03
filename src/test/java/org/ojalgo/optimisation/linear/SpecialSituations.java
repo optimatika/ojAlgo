@@ -26,6 +26,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 
@@ -40,7 +41,7 @@ public class SpecialSituations extends OptimisationLinearTests {
     public void testDegeneracy() {
 
         R064Store c = R064Store.FACTORY.column(new double[] { -2, -1, 0, 0, 0 });
-        R064Store A = R064Store.FACTORY.rows(new double[][] { { 4, 3, 1, 0, 0 }, { 4, 1, 0, 1, 0 }, { 4, 2, 0, 0, 1 } });
+        RawStore A = RawStore.wrap(new double[][] { { 4, 3, 1, 0, 0 }, { 4, 1, 0, 1, 0 }, { 4, 2, 0, 0, 1 } });
         R064Store b = R064Store.FACTORY.column(new double[] { 12, 8, 8 });
 
         R064Store x = R064Store.FACTORY.column(new double[] { 2, 0, 4, 0, 0 });
@@ -112,7 +113,7 @@ public class SpecialSituations extends OptimisationLinearTests {
     public void testMultipleOptimalSolutions() {
 
         R064Store c = R064Store.FACTORY.column(new double[] { -4, -14, 0, 0 });
-        R064Store A = R064Store.FACTORY.rows(new double[][] { { 2, 7, 1, 0 }, { 7, 2, 0, 1 } });
+        RawStore A = RawStore.wrap(new double[][] { { 2, 7, 1, 0 }, { 7, 2, 0, 1 } });
         R064Store b = R064Store.FACTORY.column(new double[] { 21, 21 });
 
         R064Store x = R064Store.FACTORY.column(new double[] { 7.0 / 3.0, 7.0 / 3.0, 0, 0 });
@@ -156,7 +157,7 @@ public class SpecialSituations extends OptimisationLinearTests {
     public void testUnboundedness() {
 
         R064Store c = R064Store.FACTORY.column(new double[] { -2, -1, 0, 0 });
-        R064Store A = R064Store.FACTORY.rows(new double[][] { { 1, -1, 1, 0 }, { 2, -1, 0, 1 } });
+        RawStore A = RawStore.wrap(new double[][] { { 1, -1, 1, 0 }, { 2, -1, 0, 1 } });
         R064Store b = R064Store.FACTORY.column(new double[] { 10, 40 });
 
         R064Store x = R064Store.FACTORY.column(new double[] { 30, 20, 0, 0 });

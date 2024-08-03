@@ -35,6 +35,7 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -1213,11 +1214,11 @@ public class NextGenSysModTest {
         }
 
         public MatrixR064 toCorrelations() {
-            return NextGenSysModTest.toCorrelations(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
+            return NextGenSysModTest.toCorrelations(MatrixR064.FACTORY.copy(RawStore.wrap(myCovarianceMtrx)), true);
         }
 
         public MatrixR064 toVolatilities() {
-            return NextGenSysModTest.toVolatilities(MatrixR064.FACTORY.rows(myCovarianceMtrx), true);
+            return NextGenSysModTest.toVolatilities(MatrixR064.FACTORY.copy(RawStore.wrap(myCovarianceMtrx)), true);
         }
 
     }

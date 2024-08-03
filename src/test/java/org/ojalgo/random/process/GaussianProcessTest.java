@@ -28,7 +28,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.process.GaussianField.Mean;
 import org.ojalgo.type.context.NumberContext;
@@ -44,8 +44,10 @@ public class GaussianProcessTest {
 
         GaussianField.Covariance<Double> tmpCovar = new GaussianField.Covariance<Double>() {
 
+            @Override
             public void calibrate(final Collection<EntryPair.KeyedPrimitive<Double>> observations, final Mean<Double> mean) {}
 
+            @Override
             public double invoke(final Double anArg1, final Double anArg2) {
                 return this.invoke(anArg1.doubleValue(), anArg2.doubleValue());
             }
@@ -76,14 +78,15 @@ public class GaussianProcessTest {
         tmpProc.addObservation(-0.25, 0.5);
         tmpProc.addObservation(0.0, 0.8);
 
-        R064Store tmpExpected = R064Store.FACTORY
-                .rows(new double[][] { { 1.7029, 1.423379254178694, 1.2174807940480699, 0.8807634427271873, 0.7384394292014367, 0.5236319646022823 },
+        RawStore expected = RawStore
+                .wrap(new double[][] { { 1.7029, 1.423379254178694, 1.2174807940480699, 0.8807634427271873, 0.7384394292014367, 0.5236319646022823 },
                         { 1.423379254178694, 1.7029, 1.5632762838868954, 1.3472073239852407, 1.2174807940480699, 0.9782733010505065 },
                         { 1.2174807940480699, 1.5632762838868954, 1.7029, 1.5170744874003474, 1.423379254178694, 1.2174807940480699 },
                         { 0.8807634427271873, 1.3472073239852407, 1.5170744874003474, 1.7029, 1.5948565596534579, 1.4888943550870049 },
                         { 0.7384394292014367, 1.2174807940480699, 1.423379254178694, 1.5948565596534579, 1.7029, 1.5632762838868954 },
                         { 0.5236319646022823, 0.9782733010505065, 1.2174807940480699, 1.4888943550870049, 1.5632762838868954, 1.7029 } });
-        TestUtils.assertEquals(tmpExpected, tmpProc.getCovariances(), NumberContext.of(8, 2));
+
+        TestUtils.assertEquals(expected, tmpProc.getCovariances(), NumberContext.of(8, 2));
 
         Normal tmpDistr = tmpProc.getDistribution(0.2);
         TestUtils.assertEquals("Mean", 0.911277527445648, tmpDistr.getExpected(), 0.005);

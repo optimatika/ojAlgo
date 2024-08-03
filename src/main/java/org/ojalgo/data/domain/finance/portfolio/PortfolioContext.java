@@ -37,9 +37,9 @@ public class PortfolioContext implements FinancePortfolio.Context {
 
         super();
 
-        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.columns(assetReturns);
+        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.column(assetReturns);
 
-        myAssetVolatilities = FinancePortfolio.MATRIX_FACTORY.columns(assetVolatilities);
+        myAssetVolatilities = FinancePortfolio.MATRIX_FACTORY.column(assetVolatilities);
         myCorrelations = FinancePortfolio.MATRIX_FACTORY.copy(correlations);
     }
 
@@ -47,7 +47,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
 
         super();
 
-        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.columns(assetReturns);
+        myAssetReturns = FinancePortfolio.MATRIX_FACTORY.column(assetReturns);
 
         myCovariances = FinancePortfolio.MATRIX_FACTORY.copy(covariances);
     }
@@ -61,15 +61,13 @@ public class PortfolioContext implements FinancePortfolio.Context {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
-        return FinancePortfolio.MATRIX_FACTORY.rows(weightsPortfolio.getWeights()).multiply(this.getAssetReturns()).doubleValue(0);
+        return FinancePortfolio.MATRIX_FACTORY.row(weightsPortfolio.getWeights()).multiply(this.getAssetReturns()).doubleValue(0);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
-        final MatrixR064 tmpWeights = FinancePortfolio.MATRIX_FACTORY.columns(weightsPortfolio.getWeights());
+        final MatrixR064 tmpWeights = FinancePortfolio.MATRIX_FACTORY.column(weightsPortfolio.getWeights());
         return tmpWeights.transpose().multiply(this.getCovariances().multiply(tmpWeights)).doubleValue(0);
     }
 

@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.MatrixQ128;
+import org.ojalgo.matrix.store.RawStore;
 
 /**
  * QsdOldNormalCase
@@ -36,32 +37,30 @@ public class QsdOldNormalCase extends GenericQPSolverTest {
         final MatrixQ128[] retVal = new MatrixQ128[8];
 
         // Equations/Equalities
-        retVal[0] = MatrixQ128.FACTORY
-                .rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
+        retVal[0] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } }));
 
         // Levels/Values
-        retVal[1] = MatrixQ128.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 } });
+        retVal[1] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 } }));
 
         // Quadratic
-        retVal[2] = MatrixQ128.FACTORY.rows(new double[][] { { 2.0, -0.0, -0.0, -0.0, 0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { -0.0, 0.0, 2.0, 0.0, 0.0 },
-                { -0.0, 0.0, 0.0, 2.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 2.0 } });
+        retVal[2] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0, -0.0, -0.0, -0.0, 0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { -0.0, 0.0, 2.0, 0.0, 0.0 },
+        { -0.0, 0.0, 0.0, 2.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 2.0 } }));
 
         // Linear
-        retVal[3] = MatrixQ128.FACTORY.rows(new double[][] { { -0.5 }, { -0.5 }, { -0.5 }, { -0.5 }, { -0.0 } });
+        retVal[3] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -0.5 }, { -0.5 }, { -0.5 }, { -0.5 }, { -0.0 } }));
 
         // Inequalities/Differences
-        retVal[4] = MatrixQ128.FACTORY
-                .rows(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, -1.0, 0.0 },
-                        { 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 } });
+        retVal[4] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, -1.0, 0.0 },
+        { 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 } }));
 
         // Limits
-        retVal[5] = MatrixQ128.FACTORY.rows(new double[][] { { -0.01 }, { -0.01 }, { -0.4 }, { -0.16 }, { 0.22 }, { 0.22 }, { 0.6 }, { 0.4 } });
+        retVal[5] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -0.01 }, { -0.01 }, { -0.4 }, { -0.16 }, { 0.22 }, { 0.22 }, { 0.6 }, { 0.4 } }));
 
         // LagrangeSolver
-        retVal[6] = MatrixQ128.FACTORY.rows(new double[][] { { 0.25 }, { 0.25 }, { 0.25 }, { 0.25 }, { 0.0 } });
+        retVal[6] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 0.25 }, { 0.25 }, { 0.25 }, { 0.25 }, { 0.0 } }));
 
         // ActiveSetSolver
-        retVal[7] = MatrixQ128.FACTORY.rows(new double[][] { { 0.20513781715162235 }, { 0.20411534066897274 }, { 0.4 }, { 0.19074684217940488 }, { 0.0 } });
+        retVal[7] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 0.20513781715162235 }, { 0.20411534066897274 }, { 0.4 }, { 0.19074684217940488 }, { 0.0 } }));
 
         return retVal;
     }

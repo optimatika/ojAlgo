@@ -31,6 +31,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
@@ -44,7 +45,7 @@ public class SolverTest extends MatrixTaskTests {
     @Test
     public void testExampleWikipediA() {
 
-        MatrixStore<Double> tmpA = R064Store.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
+        MatrixStore<Double> tmpA = RawStore.wrap(new double[][] { { 4, 1 }, { 1, 3 } });
         MatrixStore<Double> tmpB = R064Store.FACTORY.column(1, 2);
 
         MatrixStore<Double> tmpExpected = R064Store.FACTORY.column(1.0 / 11.0, 7.0 / 11.0);
@@ -85,7 +86,7 @@ public class SolverTest extends MatrixTaskTests {
     @Test
     public void testLinAlg34PDF() {
 
-        MatrixStore<Double> tmpA = R064Store.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
+        MatrixStore<Double> tmpA = RawStore.wrap(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
         MatrixStore<Double> tmpB = R064Store.FACTORY.column(8, -14, 27);
 
         MatrixStore<Double> tmpExpected = R064Store.FACTORY.column(-1, 3, 2);

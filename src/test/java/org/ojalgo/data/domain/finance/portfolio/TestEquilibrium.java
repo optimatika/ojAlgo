@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class TestEquilibrium extends FinancePortfolioTests {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         int assetNum = 16;
 
         double[][] om = { { 0.003330616, 0.003524811, 0.00386567, 0.003656347, 0.004494241, 0.004623772, 0.00458625, 0.004365933, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -117,7 +117,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         super();
     }
 
-    public MatrixR064 getCovariances(double[][] returns) {
+    public MatrixR064 getCovariances(final double[][] returns) {
 
         int row = returns.length;
         int col = returns[0].length;
@@ -163,7 +163,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         double[] rawWeights = MatrixR064.FACTORY.makeFilled(dim, 1, uniformWeight).toRawCopy1D();
         List<BigDecimal> normalisedWeights = new SimplePortfolio(rawWeights).normalise().getWeights();
 
-        MatrixR064 generatedWeights = MatrixR064.FACTORY.columns(normalisedWeights);
+        MatrixR064 generatedWeights = MatrixR064.FACTORY.column(normalisedWeights);
         MatrixR064 matchingReturns = equilibrium.calculateAssetReturns(generatedWeights);
         TestUtils.assertEquals(generatedWeights, equilibrium.calculateAssetWeights(matchingReturns), weightsContext);
 

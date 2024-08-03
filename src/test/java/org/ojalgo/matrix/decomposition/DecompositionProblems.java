@@ -27,13 +27,12 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -161,8 +160,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
 
-        PhysicalStore.Factory<Double, R064Store> storeFactory = R064Store.FACTORY;
-        R064Store m = storeFactory.rows(data);
+        RawStore m = RawStore.wrap(data);
 
         if (DEBUG) {
             BasicLogger.debugMatrix("Original", m);
@@ -203,8 +201,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 } };
 
         double[] observationVector = { 26.0, 12.0, 9.0, 18.0, 16.0, 17.0, 24.0, 32.0, 30.0, 21.0, 16.0, 12.0, 21.0, 16.0 };
-
-        final R064Store tmpOriginal = R064Store.FACTORY.rows(olsColumns);
+        final RawStore tmpOriginal = RawStore.wrap(olsColumns);
         SingularValue<Double> tmpSVD = SingularValue.R064.make(tmpOriginal);
         tmpSVD.decompose(tmpOriginal);
         R064Store rhs = R064Store.FACTORY.column(observationVector);
@@ -219,8 +216,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20090923() {
 
-        PhysicalStore<Double> tmpA = R064Store.FACTORY
-                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+        PhysicalStore<Double> tmpA = RawStore
+                .wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         SingularValue<Double> tmpSVD = SingularValue.R064.make();
         tmpSVD.decompose(tmpA);
@@ -254,8 +251,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012fixed() {
 
-        PhysicalStore<Double> tmpA = R064Store.FACTORY
-                .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
+        PhysicalStore<Double> tmpA = RawStore
+                .wrap(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
                         { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
                         { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
@@ -268,8 +265,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20100512() {
 
-        PhysicalStore<Double> tmpA = R064Store.FACTORY
-                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
+        PhysicalStore<Double> tmpA = RawStore.wrap(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         Eigenvalue<Double> tmpPrimitive = Eigenvalue.R064.make();
         tmpPrimitive.decompose(tmpA);
@@ -453,8 +449,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             }
         }
         data[0][1] = 1.01;
-
-        MatrixR064 input = MatrixR064.FACTORY.rows(data);
+        RawStore input = RawStore.wrap(data);
         try {
             //   SingularValue<Double> svd = SingularValue.make(input);
             SingularValue<Double> svd = new SingularValueDecomposition.R064();
@@ -477,13 +472,12 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20180614() {
 
-        Factory<Double, R064Store> factory = R064Store.FACTORY;
-
         // We start by creating a 5 x 7 matrix with rank 4.
         double[][] data = new double[][] { { 3, -6, 6, 9, 1, 3, 2 }, { -2, 4, 5, 3, 2, 7, 5 }, { -7, 14, 3, -4, 0, 0, 0 }, { 0, 0, -2, -2, 3, -5, -8 },
                 { -1, 2, 7, 6, 2, 0, -2 } };
+        final double[][] source = data;
 
-        MatrixStore<Double> matrixA = factory.rows(data);
+        MatrixStore<Double> matrixA = RawStore.wrap(source);
         // Print the matrix to verify it.
         if (DEBUG) {
             System.out.println("A matrix:\n" + matrixA);
@@ -497,8 +491,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         // Repeat this with a square matrix (padding with rows of zeros).
         int rows = data.length;
         int cols = data[0].length;
-        MatrixStore<Double> zeros = factory.make(cols - rows, cols);
-        MatrixStore<Double> matrixB = matrixA.below(zeros).collect(factory);
+        MatrixStore<Double> zeros = R064Store.FACTORY.make(cols - rows, cols);
+        MatrixStore<Double> matrixB = matrixA.below(zeros).collect(R064Store.FACTORY);
         if (DEBUG) {
             // Print B to verify it.
             System.out.println("\nB matrix:\n" + matrixB);
@@ -533,7 +527,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         NumberContext precision = NumberContext.of(12, 8);
 
-        R064Store matrix = R064Store.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
+        RawStore matrix = RawStore.wrap(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
                 { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });
 
         for (Eigenvalue<Double> evd : MatrixDecompositionTests.getPrimitiveEigenvalue()) {

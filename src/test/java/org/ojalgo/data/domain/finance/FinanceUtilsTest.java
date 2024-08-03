@@ -26,6 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixR064;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.NextGenSysModTest;
 import org.ojalgo.type.CalendarDateUnit;
@@ -43,7 +44,7 @@ public class FinanceUtilsTest extends FinanceTests {
 
     private static void doTestCleaning(final double[][] rawOriginal) {
 
-        MatrixR064 original = MatrixR064.FACTORY.rows(rawOriginal);
+        MatrixR064 original = MatrixR064.FACTORY.copy(RawStore.wrap(rawOriginal));
 
         SingularValue<Double> svd = SingularValue.R064.make(original);
         svd.decompose(original);

@@ -28,6 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -40,17 +41,17 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 14);
 
     public static MatrixR064 getOriginal() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getMatrixD() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static MatrixR064 getMatrixV() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

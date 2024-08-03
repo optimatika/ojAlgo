@@ -127,7 +127,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         CaseEigenvalue.doTestEigenvalues(generated, NumberContext.of(8), expected);
     }
 
-    private static void doVerifyGeneral(final R064Store matrix) {
+    private static void doVerifyGeneral(final MatrixStore<Double> matrix) {
 
         for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
 
@@ -305,8 +305,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testJamaProblem() throws IOException {
 
-        R064Store problematic = R064Store.FACTORY
-                .rows(new double[][] { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 1 }, { 0, 0, 0, 1, 0 }, { 1, 1, 0, 0, 1 }, { 1, 0, 1, 0, 1 } });
+        RawStore problematic = RawStore.wrap(new double[][] { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 1 }, { 0, 0, 0, 1, 0 }, { 1, 1, 0, 0, 1 }, { 1, 0, 1, 0, 1 } });
 
         CaseEigenvalue.doVerifyGeneral(problematic);
     }
@@ -395,7 +394,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPaulsMathNote() {
 
         double[][] tmpData = { { 3, -9 }, { 4, -3 } };
-        R064Store tmpA = R064Store.FACTORY.rows(tmpData);
+        RawStore tmpA = RawStore.wrap(tmpData);
         int tmpLength = tmpData.length;
 
         Array1D<ComplexNumber> tmpExpVals = Array1D.C128.make(2);
@@ -454,7 +453,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPrimitiveAsComplex() {
 
         double[][] tmpData = { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
-        R064Store tmpA = R064Store.FACTORY.rows(tmpData);
+        RawStore tmpA = RawStore.wrap(tmpData);
 
         int tmpLength = tmpData.length;
 
@@ -498,7 +497,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testProblemFoundInTheWild() {
 
-        R064Store matrix = R064Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+        RawStore matrix = RawStore.wrap(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
         CaseEigenvalue.doVerifyGeneral(matrix);
     }

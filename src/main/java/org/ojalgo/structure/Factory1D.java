@@ -40,38 +40,6 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
      */
     interface MayBeSparse<I extends Structure1D, DENSE extends Builder<I>, SPARSE extends Builder<I>> extends TwoStep<I, DENSE> {
 
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(long)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final long count) {
-            return this.newDenseBuilder(count);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(Structure1D)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final Structure1D shape) {
-            return this.newDenseBuilder(shape.count());
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(long)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final long count) {
-            return this.newSparseBuilder(count);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(Structure1D)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final Structure1D shape) {
-            return this.newSparseBuilder(shape.count());
-        }
-
         @Override
         default DENSE newBuilder(final long count) {
             return this.newDenseBuilder(count);
@@ -146,14 +114,6 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
                 builder.set(i, supplier.get());
             }
             return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #makeFilled(long, NullaryFunction)} instead
-         */
-        @Deprecated
-        default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-            return this.makeFilled(shape.count(), supplier);
         }
 
         B newBuilder(long count);

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.Scalar.Factory;
 import org.ojalgo.type.math.MathType;
@@ -43,38 +44,6 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
      * @author apete
      */
     interface MayBeSparse<I extends Structure2D, DENSE extends Builder<I>, SPARSE extends Builder<I>> extends TwoStep<I, DENSE> {
-
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(long,long)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final long nbRows, final long nbCols) {
-            return this.newDenseBuilder(nbRows, nbCols);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newDenseBuilder(Structure2D)} instead
-         */
-        @Deprecated
-        default DENSE makeDense(final Structure2D shape) {
-            return this.newDenseBuilder(shape.countRows(), shape.countColumns());
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(long,long)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final long nbRows, final long nbCols) {
-            return this.newSparseBuilder(nbRows, nbCols);
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newSparseBuilder(Structure2D)} instead
-         */
-        @Deprecated
-        default SPARSE makeSparse(final Structure2D shape) {
-            return this.newSparseBuilder(shape.countRows(), shape.countColumns());
-        }
 
         @Override
         default DENSE newBuilder(final long nbRows, final long nbCols) {
@@ -136,106 +105,25 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return builder.build();
         }
 
-        /**
-         * @deprecated v54 Use {@link #row(Access1D)}, {@link #column(Access1D)} or
-         *             {@link #newBuilder(long,long)} instead.
-         */
-        @Deprecated
-        default I columns(final Access1D<?>... source) {
+        default I column(final List<? extends Comparable<?>> column) {
 
-            int nbCols = source.length;
-            long nbRows = source[0].count();
+            int nbRows = column.size();
 
-            B builder = this.newBuilder(nbRows, nbCols);
+            B builder = this.newBuilder(nbRows, 1L);
 
-            if (this.getMathType().isPrimitive()) {
-                long index = 0L;
-                for (int j = 0; j < nbCols; j++) {
-                    Access1D<?> column = source[j];
-                    for (long i = 0L; i < nbRows; i++) {
-                        builder.set(index++, column.doubleValue(i));
-                    }
-                }
-            } else {
-                long index = 0L;
-                for (int j = 0; j < nbCols; j++) {
-                    Access1D<?> column = source[j];
-                    for (long i = 0L; i < nbRows; i++) {
-                        builder.set(index++, column.get(i));
-                    }
-                }
+            for (int i = 0; i < nbRows; i++) {
+                builder.set(i, column.get(i));
             }
 
             return builder.build();
         }
 
         /**
-         * @deprecated v54 Use {@link #row(Comparable<?>[])}, {@link #column(Comparable<?>[])} or
-         *             {@link #newBuilder(long,long)} instead.
+         * @deprecated v54 Use {@link RawStore#wrap(double[][])} and {@link MatrixStore#transpose()} instead.
          */
         @Deprecated
-        default I columns(final Comparable<?>[]... source) {
-
-            int nbCols = source.length;
-            int nbRows = source[0].length;
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            long index = 0L;
-            for (int j = 0; j < nbCols; j++) {
-                Comparable<?>[] column = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    builder.set(index++, column[i]);
-                }
-            }
-
-            return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #row(double[])}, {@link #column(double[])} or
-         *             {@link #newBuilder(long,long)} instead. In some cases {@link RawStore#wrap(double[][])}
-         *             could also be a good alternative (avoids copying).
-         */
-        @Deprecated
-        default I columns(final double[]... source) {
-
-            int nbCols = source.length;
-            int nbRows = source[0].length;
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            long index = 0L;
-            for (int j = 0; j < nbCols; j++) {
-                double[] column = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    builder.set(index++, column[i]);
-                }
-            }
-
-            return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newBuilder(long,long)} instead.
-         */
-        @Deprecated
-        default I columns(final List<? extends Comparable<?>>... source) {
-
-            int nbCols = source.length;
-            int nbRows = source[0].size();
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            long index = 0L;
-            for (int j = 0; j < nbCols; j++) {
-                List<? extends Comparable<?>> column = source[j];
-                for (int i = 0; i < nbRows; i++) {
-                    builder.set(index++, column.get(i));
-                }
-            }
-
-            return builder.build();
+        default I columns(final double[][] columns) {
+            return this.copy(RawStore.wrap(columns).transpose());
         }
 
         default I copy(final Access2D<?> source) {
@@ -289,14 +177,6 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return builder.build();
         }
 
-        /**
-         * @deprecated v54 Use {@link #makeFilled(long,long,NullaryFunction)} instead
-         */
-        @Deprecated
-        default I makeFilled(final Structure2D shape, final NullaryFunction<?> supplier) {
-            return this.makeFilled(shape.countRows(), shape.countColumns(), supplier);
-        }
-
         B newBuilder(long nbRows, long nbCols);
 
         default I row(final Access1D<?> row) {
@@ -346,101 +226,25 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
             return builder.build();
         }
 
-        /**
-         * @deprecated v54 Use {@link #row(Access1D)}, {@link #column(Access1D)} or
-         *             {@link #newBuilder(long,long)} instead.
-         */
-        @Deprecated
-        default I rows(final Access1D<?>... source) {
+        default I row(final List<? extends Comparable<?>> row) {
 
-            int nbRows = source.length;
-            long nbCols = source[0].count();
+            int nbCols = row.size();
 
-            B builder = this.newBuilder(nbRows, nbCols);
+            B builder = this.newBuilder(1L, nbCols);
 
-            if (this.getMathType().isPrimitive()) {
-                for (int i = 0; i < nbRows; i++) {
-                    Access1D<?> row = source[i];
-                    for (long j = 0L; j < nbCols; j++) {
-                        builder.set(Structure2D.index(nbRows, i, j), row.doubleValue(j));
-                    }
-                }
-            } else {
-                for (int i = 0; i < nbRows; i++) {
-                    Access1D<?> row = source[i];
-                    for (long j = 0L; j < nbCols; j++) {
-                        builder.set(Structure2D.index(nbRows, i, j), row.get(j));
-                    }
-                }
+            for (int j = 0; j < nbCols; j++) {
+                builder.set(j, row.get(j));
             }
 
             return builder.build();
         }
 
         /**
-         * @deprecated v54 Use {@link #row(Comparable<?>[])}, {@link #column(Comparable<?>[])} or
-         *             {@link #newBuilder(long,long)} instead.
+         * @deprecated v54 Use {@link RawStore#wrap(double[][])} instead.
          */
         @Deprecated
-        default I rows(final Comparable<?>[]... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].length;
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            for (int i = 0; i < nbRows; i++) {
-                Comparable<?>[] row = source[i];
-                for (int j = 0; j < nbCols; j++) {
-                    builder.set(Structure2D.index(nbRows, i, j), row[j]);
-                }
-            }
-
-            return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #row(double[])}, {@link #column(double[])} or
-         *             {@link #newBuilder(long,long)} instead. In some cases {@link RawStore#wrap(double[][])}
-         *             could also be a good alternative (avoids copying).
-         */
-        @Deprecated
-        default I rows(final double[]... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].length;
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            for (int i = 0; i < nbRows; i++) {
-                double[] row = source[i];
-                for (int j = 0; j < nbCols; j++) {
-                    builder.set(Structure2D.index(nbRows, i, j), row[j]);
-                }
-            }
-
-            return builder.build();
-        }
-
-        /**
-         * @deprecated v54 Use {@link #newBuilder(long,long)} instead.
-         */
-        @Deprecated
-        default I rows(final List<? extends Comparable<?>>... source) {
-
-            int nbRows = source.length;
-            int nbCols = source[0].size();
-
-            B builder = this.newBuilder(nbRows, nbCols);
-
-            for (int i = 0; i < nbRows; i++) {
-                List<? extends Comparable<?>> row = source[i];
-                for (int j = 0; j < nbCols; j++) {
-                    builder.set(Structure2D.index(nbRows, i, j), row.get(j));
-                }
-            }
-
-            return builder.build();
+        default I rows(final double[][] rows) {
+            return this.copy(RawStore.wrap(rows));
         }
 
     }

@@ -22,6 +22,7 @@
 package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -32,17 +33,17 @@ public class SimpleEquationCase extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static MatrixR064 getBody() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static MatrixR064 getRHS() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static MatrixR064 getSolution() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

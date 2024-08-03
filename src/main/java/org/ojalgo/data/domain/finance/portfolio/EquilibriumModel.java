@@ -54,19 +54,22 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         myMarketEquilibrium = marketEquilibrium.copy();
     }
 
+    @Override
     public final double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.column(tmpWeights);
         final MatrixR064 tmpAssetReturns = this.getAssetReturns();
         return this.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns).doubleValue();
     }
 
+    @Override
     public final double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetWeights = FinancePortfolio.MATRIX_FACTORY.column(tmpWeights);
         return this.calculatePortfolioVariance(tmpAssetWeights).doubleValue();
     }
 
+    @Override
     public final MatrixR064 getAssetReturns() {
         if (myAssetReturns == null) {
             myAssetReturns = this.calculateAssetReturns();
@@ -74,6 +77,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         return myAssetReturns;
     }
 
+    @Override
     public final MatrixR064 getAssetVolatilities() {
         if (myAssetVolatilities == null) {
             myAssetVolatilities = myMarketEquilibrium.toCorrelations();
@@ -88,10 +92,12 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         return myAssetWeights;
     }
 
+    @Override
     public final MatrixR064 getCorrelations() {
         return myMarketEquilibrium.toCorrelations();
     }
 
+    @Override
     public final MatrixR064 getCovariances() {
         return myMarketEquilibrium.getCovariances();
     }
@@ -105,7 +111,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         if (myMeanReturn == null) {
             final MatrixR064 tmpAssetWeights = this.getAssetWeights();
             final MatrixR064 tmpAssetReturns = this.getAssetReturns();
-            if ((tmpAssetWeights != null) && (tmpAssetReturns != null)) {
+            if (tmpAssetWeights != null && tmpAssetReturns != null) {
                 myMeanReturn = this.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns);
             }
         }
@@ -150,6 +156,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         this.reset();
     }
 
+    @Override
     public int size() {
         return myMarketEquilibrium.size();
     }

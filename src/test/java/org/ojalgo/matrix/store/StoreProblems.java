@@ -152,9 +152,8 @@ public class StoreProblems extends MatrixStoreTests {
 
         double[][] data = { { 1.0, 2.0, 3.0, 10.0 }, { 4.0, 5.0, 6.0, 11.0 }, { 7.0, 8.0, 9.0, 11.0 } };
 
-        PhysicalStore.Factory<Double, R064Store> storeFactory = R064Store.FACTORY;
-        R064Store m = storeFactory.rows(data);
-        R064Store r = storeFactory.make(m.countRows(), m.countColumns());
+        RawStore m = RawStore.wrap(data);
+        R064Store r = R064Store.FACTORY.make(m.countRows(), m.countColumns());
 
         QR<Double> qr = QR.R064.make(true);
         qr.decompose(m);
@@ -186,18 +185,18 @@ public class StoreProblems extends MatrixStoreTests {
 
         MatrixR064 A, Bu, K, sx, currentState;
 
-        final double[][] a = { { 1, 2 }, { 3, 4 } };
-        A = MatrixR064.FACTORY.rows(a);
-        final double[][] bu = { { 1, 0 }, { 0, 1 } };
-        Bu = MatrixR064.FACTORY.rows(bu);
+        double[][] a = { { 1, 2 }, { 3, 4 } };
+        A = MatrixR064.FACTORY.copy(RawStore.wrap(a));
+        double[][] bu = { { 1, 0 }, { 0, 1 } };
+        Bu = MatrixR064.FACTORY.copy(RawStore.wrap(bu));
         MatrixR064.FACTORY.makeEye(2, 2);
         K = MatrixR064.FACTORY.makeEye(2, 2);
-        final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
+        int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final MatrixR064 eye = MatrixR064.FACTORY.makeEye(A);
-        final MatrixR064 Aprime = A.subtract(Bu.multiply(K));
+        MatrixR064 eye = MatrixR064.FACTORY.makeEye(A);
+        MatrixR064 Aprime = A.subtract(Bu.multiply(K));
         MatrixR064 Apow = MatrixR064.FACTORY.copy(Aprime);
-        final MatrixR064 tmp = Aprime.subtract(eye);
+        MatrixR064 tmp = Aprime.subtract(eye);
         sx = MatrixR064.FACTORY.copy(eye);
         sx = sx.below(tmp);
 
@@ -218,11 +217,11 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20110223() {
 
-        final int tmpDim = 9;
+        int tmpDim = 9;
 
-        final PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxB = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxC = R064Store.FACTORY.make(tmpDim, tmpDim);
+        PhysicalStore<Double> tmpMtrxA = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpMtrxB = R064Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpMtrxC = R064Store.FACTORY.make(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;
         PhysicalStore<Double> tmpActual;
@@ -252,32 +251,32 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20180121() {
 
-        final SparseStore<Double> m = SparseStore.R064.make(3, 2);
-        final R064Store mAdd = R064Store.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
-        final MatrixStore<Double> n = m.add(mAdd);
+        SparseStore<Double> m = SparseStore.R064.make(3, 2);
+        RawStore mAdd = RawStore.wrap(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
+        MatrixStore<Double> n = m.add(mAdd);
 
-        final SparseStore<Double> eye = SparseStore.R064.make(2, 2);
+        SparseStore<Double> eye = SparseStore.R064.make(2, 2);
         eye.set(0, 0, 1.0);
         eye.set(1, 1, 1.0);
 
-        final MatrixStore<Double> prod = n.multiply(eye);
+        MatrixStore<Double> prod = n.multiply(eye);
 
         TestUtils.assertEquals(mAdd, prod);
 
-        final SparseStore<Double> m2 = SparseStore.R064.make(3, 2);
+        SparseStore<Double> m2 = SparseStore.R064.make(3, 2);
         m2.set(0, 0, 1.0);
 
         TestUtils.assertEquals(mAdd, m2.multiply(eye));
         TestUtils.assertEquals(mAdd, eye.premultiply(m2).collect(R064Store.FACTORY));
 
-        final SparseStore<Double> a = SparseStore.R064.make(3, 3);
+        SparseStore<Double> a = SparseStore.R064.make(3, 3);
         a.set(1, 1, 1.0);
 
-        final SparseStore<Double> b = SparseStore.R064.make(3, 5);
+        SparseStore<Double> b = SparseStore.R064.make(3, 5);
         b.set(1, 1, 1.0);
         b.set(0, 3, 1.0);
 
-        final SparseStore<Double> c = SparseStore.R064.make(3, 5);
+        SparseStore<Double> c = SparseStore.R064.make(3, 5);
         c.set(1, 1, 1.0);
 
         if (DEBUG) {
@@ -300,15 +299,19 @@ public class StoreProblems extends MatrixStoreTests {
         double[][] exp = { { 1.0, 2.0, 3.0 }, { 3.0, 4.0, 5.0 }, { 5.0, 6.0, 7.0 } };
 
         Factory<Double, R064Store> factory = R064Store.FACTORY;
+        double[][] source1 = _x;
 
-        R064Store x = factory.rows(_x);
-        R064Store y = factory.rows(_y);
+        R064Store x = factory.copy(RawStore.wrap(source1));
+        double[][] source2 = _y;
+        R064Store y = factory.copy(RawStore.wrap(source2));
 
         ElementsSupplier<Double> diff = y.onMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
+        double[][] source3 = exp;
 
-        TestUtils.assertEquals(factory.rows(exp), diff.collect(factory));
-        TestUtils.assertEquals(factory.columns(exp), transp.collect(factory));
+        TestUtils.assertEquals(factory.copy(RawStore.wrap(source3)), diff.collect(factory));
+        double[][] source = exp;
+        TestUtils.assertEquals(factory.copy(RawStore.wrap(source).transpose()), transp.collect(factory));
     }
 
 }

@@ -35,6 +35,7 @@ import org.ojalgo.matrix.MatrixQ128;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -234,7 +235,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result tmpResult = tmpModel.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
-        PhysicalStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
+        PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
         PhysicalStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -271,7 +272,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result tmpResult = tmpModel.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
-        PhysicalStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
+        PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 2.0 }, { 2.0 } });
         PhysicalStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -319,7 +320,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result tmpResult = tmpModel.minimise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
-        PhysicalStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 5.0 }, { 5.0 } });
+        PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 5.0 }, { 5.0 } });
         PhysicalStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -440,7 +441,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result tmpResult = tmpModel.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
-        MatrixStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
+        MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
         MatrixStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2, 3, 4, 5, 6, 7));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -454,7 +455,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         Optimisation.Result tmpResult = tmpModel.minimise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
-        MatrixStore<Double> tmpExpX = R064Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
+        MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
         MatrixStore<Double> tmpActX = R064Store.FACTORY.copy(tmpSolution.rows(0, 1, 2, 3, 4, 5, 6, 7));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);

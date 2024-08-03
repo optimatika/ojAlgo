@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.MatrixQ128;
+import org.ojalgo.matrix.store.RawStore;
 
 /**
  * @author apete
@@ -34,29 +35,28 @@ public class MostBasicCase extends GenericQPSolverTest {
         final MatrixQ128[] retVal = new MatrixQ128[8];
 
         // Equations/Equalities
-        retVal[0] = MatrixQ128.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        retVal[0] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } }));
 
         // Levels/Values
-        retVal[1] = MatrixQ128.FACTORY.rows(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } });
+        retVal[1] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } }));
 
         // Quadratic
-        retVal[2] = MatrixQ128.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        retVal[2] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } }));
 
         // Linear
-        retVal[3] = MatrixQ128.FACTORY.rows(new double[][] { { -2.0 }, { -3.0 }, { -4.0 } });
+        retVal[3] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -2.0 }, { -3.0 }, { -4.0 } }));
 
         // Inequalities/Differences
-        retVal[4] = MatrixQ128.FACTORY
-                .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        retVal[4] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } }));
 
         // Limits
-        retVal[5] = MatrixQ128.FACTORY.rows(new double[][] { { -1.0 }, { -2.0 }, { -3.0 }, { 3.0 }, { 4.0 }, { 5.0 } });
+        retVal[5] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0 }, { -2.0 }, { -3.0 }, { 3.0 }, { 4.0 }, { 5.0 } }));
 
         // LagrangeSolver
-        retVal[6] = MatrixQ128.FACTORY.rows(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } });
+        retVal[6] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } }));
 
         // ActiveSetSolver
-        retVal[7] = MatrixQ128.FACTORY.rows(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } });
+        retVal[7] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } }));
 
         return retVal;
     }

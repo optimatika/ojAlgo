@@ -30,6 +30,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -48,7 +49,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         NumberContext accuracy = NumberContext.of(2); // Example solutions are very much rounded
 
-        R064Store mtrxQ = FACTORY.rows(new double[][] { { 2, 3 }, { 3, 10 } });
+        RawStore mtrxQ = RawStore.wrap(new double[][] { { 2, 3 }, { 3, 10 } });
         R064Store mtrxC = FACTORY.column(-0.5, 0); // Defined negated the ojAlgo way
 
         ConvexSolver unconstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).build();
@@ -57,7 +58,7 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         TestUtils.assertEquals(unconstrainedX, unconstrainedSolver.solve(), accuracy);
 
-        R064Store mtrxAI = FACTORY.rows(new double[][] { { 3, 2 }, { 15, -3 } });
+        RawStore mtrxAI = RawStore.wrap(new double[][] { { 3, 2 }, { 15, -3 } });
         R064Store mtrxBI = FACTORY.column(-2, 1);
 
         ConvexSolver equalityConstrainedSolver = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).equalities(mtrxAI, mtrxBI).build();
@@ -121,9 +122,9 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         NumberContext accuracy = NumberContext.of(12);
 
-        R064Store mtrxQ = FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+        RawStore mtrxQ = RawStore.wrap(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
         R064Store mtrxC = FACTORY.column(8, 3, 3); // Negated, because that how ojAgo expects it
-        R064Store mtrxAE = FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
+        RawStore mtrxAE = RawStore.wrap(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
         R064Store mtrxBE = FACTORY.column(3, 0);
 
         R064Store expectedX = FACTORY.column(2, -1, 1);

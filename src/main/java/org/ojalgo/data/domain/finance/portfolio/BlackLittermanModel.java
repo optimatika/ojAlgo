@@ -83,7 +83,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
                 return myReturnVariance.doubleValue();
 
             }
-            final MatrixR064 tmpWeights = MATRIX_FACTORY.columns(myWeights);
+            final MatrixR064 tmpWeights = MATRIX_FACTORY.column(myWeights);
 
             BigDecimal retVal = myModel.calculateVariance(tmpWeights);
 
@@ -129,7 +129,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
         super(context);
 
-        myOriginalWeights = MATRIX_FACTORY.columns(originalWeights.getWeights());
+        myOriginalWeights = MATRIX_FACTORY.column(originalWeights.getWeights());
         myViews = new ArrayList<>();
     }
 

@@ -180,11 +180,6 @@ public abstract class BufferArray extends PlainArray<Double> implements AutoClos
         }
 
         @Override
-        public BufferArray makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-            return (BufferArray) super.makeFilled(shape, supplier);
-        }
-
-        @Override
         public Scalar.Factory<Double> scalar() {
             return myTypeFactory.scalar();
         }

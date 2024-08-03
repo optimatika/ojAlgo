@@ -116,19 +116,22 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         this(MATRIX_FACTORY.makeEye(someAssets.size(), someAssets.size()), someAssets);
     }
 
+    @Override
     public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.column(tmpWeights);
         final MatrixR064 tmpAssetReturns = this.getAssetReturns();
         return MarketEquilibrium.calculatePortfolioReturn(tmpAssetWeights, tmpAssetReturns).doubleValue();
     }
 
+    @Override
     public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
-        final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.columns(tmpWeights);
+        final MatrixR064 tmpAssetWeights = MATRIX_FACTORY.column(tmpWeights);
         return new MarketEquilibrium(this.getCovariances()).calculatePortfolioVariance(tmpAssetWeights).doubleValue();
     }
 
+    @Override
     public MatrixR064 getAssetReturns() {
 
         if (myAssetReturns == null) {
@@ -147,6 +150,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return myAssetReturns;
     }
 
+    @Override
     public MatrixR064 getAssetVolatilities() {
 
         if (myAssetVolatilities == null) {
@@ -169,6 +173,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return myCorrelations.doubleValue(row, col);
     }
 
+    @Override
     public MatrixR064 getCorrelations() {
         return myCorrelations;
     }
@@ -189,6 +194,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return tmpRowRisk * tmpCorrelation * tmpColRisk;
     }
 
+    @Override
     public MatrixR064 getCovariances() {
 
         if (myCovariances == null) {
@@ -277,6 +283,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return myWeights;
     }
 
+    @Override
     public int size() {
         return myComponents.size();
     }

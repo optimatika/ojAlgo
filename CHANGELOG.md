@@ -22,6 +22,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Re-implemented `Quadruple`'s divide method using primitives only. (Previously delegated to `BigDecimal`.)
 
+### Removed
+
+#### org.ojalgo.structure
+
+- Removed a bunch of stuff that was deprecated in `Factory1D`, `Factory2D` and `FactoryAnyD` and/or some of their sub-interfaces.
 
 ## [54.0.0] – 2024-06-06
 
