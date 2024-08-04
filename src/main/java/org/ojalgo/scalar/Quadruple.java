@@ -164,7 +164,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
         t1 = base1 + base2;
         e = t1 - base1;
-        t2 = ((base2 - e) + (base1 - (t1 - e))) + remainder1 + remainder2;
+        t2 = base2 - e + (base1 - (t1 - e)) + remainder1 + remainder2;
 
         double base = t1 + t2;
         double remainder = t2 - (base - t1);
@@ -206,10 +206,50 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
 
         t1 = c11 + c2;
         e = t1 - c11;
-        t2 = remainder1 * remainder2 + ((c2 - e) + (c11 - (t1 - e))) + c21;
+        t2 = remainder1 * remainder2 + (c2 - e + (c11 - (t1 - e))) + c21;
 
         double base = t1 + t2;
         double remainder = t2 - (base - t1);
+
+        return new Quadruple(base, remainder);
+    }
+
+    /**
+     * High-precision division.
+     */
+    private static Quadruple divide(final double base1, final double remainder1, final double base2, final double remainder2) {
+
+        double q1, r1, r2, s1, s2, t1, t2;
+        double c1, c2, cona, conb, a1, a2, b1, b2;
+
+        q1 = base1 / base2;
+
+        cona = q1 * SPLIT;
+        a1 = cona - (cona - q1);
+        a2 = q1 - a1;
+
+        conb = base2 * SPLIT;
+        b1 = conb - (conb - base2);
+        b2 = base2 - b1;
+
+        // high part of q1 * base2
+        c1 = q1 * base2;
+        // rounding errors and cross terms
+        c2 = a1 * b1 - c1 + a1 * b2 + a2 * b1 + a2 * b2;
+
+        // first remainder
+        r1 = base1 - c1;
+        r2 = remainder1 - c2;
+
+        // next approximation for remainder1 / base2
+        s1 = r1 / base2;
+        t1 = s1 * base2;
+        t2 = a1 * b1 - t1 + a1 * b2 + a2 * b1 + a2 * b2;
+
+        s2 = r2 / base2;
+
+        double base = q1 + s1;
+        double remainder = s2 - (base - (q1 + s1));
 
         return new Quadruple(base, remainder);
     }
@@ -247,7 +287,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         }
 
         if (Quadruple.isInfinite(this)) {
-            if (!Quadruple.isInfinite(arg) || (this.sign() == arg.sign())) {
+            if (!Quadruple.isInfinite(arg) || this.sign() == arg.sign()) {
                 return this;
             } else {
                 return NaN;
@@ -285,8 +325,15 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
             return NaN;
         }
 
-        return Quadruple.divide(this, arg);
+        //   return Quadruple.divide(this, arg);
 
+        double base1 = this.getBase();
+        double remainder1 = this.getRemainder();
+
+        double base2 = arg.getBase();
+        double remainder2 = arg.getRemainder();
+
+        return Quadruple.divide(base1, remainder1, base2, remainder2);
     }
 
     @Override
@@ -308,8 +355,8 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
             return false;
         }
         Quadruple other = (Quadruple) obj;
-        if ((Double.doubleToLongBits(myBase) != Double.doubleToLongBits(other.myBase))
-                || (Double.doubleToLongBits(myRemainder) != Double.doubleToLongBits(other.myRemainder))) {
+        if (Double.doubleToLongBits(myBase) != Double.doubleToLongBits(other.myBase)
+                || Double.doubleToLongBits(myRemainder) != Double.doubleToLongBits(other.myRemainder)) {
             return false;
         }
         return true;
@@ -331,9 +378,9 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(myBase);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ temp >>> 32);
         temp = Double.doubleToLongBits(myRemainder);
-        return prime * result + (int) (temp ^ (temp >>> 32));
+        return prime * result + (int) (temp ^ temp >>> 32);
     }
 
     @Override
@@ -432,7 +479,7 @@ public class Quadruple implements SelfDeclaringScalar<Quadruple> {
         }
 
         if (Quadruple.isInfinite(this)) {
-            if (!Quadruple.isInfinite(arg) || (this.sign() != arg.sign())) {
+            if (!Quadruple.isInfinite(arg) || this.sign() != arg.sign()) {
                 return this;
             } else {
                 return NaN;

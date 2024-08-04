@@ -83,15 +83,86 @@ public class QuadrupleTest extends ScalarTests {
                 Quadruple denominator = Quadruple.valueOf(d);
 
                 Quadruple quotient = numerator.divide(denominator);
+                BigDecimal bigDecimal = quotient.toBigDecimal();
 
                 BigDecimal expected = NC_EVAL.enforce(MissingMath.divide(BigDecimal.valueOf(n), BigDecimal.valueOf(d)));
-                BigDecimal actual = NC_EVAL.enforce(quotient.toBigDecimal());
+                BigDecimal actual = NC_EVAL.enforce(bigDecimal);
 
                 TestUtils.assertEquals(expected, actual, NC_EVAL);
 
                 TestUtils.assertTrue(actual.compareTo(expected) == 0);
             }
         }
+    }
+
+    @Test
+    public void testDivideBy3() {
+
+        Quadruple numerator = Quadruple.ONE;
+        Quadruple denominator = Quadruple.ONE.add(Quadruple.TWO);
+
+        Quadruple quotient = numerator.divide(denominator);
+
+        BigDecimal expected = MissingMath.divide(numerator.toBigDecimal(), denominator.toBigDecimal());
+        BigDecimal actual = quotient.toBigDecimal();
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        expected = NC_EVAL.enforce(expected);
+        actual = NC_EVAL.enforce(actual);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated denominator
+
+        numerator = Quadruple.ONE;
+        denominator = Quadruple.ONE.add(Quadruple.TWO).negate();
+
+        quotient = numerator.divide(denominator);
+
+        expected = MissingMath.divide(numerator.toBigDecimal(), denominator.toBigDecimal());
+        actual = quotient.toBigDecimal();
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        expected = NC_EVAL.enforce(expected);
+        actual = NC_EVAL.enforce(actual);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated numerator
+
+        numerator = Quadruple.ONE.negate();
+        denominator = Quadruple.ONE.add(Quadruple.TWO);
+
+        quotient = numerator.divide(denominator);
+
+        expected = MissingMath.divide(numerator.toBigDecimal(), denominator.toBigDecimal());
+        actual = quotient.toBigDecimal();
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        expected = NC_EVAL.enforce(expected);
+        actual = NC_EVAL.enforce(actual);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated numerator and denominator
+
+        numerator = Quadruple.ONE.negate();
+        denominator = Quadruple.ONE.add(Quadruple.TWO).negate();
+
+        quotient = numerator.divide(denominator);
+
+        expected = MissingMath.divide(numerator.toBigDecimal(), denominator.toBigDecimal());
+        actual = quotient.toBigDecimal();
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        expected = NC_EVAL.enforce(expected);
+        actual = NC_EVAL.enforce(actual);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
     }
 
     @Test
@@ -126,6 +197,57 @@ public class QuadrupleTest extends ScalarTests {
 
         BigDecimal expected = NC_EVAL.enforce(pi.multiply(e));
         BigDecimal actual = NC_EVAL.enforce(product.toBigDecimal());
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated left
+
+        pi = BigMath.PI.negate();
+        e = BigMath.E;
+
+        left = Quadruple.valueOf(pi);
+        right = Quadruple.valueOf(e);
+
+        product = left.multiply(right);
+
+        expected = NC_EVAL.enforce(pi.multiply(e));
+        actual = NC_EVAL.enforce(product.toBigDecimal());
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated right
+
+        pi = BigMath.PI;
+        e = BigMath.E.negate();
+
+        left = Quadruple.valueOf(pi);
+        right = Quadruple.valueOf(e);
+
+        product = left.multiply(right);
+
+        expected = NC_EVAL.enforce(pi.multiply(e));
+        actual = NC_EVAL.enforce(product.toBigDecimal());
+
+        TestUtils.assertEquals(expected, actual, NC_EVAL);
+
+        TestUtils.assertTrue(actual.compareTo(expected) == 0);
+
+        // Negated both
+
+        pi = BigMath.PI.negate();
+        e = BigMath.E.negate();
+
+        left = Quadruple.valueOf(pi);
+        right = Quadruple.valueOf(e);
+
+        product = left.multiply(right);
+
+        expected = NC_EVAL.enforce(pi.multiply(e));
+        actual = NC_EVAL.enforce(product.toBigDecimal());
 
         TestUtils.assertEquals(expected, actual, NC_EVAL);
 
