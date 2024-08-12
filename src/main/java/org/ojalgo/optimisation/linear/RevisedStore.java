@@ -151,18 +151,6 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateIteration() {
 
-        myInvBasis.btran(myObjective.rows(included), l);
-
-        this.doExclTranspMult(l, r);
-
-        d.fillMatching(myObjective.rows(excluded), SUBTRACT, r);
-
-        myInvBasis.ftran(myConstraintsRHS, x);
-    }
-
-    @Override
-    void calculateIteration(final IterDescr iteration) {
-
         //        PhysicalStore<Double> x0 = x.copy();
         //        PhysicalStore<Double> d0 = d.copy();
 
@@ -309,29 +297,23 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void setupDualPhaseOneObjective() {
+    void setupClassicPhase1Objective() {
+
+        int base = structure.nbIdty;
 
         if (myAlternativeObjective == null) {
-            myAlternativeObjective = RevisedStore.newColumn(n);
+            myAlternativeObjective = RevisedStore.newRow(myObjective.size());
         }
 
-        for (int j = 0; j < n; j++) {
+        int nbVariables = structure.countVariables();
 
-            double p2 = myObjective.doubleValue(j);
-            double p1 = myConstraintsBody.column(j).aggregateAll(Aggregator.SUM).doubleValue();
-
-            ColumnState columnState = this.getColumnState(j);
-
-            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
-                myObjective.set(j, ZERO);
-            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
-                myObjective.set(j, p1 != ZERO ? Math.abs(p1) : ONE);
-            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
-                myObjective.set(j, p1 != ZERO ? -Math.abs(p1) : NEG);
-            }
-
-            myAlternativeObjective.set(j, p1);
+        for (int j = 0; j < nbVariables; j++) {
+            double sum = myConstraintsBody.aggregateColumn(base, j, Aggregator.SUM).doubleValue();
+            myAlternativeObjective.set(j, -sum);
         }
+
+        //        double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
+        //        myAlternativeValue = -sum;
     }
 
     @Override
@@ -368,6 +350,19 @@ final class RevisedStore extends SimplexStore {
             }
 
         };
+    }
+
+    @Override
+    void switchObjective() {
+
+        if (myAlternativeObjective != null) {
+
+            R064Store copy = myObjective.copy();
+
+            myObjective.fillMatching(myAlternativeObjective);
+
+            myAlternativeObjective = copy;
+        }
     }
 
 }

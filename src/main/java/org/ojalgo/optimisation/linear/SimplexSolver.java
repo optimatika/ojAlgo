@@ -130,7 +130,9 @@ abstract class SimplexSolver extends LinearSolver {
             from = ColumnState.BASIS;
             direction = Direction.STAY;
         }
+
     }
+
     /**
      * Exit from {@link ColumnState#BASIS} to either {@link ColumnState#LOWER} or {@link ColumnState#UPPER}.
      * <p>
@@ -699,70 +701,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    /**
-     * <ul>
-     * <li>Determine if non-basic variables are at their lower or upper bound (or if they are unbounded)
-     * <li>Shift ranges/bounds so that (one of) the bound(s) is at zero
-     * <li>Assumes that the ranges/bounds of basic variables are already defined this way.
-     * </ul>
-     *
-     * @param prioritiseFeasibility TODO
-     * @param modifyObjective TODO
-     */
-    private void shiftBounds(final boolean prioritiseFeasibility, final boolean modifyObjective) {
-
-        int[] excluded = mySimplex.excluded;
-        for (int je = 0, limit = excluded.length; je < limit; je++) {
-            int j = excluded[je];
-
-            double rc = prioritiseFeasibility ? ZERO : mySimplex.getCost(j);
-            double lb = mySimplex.getLowerBound(j);
-            double ub = mySimplex.getUpperBound(j);
-
-            if (lb > ub) {
-                throw new IllegalStateException();
-            }
-
-            if (rc > ZERO && Double.isFinite(lb)) {
-                mySimplex.lower(j);
-                mySimplex.shiftColumn(j, lb);
-                mySolutionShift[j] += lb;
-                myValueShift += rc * lb;
-            } else if (rc < ZERO && Double.isFinite(ub)) {
-                mySimplex.upper(j);
-                mySimplex.shiftColumn(j, ub);
-                mySolutionShift[j] += ub;
-                myValueShift += rc * ub;
-            } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
-                mySimplex.unbounded(j);
-                if (modifyObjective) {
-                    mySimplex.objective().set(j, ZERO);
-                }
-            } else if (Math.abs(lb) <= Math.abs(ub)) {
-                mySimplex.lower(j);
-                mySimplex.shiftColumn(j, lb);
-                mySolutionShift[j] += lb;
-                myValueShift += rc * lb;
-                if (modifyObjective) {
-                    mySimplex.objective().set(j, ONE);
-                }
-            } else if (Math.abs(lb) >= Math.abs(ub)) {
-                mySimplex.upper(j);
-                mySimplex.shiftColumn(j, ub);
-                mySolutionShift[j] += ub;
-                myValueShift += rc * ub;
-                if (modifyObjective) {
-                    mySimplex.objective().set(j, NEG);
-                }
-            } else {
-                mySimplex.lower(j);
-                if (modifyObjective) {
-                    mySimplex.objective().set(j, ONE);
-                }
-            }
-        }
-    }
-
     private Optimisation.Result solveUnconstrained() {
 
         int nbVars = mySimplex.n;
@@ -1038,7 +976,7 @@ abstract class SimplexSolver extends LinearSolver {
 
             this.shift(iteration.enter.column(), iteration.exit.to);
 
-            mySimplex.calculateIteration(iteration);
+            mySimplex.calculateIteration();
 
         } else if (iteration.isBoundSwitch()) {
 
@@ -1202,13 +1140,9 @@ abstract class SimplexSolver extends LinearSolver {
         return !this.getDualExitCandidate(null);
     }
 
-    final IterDescr prepareToIterate(final boolean prioritiseFeasibility, final boolean modifyObjective) {
+    final IterDescr prepareToIterate() {
 
-        this.shiftBounds(prioritiseFeasibility, modifyObjective);
-
-        if (false) {
-            mySimplex.setupDualPhaseOneObjective();
-        }
+        this.setup(mySimplex);
 
         if (mySimplex.m == 0) {
             this.solveUnconstrained(); // TODO return?
@@ -1223,6 +1157,21 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return new IterDescr(mySimplex);
+    }
+
+    /**
+     * <ul>
+     * <li>Determine if non-basic variables are at their lower or upper bound (or if they are unbounded)
+     * <li>Shift ranges/bounds so that (one of) the bound(s) is at zero
+     * <li>Assumes that the ranges/bounds of basic variables are already defined this way.
+     * </ul>
+     */
+    abstract void setup(SimplexStore simplex);
+
+    final void shift(final int index, final double shift, final double weight) {
+        mySimplex.shiftColumn(index, shift);
+        mySolutionShift[index] += shift;
+        myValueShift += weight * shift;
     }
 
     void switchToPhase2() {

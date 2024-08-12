@@ -246,6 +246,9 @@ final class DenseTableau extends SimplexTableau {
     @Override
     Primitive2D newConstraintsBody() {
 
+        int base = structure.nbIdty;
+        int limit = structure.countVariables();
+
         return new Primitive2D() {
 
             @Override
@@ -268,7 +271,7 @@ final class DenseTableau extends SimplexTableau {
 
                 myTableau[row][col] = value;
 
-                if (row >= structure.nbIdty) {
+                if (row >= base && col < limit) {
                     myAuxiliaryRow[col] -= value;
                 }
             }
@@ -278,6 +281,8 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     Primitive1D newConstraintsRHS() {
+
+        int base = structure.nbIdty;
 
         return new Primitive1D() {
 
@@ -295,7 +300,7 @@ final class DenseTableau extends SimplexTableau {
 
                 myTableau[index][n] = value;
 
-                if (index >= structure.nbIdty) {
+                if (index >= base) {
                     myAuxiliaryRow[n] -= value;
                 }
             }
@@ -338,24 +343,11 @@ final class DenseTableau extends SimplexTableau {
     }
 
     @Override
-    void setupDualPhaseOneObjective() {
-
-        for (int j = 0; j < n; j++) {
-
-            double p2 = myTableau[m][j];
-            double p1 = myAuxiliaryRow[j];
-
-            ColumnState columnState = this.getColumnState(j);
-
-            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
-                myTableau[m][j] = ZERO;
-            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
-                myTableau[m][j] = p1 != ZERO ? Math.abs(p1) : ONE;
-            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
-                myTableau[m][j] = p1 != ZERO ? -Math.abs(p1) : NEG;
-            }
-
-            myAuxiliaryRow[j] = p1;
+    void switchObjective() {
+        if (myAuxiliaryRow != null) {
+            double[] tmpRow = myTableau[m];
+            myTableau[m] = myAuxiliaryRow;
+            myAuxiliaryRow = tmpRow;
         }
     }
 

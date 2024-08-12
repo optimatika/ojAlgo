@@ -55,7 +55,7 @@ import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Classic simplex solver:
+ * Classic simplex tableau solver:
  * <ul>
  * <li>Primal algorithm
  * <li>2-phase

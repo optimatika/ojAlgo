@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.ojalgo.equation.Equation;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
-import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
@@ -74,7 +75,6 @@ abstract class SimplexStore {
             return myKey;
         }
     }
-
 
     static Function<LinearStructure, SimplexStore> newStoreFactory(final Options options) {
 
@@ -140,7 +140,7 @@ abstract class SimplexStore {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
 
         myToStringList.clear();
 
@@ -154,6 +154,15 @@ abstract class SimplexStore {
     private final SimplexStore basis(final int index) {
         myPartition.update(index, ColumnState.BASIS);
         return this;
+    }
+
+    private <S extends SimplexSolver> S newSolver(final BiFunction<Optimisation.Options, SimplexStore, S> constructor, final Optimisation.Options options,
+            final int... basis) {
+        S solver = constructor.apply(options, this);
+        if (basis.length > 0) {
+            solver.basis(basis);
+        }
+        return solver;
     }
 
     protected void pivot(final SimplexSolver.IterDescr iteration) {
@@ -177,8 +186,6 @@ abstract class SimplexStore {
 
     abstract void calculateIteration();
 
-    abstract void calculateIteration(IterDescr iteration);
-
     abstract void calculatePrimalDirection(EnterInfo enter);
 
     /**
@@ -194,6 +201,8 @@ abstract class SimplexStore {
     abstract void copyBasicSolution(double[] solution);
 
     abstract void copyObjective();
+
+    abstract void switchObjective();
 
     /**
      * The number of artificial variables in the basis.
@@ -422,28 +431,18 @@ abstract class SimplexStore {
         return this;
     }
 
-    final DualSimplexSolver newDualSimplexSolver(final Options optimisationOptions, final int... basis) {
-        DualSimplexSolver solver = new DualSimplexSolver(optimisationOptions, this);
-        if (basis.length > 0) {
-            solver.basis(basis);
-        }
-        return solver;
+    final DualSimplexSolver newDualSimplexSolver(final Optimisation.Options options, final int... basis) {
+        return this.newSolver(DualSimplexSolver::new, options, basis);
+
     }
 
-    final PhasedSimplexSolver newPhasedSimplexSolver(final Options optimisationOptions, final int... basis) {
-        PhasedSimplexSolver solver = new PhasedSimplexSolver(optimisationOptions, this);
-        if (basis.length > 0) {
-            solver.basis(basis);
-        }
-        return solver;
+    final PhasedSimplexSolver newPhasedSimplexSolver(final Optimisation.Options options, final int... basis) {
+        return this.newSolver(PhasedSimplexSolver::new, options, basis);
+
     }
 
-    final PrimalSimplexSolver newPrimalSimplexSolver(final Options optimisationOptions, final int... basis) {
-        PrimalSimplexSolver solver = new PrimalSimplexSolver(optimisationOptions, this);
-        if (basis.length > 0) {
-            solver.basis(basis);
-        }
-        return solver;
+    final PrimalSimplexSolver newPrimalSimplexSolver(final Optimisation.Options options, final int... basis) {
+        return this.newSolver(PrimalSimplexSolver::new, options, basis);
     }
 
     /**
@@ -471,8 +470,6 @@ abstract class SimplexStore {
     }
 
     abstract void restoreObjective();
-
-    abstract void setupDualPhaseOneObjective();
 
     abstract Primitive1D sliceBodyRow(final int row);
 
@@ -520,15 +517,17 @@ abstract class SimplexStore {
         excluded[enter] = inclExit;
     }
 
-    final SimplexStore upper(final int index) {
-        myPartition.update(index, ColumnState.UPPER);
-        return this;
-    }
-
     boolean updateRange(final int index, final double lower, final double upper) {
         myLowerBounds[index] = lower;
         myUpperBounds[index] = upper;
         return true;
     }
+
+    final SimplexStore upper(final int index) {
+        myPartition.update(index, ColumnState.UPPER);
+        return this;
+    }
+
+    abstract void setupClassicPhase1Objective();
 
 }

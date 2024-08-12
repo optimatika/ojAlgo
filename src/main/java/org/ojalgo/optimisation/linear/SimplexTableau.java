@@ -35,7 +35,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
-import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
@@ -74,6 +73,12 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         this.set(row, col, NumberDefinition.doubleValue(value));
     }
 
+    @Override
+    public String toString() {
+        String retVal = super.toString();
+        return retVal;
+    }
+
     /**
      * Perform the pivot operation on the tableau – only. Various auxiliary bookkeeping should NOT be done
      * here.
@@ -108,11 +113,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     final void calculateIteration() {
-        // With a tableau all calculations are continuously done when pivoting
-    }
-
-    @Override
-    final void calculateIteration(final IterDescr iteration) {
         // With a tableau all calculations are continuously done when pivoting
     }
 
@@ -299,6 +299,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         for (int i = 0; i < newBasis.length; i++) {
             this.doPivot(i, newBasis[i]);
         }
+    }
+
+    @Override
+    final void setupClassicPhase1Objective() {
+        // Happens while the tableau is initially built
     }
 
     final Primitive1D sliceBodyColumn(final int col) {

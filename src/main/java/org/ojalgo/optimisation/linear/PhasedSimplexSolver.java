@@ -21,9 +21,14 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 /**
- * First runs the dual algorithm (with a modified objective function) to establish feasibility, and then the
- * primal to reach optimality.
+ * First runs the dual algorithm (with a possibly modified objective function) to establish feasibility, and
+ * then the primal to reach optimality.
+ * <p>
+ * This is the primary sub-class of {@link SimplexSolver} and the one you would typically use. All the other
+ * sub-classes are primarily there to help with testing.
  *
  * @author apete
  */
@@ -38,7 +43,7 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
         this.initiatePhase1();
 
-        IterDescr iteration = this.prepareToIterate(false, true);
+        IterDescr iteration = this.prepareToIterate();
 
         this.doDualIterations(iteration); // Phase-1
 
@@ -47,6 +52,45 @@ final class PhasedSimplexSolver extends SimplexSolver {
         this.doPrimalIterations(iteration); // Phase-2
 
         return this.extractResult();
+    }
+
+    @Override
+    void setup(final SimplexStore simplex) {
+
+        int[] excluded = simplex.excluded;
+        for (int je = 0, limit = excluded.length; je < limit; je++) {
+            int j = excluded[je];
+
+            double rc = simplex.getCost(j);
+            double lb = simplex.getLowerBound(j);
+            double ub = simplex.getUpperBound(j);
+
+            if (lb > ub) {
+                throw new IllegalStateException();
+            }
+
+            if (rc > ZERO && Double.isFinite(lb)) {
+                simplex.lower(j);
+                this.shift(j, lb, rc);
+            } else if (rc < ZERO && Double.isFinite(ub)) {
+                simplex.upper(j);
+                this.shift(j, ub, rc);
+            } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
+                simplex.unbounded(j);
+                simplex.objective().set(j, ZERO);
+            } else if (Math.abs(lb) <= Math.abs(ub)) {
+                simplex.lower(j);
+                this.shift(j, lb, rc);
+                simplex.objective().set(j, ONE);
+            } else if (Math.abs(lb) >= Math.abs(ub)) {
+                simplex.upper(j);
+                this.shift(j, ub, rc);
+                simplex.objective().set(j, NEG);
+            } else {
+                simplex.lower(j);
+                simplex.objective().set(j, ONE);
+            }
+        }
     }
 
 }

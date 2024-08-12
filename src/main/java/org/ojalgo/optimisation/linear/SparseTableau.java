@@ -319,6 +319,9 @@ final class SparseTableau extends SimplexTableau {
     @Override
     Primitive2D newConstraintsBody() {
 
+        int base = structure.nbIdty;
+        int limit = structure.countVariables();
+
         return new Primitive2D() {
 
             @Override
@@ -341,7 +344,7 @@ final class SparseTableau extends SimplexTableau {
 
                 myBody[row].set(col, value);
 
-                if (row >= structure.nbIdty) {
+                if (row >= base && col < limit) {
                     myAuxiliaryObjective.add(col, -value);
                 }
             }
@@ -351,6 +354,8 @@ final class SparseTableau extends SimplexTableau {
 
     @Override
     Primitive1D newConstraintsRHS() {
+
+        int base = structure.nbIdty;
 
         return new Primitive1D() {
 
@@ -368,7 +373,7 @@ final class SparseTableau extends SimplexTableau {
 
                 myRHS.set(index, value);
 
-                if (index >= structure.nbIdty) {
+                if (index >= base) {
                     myAuxiliaryValue -= value;
                 }
             }
@@ -415,25 +420,19 @@ final class SparseTableau extends SimplexTableau {
     }
 
     @Override
-    void setupDualPhaseOneObjective() {
+    void switchObjective() {
 
-        for (int j = 0; j < n; j++) {
+        if (myAuxiliaryObjective != null) {
 
-            double p2 = myObjective.doubleValue(j);
-            double p1 = myAuxiliaryObjective.doubleValue(j);
+            DenseArray<Double> copy = DENSE_FACTORY.copy((Access1D<?>) myObjective);
+            double copiedValue = myValue;
 
-            ColumnState columnState = this.getColumnState(j);
+            myObjective.fillMatching(myAuxiliaryObjective);
+            myValue = myAuxiliaryValue;
 
-            if (columnState == ColumnState.UNBOUNDED && p2 != ZERO) {
-
-                myObjective.set(j, ZERO);
-            } else if (columnState == ColumnState.LOWER && p2 <= ZERO) {
-                myObjective.set(j, p1 != ZERO ? Math.abs(p1) : ONE);
-            } else if (columnState == ColumnState.UPPER && p2 >= ZERO) {
-                myObjective.set(j, p1 != ZERO ? -Math.abs(p1) : NEG);
-            }
-
-            myAuxiliaryObjective.set(j, p1);
+            myAuxiliaryObjective = copy;
+            myAuxiliaryValue = copiedValue;
         }
     }
+
 }

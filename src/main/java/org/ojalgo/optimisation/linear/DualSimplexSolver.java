@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -34,9 +36,10 @@ final class DualSimplexSolver extends SimplexSolver {
         super(solverOptions, simplexStore);
     }
 
+    @Override
     public Result solve(final Result kickStarter) {
 
-        IterDescr iteration = this.prepareToIterate(false, false);
+        IterDescr iteration = this.prepareToIterate();
 
         this.doDualIterations(iteration);
 
@@ -45,6 +48,41 @@ final class DualSimplexSolver extends SimplexSolver {
         }
 
         return this.extractResult();
+    }
+
+    @Override
+    void setup(final SimplexStore simplex) {
+
+        int[] excluded = simplex.excluded;
+        for (int je = 0, limit = excluded.length; je < limit; je++) {
+            int j = excluded[je];
+
+            double rc = simplex.getCost(j);
+            double lb = simplex.getLowerBound(j);
+            double ub = simplex.getUpperBound(j);
+
+            if (lb > ub) {
+                throw new IllegalStateException();
+            }
+
+            if (rc > ZERO && Double.isFinite(lb)) {
+                simplex.lower(j);
+                this.shift(j, lb, rc);
+            } else if (rc < ZERO && Double.isFinite(ub)) {
+                simplex.upper(j);
+                this.shift(j, ub, rc);
+            } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
+                simplex.unbounded(j);
+            } else if (Math.abs(lb) <= Math.abs(ub)) {
+                simplex.lower(j);
+                this.shift(j, lb, rc);
+            } else if (Math.abs(lb) >= Math.abs(ub)) {
+                simplex.upper(j);
+                this.shift(j, ub, rc);
+            } else {
+                simplex.lower(j);
+            }
+        }
     }
 
 }
