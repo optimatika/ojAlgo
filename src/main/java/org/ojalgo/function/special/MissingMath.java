@@ -37,9 +37,31 @@ import org.ojalgo.function.constant.BigMath;
 public abstract class MissingMath {
 
     /**
-     * Corresponding to binary 256 octuple precision
+     * Coefficients for the Taylor series expansion of the exponential function.
      */
-    private static final MathContext MC256 = new MathContext(71, RoundingMode.HALF_EVEN);
+    private static final BigDecimal[] EXP_COEF;
+    /**
+     * Binary 256 octuple precision roughly corresponds to 71.34 decimal digits. Here we set it higher (for
+     * intermediate calculations) to enable end-results that are accurate to 71 decimal digits.
+     * <P>
+     * https://en.wikipedia.org/wiki/IEEE_754
+     */
+    private static final MathContext MC256 = new MathContext(77, RoundingMode.HALF_EVEN);
+
+    static {
+
+        EXP_COEF = new BigDecimal[256];
+
+        BigDecimal value = BigDecimal.ONE;
+
+        EXP_COEF[0] = value;
+        EXP_COEF[1] = value;
+
+        for (int i = 2; i < EXP_COEF.length; i++) {
+            value = value.multiply(BigDecimal.valueOf(i));
+            EXP_COEF[i] = BigDecimal.ONE.divide(value, MC256);
+        }
+    }
 
     public static double acosh(final double arg) {
         return Math.log(arg + Math.sqrt(arg * arg - 1.0));
@@ -87,8 +109,43 @@ public abstract class MissingMath {
         return Math.log((1.0 + arg) / (1.0 - arg)) / 2.0;
     }
 
+    public static BigDecimal cos(final BigDecimal arg) {
+        return MissingMath.doInternalCos(arg.remainder(BigMath.TWO_PI, MC256));
+    }
+
     public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
         return numerator.divide(denominator, MC256);
+    }
+
+    public static BigDecimal exp(final BigDecimal arg) {
+
+        int signum = arg.signum();
+
+        if (signum == 0) {
+
+            return BigDecimal.ONE;
+
+        } else if (signum < 0) {
+
+            return BigDecimal.ONE.divide(MissingMath.exp(arg.negate()), MC256);
+
+        } else {
+
+            int power = 53;
+
+            if (arg.compareTo(BigMath.TWELVE) > 0) {
+                double scale = Math.max(1.0, Math.log10(arg.doubleValue()));
+                power = Math.min(MissingMath.roundToInt(power * scale * scale), EXP_COEF.length - 1);
+            }
+
+            BigDecimal retVal = EXP_COEF[power];
+
+            while (--power >= 0) {
+                retVal = EXP_COEF[power].add(arg.multiply(retVal), MC256);
+            }
+
+            return retVal;
+        }
     }
 
     /**
@@ -220,6 +277,25 @@ public abstract class MissingMath {
             retVal = abs1 * MissingMath.sqrt1px2(abs2 / abs1);
         } else if (abs2 > 0.0) {
             retVal = abs2 * MissingMath.sqrt1px2(abs1 / abs2);
+        }
+
+        return retVal;
+    }
+
+    public static BigDecimal log(final BigDecimal arg) {
+
+        BigDecimal bigArg = arg.round(MC256);
+        double primArg = bigArg.doubleValue();
+
+        BigDecimal retVal = new BigDecimal(Math.log(primArg), MC256); // Initial guess
+
+        BigDecimal accuracy = BigMath.VERY_POSITIVE;
+        BigDecimal inverse;
+        BigDecimal difference;
+        BigDecimal shouldBeSmall;
+        while ((shouldBeSmall = (difference = (inverse = MissingMath.exp(retVal)).subtract(bigArg)).abs()).compareTo(accuracy) < 0) {
+            accuracy = shouldBeSmall;
+            retVal = retVal.subtract(difference.divide(inverse, MC256));
         }
 
         return retVal;
@@ -430,21 +506,25 @@ public abstract class MissingMath {
         }
     }
 
-    public static double power(final double arg, int param) {
+    public static double power(final double arg, final int param) {
 
         if (param < 0) {
 
             return 1.0 / MissingMath.power(arg, -param);
 
-        }
-        double retVal = 1.0;
+        } else {
 
-        while (param > 0) {
-            retVal = retVal * arg;
-            param--;
-        }
+            int exp = param;
 
-        return retVal;
+            double retVal = 1.0;
+
+            while (exp > 0) {
+                retVal = retVal * arg;
+                exp--;
+            }
+
+            return retVal;
+        }
     }
 
     public static long power(final long arg, final int param) {
@@ -484,12 +564,12 @@ public abstract class MissingMath {
         BigDecimal retVal = BigDecimal.ZERO;
         double primArg = bigArg.doubleValue();
         if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
-            retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
+            retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Initial guess
         }
 
         BigDecimal shouldBeZero;
         while ((shouldBeZero = MissingMath.power(retVal, param).subtract(bigArg)).signum() != 0) {
-            retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MC256));
+            retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(MissingMath.power(retVal, param - 1)), MC256));
         }
 
         return retVal;
@@ -544,6 +624,10 @@ public abstract class MissingMath {
         }
     }
 
+    public static BigDecimal sin(final BigDecimal arg) {
+        return MissingMath.doInternalCos(BigMath.HALF_PI.subtract(arg).remainder(BigMath.TWO_PI, MC256));
+    }
+
     public static double sqrt1px2(final double arg) {
         return Math.sqrt(1.0 + arg * arg);
     }
@@ -583,6 +667,22 @@ public abstract class MissingMath {
 
     public static int toMinIntExact(final long a, final long b, final long c, final long d) {
         return Math.toIntExact(MissingMath.min(a, b, c, d));
+    }
+
+    private static BigDecimal doInternalCos(final BigDecimal arg) {
+
+        int iter = 46;
+        int power = 2 * iter;
+
+        BigDecimal aa = arg.multiply(arg, MC256);
+
+        BigDecimal retVal = EXP_COEF[power];
+
+        while ((power -= 2) >= 0) {
+            retVal = EXP_COEF[power].subtract(aa.multiply(retVal), MC256);
+        }
+
+        return retVal.add(BigDecimal.ONE, MC256).subtract(BigDecimal.ONE);
     }
 
     static double factorialDouble(final int arg) {

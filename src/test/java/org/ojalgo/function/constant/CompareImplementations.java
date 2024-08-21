@@ -56,36 +56,42 @@ public class CompareImplementations extends FunctionConstantTests {
             final BinaryFunction<Quaternion> quaternion, final BinaryFunction<RationalNumber> rational, final BinaryFunction<Quadruple> quadruple,
             final double arg1, final double arg2) {
 
-        TestUtils.assertEquals("Big vs Complex, " + arg1 + ", " + arg2, big.invoke(arg1, arg2), complex.invoke(arg1, arg2), CONTEXT);
-        TestUtils.assertEquals("Complex vs Primitive, " + arg1 + ", " + arg2, complex.invoke(arg1, arg2), primitive.invoke(arg1, arg2), CONTEXT);
-        TestUtils.assertEquals("Primitive vs Quaternion, " + arg1 + ", " + arg2, primitive.invoke(arg1, arg2), quaternion.invoke(arg1, arg2), CONTEXT);
-        TestUtils.assertEquals("Quaternion vs Rational, " + arg1 + ", " + arg2, quaternion.invoke(arg1, arg2), rational.invoke(arg1, arg2), CONTEXT);
-        TestUtils.assertEquals("Rational vs Quadruple, " + arg1 + ", " + arg2, rational.invoke(arg1, arg2), quadruple.invoke(arg1, arg2), CONTEXT);
-        TestUtils.assertEquals("Quadruple vs Big, " + arg1 + ", " + arg2, quadruple.invoke(arg1, arg2), big.invoke(arg1, arg2), CONTEXT);
+        double reference = primitive.invoke(arg1, arg2);
+
+        TestUtils.assertEquals("Big", reference, big.invoke(arg1, arg2), CONTEXT);
+        TestUtils.assertEquals("Quadruple", reference, quadruple.invoke(arg1, arg2), CONTEXT);
+        TestUtils.assertEquals("Rational", reference, rational.invoke(arg1, arg2), CONTEXT);
+
+        TestUtils.assertEquals("Complex", reference, complex.invoke(arg1, arg2), CONTEXT);
+        TestUtils.assertEquals("Quaternion", reference, quaternion.invoke(arg1, arg2), CONTEXT);
     }
 
     private static void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex,
             final ParameterFunction<Double> primitive, final ParameterFunction<Quaternion> quaternion, final ParameterFunction<RationalNumber> rational,
             final ParameterFunction<Quadruple> quadruple, final double arg, final int param) {
 
-        TestUtils.assertEquals("Big vs Complex", big.invoke(arg, param), complex.invoke(arg, param), CONTEXT);
-        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg, param), primitive.invoke(arg, param), CONTEXT);
-        TestUtils.assertEquals("Primitive vs Quaternion", primitive.invoke(arg, param), quaternion.invoke(arg, param), CONTEXT);
-        TestUtils.assertEquals("Quaternion vs Rational", quaternion.invoke(arg, param), rational.invoke(arg, param), CONTEXT);
-        TestUtils.assertEquals("Rational vs Quadruple", rational.invoke(arg, param), quadruple.invoke(arg, param), CONTEXT);
-        TestUtils.assertEquals("Quadruple vs Big", quadruple.invoke(arg, param), big.invoke(arg, param), CONTEXT);
+        double reference = primitive.invoke(arg, param);
+
+        TestUtils.assertEquals("Big", reference, big.invoke(arg, param), CONTEXT);
+        TestUtils.assertEquals("Quadruple", reference, quadruple.invoke(arg, param), CONTEXT);
+        TestUtils.assertEquals("Rational", reference, rational.invoke(arg, param), CONTEXT);
+
+        TestUtils.assertEquals("Complex", reference, complex.invoke(arg, param), CONTEXT);
+        TestUtils.assertEquals("Quaternion", reference, quaternion.invoke(arg, param), CONTEXT);
     }
 
     private static void assertUnary(final UnaryFunction<BigDecimal> big, final UnaryFunction<ComplexNumber> complex, final UnaryFunction<Double> primitive,
             final UnaryFunction<Quaternion> quaternion, final UnaryFunction<RationalNumber> rational, final UnaryFunction<Quadruple> quadruple,
             final double arg) {
 
-        TestUtils.assertEquals("Big vs Complex, " + arg, big.invoke(arg), complex.invoke(arg), CONTEXT);
-        TestUtils.assertEquals("Complex vs Primitive, " + arg, complex.invoke(arg), primitive.invoke(arg), CONTEXT);
-        TestUtils.assertEquals("Primitive vs Quaternion, " + arg, primitive.invoke(arg), quaternion.invoke(arg), CONTEXT);
-        TestUtils.assertEquals("Quaternion vs Rational, " + arg, quaternion.invoke(arg), rational.invoke(arg), CONTEXT);
-        TestUtils.assertEquals("Rational vs Quadruple, " + arg, rational.invoke(arg), quadruple.invoke(arg), CONTEXT);
-        TestUtils.assertEquals("Quadruple vs Big, " + arg, quadruple.invoke(arg), big.invoke(arg), CONTEXT);
+        double reference = primitive.invoke(arg);
+
+        TestUtils.assertEquals("Big: " + arg, reference, big.invoke(arg), CONTEXT);
+        TestUtils.assertEquals("Quadruple: " + arg, reference, quadruple.invoke(arg), CONTEXT);
+        TestUtils.assertEquals("Rational: " + arg, reference, rational.invoke(arg), CONTEXT);
+
+        TestUtils.assertEquals("Complex: " + arg, reference, complex.invoke(arg), CONTEXT);
+        TestUtils.assertEquals("Quaternion: " + arg, reference, quaternion.invoke(arg), CONTEXT);
     }
 
     @Test

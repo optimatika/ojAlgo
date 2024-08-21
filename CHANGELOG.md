@@ -13,6 +13,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.function
+
+- The `BigDecimal` valued constants in `BigMath` for `E`, `PI` and `GOLDEN_RATIO` are redefined with more decimal digits.
+- The `BigDecimal` valued functions in `BigMath` for `EXP`, `LOG`, `SIN` and `COS` are re-implemented to produce much more accurate results.
+
 #### org.ojalgo.optimisation
 
 - The new LP solver implementation is now the default alternative.

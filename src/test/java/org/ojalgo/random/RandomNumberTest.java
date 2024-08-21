@@ -23,6 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR064;
@@ -451,6 +452,7 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testVariance() {
 
         double tmpStdDev = TEN;

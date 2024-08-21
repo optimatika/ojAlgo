@@ -24,6 +24,7 @@ package org.ojalgo;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.function.IntSupplier;
 
@@ -107,6 +108,13 @@ public abstract class TestUtils /* extends Assertions */ {
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
         TestUtils.assertEquals("Access1D<?> != Access1D<?>", expected, actual, context);
+    }
+
+    public static void assertEquals(final BigDecimal expected, final BigDecimal actual, final MathContext context) {
+        boolean equal = expected.round(context).compareTo(actual.round(context)) == 0;
+        if (!equal) {
+            TestUtils.fail(expected + " != " + actual);
+        }
     }
 
     public static void assertEquals(final boolean expected, final boolean actual) {
