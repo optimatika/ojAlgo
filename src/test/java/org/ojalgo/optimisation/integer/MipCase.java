@@ -103,6 +103,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testGen_ip021() {
         MipCase.doTest("gen-ip021.mps", "2361.45419519", null);
     }
@@ -121,6 +122,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testGen_ip036() {
         MipCase.doTest("gen-ip036.mps", "-4606.67961", null);
     }
@@ -144,6 +146,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
 
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testMad() {
         MipCase.doTest("mad.mps", "0.0268", null);
     }
@@ -242,6 +245,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testMas76() {
         MipCase.doTest("mas76.mps", "4.00050541e+04", null);
     }
@@ -267,6 +271,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testModglob() {
         MipCase.doTest("modglob.mps", "2.07405081e+07", null);
     }
@@ -314,6 +319,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testNoswot() {
         MipCase.doTest("noswot.mps", "-4.10000000e+01", null);
     }
@@ -337,6 +343,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testPp08a() {
         MipCase.doTest("pp08a.mps", "7.35000000e+03", null);
     }
@@ -359,6 +366,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testPp08aCUTS() {
         MipCase.doTest("pp08aCUTS.mps", "7.35000000e+03", null);
     }
@@ -381,6 +389,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testTimtab1() {
         MipCase.doTest("timtab1.mps", "7.64772000e+05", null);
     }
@@ -405,6 +414,7 @@ public class MipCase extends OptimisationIntegerTests implements ModelFileTest {
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testVpm2() {
         MipCase.doTest("vpm2.mps", "1.37500000e+01", null);
     }

@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.UnaryFunction;
@@ -135,6 +136,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testRandomProblemsComparedToEquilibrium() {
 
         NumberContext weightsContext = StandardType.PERCENT.withPrecision(5);

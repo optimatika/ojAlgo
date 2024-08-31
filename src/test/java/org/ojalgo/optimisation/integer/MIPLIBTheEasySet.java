@@ -72,6 +72,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testB_ball() {
         MIPLIBTheEasySet.doTest("b-ball.mps", "-1.5", null);
     }
@@ -162,6 +163,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testNeos5() {
         MIPLIBTheEasySet.doTest("neos5.mps", "15", null);
     }
@@ -195,6 +197,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     @Tag("unstable")
+    @Tag("slow")
     public void testPk1() {
         MIPLIBTheEasySet.doTest("pk1.mps", "1.10000000e+01", null);
     }

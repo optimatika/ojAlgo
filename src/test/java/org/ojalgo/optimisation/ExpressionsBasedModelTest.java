@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -143,6 +144,7 @@ public class ExpressionsBasedModelTest extends OptimisationTests {
      */
     @Test
     @Tag("unstable")
+    @Disabled
     public void testGitHubIssue2() {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();

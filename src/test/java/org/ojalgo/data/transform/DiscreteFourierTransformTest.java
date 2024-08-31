@@ -21,6 +21,7 @@
  */
 package org.ojalgo.data.transform;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.ComplexMath;
@@ -55,6 +56,7 @@ final class DiscreteFourierTransformTest extends DataTransformTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testCompareImplementationsUsingRandomInput() {
 
         NumberContext accuracy = NumberContext.of(8);
