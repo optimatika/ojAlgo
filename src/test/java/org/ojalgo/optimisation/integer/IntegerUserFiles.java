@@ -57,6 +57,8 @@ public class IntegerUserFiles extends OptimisationIntegerTests implements ModelF
      * <ul>
      * <li>v51.0.0 took about 30min to solve, first integer solution after 30s
      * <li>v51.3.0 ≈3.5min
+     * <li>v55.0.0-SNAPSHOT ≈2.5min (first integer solution after 6s, optimal solution found after 1min,
+     * solver returned after 2.5min)
      * </ul>
      */
     @Test
