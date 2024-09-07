@@ -22,6 +22,7 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -31,6 +32,7 @@ import org.ojalgo.type.CalendarDateUnit;
  * @author stefanvanegmond
  */
 @Tag("network")
+@Disabled
 public class AlphaVantageDataSourceTest extends FinanceSeriesTests {
 
     public AlphaVantageDataSourceTest() {

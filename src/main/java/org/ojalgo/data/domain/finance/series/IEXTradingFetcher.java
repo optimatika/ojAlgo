@@ -8,6 +8,9 @@ import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+ * they're already broken.
+ * <P>
  * Fetch historical financial time series data from IEX Trading: https://exchange.iex.io / https://iexcloud.io
  * <p>
  * This service has been moved/renamed/repackaged – this {@link DataFetcher} no longer works. Looks to me as
@@ -38,6 +41,7 @@ public class IEXTradingFetcher implements DataFetcher {
         myRequest = ServiceClient.newRequest().host("cloud.iexapis.com").path("/1.0/stock/" + symbol + "/chart/5y").query("format", "csv");
     }
 
+    @Override
     public InputStream getInputStream() {
         Response<InputStream> response = myRequest.send(BodyHandlers.ofInputStream());
         if (response.isResponseOK()) {
@@ -52,10 +56,12 @@ public class IEXTradingFetcher implements DataFetcher {
      *
      * @see org.ojalgo.data.domain.finance.series.DataFetcher#getResolution()
      */
+    @Override
     public CalendarDateUnit getResolution() {
         return CalendarDateUnit.DAY;
     }
 
+    @Override
     public String getSymbol() {
         return mySymbol;
     }

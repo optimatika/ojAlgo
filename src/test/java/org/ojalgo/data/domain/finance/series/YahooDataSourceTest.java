@@ -22,6 +22,7 @@
  */
 package org.ojalgo.data.domain.finance.series;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -33,6 +34,7 @@ import org.ojalgo.type.CalendarDateUnit;
  * @author apete
  */
 @Tag("network")
+@Disabled
 public class YahooDataSourceTest extends FinanceSeriesTests {
 
     private static YahooSession SESSION = new YahooSession();

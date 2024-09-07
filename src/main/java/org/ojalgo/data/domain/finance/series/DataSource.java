@@ -86,6 +86,7 @@ public final class DataSource implements FinanceData<DatePrice> {
             return this;
         }
 
+        @Override
         public CoordinatedSet<LocalDate> get() {
             switch (myResolution) {
             case YEAR:
@@ -127,10 +128,24 @@ public final class DataSource implements FinanceData<DatePrice> {
         return new DataSource.Coordinated().resolution(resolution);
     }
 
+    /**
+     * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+     * they're already broken.
+     * 
+     * @deprecated
+     */
+    @Deprecated
     public static DataSource newAlphaVantage(final String symbol, final CalendarDateUnit resolution, final String apiKey) {
         return DataSource.newAlphaVantage(symbol, resolution, apiKey, false);
     }
 
+    /**
+     * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+     * they're already broken.
+     * 
+     * @deprecated
+     */
+    @Deprecated
     public static DataSource newAlphaVantage(final String symbol, final CalendarDateUnit resolution, final String apiKey, final boolean fullOutputSize) {
         AlphaVantageFetcher fetcher = new AlphaVantageFetcher(symbol, resolution, apiKey, fullOutputSize);
         AlphaVantageParser parser = new AlphaVantageParser();
@@ -145,12 +160,26 @@ public final class DataSource implements FinanceData<DatePrice> {
         return new DataSource(FinanceDataReader.of(file, parser, resolution), parser);
     }
 
+    /**
+     * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+     * they're already broken.
+     * 
+     * @deprecated
+     */
+    @Deprecated
     public static DataSource newIEXTrading(final String symbol) {
         IEXTradingFetcher fetcher = new IEXTradingFetcher(symbol);
         IEXTradingParser parser = new IEXTradingParser();
         return new DataSource(fetcher, parser);
     }
 
+    /**
+     * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+     * they're already broken.
+     * 
+     * @deprecated
+     */
+    @Deprecated
     public static DataSource newYahoo(final YahooSession session, final String symbol, final CalendarDateUnit resolution) {
         YahooSession.Fetcher fetcher = session.newFetcher(symbol, resolution);
         YahooParser parser = new YahooParser();
@@ -215,6 +244,7 @@ public final class DataSource implements FinanceData<DatePrice> {
         return this.getCalendarDateSeries(myFetcher.getResolution(), time, zoneId);
     }
 
+    @Override
     public KeyValue<String, List<DatePrice>> getHistoricalData() {
 
         String key = myFetcher.getSymbol();
@@ -233,6 +263,7 @@ public final class DataSource implements FinanceData<DatePrice> {
         return KeyValue.of(key, value);
     }
 
+    @Override
     public List<DatePrice> getHistoricalPrices() {
         return this.getHistoricalData().getValue();
     }
@@ -253,10 +284,12 @@ public final class DataSource implements FinanceData<DatePrice> {
         return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
+    @Override
     public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
         return this.getLocalDateSeries(this.getHistoricalPrices(), myFetcher.getResolution());
     }
 
+    @Override
     public String getSymbol() {
         return myFetcher.getSymbol();
     }

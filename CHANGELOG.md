@@ -27,6 +27,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Re-implemented `Quadruple`'s divide method using primitives only. (Previously delegated to `BigDecimal`.)
 
+### Deprecated
+
+#### org.ojalgo.data
+
+- Everything related to downloading (historical) financial data is deprecated. It's already broken (due to changes in the external "service") and we're not going to try fix it.
+
 ### Removed
 
 #### org.ojalgo.structure

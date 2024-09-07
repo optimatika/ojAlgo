@@ -32,11 +32,16 @@ import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+ * they're already broken.
+ * <P>
  * Fetch historical financial time series data from Yahoo Finance: https://finance.yahoo.com
  *
  * @see https://finance.yahoo.com
  * @author apete
+ * @deprecated
  */
+@Deprecated
 public final class YahooSession {
 
     public static final class Fetcher implements DataFetcher {
@@ -52,6 +57,7 @@ public final class YahooSession {
             myResolution = resolution;
         }
 
+        @Override
         public InputStream getInputStream() {
 
             // https://query1.finance.yahoo.com/v7/finance/download/AAPL?period1=345427200&period2=1663718400&interval=1d&events=history&includeAdjustedClose=true
@@ -88,10 +94,12 @@ public final class YahooSession {
             }
         }
 
+        @Override
         public CalendarDateUnit getResolution() {
             return myResolution;
         }
 
+        @Override
         public String getSymbol() {
             return mySymbol;
         }

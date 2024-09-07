@@ -34,6 +34,9 @@ import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
+ * All data downloaders/fetchers are deprecated. They will be removed in a future release, and most likely
+ * they're already broken.
+ * <P>
  * Old, deprecated and non-functioning, version of {@link YahooSession}. Keeping it for a while as
  * documentation of how it had to be done previously.
  *
@@ -61,6 +64,7 @@ final class YahooSessionOld {
 
         }
 
+        @Override
         public InputStream getInputStream() {
 
             if (debug) {
@@ -70,7 +74,7 @@ final class YahooSessionOld {
             }
 
             String crumb = mySession.getParameterValue(CRUMB);
-            if ((crumb == null) || (crumb.length() <= 0)) {
+            if (crumb == null || crumb.length() <= 0) {
                 // No crumb, and assume no cookie either
 
                 Request challengeRequest = YahooSessionOld.buildChallengeRequest(mySession, mySymbol);
@@ -81,7 +85,7 @@ final class YahooSessionOld {
                     challengeResponse.print(BasicLogger.DEBUG);
                 }
 
-                if ((challengeResponse.toString() != null) && !challengeRequest.equals(challengeResponse.getRequest())) {
+                if (challengeResponse.toString() != null && !challengeRequest.equals(challengeResponse.getRequest())) {
                     // Was redirect (to ask for consent)
 
                     YahooSessionOld.scrapeChallengeResponse(mySession, challengeResponse);
@@ -89,7 +93,7 @@ final class YahooSessionOld {
                     Request consentRequest = YahooSessionOld.buildConsentRequest(mySession, challengeRequest);
                     Response consentResponse = consentRequest.response();
 
-                    if ((consentResponse.toString() != null) && debug) {
+                    if (consentResponse.toString() != null && debug) {
                         consentRequest.print(BasicLogger.DEBUG);
                         consentResponse.print(BasicLogger.DEBUG);
                     }
@@ -119,10 +123,12 @@ final class YahooSessionOld {
             return response.getInputStream();
         }
 
+        @Override
         public CalendarDateUnit getResolution() {
             return myResolution;
         }
 
+        @Override
         public String getSymbol() {
             return mySymbol;
         }
