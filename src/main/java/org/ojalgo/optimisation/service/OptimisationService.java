@@ -46,6 +46,7 @@ public abstract class OptimisationService {
 
     public static final class Integration extends ExpressionsBasedModel.Integration<OptimisationService.Solver> {
 
+        private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
         private static final String PATH_TEST = "/optimisation/v01/test";
 
         private Boolean myCapable = null;
@@ -56,28 +57,38 @@ public abstract class OptimisationService {
             myHost = host;
         }
 
+        @Override
         public OptimisationService.Solver build(final ExpressionsBasedModel model) {
             return new OptimisationService.Solver(model, myHost);
         }
 
+        public String getEnvironment() {
+            return ServiceClient.get(myHost + PATH_ENVIRONMENT).getBody();
+        }
+
+        @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
 
             if (myCapable == null) {
-                Response<String> response = ServiceClient.get(myHost + PATH_TEST);
-                if (response.isResponseOK() && response.getBody().contains("VALID")) {
-                    myCapable = Boolean.TRUE;
-                } else {
-                    BasicLogger.error("Calling {} failed!", myHost + PATH_TEST);
-                    myCapable = Boolean.FALSE;
-                }
+                myCapable = this.test();
             }
 
-            return myCapable.booleanValue();
+            return Boolean.TRUE.equals(myCapable);
+        }
+
+        public Boolean test() {
+            Response<String> response = ServiceClient.get(myHost + PATH_TEST);
+            if (response.isResponseOK() && response.getBody().contains("VALID")) {
+                return Boolean.TRUE;
+            } else {
+                BasicLogger.error("Calling {} failed!", myHost + PATH_TEST);
+                return Boolean.FALSE;
+            }
         }
 
     }
 
-    public static final class Solver implements Optimisation.Solver {
+    static final class Solver implements Optimisation.Solver {
 
         private static final String PATH_MAXIMISE = "/optimisation/v01/maximise";
         private static final String PATH_MINIMISE = "/optimisation/v01/minimise";
@@ -93,6 +104,7 @@ public abstract class OptimisationService {
             myHost = host;
         }
 
+        @Override
         public Result solve(final Result kickStarter) {
 
             InMemoryFile file = new InMemoryFile();
@@ -114,5 +126,4 @@ public abstract class OptimisationService {
     public static OptimisationService.Integration newIntegration(final String host) {
         return new Integration(host);
     }
-
 }

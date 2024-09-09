@@ -5,16 +5,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.netio.ServiceClient;
-import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 
 @Tag("network")
 public class OptimisationServiceTest {
 
-    private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
-    private static final String PATH_TEST = "/optimisation/v01/test";
     private static final String HOST = "http://13.60.238.124:8080";
     // private static final String HOST = "http://localhost:8080";
     // private static final String HOST = "http://test-service.optimatika.se:8080";
@@ -29,25 +25,19 @@ public class OptimisationServiceTest {
     @Test
     public void testEnvironment() {
 
-        Response<String> response = ServiceClient.get(HOST + PATH_ENVIRONMENT);
-
-        TestUtils.assertTrue(response.isResponseOK());
+        String environment = OptimisationService.newIntegration(HOST).getEnvironment();
 
         if (DEBUG) {
-            BasicLogger.debug(response.getBody());
+            BasicLogger.debug(environment);
         }
+
+        TestUtils.assertTrue(environment.contains("HW"));
+        TestUtils.assertTrue(environment.contains("thread"));
     }
 
     @Test
     public void testTest() {
-
-        Response<String> response = ServiceClient.get(HOST + PATH_TEST);
-
-        TestUtils.assertTrue(response.isResponseOK());
-
-        if (DEBUG) {
-            BasicLogger.debug(response.getBody());
-        }
+        TestUtils.assertTrue(OptimisationService.newIntegration(HOST).test().booleanValue());
     }
 
     @Test
