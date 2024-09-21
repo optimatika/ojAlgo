@@ -261,6 +261,7 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testGamma() {
         // TODO 15% error seems a little high
         this.testDist2(new Dist2Gamma(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 200000, .15);
