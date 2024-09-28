@@ -42,7 +42,8 @@ public class P20030528Case extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 1);
 
     public static MatrixR064 getProblematic() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } }));
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
+                .copy(RawStore.wrap(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

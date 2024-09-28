@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function.polynomial;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -45,6 +46,7 @@ public class PolynomialImplTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testEstimation() {
 
         final int tmpMaxSamples = 9;

@@ -38,7 +38,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     private static final NumberContext DEFINITION = NumberContext.of(7, 4);
 
     public static MatrixR064 getBody() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } }));
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore
+                .wrap(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -53,7 +54,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     }
 
     private static MatrixR064 getFactorR() {
-        MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } }));
+        MatrixR064 tmpMtrx = MatrixR064.FACTORY
+                .copy(RawStore.wrap(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

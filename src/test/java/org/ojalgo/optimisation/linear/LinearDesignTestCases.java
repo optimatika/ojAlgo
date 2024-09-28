@@ -154,12 +154,12 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
      * All variables have both lower and upper bounds, so using the dual solver is possible.
      */
     static OptimisationCase makeRelaxedGr4x6() {
-    
+
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", "gr4x6.mps", true);
-    
+
         Result result = Optimisation.Result.parse(
                 "OPTIMAL 185.55 @ { 35, 10, 0, 0, 0, 0, 0, 10, 25, 0, 0, 0, 0, 10, 0, 5, 5, 0, 0, 0, 0, 10, 0, 5, 1, 0.3333333333333333, 0, 0, 0, 0, 0, 0.3333333333333333, 1, 0, 0, 0, 0, 0.5, 0, 0.3333333333333333, 1, 0, 0, 0, 0, 0.6666666666666667, 0, 1 }");
-    
+
         return OptimisationCase.of(model, Sense.MIN, result);
     }
 

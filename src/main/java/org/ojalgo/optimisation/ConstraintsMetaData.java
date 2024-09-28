@@ -37,7 +37,8 @@ public final class ConstraintsMetaData implements Structure1D {
     }
 
     public static ConstraintsMetaData newInstance(final int nbConstraints, final boolean inclDefs) {
-        EntryPair<ModelEntity<?>, ConstraintType>[] definitions = inclDefs ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints] : null;
+        EntryPair<ModelEntity<?>, ConstraintType>[] definitions = inclDefs ? (EntryPair<ModelEntity<?>, ConstraintType>[]) new EntryPair<?, ?>[nbConstraints]
+                : null;
         boolean[] negated = new boolean[nbConstraints];
         return new ConstraintsMetaData(definitions, negated);
     }

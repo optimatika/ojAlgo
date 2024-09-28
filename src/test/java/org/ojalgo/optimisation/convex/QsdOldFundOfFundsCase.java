@@ -35,15 +35,16 @@ public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
         final MatrixQ128[] retVal = new MatrixQ128[8];
 
         // Equations/Equalities
-        retVal[0] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.069575, 0.0738, 0.1288 }, { 1.0, 0.0, 0.0, 0.0, 0.0 },
-        { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } }));
+        retVal[0] = MatrixQ128.FACTORY
+                .copy(RawStore.wrap(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.069575, 0.0738, 0.1288 }, { 1.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } }));
 
         // Levels/Values
         retVal[1] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } }));
 
         // Quadratic
-        retVal[2] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 2.0, 0.0, 0.0 },
-        { -0.0, 0.0, 0.0, 2.0, 0.0 }, { -0.0, 0.0, 0.0, 0.0, 2.0 } }));
+        retVal[2] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 2.0, 0.0, 0.0 }, { -0.0, 0.0, 0.0, 2.0, 0.0 }, { -0.0, 0.0, 0.0, 0.0, 2.0 } }));
 
         // Linear
         retVal[3] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -0.5 }, { -0.5 }, { -0.0 }, { -0.5 }, { -0.5 } }));

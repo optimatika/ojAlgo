@@ -48,7 +48,7 @@ public class SimpleQRCase extends BasicMatrixTest {
 
     private static MatrixR064 getFactorQ() {
         MatrixR064 tmpMtrx = MatrixR064.FACTORY.copy(RawStore.wrap(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
-        { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } }));
+                { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } }));
         return tmpMtrx.enforce(DEFINITION);
     }
 

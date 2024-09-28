@@ -168,8 +168,6 @@ abstract class TableauCutGenerator {
 
             if (j < nbVariables) {
 
-
-
                 double aj = body.doubleValue(j);
 
                 if (!ACCURACY.isZero(aj)) {

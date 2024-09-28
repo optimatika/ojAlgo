@@ -47,7 +47,8 @@ public class MostBasicCase extends GenericQPSolverTest {
         retVal[3] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -2.0 }, { -3.0 }, { -4.0 } }));
 
         // Inequalities/Differences
-        retVal[4] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } }));
+        retVal[4] = MatrixQ128.FACTORY.copy(RawStore
+                .wrap(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } }));
 
         // Limits
         retVal[5] = MatrixQ128.FACTORY.copy(RawStore.wrap(new double[][] { { -1.0 }, { -2.0 }, { -3.0 }, { 3.0 }, { 4.0 }, { 5.0 } }));
