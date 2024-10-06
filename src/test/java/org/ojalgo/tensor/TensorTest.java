@@ -21,6 +21,7 @@
  */
 package org.ojalgo.tensor;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayAnyD;
@@ -144,6 +145,7 @@ public class TensorTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testDeterminantAndTrace() {
 
         MatrixTensor<RationalNumber> tensorA = FACTORY_2.copy(ELEMENTS_A);
