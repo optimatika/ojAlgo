@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.random
+
+- Refactored `SampleSet` (internally) to be better aligned with recent changes to other parts of the library. Primarily the class now uses `int` indices for all internal calculations. Also added a new `java.util.stream.Collector` implementation to simplify `SampleSet` creation from streams.
+
 ## [55.0.0] – 2024-09-28
 
 ### Changed

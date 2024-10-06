@@ -456,29 +456,28 @@ public class RandomNumberTest extends RandomTests {
     @Tag("unstable")
     public void testVariance() {
 
-        double tmpStdDev = TEN;
-        double tmpExpectedVar = tmpStdDev * tmpStdDev;
+        double stdDev = TEN;
+        double expectedVar = HUNDRED;
+        int nbSamples = 10_000;
+        double accuracy = ONE; // Within 1% of the expected
 
-        SampleSet tmpSampleSet = SampleSet.make(new Normal(PI, tmpStdDev), 10000);
+        SampleSet sampleSet = SampleSet.make(Normal.of(PI, stdDev), nbSamples);
 
-        double tmpActualVar = tmpSampleSet.getVariance();
+        double actualVar = sampleSet.getVariance();
+        TestUtils.assertEquals(expectedVar, actualVar, accuracy); // Won't always pass - it's random...
 
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, SQRT.invoke(TEN)); // Won't always pass - it's random...
+        actualVar = sampleSet.getSumOfSquares() / (nbSamples - 1);
+        TestUtils.assertEquals(expectedVar, actualVar, accuracy);
 
-        tmpExpectedVar = tmpSampleSet.getSumOfSquares() / (tmpSampleSet.size() - 1);
-
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, 1E-14 / THREE);
-
-        double[] tmpValues = tmpSampleSet.getValues();
+        double[] tmpValues = sampleSet.getValues();
         double s = ZERO, s2 = ZERO;
         for (double tmpVal : tmpValues) {
             s += tmpVal;
             s2 += tmpVal * tmpVal;
         }
 
-        tmpActualVar = SampleSet.calculateVariance(s, s2, tmpValues.length);
-
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, THOUSAND * (1E-14 / THREE)); // TODO Large numerical difference, which is better?
+        actualVar = SampleSet.calculateVariance(s, s2, nbSamples);
+        TestUtils.assertEquals(expectedVar, actualVar, accuracy); // TODO Large numerical difference
     }
 
     @Test

@@ -21,10 +21,14 @@
  */
 package org.ojalgo.random;
 
+import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.NumberList;
+import org.ojalgo.random.SampleSet.CombineableSet;
 
 /**
  * SampleSetTest
@@ -34,35 +38,95 @@ import org.ojalgo.array.NumberList;
 public class SampleSetTest extends RandomTests {
 
     @Test
+    public void testCollector() {
+
+        double[] array = new double[] { 1, 2, 3, 4, 5 };
+
+        DoubleSummaryStatistics expected = Arrays.stream(array).summaryStatistics();
+
+        SampleSet actual = Arrays.stream(array).boxed().collect(SampleSet.newCollector());
+
+        TestUtils.assertEquals(expected.getAverage(), actual.getMean());
+        TestUtils.assertEquals(expected.getCount(), actual.count());
+        TestUtils.assertEquals(expected.getMax(), actual.getMaximum());
+        TestUtils.assertEquals(expected.getMin(), actual.getMinimum());
+
+        actual = Arrays.stream(array).collect(SampleSet::newCombineableSet, CombineableSet::consume, CombineableSet::combine)
+                .getResults();
+
+        TestUtils.assertEquals(expected.getAverage(), actual.getMean());
+        TestUtils.assertEquals(expected.getCount(), actual.count());
+        TestUtils.assertEquals(expected.getMax(), actual.getMaximum());
+        TestUtils.assertEquals(expected.getMin(), actual.getMinimum());
+    }
+
+    @Test
+    public void testCovariance() {
+
+        SampleSet sampleSet1 = SampleSet.wrap(1, 2, 3, 4, 5);
+        SampleSet sampleSet2 = SampleSet.wrap(5, 4, 3, 2, 1);
+
+        TestUtils.assertEquals(2.5, sampleSet1.getVariance());
+        TestUtils.assertEquals(2.5, sampleSet2.getVariance());
+
+        TestUtils.assertEquals(-2.5, sampleSet1.getCovariance(sampleSet2));
+
+        TestUtils.assertEquals(-1, sampleSet1.getCorrelation(sampleSet2));
+
+        sampleSet2.swap(-5, -4, -3, -2, -1);
+
+        TestUtils.assertEquals(2.5, sampleSet2.getVariance());
+
+        TestUtils.assertEquals(2.5, sampleSet1.getCovariance(sampleSet2));
+
+        TestUtils.assertEquals(1, sampleSet1.getCorrelation(sampleSet2));
+    }
+
+    @Test
     public void testEmptySet() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(new double[] { });
 
         try {
 
             // The key thing is that all methods return something
             // 0.0, NaN, Inf... doesn't really matter...
-            TestUtils.assertEquals(0.0, tmpSampleSet.getFirst());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getInterquartileRange());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getLargest());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getLast());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getMaximum());
-            TestUtils.assertEquals(Double.NaN, tmpSampleSet.getMean());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getMedian());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getMinimum());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile1());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile2());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile3());
-            TestUtils.assertTrue(Double.isInfinite(tmpSampleSet.getSmallest()));
-            TestUtils.assertEquals(0.0, tmpSampleSet.getStandardDeviation());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getSumOfSquares());
-            TestUtils.assertEquals(0.0, tmpSampleSet.getVariance());
+            TestUtils.assertEquals(0.0, sampleSet.getFirst());
+            TestUtils.assertEquals(0.0, sampleSet.getInterquartileRange());
+            TestUtils.assertEquals(0.0, sampleSet.getLargest());
+            TestUtils.assertEquals(0.0, sampleSet.getLast());
+            TestUtils.assertEquals(0.0, sampleSet.getMaximum());
+            TestUtils.assertEquals(Double.NaN, sampleSet.getMean());
+            TestUtils.assertEquals(0.0, sampleSet.getMedian());
+            TestUtils.assertEquals(0.0, sampleSet.getMinimum());
+            TestUtils.assertEquals(0.0, sampleSet.getQuartile1());
+            TestUtils.assertEquals(0.0, sampleSet.getQuartile2());
+            TestUtils.assertEquals(0.0, sampleSet.getQuartile3());
+            TestUtils.assertTrue(Double.isInfinite(sampleSet.getSmallest()));
+            TestUtils.assertEquals(0.0, sampleSet.getStandardDeviation());
+            TestUtils.assertEquals(0.0, sampleSet.getSumOfSquares());
+            TestUtils.assertEquals(0.0, sampleSet.getVariance());
 
         } catch (Exception exception) {
             // Important NOT to throw an exception!
             TestUtils.fail(exception.getMessage());
         }
+    }
+
+    @Test
+    public void testLargest() {
+
+        SampleSet sampleSet = SampleSet.wrap(1, 2, 3, 4, -5);
+
+        TestUtils.assertEquals(5, sampleSet.getLargest());
+    }
+
+    @Test
+    public void testMaximum() {
+
+        SampleSet sampleSet = SampleSet.wrap(1, 2, 3, 4, -5);
+
+        TestUtils.assertEquals(4, sampleSet.getMaximum());
     }
 
     @Test
@@ -76,114 +140,126 @@ public class SampleSetTest extends RandomTests {
             data.add(value);
         }
         TestUtils.assertEquals(value, sampleSet.getMean(), 1E-14);
+
+        sampleSet.swap(1, 2, 3, 4, 5);
+
+        TestUtils.assertEquals(3, sampleSet.getMean());
+    }
+
+    @Test
+    public void testMinimum() {
+
+        SampleSet sampleSet = SampleSet.wrap(1, -2, -3, -4, -5);
+
+        TestUtils.assertEquals(-5, sampleSet.getMinimum());
     }
 
     @Test
     public void testQuartileEx1() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49);
 
-        TestUtils.assertEquals(20.25, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(40.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(42.75, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(20.25, sampleSet.getQuartile1());
+        TestUtils.assertEquals(40.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(42.75, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileEx2() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 7, 15, 36, 39, 40, 41 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(7, 15, 36, 39, 40, 41);
 
-        TestUtils.assertEquals(15.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(37.5, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(40.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(15.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(37.5, sampleSet.getQuartile2());
+        TestUtils.assertEquals(40.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize0() {
 
         ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(tmpSamples);
 
-        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(0.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(0.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(0.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize1() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0);
 
-        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile3());
+        TestUtils.assertEquals(100.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(100.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(100.0, sampleSet.getQuartile3());
 
     }
 
     @Test
     public void testQuartileSize2() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0, 200.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0, 200.0);
 
-        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(150.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(100.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(150.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(200.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize3() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0, 200.0, 300.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0, 200.0, 300.0);
 
-        TestUtils.assertEquals(125.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(275.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(125.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(200.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(275.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize4() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0, 200.0, 300.0, 400.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0, 200.0, 300.0, 400.0);
 
-        TestUtils.assertEquals(150.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(250.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(350.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(150.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(250.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(350.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize6() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0, 200.0, 300.0, 400.0, 500.0, 600.0);
 
-        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(350.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(500.0, tmpSampleSet.getQuartile3());
-
+        TestUtils.assertEquals(200.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(350.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(500.0, sampleSet.getQuartile3());
     }
 
     @Test
     public void testQuartileSize8() {
 
-        ArrayR064 tmpSamples = ArrayR064.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0 });
-        SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+        SampleSet sampleSet = SampleSet.wrap(100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0);
 
-        TestUtils.assertEquals(250.0, tmpSampleSet.getQuartile1());
-        TestUtils.assertEquals(450.0, tmpSampleSet.getQuartile2());
-        TestUtils.assertEquals(650.0, tmpSampleSet.getQuartile3());
+        TestUtils.assertEquals(250.0, sampleSet.getQuartile1());
+        TestUtils.assertEquals(450.0, sampleSet.getQuartile2());
+        TestUtils.assertEquals(650.0, sampleSet.getQuartile3());
+    }
 
+    @Test
+    public void testSmallest() {
+
+        SampleSet sampleSet = SampleSet.wrap(1, -2, -3, -4, -5);
+
+        TestUtils.assertEquals(1, sampleSet.getSmallest());
+    }
+
+    @Test
+    public void testStandardDeviation() {
+
+        SampleSet sampleSet = SampleSet.wrap(1, 2, 3, 4, 5);
+
+        TestUtils.assertEquals(1.5811388300841898, sampleSet.getStandardDeviation());
     }
 
 }

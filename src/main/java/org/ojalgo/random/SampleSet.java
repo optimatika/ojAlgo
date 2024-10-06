@@ -24,14 +24,64 @@ package org.ojalgo.random;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.stream.Collector;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayR064;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.NumberList;
+import org.ojalgo.array.NumberList.ListFactory;
+import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.function.TwoStepMapper;
 
 public final class SampleSet implements Access1D<Double> {
+
+    public static final class CombineableSet<N extends Comparable<N>> implements TwoStepMapper.Combineable<N, SampleSet, SampleSet.CombineableSet<N>> {
+
+        private final ListFactory<N> myFactory;
+        private final NumberList<N> myNumbers;
+
+        CombineableSet(final ListFactory<N> factory) {
+            super();
+            myFactory = factory;
+            myNumbers = myFactory.make();
+        }
+
+        @Override
+        public void combine(final CombineableSet<N> other) {
+            myNumbers.addAll(other.getNumbers());
+        }
+
+        public void consume(final double item) {
+            myNumbers.add(item);
+        }
+
+        @Override
+        public void consume(final N item) {
+            myNumbers.add(item);
+        }
+
+        @Override
+        public SampleSet getResults() {
+            return SampleSet.wrap(myNumbers);
+        }
+
+        public CombineableSet<N> newInstance() {
+            return new CombineableSet<>(myFactory);
+        }
+
+        @Override
+        public void reset() {
+            myNumbers.reset();
+        }
+
+        NumberList<N> getNumbers() {
+            return myNumbers;
+        }
+
+    }
 
     /**
      * @param sumOfValues The sum of all values in a sample set
@@ -63,8 +113,8 @@ public final class SampleSet implements Access1D<Double> {
 
     public static SampleSet make(final RandomNumber randomNumber, final int size) {
 
-        final ArrayR064 retVal = ArrayR064.make(size);
-        final double[] tmpData = retVal.data;
+        ArrayR064 retVal = ArrayR064.make(size);
+        double[] tmpData = retVal.data;
 
         for (int i = 0; i < size; i++) {
             tmpData[i] = randomNumber.doubleValue();
@@ -73,12 +123,28 @@ public final class SampleSet implements Access1D<Double> {
         return new SampleSet(retVal);
     }
 
-    public static SampleSet wrap(final Access1D<?> someSamples) {
-        return new SampleSet(someSamples);
+    public static Collector<Double, CombineableSet<Double>, SampleSet> newCollector() {
+        return SampleSet.newCollector(ArrayR064.FACTORY);
     }
 
-    public static SampleSet wrap(final double[] someSamples) {
-        return SampleSet.wrap(Access1D.wrap(someSamples));
+    public static <N extends Comparable<N>> Collector<N, CombineableSet<N>, SampleSet> newCollector(final DenseArray.Factory<N> factory) {
+        return TwoStepMapper.Combineable.newCollector(() -> SampleSet.newCombineableSet(factory));
+    }
+
+    public static CombineableSet<Double> newCombineableSet() {
+        return SampleSet.newCombineableSet(ArrayR064.FACTORY);
+    }
+
+    public static <N extends Comparable<N>> CombineableSet<N> newCombineableSet(final DenseArray.Factory<N> factory) {
+        return new CombineableSet<>(NumberList.factory(factory));
+    }
+
+    public static SampleSet wrap(final Access1D<?> samples) {
+        return new SampleSet(samples);
+    }
+
+    public static SampleSet wrap(final double... samples) {
+        return SampleSet.wrap(ArrayR064.wrap(samples));
     }
 
     private transient double myMax = NaN;
@@ -91,14 +157,6 @@ public final class SampleSet implements Access1D<Double> {
     private transient double[] mySortedCopy = null;
     private transient double myStandardDeviation = NaN;
     private transient double myVariance = NaN;
-
-    @SuppressWarnings("unused")
-    private SampleSet() {
-
-        this(null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     SampleSet(final Access1D<?> samples) {
 
@@ -121,47 +179,48 @@ public final class SampleSet implements Access1D<Double> {
 
     @Override
     public Double get(final long index) {
-        return mySamples.doubleValue(index);
+        return Double.valueOf(mySamples.doubleValue(index));
     }
 
-    public double getCorrelation(final SampleSet anotherSampleSet) {
+    public double getCorrelation(final SampleSet other) {
 
         double retVal = ZERO;
 
-        final double tmpCovar = this.getCovariance(anotherSampleSet);
+        double covar = this.getCovariance(other);
 
-        // if (tmpCovar != ZERO) {
-        if (NumberContext.compare(tmpCovar, ZERO) != 0) {
+        if (NumberContext.compare(covar, ZERO) != 0) {
 
-            final double tmpThisStdDev = this.getStandardDeviation();
-            final double tmpThatStdDev = anotherSampleSet.getStandardDeviation();
+            double thisStdDev = this.getStandardDeviation();
+            double thatStdDev = other.getStandardDeviation();
 
-            retVal = tmpCovar / (tmpThisStdDev * tmpThatStdDev);
+            retVal = covar / (thisStdDev * thatStdDev);
         }
 
         return retVal;
     }
 
-    public double getCovariance(final SampleSet anotherSampleSet) {
+    public double getCovariance(final SampleSet other) {
 
         double retVal = ZERO;
 
-        final double thisMean = this.getMean();
-        final double thatMean = anotherSampleSet.getMean();
+        double thisMean = this.getMean();
+        double thatMean = other.getMean();
 
-        final long limit = Math.min(mySamples.count(), anotherSampleSet.count());
+        Access1D<?> otherValues = other.getSamples();
 
-        final Access1D<?> otherValues = anotherSampleSet.getSamples();
-        for (long i = 0L; i < limit; i++) {
+        int nbSamples = Math.min(mySamples.size(), other.size());
+
+        for (int i = 0; i < nbSamples; i++) {
             retVal += (mySamples.doubleValue(i) - thisMean) * (otherValues.doubleValue(i) - thatMean);
         }
 
-        retVal /= limit - 1L;
+        retVal /= nbSamples - 1;
+
         return retVal;
     }
 
     public double getFirst() {
-        if (mySamples.count() > 0L) {
+        if (mySamples.size() > 0) {
             return mySamples.doubleValue(0);
         }
         return ZERO;
@@ -178,17 +237,17 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
+        for (int i = 0, limit = mySamples.size(); i < limit; i++) {
+            retVal = Math.max(retVal, Math.abs(mySamples.doubleValue(i)));
         }
 
         return retVal;
     }
 
     public double getLast() {
-        if (mySamples.count() > 0L) {
-            return mySamples.doubleValue(mySamples.count() - 1L);
+        int nbSamples = mySamples.size();
+        if (nbSamples > 0) {
+            return mySamples.doubleValue(nbSamples - 1);
         }
         return ZERO;
     }
@@ -202,9 +261,8 @@ public final class SampleSet implements Access1D<Double> {
 
             myMax = NEGATIVE_INFINITY;
 
-            final long tmpLimit = mySamples.count();
-            for (long i = 0L; i < tmpLimit; i++) {
-                myMax = PrimitiveMath.MAX.invoke(myMax, mySamples.doubleValue(i));
+            for (int i = 0, limit = mySamples.size(); i < limit; i++) {
+                myMax = Math.max(myMax, mySamples.doubleValue(i));
             }
         }
 
@@ -217,12 +275,13 @@ public final class SampleSet implements Access1D<Double> {
 
             myMean = ZERO;
 
-            final long tmpLimit = mySamples.count();
-            for (long i = 0L; i < tmpLimit; i++) {
+            int nbSamples = mySamples.size();
+
+            for (int i = 0; i < nbSamples; i++) {
                 myMean += mySamples.doubleValue(i);
             }
 
-            myMean /= mySamples.count();
+            myMean /= nbSamples;
         }
 
         return myMean;
@@ -244,9 +303,8 @@ public final class SampleSet implements Access1D<Double> {
 
             myMin = POSITIVE_INFINITY;
 
-            final long tmpLimit = mySamples.count();
-            for (long i = 0L; i < tmpLimit; i++) {
-                myMin = PrimitiveMath.MIN.invoke(myMin, mySamples.doubleValue(i));
+            for (int i = 0, limit = mySamples.size(); i < limit; i++) {
+                myMin = Math.min(myMin, mySamples.doubleValue(i));
             }
         }
 
@@ -302,9 +360,8 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = POSITIVE_INFINITY;
 
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveMath.MIN.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
+        for (int i = 0, limit = mySamples.size(); i < limit; i++) {
+            retVal = Math.min(retVal, Math.abs(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -313,7 +370,7 @@ public final class SampleSet implements Access1D<Double> {
     public double getStandardDeviation() {
 
         if (Double.isNaN(myStandardDeviation)) {
-            myStandardDeviation = PrimitiveMath.SQRT.invoke(this.getVariance());
+            myStandardDeviation = Math.sqrt(this.getVariance());
         }
 
         return myStandardDeviation;
@@ -328,7 +385,7 @@ public final class SampleSet implements Access1D<Double> {
      *
      * @see <a href="https://en.wikipedia.org/wiki/Standard_score">WikipediA</a>
      */
-    public double getStandardScore(final long index) {
+    public double getStandardScore(final int index) {
         return (this.doubleValue(index) - this.getMean()) / this.getStandardDeviation();
     }
 
@@ -344,9 +401,9 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final double mean = this.getMean();
+        double mean = this.getMean();
         double deviation;
-        for (long i = 0L, limit = mySamples.count(); i < limit; i++) {
+        for (int i = 0, limit = mySamples.size(); i < limit; i++) {
             deviation = mySamples.doubleValue(i) - mean;
             retVal += deviation * deviation;
         }
@@ -393,7 +450,7 @@ public final class SampleSet implements Access1D<Double> {
 
     @Override
     public int size() {
-        return (int) mySamples.count();
+        return mySamples.size();
     }
 
     /**
@@ -406,22 +463,22 @@ public final class SampleSet implements Access1D<Double> {
         return this;
     }
 
-    public SampleSet swap(final double[] samples) {
-        return this.swap(Access1D.wrap(samples));
+    public SampleSet swap(final double... samples) {
+        return this.swap(ArrayR064.wrap(samples));
     }
 
     @Override
     public String toString() {
-        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Var=" + this.getVariance() + ", StdDev=" + this.getStandardDeviation()
+        return "Sample set Size=" + this.size() + ", Mean=" + this.getMean() + ", Var=" + this.getVariance() + ", StdDev=" + this.getStandardDeviation()
                 + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
     }
 
     private void calculateQuartiles() {
 
-        final int tmpSize = (int) this.getSamples().count();
-        final double[] tmpSortedCopy = this.getSortedCopy();
+        int nbSamples = this.getSamples().size();
+        double[] sortedCopy = this.getSortedCopy();
 
-        switch (tmpSize) {
+        switch (nbSamples) {
 
         case 0:
 
@@ -436,54 +493,54 @@ public final class SampleSet implements Access1D<Double> {
 
         case 1:
 
-            myMin = tmpSortedCopy[0];
-            myMax = tmpSortedCopy[0];
+            myMin = sortedCopy[0];
+            myMax = sortedCopy[0];
 
-            myQuartile1 = tmpSortedCopy[0];
-            myQuartile2 = tmpSortedCopy[0];
-            myQuartile3 = tmpSortedCopy[0];
+            myQuartile1 = sortedCopy[0];
+            myQuartile2 = sortedCopy[0];
+            myQuartile3 = sortedCopy[0];
 
             break;
 
         default:
 
-            myMin = tmpSortedCopy[0];
-            myMax = tmpSortedCopy[tmpSize - 1];
+            myMin = sortedCopy[0];
+            myMax = sortedCopy[nbSamples - 1];
 
-            final int n = tmpSize / 4;
-            final int r = tmpSize % 4;
+            int n = nbSamples / 4;
+            int r = nbSamples % 4;
 
             switch (r) {
 
             case 1:
 
-                myQuartile1 = 0.25 * tmpSortedCopy[n - 1] + 0.75 * tmpSortedCopy[n];
-                myQuartile2 = tmpSortedCopy[2 * n];
-                myQuartile3 = 0.75 * tmpSortedCopy[3 * n] + 0.25 * tmpSortedCopy[3 * n + 1];
+                myQuartile1 = 0.25 * sortedCopy[n - 1] + 0.75 * sortedCopy[n];
+                myQuartile2 = sortedCopy[2 * n];
+                myQuartile3 = 0.75 * sortedCopy[3 * n] + 0.25 * sortedCopy[3 * n + 1];
 
                 break;
 
             case 2:
 
-                myQuartile1 = tmpSortedCopy[n];
-                myQuartile2 = 0.5 * tmpSortedCopy[2 * n] + 0.5 * tmpSortedCopy[2 * n + 1];
-                myQuartile3 = tmpSortedCopy[3 * n + 1];
+                myQuartile1 = sortedCopy[n];
+                myQuartile2 = 0.5 * sortedCopy[2 * n] + 0.5 * sortedCopy[2 * n + 1];
+                myQuartile3 = sortedCopy[3 * n + 1];
 
                 break;
 
             case 3:
 
-                myQuartile1 = 0.75 * tmpSortedCopy[n] + 0.25 * tmpSortedCopy[n + 1];
-                myQuartile2 = tmpSortedCopy[2 * n + 1];
-                myQuartile3 = 0.25 * tmpSortedCopy[3 * n + 1] + 0.75 * tmpSortedCopy[3 * n + 2];
+                myQuartile1 = 0.75 * sortedCopy[n] + 0.25 * sortedCopy[n + 1];
+                myQuartile2 = sortedCopy[2 * n + 1];
+                myQuartile3 = 0.25 * sortedCopy[3 * n + 1] + 0.75 * sortedCopy[3 * n + 2];
 
                 break;
 
             default:
 
-                myQuartile1 = 0.5 * tmpSortedCopy[n - 1] + 0.5 * tmpSortedCopy[n];
-                myQuartile2 = 0.5 * tmpSortedCopy[2 * n - 1] + 0.5 * tmpSortedCopy[2 * n];
-                myQuartile3 = 0.5 * tmpSortedCopy[3 * n - 1] + 0.5 * tmpSortedCopy[3 * n];
+                myQuartile1 = 0.5 * sortedCopy[n - 1] + 0.5 * sortedCopy[n];
+                myQuartile2 = 0.5 * sortedCopy[2 * n - 1] + 0.5 * sortedCopy[2 * n];
+                myQuartile3 = 0.5 * sortedCopy[3 * n - 1] + 0.5 * sortedCopy[3 * n];
 
                 break;
             }
@@ -498,17 +555,15 @@ public final class SampleSet implements Access1D<Double> {
 
     double[] getSortedCopy() {
 
-        final Access1D<?> tmpSamples = this.getSamples();
-        final int tmpSamplesCount = (int) tmpSamples.count();
+        Access1D<?> samples = this.getSamples();
+        int nbSamples = samples.size();
 
-        if (mySortedCopy == null || mySortedCopy.length < tmpSamplesCount || mySortedCopy.length == 0) {
-            mySortedCopy = tmpSamples.toRawCopy1D();
+        if (mySortedCopy == null || mySortedCopy.length < nbSamples || mySortedCopy.length == 0) {
+            mySortedCopy = samples.toRawCopy1D();
             Arrays.parallelSort(mySortedCopy);
         } else if (mySortedCopy[0] == Double.POSITIVE_INFINITY) {
-            for (int i = 0; i < tmpSamplesCount; i++) {
-                mySortedCopy[i] = tmpSamples.doubleValue(i);
-            }
-            Arrays.parallelSort(mySortedCopy, 0, tmpSamplesCount);
+            FillMatchingSingle.fill(mySortedCopy, samples);
+            Arrays.parallelSort(mySortedCopy, 0, nbSamples);
         }
 
         return mySortedCopy;

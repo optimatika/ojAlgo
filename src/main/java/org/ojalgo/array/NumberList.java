@@ -64,14 +64,16 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     public static <N extends Comparable<N>> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
-        final Supplier<NumberList<N>> tmpSupplier = () -> NumberList.factory(arrayFactory).make();
-        final BiConsumer<NumberList<N>, N> tmpAccumulator = NumberList::add;
-        final BinaryOperator<NumberList<N>> tmpCombiner = (part1, part2) -> {
+
+        Supplier<NumberList<N>> supplier = () -> NumberList.factory(arrayFactory).make();
+        BiConsumer<NumberList<N>, N> accumulator = NumberList::add;
+        BinaryOperator<NumberList<N>> combiner = (part1, part2) -> {
             part1.addAll(part2);
             return part1;
         };
-        final Function<NumberList<N>, NumberList<N>> tmpIdentity = Function.identity();
-        return Collector.of(tmpSupplier, tmpAccumulator, tmpCombiner, tmpIdentity, Collector.Characteristics.IDENTITY_FINISH);
+        Function<NumberList<N>, NumberList<N>> finisher = Function.identity();
+
+        return Collector.of(supplier, accumulator, combiner, finisher, Collector.Characteristics.IDENTITY_FINISH);
     }
 
     public static <N extends Comparable<N>> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
