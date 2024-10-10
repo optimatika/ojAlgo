@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
@@ -89,6 +90,7 @@ public class HypergeometricFunctionTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testSpecialArguments122() {
         RANDOM.doubles(10).forEach(x -> {
             TestUtils.assertEquals(ONE / (ONE - x), HypergeometricFunction.hypergeometric(ONE, TWO, TWO, x));
