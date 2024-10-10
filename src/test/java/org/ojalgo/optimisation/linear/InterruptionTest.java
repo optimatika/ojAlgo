@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.ojalgo.TestUtils;
@@ -15,6 +16,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
  * Now and then the model used with these tests needs to be changed – ojAlgo gets better and computers faster,
  * causing the model to solve too fast for these interruption tests.
  */
+@Tag("unstable")
 public class InterruptionTest extends OptimisationLinearTests implements ModelFileTest {
 
     private static class ThreadInterrupter implements Runnable {
