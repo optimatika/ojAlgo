@@ -106,7 +106,7 @@ public class InMemoryFile {
     }
 
     /**
-     * MIME Type
+     * Media (content) Type
      */
     public Optional<String> getType() {
         return Optional.ofNullable(myType);

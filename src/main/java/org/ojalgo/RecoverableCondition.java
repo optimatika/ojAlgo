@@ -29,7 +29,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public final class RecoverableCondition extends Exception implements EffectiveThrowable {
+public class RecoverableCondition extends Exception implements EffectiveThrowable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,27 +50,27 @@ public final class RecoverableCondition extends Exception implements EffectiveTh
         super(message);
     }
 
-    RecoverableCondition() {
-        super();
+    public RecoverableCondition(final Throwable cause) {
+        super(cause);
     }
 
-    RecoverableCondition(final String message, final Throwable cause) {
+    protected RecoverableCondition(final String message, final Throwable cause) {
         super(message, cause);
+    }
+
+    RecoverableCondition() {
+        super();
     }
 
     RecoverableCondition(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    RecoverableCondition(final Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public String toString() {
         final String retVal = this.getClass().getSimpleName();
         final String tmpMessage = this.getLocalizedMessage();
-        return (tmpMessage != null) ? (retVal + ": " + tmpMessage) : retVal;
+        return tmpMessage != null ? retVal + ": " + tmpMessage : retVal;
     }
 
 }

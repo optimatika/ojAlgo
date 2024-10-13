@@ -123,12 +123,12 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
         super(cause);
     }
 
-    ProgrammingError() {
-        super();
+    protected ProgrammingError(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
-    ProgrammingError(final String message, final Throwable cause) {
-        super(message, cause);
+    ProgrammingError() {
+        super();
     }
 
     ProgrammingError(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
