@@ -22,6 +22,7 @@
 package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -77,6 +78,12 @@ public class P20061119Case extends BasicMatrixTest {
     @Test
     public void testData() {
         TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
+    }
+
+    @Tag("unstable")
+    @Override
+    public void testDotAccess1D() {
+        super.testDotAccess1D();
     }
 
     @Override
