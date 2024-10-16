@@ -32,7 +32,7 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
     private static final ThreadGroup GROUP = new ThreadGroup("ojAlgo-daemon-group");
 
     static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.units, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS,
-            new SynchronousQueue<Runnable>(), DaemonPoolExecutor.newThreadFactory("ojAlgo-daemon-"));
+            new SynchronousQueue<>(), DaemonPoolExecutor.newThreadFactory("ojAlgo-daemon-"));
 
     /**
      * @see java.util.concurrent.AbstractExecutorService#submit(java.util.concurrent.Callable)
@@ -72,7 +72,7 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
     /**
      * Like {@link Executors#newScheduledThreadPool(int)} but with identifiable (daemon) threads
      */
-    public static ExecutorService newScheduledThreadPool(final String name, final int corePoolSize) {
+    public static ScheduledExecutorService newScheduledThreadPool(final String name, final int corePoolSize) {
         return Executors.newScheduledThreadPool(corePoolSize, DaemonPoolExecutor.newThreadFactory(name));
     }
 
