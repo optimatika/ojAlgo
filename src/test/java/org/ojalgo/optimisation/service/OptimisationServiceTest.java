@@ -11,7 +11,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 @Tag("network")
 public class OptimisationServiceTest {
 
-    private static final String HOST = "http://16.171.20.7:8080";
+    private static final String HOST = "http://13.60.238.155:8080";
     // private static final String HOST = "http://localhost:8080";
     // private static final String HOST = "http://test-service.optimatika.se:8080";
 
