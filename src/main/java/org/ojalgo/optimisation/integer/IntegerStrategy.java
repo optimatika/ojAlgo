@@ -78,18 +78,27 @@ public interface IntegerStrategy {
             return new ConfigurableStrategy(myParallelism, totalDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, myGMICutConfiguration);
         }
 
+        @Override
+        public int countUniqueStrategies() {
+            return myPriorityDefinitions.length;
+        }
+
+        @Override
         public NumberContext getGapTolerance() {
             return myGapTolerance;
         }
 
+        @Override
         public GMICutConfiguration getGMICutConfiguration() {
             return myGMICutConfiguration;
         }
 
+        @Override
         public NumberContext getIntegralityTolerance() {
             return myIntegralityTolerance;
         }
 
+        @Override
         public List<Comparator<NodeKey>> getWorkerPriorities() {
             int parallelism = myParallelism.getAsInt();
             List<Comparator<NodeKey>> retVal = new ArrayList<>(parallelism);
@@ -99,6 +108,7 @@ public interface IntegerStrategy {
             return retVal;
         }
 
+        @Override
         public ModelStrategy newModelStrategy(final ExpressionsBasedModel model) {
             return myFactory.apply(model, this);
         }
@@ -190,6 +200,8 @@ public interface IntegerStrategy {
 
         return new ConfigurableStrategy(Parallelism.CORES.require(4), definitions, integrality, gap, DefaultStrategy::new, new GMICutConfiguration());
     }
+
+    int countUniqueStrategies();
 
     /**
      * The MIP gap is the difference between the best integer solution found so far and a node's relaxed

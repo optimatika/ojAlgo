@@ -194,7 +194,7 @@ public abstract class ModelStrategy implements IntegerStrategy {
 
     protected ModelStrategy(final ExpressionsBasedModel model, final IntegerStrategy strategy) {
 
-        myOptimisationSense = (model.getOptimisationSense() != Optimisation.Sense.MAX) ? Sense.MIN : Sense.MAX;
+        myOptimisationSense = model.getOptimisationSense() != Optimisation.Sense.MAX ? Sense.MIN : Sense.MAX;
 
         myStrategy = strategy;
 
@@ -211,22 +211,32 @@ public abstract class ModelStrategy implements IntegerStrategy {
         myWorkerPriorities = strategy.getWorkerPriorities();
     }
 
+    @Override
+    public int countUniqueStrategies() {
+        return myStrategy.countUniqueStrategies();
+    }
+
+    @Override
     public NumberContext getGapTolerance() {
         return myStrategy.getGapTolerance();
     }
 
+    @Override
     public GMICutConfiguration getGMICutConfiguration() {
         return myStrategy.getGMICutConfiguration();
     }
 
+    @Override
     public NumberContext getIntegralityTolerance() {
         return myStrategy.getIntegralityTolerance();
     }
 
+    @Override
     public List<Comparator<NodeKey>> getWorkerPriorities() {
         return myWorkerPriorities;
     }
 
+    @Override
     public ModelStrategy newModelStrategy(final ExpressionsBasedModel model) {
         return myStrategy.newModelStrategy(model);
     }
