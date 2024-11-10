@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.concurrent
+
+- Addition to `ProcessingService` that simplify concurrently taking items from a `BlockingQueue`.
+
 ### Changed
 
 #### org.ojalgo.random
