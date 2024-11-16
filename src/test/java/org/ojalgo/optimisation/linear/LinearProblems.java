@@ -253,6 +253,33 @@ public class LinearProblems extends OptimisationLinearTests {
     }
 
     /**
+     * https://github.com/vagmcs/Optimus/issues/43
+     * <p>
+     * The problem is unbounded (not infeasible). A feasible solution is x=120 and y=80.
+     * <p>
+     * In this case ojAlgo finds a feasible solution, but then somehow fails to identify that it's unbounded
+     * and instead returns a solution with an infinite value.
+     */
+    @Test
+    public void testOptimus43() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Variable x = model.newVariable("x").weight(-2);
+        Variable y = model.newVariable("y").lower(80).upper(170).weight(5);
+
+        model.addExpression().set(x, 1).set(y, 1).lower(200);
+
+        Result result = model.minimise();
+
+        TestUtils.assertEquals(State.UNBOUNDED, result.getState());
+    }
+
+    /**
      * Didn't recognise this as an infeasible problem.
      */
     @Test

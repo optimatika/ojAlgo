@@ -23,6 +23,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Refactored `SampleSet` (internally) to be better aligned with recent changes to other parts of the library. Primarily the class now uses `int` indices for all internal calculations. Also added a new `java.util.stream.Collector` implementation to simplify `SampleSet` creation from streams.
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- Fixed a bug where the (new) LP solver would fail to recognise unbounded problems and instead return a solution with infinite values, stating it to be optimal.
+
 ## [55.0.0] – 2024-09-28
 
 ### Changed

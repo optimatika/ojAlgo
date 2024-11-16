@@ -239,7 +239,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public enum FileFormat {
 
-        EBM, MPS;
+        EBM,
+        MPS;
 
         /**
          * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some
@@ -692,12 +693,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
         switch (format) {
-        case MPS:
-            return FileFormatMPS.read(input);
-        case EBM:
-            return FileFormatEBM.read(input);
-        default:
-            throw new IllegalArgumentException();
+            case MPS:
+                return FileFormatMPS.read(input);
+            case EBM:
+                return FileFormatEBM.read(input);
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -1420,7 +1421,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     /**
      * For test/validation during solver development.
-     * 
+     *
      * @param knownSolution The optimal solution
      * @param handler What to do if validation fails
      */
@@ -1599,16 +1600,20 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         Optimisation.Result result = prepared.solve(null);
 
-        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
-            Variable tmpVariable = myVariables.get(i);
-            if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.toBigDecimal(result.doubleValue(i)));
+        Optimisation.State retState = result.getState();
+
+        if (retState.isApproximate()) {
+            for (int i = 0, limit = myVariables.size(); i < limit; i++) {
+                Variable tmpVariable = myVariables.get(i);
+                if (!tmpVariable.isFixed()) {
+                    tmpVariable.setValue(options.solution.toBigDecimal(result.doubleValue(i)));
+                }
             }
         }
-
         Result retSolution = this.getVariableValues();
+
         double retValue = this.objective().evaluate(retSolution).doubleValue();
-        Optimisation.State retState = result.getState();
+
         List<KeyedPrimitive<EntryPair<ModelEntity<?>, ConstraintType>>> matchedMultipliers = result.getMatchedMultipliers();
 
         prepared.dispose();
