@@ -182,20 +182,20 @@ public class TDistribution extends AbstractContinuous {
 
     public static TDistribution of(final int degreesOfFreedom) {
         switch (degreesOfFreedom) {
-        case 1:
-            return new Degree1();
-        case 2:
-            return new Degree2();
-        case 3:
-            return new Degree3();
-        case 4:
-            return new Degree4();
-        case 5:
-            return new Degree5();
-        case Integer.MAX_VALUE:
-            return new DegreeInfinity();
-        default:
-            return new TDistribution(degreesOfFreedom);
+            case 1:
+                return new Degree1();
+            case 2:
+                return new Degree2();
+            case 3:
+                return new Degree3();
+            case 4:
+                return new Degree4();
+            case 5:
+                return new Degree5();
+            case Integer.MAX_VALUE:
+                return new DegreeInfinity();
+            default:
+                return new TDistribution(degreesOfFreedom);
         }
     }
 

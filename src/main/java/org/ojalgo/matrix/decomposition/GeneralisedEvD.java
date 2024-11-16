@@ -139,29 +139,29 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
 
         switch (myType) {
 
-        case BA:
+            case BA:
 
-            if (myRecovered == null) {
-                myRecovered = this.makeZero(reduced);
-            }
+                if (myRecovered == null) {
+                    myRecovered = this.makeZero(reduced);
+                }
 
-            myRecovered.fillByMultiplying(mtrxL, reduced);
+                myRecovered.fillByMultiplying(mtrxL, reduced);
 
-            return myRecovered;
+                return myRecovered;
 
-        default:
+            default:
 
-            if (reduced instanceof PhysicalStore<?>) {
-                myRecovered = (PhysicalStore<N>) reduced;
-            } else if (myRecovered != null) {
-                reduced.supplyTo(myRecovered);
-            } else {
-                myRecovered = reduced.collect(myFactory);
-            }
+                if (reduced instanceof PhysicalStore<?>) {
+                    myRecovered = (PhysicalStore<N>) reduced;
+                } else if (myRecovered != null) {
+                    reduced.supplyTo(myRecovered);
+                } else {
+                    myRecovered = reduced.collect(myFactory);
+                }
 
-            myRecovered.substituteBackwards(mtrxL, false, true, false);
+                myRecovered.substituteBackwards(mtrxL, false, true, false);
 
-            return myRecovered;
+                return myRecovered;
         }
     }
 
@@ -171,36 +171,36 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
 
         switch (myType) {
 
-        case A_B:
+            case A_B:
 
-            if (myRecovered != null) {
-                original.supplyTo(myRecovered);
-            } else {
-                myRecovered = original.collect(myFactory);
-            }
+                if (myRecovered != null) {
+                    original.supplyTo(myRecovered);
+                } else {
+                    myRecovered = original.collect(myFactory);
+                }
 
-            myRecovered.substituteForwards(mtrxL, false, false, false);
-            myReduced = myRecovered.conjugate().copy();
-            myReduced.substituteForwards(mtrxL, false, false, false);
+                myRecovered.substituteForwards(mtrxL, false, false, false);
+                myReduced = myRecovered.conjugate().copy();
+                myReduced.substituteForwards(mtrxL, false, false, false);
 
-            return myReduced;
+                return myReduced;
 
-        default:
+            default:
 
-            if (myReduced != null) {
-                original.supplyTo(myReduced);
-            } else {
-                myReduced = original.collect(myFactory);
-            }
+                if (myReduced != null) {
+                    original.supplyTo(myReduced);
+                } else {
+                    myReduced = original.collect(myFactory);
+                }
 
-            if (myRecovered == null) {
-                myRecovered = this.makeZero(original);
-            }
+                if (myRecovered == null) {
+                    myRecovered = this.makeZero(original);
+                }
 
-            myRecovered.fillByMultiplying(myReduced, mtrxL);
-            myReduced.fillByMultiplying(mtrxL.conjugate(), myRecovered);
+                myRecovered.fillByMultiplying(myReduced, mtrxL);
+                myReduced.fillByMultiplying(mtrxL.conjugate(), myRecovered);
 
-            return myReduced;
+                return myReduced;
         }
     }
 

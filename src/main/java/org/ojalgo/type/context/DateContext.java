@@ -77,23 +77,23 @@ public final class DateContext extends FormatContext<Date> {
 
         switch (myPart) {
 
-        case DATE:
+            case DATE:
 
-            LocalDate tmpDateOnly = new CalendarDate(object.getTime()).toLocalDate(ZoneOffset.UTC);
+                LocalDate tmpDateOnly = new CalendarDate(object.getTime()).toLocalDate(ZoneOffset.UTC);
 
-            return new Date(tmpDateOnly.getYear() - 1900, tmpDateOnly.getMonthValue() - 1, tmpDateOnly.getDayOfMonth());
+                return new Date(tmpDateOnly.getYear() - 1900, tmpDateOnly.getMonthValue() - 1, tmpDateOnly.getDayOfMonth());
 
-        case TIME:
+            case TIME:
 
-            LocalTime tmpTimeOnly = new CalendarDate(object.getTime()).toLocalTime(ZoneOffset.UTC);
+                LocalTime tmpTimeOnly = new CalendarDate(object.getTime()).toLocalTime(ZoneOffset.UTC);
 
-            return new Date(0, 0, 1, tmpTimeOnly.getHour(), tmpTimeOnly.getMinute(), tmpTimeOnly.getSecond());
+                return new Date(0, 0, 1, tmpTimeOnly.getHour(), tmpTimeOnly.getMinute(), tmpTimeOnly.getSecond());
 
-        default:
+            default:
 
-            long tmpDateAndTime = new CalendarDate(object.getTime()).millis;
+                long tmpDateAndTime = new CalendarDate(object.getTime()).millis;
 
-            return new Date(tmpDateAndTime);
+                return new Date(tmpDateAndTime);
         }
     }
 
@@ -109,13 +109,13 @@ public final class DateContext extends FormatContext<Date> {
 
         switch (myPart) {
 
-        case DATE:
+            case DATE:
 
-            return CalendarDateUnit.DAY;
+                return CalendarDateUnit.DAY;
 
-        default:
+            default:
 
-            return CalendarDateUnit.SECOND;
+                return CalendarDateUnit.SECOND;
         }
     }
 

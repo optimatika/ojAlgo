@@ -51,28 +51,28 @@ public abstract class OperationBinary implements ArrayOperation {
                 CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
             } else {
                 switch (data.getMathType()) {
-                case R032:
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.floatValue(i), right.floatValue(i)));
-                    }
-                    break;
-                case Z064:
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.longValue(i), right.longValue(i)));
-                    }
-                    break;
-                case Z032:
-                case Z016:
-                case Z008:
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.intValue(i), right.intValue(i)));
-                    }
-                    break;
-                default:
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.doubleValue(i), right.doubleValue(i)));
-                    }
-                    break;
+                    case R032:
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.floatValue(i), right.floatValue(i)));
+                        }
+                        break;
+                    case Z064:
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.longValue(i), right.longValue(i)));
+                        }
+                        break;
+                    case Z032:
+                    case Z016:
+                    case Z008:
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.intValue(i), right.intValue(i)));
+                        }
+                        break;
+                    default:
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.doubleValue(i), right.doubleValue(i)));
+                        }
+                        break;
                 }
             }
         } else {
@@ -96,32 +96,32 @@ public abstract class OperationBinary implements ArrayOperation {
                 CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
             } else {
                 switch (data.getMathType()) {
-                case R032:
-                    float floatValue = Scalar.floatValue(right);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.floatValue(i), floatValue));
-                    }
-                    break;
-                case Z064:
-                    long longValue = Scalar.longValue(right);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.longValue(i), longValue));
-                    }
-                    break;
-                case Z032:
-                case Z016:
-                case Z008:
-                    int intValue = Scalar.intValue(right);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.intValue(i), intValue));
-                    }
-                    break;
-                default:
-                    double doubleValue = Scalar.doubleValue(right);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(left.doubleValue(i), doubleValue));
-                    }
-                    break;
+                    case R032:
+                        float floatValue = Scalar.floatValue(right);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.floatValue(i), floatValue));
+                        }
+                        break;
+                    case Z064:
+                        long longValue = Scalar.longValue(right);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.longValue(i), longValue));
+                        }
+                        break;
+                    case Z032:
+                    case Z016:
+                    case Z008:
+                        int intValue = Scalar.intValue(right);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.intValue(i), intValue));
+                        }
+                        break;
+                    default:
+                        double doubleValue = Scalar.doubleValue(right);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(left.doubleValue(i), doubleValue));
+                        }
+                        break;
                 }
             }
         } else {
@@ -145,32 +145,32 @@ public abstract class OperationBinary implements ArrayOperation {
                 CorePrimitiveOperation.subtract(data, first, limit, step, left, right);
             } else {
                 switch (data.getMathType()) {
-                case R032:
-                    float floatValue = Scalar.floatValue(left);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(floatValue, right.floatValue(i)));
-                    }
-                    break;
-                case Z064:
-                    long longValue = Scalar.longValue(left);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(longValue, right.longValue(i)));
-                    }
-                    break;
-                case Z032:
-                case Z016:
-                case Z008:
-                    int intValue = Scalar.intValue(left);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(intValue, right.intValue(i)));
-                    }
-                    break;
-                default:
-                    double doubleValue = Scalar.doubleValue(left);
-                    for (long i = first; i < limit; i += step) {
-                        data.set(i, function.invoke(doubleValue, right.doubleValue(i)));
-                    }
-                    break;
+                    case R032:
+                        float floatValue = Scalar.floatValue(left);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(floatValue, right.floatValue(i)));
+                        }
+                        break;
+                    case Z064:
+                        long longValue = Scalar.longValue(left);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(longValue, right.longValue(i)));
+                        }
+                        break;
+                    case Z032:
+                    case Z016:
+                    case Z008:
+                        int intValue = Scalar.intValue(left);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(intValue, right.intValue(i)));
+                        }
+                        break;
+                    default:
+                        double doubleValue = Scalar.doubleValue(left);
+                        for (long i = first; i < limit; i += step) {
+                            data.set(i, function.invoke(doubleValue, right.doubleValue(i)));
+                        }
+                        break;
                 }
             }
         } else {

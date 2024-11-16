@@ -490,19 +490,19 @@ public abstract class MissingMath {
 
     public static BigDecimal power(final BigDecimal arg, final int param) {
         switch (param) {
-        case 0:
-            return BigDecimal.ONE;
-        case 1:
-            return arg;
-        case 2:
-            return arg.multiply(arg, MC256);
-        case 3:
-            return arg.multiply(arg).multiply(arg, MC256);
-        case 4:
-            BigDecimal arg2 = arg.multiply(arg);
-            return arg2.multiply(arg2, MC256);
-        default:
-            return arg.pow(param, MC256);
+            case 0:
+                return BigDecimal.ONE;
+            case 1:
+                return arg;
+            case 2:
+                return arg.multiply(arg, MC256);
+            case 3:
+                return arg.multiply(arg).multiply(arg, MC256);
+            case 4:
+                BigDecimal arg2 = arg.multiply(arg);
+                return arg2.multiply(arg2, MC256);
+            default:
+                return arg.pow(param, MC256);
         }
     }
 
@@ -615,12 +615,12 @@ public abstract class MissingMath {
 
     public static BigDecimal signum(final BigDecimal arg) {
         switch (arg.signum()) {
-        case 1:
-            return BigDecimal.ONE;
-        case -1:
-            return BigDecimal.ONE.negate();
-        default:
-            return BigDecimal.ZERO;
+            case 1:
+                return BigDecimal.ONE;
+            case -1:
+                return BigDecimal.ONE.negate();
+            default:
+                return BigDecimal.ZERO;
         }
     }
 

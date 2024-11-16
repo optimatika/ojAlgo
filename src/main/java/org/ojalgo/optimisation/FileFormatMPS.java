@@ -85,91 +85,91 @@ final class FileFormatMPS {
 
             switch (type) {
 
-            case LO:
+                case LO:
 
-                myVariable.lower(value);
+                    myVariable.lower(value);
 
-                break;
+                    break;
 
-            case UP:
+                case UP:
 
-                myVariable.upper(value);
+                    myVariable.upper(value);
 
-                if (!myVariable.isLowerLimitSet()) {
-                    myVariable.lower(ZERO);
-                }
+                    if (!myVariable.isLowerLimitSet()) {
+                        myVariable.lower(ZERO);
+                    }
 
-                break;
+                    break;
 
-            case FX:
+                case FX:
 
-                myVariable.level(value);
+                    myVariable.level(value);
 
-                break;
+                    break;
 
-            case FR:
+                case FR:
 
-                myVariable.level(null);
+                    myVariable.level(null);
 
-                break;
+                    break;
 
-            case MI:
+                case MI:
 
-                myVariable.lower(null);
+                    myVariable.lower(null);
 
-                if (!myVariable.isUpperLimitSet()) {
-                    myVariable.upper(ZERO);
-                }
+                    if (!myVariable.isUpperLimitSet()) {
+                        myVariable.upper(ZERO);
+                    }
 
-                break;
+                    break;
 
-            case PL:
+                case PL:
 
-                myVariable.upper(null);
+                    myVariable.upper(null);
 
-                if (!myVariable.isLowerLimitSet()) {
-                    myVariable.lower(ZERO);
-                }
+                    if (!myVariable.isLowerLimitSet()) {
+                        myVariable.lower(ZERO);
+                    }
 
-                break;
+                    break;
 
-            case BV:
+                case BV:
 
-                myVariable.lower(ZERO).upper(ONE).integer(true);
+                    myVariable.lower(ZERO).upper(ONE).integer(true);
 
-                break;
+                    break;
 
-            case LI:
+                case LI:
 
-                myVariable.lower(value).upper(null).integer(true);
+                    myVariable.lower(value).upper(null).integer(true);
 
-                break;
+                    break;
 
-            case UI:
+                case UI:
 
-                myVariable.upper(value).integer(true);
+                    myVariable.upper(value).integer(true);
 
-                if (!myVariable.isLowerLimitSet()) {
-                    myVariable.lower(ZERO);
-                }
+                    if (!myVariable.isLowerLimitSet()) {
+                        myVariable.lower(ZERO);
+                    }
 
-                break;
+                    break;
 
-            case SC:
+                case SC:
 
-                mySemicontinuous = true;
+                    mySemicontinuous = true;
 
-                myVariable.upper(value);
+                    myVariable.upper(value);
 
-                if (!myVariable.isLowerLimitSet()) {
-                    myVariable.lower(ONE);
-                }
+                    if (!myVariable.isLowerLimitSet()) {
+                        myVariable.lower(ONE);
+                    }
 
-                break;
+                    break;
 
-            default:
+                default:
 
-                break;
+                    break;
             }
 
             return this;
@@ -293,32 +293,32 @@ final class FileFormatMPS {
 
             switch (myType) {
 
-            case E:
+                case E:
 
-                int tmpSignum = value.signum();
-                if (tmpSignum == 1) {
-                    myExpression.upper(myExpression.getLowerLimit().add(value));
-                } else if (tmpSignum == -1) {
-                    myExpression.lower(myExpression.getUpperLimit().add(value));
-                }
+                    int tmpSignum = value.signum();
+                    if (tmpSignum == 1) {
+                        myExpression.upper(myExpression.getLowerLimit().add(value));
+                    } else if (tmpSignum == -1) {
+                        myExpression.lower(myExpression.getUpperLimit().add(value));
+                    }
 
-                break;
+                    break;
 
-            case L:
+                case L:
 
-                myExpression.lower(myExpression.getUpperLimit().subtract(value.abs()));
+                    myExpression.lower(myExpression.getUpperLimit().subtract(value.abs()));
 
-                break;
+                    break;
 
-            case G:
+                case G:
 
-                myExpression.upper(myExpression.getLowerLimit().add(value.abs()));
+                    myExpression.upper(myExpression.getLowerLimit().add(value.abs()));
 
-                break;
+                    break;
 
-            default:
+                default:
 
-                break;
+                    break;
             }
 
             return this;
@@ -328,33 +328,33 @@ final class FileFormatMPS {
 
             switch (myType) {
 
-            case E:
+                case E:
 
-                myExpression.level(value);
+                    myExpression.level(value);
 
-                break;
+                    break;
 
-            case L:
+                case L:
 
-                myExpression.upper(value);
+                    myExpression.upper(value);
 
-                break;
+                    break;
 
-            case G:
+                case G:
 
-                myExpression.lower(value);
+                    myExpression.lower(value);
 
-                break;
+                    break;
 
-            case N:
+                case N:
 
-                myExpression.addObjectiveConstant(value.negate());
+                    myExpression.addObjectiveConstant(value.negate());
 
-                break;
+                    break;
 
-            default:
+                default:
 
-                break;
+                    break;
             }
 
             return this;
@@ -577,15 +577,15 @@ final class FileFormatMPS {
 
         switch (retVal) {
 
-        case NAME:
+            case NAME:
 
-            myName = tmpArgument;
+                myName = tmpArgument;
 
-            break;
+                break;
 
-        default:
+            default:
 
-            break;
+                break;
         }
 
         return retVal;
@@ -597,160 +597,160 @@ final class FileFormatMPS {
 
         switch (section) {
 
-        case NAME:
+            case NAME:
 
-            break;
+                break;
 
-        case OBJSENSE:
+            case OBJSENSE:
 
-            if (line.contains(MAX)) {
-                myModel.setOptimisationSense(Optimisation.Sense.MAX);
-            } else {
-                myModel.setOptimisationSense(Optimisation.Sense.MIN);
-            }
-
-            break;
-
-        case OBJNAME:
-
-            break;
-
-        case ROWS:
-
-            this.extractFields(line, myVerifierROWS);
-
-            RowType rowType = RowType.valueOf(myFields[0]);
-            String rowName = myFields[1].trim();
-            if (myIdRowN == null && rowType == RowType.N) {
-                myIdRowN = rowName;
-            }
-
-            myRows.put(myFields[1], new Row(rowName, rowType, myIdRowN));
-
-            break;
-
-        case COLUMNS:
-
-            if (line.contains(MARKER)) {
-
-                if (line.contains(INTORG)) {
-                    myIntegerMarker = true;
-                } else if (line.contains(INTEND)) {
-                    myIntegerMarker = false;
+                if (line.contains(MAX)) {
+                    myModel.setOptimisationSense(Optimisation.Sense.MAX);
+                } else {
+                    myModel.setOptimisationSense(Optimisation.Sense.MIN);
                 }
 
-            } else {
+                break;
 
-                this.extractFields(line, myVerifierCOLUMNS);
+            case OBJNAME:
 
-                Column tmpColumn = myColumns.computeIfAbsent(myFields[1].trim(), Column::new);
+                break;
 
-                tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
+            case ROWS:
+
+                this.extractFields(line, myVerifierROWS);
+
+                RowType rowType = RowType.valueOf(myFields[0]);
+                String rowName = myFields[1].trim();
+                if (myIdRowN == null && rowType == RowType.N) {
+                    myIdRowN = rowName;
+                }
+
+                myRows.put(myFields[1], new Row(rowName, rowType, myIdRowN));
+
+                break;
+
+            case COLUMNS:
+
+                if (line.contains(MARKER)) {
+
+                    if (line.contains(INTORG)) {
+                        myIntegerMarker = true;
+                    } else if (line.contains(INTEND)) {
+                        myIntegerMarker = false;
+                    }
+
+                } else {
+
+                    this.extractFields(line, myVerifierCOLUMNS);
+
+                    Column tmpColumn = myColumns.computeIfAbsent(myFields[1].trim(), Column::new);
+
+                    tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
+                    if (myFields[4] != null) {
+                        tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
+                    }
+
+                    if (myIntegerMarker) {
+                        tmpColumn.integer(myIntegerMarker);
+                    }
+                }
+
+                break;
+
+            case RHS:
+
+                this.extractFields(line, myVerifierRHS);
+
+                if (myIdRHS == null) {
+                    myIdRHS = myFields[1];
+                } else if (!myIdRHS.equals(myFields[1])) {
+                    break;
+                }
+
+                myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
+
                 if (myFields[4] != null) {
-                    tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
+                    myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
                 }
 
-                if (myIntegerMarker) {
-                    tmpColumn.integer(myIntegerMarker);
+                break;
+
+            case RANGES:
+
+                this.extractFields(line, myVerifierRANGES);
+
+                if (myIdRANGES == null) {
+                    myIdRANGES = myFields[1];
+                } else if (!myIdRANGES.equals(myFields[1])) {
+                    break;
                 }
-            }
 
-            break;
+                myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
 
-        case RHS:
+                if (myFields[4] != null) {
+                    myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
+                }
 
-            this.extractFields(line, myVerifierRHS);
-
-            if (myIdRHS == null) {
-                myIdRHS = myFields[1];
-            } else if (!myIdRHS.equals(myFields[1])) {
                 break;
-            }
 
-            myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
+            case BOUNDS:
 
-            if (myFields[4] != null) {
-                myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
-            }
+                this.extractFields(line, myVerifierBOUNDS);
 
-            break;
+                if (myIdBOUNDS == null) {
+                    myIdBOUNDS = myFields[1];
+                } else if (!myIdBOUNDS.equals(myFields[1])) {
+                    break;
+                }
 
-        case RANGES:
+                BoundType boundType = BoundType.valueOf(myFields[0]);
 
-            this.extractFields(line, myVerifierRANGES);
+                myColumns.get(myFields[2]).bound(boundType, myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
-            if (myIdRANGES == null) {
-                myIdRANGES = myFields[1];
-            } else if (!myIdRANGES.equals(myFields[1])) {
                 break;
-            }
 
-            myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
+            case QUADOBJ:
 
-            if (myFields[4] != null) {
-                myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
-            }
+                this.extractFields(line, myVerifierQ);
 
-            break;
+                if (myQuadObjExpr == null) {
+                    myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
+                }
 
-        case BOUNDS:
+                Variable var1 = myColumns.get(myFields[1]).getVariable();
+                Variable var2 = myColumns.get(myFields[2]).getVariable();
+                BigDecimal param3 = new BigDecimal(myFields[3]);
 
-            this.extractFields(line, myVerifierBOUNDS);
+                myQuadObjExpr.set(var1, var2, param3);
+                if (!var1.equals(var2)) {
+                    myQuadObjExpr.set(var2, var1, param3);
+                }
 
-            if (myIdBOUNDS == null) {
-                myIdBOUNDS = myFields[1];
-            } else if (!myIdBOUNDS.equals(myFields[1])) {
                 break;
-            }
 
-            BoundType boundType = BoundType.valueOf(myFields[0]);
+            case QMATRIX:
 
-            myColumns.get(myFields[2]).bound(boundType, myFields[3] != null ? new BigDecimal(myFields[3]) : null);
+                this.extractFields(line, myVerifierQ);
 
-            break;
+                if (myQuadObjExpr == null) {
+                    myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
+                }
 
-        case QUADOBJ:
+                Variable varA = myColumns.get(myFields[1]).getVariable();
+                Variable varB = myColumns.get(myFields[2]).getVariable();
+                BigDecimal paramC = new BigDecimal(myFields[3]);
 
-            this.extractFields(line, myVerifierQ);
+                myQuadObjExpr.set(varA, varB, paramC);
 
-            if (myQuadObjExpr == null) {
-                myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
-            }
+                break;
 
-            Variable var1 = myColumns.get(myFields[1]).getVariable();
-            Variable var2 = myColumns.get(myFields[2]).getVariable();
-            BigDecimal param3 = new BigDecimal(myFields[3]);
+            case ENDATA:
 
-            myQuadObjExpr.set(var1, var2, param3);
-            if (!var1.equals(var2)) {
-                myQuadObjExpr.set(var2, var1, param3);
-            }
+                break;
 
-            break;
+            default:
 
-        case QMATRIX:
-
-            this.extractFields(line, myVerifierQ);
-
-            if (myQuadObjExpr == null) {
-                myQuadObjExpr = myModel.newExpression(section.name()).weight(HALF);
-            }
-
-            Variable varA = myColumns.get(myFields[1]).getVariable();
-            Variable varB = myColumns.get(myFields[2]).getVariable();
-            BigDecimal paramC = new BigDecimal(myFields[3]);
-
-            myQuadObjExpr.set(varA, varB, paramC);
-
-            break;
-
-        case ENDATA:
-
-            break;
-
-        default:
-
-            break;
+                break;
         }
     }
 

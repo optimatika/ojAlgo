@@ -52,37 +52,37 @@ public abstract class FillAll implements ArrayOperation {
     public static <N extends Comparable<N>> void fill(final BasicArray<N> data, final long first, final long limit, final long step, final N value) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(value);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, doubleValue);
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(value);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, floatValue);
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(value);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, longValue);
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(value);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, intValue);
-            }
-            break;
-        default:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, value);
-            }
-            break;
+            case R064:
+                double doubleValue = Scalar.doubleValue(value);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, doubleValue);
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(value);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, floatValue);
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(value);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, longValue);
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(value);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, intValue);
+                }
+                break;
+            default:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, value);
+                }
+                break;
         }
     }
 
@@ -90,33 +90,33 @@ public abstract class FillAll implements ArrayOperation {
             final NullaryFunction<?> supplier) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, supplier.doubleValue());
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, supplier.floatValue());
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, supplier.longValue());
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, supplier.intValue());
-            }
-            break;
-        default:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, supplier.get());
-            }
-            break;
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, supplier.doubleValue());
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, supplier.floatValue());
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, supplier.longValue());
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, supplier.intValue());
+                }
+                break;
+            default:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, supplier.get());
+                }
+                break;
         }
     }
 

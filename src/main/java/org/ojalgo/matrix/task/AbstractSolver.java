@@ -444,23 +444,23 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
-        case 1:
-            AbstractSolver.full1X1(tmpBody, tmpRHS, solution);
-            break;
-        case 2:
-            AbstractSolver.symmetric2X2(tmpBody, tmpRHS, solution);
-            break;
-        case 3:
-            AbstractSolver.symmetric3X3(tmpBody, tmpRHS, solution);
-            break;
-        case 4:
-            AbstractSolver.symmetric4X4(tmpBody, tmpRHS, solution);
-            break;
-        case 5:
-            AbstractSolver.symmetric5X5(tmpBody, tmpRHS, solution);
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case 1:
+                AbstractSolver.full1X1(tmpBody, tmpRHS, solution);
+                break;
+            case 2:
+                AbstractSolver.symmetric2X2(tmpBody, tmpRHS, solution);
+                break;
+            case 3:
+                AbstractSolver.symmetric3X3(tmpBody, tmpRHS, solution);
+                break;
+            case 4:
+                AbstractSolver.symmetric4X4(tmpBody, tmpRHS, solution);
+                break;
+            case 5:
+                AbstractSolver.symmetric5X5(tmpBody, tmpRHS, solution);
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
 
     }

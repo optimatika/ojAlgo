@@ -233,14 +233,14 @@ public abstract class Presolvers {
                 final NumberContext precision) {
 
             switch (remaining.size()) {
-            case 0:
-                return Presolvers.doCase0(expression, remaining, lower, upper, precision);
-            case 1:
-                return Presolvers.doCase1(expression, remaining, lower, upper, precision);
-            case 2:
-                return Presolvers.doCase2(expression, remaining, lower, upper, precision);
-            default: // 3 or more
-                return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
+                case 0:
+                    return Presolvers.doCase0(expression, remaining, lower, upper, precision);
+                case 1:
+                    return Presolvers.doCase1(expression, remaining, lower, upper, precision);
+                case 2:
+                    return Presolvers.doCase2(expression, remaining, lower, upper, precision);
+                default: // 3 or more
+                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
         }
     };

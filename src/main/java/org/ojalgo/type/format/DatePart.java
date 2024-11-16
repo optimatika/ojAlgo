@@ -45,39 +45,39 @@ public enum DatePart {
 
         switch (tmpStyle) {
 
-        case SQL:
+            case SQL:
 
-            switch (this) {
+                switch (this) {
 
-            case DATE:
+                    case DATE:
 
-                return new SimpleDateFormat("yyyy-MM-dd");
+                        return new SimpleDateFormat("yyyy-MM-dd");
 
-            case TIME:
+                    case TIME:
 
-                return new SimpleDateFormat("HH:mm:ss");
+                        return new SimpleDateFormat("HH:mm:ss");
 
-            default:
+                    default:
 
-                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            }
-
-        default:
-
-            switch (this) {
-
-            case DATE:
-
-                return DateFormat.getDateInstance(tmpStyle.intValue(), tmpLocale);
-
-            case TIME:
-
-                return DateFormat.getTimeInstance(tmpStyle.intValue(), tmpLocale);
+                        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                }
 
             default:
 
-                return DateFormat.getDateTimeInstance(tmpStyle.intValue(), tmpStyle.intValue(), tmpLocale);
-            }
+                switch (this) {
+
+                    case DATE:
+
+                        return DateFormat.getDateInstance(tmpStyle.intValue(), tmpLocale);
+
+                    case TIME:
+
+                        return DateFormat.getTimeInstance(tmpStyle.intValue(), tmpLocale);
+
+                    default:
+
+                        return DateFormat.getDateTimeInstance(tmpStyle.intValue(), tmpStyle.intValue(), tmpLocale);
+                }
         }
     }
 

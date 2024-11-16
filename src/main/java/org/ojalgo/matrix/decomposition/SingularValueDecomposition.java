@@ -298,35 +298,35 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
             switch (kase) { // Perform the task indicated by kase.
 
-            // s[p] and e[k-1] are negligible and k<p
-            case 1: // Deflate negligible s[p]
+                // s[p] and e[k-1] are negligible and k<p
+                case 1: // Deflate negligible s[p]
 
-                SingularValueDecomposition.doCase1(s, e, p, k, q2RotR);
-                break;
+                    SingularValueDecomposition.doCase1(s, e, p, k, q2RotR);
+                    break;
 
-            // s[k] is negligible and k<p
-            case 2: // Split at negligible s[k]
+                // s[k] is negligible and k<p
+                case 2: // Split at negligible s[k]
 
-                SingularValueDecomposition.doCase2(s, e, p, k, q1RotR);
-                break;
+                    SingularValueDecomposition.doCase2(s, e, p, k, q1RotR);
+                    break;
 
-            // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
-            case 3: // Perform QR-step.
+                // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
+                case 3: // Perform QR-step.
 
-                SingularValueDecomposition.doCase3(s, e, p, k, q1RotR, q2RotR);
-                break;
+                    SingularValueDecomposition.doCase3(s, e, p, k, q1RotR, q2RotR);
+                    break;
 
-            // e[p-1] is negligible
-            case 4: // Convergence
+                // e[p-1] is negligible
+                case 4: // Convergence
 
-                SingularValueDecomposition.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
-                p--;
-                break;
+                    SingularValueDecomposition.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
+                    p--;
+                    break;
 
-            // Should never happen
-            default:
+                // Should never happen
+                default:
 
-                throw new IllegalStateException();
+                    throw new IllegalStateException();
 
             } // switch
         } // while

@@ -51,8 +51,7 @@ public class SampleSetTest extends RandomTests {
         TestUtils.assertEquals(expected.getMax(), actual.getMaximum());
         TestUtils.assertEquals(expected.getMin(), actual.getMinimum());
 
-        actual = Arrays.stream(array).collect(SampleSet::newCombineableSet, CombineableSet::consume, CombineableSet::combine)
-                .getResults();
+        actual = Arrays.stream(array).collect(SampleSet::newCombineableSet, CombineableSet::consume, CombineableSet::combine).getResults();
 
         TestUtils.assertEquals(expected.getAverage(), actual.getMean());
         TestUtils.assertEquals(expected.getCount(), actual.count());

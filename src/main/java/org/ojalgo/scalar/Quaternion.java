@@ -181,24 +181,24 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
         switch (axis) {
 
-        case X:
+            case X:
 
-            tmpI = PrimitiveMath.SIN.invoke(angle);
-            break;
+                tmpI = PrimitiveMath.SIN.invoke(angle);
+                break;
 
-        case Y:
+            case Y:
 
-            tmpJ = PrimitiveMath.SIN.invoke(angle);
-            break;
+                tmpJ = PrimitiveMath.SIN.invoke(angle);
+                break;
 
-        case Z:
+            case Z:
 
-            tmpK = PrimitiveMath.SIN.invoke(angle);
-            break;
+                tmpK = PrimitiveMath.SIN.invoke(angle);
+                break;
 
-        default:
+            default:
 
-            throw new ProgrammingError("How could this happen?");
+                throw new ProgrammingError("How could this happen?");
         }
 
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
@@ -450,40 +450,40 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
     @Override
     public double doubleValue(final int index) {
         switch (index) {
-        case 0:
-            return myScalar;
-        case 1:
-            return i;
-        case 2:
-            return j;
-        case 3:
-            return k;
-        case 4:
-            return -i;
-        case 5:
-            return myScalar;
-        case 6:
-            return k;
-        case 7:
-            return -j;
-        case 8:
-            return -j;
-        case 9:
-            return -k;
-        case 10:
-            return myScalar;
-        case 11:
-            return i;
-        case 12:
-            return -k;
-        case 13:
-            return j;
-        case 14:
-            return -i;
-        case 15:
-            return myScalar;
-        default:
-            throw new ArrayIndexOutOfBoundsException();
+            case 0:
+                return myScalar;
+            case 1:
+                return i;
+            case 2:
+                return j;
+            case 3:
+                return k;
+            case 4:
+                return -i;
+            case 5:
+                return myScalar;
+            case 6:
+                return k;
+            case 7:
+                return -j;
+            case 8:
+                return -j;
+            case 9:
+                return -k;
+            case 10:
+                return myScalar;
+            case 11:
+                return i;
+            case 12:
+                return -k;
+            case 13:
+                return j;
+            case 14:
+                return -i;
+            case 15:
+                return myScalar;
+            default:
+                throw new ArrayIndexOutOfBoundsException();
         }
     }
 

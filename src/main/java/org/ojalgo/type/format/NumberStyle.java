@@ -98,21 +98,21 @@ public enum NumberStyle {
 
         switch (this) {
 
-        case CURRENCY:
+            case CURRENCY:
 
-            return NumberFormat.getCurrencyInstance(locale != null ? locale : Locale.getDefault());
+                return NumberFormat.getCurrencyInstance(locale != null ? locale : Locale.getDefault());
 
-        case INTEGER:
+            case INTEGER:
 
-            return NumberFormat.getIntegerInstance(locale != null ? locale : Locale.getDefault());
+                return NumberFormat.getIntegerInstance(locale != null ? locale : Locale.getDefault());
 
-        case PERCENT:
+            case PERCENT:
 
-            return NumberFormat.getPercentInstance(locale != null ? locale : Locale.getDefault());
+                return NumberFormat.getPercentInstance(locale != null ? locale : Locale.getDefault());
 
-        default:
+            default:
 
-            return NumberFormat.getInstance(locale != null ? locale : Locale.getDefault());
+                return NumberFormat.getInstance(locale != null ? locale : Locale.getDefault());
         }
     }
 

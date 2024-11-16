@@ -173,12 +173,12 @@ abstract class ArrayBasedTensor<N extends Comparable<N>, T extends ArrayBasedTen
         double frobeniusNorm = NumberDefinition.doubleValue(array.aggregateAll(Aggregator.NORM2));
 
         switch (this.rank()) {
-        case 1:
-            return frobeniusNorm;
-        case 2:
-            return frobeniusNorm / PrimitiveMath.SQRT.invoke(this.dimensions());
-        default:
-            return frobeniusNorm / PrimitiveMath.ROOT.invoke(this.dimensions(), this.rank());
+            case 1:
+                return frobeniusNorm;
+            case 2:
+                return frobeniusNorm / PrimitiveMath.SQRT.invoke(this.dimensions());
+            default:
+                return frobeniusNorm / PrimitiveMath.ROOT.invoke(this.dimensions(), this.rank());
         }
     }
 

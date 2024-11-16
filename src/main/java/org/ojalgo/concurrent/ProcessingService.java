@@ -22,10 +22,10 @@ import java.util.function.Supplier;
 import org.ojalgo.type.function.TwoStepMapper;
 
 /**
- * A simple wrapper around an {@link ExecutorService} that makes it easier to process collections of items in parallel.
- * The work items are processed by a {@link Consumer}, {@link Function} or {@link TwoStepMapper}. In particular the
- * {@link TwoStepMapper} can be used to aggregate/reduce data from the work items and then combine the collected data
- * into a final result.
+ * A simple wrapper around an {@link ExecutorService} that makes it easier to process collections of items in
+ * parallel. The work items are processed by a {@link Consumer}, {@link Function} or {@link TwoStepMapper}. In
+ * particular the {@link TwoStepMapper} can be used to aggregate/reduce data from the work items and then
+ * combine the collected data into a final result.
  */
 public final class ProcessingService {
 
@@ -100,12 +100,12 @@ public final class ProcessingService {
     }
 
     /**
-     * Compute an output item for each (unique) input item, and return the results as a {@link Map}. If the input
-     * contains duplicates, the output will have fewer items. It is therefore vital that the input type implements
-     * {@link Object#hashCode()} and {@link Object#equals(Object)} properly.
+     * Compute an output item for each (unique) input item, and return the results as a {@link Map}. If the
+     * input contains duplicates, the output will have fewer items. It is therefore vital that the input type
+     * implements {@link Object#hashCode()} and {@link Object#equals(Object)} properly.
      * <p>
-     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them with
-     * {@code computer} and collectiing the results in a {@link Map}.
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code computer} and collectiing the results in a {@link Map}.
      *
      * @param <W> The work item type
      * @param <R> The function return type
@@ -147,8 +147,9 @@ public final class ProcessingService {
 
     /**
      * Simply map each (unique) input item to an output item - a {@link Collection} of input results in a
-     * {@link Collection} of output. If the input contains duplicates, the output will have fewer items. It is therefore
-     * vital that the input type implements {@link Object#hashCode()} and {@link Object#equals(Object)} properly.
+     * {@link Collection} of output. If the input contains duplicates, the output will have fewer items. It is
+     * therefore vital that the input type implements {@link Object#hashCode()} and
+     * {@link Object#equals(Object)} properly.
      *
      * @param <W> The input item type
      * @param <R> The output item type
@@ -178,8 +179,8 @@ public final class ProcessingService {
     }
 
     /**
-     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them with
-     * {@code processor}.
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code processor}.
      *
      * @param <W> The work item type
      * @param work The collection of work items
@@ -232,8 +233,8 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,int,Supplier<? extends TwoStepMapper.Mergeable<W, R>>)}
-     *             instead
+     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,int,Supplier<? extends
+     *             TwoStepMapper.Mergeable<W, R>>)} instead
      */
     @Deprecated
     public <W, R> R reduce(final Collection<W> work, final int parallelism, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
@@ -250,8 +251,8 @@ public final class ProcessingService {
     }
 
     /**
-     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,Supplier<? extends TwoStepMapper.Mergeable<W, R>>)}
-     *             instead
+     * @deprecated v54 Use {@link #reduceMergeable(Collection<W>,Supplier<? extends TwoStepMapper.Mergeable<W,
+     *             R>>)} instead
      */
     @Deprecated
     public <W, R> R reduce(final Collection<W> work, final Supplier<? extends TwoStepMapper.Mergeable<W, R>> reducer) {
@@ -259,12 +260,12 @@ public final class ProcessingService {
     }
 
     /**
-     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them with
-     * {@code reducer}. The state of each task's {@code reducer} will be combined into a single instance, and the
-     * results of that instance will be returned.
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code reducer}. The state of each task's {@code reducer} will be combined into a single instance,
+     * and the results of that instance will be returned.
      * <p>
-     * Each {@link TwoStepMapper.Combineable} is only worked on by a single thread, and the results are combined into a
-     * single instance. The instances are not reused.
+     * Each {@link TwoStepMapper.Combineable} is only worked on by a single thread, and the results are
+     * combined into a single instance. The instances are not reused.
      *
      * @param work The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
@@ -316,12 +317,12 @@ public final class ProcessingService {
     }
 
     /**
-     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them with
-     * {@code reducer}. The results of each task's {@code reducer} will be merged into a single instance, and the
-     * results of that instance will be returned.
+     * Will create at most {@code parallelism} tasks to work through the {@code work} items, processing them
+     * with {@code reducer}. The results of each task's {@code reducer} will be merged into a single instance,
+     * and the results of that instance will be returned.
      * <p>
-     * Each {@link TwoStepMapper.Mergeable} is only worked on by a single thread, and the results are combined into a
-     * single instance. The instances are not reused.
+     * Each {@link TwoStepMapper.Mergeable} is only worked on by a single thread, and the results are combined
+     * into a single instance. The instances are not reused.
      *
      * @param work The collection of work items
      * @param parallelism The maximum number of concurrent workers that will process the work items
@@ -401,13 +402,13 @@ public final class ProcessingService {
     }
 
     /**
-     * Will submit precisely {@code parallelism} tasks that each take from the {@code queue} feeding the items to the
-     * {@code processor}. The tasks will continue to run until the returned {@link AtomicBoolean} is set to
-     * {@code false} (or the thread is interrupted).
+     * Will submit precisely {@code parallelism} tasks that each take from the {@code queue} feeding the items
+     * to the {@code processor}. The tasks will continue to run until the returned {@link AtomicBoolean} is
+     * set to {@code false} (or the thread is interrupted).
      * <p>
-     * If the threads of the underlying {@link ExecutorService} are daemon threads, the JVM will not wait for them to
-     * finish before it exits. The default behaviour, using {@link #INSTANCE} or {@link #newInstance(String)}, is to
-     * make use of ojAlgo's {@link DaemonPoolExecutor}.
+     * If the threads of the underlying {@link ExecutorService} are daemon threads, the JVM will not wait for
+     * them to finish before it exits. The default behaviour, using {@link #INSTANCE} or
+     * {@link #newInstance(String)}, is to make use of ojAlgo's {@link DaemonPoolExecutor}.
      *
      * @param <T> The work item type
      * @param queue The queue to take from

@@ -89,14 +89,14 @@ public final class DataSource implements FinanceData<DatePrice> {
         @Override
         public CoordinatedSet<LocalDate> get() {
             switch (myResolution) {
-            case YEAR:
-                return myBuilder.build(LAST_DAY_OF_YEAR);
-            case MONTH:
-                return myBuilder.build(LAST_DAY_OF_MONTH);
-            case WEEK:
-                return myBuilder.build(FRIDAY_OF_WEEK);
-            default:
-                return myBuilder.build();
+                case YEAR:
+                    return myBuilder.build(LAST_DAY_OF_YEAR);
+                case MONTH:
+                    return myBuilder.build(LAST_DAY_OF_MONTH);
+                case WEEK:
+                    return myBuilder.build(FRIDAY_OF_WEEK);
+                default:
+                    return myBuilder.build();
             }
         }
 
@@ -310,18 +310,18 @@ public final class DataSource implements FinanceData<DatePrice> {
         LocalDate adjusted;
         for (DatePrice datePrice : historicalPrices) {
             switch (resolution) {
-            case YEAR:
-                adjusted = LAST_DAY_OF_YEAR.apply(datePrice.date);
-                break;
-            case MONTH:
-                adjusted = LAST_DAY_OF_MONTH.apply(datePrice.date);
-                break;
-            case WEEK:
-                adjusted = FRIDAY_OF_WEEK.apply(datePrice.date);
-                break;
-            default:
-                adjusted = datePrice.date;
-                break;
+                case YEAR:
+                    adjusted = LAST_DAY_OF_YEAR.apply(datePrice.date);
+                    break;
+                case MONTH:
+                    adjusted = LAST_DAY_OF_MONTH.apply(datePrice.date);
+                    break;
+                case WEEK:
+                    adjusted = FRIDAY_OF_WEEK.apply(datePrice.date);
+                    break;
+                default:
+                    adjusted = datePrice.date;
+                    break;
             }
             retVal.put(adjusted, datePrice);
         }

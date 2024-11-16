@@ -70,26 +70,26 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
 
                 for (long i = 0, limit = data.count(); i < limit; i++) {
                     switch (type) {
-                    case 0x08:
-                        data.set(i, input.readUnsignedByte());
-                        break;
-                    case 0x09:
-                        data.set(i, input.readByte());
-                        break;
-                    case 0x0B:
-                        data.set(i, input.readShort());
-                        break;
-                    case 0x0C:
-                        data.set(i, input.readInt());
-                        break;
-                    case 0x0D:
-                        data.set(i, input.readFloat());
-                        break;
-                    case 0x0E:
-                        data.set(i, input.readDouble());
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown element type!");
+                        case 0x08:
+                            data.set(i, input.readUnsignedByte());
+                            break;
+                        case 0x09:
+                            data.set(i, input.readByte());
+                            break;
+                        case 0x0B:
+                            data.set(i, input.readShort());
+                            break;
+                        case 0x0C:
+                            data.set(i, input.readInt());
+                            break;
+                        case 0x0D:
+                            data.set(i, input.readFloat());
+                            break;
+                        case 0x0E:
+                            data.set(i, input.readDouble());
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown element type!");
                     }
                 }
 

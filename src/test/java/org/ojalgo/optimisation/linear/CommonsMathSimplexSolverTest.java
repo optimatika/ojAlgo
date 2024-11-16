@@ -663,63 +663,63 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         private static double roundUnscaled(double unscaled, final double sign, final int roundingMethod) {
             switch (roundingMethod) {
-            case BigDecimal.ROUND_CEILING:
-                if (sign == -1) {
+                case BigDecimal.ROUND_CEILING:
+                    if (sign == -1) {
+                        unscaled = PrimitiveMath.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    } else {
+                        unscaled = PrimitiveMath.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    }
+                    break;
+                case BigDecimal.ROUND_DOWN:
                     unscaled = PrimitiveMath.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                } else {
+                    break;
+                case BigDecimal.ROUND_FLOOR:
+                    if (sign == -1) {
+                        unscaled = PrimitiveMath.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    } else {
+                        unscaled = PrimitiveMath.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    }
+                    break;
+                case BigDecimal.ROUND_HALF_DOWN: {
+                    unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
+                    double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                    if (fraction > 0.5) {
+                        unscaled = PrimitiveMath.CEIL.invoke(unscaled);
+                    } else {
+                        unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
+                    }
+                    break;
+                }
+                case BigDecimal.ROUND_HALF_EVEN: {
+                    double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                    if (fraction > 0.5 || fraction >= 0.5
+                            && PrimitiveMath.FLOOR.invoke(unscaled) / 2.0 != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)) {
+                        unscaled = PrimitiveMath.CEIL.invoke(unscaled);
+                    } else {
+                        unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
+                    }
+                    break;
+                }
+                case BigDecimal.ROUND_HALF_UP: {
+                    unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
+                    double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
+                    if (fraction >= 0.5) {
+                        unscaled = PrimitiveMath.CEIL.invoke(unscaled);
+                    } else {
+                        unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
+                    }
+                    break;
+                }
+                case BigDecimal.ROUND_UNNECESSARY:
+                    if (unscaled != PrimitiveMath.FLOOR.invoke(unscaled)) {
+                        throw new RuntimeException();
+                    }
+                    break;
+                case BigDecimal.ROUND_UP:
                     unscaled = PrimitiveMath.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                }
-                break;
-            case BigDecimal.ROUND_DOWN:
-                unscaled = PrimitiveMath.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                break;
-            case BigDecimal.ROUND_FLOOR:
-                if (sign == -1) {
-                    unscaled = PrimitiveMath.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                } else {
-                    unscaled = PrimitiveMath.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                }
-                break;
-            case BigDecimal.ROUND_HALF_DOWN: {
-                unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
-                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
-                if (fraction > 0.5) {
-                    unscaled = PrimitiveMath.CEIL.invoke(unscaled);
-                } else {
-                    unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
-                }
-                break;
-            }
-            case BigDecimal.ROUND_HALF_EVEN: {
-                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
-                if (fraction > 0.5 || fraction >= 0.5
-                        && PrimitiveMath.FLOOR.invoke(unscaled) / 2.0 != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)) {
-                    unscaled = PrimitiveMath.CEIL.invoke(unscaled);
-                } else {
-                    unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
-                }
-                break;
-            }
-            case BigDecimal.ROUND_HALF_UP: {
-                unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
-                double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
-                if (fraction >= 0.5) {
-                    unscaled = PrimitiveMath.CEIL.invoke(unscaled);
-                } else {
-                    unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
-                }
-                break;
-            }
-            case BigDecimal.ROUND_UNNECESSARY:
-                if (unscaled != PrimitiveMath.FLOOR.invoke(unscaled)) {
+                    break;
+                default:
                     throw new RuntimeException();
-                }
-                break;
-            case BigDecimal.ROUND_UP:
-                unscaled = PrimitiveMath.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                break;
-            default:
-                throw new RuntimeException();
             }
             return unscaled;
         }
@@ -771,12 +771,12 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public Relationship oppositeRelationship() {
             switch (this) {
-            case LEQ:
-                return GEQ;
-            case GEQ:
-                return LEQ;
-            default:
-                return EQ;
+                case LEQ:
+                    return GEQ;
+                case GEQ:
+                    return LEQ;
+                default:
+                    return EQ;
             }
         }
 
@@ -808,15 +808,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                     expression.set(i, factors[i]);
                 }
                 switch (linearConstraint.getType()) {
-                case GEQ:
-                    expression.lower(new BigDecimal(linearConstraint.getRhs()));
-                    break;
-                case LEQ:
-                    expression.upper(new BigDecimal(linearConstraint.getRhs()));
-                    break;
-                default:
-                    expression.level(new BigDecimal(linearConstraint.getRhs()));
-                    break;
+                    case GEQ:
+                        expression.lower(new BigDecimal(linearConstraint.getRhs()));
+                        break;
+                    case LEQ:
+                        expression.upper(new BigDecimal(linearConstraint.getRhs()));
+                        break;
+                    default:
+                        expression.level(new BigDecimal(linearConstraint.getRhs()));
+                        break;
                 }
             }
 

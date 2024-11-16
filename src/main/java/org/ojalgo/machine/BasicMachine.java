@@ -63,21 +63,21 @@ public class BasicMachine {
 
         switch (prefix) {
 
-        case 1:
+            case 1:
 
-            return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
+                return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
 
-        case 2:
+            case 2:
 
-            return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
+                return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
 
-        case 3:
+            case 3:
 
-            return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
+                return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
 
-        default:
+            default:
 
-            return memory + BYTES + threads + ((threads == 1) ? THREAD : THREADS);
+                return memory + BYTES + threads + ((threads == 1) ? THREAD : THREADS);
         }
 
     }

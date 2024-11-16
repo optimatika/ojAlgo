@@ -49,57 +49,57 @@ public abstract class AggregatorSet<N extends Comparable<N>> {
 
         switch (aggregator) {
 
-        case AVERAGE:
+            case AVERAGE:
 
-            return this.average();
+                return this.average();
 
-        case CARDINALITY:
+            case CARDINALITY:
 
-            return this.cardinality();
+                return this.cardinality();
 
-        case LARGEST:
+            case LARGEST:
 
-            return this.largest();
+                return this.largest();
 
-        case MAXIMUM:
+            case MAXIMUM:
 
-            return this.maximum();
+                return this.maximum();
 
-        case MINIMUM:
+            case MINIMUM:
 
-            return this.minimum();
+                return this.minimum();
 
-        case NORM1:
+            case NORM1:
 
-            return this.norm1();
+                return this.norm1();
 
-        case NORM2:
+            case NORM2:
 
-            return this.norm2();
+                return this.norm2();
 
-        case PRODUCT:
+            case PRODUCT:
 
-            return this.product();
+                return this.product();
 
-        case PRODUCT2:
+            case PRODUCT2:
 
-            return this.product2();
+                return this.product2();
 
-        case SMALLEST:
+            case SMALLEST:
 
-            return this.smallest();
+                return this.smallest();
 
-        case SUM:
+            case SUM:
 
-            return this.sum();
+                return this.sum();
 
-        case SUM2:
+            case SUM2:
 
-            return this.sum2();
+                return this.sum2();
 
-        default:
+            default:
 
-            throw new IllegalArgumentException();
+                throw new IllegalArgumentException();
         }
     }
 

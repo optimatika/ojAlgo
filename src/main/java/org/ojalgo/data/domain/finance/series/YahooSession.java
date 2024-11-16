@@ -71,15 +71,15 @@ public final class YahooSession {
             request.query("period2", Long.toString(now.getEpochSecond()));
 
             switch (myResolution) {
-            case MONTH:
-                request.query("interval", 1 + "mo");
-                break;
-            case WEEK:
-                request.query("interval", 1 + "wk");
-                break;
-            default:
-                request.query("interval", 1 + "d");
-                break;
+                case MONTH:
+                    request.query("interval", 1 + "mo");
+                    break;
+                case WEEK:
+                    request.query("interval", 1 + "wk");
+                    break;
+                default:
+                    request.query("interval", 1 + "d");
+                    break;
             }
 
             request.query("events", "history");

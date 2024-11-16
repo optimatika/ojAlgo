@@ -239,8 +239,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public enum FileFormat {
 
-        EBM,
-        MPS;
+        EBM, MPS;
 
         /**
          * Apart from the "native" EBM file format, currently only supports the MPS file format, but with some

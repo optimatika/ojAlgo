@@ -193,12 +193,12 @@ abstract class FileFormat {
         int version = input.readInt();
 
         switch (version) {
-        case Version1.ID:
-            return Version1.read(factory, input);
-        case Version2.ID:
-            return Version2.read(factory, input);
-        default:
-            throw new IOException("Unsupported version!");
+            case Version1.ID:
+                return Version1.read(factory, input);
+            case Version2.ID:
+                return Version2.read(factory, input);
+            default:
+                throw new IOException("Unsupported version!");
         }
     }
 
@@ -209,14 +209,14 @@ abstract class FileFormat {
         output.writeInt(version);
 
         switch (version) {
-        case Version1.ID:
-            Version1.write(network, output);
-            break;
-        case Version2.ID:
-            Version2.write(network, output);
-            break;
-        default:
-            throw new IOException("Unsupported version!");
+            case Version1.ID:
+                Version1.write(network, output);
+                break;
+            case Version2.ID:
+                Version2.write(network, output);
+                break;
+            default:
+                throw new IOException("Unsupported version!");
         }
     }
 

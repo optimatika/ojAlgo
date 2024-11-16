@@ -200,15 +200,15 @@ final class YahooSessionOld {
         ResourceLocator.Request request = session.request().host(QUERY1_FINANCE_YAHOO_COM).path("/v7/finance/download/" + symbol);
 
         switch (resolution) {
-        case MONTH:
-            request.query(INTERVAL, 1 + "mo");
-            break;
-        case WEEK:
-            request.query(INTERVAL, 1 + "wk");
-            break;
-        default:
-            request.query(INTERVAL, 1 + "d");
-            break;
+            case MONTH:
+                request.query(INTERVAL, 1 + "mo");
+                break;
+            case WEEK:
+                request.query(INTERVAL, 1 + "wk");
+                break;
+            default:
+                request.query(INTERVAL, 1 + "d");
+                break;
         }
 
         request.query("events", "history");

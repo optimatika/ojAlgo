@@ -311,21 +311,21 @@ public final class ServiceClient {
                 BodyPublisher body = this.body();
 
                 switch (myMethod) {
-                case DELETE:
-                    myBuilder.DELETE();
-                    break;
-                case GET:
-                    myBuilder.GET();
-                    break;
-                case POST:
-                    myBuilder.POST(body);
-                    break;
-                case PUT:
-                    myBuilder.PUT(body);
-                    break;
-                default:
-                    myBuilder.method(myMethod.name(), body);
-                    break;
+                    case DELETE:
+                        myBuilder.DELETE();
+                        break;
+                    case GET:
+                        myBuilder.GET();
+                        break;
+                    case POST:
+                        myBuilder.POST(body);
+                        break;
+                    case PUT:
+                        myBuilder.PUT(body);
+                        break;
+                    default:
+                        myBuilder.method(myMethod.name(), body);
+                        break;
                 }
 
                 myRequest = myBuilder.build();

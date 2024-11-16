@@ -34,15 +34,15 @@ public final class AlphaVantageFetcher implements DataFetcher {
         myRequest = ServiceClient.newRequest().host("www.alphavantage.co").path("/query");
 
         switch (resolution) {
-        case MONTH:
-            myRequest.query("function", "TIME_SERIES_MONTHLY_ADJUSTED");
-            break;
-        case WEEK:
-            myRequest.query("function", "TIME_SERIES_WEEKLY_ADJUSTED");
-            break;
-        default:
-            myRequest.query("function", "TIME_SERIES_DAILY_ADJUSTED");
-            break;
+            case MONTH:
+                myRequest.query("function", "TIME_SERIES_MONTHLY_ADJUSTED");
+                break;
+            case WEEK:
+                myRequest.query("function", "TIME_SERIES_WEEKLY_ADJUSTED");
+                break;
+            default:
+                myRequest.query("function", "TIME_SERIES_DAILY_ADJUSTED");
+                break;
         }
         myRequest.query("symbol", symbol);
         myRequest.query("apikey", apiKey);

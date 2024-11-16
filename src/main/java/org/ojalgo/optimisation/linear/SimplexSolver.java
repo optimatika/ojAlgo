@@ -55,9 +55,7 @@ import org.ojalgo.type.context.NumberContext;
 abstract class SimplexSolver extends LinearSolver {
 
     enum Direction {
-        DECREASE,
-        INCREASE,
-        STAY;
+        DECREASE, INCREASE, STAY;
     }
 
     /**

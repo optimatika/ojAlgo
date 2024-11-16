@@ -39,33 +39,33 @@ public abstract class OperationVoid implements ArrayOperation {
             final VoidFunction<N> visitor) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                visitor.invoke(data.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                visitor.invoke(data.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                visitor.invoke(data.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                visitor.invoke(data.intValue(i));
-            }
-            break;
-        default:
-            for (long i = first; i < limit; i += step) {
-                visitor.invoke(data.get(i));
-            }
-            break;
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    visitor.invoke(data.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    visitor.invoke(data.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    visitor.invoke(data.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    visitor.invoke(data.intValue(i));
+                }
+                break;
+            default:
+                for (long i = first; i < limit; i += step) {
+                    visitor.invoke(data.get(i));
+                }
+                break;
         }
     }
 

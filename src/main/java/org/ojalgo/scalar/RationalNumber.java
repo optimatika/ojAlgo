@@ -496,12 +496,12 @@ public final class RationalNumber implements SelfDeclaringScalar<RationalNumber>
     public double doubleValue() {
         if (myDenominator == 0L) {
             switch (Long.compare(myNumerator, 0L)) {
-            case 1:
-                return Double.POSITIVE_INFINITY;
-            case -1:
-                return Double.NEGATIVE_INFINITY;
-            default:
-                return Double.NaN;
+                case 1:
+                    return Double.POSITIVE_INFINITY;
+                case -1:
+                    return Double.NEGATIVE_INFINITY;
+                default:
+                    return Double.NaN;
             }
         }
         return this.toBigDecimal().doubleValue();

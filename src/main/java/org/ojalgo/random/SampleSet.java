@@ -480,72 +480,72 @@ public final class SampleSet implements Access1D<Double> {
 
         switch (nbSamples) {
 
-        case 0:
+            case 0:
 
-            myMin = ZERO;
-            myMax = ZERO;
+                myMin = ZERO;
+                myMax = ZERO;
 
-            myQuartile1 = ZERO;
-            myQuartile2 = ZERO;
-            myQuartile3 = ZERO;
+                myQuartile1 = ZERO;
+                myQuartile2 = ZERO;
+                myQuartile3 = ZERO;
 
-            break;
-
-        case 1:
-
-            myMin = sortedCopy[0];
-            myMax = sortedCopy[0];
-
-            myQuartile1 = sortedCopy[0];
-            myQuartile2 = sortedCopy[0];
-            myQuartile3 = sortedCopy[0];
-
-            break;
-
-        default:
-
-            myMin = sortedCopy[0];
-            myMax = sortedCopy[nbSamples - 1];
-
-            int n = nbSamples / 4;
-            int r = nbSamples % 4;
-
-            switch (r) {
+                break;
 
             case 1:
 
-                myQuartile1 = 0.25 * sortedCopy[n - 1] + 0.75 * sortedCopy[n];
-                myQuartile2 = sortedCopy[2 * n];
-                myQuartile3 = 0.75 * sortedCopy[3 * n] + 0.25 * sortedCopy[3 * n + 1];
+                myMin = sortedCopy[0];
+                myMax = sortedCopy[0];
 
-                break;
-
-            case 2:
-
-                myQuartile1 = sortedCopy[n];
-                myQuartile2 = 0.5 * sortedCopy[2 * n] + 0.5 * sortedCopy[2 * n + 1];
-                myQuartile3 = sortedCopy[3 * n + 1];
-
-                break;
-
-            case 3:
-
-                myQuartile1 = 0.75 * sortedCopy[n] + 0.25 * sortedCopy[n + 1];
-                myQuartile2 = sortedCopy[2 * n + 1];
-                myQuartile3 = 0.25 * sortedCopy[3 * n + 1] + 0.75 * sortedCopy[3 * n + 2];
+                myQuartile1 = sortedCopy[0];
+                myQuartile2 = sortedCopy[0];
+                myQuartile3 = sortedCopy[0];
 
                 break;
 
             default:
 
-                myQuartile1 = 0.5 * sortedCopy[n - 1] + 0.5 * sortedCopy[n];
-                myQuartile2 = 0.5 * sortedCopy[2 * n - 1] + 0.5 * sortedCopy[2 * n];
-                myQuartile3 = 0.5 * sortedCopy[3 * n - 1] + 0.5 * sortedCopy[3 * n];
+                myMin = sortedCopy[0];
+                myMax = sortedCopy[nbSamples - 1];
+
+                int n = nbSamples / 4;
+                int r = nbSamples % 4;
+
+                switch (r) {
+
+                    case 1:
+
+                        myQuartile1 = 0.25 * sortedCopy[n - 1] + 0.75 * sortedCopy[n];
+                        myQuartile2 = sortedCopy[2 * n];
+                        myQuartile3 = 0.75 * sortedCopy[3 * n] + 0.25 * sortedCopy[3 * n + 1];
+
+                        break;
+
+                    case 2:
+
+                        myQuartile1 = sortedCopy[n];
+                        myQuartile2 = 0.5 * sortedCopy[2 * n] + 0.5 * sortedCopy[2 * n + 1];
+                        myQuartile3 = sortedCopy[3 * n + 1];
+
+                        break;
+
+                    case 3:
+
+                        myQuartile1 = 0.75 * sortedCopy[n] + 0.25 * sortedCopy[n + 1];
+                        myQuartile2 = sortedCopy[2 * n + 1];
+                        myQuartile3 = 0.25 * sortedCopy[3 * n + 1] + 0.75 * sortedCopy[3 * n + 2];
+
+                        break;
+
+                    default:
+
+                        myQuartile1 = 0.5 * sortedCopy[n - 1] + 0.5 * sortedCopy[n];
+                        myQuartile2 = 0.5 * sortedCopy[2 * n - 1] + 0.5 * sortedCopy[2 * n];
+                        myQuartile3 = 0.5 * sortedCopy[3 * n - 1] + 0.5 * sortedCopy[3 * n];
+
+                        break;
+                }
 
                 break;
-            }
-
-            break;
         }
     }
 

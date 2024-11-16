@@ -138,75 +138,75 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-            case '+':
-                negative = false;
-                break;
-            case '-':
-                negative = true;
-                break;
-            case '.':
-                decimalplaces = 0;
-                break;
-            default:
-                unscaled = 10L * unscaled + digit - '0';
-                decimalplaces++;
-                break;
+                case '+':
+                    negative = false;
+                    break;
+                case '-':
+                    negative = true;
+                    break;
+                case '.':
+                    decimalplaces = 0;
+                    break;
+                default:
+                    unscaled = 10L * unscaled + digit - '0';
+                    decimalplaces++;
+                    break;
             }
         }
 
         double retVal = unscaled;
 
         switch (decimalplaces) {
-        case 16:
-            retVal /= 10_000_000_000_000_000D;
-            break;
-        case 15:
-            retVal /= 1_000_000_000_000_000D;
-            break;
-        case 14:
-            retVal /= 100_000_000_000_000D;
-            break;
-        case 13:
-            retVal /= 10_000_000_000_000D;
-            break;
-        case 12:
-            retVal /= 1_000_000_000_000D;
-            break;
-        case 11:
-            retVal /= 100_000_000_000D;
-            break;
-        case 10:
-            retVal /= 10_000_000_000D;
-            break;
-        case 9:
-            retVal /= 1_000_000_000D;
-            break;
-        case 8:
-            retVal /= 100_000_000D;
-            break;
-        case 7:
-            retVal /= 10_000_000D;
-            break;
-        case 6:
-            retVal /= 1_000_000D;
-            break;
-        case 5:
-            retVal /= 100_000D;
-            break;
-        case 4:
-            retVal /= 10_000D;
-            break;
-        case 3:
-            retVal /= 1_000D;
-            break;
-        case 2:
-            retVal /= 100D;
-            break;
-        case 1:
-            retVal /= 10D;
-            break;
-        default:
-            break;
+            case 16:
+                retVal /= 10_000_000_000_000_000D;
+                break;
+            case 15:
+                retVal /= 1_000_000_000_000_000D;
+                break;
+            case 14:
+                retVal /= 100_000_000_000_000D;
+                break;
+            case 13:
+                retVal /= 10_000_000_000_000D;
+                break;
+            case 12:
+                retVal /= 1_000_000_000_000D;
+                break;
+            case 11:
+                retVal /= 100_000_000_000D;
+                break;
+            case 10:
+                retVal /= 10_000_000_000D;
+                break;
+            case 9:
+                retVal /= 1_000_000_000D;
+                break;
+            case 8:
+                retVal /= 100_000_000D;
+                break;
+            case 7:
+                retVal /= 10_000_000D;
+                break;
+            case 6:
+                retVal /= 1_000_000D;
+                break;
+            case 5:
+                retVal /= 100_000D;
+                break;
+            case 4:
+                retVal /= 10_000D;
+                break;
+            case 3:
+                retVal /= 1_000D;
+                break;
+            case 2:
+                retVal /= 100D;
+                break;
+            case 1:
+                retVal /= 10D;
+                break;
+            default:
+                break;
         }
 
         if (negative) {
@@ -233,48 +233,48 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-            case '+':
-                negative = false;
-                break;
-            case '-':
-                negative = true;
-                break;
-            case '.':
-                decimalplaces = 0;
-                break;
-            default:
-                unscaled = 10 * unscaled + digit - '0';
-                decimalplaces++;
-                break;
+                case '+':
+                    negative = false;
+                    break;
+                case '-':
+                    negative = true;
+                    break;
+                case '.':
+                    decimalplaces = 0;
+                    break;
+                default:
+                    unscaled = 10 * unscaled + digit - '0';
+                    decimalplaces++;
+                    break;
             }
         }
 
         float retVal = unscaled;
 
         switch (decimalplaces) {
-        case 7:
-            retVal /= 10_000_000F;
-            break;
-        case 6:
-            retVal /= 1_000_000F;
-            break;
-        case 5:
-            retVal /= 100_000F;
-            break;
-        case 4:
-            retVal /= 10_000F;
-            break;
-        case 3:
-            retVal /= 1_000F;
-            break;
-        case 2:
-            retVal /= 100F;
-            break;
-        case 1:
-            retVal /= 10F;
-            break;
-        default:
-            break;
+            case 7:
+                retVal /= 10_000_000F;
+                break;
+            case 6:
+                retVal /= 1_000_000F;
+                break;
+            case 5:
+                retVal /= 100_000F;
+                break;
+            case 4:
+                retVal /= 10_000F;
+                break;
+            case 3:
+                retVal /= 1_000F;
+                break;
+            case 2:
+                retVal /= 100F;
+                break;
+            case 1:
+                retVal /= 10F;
+                break;
+            default:
+                break;
         }
 
         if (negative) {
@@ -300,15 +300,15 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-            case '+':
-                negative = false;
-                break;
-            case '-':
-                negative = true;
-                break;
-            default:
-                retVal = 10 * retVal + digit - '0';
-                break;
+                case '+':
+                    negative = false;
+                    break;
+                case '-':
+                    negative = true;
+                    break;
+                default:
+                    retVal = 10 * retVal + digit - '0';
+                    break;
             }
         }
 
@@ -335,15 +335,15 @@ public interface NumberDefinition {
             char digit = sequence.charAt(i);
 
             switch (digit) {
-            case '+':
-                negative = false;
-                break;
-            case '-':
-                negative = true;
-                break;
-            default:
-                retVal = 10L * retVal + digit - '0';
-                break;
+                case '+':
+                    negative = false;
+                    break;
+                case '-':
+                    negative = true;
+                    break;
+                default:
+                    retVal = 10L * retVal + digit - '0';
+                    break;
             }
         }
 

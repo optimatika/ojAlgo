@@ -178,26 +178,26 @@ abstract class FileFormatEBM {
                 String[] fields = line.split(TAB);
 
                 switch (line.charAt(0)) {
-                case 'V':
-                    FileFormatEBM.readVariable(retVal, fields);
-                    break;
-                case 'E':
-                    current = FileFormatEBM.readExpression(retVal, fields);
-                    break;
-                case 'L':
-                    if (current == null) {
+                    case 'V':
+                        FileFormatEBM.readVariable(retVal, fields);
+                        break;
+                    case 'E':
+                        current = FileFormatEBM.readExpression(retVal, fields);
+                        break;
+                    case 'L':
+                        if (current == null) {
+                            throw new IllegalStateException();
+                        }
+                        FileFormatEBM.readLinear(current, fields);
+                        break;
+                    case 'Q':
+                        if (current == null) {
+                            throw new IllegalStateException();
+                        }
+                        FileFormatEBM.readQuadratic(current, fields);
+                        break;
+                    default:
                         throw new IllegalStateException();
-                    }
-                    FileFormatEBM.readLinear(current, fields);
-                    break;
-                case 'Q':
-                    if (current == null) {
-                        throw new IllegalStateException();
-                    }
-                    FileFormatEBM.readQuadratic(current, fields);
-                    break;
-                default:
-                    throw new IllegalStateException();
                 }
             }
 

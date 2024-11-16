@@ -33,30 +33,30 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) + right.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) + right.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) + right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) + right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) + right.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) + right.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) + right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) + right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -64,34 +64,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) + doubleValue);
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) + floatValue);
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) + longValue);
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) + intValue);
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) + doubleValue);
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) + floatValue);
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) + longValue);
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) + intValue);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -99,34 +99,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, doubleValue + right.doubleValue(i));
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, floatValue + right.floatValue(i));
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, longValue + right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, intValue + right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, doubleValue + right.doubleValue(i));
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, floatValue + right.floatValue(i));
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, longValue + right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, intValue + right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -242,30 +242,30 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) / right.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) / right.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) / right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) / right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) / right.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) / right.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) / right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) / right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -273,34 +273,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) / doubleValue);
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) / floatValue);
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) / longValue);
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) / intValue);
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) / doubleValue);
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) / floatValue);
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) / longValue);
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) / intValue);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -308,34 +308,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, doubleValue / right.doubleValue(i));
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, floatValue / right.floatValue(i));
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, longValue / right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, intValue / right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, doubleValue / right.doubleValue(i));
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, floatValue / right.floatValue(i));
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, longValue / right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, intValue / right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -451,30 +451,30 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) * right.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) * right.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) * right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) * right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) * right.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) * right.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) * right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) * right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -482,34 +482,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) * doubleValue);
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) * floatValue);
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) * longValue);
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) * intValue);
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) * doubleValue);
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) * floatValue);
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) * longValue);
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) * intValue);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -517,34 +517,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> left, final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, doubleValue * right.doubleValue(i));
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, floatValue * right.floatValue(i));
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, longValue * right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, intValue * right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, doubleValue * right.doubleValue(i));
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, floatValue * right.floatValue(i));
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, longValue * right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, intValue * right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -660,30 +660,30 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> values) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, -values.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, -values.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, -values.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, -values.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, -values.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, -values.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, -values.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, -values.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -727,30 +727,30 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) - right.doubleValue(i));
-            }
-            break;
-        case R032:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) - right.floatValue(i));
-            }
-            break;
-        case Z064:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) - right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) - right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) - right.doubleValue(i));
+                }
+                break;
+            case R032:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) - right.floatValue(i));
+                }
+                break;
+            case Z064:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) - right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) - right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -758,34 +758,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.doubleValue(i) - doubleValue);
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.floatValue(i) - floatValue);
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.longValue(i) - longValue);
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(right);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, left.intValue(i) - intValue);
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.doubleValue(i) - doubleValue);
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.floatValue(i) - floatValue);
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.longValue(i) - longValue);
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(right);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, left.intValue(i) - intValue);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -793,34 +793,34 @@ public abstract class CorePrimitiveOperation implements ArrayOperation {
             final Comparable<?> left, final Access1D<N> right) {
 
         switch (data.getMathType()) {
-        case R064:
-            double doubleValue = Scalar.doubleValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, doubleValue - right.doubleValue(i));
-            }
-            break;
-        case R032:
-            float floatValue = Scalar.floatValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, floatValue - right.floatValue(i));
-            }
-            break;
-        case Z064:
-            long longValue = Scalar.longValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, longValue - right.longValue(i));
-            }
-            break;
-        case Z032:
-        case Z016:
-        case Z008:
-            int intValue = Scalar.intValue(left);
-            for (long i = first; i < limit; i += step) {
-                data.set(i, intValue - right.intValue(i));
-            }
-            break;
-        default:
-            throw new IllegalArgumentException();
+            case R064:
+                double doubleValue = Scalar.doubleValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, doubleValue - right.doubleValue(i));
+                }
+                break;
+            case R032:
+                float floatValue = Scalar.floatValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, floatValue - right.floatValue(i));
+                }
+                break;
+            case Z064:
+                long longValue = Scalar.longValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, longValue - right.longValue(i));
+                }
+                break;
+            case Z032:
+            case Z016:
+            case Z008:
+                int intValue = Scalar.intValue(left);
+                for (long i = first; i < limit; i += step) {
+                    data.set(i, intValue - right.intValue(i));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
