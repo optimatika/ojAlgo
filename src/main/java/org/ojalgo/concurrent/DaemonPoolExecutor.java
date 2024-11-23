@@ -86,7 +86,7 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
     /**
      * Like {@link Executors#newSingleThreadScheduledExecutor()} but with identifiable (daemon) threads
      */
-    public static ExecutorService newSingleThreadScheduledExecutor(final String name) {
+    public static ScheduledExecutorService newSingleThreadScheduledExecutor(final String name) {
         return Executors.newSingleThreadScheduledExecutor(DaemonPoolExecutor.newThreadFactory(name));
     }
 

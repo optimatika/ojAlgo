@@ -24,11 +24,17 @@ package org.ojalgo.type;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * A supplier that most of the time returns a cached value, and only recomputes it when necessary
+ * (periodically).
+ *
+ * @deprecated v56 Use {@link ForgetfulMap#newValueCache(Object, java.util.function.Function)} instead.
+ */
+@Deprecated
 public abstract class TypeCache<T> {
 
     private static final Timer TIMER = new Timer("TypeCache-Daemon", true);
     private transient volatile T myCachedObject;
-
     private volatile boolean myDirty;
 
     public TypeCache(final long aPurgeIntervalMeassure, final CalendarDateUnit aPurgeIntervalUnit) {
@@ -60,7 +66,7 @@ public abstract class TypeCache<T> {
 
     public synchronized final T getCachedObject() {
 
-        if ((myCachedObject == null) || myDirty) {
+        if (myCachedObject == null || myDirty) {
 
             myCachedObject = this.recreateCache();
 
