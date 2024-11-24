@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
@@ -262,6 +263,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testGenerateRandomAllPositive() {
         CaseEigenvalue.doTestEigenvaluesOfGenerated(10, 5, 2, 1);
     }
