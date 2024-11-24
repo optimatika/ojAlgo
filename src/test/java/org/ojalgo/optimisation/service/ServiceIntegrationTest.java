@@ -9,7 +9,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 
 @Tag("network")
-public class OptimisationServiceTest {
+public class ServiceIntegrationTest {
 
     private static final String HOST = "http://16.16.99.66:8080";
     // private static final String HOST = "http://localhost:8080";
@@ -25,7 +25,7 @@ public class OptimisationServiceTest {
     @Test
     public void testEnvironment() {
 
-        String environment = OptimisationService.newIntegration(HOST).getEnvironment();
+        String environment = ServiceIntegration.newInstance(HOST).getEnvironment();
 
         if (DEBUG) {
             BasicLogger.debug(environment);
@@ -37,7 +37,7 @@ public class OptimisationServiceTest {
 
     @Test
     public void testTest() {
-        TestUtils.assertTrue(OptimisationService.newIntegration(HOST).test().booleanValue());
+        TestUtils.assertTrue(ServiceIntegration.newInstance(HOST).test().booleanValue());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class OptimisationServiceTest {
         Result expMax = model.maximise();
         Result expMin = model.minimise();
 
-        ExpressionsBasedModel.addIntegration(OptimisationService.newIntegration(HOST));
+        ExpressionsBasedModel.addIntegration(ServiceIntegration.newInstance(HOST));
 
         Result actMax = model.maximise();
         Result actMin = model.minimise();

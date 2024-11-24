@@ -21,109 +21,199 @@
  */
 package org.ojalgo.optimisation.service;
 
+import java.io.ByteArrayInputStream;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.ojalgo.RecoverableCondition;
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.concurrent.ProcessingService;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.netio.InMemoryFile;
-import org.ojalgo.netio.ServiceClient;
-import org.ojalgo.netio.ServiceClient.Response;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.Optimisation.Sense;
+import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.integer.IntegerStrategy;
+import org.ojalgo.type.ForgetfulMap;
 
 /**
- * {@link Solver} and {@link Integration} implementations that make use of Optimatika's
- * Optimisation-as-a-Service (OaaS).
- * <p>
- * There is a test/demo version of that service available at: http://test-service.optimatika.se
- * <p>
- * That particular instance is NOT for production use, and may be restricted or removed without warning.
- * <p>
- * If you'd like access to a service instance for (private) production use, you should contact Optimatika
- * using: https://www.optimatika.se/products-services-inquiry/
- *
- * @author apete
- * @see https://www.optimatika.se/products-services-inquiry/
+ * Basic usage:
+ * <ol>
+ * <li>Put optimisation problems on the solve queue bu calling {@link #putOnQueue(Sense, byte[], FileFormat)}
+ * <li>Check the status of the optimisation by calling {@link #getStatus(String)} – is it {@link Status#DONE}
+ * or still {@link Status#PENDING}?
+ * <li>Get the result of the optimisation by calling {@link #getResult(String)} – when {@link Status#DONE}
  */
-public abstract class OptimisationService {
+public final class OptimisationService {
 
-    public static final class Integration extends ExpressionsBasedModel.Integration<OptimisationService.Solver> {
+    public enum Status {
+        DONE, PENDING;
+    }
 
-        private static final String PATH_ENVIRONMENT = "/optimisation/v01/environment";
-        private static final String PATH_TEST = "/optimisation/v01/test";
+    static final class Problem {
 
-        private Boolean myCapable = null;
-        private final String myHost;
+        private final byte[] myContents;
+        private final FileFormat myFormat;
+        private final String myKey;
+        private final Optimisation.Sense mySense;
 
-        Integration(final String host) {
+        Problem(final String key, final Sense sense, final byte[] contents, final FileFormat format) {
             super();
-            myHost = host;
+            myKey = key;
+            mySense = sense;
+            myContents = contents;
+            myFormat = format;
         }
 
         @Override
-        public OptimisationService.Solver build(final ExpressionsBasedModel model) {
-            return new OptimisationService.Solver(model, myHost);
-        }
-
-        public String getEnvironment() {
-            return ServiceClient.get(myHost + PATH_ENVIRONMENT).getBody();
-        }
-
-        @Override
-        public boolean isCapable(final ExpressionsBasedModel model) {
-
-            if (myCapable == null) {
-                myCapable = this.test();
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
             }
-
-            return Boolean.TRUE.equals(myCapable);
-        }
-
-        public Boolean test() {
-            Response<String> response = ServiceClient.get(myHost + PATH_TEST);
-            if (response.isResponseOK() && response.getBody().contains("VALID")) {
-                return Boolean.TRUE;
-            } else {
-                BasicLogger.error("Calling {} failed!", myHost + PATH_TEST);
-                return Boolean.FALSE;
+            if (!(obj instanceof Problem)) {
+                return false;
             }
-        }
-
-    }
-
-    static final class Solver implements Optimisation.Solver {
-
-        private static final String PATH_MAXIMISE = "/optimisation/v01/maximise";
-        private static final String PATH_MINIMISE = "/optimisation/v01/minimise";
-
-        private final String myHost;
-        private final ExpressionsBasedModel myModel;
-        private final Optimisation.Sense myOptimisationSense;
-
-        Solver(final ExpressionsBasedModel model, final String host) {
-            super();
-            myModel = model;
-            myOptimisationSense = model.getOptimisationSense();
-            myHost = host;
+            Problem other = (Problem) obj;
+            return Arrays.equals(myContents, other.myContents) && myFormat == other.myFormat && Objects.equals(myKey, other.myKey) && mySense == other.mySense;
         }
 
         @Override
-        public Result solve(final Result kickStarter) {
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + Arrays.hashCode(myContents);
+            result = prime * result + Objects.hash(myFormat, myKey, mySense);
+            return result;
+        }
 
-            InMemoryFile file = new InMemoryFile();
+        byte[] getContents() {
+            return myContents;
+        }
 
-            myModel.simplify().writeTo(file);
+        FileFormat getFormat() {
+            return myFormat;
+        }
 
-            //  String modelAsString = file.getContentsAsString();
+        String getKey() {
+            return myKey;
+        }
 
-            Response<String> response = myOptimisationSense == Optimisation.Sense.MAX
-                    ? ServiceClient.post(myHost + PATH_MAXIMISE, file.getContentsAsByteArray())
-                    : ServiceClient.post(myHost + PATH_MINIMISE, file.getContentsAsByteArray());
-
-            String responseBody = response.getBody();
-            return Optimisation.Result.parse(responseBody);
+        Optimisation.Sense getSense() {
+            return mySense;
         }
 
     }
 
-    public static OptimisationService.Integration newIntegration(final String host) {
-        return new Integration(host);
+    private static final Result FAILED = Optimisation.Result.of(PrimitiveMath.NaN, Optimisation.State.FAILED);
+
+    public static ServiceIntegration newIntegration(final String host) {
+        return ServiceIntegration.newInstance(host);
     }
+
+    private static Optimisation.Result doOptimise(final Sense sense, final byte[] contents, final FileFormat format) throws RecoverableCondition {
+        try (ByteArrayInputStream input = new ByteArrayInputStream(contents)) {
+            ExpressionsBasedModel model = ExpressionsBasedModel.parse(input, format);
+            model.options.progress(IntegerSolver.class);
+            return sense == Sense.MAX ? model.maximise() : model.minimise();
+        } catch (Exception cause) {
+            throw new RecoverableCondition(cause);
+        }
+    }
+
+    private static String generateKey() {
+        return ASCII.generateRandom(16, ASCII::isAlphanumeric);
+    }
+
+    private final int myNumberOfWorkers;
+    private final Optimisation.Options myOptimisationOptions;
+    private final ProcessingService myProcessingService = ProcessingService.newInstance("optimisation-worker");
+    private final BlockingQueue<Problem> myQueue = new LinkedBlockingQueue<>(128);
+    private final ForgetfulMap<String, Optimisation.Result> myResultCache = ForgetfulMap.newBuilder().expireAfterAccess(Duration.ofHours(1)).build();
+
+    private final ForgetfulMap<String, Status> myStatusCache = ForgetfulMap.newBuilder().expireAfterAccess(Duration.ofHours(1)).build();
+
+    public OptimisationService() {
+
+        super();
+
+        Parallelism baseParallelism = Parallelism.THREADS;
+        int nbStrategies = IntegerStrategy.DEFAULT.countUniqueStrategies();
+
+        myNumberOfWorkers = baseParallelism.divideBy(2 * nbStrategies).getAsInt();
+
+        IntegerStrategy integerStrategy = IntegerStrategy.DEFAULT.withParallelism(baseParallelism.divideBy(myNumberOfWorkers));
+
+        myOptimisationOptions = new Optimisation.Options();
+        myOptimisationOptions.integer(integerStrategy);
+
+        myProcessingService.take(myQueue, myNumberOfWorkers, this::doOptimise);
+    }
+
+    public Optimisation.Result getResult(final String key) {
+        return myResultCache.getIfPresent(key);
+    }
+
+    public Status getStatus(final String key) {
+        return myStatusCache.getIfPresent(key);
+    }
+
+    public Optimisation.Result optimise(final Sense sense, final byte[] contents, final FileFormat format) {
+        try {
+            return OptimisationService.doOptimise(sense, contents, format);
+        } catch (RecoverableCondition cause) {
+            BasicLogger.error("Optimisation failed!", cause);
+            return FAILED;
+        }
+    }
+
+    public String putOnQueue(final Optimisation.Sense sense, final byte[] contents, final FileFormat format) throws RecoverableCondition {
+
+        String key = OptimisationService.generateKey();
+
+        Problem problem = new Problem(key, sense, contents, format);
+
+        if (myQueue.offer(problem)) {
+
+            myStatusCache.put(key, Status.PENDING);
+
+            return key;
+
+        } else {
+
+            throw new RecoverableCondition("Queue is full!");
+        }
+    }
+
+    private void doOptimise(final Problem problem) {
+
+        try {
+
+            Sense sense = problem.getSense();
+            byte[] contents = problem.getContents();
+            FileFormat format = problem.getFormat();
+
+            Optimisation.Result result = OptimisationService.doOptimise(sense, contents, format);
+
+            myResultCache.put(problem.getKey(), result);
+
+        } catch (RecoverableCondition cause) {
+
+            BasicLogger.error("Optimisation failed!", cause);
+
+            myResultCache.put(problem.getKey(), FAILED);
+
+        } finally {
+
+            myStatusCache.put(problem.getKey(), Status.DONE);
+        }
+
+    }
+
 }

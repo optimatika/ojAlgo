@@ -11,6 +11,28 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.type
+
+- A new cache implementation named `ForgetfulMap`. To save you adding a dependency on Caffeine or similar.
+
+#### org.ojalgo.optimisation
+
+- There is a new `OptimisationService` implementation with which you can queue up optimisation problems to have them solved. This service is (will be) configurable regarding how many problems to work on concurrently, and how many threads the solvers can use, among other things.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Refactoring and additions to what's in the `org.ojalgo.optimisation.service` package. They're breaking changes, but most likely no one outside Optimatika used this.
+
+### Deprecated
+
+#### org.ojalgo.type
+
+- `TypeCache` is replaced by `ForgetfulMap.ValueCache`.
+
 ## [55.0.1] – 2024-11-17
 
 ### Added
