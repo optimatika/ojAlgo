@@ -37,6 +37,10 @@ import org.ojalgo.type.context.NumberContext;
 
 public interface IntegerStrategy {
 
+    /**
+     * Apart from being able to configure various standard properties, you can also provide your own
+     * {@link ModelStrategy} factory.
+     */
     final class ConfigurableStrategy implements IntegerStrategy {
 
         private final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> myFactory;
@@ -100,11 +104,20 @@ public interface IntegerStrategy {
 
         @Override
         public List<Comparator<NodeKey>> getWorkerPriorities() {
-            int parallelism = myParallelism.getAsInt();
-            List<Comparator<NodeKey>> retVal = new ArrayList<>(parallelism);
-            for (int i = 0; i < parallelism; i++) {
-                retVal.add(myPriorityDefinitions[i % myPriorityDefinitions.length]);
+
+            int nbWorkers = myParallelism.getAsInt();
+            int nbDefinitions = myPriorityDefinitions.length;
+            int nbRepetions = (nbWorkers + nbDefinitions - 1) / nbDefinitions;
+
+            List<Comparator<NodeKey>> retVal = new ArrayList<>(nbRepetions * nbDefinitions);
+
+            for (int d = 0; d < nbDefinitions; d++) {
+                Comparator<NodeKey> prioDef = myPriorityDefinitions[d];
+                for (int r = 0; r < nbRepetions; r++) {
+                    retVal.add(prioDef);
+                }
             }
+
             return retVal;
         }
 
@@ -124,6 +137,9 @@ public interface IntegerStrategy {
             return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, myFactory, newConfiguration);
         }
 
+        /**
+         * Create a sub-class of {@link ModelStrategy} and provide a factory method for it here.
+         */
         public ConfigurableStrategy withModelStrategyFactory(final BiFunction<ExpressionsBasedModel, IntegerStrategy, ModelStrategy> newFactory) {
             return new ConfigurableStrategy(myParallelism, myPriorityDefinitions, myIntegralityTolerance, myGapTolerance, newFactory, myGMICutConfiguration);
         }
@@ -198,7 +214,8 @@ public interface IntegerStrategy {
         NumberContext integrality = NumberContext.of(12, 8);
         NumberContext gap = NumberContext.of(7, 8);
 
-        return new ConfigurableStrategy(Parallelism.CORES.require(4), definitions, integrality, gap, DefaultStrategy::new, new GMICutConfiguration());
+        return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
+                new GMICutConfiguration());
     }
 
     int countUniqueStrategies();

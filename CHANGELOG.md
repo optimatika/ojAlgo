@@ -26,6 +26,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Refactoring and additions to what's in the `org.ojalgo.optimisation.service` package. They're breaking changes, but most likely no one outside Optimatika used this.
+- Minor internal changes to how the `IntegerSolver` works. There's now an equal number of worker threads per worker-strategy.
 
 ### Deprecated
 
