@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [55.0.2] – 2024-11-30
+
 ### Added
 
 #### org.ojalgo.type
