@@ -306,6 +306,10 @@ public interface Optimisation {
             super();
         }
 
+        /**
+         * Set the {@link #time_abort} to the given duration. A duration may be constructed this way:
+         * <code>CalendarDateUnit.HOUR.newDuration(0.5)</code>.
+         */
         public Options abort(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
             time_abort = duration.toDurationInMillis();
@@ -390,6 +394,10 @@ public interface Optimisation {
             myConfigurator = configurator;
         }
 
+        /**
+         * Set the {@link #time_suffice} to the given duration. A duration may be constructed this way:
+         * <code>CalendarDateUnit.HOUR.newDuration(0.5)</code>.
+         */
         public Options suffice(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
             time_suffice = duration.toDurationInMillis();
