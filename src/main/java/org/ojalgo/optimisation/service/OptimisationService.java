@@ -46,7 +46,7 @@ import org.ojalgo.type.ForgetfulMap;
 /**
  * Basic usage:
  * <ol>
- * <li>Put optimisation problems on the solve queue bu calling {@link #putOnQueue(Sense, byte[], FileFormat)}
+ * <li>Put optimisation problems on the solve queue by calling {@link #putOnQueue(Sense, byte[], FileFormat)}
  * <li>Check the status of the optimisation by calling {@link #getStatus(String)} – is it {@link Status#DONE}
  * or still {@link Status#PENDING}?
  * <li>Get the result of the optimisation by calling {@link #getResult(String)} – when {@link Status#DONE}
@@ -136,7 +136,6 @@ public final class OptimisationService {
     private final ProcessingService myProcessingService = ProcessingService.newInstance("optimisation-worker");
     private final BlockingQueue<Problem> myQueue = new LinkedBlockingQueue<>(128);
     private final ForgetfulMap<String, Optimisation.Result> myResultCache = ForgetfulMap.newBuilder().expireAfterAccess(Duration.ofHours(1)).build();
-
     private final ForgetfulMap<String, Status> myStatusCache = ForgetfulMap.newBuilder().expireAfterAccess(Duration.ofHours(1)).build();
 
     public OptimisationService() {
@@ -146,9 +145,10 @@ public final class OptimisationService {
         Parallelism baseParallelism = Parallelism.THREADS;
         int nbStrategies = IntegerStrategy.DEFAULT.countUniqueStrategies();
 
-        myNumberOfWorkers = baseParallelism.divideBy(2 * nbStrategies).getAsInt();
+        int targetNbWorkers = baseParallelism.divideBy(2 * nbStrategies).getAsInt();
+        myNumberOfWorkers = Math.max(2, targetNbWorkers);
 
-        IntegerStrategy integerStrategy = IntegerStrategy.DEFAULT.withParallelism(baseParallelism.divideBy(myNumberOfWorkers));
+        IntegerStrategy integerStrategy = IntegerStrategy.DEFAULT.withParallelism(baseParallelism.divideBy(targetNbWorkers));
 
         myOptimisationOptions = new Optimisation.Options();
         myOptimisationOptions.integer(integerStrategy);
