@@ -29,13 +29,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.netio.FromFileReader;
 import org.ojalgo.netio.InMemoryFile;
 import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.SimpleSeries;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.PrimitiveNumber;
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 public final class FinanceDataReader<DP extends DatePrice> implements FinanceData<DP>, DataFetcher {
@@ -92,22 +92,24 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
         myResolution = resolution;
     }
 
+    @Override
     public KeyValue<String, List<DP>> getHistoricalData() {
         return KeyValue.of(this.getSymbol(), this.getHistoricalPrices());
     }
 
+    @Override
     public List<DP> getHistoricalPrices() {
 
         List<DP> retVal = new ArrayList<>();
 
         if (myFile != null) {
-            try (TextLineReader reader = TextLineReader.of(myFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+            try (TextLineReader reader = TextLineReader.of(myFile); FromFileReader<DP> supplier = reader.withFilteredParser(myParser)) {
                 supplier.forEach(retVal::add);
             } catch (Exception cause) {
                 throw new RuntimeException(cause);
             }
         } else if (myInMemoryFile != null) {
-            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); FromFileReader<DP> supplier = reader.withFilteredParser(myParser)) {
                 supplier.forEach(retVal::add);
             } catch (Exception cause) {
                 throw new RuntimeException(cause);
@@ -119,6 +121,7 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
         return retVal;
     }
 
+    @Override
     public InputStream getInputStream() {
         if (myFile != null) {
             try {
@@ -133,18 +136,19 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
         }
     }
 
+    @Override
     public BasicSeries<LocalDate, PrimitiveNumber> getPriceSeries() {
 
         BasicSeries<LocalDate, PrimitiveNumber> retVal = new SimpleSeries<>();
 
         if (myFile != null) {
-            try (TextLineReader reader = TextLineReader.of(myFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+            try (TextLineReader reader = TextLineReader.of(myFile); FromFileReader<DP> supplier = reader.withFilteredParser(myParser)) {
                 supplier.forEach(dp -> retVal.put(dp.date, dp));
             } catch (Exception cause) {
                 throw new RuntimeException(cause);
             }
         } else if (myInMemoryFile != null) {
-            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); AutoSupplier<DP> supplier = reader.withFilteredParser(myParser)) {
+            try (TextLineReader reader = TextLineReader.of(myInMemoryFile); FromFileReader<DP> supplier = reader.withFilteredParser(myParser)) {
                 supplier.forEach(dp -> retVal.put(dp.date, dp));
             } catch (Exception cause) {
                 throw new RuntimeException(cause);
@@ -156,10 +160,12 @@ public final class FinanceDataReader<DP extends DatePrice> implements FinanceDat
         return retVal;
     }
 
+    @Override
     public CalendarDateUnit getResolution() {
         return myResolution;
     }
 
+    @Override
     public String getSymbol() {
         if (myFile != null) {
             return FinanceDataReader.toSymbol(myFile.getName());

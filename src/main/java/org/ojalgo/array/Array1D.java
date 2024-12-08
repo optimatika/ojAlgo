@@ -24,9 +24,6 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.RandomAccess;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
@@ -120,132 +117,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
-        }
-
-    }
-
-    static final class QuickAscendingSorter extends RecursiveAction {
-
-        private static final long serialVersionUID = 1L;
-
-        private final long high;
-        private final long low;
-        private final Array1D<?> myArray;
-
-        private QuickAscendingSorter(final Array1D<?> array, final long low, final long high) {
-            super();
-            myArray = array;
-            this.low = low;
-            this.high = high;
-        }
-
-        QuickAscendingSorter(final Array1D<?> array) {
-            this(array, 0L, array.count() - 1L);
-        }
-
-        @Override
-        protected void compute() {
-
-            long i = low, j = high;
-
-            double pivot = myArray.doubleValue(low + (high - low) / 2);
-
-            while (i <= j) {
-
-                while (myArray.doubleValue(i) < pivot) {
-                    i++;
-                }
-                while (myArray.doubleValue(j) > pivot) {
-                    j--;
-                }
-
-                if (i <= j) {
-                    myArray.exchange(i, j);
-                    i++;
-                    j--;
-                }
-            }
-
-            QuickAscendingSorter tmpPartL = null;
-            QuickAscendingSorter tmpPartH = null;
-
-            if (low < j) {
-                tmpPartL = new QuickAscendingSorter(myArray, low, j);
-                tmpPartL.fork();
-            }
-            if (i < high) {
-                tmpPartH = new QuickAscendingSorter(myArray, i, high);
-                tmpPartH.fork();
-            }
-            if (tmpPartL != null) {
-                tmpPartL.join();
-            }
-            if (tmpPartH != null) {
-                tmpPartH.join();
-            }
-        }
-
-    }
-
-    static final class QuickDescendingSorter extends RecursiveAction {
-
-        private static final long serialVersionUID = 1L;
-
-        private final long high;
-        private final long low;
-        private final Array1D<?> myArray;
-
-        private QuickDescendingSorter(final Array1D<?> array, final long low, final long high) {
-            super();
-            myArray = array;
-            this.low = low;
-            this.high = high;
-        }
-
-        QuickDescendingSorter(final Array1D<?> array) {
-            this(array, 0L, array.count() - 1L);
-        }
-
-        @Override
-        protected void compute() {
-
-            long i = low, j = high;
-
-            double pivot = myArray.doubleValue(low + (high - low) / 2);
-
-            while (i <= j) {
-
-                while (myArray.doubleValue(i) > pivot) {
-                    i++;
-                }
-                while (myArray.doubleValue(j) < pivot) {
-                    j--;
-                }
-
-                if (i <= j) {
-                    myArray.exchange(i, j);
-                    i++;
-                    j--;
-                }
-            }
-
-            QuickDescendingSorter tmpPartL = null;
-            QuickDescendingSorter tmpPartH = null;
-
-            if (low < j) {
-                tmpPartL = new QuickDescendingSorter(myArray, low, j);
-                tmpPartL.fork();
-            }
-            if (i < high) {
-                tmpPartH = new QuickDescendingSorter(myArray, i, high);
-                tmpPartH.fork();
-            }
-            if (tmpPartL != null) {
-                tmpPartL.join();
-            }
-            if (tmpPartH != null) {
-                tmpPartH.join();
-            }
         }
 
     }
@@ -674,13 +545,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         } else {
 
-            //this.sortAscending(0L, this.count() - 1L);
-
-            try {
-                ForkJoinPool.commonPool().submit(new QuickAscendingSorter(this)).get();
-            } catch (InterruptedException | ExecutionException exception) {
-                exception.printStackTrace();
-            }
+            this.sortAscending(0L, this.count() - 1L);
         }
     }
 
@@ -693,13 +558,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         } else {
 
-            //this.sortDescending(0L, this.count() - 1L);
-
-            try {
-                ForkJoinPool.commonPool().submit(new QuickDescendingSorter(this)).get();
-            } catch (InterruptedException | ExecutionException exception) {
-                exception.printStackTrace();
-            }
+            this.sortDescending(0L, this.count() - 1L);
         }
     }
 

@@ -87,12 +87,12 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
 
     @Override
     public final void sortAscending() {
-        Arrays.parallelSort(data);
+        Arrays.sort(data);
     }
 
     @Override
     public final void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
+        Arrays.sort(data, Comparator.reverseOrder());
     }
 
     @Override

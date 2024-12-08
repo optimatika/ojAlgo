@@ -53,7 +53,7 @@ public class SegmentedFileTest extends NetioTests {
 
                 try (TextLineReader reader = segmentedFile.newTextLineReader(segment)) {
 
-                    reader.processAll(line -> {
+                    reader.forEach(line -> {
                         TestUtils.assertEquals(LINES[counter.getAndIncrement()], line);
                     });
                 }

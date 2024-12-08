@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-import org.ojalgo.type.function.AutoConsumer;
 import org.ojalgo.type.function.OperatorWithException;
 
 public final class TextLineWriter implements ToFileWriter<CharSequence> {
@@ -180,8 +179,8 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
         return new CSVLineBuilder(this, delimiter);
     }
 
-    public <T> AutoConsumer<T> withFormatter(final Formatter<T> formatter) {
-        return AutoConsumer.mapped(formatter::format, this);
+    public <T> ToFileWriter<T> withFormatter(final Formatter<T> formatter) {
+        return new MappedWriter<>(formatter::format, this);
     }
 
     @Override

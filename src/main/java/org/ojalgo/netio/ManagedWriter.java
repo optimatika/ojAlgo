@@ -19,33 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.io.IOException;
 
-final class SupplierIterator<T> implements Iterator<T> {
+import org.ojalgo.type.management.Throughput;
 
-    private transient T myNext;
-    private final AutoSupplier<T> mySupplier;
+final class ManagedWriter<T> implements ToFileWriter<T> {
 
-    SupplierIterator(final AutoSupplier<T> supplier) {
+    private final Throughput myManager;
+    private final ToFileWriter<T> myWriter;
+
+    ManagedWriter(final Throughput manager, final ToFileWriter<T> writer) {
         super();
-        mySupplier = supplier;
-        myNext = mySupplier.get();
+        myManager = manager;
+        myWriter = writer;
     }
 
-    public boolean hasNext() {
-        return myNext != null;
+    @Override
+    public void close() throws IOException {
+        myWriter.close();
     }
 
-    public T next() {
-        if (myNext == null) {
-            throw new NoSuchElementException();
-        }
-        T retVal = myNext;
-        myNext = mySupplier.get();
-        return retVal;
+    @Override
+    public void write(final T item) {
+        myManager.increment();
+        myWriter.write(item);
     }
 
 }

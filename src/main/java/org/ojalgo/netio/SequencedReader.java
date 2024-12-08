@@ -19,19 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-final class SequencedSupplier<S, T> implements AutoSupplier<T> {
+final class SequencedReader<S, T> implements FromFileReader<T> {
 
-    private Supplier<T> myCurrent;
-    private final Function<S, ? extends Supplier<T>> myFactory;
+    private FromFileReader<T> myCurrent;
+    private final Function<S, ? extends FromFileReader<T>> myFactory;
     private final BlockingQueue<S> mySources;
 
-    SequencedSupplier(final BlockingQueue<S> sources, final Function<S, ? extends Supplier<T>> factory) {
+    /**
+     * Create an {@link AutoSupplier} that will supply items from the containers, one after the other, until
+     * all containers are empty. You can create multiple such suppliers sharing the same queue of containers.
+     *
+     * @param <S> The type of some sort of item container (maybe a {@link File})
+     * @param <T> The supplier item type (what do the files contain?)
+     * @param sources A set of item containers (could be a set of {@link File}:s)
+     * @param factory A factory method that can take one of the "containers" and return an item supplier.
+     * @return A sequenced supplier.
+     */
+    SequencedReader(final BlockingQueue<S> sources, final Function<S, ? extends FromFileReader<T>> factory) {
 
         super();
 
@@ -41,34 +52,33 @@ final class SequencedSupplier<S, T> implements AutoSupplier<T> {
     }
 
     @Override
-    public void close() throws Exception {
-        if ((myCurrent != null) && (myCurrent instanceof AutoCloseable)) {
-            ((AutoCloseable) myCurrent).close();
+    public void close() throws IOException {
+        if (myCurrent != null) {
+            myCurrent.close();
         }
     }
 
+    @Override
     public T read() {
 
         if (myCurrent == null) {
             return null;
         }
 
-        T retVal = myCurrent.get();
+        T retVal = myCurrent.read();
 
         if (retVal == null) {
 
-            if (myCurrent instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) myCurrent).close();
-                } catch (Exception cause) {
-                    throw new RuntimeException(cause);
-                }
+            try {
+                myCurrent.close();
+            } catch (Exception cause) {
+                throw new RuntimeException(cause);
             }
 
             this.nextSupplier();
 
             if (myCurrent != null) {
-                retVal = myCurrent.get();
+                retVal = myCurrent.read();
             }
         }
 

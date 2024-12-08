@@ -27,8 +27,13 @@ import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.concurrent.Parallelism;
@@ -245,6 +250,36 @@ public class SegmentedFile implements AutoCloseable {
         }
     }
 
+    public <T> FromFileReader<T> newDataReader(final DataReader.Deserializer<T> deserializer) {
+        return FromFileReader.newBuilder(this).build(segment -> this.newDataReader(segment, deserializer));
+    }
+
+    public <T> DataReader<T> newDataReader(final Segment segment, final DataReader.Deserializer<T> deserializer) {
+        try {
+            return new DataReader<>(new ByteBufferBackedInputStream(myFileChannel.map(MapMode.READ_ONLY, segment.offset, segment.size)), deserializer);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    /**
+     * Each reader instantiated by this factory will read from the segments in sequence, until all of them are
+     * done. The idea is that you can create multiple readers and have them work in parallel (each segment
+     * will only be read once by one of the readers). If you only instantiate 1 reader, then maybe you
+     * shouldn't have created file segments in the first place.
+     */
+    public <T> Supplier<FromFileReader<T>> newSequencedFactory(final Function<Segment, FromFileReader<T>> factory) {
+
+        BlockingQueue<Segment> work = new LinkedTransferQueue<>();
+        Collections.addAll(work, mySegments);
+
+        return () -> new SequencedReader<>(work, factory);
+    }
+
+    public FromFileReader<String> newTextLineReader() {
+        return FromFileReader.newBuilder(this).build(this::newTextLineReader);
+    }
+
     /**
      * Call this once for each file segment, and use the returned {@link TextLineReader} to read the file
      * segment. The {@link TextLineReader} is not thread safe, and should only be used by a single thread.
@@ -261,8 +296,16 @@ public class SegmentedFile implements AutoCloseable {
         }
     }
 
+    public <T> FromFileReader<T> newTextLineReader(final TextLineReader.Parser<T> parser) {
+        return FromFileReader.newBuilder(this).build(segment -> this.newTextLineReader(segment).withParser(parser));
+    }
+
     public List<Segment> segments() {
         return List.of(mySegments);
+    }
+
+    Segment[] getSegments() {
+        return mySegments;
     }
 
 }

@@ -36,7 +36,61 @@ import org.ojalgo.type.keyvalue.KeyValue;
 
 public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWriter.Serializer<T> {
 
-    DataInterpreter<String> STRING = new DataInterpreter<>() {
+    DataInterpreter<byte[]> BYTES = new DataInterpreter<>() {
+
+        public byte[] deserialize(final DataInput input) throws IOException {
+            int length = input.readInt();
+            byte[] retVal = new byte[length];
+            for (int i = 0; i < length; i++) {
+                retVal[i] = input.readByte();
+            }
+            return retVal;
+        }
+
+        public void serialize(final byte[] data, final DataOutput output) throws IOException {
+            int length = data.length;
+            output.writeInt(length);
+            for (int i = 0; i < length; i++) {
+                output.writeByte(data[i]);
+            }
+        }
+
+    };
+
+    DataInterpreter<String> STRING_BYTES = new DataInterpreter<>() {
+
+        public String deserialize(final DataInput input) throws IOException {
+            return new String(BYTES.deserialize(input));
+        }
+
+        public void serialize(final String data, final DataOutput output) throws IOException {
+            int length = data.length();
+            output.writeInt(length);
+            output.writeBytes(data);
+        }
+
+    };
+
+    DataInterpreter<String> STRING_CHARS = new DataInterpreter<>() {
+
+        public String deserialize(final DataInput input) throws IOException {
+            int length = input.readInt();
+            StringBuilder builder = new StringBuilder(length);
+            for (int i = 0; i < length; i++) {
+                builder.append(input.readChar());
+            }
+            return builder.toString();
+        }
+
+        public void serialize(final String data, final DataOutput output) throws IOException {
+            int length = data.length();
+            output.writeInt(length);
+            output.writeChars(data);
+        }
+
+    };
+
+    DataInterpreter<String> STRING_UTF = new DataInterpreter<>() {
 
         public String deserialize(final DataInput input) throws IOException {
             return input.readUTF();
@@ -47,6 +101,12 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
         }
 
     };
+
+    /**
+     * @deprecated v56 Use one of the other alternatives
+     */
+    @Deprecated
+    DataInterpreter<String> STRING = STRING_UTF;
 
     static <N extends Comparable<N>> DataInterpreter<ArrayAnyD<N>> newIDX(final DenseArray.Factory<N> denseArray) {
 
@@ -134,6 +194,64 @@ public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWrit
             }
 
         };
+    }
+
+    static byte toByte(final byte[] bytes) {
+        return bytes[0];
+    }
+
+    static byte[] toBytes(final byte value) {
+        return new byte[] { value };
+    }
+
+    static byte[] toBytes(final char value) {
+        return new byte[] { (byte) (value >>> 8 & 0xFF), (byte) (value >>> 0 & 0xFF) };
+    }
+
+    static byte[] toBytes(final double value) {
+        return DataInterpreter.toBytes(Double.doubleToLongBits(value));
+    }
+
+    static byte[] toBytes(final float value) {
+        return DataInterpreter.toBytes(Float.floatToIntBits(value));
+    }
+
+    static byte[] toBytes(final int value) {
+        return new byte[] { (byte) (value >>> 24 & 0xFF), (byte) (value >>> 16 & 0xFF), (byte) (value >>> 8 & 0xFF), (byte) (value >>> 0 & 0xFF) };
+    }
+
+    static byte[] toBytes(final long value) {
+        return new byte[] { (byte) (value >>> 56 & 0xFF), (byte) (value >>> 48 & 0xFF), (byte) (value >>> 40 & 0xFF), (byte) (value >>> 32 & 0xFF),
+                (byte) (value >>> 24 & 0xFF), (byte) (value >>> 16 & 0xFF), (byte) (value >>> 8 & 0xFF), (byte) (value >>> 0 & 0xFF) };
+    }
+
+    static byte[] toBytes(final short value) {
+        return new byte[] { (byte) (value >>> 8 & 0xFF), (byte) (value >>> 0 & 0xFF) };
+    }
+
+    static char toChar(final byte[] bytes) {
+        return (char) ((bytes[0] & 0xFF) << 8 | bytes[1] & 0xFF);
+    }
+
+    static double toDouble(final byte[] bytes) {
+        return Double.longBitsToDouble(DataInterpreter.toLong(bytes));
+    }
+
+    static float toFloat(final byte[] bytes) {
+        return Float.intBitsToFloat(DataInterpreter.toInt(bytes));
+    }
+
+    static int toInt(final byte[] bytes) {
+        return (bytes[0] & 0xFF) << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | bytes[3] & 0xFF;
+    }
+
+    static long toLong(final byte[] bytes) {
+        return (long) (bytes[0] & 0xFF) << 56 | (long) (bytes[1] & 0xFF) << 48 | (long) (bytes[2] & 0xFF) << 40 | (long) (bytes[3] & 0xFF) << 32
+                | (long) (bytes[4] & 0xFF) << 24 | (long) (bytes[5] & 0xFF) << 16 | (long) (bytes[6] & 0xFF) << 8 | bytes[7] & 0xFF;
+    }
+
+    static short toShort(final byte[] bytes) {
+        return (short) ((bytes[0] & 0xFF) << 8 | bytes[1] & 0xFF);
     }
 
     default DataReader<T> newReader(final File file) {

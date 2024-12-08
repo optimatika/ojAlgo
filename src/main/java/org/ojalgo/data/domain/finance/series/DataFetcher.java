@@ -23,16 +23,16 @@ package org.ojalgo.data.domain.finance.series;
 
 import java.io.InputStream;
 
+import org.ojalgo.netio.FromFileReader;
 import org.ojalgo.netio.TextLineReader;
 import org.ojalgo.netio.TextLineReader.Parser;
 import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.function.AutoSupplier;
 
 public interface DataFetcher {
 
     InputStream getInputStream();
 
-    default <T> AutoSupplier<T> getReader(final Parser<T> parser) {
+    default <T> FromFileReader<T> getReader(final Parser<T> parser) {
         InputStream stream = this.getInputStream();
         TextLineReader reader = new TextLineReader(stream);
         return reader.withFilteredParser(parser);

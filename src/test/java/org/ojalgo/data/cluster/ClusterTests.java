@@ -19,30 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.data.cluster;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Set;
 
-final class MappedConsumer<IN, OUT> implements AutoConsumer<IN> {
+import org.ojalgo.netio.BasicLogger;
 
-    private final Consumer<OUT> myConsumer;
-    private final Function<IN, OUT> myMapper;
+abstract class ClusterTests {
 
-    MappedConsumer(final Function<IN, OUT> mapper, final Consumer<OUT> consumer) {
-        super();
-        myMapper = mapper;
-        myConsumer = consumer;
-    }
+    static final boolean DEBUG = false;
 
-    public void close() throws Exception {
-        if (myConsumer instanceof AutoCloseable) {
-            ((AutoCloseable) myConsumer).close();
+    void printClusters(final String label, final List<Set<Point>> clusters) {
+        BasicLogger.debug(label);
+        for (int i = 0; i < clusters.size(); i++) {
+            BasicLogger.debug("Cluster " + (i + 1) + ": " + clusters.get(i));
         }
-    }
-
-    public void write(final IN item) {
-        myConsumer.accept(myMapper.apply(item));
     }
 
 }

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.netio;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,54 +29,68 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.function.OperatorWithException;
 
-public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
+/**
+ * Essentially just a {@link Supplier}, but assumed to be reading from a file or some other source of data,
+ * and therefore extends {@link Closeable}.
+ */
+@FunctionalInterface
+public interface FromFileReader<T> extends Iterable<T>, Closeable {
 
-    public static final class Builder extends ReaderWriterBuilder<FromFileReader.Builder> {
+    public static final class Builder<F> extends ReaderWriterBuilder<F, FromFileReader.Builder<F>> {
 
-        Builder(final File[] files) {
+        Builder(final F[] files) {
             super(files);
         }
 
-        public <T> AutoSupplier<T> build(final Function<File, ? extends FromFileReader<T>> factory) {
+        @SuppressWarnings("resource")
+        public <T> FromFileReader<T> build(final Function<F, ? extends FromFileReader<T>> factory) {
 
-            File[] files = this.getFiles();
+            F[] files = this.getFiles();
 
-            LinkedBlockingDeque<T> queue = new LinkedBlockingDeque<>(this.getQueueCapacity());
+            BlockingQueue<T> queue = this.newQueue(this.getQueueCapacity());
 
-            AutoSupplier<T> single;
+            FromFileReader<T> single = FromFileReader.empty();
 
             if (files.length == 1) {
 
-                single = AutoSupplier.queued(this.getExecutor(), queue, factory.apply(files[0]));
+                single = new QueuedReader<>(this.getExecutor(), queue, factory.apply(files[0]));
 
             } else {
 
-                LinkedBlockingDeque<File> containers = new LinkedBlockingDeque<>(files.length);
+                BlockingQueue<F> containers = new LinkedTransferQueue<>();
                 Collections.addAll(containers, files);
 
-                AutoSupplier<T>[] readers = (AutoSupplier<T>[]) new AutoSupplier<?>[this.getParallelism()];
+                FromFileReader<T>[] readers = (FromFileReader<T>[]) new FromFileReader<?>[this.getParallelism()];
                 for (int i = 0; i < readers.length; i++) {
-                    readers[i] = AutoSupplier.sequenced(containers, factory);
+                    readers[i] = new SequencedReader<>(containers, factory);
                 }
 
-                single = AutoSupplier.queued(this.getExecutor(), queue, readers);
+                single = new QueuedReader<>(this.getExecutor(), queue, readers);
             }
 
             if (this.isStatisticsCollector()) {
-                return AutoSupplier.managed(this.getStatisticsCollector(), single);
+                return new ManagedReader<>(this.getStatisticsCollector(), single);
             } else {
                 return single;
             }
@@ -132,6 +147,10 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
         }
     }
 
+    static <T> FromFileReader<T> empty() {
+        return () -> null;
+    }
+
     static InputStream input(final File file) {
 
         try {
@@ -157,43 +176,79 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
         return filter.apply(FromFileReader.input(file));
     }
 
-    static Builder newBuilder(final File... file) {
-        return new Builder(file);
+    static <F> Builder<F> newBuilder(final F... file) {
+        return new Builder<>(file);
     }
 
-    static Builder newBuilder(final ShardedFile shards) {
-        return new Builder(shards.shards());
+    static Builder<File> newBuilder(final File file) {
+        return new Builder<>(new File[] { file });
+    }
+
+    static Builder<Path> newBuilder(final Path file) {
+        return new Builder<>(new Path[] { file });
+    }
+
+    static Builder<SegmentedFile.Segment> newBuilder(final SegmentedFile segmented) {
+        return new Builder<>(segmented.getSegments());
+    }
+
+    static Builder<File> newBuilder(final ShardedFile sharded) {
+        return new Builder<>(sharded.shards());
+    }
+
+    @Override
+    default void close() throws IOException {
+        // Default implementation does nothing
     }
 
     /**
-     * A factory that produce readers that read items from the supplied sources. (You have a collection of
-     * files and want to read through them all using 1 or more readers.)
+     * Behaves similar to {@link BlockingQueue#drainTo(Collection, int)} except that returning 0 means there
+     * are no more items to read.
      */
-    static <S, T> Supplier<AutoSupplier<T>> newFactory(final Function<S, FromFileReader<T>> factory, final Collection<? extends S> sources) {
+    default int drainTo(final Collection<? super T> container, final int maxElements) {
 
-        BlockingQueue<S> work = new LinkedBlockingDeque<>(sources);
+        int retVal = 0;
 
-        return () -> AutoSupplier.sequenced(work, factory);
-    }
-
-    static <S, T> Supplier<AutoSupplier<T>> newFactory(final Function<S, FromFileReader<T>> factory, final S... sources) {
-
-        BlockingQueue<S> work = new LinkedBlockingDeque<>();
-        Collections.addAll(work, sources);
-
-        return () -> AutoSupplier.sequenced(work, factory);
-    }
-
-    default void close() throws IOException {
-        try {
-            AutoSupplier.super.close();
-        } catch (Exception cause) {
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else {
-                throw new RuntimeException(cause);
-            }
+        T item = null;
+        while (retVal < maxElements && (item = this.read()) != null) {
+            container.add(item);
+            retVal++;
         }
+
+        return retVal;
+    }
+
+    /**
+     * Similar to {@link #forEach(Consumer)} but processes items in batches. Will extract up to batchSize
+     * items before calling the action, and then repeat until no more items are available.
+     */
+    default void forEachInBacthes(final int batchSize, final Consumer<? super T> action) {
+
+        List<T> batch = new ArrayList<>(batchSize);
+
+        while (this.drainTo(batch, batchSize) > 0) {
+            batch.forEach(action);
+            batch.clear();
+        }
+    }
+
+    @Override
+    default Iterator<T> iterator() {
+        return new SupplierIterator<>(this);
+    }
+
+    default <U> FromFileReader<U> map(final Function<T, U> mapper) {
+        return new MappedReader<>(this, mapper);
+    }
+
+    /**
+     * Returning null indicates that there are no more items to read. That's the same behaviour as
+     * {@link BufferedReader#readLine()}. All implementations must return null precisely once.
+     */
+    T read();
+
+    default Stream<T> stream() {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator(), Spliterator.ORDERED | Spliterator.NONNULL), false);
     }
 
 }

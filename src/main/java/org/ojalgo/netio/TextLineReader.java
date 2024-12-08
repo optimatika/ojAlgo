@@ -30,7 +30,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.function.Predicate;
 
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.function.OperatorWithException;
 
 public final class TextLineReader implements FromFileReader<String> {
@@ -104,19 +103,19 @@ public final class TextLineReader implements FromFileReader<String> {
     /**
      * The filter is {@link TextLineReader#isLineOK(String)}
      */
-    public <T> AutoSupplier<T> withFilteredParser(final Parser<T> parser) {
-        return AutoSupplier.mapped(this, TextLineReader::isLineOK, parser::parse);
+    public <T> FromFileReader<T> withFilteredParser(final Parser<T> parser) {
+        return new MappedReader<>(this, TextLineReader::isLineOK, parser::parse);
     }
 
     /**
      * The filter could for instance be {@link TextLineReader#isLineOK(String)}
      */
-    public <T> AutoSupplier<T> withFilteredParser(final Predicate<String> filter, final Parser<T> parser) {
-        return AutoSupplier.mapped(this, filter, parser::parse);
+    public <T> FromFileReader<T> withFilteredParser(final Predicate<String> filter, final Parser<T> parser) {
+        return new MappedReader<>(this, filter, parser::parse);
     }
 
-    public <T> AutoSupplier<T> withParser(final Parser<T> parser) {
-        return AutoSupplier.mapped(this, parser::parse);
+    public <T> FromFileReader<T> withParser(final Parser<T> parser) {
+        return new MappedReader<>(this, parser::parse);
     }
 
 }

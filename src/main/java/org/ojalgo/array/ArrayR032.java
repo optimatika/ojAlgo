@@ -217,13 +217,13 @@ public class ArrayR032 extends PrimitiveArray {
 
     @Override
     public void sortAscending() {
-        Arrays.parallelSort(data);
+        Arrays.sort(data);
     }
 
     @Override
     public void sortDescending() {
         CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
-        Arrays.parallelSort(data);
+        Arrays.sort(data);
         CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
     }
 

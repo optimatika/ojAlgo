@@ -19,19 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.KeyValue;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-@FunctionalInterface
-public interface ScoredDualConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {
+final class SupplierIterator<T> implements Iterator<T> {
 
-    default void write(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> item) {
-        KeyValue.Dual<T> key = item.getKey();
-        this.write(key.first, key.second, item.floatValue());
+    private transient T myNext;
+    private final FromFileReader<T> mySupplier;
+
+    SupplierIterator(final FromFileReader<T> supplier) {
+        super();
+        mySupplier = supplier;
+        myNext = mySupplier.read();
     }
 
-    void write(T key1, T key2, float score);
+    @Override
+    public boolean hasNext() {
+        return myNext != null;
+    }
+
+    @Override
+    public T next() {
+        if (myNext == null) {
+            throw new NoSuchElementException();
+        }
+        T retVal = myNext;
+        myNext = mySupplier.read();
+        return retVal;
+    }
 
 }

@@ -19,8 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-interface AutoFunctional {
+import java.io.IOException;
+import java.util.Collection;
+
+import org.ojalgo.type.management.Throughput;
+
+final class ManagedReader<T> implements FromFileReader<T> {
+
+    private final Throughput myManager;
+    private final FromFileReader<T> myReader;
+
+    ManagedReader(final Throughput manager, final FromFileReader<T> reader) {
+        super();
+        myManager = manager;
+        myReader = reader;
+    }
+
+    @Override
+    public void close() throws IOException {
+        myReader.close();
+    }
+
+    @Override
+    public int drainTo(final Collection<? super T> container, final int maxElements) {
+
+        int retVal = myReader.drainTo(container, maxElements);
+
+        if (retVal != 0) {
+            myManager.add(retVal);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public T read() {
+        T retVal = myReader.read();
+        if (retVal != null) {
+            myManager.increment();
+        }
+        return retVal;
+    }
 
 }

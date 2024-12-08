@@ -74,6 +74,10 @@ public abstract class TestUtils /* extends Assertions */ {
 
     private static final NumberContext EQUALS = NumberContext.of(12);
 
+    public static void assertArrayEquals(final byte[] expected, final byte[] actual) {
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
     public static void assertBounds(final Comparable<?> lower, final Access1D<?> values, final Comparable<?> upper, final NumberContext precision) {
         for (ElementView1D<?, ?> tmpValue : values.elements()) {
             TestUtils.assertBounds(lower, tmpValue.get(), upper, precision);

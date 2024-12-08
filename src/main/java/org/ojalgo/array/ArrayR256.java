@@ -131,12 +131,12 @@ public class ArrayR256 extends ReferenceTypeArray<BigDecimal> {
 
     @Override
     public void sortAscending() {
-        Arrays.parallelSort(data);
+        Arrays.sort(data);
     }
 
     @Override
     public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
+        Arrays.sort(data, Comparator.reverseOrder());
     }
 
     @Override

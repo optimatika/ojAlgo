@@ -36,6 +36,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.ColumnView;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
@@ -50,26 +51,26 @@ import org.ojalgo.structure.Transformation2D;
 public class DataProcessors {
 
     /**
-     * Variables centered so that their average will be 0.0
+     * Variables (columns) centered so that their average will be 0.0
      */
     public static final Transformation2D<Double> CENTER = DataProcessors.newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()));
 
     /**
-     * Variables will be centered around 0.0 AND scaled to be [-1.0,1.0]. The minimum value will be
-     * transformed to -1.0 and the maximum to +1.0.
+     * Variables (columns) will be transformed to be [-1.0,1.0]. The minimum value will be transformed to -1.0
+     * and the maximum to +1.0. The midrange will be transformed to 0.0.
      */
     public static final Transformation2D<Double> CENTER_AND_SCALE = DataProcessors
-            .newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by((ss.getMaximum() - ss.getMinimum()) / TWO)));
+            .newColumnsTransformer(ss -> SUBTRACT.by(ss.getMidrange()).andThen(DIVIDE.by(ss.getRange() / TWO)));
 
     /**
-     * Variables scaled to be within [-1.0,1.0] (divide by largest magnitude regardless of sign). If all
-     * values are positive the range will within [0.0,1.0]. If all are negative the range will be within
+     * Variables (columns) scaled to be within [-1.0,1.0] (divide by largest magnitude regardless of sign). If
+     * all values are positive the range will within [0.0,1.0]. If all are negative the range will be within
      * [-1.0,0.0]
      */
     public static final Transformation2D<Double> SCALE = DataProcessors.newColumnsTransformer(ss -> DIVIDE.by(ss.getLargest()));
 
     /**
-     * Will normalise each variable - replace each value with its standard score.
+     * Will normalise each variable (columns) - replace each value with its standard score.
      */
     public static final Transformation2D<Double> STANDARD_SCORE = DataProcessors
             .newColumnsTransformer(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
@@ -244,7 +245,7 @@ public class DataProcessors {
      * <p>
      * The constants {@link #CENTER}, {@link #SCALE}, {@link #CENTER_AND_SCALE} and {@link #STANDARD_SCORE}
      * are predefined {@link Transformation2D} instances created by calling this method.
-     * 
+     *
      * @param definition A {@link Function} that will create a {@link UnaryFunction} from a {@link SampleSet}
      *        to be applied to each column
      * @return A {@link Transformation2D} that will apply a {@link UnaryFunction} to each column
@@ -259,6 +260,22 @@ public class DataProcessors {
                     sampleSet.swap(view);
                     UnaryFunction<Double> modifier = definition.apply(sampleSet);
                     transformable.modifyColumn(view.column(), modifier);
+                }
+            }
+
+        };
+    }
+
+    public static Transformation2D<Double> newRowsTransformer(final Function<SampleSet, UnaryFunction<Double>> definition) {
+
+        return new Transformation2D<>() {
+
+            public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {
+                SampleSet sampleSet = SampleSet.make();
+                for (RowView<Double> view : transformable.rows()) {
+                    sampleSet.swap(view);
+                    UnaryFunction<Double> modifier = definition.apply(sampleSet);
+                    transformable.modifyRow(view.row(), modifier);
                 }
             }
 

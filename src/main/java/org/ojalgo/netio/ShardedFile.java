@@ -25,8 +25,13 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.function.Function;
 import java.util.function.LongFunction;
+import java.util.function.Supplier;
 
 import org.ojalgo.type.format.NumberStyle;
 import org.ojalgo.type.keyvalue.EntryPair;
@@ -155,7 +160,20 @@ public final class ShardedFile implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + numberOfShards;
-        return prime * result + ((single == null) ? 0 : single.hashCode());
+        return prime * result + (single == null ? 0 : single.hashCode());
+    }
+
+    /**
+     * Each reader instantiated by this factory will read from the shards in sequence, until all of them are
+     * done. The idea is that you can create multiple readers and have them work in parallel (each shard will
+     * only be read once by one of the readers).
+     */
+    public <T> Supplier<FromFileReader<T>> newSequencedFactory(final Function<File, FromFileReader<T>> factory) {
+
+        BlockingQueue<File> work = new LinkedTransferQueue<>();
+        Collections.addAll(work, myShards);
+
+        return () -> new SequencedReader<>(work, factory);
     }
 
     public File shard(final int index) {

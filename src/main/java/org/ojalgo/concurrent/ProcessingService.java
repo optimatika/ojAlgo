@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -191,7 +191,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new LinkedTransferQueue<>(work);
 
         List<CallableConsumer<W>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {
@@ -277,7 +277,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new LinkedTransferQueue<>(work);
 
         List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {
@@ -333,7 +333,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new LinkedTransferQueue<>(work);
 
         List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {

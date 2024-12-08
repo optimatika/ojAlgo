@@ -11,6 +11,43 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.data
+
+- New package `org.ojalgo.data.cluster` with k-means and greedy clustering algorithms implemented, as well as generalisations, specialisations and combinations of those.
+- `DataProcessors` now has a method `Transformation2D newRowsTransformer(Function<SampleSet, UnaryFunction>)` to complement the existing `newColumnsTransformer`.
+
+#### org.ojalgo.random
+
+- `SampleSet` gained a couple of methods; `getMidrange()` and `getRange()`.
+
+### Changed
+
+#### org.ojalgo.array
+
+- Sorting is no longer parallel/multi-threaded. The previous implementations made use of the common `ForkJoinPool`.
+
+#### org.ojalgo.netio
+
+- The `FromFileReader` and `ToFileWriter` interfaces and their implementations used to extend and delegate to code in the `org.ojalgo.type.function` package. Much of what was in that package has been moved to and merged with stuff in the `org.ojalgo.netio` package.
+- The `FromFileReader.Builder` and `ToFileWriter.Builder` builders now use generic "file" types. They used to be implemented in terms of Java's `File`, but can now be anything like `Path` or ojAlgo's own `SegmentedFile`, `ShardedFile` or `InMemoryFile`.
+- The `DataInterpreter` gained some additional standard interpreters, as well as utilities to convert back and forth between `byte[]`.
+
+#### org.ojalgo.random
+
+- `SamleSet` no longer makes use of parallel/multi-threaded sorting – to avoid making use of the common `ForkJoinPool`.
+
+#### org.ojalgo.type
+
+- The `AutoSupplier` and `AutoConsumer` interfaces are removed. They used to provide abstract/generalised functionality for `FromFileReader` and `ToFileWriter` in the `org.ojalgo.netio` package. All features and functionality still exists, but in terms of the more specific/concrete `FromFileReader` and `ToFileWriter`. If you directly referenced any of the various utility methods in `AutoSupplier` or `AutoConsumer` they're now gone. They primarily existed so that `FromFileReader` and `ToFileWriter` could access them (from another package). The features and functionality they provided are now available through other classes in the `org.ojalgo.netio` package – like `FromFileReader.Builder` and `ToFileWriter.Builder`.
+
+### Fixed
+
+#### org.ojalgo.data
+
+- In `DataProcessors`, the `CENTER_AND_SCALE` transformation didn't do exactly what the documentation said it. That's been fixed.
+
 ## [55.0.2] – 2024-11-30
 
 ### Added

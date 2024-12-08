@@ -24,6 +24,7 @@ package org.ojalgo.netio;
 import java.io.BufferedInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,11 +44,14 @@ public final class DataReader<T> implements FromFileReader<T> {
         /**
          * Will return null on EOF
          */
+        @Override
         default T apply(final DataInput input) {
             try {
                 return this.deserialize(input);
-            } catch (IOException cause) {
+            } catch (EOFException cause) {
                 return null;
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
             }
         }
 
@@ -83,10 +87,12 @@ public final class DataReader<T> implements FromFileReader<T> {
         myDeserializer = deserializer;
     }
 
+    @Override
     public void close() throws IOException {
         myInput.close();
     }
 
+    @Override
     public T read() {
         return myDeserializer.apply(myInput);
     }

@@ -109,6 +109,15 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return true;
     }
 
+    public boolean add(final float element) {
+
+        this.ensureCapacity();
+
+        myStorage.set(myActualCount++, element);
+
+        return true;
+    }
+
     @Override
     public void add(final int index, final N element) {
 

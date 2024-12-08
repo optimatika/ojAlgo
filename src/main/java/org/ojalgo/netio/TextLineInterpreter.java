@@ -25,25 +25,23 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ojalgo.type.function.AutoConsumer;
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.function.OperatorWithException;
 
 public interface TextLineInterpreter<T> extends TextLineReader.Parser<T>, TextLineWriter.Formatter<T> {
 
-    default AutoSupplier<T> newReader(final File file) {
+    default FromFileReader<T> newReader(final File file) {
         return TextLineReader.of(file).withParser(this);
     }
 
-    default AutoSupplier<T> newReader(final File file, final OperatorWithException<InputStream> filter) {
+    default FromFileReader<T> newReader(final File file, final OperatorWithException<InputStream> filter) {
         return TextLineReader.of(file, filter).withParser(this);
     }
 
-    default AutoConsumer<T> newWriter(final File file) {
+    default ToFileWriter<T> newWriter(final File file) {
         return TextLineWriter.of(file).withFormatter(this);
     }
 
-    default AutoConsumer<T> newWriter(final File file, final OperatorWithException<OutputStream> filter) {
+    default ToFileWriter<T> newWriter(final File file, final OperatorWithException<OutputStream> filter) {
         return TextLineWriter.of(file, filter).withFormatter(this);
     }
 

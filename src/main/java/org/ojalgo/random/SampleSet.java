@@ -295,6 +295,13 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
+     * The mean of the highest and lowest values. (Max + Min) / 2
+     */
+    public double getMidrange() {
+        return (this.getMaximum() + this.getMinimum()) / TWO;
+    }
+
+    /**
      * min(value)
      */
     public double getMinimum() {
@@ -351,6 +358,13 @@ public final class SampleSet implements Access1D<Double> {
         }
 
         return myQuartile3;
+    }
+
+    /**
+     * The difference between the highest and lowest values. Max - Min
+     */
+    public double getRange() {
+        return this.getMaximum() - this.getMinimum();
     }
 
     /**
@@ -560,10 +574,10 @@ public final class SampleSet implements Access1D<Double> {
 
         if (mySortedCopy == null || mySortedCopy.length < nbSamples || mySortedCopy.length == 0) {
             mySortedCopy = samples.toRawCopy1D();
-            Arrays.parallelSort(mySortedCopy);
+            Arrays.sort(mySortedCopy);
         } else if (mySortedCopy[0] == Double.POSITIVE_INFINITY) {
             FillMatchingSingle.fill(mySortedCopy, samples);
-            Arrays.parallelSort(mySortedCopy, 0, nbSamples);
+            Arrays.sort(mySortedCopy, 0, nbSamples);
         }
 
         return mySortedCopy;

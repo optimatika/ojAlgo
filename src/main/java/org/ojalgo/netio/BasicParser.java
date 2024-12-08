@@ -48,7 +48,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     default void parse(final File file, final boolean skipHeader, final Consumer<T> consumer) {
 
         try (TextLineReader supplier = TextLineReader.of(file)) {
-            this.parse(supplier, skipHeader, consumer);
+            this.parse(supplier::read, skipHeader, consumer);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
@@ -73,7 +73,7 @@ public interface BasicParser<T> extends TextLineReader.Parser<T> {
     default void parse(final Reader reader, final boolean skipHeader, final Consumer<T> consumer) {
 
         try (TextLineReader supplier = new TextLineReader(reader)) {
-            this.parse(supplier, skipHeader, consumer);
+            this.parse(supplier::read, skipHeader, consumer);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }

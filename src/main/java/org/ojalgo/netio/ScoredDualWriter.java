@@ -19,35 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.function.Supplier;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.KeyValue;
 
-import org.ojalgo.type.management.Throughput;
+@FunctionalInterface
+public interface ScoredDualWriter<T> extends ToFileWriter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {
 
-final class ManagedSupplier<T> implements AutoSupplier<T> {
-
-    private final Throughput myManager;
-    private final Supplier<T> mySupplier;
-
-    ManagedSupplier(final Throughput manager, final Supplier<T> supplier) {
-        super();
-        myManager = manager;
-        mySupplier = supplier;
+    @Override
+    default void write(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> item) {
+        KeyValue.Dual<T> key = item.getKey();
+        this.write(key.first, key.second, item.floatValue());
     }
 
-    public void close() throws Exception {
-        if (mySupplier instanceof AutoCloseable) {
-            ((AutoCloseable) mySupplier).close();
-        }
-    }
-
-    public T read() {
-        T retVal = mySupplier.get();
-        if (retVal != null) {
-            myManager.increment();
-        }
-        return retVal;
-    }
+    void write(T key1, T key2, float score);
 
 }

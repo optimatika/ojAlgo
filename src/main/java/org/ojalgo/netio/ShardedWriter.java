@@ -19,43 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.function.Consumer;
+import java.io.IOException;
 import java.util.function.ToIntFunction;
 
 import org.ojalgo.function.special.PowerOf2;
 
-abstract class ShardedConsumer<T> implements AutoConsumer<T> {
+abstract class ShardedWriter<T> implements ToFileWriter<T> {
 
-    static final class GeneralShardedConsumer<T> extends ShardedConsumer<T> {
+    static final class GeneralShardedConsumer<T> extends ShardedWriter<T> {
 
-        private final Consumer<T>[] myConsumers;
+        private final ToFileWriter<T>[] myWriters;
         private final ToIntFunction<T> myDistributor;
         private final int myNumberOfShards;
 
-        GeneralShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+        GeneralShardedConsumer(final ToIntFunction<T> distributor, final ToFileWriter<T>[] consumers) {
 
             super(consumers);
 
-            myConsumers = consumers;
+            myWriters = consumers;
             myDistributor = distributor;
             myNumberOfShards = consumers.length;
         }
 
+        @Override
         public void write(final T item) {
-            myConsumers[Math.abs(myDistributor.applyAsInt(item) % myNumberOfShards)].accept(item);
+            myWriters[Math.abs(myDistributor.applyAsInt(item) % myNumberOfShards)].write(item);
         }
 
     }
 
-    static final class PowerOf2ShardedConsumer<T> extends ShardedConsumer<T> {
+    static final class PowerOf2ShardedConsumer<T> extends ShardedWriter<T> {
 
-        private final Consumer<T>[] myConsumers;
+        private final ToFileWriter<T>[] myWriters;
         private final ToIntFunction<T> myDistributor;
         private final int myIndexMask;
 
-        PowerOf2ShardedConsumer(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+        PowerOf2ShardedConsumer(final ToIntFunction<T> distributor, final ToFileWriter<T>[] consumers) {
 
             super(consumers);
 
@@ -63,18 +64,19 @@ abstract class ShardedConsumer<T> implements AutoConsumer<T> {
                 throw new IllegalArgumentException("The number of consumers must be a power of 2!");
             }
 
-            myConsumers = consumers;
+            myWriters = consumers;
             myDistributor = distributor;
             myIndexMask = consumers.length - 1;
         }
 
+        @Override
         public void write(final T item) {
-            myConsumers[myDistributor.applyAsInt(item) & myIndexMask].accept(item);
+            myWriters[myDistributor.applyAsInt(item) & myIndexMask].write(item);
         }
 
     }
 
-    static <T> ShardedConsumer<T> of(final ToIntFunction<T> distributor, final Consumer<T>[] consumers) {
+    static <T> ShardedWriter<T> of(final ToIntFunction<T> distributor, final ToFileWriter<T>[] consumers) {
         if (PowerOf2.isPowerOf2(consumers.length)) {
             return new PowerOf2ShardedConsumer<>(distributor, consumers);
         } else {
@@ -82,20 +84,19 @@ abstract class ShardedConsumer<T> implements AutoConsumer<T> {
         }
     }
 
-    private final Consumer<T>[] myConsumers;
+    private final ToFileWriter<T>[] myWriters;
 
-    ShardedConsumer(final Consumer<T>[] consumers) {
+    ShardedWriter(final ToFileWriter<T>[] consumers) {
 
         super();
 
-        myConsumers = consumers;
+        myWriters = consumers;
     }
 
-    public void close() throws Exception {
-        for (Consumer<T> consumer : myConsumers) {
-            if (consumer instanceof AutoCloseable) {
-                ((AutoCloseable) consumer).close();
-            }
+    @Override
+    public void close() throws IOException {
+        for (ToFileWriter<T> consumer : myWriters) {
+            consumer.close();
         }
     }
 

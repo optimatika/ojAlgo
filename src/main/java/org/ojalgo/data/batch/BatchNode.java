@@ -41,8 +41,6 @@ import org.ojalgo.netio.DataWriter;
 import org.ojalgo.netio.FromFileReader;
 import org.ojalgo.netio.ShardedFile;
 import org.ojalgo.netio.ToFileWriter;
-import org.ojalgo.type.function.AutoConsumer;
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.function.TwoStepMapper;
 import org.ojalgo.type.management.MBeanUtils;
 import org.ojalgo.type.management.Throughput;
@@ -218,7 +216,7 @@ public final class BatchNode<T> {
     private final IntSupplier myParallelism;
     private final ProcessingService myProcessor;
     private final int myQueueCapacity;
-    private transient Function<File, AutoSupplier<T>> myReaderFactory = null;
+    private transient Function<File, FromFileReader<T>> myReaderFactory = null;
     private final Throughput myReaderManager;
     private final ShardedFile myShards;
     private final Throughput myWriterManger;
@@ -250,7 +248,7 @@ public final class BatchNode<T> {
         myShards.delete();
     }
 
-    public AutoConsumer<T> newWriter() {
+    public ToFileWriter<T> newWriter() {
         return ToFileWriter.newBuilder(myShards).queue(myQueueCapacity).parallelism(myParallelism).statistics(myWriterManger).build(myDistributor,
                 shard -> DataWriter.of(shard, myInterpreter));
     }
@@ -277,7 +275,7 @@ public final class BatchNode<T> {
      * Similar to {@link #processMergeable(Supplier, Consumer)} but the {@code processor} is called with the
      * aggregator instance itself rather than its extracted results. This corresponds to
      * {@link TwoStepMapper#Combineable} rather than {@link TwoStepMapper#Mergeable}.
-     * 
+     *
      * @see #processMergeable(Supplier, Consumer)
      */
     public <R, A extends TwoStepMapper<T, R>> void processCombineable(final Supplier<A> aggregatorFactory, final Consumer<A> processor) {
@@ -367,7 +365,7 @@ public final class BatchNode<T> {
      * {@link TwoStepMapper#merge(Object)} - you can only use this if merging partial (sub)results is
      * possible. Use a constructor or factory method that produce instances of that type as the argument to
      * this method.
-     * 
+     *
      * @deprecated v54 Use {@link #reduceByMerging(Supplier<A>)} instead
      */
     @Deprecated
@@ -375,7 +373,7 @@ public final class BatchNode<T> {
         return this.reduceByMerging(aggregatorFactory);
     }
 
-    private Function<File, AutoSupplier<T>> getReaderFactory() {
+    private Function<File, FromFileReader<T>> getReaderFactory() {
         if (myReaderFactory == null) {
             Function<File, DataReader<T>> baseReader = file -> DataReader.of(file, myInterpreter);
             myReaderFactory = file -> FromFileReader.newBuilder(file).parallelism(1).queue(myQueueCapacity / myParallelism.getAsInt())
@@ -386,7 +384,7 @@ public final class BatchNode<T> {
 
     private void process(final File shard, final Consumer<T> consumer) {
 
-        try (AutoSupplier<T> reader = this.newReader(shard)) {
+        try (FromFileReader<T> reader = this.newReader(shard)) {
 
             T item = null;
             while ((item = reader.read()) != null) {
@@ -403,7 +401,7 @@ public final class BatchNode<T> {
 
         A aggregator = aggregatorFactory.get(); // It's a ThreadLocal...
 
-        try (AutoSupplier<T> reader = this.newReader(shard)) {
+        try (FromFileReader<T> reader = this.newReader(shard)) {
 
             T item = null;
             while ((item = reader.read()) != null) {
@@ -423,7 +421,7 @@ public final class BatchNode<T> {
 
         A aggregator = aggregatorFactory.get(); // It's a ThreadLocal...
 
-        try (AutoSupplier<T> reader = this.newReader(shard)) {
+        try (FromFileReader<T> reader = this.newReader(shard)) {
 
             T item = null;
             while ((item = reader.read()) != null) {
@@ -439,7 +437,7 @@ public final class BatchNode<T> {
         }
     }
 
-    AutoSupplier<T> newReader(final File file) {
+    FromFileReader<T> newReader(final File file) {
         return this.getReaderFactory().apply(file);
     }
 
