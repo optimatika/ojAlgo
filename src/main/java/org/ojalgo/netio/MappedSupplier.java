@@ -19,34 +19,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.function.Supplier;
+import java.io.IOException;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-import org.ojalgo.type.management.Throughput;
+final class MappedSupplier<IN, OUT> implements FromFileReader<OUT> {
 
-final class ManagedSupplier<T> implements AutoSupplier<T> {
+    private final Function<IN, OUT> myMapper;
+    private final FromFileReader<IN> mySupplier;
+    private final Predicate<IN> myFilter;
 
-    private final Throughput myManager;
-    private final Supplier<T> mySupplier;
+    MappedSupplier(final FromFileReader<IN> supplier, final Function<IN, OUT> mapper) {
+        this(supplier, in -> true, mapper);
+    }
 
-    ManagedSupplier(final Throughput manager, final Supplier<T> supplier) {
+    MappedSupplier(final FromFileReader<IN> supplier, final Predicate<IN> filter, final Function<IN, OUT> mapper) {
         super();
-        myManager = manager;
         mySupplier = supplier;
+        myFilter = filter;
+        myMapper = mapper;
     }
 
-    public void close() throws Exception {
-        if (mySupplier instanceof AutoCloseable) {
-            ((AutoCloseable) mySupplier).close();
-        }
+    @Override
+    public void close() throws IOException {
+        mySupplier.close();
     }
 
-    public T read() {
-        T retVal = mySupplier.get();
-        if (retVal != null) {
-            myManager.increment();
+    @Override
+    public OUT read() {
+
+        IN unmapped = null;
+        OUT retVal = null;
+
+        while ((unmapped = mySupplier.read()) != null && (!myFilter.test(unmapped) || (retVal = myMapper.apply(unmapped)) == null)) {
+            // Read until we get a non-null item that passes the test and mapping works (return not-null)
         }
+
         return retVal;
     }
 

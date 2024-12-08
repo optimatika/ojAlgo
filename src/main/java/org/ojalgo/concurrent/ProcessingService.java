@@ -6,13 +6,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -191,7 +191,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new ArrayBlockingQueue<>(work.size(), false, work);
 
         List<CallableConsumer<W>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {
@@ -277,7 +277,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new ArrayBlockingQueue<>(work.size(), false, work);
 
         List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {
@@ -333,7 +333,7 @@ public final class ProcessingService {
 
         int concurrency = Math.min(work.size(), parallelism);
 
-        Queue<W> queue = new LinkedBlockingDeque<>(work);
+        Queue<W> queue = new ArrayBlockingQueue<>(work.size(), false, work);
 
         List<CallableMapper<W, R>> tasks = new ArrayList<>(concurrency);
         for (int i = 0; i < concurrency; i++) {

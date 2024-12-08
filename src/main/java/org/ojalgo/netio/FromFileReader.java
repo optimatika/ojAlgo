@@ -30,52 +30,57 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import org.ojalgo.type.function.AutoSupplier;
 import org.ojalgo.type.function.OperatorWithException;
+import org.ojalgo.type.management.MBeanUtils;
+import org.ojalgo.type.management.Throughput;
 
-public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
+public interface FromFileReader<T> extends Iterable<T>, Closeable {
 
-    public static final class Builder extends ReaderWriterBuilder<FromFileReader.Builder> {
+    public static final class Builder<F> extends ReaderWriterBuilder<F, FromFileReader.Builder<F>> {
 
-        Builder(final File[] files) {
+        Builder(final F[] files) {
             super(files);
         }
 
-        public <T> AutoSupplier<T> build(final Function<File, ? extends FromFileReader<T>> factory) {
+        public <T> FromFileReader<T> build(final Function<F, ? extends FromFileReader<T>> factory) {
 
-            File[] files = this.getFiles();
+            F[] files = this.getFiles();
 
-            LinkedBlockingDeque<T> queue = new LinkedBlockingDeque<>(this.getQueueCapacity());
+            BlockingQueue<T> queue = new LinkedBlockingQueue<>(this.getQueueCapacity());
 
-            AutoSupplier<T> single;
+            FromFileReader<T> single;
 
             if (files.length == 1) {
 
-                single = AutoSupplier.queued(this.getExecutor(), queue, factory.apply(files[0]));
+                single = FromFileReader.queued(this.getExecutor(), queue, factory.apply(files[0]));
 
             } else {
 
-                LinkedBlockingDeque<File> containers = new LinkedBlockingDeque<>(files.length);
+                BlockingQueue<F> containers = new ArrayBlockingQueue<>(files.length);
                 Collections.addAll(containers, files);
 
-                AutoSupplier<T>[] readers = (AutoSupplier<T>[]) new AutoSupplier<?>[this.getParallelism()];
+                FromFileReader<T>[] readers = (FromFileReader<T>[]) new FromFileReader<?>[this.getParallelism()];
                 for (int i = 0; i < readers.length; i++) {
-                    readers[i] = AutoSupplier.sequenced(containers, factory);
+                    readers[i] = FromFileReader.sequenced(containers, factory);
                 }
 
-                single = AutoSupplier.queued(this.getExecutor(), queue, readers);
+                single = FromFileReader.queued(this.getExecutor(), queue, readers);
             }
 
             if (this.isStatisticsCollector()) {
-                return AutoSupplier.managed(this.getStatisticsCollector(), single);
+                return FromFileReader.managed(this.getStatisticsCollector(), single);
             } else {
                 return single;
             }
@@ -132,6 +137,10 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
         }
     }
 
+    static <T> FromFileReader<T> empty() {
+        return () -> null;
+    }
+
     static InputStream input(final File file) {
 
         try {
@@ -157,43 +166,123 @@ public interface FromFileReader<T> extends AutoSupplier<T>, Closeable {
         return filter.apply(FromFileReader.input(file));
     }
 
-    static Builder newBuilder(final File... file) {
-        return new Builder(file);
+    /**
+     * Will create a JMX bean, with the given name, that keeps track of the supplier's throughput.
+     */
+    static <T> FromFileReader<T> managed(final String name, final FromFileReader<T> supplier) {
+
+        Throughput manager = new Throughput();
+
+        MBeanUtils.register(manager, name);
+
+        return new ManagedSupplier<>(manager, supplier);
     }
 
-    static Builder newBuilder(final ShardedFile shards) {
-        return new Builder(shards.shards());
+    /**
+     * If you want that throughput manager to be registered as a JMX bean, that's up to you.
+     */
+    static <T> FromFileReader<T> managed(final Throughput manager, final FromFileReader<T> supplier) {
+        return new ManagedSupplier<>(manager, supplier);
+    }
+
+    /**
+     * Get something and map/transform before returning it
+     */
+    static <T, U> FromFileReader<U> mapped(final FromFileReader<T> supplier, final Function<T, U> mapper) {
+        return new MappedSupplier<>(supplier, mapper);
+    }
+
+    /**
+     * Get something, that passes the test, and map/transform before returning it
+     */
+    static <T, U> FromFileReader<U> mapped(final FromFileReader<T> supplier, final Predicate<T> filter, final Function<T, U> mapper) {
+        return new MappedSupplier<>(supplier, filter, mapper);
+    }
+
+    static Builder<File> newBuilder(final File... file) {
+        return new Builder<>(file);
+    }
+
+    static Builder<SegmentedFile.Segment> newBuilder(final SegmentedFile segmentedFile) {
+        return new Builder<>(segmentedFile.getSegments());
+    }
+
+    static Builder<File> newBuilder(final ShardedFile shards) {
+        return new Builder<>(shards.shards());
     }
 
     /**
      * A factory that produce readers that read items from the supplied sources. (You have a collection of
      * files and want to read through them all using 1 or more readers.)
      */
-    static <S, T> Supplier<AutoSupplier<T>> newFactory(final Function<S, FromFileReader<T>> factory, final Collection<? extends S> sources) {
+    static <S, T> Supplier<FromFileReader<T>> newFactory(final Function<S, FromFileReader<T>> factory, final Collection<? extends S> sources) {
 
-        BlockingQueue<S> work = new LinkedBlockingDeque<>(sources);
+        BlockingQueue<S> work = new ArrayBlockingQueue<>(sources.size(), false, sources);
 
-        return () -> AutoSupplier.sequenced(work, factory);
+        return () -> FromFileReader.sequenced(work, factory);
     }
 
-    static <S, T> Supplier<AutoSupplier<T>> newFactory(final Function<S, FromFileReader<T>> factory, final S... sources) {
+    static <S, T> Supplier<FromFileReader<T>> newFactory(final Function<S, FromFileReader<T>> factory, final S... sources) {
 
-        BlockingQueue<S> work = new LinkedBlockingDeque<>();
+        BlockingQueue<S> work = new ArrayBlockingQueue<>(sources.length, false);
         Collections.addAll(work, sources);
 
-        return () -> AutoSupplier.sequenced(work, factory);
+        return () -> FromFileReader.sequenced(work, factory);
     }
 
-    default void close() throws IOException {
-        try {
-            AutoSupplier.super.close();
-        } catch (Exception cause) {
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else {
-                throw new RuntimeException(cause);
-            }
-        }
+    /**
+     * Multiple suppliers supply to a queue, then you get from that queue. There will be 1 thread (executor
+     * task) per supplier.
+     */
+    static <T> FromFileReader<T> queued(final ExecutorService executor, final BlockingQueue<T> queue, final FromFileReader<T>... suppliers) {
+        return new QueuedSupplier<>(executor, queue, suppliers);
     }
+
+    static <T> FromFileReader<T> sequenced(final BlockingQueue<? extends FromFileReader<T>> sources) {
+        return new SequencedSupplier<>(sources, s -> s);
+    }
+
+    /**
+     * Create an {@link AutoSupplier} that will supply items from the containers, one after the other, until
+     * all containers are empty. You can create multiple such suppliers sharing the same queue of containers.
+     *
+     * @param <S> The type of some sort of item container (maybe a {@link File})
+     * @param <T> The supplier item type (what do the files contain?)
+     * @param sources A set of item containers (could be a set of {@link File}:s)
+     * @param factory A factory method that can take one of the "containers" and return an item supplier.
+     * @return A sequenced supplier.
+     */
+    static <S, T> FromFileReader<T> sequenced(final BlockingQueue<S> sources, final Function<S, ? extends FromFileReader<T>> factory) {
+        return new SequencedSupplier<>(sources, factory);
+    }
+
+    @Override
+    default void close() throws IOException {
+        // Default implementation does nothing
+    }
+
+    default int drainTo(final Collection<? super T> container, final int maxElements) {
+
+        int retVal = 0;
+
+        T item = null;
+        while (retVal < maxElements && (item = this.read()) != null) {
+            container.add(item);
+            retVal++;
+        }
+
+        return retVal;
+    }
+
+    @Override
+    default Iterator<T> iterator() {
+        return new SupplierIterator<>(this);
+    }
+
+    default <U> FromFileReader<U> map(final Function<T, U> mapper) {
+        return new MappedSupplier<>(this, mapper);
+    }
+
+    T read();
 
 }

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.netio;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.function.IntSupplier;
 
@@ -30,7 +29,7 @@ import org.ojalgo.concurrent.Parallelism;
 import org.ojalgo.type.management.MBeanUtils;
 import org.ojalgo.type.management.Throughput;
 
-abstract class ReaderWriterBuilder<B extends ReaderWriterBuilder<B>> {
+abstract class ReaderWriterBuilder<F, B extends ReaderWriterBuilder<F, B>> {
 
     private static volatile ExecutorService EXECUTOR = null;
 
@@ -46,13 +45,13 @@ abstract class ReaderWriterBuilder<B extends ReaderWriterBuilder<B>> {
     }
 
     private ExecutorService myExecutor = null;
-    private final File[] myFiles;
+    private final F[] myFiles;
     private String myManagerName = null;
     private IntSupplier myParallelism = Parallelism.CORES.limit(32);
     private int myQueueCapacity = 1024;
     private Throughput myStatisticsCollector = null;
 
-    ReaderWriterBuilder(final File[] files) {
+    ReaderWriterBuilder(final F[] files) {
         super();
         myFiles = files;
     }
@@ -93,7 +92,7 @@ abstract class ReaderWriterBuilder<B extends ReaderWriterBuilder<B>> {
         return myExecutor;
     }
 
-    File[] getFiles() {
+    F[] getFiles() {
         return myFiles;
     }
 
@@ -114,6 +113,6 @@ abstract class ReaderWriterBuilder<B extends ReaderWriterBuilder<B>> {
     }
 
     boolean isStatisticsCollector() {
-        return (myStatisticsCollector != null || myManagerName != null);
+        return myStatisticsCollector != null || myManagerName != null;
     }
 }

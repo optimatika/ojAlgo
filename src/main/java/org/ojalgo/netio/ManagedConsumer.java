@@ -19,30 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.io.IOException;
 
-final class MappedConsumer<IN, OUT> implements AutoConsumer<IN> {
+import org.ojalgo.type.management.Throughput;
 
-    private final Consumer<OUT> myConsumer;
-    private final Function<IN, OUT> myMapper;
+final class ManagedConsumer<T> implements ToFileWriter<T> {
 
-    MappedConsumer(final Function<IN, OUT> mapper, final Consumer<OUT> consumer) {
+    private final ToFileWriter<T> myConsumer;
+    private final Throughput myManager;
+
+    ManagedConsumer(final Throughput manager, final ToFileWriter<T> consumer) {
         super();
-        myMapper = mapper;
+        myManager = manager;
         myConsumer = consumer;
     }
 
-    public void close() throws Exception {
-        if (myConsumer instanceof AutoCloseable) {
-            ((AutoCloseable) myConsumer).close();
-        }
+    @Override
+    public void close() throws IOException {
+        myConsumer.close();
     }
 
-    public void write(final IN item) {
-        myConsumer.accept(myMapper.apply(item));
+    @Override
+    public void write(final T item) {
+        myManager.increment();
+        myConsumer.write(item);
     }
 
 }

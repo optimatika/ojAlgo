@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
@@ -36,28 +37,29 @@ import java.util.function.ToIntFunction;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.ojalgo.type.function.AutoConsumer;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
+import org.ojalgo.type.management.MBeanUtils;
+import org.ojalgo.type.management.Throughput;
 
-public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
+public interface ToFileWriter<T> extends Closeable {
 
-    public static final class Builder extends ReaderWriterBuilder<ToFileWriter.Builder> {
+    public static final class Builder<F> extends ReaderWriterBuilder<F, ToFileWriter.Builder<F>> {
 
-        Builder(final File[] files) {
+        Builder(final F[] files) {
             super(files);
 
         }
 
-        public <T> AutoConsumer<T> build(final Function<File, ToFileWriter<T>> factory) {
+        public <T> ToFileWriter<T> build(final Function<F, ToFileWriter<T>> factory) {
             return this.build(Object::hashCode, factory);
         }
 
         @SuppressWarnings("resource")
-        public <T> AutoConsumer<T> build(final ToIntFunction<T> distributor, final Function<File, ? extends AutoConsumer<T>> factory) {
+        public <T> ToFileWriter<T> build(final ToIntFunction<T> distributor, final Function<F, ? extends ToFileWriter<T>> factory) {
 
-            File[] files = this.getFiles();
+            F[] files = this.getFiles();
 
-            AutoConsumer<T>[] shards = (AutoConsumer<T>[]) new AutoConsumer<?>[files.length];
+            ToFileWriter<T>[] shards = (ToFileWriter<T>[]) new ToFileWriter<?>[files.length];
             for (int i = 0; i < shards.length; i++) {
                 shards[i] = factory.apply(files[i]);
             }
@@ -70,29 +72,29 @@ public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
             int numberOfQueues = Math.max(1, Math.min(parallelism, numberOfShards));
             int capacityPerQueue = Math.max(3, queueCapacity / numberOfQueues);
 
-            AutoConsumer<T> single;
+            ToFileWriter<T> single;
 
             if (numberOfShards == 1) {
 
-                LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
-                single = AutoConsumer.queued(executor, queue, shards[0]);
+                BlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
+                single = ToFileWriter.queued(executor, queue, shards[0]);
 
             } else if (numberOfQueues == 1) {
 
-                LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
-                AutoConsumer<T> consumer = AutoConsumer.sharded(distributor, shards);
-                single = AutoConsumer.queued(executor, queue, consumer);
+                BlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
+                ToFileWriter<T> consumer = ToFileWriter.sharded(distributor, shards);
+                single = ToFileWriter.queued(executor, queue, consumer);
 
             } else if (numberOfQueues == numberOfShards) {
 
-                AutoConsumer<T>[] queuedWriters = (AutoConsumer<T>[]) new AutoConsumer<?>[numberOfQueues];
+                ToFileWriter<T>[] queuedWriters = (ToFileWriter<T>[]) new ToFileWriter<?>[numberOfQueues];
 
                 for (int q = 0; q < numberOfQueues; q++) {
-                    LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
-                    queuedWriters[q] = AutoConsumer.queued(executor, queue, shards[q]);
+                    BlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
+                    queuedWriters[q] = ToFileWriter.queued(executor, queue, shards[q]);
                 }
 
-                single = AutoConsumer.sharded(distributor, queuedWriters);
+                single = ToFileWriter.sharded(distributor, queuedWriters);
 
             } else {
 
@@ -102,7 +104,7 @@ public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
                 }
                 int shardsPerQueue = candidateShardsPerQueue;
 
-                AutoConsumer<T>[] queuedWriters = (AutoConsumer<T>[]) new AutoConsumer<?>[numberOfQueues];
+                ToFileWriter<T>[] queuedWriters = (ToFileWriter<T>[]) new ToFileWriter<?>[numberOfQueues];
 
                 ToIntFunction<T> toQueueDistributor = item -> Math.abs(distributor.applyAsInt(item) % numberOfShards) / shardsPerQueue;
                 ToIntFunction<T> toShardDistributor = item -> Math.abs(distributor.applyAsInt(item) % numberOfShards) % shardsPerQueue;
@@ -110,54 +112,84 @@ public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
                 for (int q = 0; q < numberOfQueues; q++) {
                     int offset = q * shardsPerQueue;
 
-                    AutoConsumer<T>[] shardWriters = (AutoConsumer<T>[]) new AutoConsumer<?>[shardsPerQueue];
-                    Arrays.fill(shardWriters, AutoConsumer.NULL);
+                    ToFileWriter<T>[] shardWriters = (ToFileWriter<T>[]) new ToFileWriter<?>[shardsPerQueue];
+                    Arrays.fill(shardWriters, ToFileWriter.NULL);
                     for (int b = 0; b < shardsPerQueue && offset + b < numberOfShards; b++) {
                         shardWriters[b] = shards[offset + b];
                     }
 
-                    LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
-                    AutoConsumer<T> writer = AutoConsumer.sharded(toShardDistributor, shardWriters);
-                    queuedWriters[q] = AutoConsumer.queued(executor, queue, writer);
+                    BlockingQueue<T> queue = new LinkedBlockingQueue<>(capacityPerQueue);
+                    ToFileWriter<T> writer = ToFileWriter.sharded(toShardDistributor, shardWriters);
+                    queuedWriters[q] = ToFileWriter.queued(executor, queue, writer);
                 }
 
-                single = AutoConsumer.sharded(toQueueDistributor, queuedWriters);
+                single = ToFileWriter.sharded(toQueueDistributor, queuedWriters);
             }
 
             if (this.isStatisticsCollector()) {
-                return AutoConsumer.managed(this.getStatisticsCollector(), single);
+                return ToFileWriter.managed(this.getStatisticsCollector(), single);
             } else {
                 return single;
             }
         }
 
-        public <T> AutoConsumer<KeyedPrimitive<T>> buildMapped(final Function<File, ToFileWriter<T>> factory) {
+        public <T> ToFileWriter<KeyedPrimitive<T>> buildMapped(final Function<F, ToFileWriter<T>> factory) {
 
             Function<KeyedPrimitive<T>, T> mapper = KeyedPrimitive::getKey;
             ToIntFunction<KeyedPrimitive<T>> distributor = KeyedPrimitive::intValue;
 
-            Function<File, AutoConsumer<KeyedPrimitive<T>>> mappedFactory = file -> AutoConsumer.mapped(mapper, factory.apply(file));
+            Function<F, ToFileWriter<KeyedPrimitive<T>>> mappedFactory = file -> ToFileWriter.mapped(mapper, factory.apply(file));
 
             return this.build(distributor, mappedFactory);
         }
 
     }
 
+    ToFileWriter<?> NULL = item -> {
+        throw new IllegalStateException("NULL!");
+    };
+
+    /**
+     * Will create a JMX bean, with the given name, that keeps track of the consumer's throughput.
+     */
+    static <T> ToFileWriter<T> managed(final String name, final ToFileWriter<T> consumer) {
+
+        Throughput manager = new Throughput();
+
+        MBeanUtils.register(manager, name);
+
+        return new ManagedConsumer<>(manager, consumer);
+    }
+
+    /**
+     * If you want that throughput manager to be registered as a JMX bean, that's up to you.
+     */
+    static <T> ToFileWriter<T> managed(final Throughput manager, final ToFileWriter<T> consumer) {
+        return new ManagedConsumer<>(manager, consumer);
+    }
+
+    /**
+     * Map/transform and then consume
+     */
+    static <S, T> ToFileWriter<S> mapped(final Function<S, T> mapper, final ToFileWriter<T> consumer) {
+        return new MappedConsumer<>(mapper, consumer);
+    }
+
     /**
      * Make sure this directory exists, create if necessary
      */
     static void mkdirs(final File dir) {
-        if (!dir.exists() && (!dir.mkdirs() && !dir.exists())) {
+        if (!dir.exists() && !dir.mkdirs() && !dir.exists()) {
             throw new RuntimeException("Failed to create " + dir.getAbsolutePath());
         }
     }
 
-    static Builder newBuilder(final File... file) {
-        return new Builder(file);
+    static Builder<File> newBuilder(final File... file) {
+        return new Builder<>(file);
     }
 
-    static Builder newBuilder(final ShardedFile shards) {
-        return new Builder(shards.shards());
+    static Builder<File> newBuilder(final ShardedFile shards) {
+        return new Builder<>(shards.shards());
     }
 
     static OutputStream output(final File file) {
@@ -181,6 +213,14 @@ public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
         }
     }
 
+    /**
+     * Put on the queue, and then the consumers work off that queue. There will be 1 thread (executor task)
+     * per consumer.
+     */
+    static <T> ToFileWriter<T> queued(final ExecutorService executor, final BlockingQueue<T> queue, final ToFileWriter<T>... consumers) {
+        return new QueuedConsumer<>(executor, queue, consumers);
+    }
+
     static <T extends Serializable> void serializeObjectToFile(final T object, final File file) {
         try (ObjectOutputStream oos = new ObjectOutputStream(ToFileWriter.output(file))) {
             oos.writeObject(object);
@@ -189,15 +229,33 @@ public interface ToFileWriter<T> extends AutoConsumer<T>, Closeable {
         }
     }
 
+    /**
+     * Distribute to 1 of the consumers
+     */
+    static <T> ToFileWriter<T> sharded(final ToIntFunction<T> distributor, final ToFileWriter<T>... consumers) {
+        return ShardedConsumer.of(distributor, consumers);
+    }
+
+    @Override
     default void close() throws IOException {
-        try {
-            AutoConsumer.super.close();
-        } catch (Exception cause) {
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else {
-                throw new RuntimeException(cause);
-            }
+        // Default implementation does nothing
+    }
+
+    /**
+     * Write the item to the consumer.
+     *
+     * @param item The item to be written
+     */
+    void write(T item);
+
+    /**
+     * Write the batch (collection of items) to the consumer.
+     *
+     * @param batch The batch to be written
+     */
+    default void writeBatch(final Iterable<? extends T> batch) {
+        for (T item : batch) {
+            this.write(item);
         }
     }
 

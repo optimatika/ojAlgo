@@ -19,32 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 
-final class QueuedSupplier<T> implements AutoSupplier<T> {
+final class QueuedSupplier<T> implements FromFileReader<T> {
 
     static final class Worker<T> implements Runnable {
 
         private final BlockingQueue<T> myQueue;
-        private final Supplier<T> mySupplier;
+        private final FromFileReader<T> mySupplier;
 
-        Worker(final BlockingQueue<T> queue, final Supplier<T> reader) {
+        Worker(final BlockingQueue<T> queue, final FromFileReader<T> reader) {
             super();
             myQueue = queue;
             mySupplier = reader;
         }
 
+        @Override
         public void run() {
             try {
                 T item = null;
-                while ((item = mySupplier.get()) != null) {
+                while ((item = mySupplier.read()) != null) {
                     myQueue.put(item);
                 }
             } catch (InterruptedException cause) {
@@ -56,9 +57,9 @@ final class QueuedSupplier<T> implements AutoSupplier<T> {
 
     private final Future<?>[] myFutures;
     private final BlockingQueue<T> myQueue;
-    private final Supplier<T>[] mySuppliers;
+    private final FromFileReader<T>[] mySuppliers;
 
-    QueuedSupplier(final ExecutorService executor, final BlockingQueue<T> queue, final Supplier<T>... suppliers) {
+    QueuedSupplier(final ExecutorService executor, final BlockingQueue<T> queue, final FromFileReader<T>... suppliers) {
 
         super();
 
@@ -72,23 +73,23 @@ final class QueuedSupplier<T> implements AutoSupplier<T> {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         try {
             for (int i = 0; i < myFutures.length; i++) {
                 myFutures[i].get();
-                if (mySuppliers[i] instanceof AutoCloseable) {
-                    ((AutoCloseable) mySuppliers[i]).close();
-                }
+                mySuppliers[i].close();
             }
         } catch (InterruptedException | ExecutionException cause) {
             throw new RuntimeException(cause);
         }
     }
 
+    @Override
     public int drainTo(final Collection<? super T> container, final int maxElements) {
         return myQueue.drainTo(container, maxElements);
     }
 
+    @Override
     public T read() {
 
         T retVal = myQueue.poll();

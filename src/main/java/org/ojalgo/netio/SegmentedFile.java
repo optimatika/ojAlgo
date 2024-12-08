@@ -245,6 +245,18 @@ public class SegmentedFile implements AutoCloseable {
         }
     }
 
+    public <T> FromFileReader<T> newDataReader(final DataReader.Deserializer<T> deserializer) {
+        return FromFileReader.newBuilder(this).build(segment -> this.newDataReader(segment, deserializer));
+    }
+
+    public <T> DataReader<T> newDataReader(final Segment segment, final DataReader.Deserializer<T> deserializer) {
+        try {
+            return new DataReader<>(new ByteBufferBackedInputStream(myFileChannel.map(MapMode.READ_ONLY, segment.offset, segment.size)), deserializer);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
     /**
      * Call this once for each file segment, and use the returned {@link TextLineReader} to read the file
      * segment. The {@link TextLineReader} is not thread safe, and should only be used by a single thread.
@@ -261,8 +273,20 @@ public class SegmentedFile implements AutoCloseable {
         }
     }
 
+    public <T> FromFileReader<T> newTextLineReader(final TextLineReader.Parser<T> parser) {
+        return FromFileReader.newBuilder(this).build(segment -> this.newTextLineReader(segment).withParser(parser));
+    }
+
+    public FromFileReader<String> newTextLineReader() {
+        return FromFileReader.newBuilder(this).build(this::newTextLineReader);
+    }
+
     public List<Segment> segments() {
         return List.of(mySegments);
+    }
+
+    Segment[] getSegments() {
+        return mySegments;
     }
 
 }

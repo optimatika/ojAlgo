@@ -19,19 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import org.ojalgo.type.keyvalue.EntryPair;
-import org.ojalgo.type.keyvalue.KeyValue;
+import java.io.IOException;
 
-@FunctionalInterface
-public interface ScoredDualConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {
+import org.ojalgo.type.management.Throughput;
 
-    default void write(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> item) {
-        KeyValue.Dual<T> key = item.getKey();
-        this.write(key.first, key.second, item.floatValue());
+final class ManagedSupplier<T> implements FromFileReader<T> {
+
+    private final Throughput myManager;
+    private final FromFileReader<T> mySupplier;
+
+    ManagedSupplier(final Throughput manager, final FromFileReader<T> supplier) {
+        super();
+        myManager = manager;
+        mySupplier = supplier;
     }
 
-    void write(T key1, T key2, float score);
+    @Override
+    public void close() throws IOException {
+        mySupplier.close();
+    }
+
+    @Override
+    public T read() {
+        T retVal = mySupplier.read();
+        if (retVal != null) {
+            myManager.increment();
+        }
+        return retVal;
+    }
 
 }

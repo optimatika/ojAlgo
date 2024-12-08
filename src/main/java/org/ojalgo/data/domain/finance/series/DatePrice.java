@@ -105,6 +105,7 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
         date = key;
     }
 
+    @Override
     public int compareTo(final PrimitiveNumber reference) {
 
         int retVal = 0;
@@ -120,10 +121,12 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
         return retVal;
     }
 
+    @Override
     public boolean containsKey(final Object key) {
         return date.equals(key);
     }
 
+    @Override
     public boolean containsValue(final Object value) {
         if (value instanceof Comparable<?>) {
             return NumberDefinition.doubleValue((Comparable<?>) value) == this.getPrice();
@@ -132,6 +135,7 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
         }
     }
 
+    @Override
     public final double doubleValue() {
         return this.getPrice();
     }
@@ -155,6 +159,7 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
         return true;
     }
 
+    @Override
     public PrimitiveNumber get(final Object key) {
         if (date.equals(key)) {
             return this;
@@ -163,6 +168,7 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
         }
     }
 
+    @Override
     public final LocalDate getKey() {
         return date;
     }
@@ -173,9 +179,10 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        return prime * result + ((date == null) ? 0 : date.hashCode());
+        return prime * result + (date == null ? 0 : date.hashCode());
     }
 
+    @Override
     public Set<LocalDate> keySet() {
         return Collections.singleton(date);
     }
@@ -184,4 +191,5 @@ public abstract class DatePrice implements EntryPair.KeyedPrimitive<LocalDate> {
     public final String toString() {
         return this.getKey() + ": " + this.getPrice();
     }
+
 }

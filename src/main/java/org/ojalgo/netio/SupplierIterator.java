@@ -19,8 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-interface AutoFunctional {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+final class SupplierIterator<T> implements Iterator<T> {
+
+    private transient T myNext;
+    private final FromFileReader<T> mySupplier;
+
+    SupplierIterator(final FromFileReader<T> supplier) {
+        super();
+        mySupplier = supplier;
+        myNext = mySupplier.read();
+    }
+
+    @Override
+    public boolean hasNext() {
+        return myNext != null;
+    }
+
+    @Override
+    public T next() {
+        if (myNext == null) {
+            throw new NoSuchElementException();
+        }
+        T retVal = myNext;
+        myNext = mySupplier.read();
+        return retVal;
+    }
 
 }

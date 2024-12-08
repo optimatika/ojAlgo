@@ -19,42 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 
-final class QueuedConsumer<T> implements AutoConsumer<T> {
+final class QueuedConsumer<T> implements ToFileWriter<T> {
 
     static final class Worker<T> implements Runnable {
 
-        private final Consumer<T> myConsumer;
+        private final ToFileWriter<T> myConsumer;
         private final QueuedConsumer<T> myParent;
 
-        Worker(final QueuedConsumer<T> parent, final Consumer<T> consumer) {
+        Worker(final QueuedConsumer<T> parent, final ToFileWriter<T> consumer) {
             super();
             myParent = parent;
             myConsumer = consumer;
         }
 
+        @Override
         public void run() {
 
             List<T> batchContainer = myParent.newBatchContainer();
 
             while (myParent.drainTo(batchContainer) != 0 || myParent.isMoreToCome()) {
                 if (batchContainer.size() != 0) {
-                    if (myConsumer instanceof AutoConsumer<?>) {
-                        ((AutoConsumer<T>) myConsumer).writeBatch(batchContainer);
-                    } else {
-                        for (T item : batchContainer) {
-                            myConsumer.accept(item);
-                        }
-                    }
+                    myConsumer.writeBatch(batchContainer);
                     batchContainer.clear();
                 } else {
                     try {
@@ -70,11 +65,11 @@ final class QueuedConsumer<T> implements AutoConsumer<T> {
 
     private volatile boolean myActive;
     private final int myBatchSize;
-    private final Consumer<T>[] myConsumers;
+    private final ToFileWriter<T>[] myConsumers;
     private final Future<?>[] myFutures;
     private final BlockingQueue<T> myQueue;
 
-    QueuedConsumer(final ExecutorService executor, final BlockingQueue<T> queue, final Consumer<T>... consumers) {
+    QueuedConsumer(final ExecutorService executor, final BlockingQueue<T> queue, final ToFileWriter<T>... consumers) {
 
         super();
 
@@ -92,22 +87,21 @@ final class QueuedConsumer<T> implements AutoConsumer<T> {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
 
         myActive = false;
 
         try {
             for (int i = 0; i < myFutures.length; i++) {
                 myFutures[i].get();
-                if (myConsumers[i] instanceof AutoCloseable) {
-                    ((AutoCloseable) myConsumers[i]).close();
-                }
+                myConsumers[i].close();
             }
         } catch (InterruptedException | ExecutionException cause) {
             throw new RuntimeException(cause);
         }
     }
 
+    @Override
     public void write(final T item) {
         try {
             myQueue.put(item);

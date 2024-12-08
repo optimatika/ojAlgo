@@ -19,33 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.KeyValue;
 
-final class SupplierIterator<T> implements Iterator<T> {
+@FunctionalInterface
+public interface ScoredDualConsumer<T> extends ToFileWriter<EntryPair.KeyedPrimitive<KeyValue.Dual<T>>> {
 
-    private transient T myNext;
-    private final AutoSupplier<T> mySupplier;
-
-    SupplierIterator(final AutoSupplier<T> supplier) {
-        super();
-        mySupplier = supplier;
-        myNext = mySupplier.get();
+    @Override
+    default void write(final EntryPair.KeyedPrimitive<KeyValue.Dual<T>> item) {
+        KeyValue.Dual<T> key = item.getKey();
+        this.write(key.first, key.second, item.floatValue());
     }
 
-    public boolean hasNext() {
-        return myNext != null;
-    }
-
-    public T next() {
-        if (myNext == null) {
-            throw new NoSuchElementException();
-        }
-        T retVal = myNext;
-        myNext = mySupplier.get();
-        return retVal;
-    }
+    void write(T key1, T key2, float score);
 
 }

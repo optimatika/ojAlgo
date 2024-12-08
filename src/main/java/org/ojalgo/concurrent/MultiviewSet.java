@@ -21,12 +21,12 @@
  */
 package org.ojalgo.concurrent;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -99,23 +99,10 @@ public final class MultiviewSet<T> {
     }
 
     private final Set<T> myCommonSet = ConcurrentHashMap.newKeySet();
-    private final Collection<PrioritisedView> myViews = new LinkedBlockingDeque<>();
-    private final boolean myRemoveFromViews;
+    private final Collection<PrioritisedView> myViews = new ArrayList<>();
 
     public MultiviewSet() {
-        this(false); //TODO Not decided what the default should be
-
-    }
-
-    /**
-     * @param removeFromViews Switch if each and every call to {@link #remove(Object)} should also explicitly
-     *        call {@link PrioritisedView#remove(Object)} on each of the views. This is (probably)
-     *        innefficient, and is unnecessary as a call to {@link PrioritisedView#poll()} will assert that
-     *        the returned instance did exist in the main {@link Set}.
-     */
-    public MultiviewSet(final boolean removeFromViews) {
         super();
-        myRemoveFromViews = removeFromViews;
     }
 
     /**
@@ -167,16 +154,10 @@ public final class MultiviewSet<T> {
     }
 
     /**
-     * Remove an entry from the common {@link Set} and all {@link Queue}:s.
+     * Remove an entry from the common {@link Set}.
      */
     public boolean remove(final T entry) {
-        boolean retVal = myCommonSet.remove(entry);
-        if (myRemoveFromViews && retVal) {
-            for (MultiviewSet<T>.PrioritisedView view : myViews) {
-                view.remove(entry);
-            }
-        }
-        return retVal;
+        return myCommonSet.remove(entry);
     }
 
     public int size() {

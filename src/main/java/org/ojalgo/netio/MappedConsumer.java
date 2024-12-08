@@ -19,45 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type.function;
+package org.ojalgo.netio;
 
+import java.io.IOException;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-final class MappedSupplier<IN, OUT> implements AutoSupplier<OUT> {
+final class MappedConsumer<IN, OUT> implements ToFileWriter<IN> {
 
+    private final ToFileWriter<OUT> myConsumer;
     private final Function<IN, OUT> myMapper;
-    private final Supplier<IN> mySupplier;
-    private final Predicate<IN> myFilter;
 
-    MappedSupplier(final Supplier<IN> supplier, final Function<IN, OUT> mapper) {
-        this(supplier, in -> true, mapper);
-    }
-
-    MappedSupplier(final Supplier<IN> supplier, final Predicate<IN> filter, final Function<IN, OUT> mapper) {
+    MappedConsumer(final Function<IN, OUT> mapper, final ToFileWriter<OUT> consumer) {
         super();
-        mySupplier = supplier;
-        myFilter = filter;
         myMapper = mapper;
+        myConsumer = consumer;
     }
 
-    public void close() throws Exception {
-        if (mySupplier instanceof AutoCloseable) {
-            ((AutoCloseable) mySupplier).close();
-        }
+    @Override
+    public void close() throws IOException {
+        myConsumer.close();
     }
 
-    public OUT read() {
-
-        IN unmapped = null;
-        OUT retVal = null;
-
-        while ((unmapped = mySupplier.get()) != null && (!myFilter.test(unmapped) || (retVal = myMapper.apply(unmapped)) == null)) {
-            // Read until we get a non-null item that passes the test and mapping works (return not-null)
-        }
-
-        return retVal;
+    @Override
+    public void write(final IN item) {
+        myConsumer.write(myMapper.apply(item));
     }
 
 }

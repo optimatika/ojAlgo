@@ -30,8 +30,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.netio.FromFileReader;
 import org.ojalgo.netio.TextLineReader;
-import org.ojalgo.type.function.AutoSupplier;
 
 public class DataParserTest extends FinanceSeriesTests {
 
@@ -39,6 +39,7 @@ public class DataParserTest extends FinanceSeriesTests {
 
         List<DP> data = new ArrayList<>();
 
+        @Override
         public void accept(final DP parsed) {
             data.add(parsed);
         }
@@ -72,7 +73,7 @@ public class DataParserTest extends FinanceSeriesTests {
         DatePriceParser parser = new DatePriceParser();
 
         // try (TextLineReader reader = TextLineReader.of(file); AutoSupplier<DatePrice> supplier = reader.withFilteredParser(BasicParser::isLineOK, parser)) {
-        try (TextLineReader reader = TextLineReader.of(file); AutoSupplier<DatePrice> supplier = reader.withParser(parser)) {
+        try (TextLineReader reader = TextLineReader.of(file); FromFileReader<DatePrice> supplier = reader.withParser(parser)) {
 
             ResultsConsumer<DatePrice> collector = new ResultsConsumer<>();
 

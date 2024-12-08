@@ -23,6 +23,7 @@ package org.ojalgo.type;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 
 import org.ojalgo.ProgrammingError;
 
@@ -33,7 +34,7 @@ public abstract class ObjectPool<T> {
 
     public ObjectPool() {
         super();
-        myObjects = new LinkedBlockingQueue<>();
+        myObjects = new LinkedTransferQueue<>();
         myLimited = false;
     }
 
