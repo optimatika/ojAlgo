@@ -1,8 +1,10 @@
 package org.ojalgo.data.cluster;
 
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Greedy clustering is a simpler alternative to K-Means. Instead of globally optimizing the cluster
@@ -59,41 +61,17 @@ Greedy Clustering
  */
 public class GreedyClustering {
 
-    private static class Point {
+    public static <T> List<Set<T>> cluster(final Collection<T> points, final DistanceCalcularor<T> distanceCalculator, final double threshold) {
 
-        double x, y;
+        List<Set<T>> clusters = new ArrayList<>();
 
-        Point(final double x, final double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        /**
-         * Calculates the Euclidean distance between this point and another point.
-         *
-         * @param other The other point to which the distance is calculated.
-         * @return The Euclidean distance between this point and the other point.
-         */
-        double distance(final Point other) {
-            return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
-        }
-
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ")";
-        }
-    }
-
-    public static List<List<Point>> greedyClustering(final List<Point> points, final double threshold) {
-        List<List<Point>> clusters = new ArrayList<>();
-
-        for (Point point : points) {
+        for (T point : points) {
             boolean addedToCluster = false;
 
             // Try to add the point to an existing cluster
-            for (List<Point> cluster : clusters) {
-                for (Point member : cluster) {
-                    if (point.distance(member) <= threshold) {
+            for (Set<T> cluster : clusters) {
+                for (T member : cluster) {
+                    if (distanceCalculator.distance(point, member) <= threshold) {
                         cluster.add(point);
                         addedToCluster = true;
                         break;
@@ -106,34 +84,12 @@ public class GreedyClustering {
 
             // If no suitable cluster is found, create a new one
             if (!addedToCluster) {
-                List<Point> newCluster = new ArrayList<>();
+                Set<T> newCluster = new HashSet<>();
                 newCluster.add(point);
                 clusters.add(newCluster);
             }
         }
 
         return clusters;
-    }
-
-    public static void main(final String[] args) {
-
-        // (1, 1), (2, 1), (10, 10), (11, 11), (2, 2), (12, 10)
-
-        // With a threshold of  2.5 , the output could be:
-
-        //    Cluster 1: [(1.0, 1.0), (2.0, 1.0), (2.0, 2.0)]
-        //    Cluster 2: [(10.0, 10.0), (11.0, 11.0), (12.0, 10.0)]
-
-        // Sample points
-        List<Point> points = List.of(new Point(1, 1), new Point(2, 1), new Point(10, 10), new Point(11, 11), new Point(2, 2), new Point(12, 10));
-
-        double threshold = 2.5; // Maximum distance for points to be in the same cluster
-
-        List<List<Point>> clusters = GreedyClustering.greedyClustering(points, threshold);
-
-        // Print clusters
-        for (int i = 0; i < clusters.size(); i++) {
-            System.out.println("Cluster " + (i + 1) + ": " + clusters.get(i));
-        }
     }
 }

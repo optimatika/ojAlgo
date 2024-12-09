@@ -1,6 +1,5 @@
 package org.ojalgo.data.cluster;
 
-
 @FunctionalInterface
 public interface DistanceCalcularor<T> {
 

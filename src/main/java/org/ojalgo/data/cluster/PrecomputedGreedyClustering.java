@@ -1,8 +1,9 @@
 package org.ojalgo.data.cluster;
 
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <pre>
@@ -37,14 +38,14 @@ Pre-calculated and sorted distances are most beneficial for algorithms that repe
  */
 public class PrecomputedGreedyClustering {
 
-    public static List<List<Integer>> clusterWithPrecomputedDistances(final double[][] distances, final double threshold) {
+    public static List<Set<Integer>> cluster(final double[][] distances, final double threshold) {
         int n = distances.length;
         boolean[] visited = new boolean[n];
-        List<List<Integer>> clusters = new ArrayList<>();
+        List<Set<Integer>> clusters = new ArrayList<>();
 
         for (int i = 0; i < n; i++) {
             if (!visited[i]) {
-                List<Integer> cluster = new ArrayList<>();
+                Set<Integer> cluster = new HashSet<>();
                 cluster.add(i);
                 visited[i] = true;
 
@@ -60,17 +61,5 @@ public class PrecomputedGreedyClustering {
         }
 
         return clusters;
-    }
-
-    public static void main(final String[] args) {
-        // Example distance matrix
-        double[][] distances = { { 0, 1, 10, 11 }, { 1, 0, 9, 12 }, { 10, 9, 0, 1 }, { 11, 12, 1, 0 } };
-
-        double threshold = 2.0; // Threshold for clustering
-        List<List<Integer>> clusters = PrecomputedGreedyClustering.clusterWithPrecomputedDistances(distances, threshold);
-
-        for (int i = 0; i < clusters.size(); i++) {
-            System.out.println("Cluster " + (i + 1) + ": " + clusters.get(i));
-        }
     }
 }
