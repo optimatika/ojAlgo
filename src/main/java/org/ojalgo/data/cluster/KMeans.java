@@ -54,7 +54,10 @@ public class KMeans {
         Random random = new Random();
         List<T> centroids = new ArrayList<>();
         for (int i = 0; i < k; i++) {
-            centroids.add(points.get(random.nextInt(points.size())));
+            int size = points.size();
+            int nextInt = random.nextInt(size);
+            T e = points.get(nextInt);
+            centroids.add(e);
         }
 
         List<Set<T>> clusters = new ArrayList<>();

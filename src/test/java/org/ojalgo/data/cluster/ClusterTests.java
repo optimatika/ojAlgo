@@ -52,10 +52,7 @@ abstract class ClusterTests {
                 return false;
             }
             Point other = (Point) obj;
-            if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x)) {
-                return false;
-            }
-            if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y)) {
+            if ((Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x)) || (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))) {
                 return false;
             }
             return true;
@@ -67,9 +64,9 @@ abstract class ClusterTests {
             int result = 1;
             long temp;
             temp = Double.doubleToLongBits(x);
-            result = prime * result + (int) (temp ^ (temp >>> 32));
+            result = prime * result + (int) (temp ^ temp >>> 32);
             temp = Double.doubleToLongBits(y);
-            result = prime * result + (int) (temp ^ (temp >>> 32));
+            result = prime * result + (int) (temp ^ temp >>> 32);
             return result;
         }
 
@@ -90,6 +87,6 @@ abstract class ClusterTests {
 
     }
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
 }

@@ -23,7 +23,6 @@ public class GreedyClusteringTest extends ClusterTests {
         // Sample points
 
         Set<ClusterTests.Point> cluster1 = Set.of(new ClusterTests.Point(1, 1), new ClusterTests.Point(2, 1), new ClusterTests.Point(2, 2));
-
         Set<ClusterTests.Point> cluster2 = Set.of(new ClusterTests.Point(10, 10), new ClusterTests.Point(11, 11), new ClusterTests.Point(12, 10));
 
         Set<ClusterTests.Point> points = new HashSet<>();
