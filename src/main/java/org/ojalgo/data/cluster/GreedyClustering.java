@@ -59,7 +59,7 @@ Greedy Clustering
     •   Impact: Can make the algorithm more efficient for large datasets with many clusters.
  * </pre>
  */
-public class GreedyClustering {
+public class GreedyClustering<T> implements ClusteringAlgorithm<T> {
 
     public static <T> List<Set<T>> cluster(final Collection<T> points, final DistanceCalcularor<T> distanceCalculator, final double threshold) {
 
@@ -91,5 +91,11 @@ public class GreedyClustering {
         }
 
         return clusters;
+    }
+
+    @Override
+    public List<Set<T>> cluster(final Collection<T> input) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -46,9 +46,9 @@ K-Nearest Neighbors in K-Means Initialization
     •   Impact: Accelerates initialization, which can be critical for large datasets.
  * </pre>
  */
-public class KMeans<T> extends GeneralisedKMeansClustering<T> {
+public class GreedyKMeans<T> extends GeneralisedKMeansClustering<T> {
 
-    public KMeans(final ClusteringAlgorithm initialiser, final int k, final Function averageCalculator, final DistanceCalcularor distanceCalculator,
+    public GreedyKMeans(final ClusteringAlgorithm initialiser, final int k, final Function averageCalculator, final DistanceCalcularor distanceCalculator,
             final int maxIterations) {
         super(initialiser, k, averageCalculator, distanceCalculator, maxIterations);
         // TODO Auto-generated constructor stub
