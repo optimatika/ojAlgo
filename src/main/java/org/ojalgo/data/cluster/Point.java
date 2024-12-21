@@ -13,8 +13,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 public final class Point implements Comparable<Point> {
 
     /**
-     * Primarily used when constructing test cases and similar. For real world applications you should use
-     * {@link Point#convert(List, Function)} instead.
+     * Primarily used when constructing test cases and similar. For real world applications you should
+     * probably use {@link Point#convert(List, Function)} instead.
      */
     public static final class Factory {
 
@@ -44,8 +44,8 @@ public final class Point implements Comparable<Point> {
      * <ol>
      * <li>Calculate, and store, distances between all the points (to enable statistical analysis, and speed
      * up the following steps)
-     * <li>Perform statistical analysis of the distances to determine a suitable distance threshold (to get
-     * the threshold needed for greedy clustering)
+     * <li>Perform statistical analysis of the distances to determine a suitable distance threshold for greedy
+     * clustering
      * <li>Perform greedy clustering to get an initial set of centroids
      * <li>Filter out centroids/clusters corresponding to extremely small clusters (This determines the 'k')
      * <li>Perform k-means clustering to refine the clusters and centroids

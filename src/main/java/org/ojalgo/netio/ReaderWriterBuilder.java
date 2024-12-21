@@ -41,7 +41,7 @@ abstract class ReaderWriterBuilder<F, B extends ReaderWriterBuilder<F, B>> {
         if (EXECUTOR == null) {
             synchronized (ReaderWriterBuilder.class) {
                 if (EXECUTOR == null) {
-                    EXECUTOR = DaemonPoolExecutor.newCachedThreadPool("ojAlgo IO");
+                    EXECUTOR = DaemonPoolExecutor.newCachedThreadPool("ojAlgo-IO");
                 }
             }
         }

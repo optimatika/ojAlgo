@@ -28,6 +28,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Sorting is no longer parallel/multi-threaded. The previous implementations made use of the common `ForkJoinPool`.
 
+#### org.ojalgo.data
+
+- Creating a JMX bean (to monitor throughput) with `BatchNode` is now optional, and the default is to not create them. (Used to always create them.)
+
 #### org.ojalgo.netio
 
 - The `FromFileReader` and `ToFileWriter` interfaces and their implementations used to extend and delegate to code in the `org.ojalgo.type.function` package. Much of what was in that package has been moved to and merged with stuff in the `org.ojalgo.netio` package.
