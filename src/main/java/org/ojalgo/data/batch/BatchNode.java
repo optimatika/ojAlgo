@@ -62,8 +62,8 @@ public final class BatchNode<T> {
         private ExecutorService myExecutor = null;
         private int myFragmentation = 64;
         private final DataInterpreter<T> myInterpreter;
+        private boolean myManaged = false;
         private int myParallelism = Parallelism.CORES.getAsInt();
-
         private int myQueueCapacity = 1024;
 
         Builder(final File directory, final DataInterpreter<T> interpreter) {
@@ -98,6 +98,14 @@ public final class BatchNode<T> {
          */
         public BatchNode.Builder<T> fragmentation(final int fragmentation) {
             myFragmentation = fragmentation;
+            return this;
+        }
+
+        /**
+         * Do you want a JMX bean to keep track of throughput?
+         */
+        public BatchNode.Builder<T> managed(final boolean managed) {
+            myManaged = managed;
             return this;
         }
 
@@ -173,6 +181,10 @@ public final class BatchNode<T> {
             return ShardedFile.of(myDirectory, "Shard.data", this.getFragmentation());
         }
 
+        boolean isManaged() {
+            return myManaged;
+        }
+
     }
 
     private static final class TwoStepWrapper<T> implements TwoStepMapper<T, Boolean> {
@@ -233,12 +245,20 @@ public final class BatchNode<T> {
         myProcessor = builder.getProcessor();
         myQueueCapacity = builder.getQueueCapacity();
 
-        myWriterManger = new Throughput();
-        myReaderManager = new Throughput();
+        if (builder.isManaged()) {
 
-        String name = builder.getName();
-        MBeanUtils.register(myWriterManger, name + "-Writer");
-        MBeanUtils.register(myReaderManager, name + "-Reader");
+            myWriterManger = new Throughput();
+            myReaderManager = new Throughput();
+
+            String name = builder.getName();
+            MBeanUtils.register(myWriterManger, name + "-Writer");
+            MBeanUtils.register(myReaderManager, name + "-Reader");
+
+        } else {
+
+            myWriterManger = null;
+            myReaderManager = null;
+        }
     }
 
     /**

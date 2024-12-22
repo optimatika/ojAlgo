@@ -29,7 +29,6 @@ public class KaggleTest extends ClusterTests {
 
             if (parts.length != 5 && !ASCII.isDigit(parts[0].charAt(0))) {
                 throw new IllegalArgumentException("Invalid input line: " + line);
-
             }
 
             int customerID = Integer.parseInt(parts[0]);

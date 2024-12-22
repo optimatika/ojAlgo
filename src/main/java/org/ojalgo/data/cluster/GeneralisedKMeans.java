@@ -35,8 +35,7 @@ public final class GeneralisedKMeans<T> implements ClusteringAlgorithm<T> {
      *        (the set of items in a cluster).
      * @param distanceCalculator A function that calculates the distance between two points.
      */
-    public GeneralisedKMeans(final Function<Collection<T>, List<T>> centroidInitialiser,
-            final Function<Collection<T>, T> centroidUpdater,
+    public GeneralisedKMeans(final Function<Collection<T>, List<T>> centroidInitialiser, final Function<Collection<T>, T> centroidUpdater,
             final ToDoubleBiFunction<T, T> distanceCalculator) {
 
         super();

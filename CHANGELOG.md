@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [55.1.0] – 2024-12-22
+
 ### Added
 
 #### org.ojalgo.data
@@ -27,6 +29,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.array
 
 - Sorting is no longer parallel/multi-threaded. The previous implementations made use of the common `ForkJoinPool`.
+
+#### org.ojalgo.data
+
+- Creating a JMX bean (to monitor throughput) with `BatchNode` is now optional, and the default is to not create them. (Used to always create them.)
 
 #### org.ojalgo.netio
 

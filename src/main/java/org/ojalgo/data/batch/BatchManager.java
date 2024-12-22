@@ -41,6 +41,7 @@ public final class BatchManager {
     private final File myBatchRootDirectory;
     private ExecutorService myExecutor = null;
     private Integer myFragmentation = null;
+    private boolean myManaged = false;
     private IntSupplier myParallelism = null;
     private Integer myQueueCapacity = null;
 
@@ -76,6 +77,14 @@ public final class BatchManager {
         return this;
     }
 
+    /**
+     * @see BatchNode.Builder#managed(boolean
+     */
+    public BatchManager managed(final boolean managed) {
+        myManaged = managed;
+        return this;
+    }
+
     public <T> BatchNode.Builder<T> newNodeBuilder(final String nodeName, final DataInterpreter<T> dataInterpreter) {
 
         Builder<T> retVal = BatchNode.newBuilder(new File(myBatchRootDirectory, nodeName), dataInterpreter);
@@ -95,6 +104,8 @@ public final class BatchManager {
         if (myQueueCapacity != null) {
             retVal.queue(myQueueCapacity.intValue());
         }
+
+        retVal.managed(myManaged);
 
         return retVal;
     }

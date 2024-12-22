@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>55.0.2</version>
+    <version>55.1.0</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
     <packaging>jar</packaging>
@@ -48,7 +48,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>11</version.java>
-        <version.org.junit.jupiter>5.11.3</version.org.junit.jupiter>
+        <version.org.junit.jupiter>5.11.4</version.org.junit.jupiter>
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
     </properties>
     <dependencies>
@@ -144,7 +144,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.1</version>
+                <version>3.11.2</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

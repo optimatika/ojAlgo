@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -222,11 +223,16 @@ public final class IntegerSolver extends GenericSolver {
 
         Map<Comparator<NodeKey>, MultiviewSet<NodeKey>.PrioritisedView> views = new ConcurrentHashMap<>();
 
-        ProcessingService.INSTANCE.process(strategy.getWorkerPriorities(), workerStrategy -> {
+        List<Comparator<NodeKey>> workerPriorities = strategy.getWorkerPriorities();
+        for (Comparator<NodeKey> workerPriority : workerPriorities) {
+            views.computeIfAbsent(workerPriority, myDeferredNodes::newView);
+        }
+
+        ProcessingService.INSTANCE.process(workerPriorities, workerPriority -> {
 
             boolean workerNormalExit = solverNormalExit.get();
 
-            MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerStrategy, myDeferredNodes::newView);
+            MultiviewSet<NodeKey>.PrioritisedView view = views.computeIfAbsent(workerPriority, myDeferredNodes::newView);
 
             RingLogger nodePrinter = this.newPrinter();
 
