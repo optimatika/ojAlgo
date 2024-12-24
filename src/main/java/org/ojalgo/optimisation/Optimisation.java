@@ -344,8 +344,9 @@ public interface Optimisation {
             ProgrammingError.throwIfNull(type);
             if (myConfigurator != null && type.isInstance(myConfigurator)) {
                 return Optional.of((T) myConfigurator);
+            } else {
+                return Optional.empty();
             }
-            return Optional.empty();
         }
 
         public IntegerStrategy integer() {
