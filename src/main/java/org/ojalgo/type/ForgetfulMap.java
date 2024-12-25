@@ -8,11 +8,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.concurrent.DaemonPoolExecutor;
+import org.ojalgo.function.special.PowerOf2;
 
 /**
  * A {@link Map} that can forget entries after a specified period of time – a cache in other words. The
@@ -29,14 +32,23 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
     public static final class Builder {
 
         private long myAccessLimit = Long.MAX_VALUE;
+        private int myInitialCapacity = 16;
         private long myWriteLimit = Long.MAX_VALUE;
 
-        private Builder() {
+        Builder() {
             super();
         }
 
         public <K, V> ForgetfulMap<K, V> build() {
             return new ForgetfulMap<>(this);
+        }
+
+        public <K, V> ForgetfulMap<K, V> build(final Consumer<V> disposer) {
+            return new ForgetfulMap<>(this, disposer);
+        }
+
+        public <V> ForgetfulMap.ValueCache<V> build(final Supplier<V> instantiator, final Consumer<V> disposer) {
+            return this.initialCapacity(1).build(disposer).newValueCache("INSTANCE", k -> instantiator.get());
         }
 
         public Builder expireAfterAccess(final CalendarDateDuration duration) {
@@ -73,8 +85,17 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
             return this.expireAfterWrite(unit.toMillis(duration));
         }
 
+        public Builder initialCapacity(final int initialCapacity) {
+            myInitialCapacity = PowerOf2.smallestNotLessThan(initialCapacity);
+            return this;
+        }
+
         long getAccessLimit() {
             return myAccessLimit;
+        }
+
+        int getInitialCapacity() {
+            return myInitialCapacity;
         }
 
         long getWriteLimit() {
@@ -84,62 +105,30 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
     }
 
     /**
-     * A re-implementation of {@link TypeCache} backed by a {@link ForgetfulMap}. Essentially it's a supplier
-     * that most of the time returns a cached value, and only recomputes it periodically.
+     * The specifications of {@link TypeCache} to allow for another implementation.
      */
-    public static final class ValueCache<K, V> {
+    public static interface ValueCache<V> {
 
-        private final ForgetfulMap<K, V> myCache;
-        private volatile boolean myDirty;
-        private final K myKey;
-        private final Function<? super K, ? extends V> myValueSupplier;
+        void flushCache();
 
-        ValueCache(final K key, final ForgetfulMap<K, V> cache, final Function<? super K, ? extends V> valueSupplier) {
-            super();
-            myKey = key;
-            myCache = cache;
-            myValueSupplier = valueSupplier;
-        }
-
-        public final void flushCache() {
-            myCache.remove(myKey);
-        }
-
-        public final V getCachedObject() {
-
-            if (myDirty) {
-                myDirty = false;
-                V newValue = myValueSupplier.apply(myKey);
-                myCache.put(myKey, newValue);
-                return newValue;
-            } else {
-                myDirty = false;
-                return myCache.computeIfAbsent(myKey, myValueSupplier);
-            }
-        }
+        V getCachedObject();
 
         /**
          * Is there currently a value cached for this key?
          */
-        public final boolean isCacheSet() {
-            return myCache.containsKey(myKey);
-        }
+        boolean isCacheSet();
 
         /**
          * @return true if {@link #makeDirty()} has been called since the last time {@link #getCachedObject()}
          *         was called.
          */
-        public final boolean isDirty() {
-            return myDirty;
-        }
+        boolean isDirty();
 
         /**
          * Will force re-creation of the value the next time {@link #getCachedObject()} is called. This method
          * does NOT immediately remove or invalidate the value from the underlying cache.
          */
-        public final void makeDirty() {
-            myDirty = true;
-        }
+        void makeDirty();
 
     }
 
@@ -197,6 +186,71 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
 
     }
 
+    /**
+     * A re-implementation of {@link TypeCache} backed by a {@link ForgetfulMap}. Essentially it's a supplier
+     * that most of the time returns a cached value, and only recomputes it periodically.
+     */
+    private static final class ValueCacheImpl<K, V> implements ValueCache<V> {
+
+        private final ForgetfulMap<K, V> myCache;
+        private volatile boolean myDirty;
+        private final K myKey;
+        private final Function<? super K, ? extends V> myValueSupplier;
+
+        ValueCacheImpl(final K key, final ForgetfulMap<K, V> cache, final Function<? super K, ? extends V> valueSupplier) {
+            super();
+            myKey = key;
+            myCache = cache;
+            myValueSupplier = valueSupplier;
+        }
+
+        @Override
+        public final void flushCache() {
+            myCache.remove(myKey);
+        }
+
+        @Override
+        public final V getCachedObject() {
+
+            if (myDirty) {
+                myDirty = false;
+                V newValue = myValueSupplier.apply(myKey);
+                myCache.put(myKey, newValue);
+                return newValue;
+            } else {
+                myDirty = false;
+                return myCache.computeIfAbsent(myKey, myValueSupplier);
+            }
+        }
+
+        /**
+         * Is there currently a value cached for this key?
+         */
+        @Override
+        public final boolean isCacheSet() {
+            return myCache.containsKey(myKey);
+        }
+
+        /**
+         * @return true if {@link #makeDirty()} has been called since the last time {@link #getCachedObject()}
+         *         was called.
+         */
+        @Override
+        public final boolean isDirty() {
+            return myDirty;
+        }
+
+        /**
+         * Will force re-creation of the value the next time {@link #getCachedObject()} is called. This method
+         * does NOT immediately remove or invalidate the value from the underlying cache.
+         */
+        @Override
+        public final void makeDirty() {
+            myDirty = true;
+        }
+
+    }
+
     private static final ScheduledExecutorService CLEANER = DaemonPoolExecutor.newSingleThreadScheduledExecutor("ForgetfulMap-Cleaner");
 
     public static ForgetfulMap.Builder newBuilder() {
@@ -204,12 +258,21 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
     }
 
     private final long myAccessLimit;
-    private final Map<K, CachedValue<V>> myStorage = new ConcurrentHashMap<>();
+    private final Consumer<V> myDisposer;
+    private final Map<K, CachedValue<V>> myStorage;
     private final long myWriteLimit;
 
     ForgetfulMap(final Builder builder) {
+        this(builder, null);
+    }
+
+    ForgetfulMap(final Builder builder, final Consumer<V> disposer) {
 
         super();
+
+        myStorage = new ConcurrentHashMap<>(builder.getInitialCapacity());
+
+        myDisposer = disposer;
 
         myWriteLimit = builder.getWriteLimit();
         myAccessLimit = builder.getAccessLimit();
@@ -218,6 +281,7 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
 
         // Periodically clean up expired entries
         CLEANER.scheduleAtFixedRate(this::cleanUp, interval, interval, TimeUnit.MILLISECONDS);
+
     }
 
     /**
@@ -226,12 +290,23 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
      */
     public void cleanUp() {
         long now = System.currentTimeMillis();
-        myStorage.entrySet().removeIf(entry -> this.isExpired(now, entry.getValue()));
+        myStorage.forEach((key, value) -> {
+            if (this.isExpired(now, value)) {
+                CachedValue<V> removed = myStorage.remove(key);
+                if (myDisposer != null) {
+                    myDisposer.accept(removed.value);
+                }
+            }
+        });
     }
 
     @Override
     public void clear() {
-        myStorage.clear();
+        if (myDisposer == null) {
+            myStorage.clear();
+        } else {
+            myStorage.forEach((key, value) -> myDisposer.accept(myStorage.remove(key).value));
+        }
     }
 
     @Override
@@ -241,7 +316,7 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public boolean containsValue(final Object value) {
-        return myStorage.containsValue(value);
+        return myStorage.values().stream().map(cached -> cached.value).anyMatch(v -> Objects.equals(v, value));
     }
 
     @Override
@@ -301,7 +376,10 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
             long now = System.currentTimeMillis();
 
             if (this.isExpired(now, cached)) {
-                myStorage.remove(key);
+                V removed = myStorage.remove(key).value;
+                if (myDisposer != null) {
+                    myDisposer.accept(removed);
+                }
                 return null;
             } else {
                 cached.accessed = now;
@@ -338,7 +416,7 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
      * that is being loaded (or reloaded) and is otherwise not present.
      */
     public void invalidate(final K key) {
-        myStorage.remove(key);
+        this.remove(key);
     }
 
     /**
@@ -346,7 +424,7 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
      * being loaded (or reloaded) and is otherwise not present.
      */
     public void invalidateAll() {
-        myStorage.clear();
+        this.clear();
     }
 
     /**
@@ -367,8 +445,8 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
         return myStorage.keySet();
     }
 
-    public ValueCache<K, V> newValueCache(final K key, final Function<? super K, ? extends V> valueSupplier) {
-        return new ValueCache<>(key, this, valueSupplier);
+    public ValueCache<V> newValueCache(final K key, final Function<? super K, ? extends V> valueSupplier) {
+        return new ValueCacheImpl<>(key, this, valueSupplier);
     }
 
     @Override
@@ -395,17 +473,26 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V remove(final Object key) {
-        CachedValue<V> existing = myStorage.remove(key);
-        if (existing == null) {
+        CachedValue<V> removed = myStorage.remove(key);
+        if (removed == null) {
             return null;
         } else {
-            return existing.value;
+            V retVal = removed.value;
+            if (myDisposer != null) {
+                myDisposer.accept(retVal);
+            }
+            return retVal;
         }
     }
 
     @Override
     public boolean remove(final Object key, final Object value) {
-        return myStorage.remove(key, value);
+        V cached = this.get(key);
+        if (Objects.equals(cached, value)) {
+            return this.remove(key) != null;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -442,7 +529,11 @@ public final class ForgetfulMap<K, V> extends AbstractMap<K, V> {
                 if (oldValue == null) {
                     return null;
                 } else {
-                    return oldValue.value;
+                    V retVal = oldValue.value;
+                    if (myDisposer != null) {
+                        myDisposer.accept(retVal);
+                    }
+                    return retVal;
                 }
             }
 

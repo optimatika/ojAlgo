@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>55.1.0</version>
+    <version>55.1.1-SNAPSHOT</version>
     <name>ojAlgo</name>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
     <packaging>jar</packaging>

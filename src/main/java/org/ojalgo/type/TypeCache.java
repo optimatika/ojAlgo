@@ -31,7 +31,7 @@ import java.util.TimerTask;
  * @deprecated v56 Use {@link ForgetfulMap#newValueCache(Object, java.util.function.Function)} instead.
  */
 @Deprecated
-public abstract class TypeCache<T> {
+public abstract class TypeCache<T> implements ForgetfulMap.ValueCache<T> {
 
     private static final Timer TIMER = new Timer("TypeCache-Daemon", true);
     private transient volatile T myCachedObject;
@@ -60,10 +60,12 @@ public abstract class TypeCache<T> {
         this(8L, CalendarDateUnit.HOUR);
     }
 
+    @Override
     public synchronized final void flushCache() {
         myCachedObject = null;
     }
 
+    @Override
     public synchronized final T getCachedObject() {
 
         if (myCachedObject == null || myDirty) {
@@ -76,14 +78,17 @@ public abstract class TypeCache<T> {
         return myCachedObject;
     }
 
+    @Override
     public synchronized final boolean isCacheSet() {
         return myCachedObject != null;
     }
 
+    @Override
     public synchronized final boolean isDirty() {
         return myDirty;
     }
 
+    @Override
     public synchronized final void makeDirty() {
         myDirty = true;
     }
