@@ -107,6 +107,13 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
             return this;
         }
 
+        public void line(final Object... cols) {
+            for (Object col : cols) {
+                this.append(col);
+            }
+            this.write();
+        }
+
         /**
          * Write the line/row and reset the builder – ready to build the next line.
          */
@@ -147,6 +154,10 @@ public final class TextLineWriter implements ToFileWriter<CharSequence> {
 
     public static TextLineWriter of(final InMemoryFile file, final OperatorWithException<OutputStream> filter) {
         return new TextLineWriter(filter.apply(file.newOutputStream()));
+    }
+
+    public static TextLineWriter of(final String pathname) {
+        return TextLineWriter.of(new File(pathname));
     }
 
     private final BufferedWriter myWriter;

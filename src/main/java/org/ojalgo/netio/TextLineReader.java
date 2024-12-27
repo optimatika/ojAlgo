@@ -70,6 +70,10 @@ public final class TextLineReader implements FromFileReader<String> {
         return new TextLineReader(filter.apply(file.newInputStream()));
     }
 
+    public static TextLineReader of(final String pathname) {
+        return TextLineReader.of(new File(pathname));
+    }
+
     private final BufferedReader myReader;
 
     public TextLineReader(final InputStream inputStream) {

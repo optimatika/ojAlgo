@@ -1444,6 +1444,40 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
 
     /**
      * <pre>
+    The TUFF instance from the Netlib collection of LP (linear programming) models is notable for its challenging characteristics, which test certain aspects of an LP solver’s numerical stability and performance. The key thing for the LP solver to “get right” to solve TUFF effectively is managing numerical stability and precision. Here’s what that entails:
+
+    Key Challenges of TUFF
+    1.  Ill-Conditioned Basis Matrices:
+    TUFF features constraint matrices that can lead to basis matrices with very high or low condition numbers. This means that small changes or numerical errors can greatly affect calculations, particularly during pivoting in the simplex method.
+    2.  Dense Matrix Structure:
+    The TUFF model has a relatively high density compared to some other Netlib instances. This density can affect both memory access patterns and numerical computations, requiring the solver to be efficient in matrix operations.
+    3.  Degeneracy:
+    The TUFF instance exhibits significant degeneracy, where multiple basis pivots may lead to the same basic feasible solution. This can cause issues like cycling or excessive iterations, especially for naive simplex implementations.
+    4.  Numerical Precision:
+    Due to the combination of ill-conditioning and potential degeneracy, the TUFF instance is particularly sensitive to numerical precision. Finite precision arithmetic can lead to incorrect pivots, infeasible solutions, or convergence issues if the solver is not robustly designed.
+
+    Key Solver Requirements for TUFF
+    1.  Precision in Linear Algebra:
+    •   Using techniques like stable factorization methods (e.g., LU decomposition with partial pivoting).
+    •   Handling small pivot elements carefully to avoid numerical issues.
+    •   Implementing advanced basis update strategies to minimize accumulation of numerical errors.
+    2.  Handling Degeneracy:
+    •   The solver should use anti-cycling techniques such as Bland’s Rule or perturbation methods to prevent infinite loops or excessive iterations caused by degenerate pivots.
+    3.  Scaling of Problem Data:
+    •   Scaling the constraint matrix and objective coefficients effectively to normalize values can reduce condition numbers and improve numerical stability.
+    •   Equilibration scaling (row and column scaling) can help mitigate numerical instability.
+    4.  Refinements and Post-Solution Analysis:
+    •   Employing iterative refinement techniques to verify the accuracy of solutions.
+    •   Adjusting the primal and dual feasibility tolerances dynamically to ensure that numerical approximations do not introduce inaccuracies.
+    5.  Efficient Handling of Dense Structures:
+    •   Optimizing data structures for dense constraint matrices to improve memory usage and computational speed.
+
+    Conclusion
+
+    The TUFF instance primarily tests the solver’s ability to handle numerical challenges arising from ill-conditioning, degeneracy, and the dense structure of the problem. Solvers like CPLEX, Gurobi, and modern implementations of the simplex or interior-point methods tend to succeed on TUFF due to their advanced preprocessing, numerical stability enhancements, and robustness to degeneracy. Older or simpler solvers may struggle without these techniques.     *
+     * </pre>
+     *
+     * <pre>
      * 2019-02-13: Objective obtained/verified by CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
@@ -1452,7 +1486,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     @Tag("unstable")
     @Tag("bm1000")
     public void testTUFF() {
-        CuteNetlibCase.doTest("TUFF.SIF", "0.29214776509361284", "0.8949901867574317", NumberContext.of(7, 4));
+        CuteNetlibCase.doTest("TUFF.SIF", "0.292147765093613", "0.894990186757432", NumberContext.of(7, 4));
     }
 
     /**
