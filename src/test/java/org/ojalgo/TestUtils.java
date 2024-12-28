@@ -48,6 +48,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -522,6 +523,10 @@ public abstract class TestUtils /* extends Assertions */ {
         TestUtils.assertOptimisationResult(message, expected, actual, context, true, false, true, false);
     }
 
+    public static void assertStateInfeasible(final Result actual) {
+        Assertions.assertEquals(Optimisation.State.INFEASIBLE, actual.getState(), actual.toString());
+    }
+
     public static void assertStateLessThanFeasible(final Optimisation.Result actual) {
         Assertions.assertFalse(actual.getState().isFeasible(), actual.toString());
     }
@@ -532,6 +537,14 @@ public abstract class TestUtils /* extends Assertions */ {
 
     public static void assertStateNotLessThanOptimal(final Optimisation.Result actual) {
         Assertions.assertTrue(actual.getState().isOptimal(), actual.toString());
+    }
+
+    public static void assertStateUnbounded(final Result actual) {
+        Assertions.assertEquals(Optimisation.State.UNBOUNDED, actual.getState(), actual.toString());
+    }
+
+    public static void assertStateUnboundedOrLessThanFeasible(final Result actual) {
+        Assertions.assertTrue(!actual.getState().isFeasible() || Optimisation.State.UNBOUNDED.equals(actual.getState()), actual.toString());
     }
 
     public static void assertTensorEquals(final Tensor<?, ?> expected, final Tensor<?, ?> actual) {

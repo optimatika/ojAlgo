@@ -38,33 +38,76 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface ModelFileTest {
 
+    /**
+     * expMinValString or expMaxValString can be null, empty string or a number-string.
+     * <ul>
+     * <li>null means that direction is not tested.
+     * <li>A number-string is the expected optimal solution value.
+     * <li>An empty string means unbounded in that direction.
+     * <li>If both are empty string the problem is infeasible (rather than unbounded in both directions).
+     * </ul>
+     */
     static void assertValues(final ExpressionsBasedModel model, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
 
-        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
-        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
+        BigDecimal expMinVal = expMinValString != null && !expMinValString.isEmpty() ? new BigDecimal(expMinValString) : null;
+        BigDecimal expMaxVal = expMaxValString != null && !expMaxValString.isEmpty() ? new BigDecimal(expMaxValString) : null;
 
         TestUtils.assertTrue(model.validate());
 
-        if (expMinVal != null) {
+        Result result = null;
 
-            Result result = model.minimise();
+        if (expMinValString != null) {
 
-            TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+            result = model.minimise();
 
-            TestUtils.assertEquals(expMinVal, result.getValue(), accuracy);
+            if (expMinValString.isEmpty()) {
 
-            TestUtils.assertStateNotLessThanOptimal(result);
+                if (expMaxValString != null && expMaxValString.isEmpty()) {
+                    // Infeasible
+
+                    TestUtils.assertStateLessThanFeasible(result);
+
+                } else {
+                    // Unbounded
+
+                    TestUtils.assertStateUnboundedOrLessThanFeasible(result);
+                }
+
+            } else {
+
+                TestUtils.assertStateNotLessThanOptimal(result);
+
+                TestUtils.assertEquals(expMinVal, result.getValue(), accuracy);
+
+                TestUtils.assertTrue("Minimisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+            }
         }
 
-        if (expMaxVal != null) {
+        if (expMaxValString != null) {
 
-            Result result = model.maximise();
+            result = model.maximise();
 
-            TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+            if (expMaxValString.isEmpty()) {
 
-            TestUtils.assertEquals(expMaxVal, result.getValue(), accuracy);
+                if (expMinValString != null && expMinValString.isEmpty()) {
+                    // Infeasible
 
-            TestUtils.assertStateNotLessThanOptimal(result);
+                    TestUtils.assertStateLessThanFeasible(result);
+
+                } else {
+                    // Unbounded
+
+                    TestUtils.assertStateUnboundedOrLessThanFeasible(result);
+                }
+
+            } else {
+
+                TestUtils.assertStateNotLessThanOptimal(result);
+
+                TestUtils.assertEquals(expMaxVal, result.getValue(), accuracy);
+
+                TestUtils.assertTrue("Maximisation solution not valid!", model.validate(result, accuracy, BasicLogger.DEBUG));
+            }
         }
     }
 
