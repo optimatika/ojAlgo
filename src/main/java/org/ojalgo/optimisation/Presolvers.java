@@ -126,7 +126,7 @@ public abstract class Presolvers {
                                 min = null;
                             }
                         }
-                    } else {
+                    } else if (coefficient.signum() > 0) {
                         if (max != null) {
                             if (variable.isUpperLimitSet()) {
                                 max = max.add(coefficient.multiply(variable.getUpperLimit()));
@@ -195,15 +195,15 @@ public abstract class Presolvers {
                 if (variable.isObjective()) {
                     int weightSignum = variable.getContributionWeight().signum();
 
-                    if ((model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == -1)
-                            || ((model.getOptimisationSense() != Optimisation.Sense.MAX) && weightSignum == 1)) {
+                    Optimisation.Sense sense = model.getOptimisationSense();
+
+                    if (sense == Optimisation.Sense.MAX && weightSignum == -1 || sense == Optimisation.Sense.MIN && weightSignum == 1) {
                         if (variable.isLowerLimitSet()) {
                             variable.setFixed(variable.getLowerLimit());
                         } else {
                             variable.setUnbounded(true);
                         }
-                    } else if ((model.getOptimisationSense() == Optimisation.Sense.MAX && weightSignum == 1)
-                            || ((model.getOptimisationSense() != Optimisation.Sense.MAX) && weightSignum == -1)) {
+                    } else if (sense == Optimisation.Sense.MAX && weightSignum == 1 || sense == Optimisation.Sense.MIN && weightSignum == -1) {
                         if (variable.isUpperLimitSet()) {
                             variable.setFixed(variable.getUpperLimit());
                         } else {
@@ -715,15 +715,19 @@ public abstract class Presolvers {
     }
 
     static BigDecimal findCommonLevel(final BigDecimal a, final BigDecimal b) {
+
         if (a.compareTo(b) == 0) {
             return a;
         }
+
         BigDecimal levelledA = LEVEL.enforce(a);
         BigDecimal levelledB = LEVEL.enforce(b);
+
         if (levelledA.compareTo(levelledB) == 0) {
             return DIVIDE.invoke(a.add(a), TWO);
+        } else {
+            return null;
         }
-        return null;
     }
 
 }

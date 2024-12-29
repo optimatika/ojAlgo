@@ -787,20 +787,20 @@ abstract class SimplexSolver extends LinearSolver {
 
                         if (exitDirection == Direction.INCREASE) {
                             if (columnState == ColumnState.LOWER && denom < ZERO) {
-                                ratio = numer / -denom;
+                                ratio = Math.max(ZERO, numer) / -denom;
                             } else if (columnState == ColumnState.UPPER && denom > ZERO) {
-                                ratio = -numer / denom;
+                                ratio = Math.max(ZERO, -numer) / denom;
                             }
                         } else if (exitDirection == Direction.DECREASE) {
                             if (columnState == ColumnState.LOWER && denom > ZERO) {
-                                ratio = numer / denom;
+                                ratio = Math.max(ZERO, numer) / denom;
                             } else if (columnState == ColumnState.UPPER && denom < ZERO) {
-                                ratio = -numer / -denom;
+                                ratio = Math.max(ZERO, -numer) / -denom;
                             }
                         }
                     }
 
-                    if (printable && this.isLogDebug()) {
+                    if (ratio < ZERO || printable && this.isLogDebug()) {
                         this.log(1, "{}({}) {} / {} = {}", j, je, numer, denom, ratio);
                     }
 
@@ -874,7 +874,7 @@ abstract class SimplexSolver extends LinearSolver {
                         ratio = numer / denom;
                     }
 
-                    if (printable && this.isLogDebug()) {
+                    if (ratio < ZERO || printable && this.isLogDebug()) {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
@@ -911,7 +911,7 @@ abstract class SimplexSolver extends LinearSolver {
                         ratio = numer / denom;
                     }
 
-                    if (printable && this.isLogDebug()) {
+                    if (ratio < ZERO || printable && this.isLogDebug()) {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
@@ -1011,13 +1011,57 @@ abstract class SimplexSolver extends LinearSolver {
 
     }
 
+    private boolean verifyDualFeasibility() {
+
+        double epsilon = options.feasibility.epsilon();
+
+        for (int je = 0; je < mySimplex.excluded.length; je++) {
+            int j = mySimplex.excluded[je];
+
+            ColumnState state = mySimplex.getColumnState(j);
+
+            double rc = mySimplex.getReducedCost(je);
+            double lb = mySimplex.getLowerBound(j);
+            double ub = mySimplex.getUpperBound(j);
+
+            switch (state) {
+                case LOWER:
+                    if (rc < -epsilon) {
+                        this.log("{}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        return false;
+                    }
+                    break;
+
+                case UPPER:
+                    if (rc > epsilon) {
+                        this.log("{}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        return false;
+                    }
+                    break;
+
+                case UNBOUNDED:
+                    // No reduced cost constraints for unbounded variables
+                    break;
+
+                default:
+                    throw new IllegalStateException("Unexpected ColumnState for variable " + j + ": " + state);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean verifyPrimalFeasibility() {
+        // TODO
+        return true;
+    }
+
     final SimplexSolver basis(final int[] basis) {
         mySimplex.resetBasis(basis);
         return this;
     }
 
     final void doDualIterations(final IterDescr iteration) {
-
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
 
@@ -1051,6 +1095,10 @@ abstract class SimplexSolver extends LinearSolver {
             if (this.isLogDebug() && mySimplex.isPrintable()) {
                 this.logCurrentState();
             }
+        }
+
+        if (options.validate) {
+            this.verifyDualFeasibility();
         }
     }
 
