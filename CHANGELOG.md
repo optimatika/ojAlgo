@@ -23,6 +23,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - The configuration option `options.experimental` is no longer used to switch between the old/classic and new/dual simplex solvers. Instead there are specific configurations for this – `options.linear().dual()` and `options.linear().primal()`. If you don't specify which to use, there is internal logic that switches implementation based on problem size.
 
+#### org.ojalgo.type
+
+- `NumberContext` now explicitly exposes the relative and absolute errors as `getRelativeError()` and `getAbsoluteError()`, and the `epsilon()` method has been redefined to return the maximum of those two values.
+
 ## [55.1.0] – 2024-12-22
 
 ### Added

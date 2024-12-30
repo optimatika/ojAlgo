@@ -163,11 +163,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return value == 0D || Math.abs(value) <= tolerance;
     }
 
-    private final double myEpsilon;
+    private final double myAbsoluteError;
     private final MathContext myMathContext;
+    private final double myRelativeError;
     private final double myRoundingFactor;
     private final int myScale;
-    private final double myZeroError;
 
     private NumberContext(final NumberFormat format, final int precision, final int scale, final RoundingMode mode) {
         this(format, new MathContext(precision, mode), scale);
@@ -180,18 +180,18 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         myMathContext = math;
 
         if (math.getPrecision() > 0) {
-            myEpsilon = Math.max(PrimitiveMath.MACHINE_EPSILON, Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision()));
+            myRelativeError = Math.max(PrimitiveMath.MACHINE_EPSILON, Math.pow(PrimitiveMath.TEN, 1 - math.getPrecision()));
         } else {
-            myEpsilon = PrimitiveMath.MACHINE_EPSILON;
+            myRelativeError = PrimitiveMath.MACHINE_EPSILON;
         }
 
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = Math.max(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale));
+            myAbsoluteError = Math.max(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale));
             myRoundingFactor = MissingMath.power(PrimitiveMath.TEN, scale);
         } else {
-            myZeroError = PrimitiveMath.MACHINE_SMALLEST;
+            myAbsoluteError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
         }
     }
@@ -241,11 +241,13 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
-     * epsilon is defined as the difference between 1 and the next larger decimal number with the given number
-     * of digits (precision).
+     * The larger of the two errors (relative and absolute).
+     *
+     * @see #getRelativeError()
+     * @see #getAbsoluteError()
      */
     public double epsilon() {
-        return myEpsilon;
+        return Math.max(this.getRelativeError(), this.getAbsoluteError());
     }
 
     /**
@@ -287,6 +289,13 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return this.format().format(number);
     }
 
+    /**
+     * The absolute error is half the size of the last decimal place (scale).
+     */
+    public double getAbsoluteError() {
+        return myAbsoluteError;
+    }
+
     @Override
     public NumberFormat getFormat() {
         return (NumberFormat) super.getFormat();
@@ -302,6 +311,14 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
 
     public int getPrecision() {
         return myMathContext.getPrecision();
+    }
+
+    /**
+     * The relative error is defined as the difference between 1 and the next larger decimal number with the
+     * given number of digits (precision).
+     */
+    public double getRelativeError() {
+        return myRelativeError;
     }
 
     public RoundingMode getRoundingMode() {
@@ -326,8 +343,9 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     public boolean isDifferent(final double expected, final double actual) {
         if (expected == actual) {
             return false;
+        } else {
+            return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
         }
-        return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
     }
 
     public boolean isInteger(final double value) {
@@ -362,11 +380,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        if (NumberContext.isZero(comparedTo, myZeroError)) {
-            return NumberContext.isZero(value, myZeroError);
+        if (NumberContext.isZero(comparedTo, myAbsoluteError)) {
+            return NumberContext.isZero(value, myAbsoluteError);
         } else {
             double relative = value / comparedTo;
-            return NumberContext.isZero(relative, myEpsilon);
+            return NumberContext.isZero(relative, myRelativeError);
         }
     }
 
@@ -380,7 +398,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public boolean isZero(final double value) {
-        return NumberContext.isZero(value, myZeroError);
+        return NumberContext.isZero(value, myAbsoluteError);
     }
 
     /**

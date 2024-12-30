@@ -50,8 +50,10 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
         // model.options.debug(IntegerSolver.class);
         // model.options.debug(ConvexSolver.class);
         // model.options.debug(LinearSolver.class);
-        // model.options.progress(IntegerSolver.class);
+        // model.options.progress(LinearSolver.class);
         // model.options.validate = true;
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
         // model.options.mip_defer = 0.25;
         // model.options.mip_gap = 1.0E-5;
 

@@ -1013,9 +1013,11 @@ abstract class SimplexSolver extends LinearSolver {
 
     private boolean verifyDualFeasibility() {
 
+        boolean retVal = true;
+
         double epsilon = options.feasibility.epsilon();
 
-        for (int je = 0; je < mySimplex.excluded.length; je++) {
+        for (int je = 0, limit = mySimplex.excluded.length; je < limit; je++) {
             int j = mySimplex.excluded[je];
 
             ColumnState state = mySimplex.getColumnState(j);
@@ -1027,15 +1029,15 @@ abstract class SimplexSolver extends LinearSolver {
             switch (state) {
                 case LOWER:
                     if (rc < -epsilon) {
-                        this.log("{}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                        return false;
+                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        retVal = false;
                     }
                     break;
 
                 case UPPER:
                     if (rc > epsilon) {
-                        this.log("{}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                        return false;
+                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                        retVal = false;
                     }
                     break;
 
@@ -1048,12 +1050,31 @@ abstract class SimplexSolver extends LinearSolver {
             }
         }
 
-        return true;
+        return retVal;
     }
 
     private boolean verifyPrimalFeasibility() {
-        // TODO
-        return true;
+
+        boolean retVal = true;
+
+        double epsilon = options.feasibility.epsilon();
+
+        for (int i = 0, limit = mySimplex.included.length; i < limit; i++) {
+            int j = mySimplex.included[i];
+
+            double value = mySimplex.getCurrentRHS(i);
+
+            double lb = mySimplex.getLowerBound(j);
+            double ub = mySimplex.getUpperBound(j);
+
+            // Check if the value lies within the bounds
+            if (value < lb - epsilon || value > ub + epsilon) {
+                this.log("!PF {}({}) {}, but [{},{}]", j, i, value, lb, ub);
+                retVal = false;
+            }
+        }
+
+        return retVal;
     }
 
     final SimplexSolver basis(final int[] basis) {
@@ -1062,6 +1083,11 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     final void doDualIterations(final IterDescr iteration) {
+
+        if (options.validate) {
+            this.verifyDualFeasibility();
+        }
+
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
 
@@ -1095,19 +1121,18 @@ abstract class SimplexSolver extends LinearSolver {
             if (this.isLogDebug() && mySimplex.isPrintable()) {
                 this.logCurrentState();
             }
-        }
 
-        if (options.validate) {
-            this.verifyDualFeasibility();
+            if (options.validate) {
+                this.verifyDualFeasibility();
+            }
         }
     }
 
     final void doPrimalIterations(final IterDescr iteration) {
 
-        // TODO Re-enable validation here
-        //        if (options.validate) {
-        //            this.validate(this.extractResult());
-        //        }
+        if (options.validate) {
+            this.verifyPrimalFeasibility();
+        }
 
         boolean done = false;
         while (this.isIterationAllowed() && !done) {
@@ -1143,10 +1168,9 @@ abstract class SimplexSolver extends LinearSolver {
                 this.logCurrentState();
             }
 
-            // TODO Re-enable validation here
-            //            if (options.validate) {
-            //                this.validate(this.extractResult());
-            //            }
+            if (options.validate) {
+                this.verifyPrimalFeasibility();
+            }
         }
     }
 
