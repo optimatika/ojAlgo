@@ -63,6 +63,10 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result result = Result.of(8.5755E8, State.OPTIMAL, 7.84804E+8, 0, 0, 7.2746E+7);
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("usersupplied", "GitHub546.ebm", false);
+        // The old/classic solver cannot handle this problem.
+        // (That was the original bug report.)
+        // Have to force use of the newer dual solver.
+        model.options.linear().dual();
 
         return OptimisationCase.of(model, Sense.MIN, result);
     }

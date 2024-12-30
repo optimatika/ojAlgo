@@ -493,6 +493,34 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static final class Configuration {
 
+        private Boolean myDualOrPrimal = null;
+
+        /**
+         * Force use of the newer (mainly) dual simplex implementation. If you don't specify which to use,
+         * there is internal logic that switches implementation based on problem size.
+         */
+        public Configuration dual() {
+            myDualOrPrimal = Boolean.TRUE;
+            return this;
+        }
+
+        /**
+         * Force use of ojAlgo's original (classic 2-phase primal) simplex implementation.
+         *
+         * @see #dual()
+         */
+        public Configuration primal() {
+            myDualOrPrimal = Boolean.FALSE;
+            return this;
+        }
+
+        /**
+         * TRUE for dual, FALSE for primal and null means "let the solver decide".
+         */
+        Boolean getDualOrPrimal() {
+            return myDualOrPrimal;
+        }
+
     }
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
@@ -500,11 +528,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         @Override
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            boolean alternative = !model.options.experimental;
+            Boolean dualOrPrimal = model.options.linear().getDualOrPrimal();
 
-            this.setSwitch(model, alternative);
+            boolean newerDualImpl = true;
+            if (Boolean.FALSE.equals(dualOrPrimal)) {
+                newerDualImpl = false;
+            } else if (Boolean.TRUE.equals(dualOrPrimal)) {
+                newerDualImpl = true;
+            } else if (dualOrPrimal == null) {
+                if (model.countVariables() < 80 && model.countExpressions() < 50) {
+                    newerDualImpl = false;
+                } else {
+                    newerDualImpl = true;
+                }
+            }
 
-            if (alternative) {
+            this.setSwitch(model, newerDualImpl);
+
+            if (newerDualImpl) {
                 return NEW_INTEGRATION.build(model);
             } else {
                 return OLD_INTEGRATION.build(model);

@@ -31,24 +31,30 @@ abstract class OptimisationLinearTests {
 
     static final boolean DEBUG = false;
 
-    static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Standard-Default",
+    static final Map<String, ExpressionsBasedModel.Integration<LinearSolver>> INTEGRATIONS = Map.of("Dual-Default",
             LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = false;
+                opt.linear().dual();
                 opt.sparse = null;
-            }), "Standard-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = false;
+            }), "Dual-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().dual();
                 opt.sparse = Boolean.FALSE;
-            }), "Standard-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = false;
+            }), "Dual-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().dual();
                 opt.sparse = Boolean.TRUE;
-            }), "Experimental-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = true;
+            }), "Primal-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().primal();
                 opt.sparse = null;
-            }), "Experimental-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = true;
+            }), "Primal-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().primal();
                 opt.sparse = Boolean.FALSE;
-            }), "Experimental-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
-                opt.experimental = true;
+            }), "Primal-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.linear().primal();
+                opt.sparse = Boolean.TRUE;
+            }), "Default-Default", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.sparse = null;
+            }), "Default-Dense", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
+                opt.sparse = Boolean.FALSE;
+            }), "Default-Sparse", LinearSolver.INTEGRATION.withOptionsModifier(opt -> {
                 opt.sparse = Boolean.TRUE;
             }));
 

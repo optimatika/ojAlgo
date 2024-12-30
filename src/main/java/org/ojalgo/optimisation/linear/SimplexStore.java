@@ -81,7 +81,7 @@ abstract class SimplexStore {
         return structure -> {
 
             if (Boolean.TRUE.equals(options.sparse)
-                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 500_000) {
+                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
                 return new RevisedStore(structure);
             } else {
                 return new DenseTableau(structure);

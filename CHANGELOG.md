@@ -11,11 +11,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-### Changed
+### Added
 
 #### org.ojalgo.type
 
 - The `ForgetfulMap` gained support for disposer-hooks – code that is called when objects are invalidated and removed from the cache. Also streamlined the code to create single `ForgetfulMap.ValueCache<T>` instances.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- The configuration option `options.experimental` is no longer used to switch between the old/classic and new/dual simplex solvers. Instead there are specific configurations for this – `options.linear().dual()` and `options.linear().primal()`. If you don't specify which to use, there is internal logic that switches implementation based on problem size.
 
 ## [55.1.0] – 2024-12-22
 
