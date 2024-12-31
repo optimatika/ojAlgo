@@ -61,7 +61,7 @@ public class InterruptionTest extends OptimisationLinearTests implements ModelFi
     }
 
     @Test
-    @Timeout(value = 4, unit = TimeUnit.SECONDS)
+    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void slowMinimizationShouldBeInterrupted() throws InterruptedException {
 
         Thread minimizer = new Thread(this::launchSlowMinimization);

@@ -33,8 +33,11 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
+import org.ojalgo.type.context.NumberContext;
 
 final class DenseTableau extends SimplexTableau {
+
+    private static final NumberContext PRECISION = NumberContext.of(12);
 
     private double[] myAuxiliaryRow = null;
     private final int myColDim;
@@ -91,7 +94,7 @@ final class DenseTableau extends SimplexTableau {
             if (i != row) {
                 double[] dataRow = myTableau[i];
                 double colVal = dataRow[col];
-                if (colVal != ZERO) {
+                if (colVal != ZERO && !PRECISION.isZero(colVal)) {
                     AXPY.invoke(dataRow, 0, -colVal, pivotRow, 0, 0, myColDim);
                 }
             }

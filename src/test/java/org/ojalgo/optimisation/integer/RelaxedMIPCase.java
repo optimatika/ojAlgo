@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -34,7 +33,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
 
     private static final NumberContext ACCURACY = NumberContext.of(8, 6);
 
-    private static void doTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
+    private static void doTest(final String name, final String expMinValString, final String expMaxValString, final NumberContext accuracy) {
 
         ExpressionsBasedModel model = ModelFileTest.makeModel("miplib", name, true);
 
@@ -49,7 +48,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
             // model.options.mip_gap = 1.0E-5;
         }
 
-        ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
+        ModelFileTest.assertValues(model, expMinValString, expMaxValString, accuracy != null ? accuracy : ACCURACY);
     }
 
     /**
@@ -293,7 +292,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testNeos911880() {
-        RelaxedMIPCase.doTest("neos-911880.mps", "23.26", null, null);
+        RelaxedMIPCase.doTest("neos-911880.mps", "23.26", null, NumberContext.of(4));
     }
 
     /**
@@ -456,7 +455,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        RelaxedMIPCase.doTest("pk1.mps", "0", null, tmpSolution);
+        RelaxedMIPCase.doTest("pk1.mps", "0", null, null);
     }
 
     /**

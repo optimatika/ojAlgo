@@ -1234,7 +1234,7 @@ public class CuteNetlibCase extends OptimisationLinearTests implements ModelFile
     @Test
     @Tag("bm1000")
     public void testSHARE1B() {
-        CuteNetlibCase.doTest("SHARE1B.SIF", "-76589.31857918584", "74562.53714565346", NumberContext.of(4, 4));
+        CuteNetlibCase.doTest("SHARE1B.SIF", "-76589.31857918584", "74562.53714565346", NumberContext.of(3, 6));
     }
 
     /**

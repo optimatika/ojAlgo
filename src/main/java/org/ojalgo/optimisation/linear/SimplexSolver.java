@@ -1020,6 +1020,10 @@ abstract class SimplexSolver extends LinearSolver {
         for (int je = 0, limit = mySimplex.excluded.length; je < limit; je++) {
             int j = mySimplex.excluded[je];
 
+            if (mySimplex.isArtificial(j)) {
+                continue;
+            }
+
             ColumnState state = mySimplex.getColumnState(j);
 
             double rc = mySimplex.getReducedCost(je);

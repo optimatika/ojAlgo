@@ -3,8 +3,11 @@ package org.ojalgo.optimisation;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
+import org.ojalgo.optimisation.linear.LinearSolver;
 
 public final class OptimisationCase {
+
+    private static final boolean DEBUG = false;
 
     public static OptimisationCase of(final ExpressionsBasedModel model, final Sense sense, final Result result) {
         return new OptimisationCase(model, sense, result);
@@ -22,6 +25,11 @@ public final class OptimisationCase {
     }
 
     public Optimisation.Result assertResult() {
+
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
         Optimisation.Result actual = sense.solve(model);
         TestUtils.assertResult(result, actual);
         return actual;

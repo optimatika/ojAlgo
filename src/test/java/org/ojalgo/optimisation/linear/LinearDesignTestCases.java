@@ -215,24 +215,28 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test2LinearModelCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(THREE), tmpModel.newVariable("X2").lower(ZERO).weight(ZERO),
-                tmpModel.newVariable("X3").lower(ZERO).weight(ONE) };
+        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(THREE), model.newVariable("X2").lower(ZERO).weight(ZERO),
+                model.newVariable("X3").lower(ZERO).weight(ONE) };
 
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { ONE, TWO, ONE }[i]);
         }
         tmpExprC1.level(TEN);
 
-        Expression tmpExprC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC2 = model.newExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ONE, TWO.negate(), TWO }[i]);
         }
         tmpExprC2.level(SIX);
 
-        Optimisation.Result tmpResult = tmpModel.maximise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
         PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
@@ -247,29 +251,33 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test3LinearModelCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(TEN.add(FIVE)), tmpModel.newVariable("X2").lower(ZERO).weight(TEN) };
+        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(TEN.add(FIVE)), model.newVariable("X2").lower(ZERO).weight(TEN) };
 
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { ONE, ZERO }[i]);
         }
         tmpExprC1.upper(TWO);
 
-        Expression tmpExprC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC2 = model.newExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ZERO, ONE }[i]);
         }
         tmpExprC2.upper(THREE);
 
-        Expression tmpExprC3 = tmpModel.newExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC3 = model.newExpression("C3");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
         tmpExprC3.level(FOUR);
 
-        Optimisation.Result tmpResult = tmpModel.maximise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
         PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 2.0 }, { 2.0 } });
@@ -295,29 +303,33 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test5LinearModelCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(TWO), tmpModel.newVariable("X2").lower(ZERO).weight(THREE) };
+        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(TWO), model.newVariable("X2").lower(ZERO).weight(THREE) };
 
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC1.set(i, new BigDecimal[] { HALF, QUARTER }[i]);
         }
         tmpExprC1.upper(FOUR);
 
-        Expression tmpExprC2 = tmpModel.newExpression("C2");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC2 = model.newExpression("C2");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC2.set(i, new BigDecimal[] { ONE, THREE }[i]);
         }
         tmpExprC2.lower(TEN.add(TEN));
 
-        Expression tmpExprC3 = tmpModel.newExpression("C3");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC3 = model.newExpression("C3");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
         tmpExprC3.level(TEN);
 
-        Optimisation.Result tmpResult = tmpModel.minimise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.minimise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
         PhysicalStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 5.0 }, { 5.0 } });
@@ -332,12 +344,16 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void test6LinearModelCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ZERO).weight(ONE), tmpModel.newVariable("X2").lower(ZERO).weight(TWO),
-                tmpModel.newVariable("X3").lower(ZERO).weight(THREE) };
+        Variable[] tmpVariables = { model.newVariable("X1").lower(ZERO).weight(ONE), model.newVariable("X2").lower(ZERO).weight(TWO),
+                model.newVariable("X3").lower(ZERO).weight(THREE) };
 
-        Optimisation.Result tmpResult = tmpModel.maximise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.maximise();
 
         TestUtils.assertEquals(State.UNBOUNDED, tmpResult.getState());
     }
@@ -416,18 +432,22 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testInfeasibleCase() {
 
-        ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        Variable[] tmpVariables = { tmpModel.newVariable("X1").lower(ONE).weight(ONE), tmpModel.newVariable("X2").lower(ONE).weight(TWO),
-                tmpModel.newVariable("X3").lower(ONE).weight(THREE) };
+        Variable[] tmpVariables = { model.newVariable("X1").lower(ONE).weight(ONE), model.newVariable("X2").lower(ONE).weight(TWO),
+                model.newVariable("X3").lower(ONE).weight(THREE) };
 
-        Expression tmpExprC1 = tmpModel.newExpression("C1");
-        for (int i = 0; i < tmpModel.countVariables(); i++) {
+        Expression tmpExprC1 = model.newExpression("C1");
+        for (int i = 0; i < model.countVariables(); i++) {
             tmpExprC1.set(i, ONE);
         }
         tmpExprC1.upper(TWO);
 
-        Optimisation.Result tmpResult = tmpModel.maximise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.maximise();
 
         TestUtils.assertFalse(tmpResult.getState().isFeasible());
 
@@ -436,9 +456,13 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testMaxOldKnapsackTestModel() {
 
-        ExpressionsBasedModel tmpModel = LinearDesignTestCases.buildOldKnapsackTestModel();
+        ExpressionsBasedModel model = LinearDesignTestCases.buildOldKnapsackTestModel();
 
-        Optimisation.Result tmpResult = tmpModel.maximise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.maximise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
         MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
@@ -450,9 +474,13 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     @Test
     public void testMinOldKnapsackTestModel() {
 
-        ExpressionsBasedModel tmpModel = LinearDesignTestCases.buildOldKnapsackTestModel();
+        ExpressionsBasedModel model = LinearDesignTestCases.buildOldKnapsackTestModel();
 
-        Optimisation.Result tmpResult = tmpModel.minimise();
+        if (DEBUG) {
+            model.options.debug(LinearSolver.class);
+        }
+
+        Optimisation.Result tmpResult = model.minimise();
         MatrixQ128 tmpSolution = MatrixQ128.FACTORY.column(tmpResult);
 
         MatrixStore<Double> tmpExpX = RawStore.wrap(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });

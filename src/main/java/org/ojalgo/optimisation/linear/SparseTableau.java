@@ -33,11 +33,13 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
+import org.ojalgo.type.context.NumberContext;
 
 final class SparseTableau extends SimplexTableau {
 
     private static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(ArrayR064.FACTORY);
     private static final DenseArray.Factory<Double> DENSE_FACTORY = ArrayR064.FACTORY;
+    private static final NumberContext PRECISION = NumberContext.of(12);
 
     private static double scale(final SparseArray<Double> body, final double rhs, final int col) {
 
@@ -149,7 +151,7 @@ final class SparseTableau extends SimplexTableau {
             if (i != row) {
                 SparseArray<Double> rowY = myBody[i];
                 colVal = -rowY.doubleValue(col);
-                if (colVal != ZERO) {
+                if (colVal != ZERO && !PRECISION.isZero(colVal)) {
                     body.axpy(colVal, rowY);
                     myRHS.add(i, colVal * rhs);
                 }
