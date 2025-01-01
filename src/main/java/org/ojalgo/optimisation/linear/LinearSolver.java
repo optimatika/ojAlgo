@@ -543,44 +543,44 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 }
             }
 
-            this.setSwitch(model, newerDualImpl);
+            this.setSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP, newerDualImpl);
 
             if (newerDualImpl) {
-                return NEW_INTEGRATION.build(model);
+                return NEWER_DUAL_SOLVER.build(model);
             } else {
-                return OLD_INTEGRATION.build(model);
+                return OLDER_PRIMAL_SOLVER.build(model);
             }
         }
 
         @Override
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return OLD_INTEGRATION.isCapable(model) || NEW_INTEGRATION.isCapable(model);
+            return OLDER_PRIMAL_SOLVER.isCapable(model) || NEWER_DUAL_SOLVER.isCapable(model);
         }
 
         @Override
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.toModelState(solverState, model);
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+                return NEWER_DUAL_SOLVER.toModelState(solverState, model);
             } else {
-                return OLD_INTEGRATION.toModelState(solverState, model);
+                return OLDER_PRIMAL_SOLVER.toModelState(solverState, model);
             }
         }
 
         @Override
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.toSolverState(modelState, model);
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+                return NEWER_DUAL_SOLVER.toSolverState(modelState, model);
             } else {
-                return OLD_INTEGRATION.toSolverState(modelState, model);
+                return OLDER_PRIMAL_SOLVER.toSolverState(modelState, model);
             }
         }
 
         @Override
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
-            if (this.isSwitch(model)) {
-                return NEW_INTEGRATION.getIndexInSolver(model, variable);
+            if (this.isSwitch(model, ExpressionsBasedModel.IntegrationProperty.PRIMAL_OR_DUAL_LP)) {
+                return NEWER_DUAL_SOLVER.getIndexInSolver(model, variable);
             } else {
-                return OLD_INTEGRATION.getIndexInSolver(model, variable);
+                return OLDER_PRIMAL_SOLVER.getIndexInSolver(model, variable);
             }
         }
 
@@ -770,17 +770,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static final ExpressionsBasedModel.Integration<LinearSolver> INTEGRATION = new ModelIntegration();
 
-    /**
-     * An integration to a new/alternative/experimental LP-solver. This solver is intended to replace the
-     * current (old) solver, but is not yet ready to do that. You're welcome to try it - just add this
-     * integration by calling {@link ExpressionsBasedModel#addIntegration(ExpressionsBasedModel.Integration)}.
-     */
-    static final NewIntegration NEW_INTEGRATION = new NewIntegration();
+    static final NewIntegration NEWER_DUAL_SOLVER = new NewIntegration();
 
     /**
-     * An integration to a old/traditional/default LP-solver.
+     * An integration to a old/classic/primal LP-solver.
      */
-    static final OldIntegration OLD_INTEGRATION = new OldIntegration();
+    static final OldIntegration OLDER_PRIMAL_SOLVER = new OldIntegration();
 
     public static LinearSolver.Builder newBuilder() {
         return new LinearSolver.Builder();

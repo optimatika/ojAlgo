@@ -50,6 +50,7 @@ import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
+import org.ojalgo.type.EnumBitSet;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.keyvalue.EntryPair;
 import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
@@ -316,17 +317,59 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
             return model.indexOfFreeVariable(variable);
         }
 
-        protected final boolean isSwitch(final ExpressionsBasedModel model) {
-            return model.isIntegrationSwitch();
+        protected final boolean isSwitch(final ExpressionsBasedModel model, final IntegrationProperty property) {
+            return model.isIntegrationSwitch(property);
         }
 
         protected final ExpressionsBasedModel.Validator newValidator(final ExpressionsBasedModel model) {
             return new ExpressionsBasedModel.Validator(model, this, model.getKnownSolution(), model.getValidationFailureHandler());
         }
 
-        protected final void setSwitch(final ExpressionsBasedModel model, final boolean value) {
-            model.setIntegrationSwitch(value);
+        protected final void setSwitch(final ExpressionsBasedModel model, final IntegrationProperty property, final boolean value) {
+            model.setIntegrationSwitch(property, value);
         }
+
+    }
+
+    /**
+     * Various switches that can be set by solver integrations to control its own behaviour. Typically used
+     * when a single integration is a facade delegating to a set of (switching between a pair of) other
+     * integrations.
+     * <p>
+     * The various properties are here are for very specific use cases, but have been given generic names to
+     * encourage reuse.
+     * <p>
+     * Solver integrations are (absolutely have to be) stateless. If they contain logic that cause them to
+     * take different paths, information about that needs to be stored in the model (or solver) instance.
+     * That's what these properties are for.
+     *
+     * @see ExpressionsBasedModel.Integration#setSwitch(ExpressionsBasedModel, IntegrationProperty, boolean)
+     * @see ExpressionsBasedModel.Integration#isSwitch(ExpressionsBasedModel, IntegrationProperty)
+     */
+    public static enum IntegrationProperty {
+
+        /**
+         * Any integration that can switch between Java and native code solvers.
+         * <p>
+         * JAVA==false, NATIVE==true
+         */
+        JAVA_OR_NATIVE_CODE,
+        /**
+         * Any integration that can handle both LP and QP models.
+         * <p>
+         * LP==false, QP==true
+         */
+        LP_OR_QP,
+        /**
+         * Any LP solver integration that can switch between primal and dual algorithm implementations.
+         * <p>
+         * PRIMAL==false, DUAL==true
+         */
+        PRIMAL_OR_DUAL_LP,
+        /**
+         * Something temporary or experimental that does not yet have a specific constant.
+         */
+        TEMPORARY;
 
     }
 
@@ -337,9 +380,6 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         }
 
         /**
-         * @param remaining TODO
-         * @param lower TODO
-         * @param upper TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
@@ -645,12 +685,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     }
 
     private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
+
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
     static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
-
     static {
         ExpressionsBasedModel.resetPresolvers();
     }
@@ -672,6 +712,30 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
     public static void clearPresolvers() {
         PRESOLVERS.clear();
+    }
+
+    /**
+     * Don't you worry about this! It's for internal use.
+     */
+    public static boolean isNative(final ExpressionsBasedModel model) {
+
+        boolean mip = model.isAnyVariableInteger();
+
+        boolean qp = model.isAnyExpressionQuadratic();
+
+        if (mip) {
+            if (qp) {
+                return false;
+            } else {
+                return model.countVariables() > 50 || model.countExpressions() > 40;
+            }
+        } else {
+            if (qp) {
+                return model.countVariables() > 200 || model.countExpressions() > 200;
+            } else {
+                return model.countVariables() > 500 || model.countExpressions() > 400;
+            }
+        }
     }
 
     /**
@@ -720,7 +784,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private final Map<String, Expression> myExpressions = new HashMap<>();
     private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient boolean myInfeasible = false;
-    private boolean myIntegrationSwitch = false;
+    private final EnumBitSet<IntegrationProperty> myIntegrationProperties = new EnumBitSet<>();
     private Optimisation.Result myKnownSolution = null;
     private BigDecimal myObjectiveConstant = BigMath.ZERO;
     private Optimisation.Sense myOptimisationSense = null;
@@ -1762,8 +1826,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         return true;
     }
 
-    boolean isIntegrationSwitch() {
-        return myIntegrationSwitch;
+    boolean isIntegrationSwitch(final IntegrationProperty property) {
+        return myIntegrationProperties.get(property);
     }
 
     boolean isReferenced(final Variable variable) {
@@ -1851,8 +1915,8 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
         myInfeasible = true;
     }
 
-    void setIntegrationSwitch(final boolean value) {
-        myIntegrationSwitch = value;
+    void setIntegrationSwitch(final IntegrationProperty property, final boolean value) {
+        myIntegrationProperties.set(property, value);
     }
 
     void setOptimisationSense(final Optimisation.Sense optimisationSense) {

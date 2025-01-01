@@ -1,3 +1,24 @@
+/*
+ * Copyright 1997-2024 Optimatika
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.ojalgo.type;
 
 import java.time.Instant;
@@ -47,7 +68,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public Calendar toKey(final long index) {
-                    final long tmpTimeInMillis = (index * resolution.toDurationInMillis()) + reference.getTimeInMillis();
+                    final long tmpTimeInMillis = index * resolution.toDurationInMillis() + reference.getTimeInMillis();
                     final GregorianCalendar retVal = new GregorianCalendar();
                     retVal.setTimeInMillis(tmpTimeInMillis);
                     return retVal;
@@ -119,7 +140,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public CalendarDate toKey(final long index) {
-                    return new CalendarDate((index * resolution.toDurationInMillis()) + reference.millis);
+                    return new CalendarDate(index * resolution.toDurationInMillis() + reference.millis);
                 }
 
             };
@@ -183,7 +204,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public Date toKey(final long index) {
-                    return new Date((index * resolution.toDurationInMillis()) + reference.getTime());
+                    return new Date(index * resolution.toDurationInMillis() + reference.getTime());
                 }
 
             };
@@ -316,11 +337,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 private final long myResolution = resolution.toDurationInMillis();
 
                 public long toIndex(final LocalDate key) {
-                    return ((DAY_SIZE * key.toEpochDay()) - myReference) / myResolution;
+                    return (DAY_SIZE * key.toEpochDay() - myReference) / myResolution;
                 }
 
                 public LocalDate toKey(final long index) {
-                    return LocalDate.ofEpochDay((myReference + (index * myResolution)) / DAY_SIZE);
+                    return LocalDate.ofEpochDay((myReference + index * myResolution) / DAY_SIZE);
                 }
 
             };
@@ -348,11 +369,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 private final long myResolution = resolution.toDurationInMillis();
 
                 public long toIndex(final LocalDate key) {
-                    return (DAY_SIZE * key.toEpochDay()) / myResolution;
+                    return DAY_SIZE * key.toEpochDay() / myResolution;
                 }
 
                 public LocalDate toKey(final long index) {
-                    return LocalDate.ofEpochDay((index * myResolution) / DAY_SIZE);
+                    return LocalDate.ofEpochDay(index * myResolution / DAY_SIZE);
                 }
 
             };
@@ -391,7 +412,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    return LocalDateTime.ofEpochSecond(myReference + (index * myResolution), 0, ZoneOffset.UTC);
+                    return LocalDateTime.ofEpochSecond(myReference + index * myResolution, 0, ZoneOffset.UTC);
                 }
 
             };
@@ -462,7 +483,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public LocalTime toKey(final long index) {
-                    return LocalTime.ofNanoOfDay(myReference + (index * myResolution));
+                    return LocalTime.ofNanoOfDay(myReference + index * myResolution);
                 }
 
             };
