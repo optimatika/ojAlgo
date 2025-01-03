@@ -59,8 +59,8 @@ final class RevisedStore extends SimplexStore {
     /**
      * Reduced costs / dual slack
      */
-    private final PhysicalStore<Double> d;
-    private final PhysicalStore<Double> l;
+    private final R064Store d;
+    private final R064Store l;
     private final MatrixStore<Double> myBasis;
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
@@ -71,16 +71,16 @@ final class RevisedStore extends SimplexStore {
     /**
      * cost reducer
      */
-    private final PhysicalStore<Double> r;
+    private final R064Store r;
     /**
      * primal basic solution
      */
-    private final PhysicalStore<Double> x;
+    private final R064Store x;
     /**
      * delta – primal basic solution
      */
-    private final PhysicalStore<Double> y;
-    private final PhysicalStore<Double> z;
+    private final R064Store y;
+    private final R064Store z;
 
     RevisedStore(final int mm, final int nn) {
         this(new LinearStructure(mm, nn));
@@ -159,11 +159,13 @@ final class RevisedStore extends SimplexStore {
         // d += a
         // ...and then move the setup/prepare/update outside of the loop
 
-        myInvBasis.btran(myObjective.rows(included), l);
+        R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
+
+        myInvBasis.btran(objective.rows(included), l);
 
         this.doExclTranspMult(l, r);
 
-        d.fillMatching(myObjective.rows(excluded), SUBTRACT, r);
+        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
 
         myInvBasis.ftran(myConstraintsRHS, x);
 
@@ -210,15 +212,6 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void copyObjective() {
-        if (myPhase1Objective == null) {
-            myPhase1Objective = myObjective.copy();
-        } else {
-            myPhase1Objective.fillMatching(myObjective);
-        }
-    }
-
-    @Override
     double extractValue() {
 
         double retVal = ZERO;
@@ -253,6 +246,55 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    double getEffectiveCost(final int je, final ColumnState columnState) {
+
+        int j = excluded[je]; // TODO Maybe should pass j directly
+
+        if (columnState == ColumnState.BASIS) {
+
+            // TODO As long as we pass je rather than j the column state cannot be BASIS
+
+            if (myPhase1Objective != null) {
+                // TODO return myAuxiliaryObjective.doubleValue(j);
+                return ZERO; // TODO Not this!
+            } else {
+                return d.doubleValue(je);
+            }
+
+        } else if (columnState == ColumnState.LOWER) {
+
+            double retVal = d.doubleValue(je);
+            if (retVal <= ZERO) {
+                if (myPhase1Objective != null) {
+                    // TODO retVal = myAuxiliaryObjective.doubleValue(j);
+                    if (retVal <= ZERO) {
+                        retVal = ONE;
+                    }
+                }
+            }
+            return retVal;
+
+        } else if (columnState == ColumnState.UPPER) {
+
+            double retVal = d.doubleValue(je);
+            if (retVal >= ZERO) {
+                if (myPhase1Objective != null) {
+                    // TODO retVal = myAuxiliaryObjective.doubleValue(j);
+                    if (retVal >= ZERO) {
+                        retVal = NEG;
+                    }
+                }
+            }
+            return retVal;
+
+        } else {
+
+            // ColumnState = UNBOUNDED
+            return ZERO;
+        }
+    }
+
+    @Override
     double getInfeasibility(final int i) {
 
         int ii = included[i];
@@ -283,17 +325,26 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    R064Store phase1() {
+
+        if (myPhase1Objective == null) {
+            myPhase1Objective = RevisedStore.newColumn(n);
+        }
+
+        return myPhase1Objective;
+    }
+
+    @Override
+    void removePhase1() {
+        myPhase1Objective = null;
+    }
+
+    @Override
     void resetBasis(final int[] basis) {
 
         super.resetBasis(basis);
 
         myInvBasis.reset(myBasis);
-    }
-
-    @Override
-    void restoreObjective() {
-        myObjective.fillMatching(myPhase1Objective);
-        myPhase1Objective = null;
     }
 
     @Override
@@ -350,19 +401,6 @@ final class RevisedStore extends SimplexStore {
             }
 
         };
-    }
-
-    @Override
-    void switchObjective() {
-
-        if (myPhase1Objective != null) {
-
-            R064Store copy = myObjective.copy();
-
-            myObjective.fillMatching(myPhase1Objective);
-
-            myPhase1Objective = copy;
-        }
     }
 
 }

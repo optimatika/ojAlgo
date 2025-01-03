@@ -23,8 +23,6 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.CorePrimitiveOperation;
@@ -91,14 +89,17 @@ final class DenseTableau extends SimplexTableau {
             if (i != row) {
                 double[] dataRow = myTableau[i];
                 double colVal = dataRow[col];
-                if (colVal != ZERO && !PRECISION.isZero(colVal)) {
+                if (colVal != ZERO && (myPhase1Row != null && i == m || !PRECISION.isZero(colVal))) {
                     AXPY.invoke(dataRow, 0, -colVal, pivotRow, 0, 0, myColDim);
                 }
             }
         }
 
         if (myPhase1Row != null) {
-            AXPY.invoke(myPhase1Row, 0, -myPhase1Row[col], pivotRow, 0, 0, myColDim);
+            double colVal = myPhase1Row[col];
+            if (colVal != ZERO && !PRECISION.isZero(colVal)) {
+                AXPY.invoke(myPhase1Row, 0, -colVal, pivotRow, 0, 0, myColDim);
+            }
         }
     }
 
@@ -131,15 +132,6 @@ final class DenseTableau extends SimplexTableau {
     void copyBasicSolution(final double[] solution) {
         for (int i = 0; i < included.length; i++) {
             solution[included[i]] = myTableau[i][n];
-        }
-    }
-
-    @Override
-    void copyObjective() {
-        if (myPhase1Row == null) {
-            myPhase1Row = Arrays.copyOf(myTableau[m], myColDim);
-        } else {
-            System.arraycopy(myTableau[m], 0, myPhase1Row, 0, myColDim);
         }
     }
 
@@ -230,11 +222,68 @@ final class DenseTableau extends SimplexTableau {
     }
 
     @Override
+    double getEffectiveCost(final int je, final ColumnState columnState) {
+
+        int j = excluded[je]; // TODO Maybe should pass j directly
+
+        if (columnState == ColumnState.BASIS) {
+
+            // TODO As long as we pass je rather than j the column state cannot be BASIS
+
+            if (myPhase1Row != null) {
+                return myPhase1Row[j];
+            } else {
+                return myTableau[m][j];
+            }
+
+        } else if (columnState == ColumnState.LOWER) {
+
+            double retVal = myTableau[m][j];
+            if (retVal <= ZERO) {
+                if (myPhase1Row != null) {
+                    retVal = myPhase1Row[j];
+                    if (retVal <= ZERO) {
+                        retVal = ONE;
+                    }
+                }
+            }
+            return retVal;
+
+        } else if (columnState == ColumnState.UPPER) {
+
+            double retVal = myTableau[m][j];
+            if (retVal >= ZERO) {
+                if (myPhase1Row != null) {
+                    retVal = myPhase1Row[j];
+                    if (retVal >= ZERO) {
+                        retVal = NEG;
+                    }
+                }
+            }
+            return retVal;
+
+        } else {
+
+            // ColumnState = UNBOUNDED
+            return ZERO;
+        }
+    }
+
+    @Override
     double getInfeasibility() {
         if (myPhase1Row != null) {
             return myPhase1Row[n];
         } else {
             return ZERO;
+        }
+    }
+
+    @Override
+    final double getReducedCost(final int je) {
+        if (myPhase1Row != null) {
+            return myPhase1Row[excluded[je]];
+        } else {
+            return myTableau[m][excluded[je]];
         }
     }
 
@@ -337,18 +386,35 @@ final class DenseTableau extends SimplexTableau {
     }
 
     @Override
-    void restoreObjective() {
-        myTableau[m] = myPhase1Row;
-        myPhase1Row = null;
+    Primitive1D phase1() {
+
+        if (myPhase1Row == null) {
+            myPhase1Row = new double[n + 1];
+        }
+
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return myPhase1Row[index];
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                myPhase1Row[index] = value;
+            }
+
+            @Override
+            public int size() {
+                return structure.countModelVariables();
+            }
+
+        };
     }
 
     @Override
-    void switchObjective() {
-        if (myPhase1Row != null) {
-            double[] tmpRow = myTableau[m];
-            myTableau[m] = myPhase1Row;
-            myPhase1Row = tmpRow;
-        }
+    void removePhase1() {
+        myPhase1Row = null;
     }
 
 }

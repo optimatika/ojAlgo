@@ -145,7 +145,7 @@ final class SparseTableau extends SimplexTableau {
 
         double colVal;
 
-        for (int i = 0; i < myBody.length; i++) {
+        for (int i = 0, limit = myBody.length; i < limit; i++) {
             if (i != row) {
                 SparseArray<Double> rowY = myBody[i];
                 colVal = -rowY.doubleValue(col);
@@ -157,14 +157,14 @@ final class SparseTableau extends SimplexTableau {
         }
 
         colVal = -myObjective.doubleValue(col);
-        if (colVal != ZERO) {
+        if (colVal != ZERO && (myPhase1Objective != null || !PRECISION.isZero(colVal))) {
             body.axpy(colVal, myObjective);
             myValue += colVal * rhs;
         }
 
         if (myPhase1Objective != null) {
             colVal = -myPhase1Objective.doubleValue(col);
-            if (colVal != ZERO) {
+            if (colVal != ZERO && !PRECISION.isZero(colVal)) {
                 body.axpy(colVal, myPhase1Objective);
                 myPhase1Value += colVal * rhs;
             }
@@ -199,17 +199,6 @@ final class SparseTableau extends SimplexTableau {
         for (int i = 0; i < included.length; i++) {
             solution[included[i]] = myRHS.doubleValue(i);
         }
-    }
-
-    @Override
-    void copyObjective() {
-
-        if (myPhase1Objective == null) {
-            myPhase1Objective = SparseTableau.DENSE_FACTORY.make(n);
-        }
-
-        myPhase1Objective.fillMatching(myObjective);
-        myPhase1Value = myValue;
     }
 
     @Override
@@ -299,6 +288,54 @@ final class SparseTableau extends SimplexTableau {
         return true;
     }
 
+    @Override
+    double getEffectiveCost(final int je, final ColumnState columnState) {
+
+        int j = excluded[je]; // TODO Maybe should pass j directly
+
+        if (columnState == ColumnState.BASIS) {
+
+            // TODO As long as we pass je rather than j the column state cannot be BASIS
+
+            if (myPhase1Objective != null) {
+                return myPhase1Objective.doubleValue(j);
+            } else {
+                return myObjective.doubleValue(j);
+            }
+
+        } else if (columnState == ColumnState.LOWER) {
+
+            double retVal = myObjective.doubleValue(j);
+            if (retVal <= ZERO) {
+                if (myPhase1Objective != null) {
+                    retVal = myPhase1Objective.doubleValue(j);
+                    if (retVal <= ZERO) {
+                        retVal = ONE;
+                    }
+                }
+            }
+            return retVal;
+
+        } else if (columnState == ColumnState.UPPER) {
+
+            double retVal = myObjective.doubleValue(j);
+            if (retVal >= ZERO) {
+                if (myPhase1Objective != null) {
+                    retVal = myPhase1Objective.doubleValue(j);
+                    if (retVal >= ZERO) {
+                        retVal = NEG;
+                    }
+                }
+            }
+            return retVal;
+
+        } else {
+
+            // ColumnState = UNBOUNDED
+            return ZERO;
+        }
+    }
+
     /**
      * @return The phase 1 objective function value
      */
@@ -308,6 +345,15 @@ final class SparseTableau extends SimplexTableau {
             return myPhase1Value;
         } else {
             return ZERO;
+        }
+    }
+
+    @Override
+    final double getReducedCost(final int je) {
+        if (myPhase1Objective != null) {
+            return myPhase1Objective.doubleValue(excluded[je]);
+        } else {
+            return myObjective.doubleValue(excluded[je]);
         }
     }
 
@@ -410,29 +456,35 @@ final class SparseTableau extends SimplexTableau {
     }
 
     @Override
-    void restoreObjective() {
+    Primitive1D phase1() {
 
-        myObjective.fillMatching(myPhase1Objective);
-        myPhase1Objective = null;
+        if (myPhase1Objective == null) {
+            myPhase1Objective = SparseTableau.DENSE_FACTORY.make(n);
+        }
 
-        myValue = myPhase1Value;
-        myPhase1Value = NaN;
+        return new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return myPhase1Objective.doubleValue(index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                myPhase1Objective.set(index, value);
+            }
+
+            @Override
+            public int size() {
+                return structure.countModelVariables();
+            }
+
+        };
     }
 
     @Override
-    void switchObjective() {
-
-        if (myPhase1Objective != null) {
-
-            DenseArray<Double> copy = DENSE_FACTORY.copy((Access1D<?>) myObjective);
-            double copiedValue = myValue;
-
-            myObjective.fillMatching(myPhase1Objective);
-            myValue = myPhase1Value;
-
-            myPhase1Objective = copy;
-            myPhase1Value = copiedValue;
-        }
+    void removePhase1() {
+        myPhase1Objective = null;
     }
 
 }

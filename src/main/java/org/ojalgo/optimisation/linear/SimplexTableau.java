@@ -259,12 +259,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         }
     }
 
-    @Override
-    final double getReducedCost(final int je) {
-        // return myTableau[m][excluded[je]];
-        return this.objective().doubleValue(excluded[je]);
-    }
-
     /**
      * @return The (phase 2) objective function value
      */

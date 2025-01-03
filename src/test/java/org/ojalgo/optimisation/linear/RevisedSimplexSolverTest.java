@@ -312,7 +312,7 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         model.addExpression().add(v0, 1).add(v1, 1).level(5);
         model.addExpression().add(v2, 1).lower(-10);
 
-        // 5, 0, -10 and 0, 5, -10 (or any linear kombination) are both optimal
+        // 5, 0, -10 and 0, 5, -10 (or any linear combination) are both optimal
         Optimisation.Result expected = Optimisation.Result.of(-10, State.OPTIMAL, 5, 0, -10);
 
         RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
