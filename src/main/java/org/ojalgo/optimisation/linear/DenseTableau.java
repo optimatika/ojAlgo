@@ -33,14 +33,11 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
-import org.ojalgo.type.context.NumberContext;
 
 final class DenseTableau extends SimplexTableau {
 
-    private static final NumberContext PRECISION = NumberContext.of(12);
-
-    private double[] myAuxiliaryRow = null;
     private final int myColDim;
+    private double[] myPhase1Row = null;
     private final double[][] myTableau;
 
     DenseTableau(final int mm, final int nn) {
@@ -57,13 +54,13 @@ final class DenseTableau extends SimplexTableau {
         myTableau = new double[nbRows][nbCols];
         myColDim = nbCols;
 
-        myAuxiliaryRow = new double[nbCols];
+        myPhase1Row = new double[nbCols];
     }
 
     @Override
     public double doubleValue(final int row, final int col) {
         if (row == m + 1) {
-            return myAuxiliaryRow[col];
+            return myPhase1Row[col];
         } else {
             return myTableau[row][col];
         }
@@ -76,7 +73,7 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     public int getRowDim() {
-        if (myAuxiliaryRow != null) {
+        if (myPhase1Row != null) {
             return myTableau.length + 1;
         } else {
             return myTableau.length;
@@ -100,8 +97,8 @@ final class DenseTableau extends SimplexTableau {
             }
         }
 
-        if (myAuxiliaryRow != null) {
-            AXPY.invoke(myAuxiliaryRow, 0, -myAuxiliaryRow[col], pivotRow, 0, 0, myColDim);
+        if (myPhase1Row != null) {
+            AXPY.invoke(myPhase1Row, 0, -myPhase1Row[col], pivotRow, 0, 0, myColDim);
         }
     }
 
@@ -139,10 +136,10 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     void copyObjective() {
-        if (myAuxiliaryRow == null) {
-            myAuxiliaryRow = Arrays.copyOf(myTableau[m], myColDim);
+        if (myPhase1Row == null) {
+            myPhase1Row = Arrays.copyOf(myTableau[m], myColDim);
         } else {
-            System.arraycopy(myTableau[m], 0, myAuxiliaryRow, 0, myColDim);
+            System.arraycopy(myTableau[m], 0, myPhase1Row, 0, myColDim);
         }
     }
 
@@ -234,8 +231,8 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     double getInfeasibility() {
-        if (myAuxiliaryRow != null) {
-            return myAuxiliaryRow[n];
+        if (myPhase1Row != null) {
+            return myPhase1Row[n];
         } else {
             return ZERO;
         }
@@ -275,7 +272,7 @@ final class DenseTableau extends SimplexTableau {
                 myTableau[row][col] = value;
 
                 if (row >= base && col < limit) {
-                    myAuxiliaryRow[col] -= value;
+                    myPhase1Row[col] -= value;
                 }
             }
 
@@ -304,7 +301,7 @@ final class DenseTableau extends SimplexTableau {
                 myTableau[index][n] = value;
 
                 if (index >= base) {
-                    myAuxiliaryRow[n] -= value;
+                    myPhase1Row[n] -= value;
                 }
             }
 
@@ -341,16 +338,16 @@ final class DenseTableau extends SimplexTableau {
 
     @Override
     void restoreObjective() {
-        myTableau[m] = myAuxiliaryRow;
-        myAuxiliaryRow = null;
+        myTableau[m] = myPhase1Row;
+        myPhase1Row = null;
     }
 
     @Override
     void switchObjective() {
-        if (myAuxiliaryRow != null) {
+        if (myPhase1Row != null) {
             double[] tmpRow = myTableau[m];
-            myTableau[m] = myAuxiliaryRow;
-            myAuxiliaryRow = tmpRow;
+            myTableau[m] = myPhase1Row;
+            myPhase1Row = tmpRow;
         }
     }
 

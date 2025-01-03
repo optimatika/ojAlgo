@@ -46,6 +46,8 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
+    static final NumberContext PRECISION = NumberContext.of(12);
+
     static Function<LinearStructure, SimplexTableau> newTableauFactory(final Optimisation.Options options) {
 
         if (options.sparse != null && options.sparse.booleanValue()) {
@@ -216,7 +218,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     final double getCurrentElement(final ExitInfo exit, final int je) {
-        // return myTableau[exit.index][excluded[je]];    
+        // return myTableau[exit.index][excluded[je]];
         return this.constraintsBody().doubleValue(exit.index, excluded[je]);
     }
 

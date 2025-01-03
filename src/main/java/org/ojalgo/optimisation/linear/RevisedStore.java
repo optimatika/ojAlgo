@@ -61,13 +61,13 @@ final class RevisedStore extends SimplexStore {
      */
     private final PhysicalStore<Double> d;
     private final PhysicalStore<Double> l;
-    private R064Store myAlternativeObjective = null;
     private final MatrixStore<Double> myBasis;
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
     private final R064Store myConstraintsRHS;
     private final ProductFormInverse myInvBasis;
     private final R064Store myObjective;
+    private R064Store myPhase1Objective = null;
     /**
      * cost reducer
      */
@@ -211,10 +211,10 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     void copyObjective() {
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = myObjective.copy();
+        if (myPhase1Objective == null) {
+            myPhase1Objective = myObjective.copy();
         } else {
-            myAlternativeObjective.fillMatching(myObjective);
+            myPhase1Objective.fillMatching(myObjective);
         }
     }
 
@@ -292,8 +292,8 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     void restoreObjective() {
-        myObjective.fillMatching(myAlternativeObjective);
-        myAlternativeObjective = null;
+        myObjective.fillMatching(myPhase1Objective);
+        myPhase1Objective = null;
     }
 
     @Override
@@ -301,15 +301,15 @@ final class RevisedStore extends SimplexStore {
 
         int base = structure.nbIdty;
 
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = RevisedStore.newRow(myObjective.size());
+        if (myPhase1Objective == null) {
+            myPhase1Objective = RevisedStore.newRow(myObjective.size());
         }
 
         int nbVariables = structure.countVariables();
 
         for (int j = 0; j < nbVariables; j++) {
             double sum = myConstraintsBody.aggregateColumn(base, j, Aggregator.SUM).doubleValue();
-            myAlternativeObjective.set(j, -sum);
+            myPhase1Objective.set(j, -sum);
         }
 
         //        double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
@@ -355,13 +355,13 @@ final class RevisedStore extends SimplexStore {
     @Override
     void switchObjective() {
 
-        if (myAlternativeObjective != null) {
+        if (myPhase1Objective != null) {
 
             R064Store copy = myObjective.copy();
 
-            myObjective.fillMatching(myAlternativeObjective);
+            myObjective.fillMatching(myPhase1Objective);
 
-            myAlternativeObjective = copy;
+            myPhase1Objective = copy;
         }
     }
 
