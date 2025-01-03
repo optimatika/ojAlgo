@@ -138,6 +138,36 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
     /**
      * <pre>
     Branch&Bound Node
+    5 (4) 7=0.0833333333333286 1167875.1663773148 [0=3<18, 1=57<72, 2=0<18, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
+    Solutions=0 Nodes/Iterations=3 INVALID Infinity @ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+    Node Result: OPTIMAL 8265.302951388889 @ { 60.0, 9.46932870370371, 0.0, 63.46932870370371, 5.203993055555552, 0.0, 62.326388888888886, 13.489583333333336, 0.0, 69.58333333333331, 4.3749999999999964, 0.0, 67.0, 11.0, 50.0, 71.0, 0.0, 1350.0 }
+    Node solved to optimality!
+    0.30 ! 0 <= ANZ6 <= 0
+    Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!
+    Integer indices: [1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16]
+    Lower bounds: [3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0]
+    Upper bounds: [18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18]
+    Done 4 IntegerSolver iterations in 0.043330625s with NodeStatistics [I=0, E=0, S=0, A=0]
+     * </pre>
+     *
+     * When solving this node directly with the integer solver it is correctly identified as infeasible, but
+     * when this node is reached during the branch and bound process the LP node solver marks it as optimal.
+     * (It is only infeasible when taking into account the integer constraints.) This is due to some complex
+     * relationship between model pre-solve (at the nodes) and in-place updates of the solver instances.
+     */
+    @Test
+    public void testFlugplN5() {
+
+        int[] integers = { 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16 };
+        int[] lower = { 3, 57, 0, 57, 0, 57, 0, 67, 0, 71, 0 };
+        int[] upper = { 18, 72, 18, 75, 18, 75, 18, 67, 18, 75, 18 };
+
+        SpecificBranchCase.doTestNode("flugpl.mps", integers, lower, upper, State.INFEASIBLE, null);
+    }
+
+    /**
+     * <pre>
+    Branch&Bound Node
     7 (5) 2=0.20399305555555447 1168080.295138889 [0=3<18, 1=57<72, 2=0<5, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=67<67, 8=0<18, 9=71<75, 10=0<18]
     Solutions=0 Nodes/Iterations=4 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
     Node Result: { 60.0, 9.695987654320987, 0.0, 63.69598765432099, 5.0, 0.0, 62.326388888888886, 13.489583333333336, 0.0, 69.58333333333331, 4.3749999999999964, 0.0, 67.0, 11.0, 50.0, 71.0, 0.0, 1350.0 }

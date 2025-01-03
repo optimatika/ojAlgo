@@ -46,6 +46,12 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, Mutate2D {
 
+    /**
+     * Used when pivoting to identify rows with elements that are already very close to zero (to avoid
+     * updating those rows).
+     */
+    static final NumberContext PRECISION = NumberContext.of(15);
+
     static Function<LinearStructure, SimplexTableau> newTableauFactory(final Optimisation.Options options) {
 
         if (options.sparse != null && options.sparse.booleanValue()) {
@@ -75,8 +81,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     public String toString() {
-        String retVal = super.toString();
-        return retVal;
+        return super.toString();
     }
 
     /**
@@ -216,7 +221,7 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
 
     @Override
     final double getCurrentElement(final ExitInfo exit, final int je) {
-        // return myTableau[exit.index][excluded[je]];    
+        // return myTableau[exit.index][excluded[je]];
         return this.constraintsBody().doubleValue(exit.index, excluded[je]);
     }
 
@@ -255,12 +260,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         } else {
             return ZERO; // No infeasibility
         }
-    }
-
-    @Override
-    final double getReducedCost(final int je) {
-        // return myTableau[m][excluded[je]];
-        return this.objective().doubleValue(excluded[je]);
     }
 
     /**

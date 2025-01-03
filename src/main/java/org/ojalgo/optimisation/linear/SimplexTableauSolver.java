@@ -62,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  * <li>All variables assumed >=0, and RHS required to be >=0
  * <li>Variable bounds other than >=0 handled like constraints
  * </ul>
- * 
+ *
  * @author apete
  */
 final class SimplexTableauSolver extends LinearSolver {

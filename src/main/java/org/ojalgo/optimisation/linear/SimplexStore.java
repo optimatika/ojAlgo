@@ -36,6 +36,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Primitive1D;
@@ -199,10 +200,6 @@ abstract class SimplexStore {
     abstract Mutate1D constraintsRHS();
 
     abstract void copyBasicSolution(double[] solution);
-
-    abstract void copyObjective();
-
-    abstract void switchObjective();
 
     /**
      * The number of artificial variables in the basis.
@@ -446,9 +443,16 @@ abstract class SimplexStore {
     }
 
     /**
-     * The simplex' objective function.
+     * The objective function.
      */
     abstract Mutate1D objective();
+
+    /**
+     * The phase-1 objective function.
+     */
+    abstract <T extends Mutate1D & Access1D<Double>> T phase1();
+
+    abstract void removePhase1();
 
     /**
      * Everything that is not in the basis is set to be in at lower bound.
@@ -469,7 +473,7 @@ abstract class SimplexStore {
         myPartition.extract(ColumnState.BASIS, true, excluded);
     }
 
-    abstract void restoreObjective();
+    abstract void setupClassicPhase1Objective();
 
     abstract Primitive1D sliceBodyRow(final int row);
 
@@ -527,7 +531,5 @@ abstract class SimplexStore {
         myPartition.update(index, ColumnState.UPPER);
         return this;
     }
-
-    abstract void setupClassicPhase1Objective();
 
 }

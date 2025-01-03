@@ -51,6 +51,8 @@ final class PrimalSimplexSolver extends SimplexSolver {
     @Override
     void setup(final SimplexStore simplex) {
 
+        simplex.removePhase1();
+
         int[] excluded = simplex.excluded;
         for (int je = 0, limit = excluded.length; je < limit; je++) {
             int j = excluded[je];

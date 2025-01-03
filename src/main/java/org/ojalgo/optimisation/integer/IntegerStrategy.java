@@ -208,14 +208,14 @@ public interface IntegerStrategy {
 
     static ConfigurableStrategy newConfigurable() {
 
-        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.EARLIEST_SEQUENCE, NodeKey.LARGEST_DISPLACEMENT,
-                NodeKey.SMALLEST_DISPLACEMENT, NodeKey.LATEST_SEQUENCE };
+        Comparator<NodeKey>[] definitions = (Comparator<NodeKey>[]) new Comparator<?>[] { NodeKey.FIFO_SEQUENCE, NodeKey.SMALL_DISPLACEMENT,
+                NodeKey.LIFO_SEQUENCE, NodeKey.LARGE_DISPLACEMENT };
 
-        NumberContext integrality = NumberContext.of(12, 8);
-        NumberContext gap = NumberContext.of(7, 8);
+            NumberContext integrality = NumberContext.of(12, 8);
+            NumberContext gap = NumberContext.of(7, 8);
 
-        return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
-                new GMICutConfiguration());
+            return new ConfigurableStrategy(Parallelism.CORES.require(definitions.length), definitions, integrality, gap, DefaultStrategy::new,
+                    new GMICutConfiguration());
     }
 
     int countUniqueStrategies();

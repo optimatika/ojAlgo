@@ -21,13 +21,19 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.ojalgo.concurrent.Parallelism;
+import org.ojalgo.optimisation.integer.IntegerStrategy.ConfigurableStrategy;
+
 /**
  * OptimisationIntegerPackageTests
  *
  * @author apete
  */
-public abstract class OptimisationIntegerTests {
+abstract class OptimisationIntegerTests {
 
     static final boolean DEBUG = false;
+
+    static final ConfigurableStrategy SIMPLE_FIFO_STRATEGY = IntegerStrategy.DEFAULT.withPriorityDefinitions(NodeKey.FIFO_SEQUENCE)
+            .withParallelism(Parallelism.ONE);
 
 }

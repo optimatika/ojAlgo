@@ -57,12 +57,12 @@ public class ExperimentsMIP extends OptimisationIntegerTests implements ModelFil
         MODELS.add("timtab1.mps");
         MODELS.add("vpm2.mps");
 
-        COMPARATORS.put("DISPLACE_DECR", NodeKey.SMALLEST_DISPLACEMENT);
-        COMPARATORS.put("DISPLACE_INCR", NodeKey.LARGEST_DISPLACEMENT);
-        COMPARATORS.put("OBJECTIV_DECR", NodeKey.MIN_OBJECTIVE);
-        COMPARATORS.put("OBJECTIV_INCR", NodeKey.MAX_OBJECTIVE);
-        COMPARATORS.put("SEQUENCE_DECR", NodeKey.EARLIEST_SEQUENCE);
-        COMPARATORS.put("SEQUENCE_INCR", NodeKey.LATEST_SEQUENCE);
+        COMPARATORS.put("DISPLACE_DECR", NodeKey.LARGE_DISPLACEMENT);
+        COMPARATORS.put("DISPLACE_INCR", NodeKey.SMALL_DISPLACEMENT);
+        COMPARATORS.put("OBJECTIV_DECR", NodeKey.MAX_OBJECTIVE);
+        COMPARATORS.put("OBJECTIV_INCR", NodeKey.MIN_OBJECTIVE);
+        COMPARATORS.put("SEQUENCE_DECR", NodeKey.LIFO_SEQUENCE);
+        COMPARATORS.put("SEQUENCE_INCR", NodeKey.FIFO_SEQUENCE);
     }
 
     public static void main(final String... args) {
@@ -90,7 +90,7 @@ public class ExperimentsMIP extends OptimisationIntegerTests implements ModelFil
                 double value = minimise.getValue();
                 CalendarDateDuration duration = clock.stop(CalendarDateUnit.MILLIS);
 
-                BasicLogger.debug(18, modelName, comparatorName, state, value, duration);
+                BasicLogger.debugColumns(20, modelName, comparatorName, state, value, duration);
             }
         }
     }

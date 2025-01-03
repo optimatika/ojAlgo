@@ -691,6 +691,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
     static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
+
     static {
         ExpressionsBasedModel.resetPresolvers();
     }

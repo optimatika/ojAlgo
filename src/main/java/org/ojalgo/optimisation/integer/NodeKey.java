@@ -59,12 +59,12 @@ public final class NodeKey implements Comparable<NodeKey> {
 
     }
 
-    public static final Comparator<NodeKey> EARLIEST_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed();
-    public static final Comparator<NodeKey> LARGEST_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
-    public static final Comparator<NodeKey> LATEST_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
-    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective);
-    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed();
-    public static final Comparator<NodeKey> SMALLEST_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement).reversed();
+    public static final Comparator<NodeKey> FIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence);
+    public static final Comparator<NodeKey> LARGE_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement).reversed();
+    public static final Comparator<NodeKey> LIFO_SEQUENCE = Comparator.comparingLong((final NodeKey nk) -> nk.sequence).reversed();
+    public static final Comparator<NodeKey> MAX_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective).reversed();
+    public static final Comparator<NodeKey> MIN_OBJECTIVE = Comparator.comparingDouble((final NodeKey nk) -> nk.objective);
+    public static final Comparator<NodeKey> SMALL_DISPLACEMENT = Comparator.comparingDouble((final NodeKey nk) -> nk.displacement);
 
     /**
      * Used for one thing only - to validate (log problems with) node solver results. Does not effect the
@@ -184,8 +184,7 @@ public final class NodeKey implements Comparable<NodeKey> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (sequence ^ sequence >>> 32);
-        return result;
+        return prime * result + (int) (sequence ^ sequence >>> 32);
     }
 
     @Override

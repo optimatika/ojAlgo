@@ -45,11 +45,12 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
         // model.options.debug(Optimisation.Solver.class);
         // model.options.debug(IntegerSolver.class);
-        // model.options.debug(ConvexSolver.class);
         // model.options.debug(LinearSolver.class);
+        // model.options.validate = false;
         // model.options.progress(IntegerSolver.class);
-        // model.options.validate = true;
         // model.options.integer(IntegerStrategy.DEFAULT.withGapTolerance(NumberContext.of(3)));
+        // model.options.integer(SIMPLE_FIFO_STRATEGY);
+        // model.options.iterations_abort = 10;
 
         ModelFileTest.assertValues(model, expMinValString, expMaxValString, ACCURACY);
     }

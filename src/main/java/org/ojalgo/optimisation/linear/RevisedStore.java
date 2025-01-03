@@ -59,28 +59,28 @@ final class RevisedStore extends SimplexStore {
     /**
      * Reduced costs / dual slack
      */
-    private final PhysicalStore<Double> d;
-    private final PhysicalStore<Double> l;
-    private R064Store myAlternativeObjective = null;
+    private final R064Store d;
+    private final R064Store l;
     private final MatrixStore<Double> myBasis;
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
     private final R064Store myConstraintsRHS;
     private final ProductFormInverse myInvBasis;
     private final R064Store myObjective;
+    private R064Store myPhase1Objective = null;
     /**
      * cost reducer
      */
-    private final PhysicalStore<Double> r;
+    private final R064Store r;
     /**
      * primal basic solution
      */
-    private final PhysicalStore<Double> x;
+    private final R064Store x;
     /**
      * delta – primal basic solution
      */
-    private final PhysicalStore<Double> y;
-    private final PhysicalStore<Double> z;
+    private final R064Store y;
+    private final R064Store z;
 
     RevisedStore(final int mm, final int nn) {
         this(new LinearStructure(mm, nn));
@@ -159,11 +159,13 @@ final class RevisedStore extends SimplexStore {
         // d += a
         // ...and then move the setup/prepare/update outside of the loop
 
-        myInvBasis.btran(myObjective.rows(included), l);
+        R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
+
+        myInvBasis.btran(objective.rows(included), l);
 
         this.doExclTranspMult(l, r);
 
-        d.fillMatching(myObjective.rows(excluded), SUBTRACT, r);
+        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
 
         myInvBasis.ftran(myConstraintsRHS, x);
 
@@ -206,15 +208,6 @@ final class RevisedStore extends SimplexStore {
         for (int ji = 0; ji < included.length; ji++) {
             int j = included[ji];
             solution[j] = x.doubleValue(ji);
-        }
-    }
-
-    @Override
-    void copyObjective() {
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = myObjective.copy();
-        } else {
-            myAlternativeObjective.fillMatching(myObjective);
         }
     }
 
@@ -283,6 +276,21 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
+    R064Store phase1() {
+
+        if (myPhase1Objective == null) {
+            myPhase1Objective = RevisedStore.newColumn(n);
+        }
+
+        return myPhase1Objective;
+    }
+
+    @Override
+    void removePhase1() {
+        myPhase1Objective = null;
+    }
+
+    @Override
     void resetBasis(final int[] basis) {
 
         super.resetBasis(basis);
@@ -291,25 +299,19 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    void restoreObjective() {
-        myObjective.fillMatching(myAlternativeObjective);
-        myAlternativeObjective = null;
-    }
-
-    @Override
     void setupClassicPhase1Objective() {
 
         int base = structure.nbIdty;
 
-        if (myAlternativeObjective == null) {
-            myAlternativeObjective = RevisedStore.newRow(myObjective.size());
+        if (myPhase1Objective == null) {
+            myPhase1Objective = RevisedStore.newRow(myObjective.size());
         }
 
         int nbVariables = structure.countVariables();
 
         for (int j = 0; j < nbVariables; j++) {
             double sum = myConstraintsBody.aggregateColumn(base, j, Aggregator.SUM).doubleValue();
-            myAlternativeObjective.set(j, -sum);
+            myPhase1Objective.set(j, -sum);
         }
 
         //        double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
@@ -350,19 +352,6 @@ final class RevisedStore extends SimplexStore {
             }
 
         };
-    }
-
-    @Override
-    void switchObjective() {
-
-        if (myAlternativeObjective != null) {
-
-            R064Store copy = myObjective.copy();
-
-            myObjective.fillMatching(myAlternativeObjective);
-
-            myAlternativeObjective = copy;
-        }
     }
 
 }

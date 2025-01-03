@@ -39,6 +39,7 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 
+@Tag("unstable")
 public class SparsePerformance extends MatrixStoreTests {
 
     static void fill(final Mutate2D mtrx) {

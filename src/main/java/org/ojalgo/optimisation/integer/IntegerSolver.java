@@ -44,6 +44,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.TypeUtils;
 
@@ -303,7 +304,7 @@ public final class IntegerSolver extends GenericSolver {
 
     protected double evaluateFunction(final Access1D<?> solution) {
         if (myFunction != null && solution != null && myFunction.arity() == solution.count()) {
-            return myFunction.invoke(Access1D.asPrimitive1D(solution)).doubleValue();
+            return myFunction.invoke(Primitive1D.wrap(solution)).doubleValue();
         }
         return Double.NaN;
     }
@@ -478,8 +479,15 @@ public final class IntegerSolver extends GenericSolver {
 
             IntegerSolver.flush(nodePrinter, myIntegerModel.options.logger_appender);
 
-            // return false;
-            return myNodeStatistics.failed();
+            /*
+             * Used to mark this as a failure since it happened because of problems with the linear solver,
+             * but now could be just that the updated solver instance did not recognise that it had become
+             * infeasible due to integer rounding on the constraints. (The LP solver simply doesn't know it's
+             * actually solving a MIP.) Something model pre-solving would probably have caught. Marking as
+             * failure will stop the overall solver process, which is not what we want (if this is just an
+             * infeasible node). Therefore we'll mark it as infeasible.
+             */
+            return myNodeStatistics.infeasible();
         }
 
         int branchIntegerIndex = this.identifyNonIntegerVariable(nodeResult, nodeKey, strategy);

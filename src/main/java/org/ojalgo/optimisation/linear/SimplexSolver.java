@@ -1204,10 +1204,6 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    final void initiatePhase1() {
-        mySimplex.copyObjective();
-    }
-
     final boolean isDualFeasible() {
         return !this.getPrimalEnterCandidate(null);
     }
@@ -1251,7 +1247,7 @@ abstract class SimplexSolver extends LinearSolver {
     }
 
     void switchToPhase2() {
-        mySimplex.restoreObjective();
+        mySimplex.removePhase1();
         mySimplex.calculateIteration();
     }
 

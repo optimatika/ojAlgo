@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.structure.Mutate1D;
+
 /**
  * First runs the dual algorithm (with a possibly modified objective function) to establish feasibility, and
  * then the primal to reach optimality.
@@ -41,8 +43,6 @@ final class PhasedSimplexSolver extends SimplexSolver {
     @Override
     public Result solve(final Result kickStarter) {
 
-        this.initiatePhase1();
-
         IterDescr iteration = this.prepareToIterate();
 
         this.doDualIterations(iteration); // Phase-1
@@ -56,6 +56,8 @@ final class PhasedSimplexSolver extends SimplexSolver {
 
     @Override
     void setup(final SimplexStore simplex) {
+
+        Mutate1D phase1 = simplex.phase1();
 
         int[] excluded = simplex.excluded;
         for (int je = 0, limit = excluded.length; je < limit; je++) {
@@ -72,23 +74,25 @@ final class PhasedSimplexSolver extends SimplexSolver {
             if (rc > ZERO && Double.isFinite(lb)) {
                 simplex.lower(j);
                 this.shift(j, lb, rc);
+                phase1.set(j, rc);
             } else if (rc < ZERO && Double.isFinite(ub)) {
                 simplex.upper(j);
                 this.shift(j, ub, rc);
+                phase1.set(j, rc);
             } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
-                simplex.objective().set(j, ZERO);
+                phase1.set(j, ZERO);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
                 simplex.lower(j);
                 this.shift(j, lb, rc);
-                simplex.objective().set(j, ONE);
+                phase1.set(j, Math.max(ONE, simplex.getReducedCost(je)));
             } else if (Math.abs(lb) >= Math.abs(ub)) {
                 simplex.upper(j);
                 this.shift(j, ub, rc);
-                simplex.objective().set(j, NEG);
+                phase1.set(j, Math.min(NEG, simplex.getReducedCost(je)));
             } else {
                 simplex.lower(j);
-                simplex.objective().set(j, ONE);
+                phase1.set(j, ONE);
             }
         }
     }
