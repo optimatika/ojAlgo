@@ -300,12 +300,6 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
         }
     }
 
-    void setColumnStateOnExcludedToLower() {
-        for (int i = 0, limit = structure.countVariablesExcluded(); i < limit; i++) {
-            this.lower(i);
-        }
-    }
-
     @Override
     final void setupClassicPhase1Objective() {
         // Happens while the tableau is initially built

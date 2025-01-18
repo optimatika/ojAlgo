@@ -732,6 +732,10 @@ final class SimplexTableauSolver extends LinearSolver {
 
         super(solverOptions);
 
+        for (int i = 0, limit = tableau.structure.countVariablesExcluded(); i < limit; i++) {
+            tableau.lower(i);
+        }
+
         myTableau = tableau;
 
         myPoint = new SimplexTableauSolver.IterationPoint();

@@ -132,10 +132,7 @@ abstract class SimplexStore {
         excluded = Structure1D.newIncreasingRange(0, n - m);
         included = Structure1D.newIncreasingRange(n - m, m);
 
-        myPartition = new EnumPartition<>(n, ColumnState.LOWER);
-        for (int j = 0; j < m; j++) {
-            myPartition.update(included[j], ColumnState.BASIS);
-        }
+        myPartition = new EnumPartition<>(n, ColumnState.BASIS);
 
         myRemainingArtificials = linearStructure.nbArti;
     }
@@ -463,7 +460,7 @@ abstract class SimplexStore {
             throw new IllegalStateException();
         }
 
-        myPartition.fill(ColumnState.LOWER);
+        myPartition.reset(ColumnState.LOWER);
 
         for (int i = 0; i < newBasis.length; i++) {
             myPartition.update(newBasis[i], ColumnState.BASIS);
