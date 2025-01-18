@@ -44,7 +44,10 @@ public final class EnumPartition<E extends Enum<E>> {
         myConstants = initialValue.getDeclaringClass().getEnumConstants();
         myCounts = new int[myConstants.length];
 
-        this.fill(initialValue);
+        int ordinal = initialValue.ordinal();
+
+        Arrays.fill(myValues, (byte) ordinal);
+        myCounts[ordinal] = size;
     }
 
     /**
@@ -97,21 +100,19 @@ public final class EnumPartition<E extends Enum<E>> {
         byte key = (byte) value.ordinal();
 
         for (int i = 0, j = 0; i < myValues.length && j < receiver.length; i++) {
-            if ((myValues[i] == key) != negate) {
+            if (myValues[i] == key != negate) {
                 receiver[j] = i;
                 j++;
             }
         }
     }
 
+    /**
+     * @deprecated v56 Use {@link #reset(E)} instead
+     */
+    @Deprecated
     public void fill(final E value) {
-
-        int index = value.ordinal();
-        byte key = (byte) index;
-
-        Arrays.fill(myValues, key);
-        Arrays.fill(myCounts, 0);
-        myCounts[index] = myValues.length;
+        this.reset(value);
     }
 
     public E get(final int index) {
@@ -120,6 +121,15 @@ public final class EnumPartition<E extends Enum<E>> {
 
     public boolean is(final int index, final E value) {
         return myValues[index] == value.ordinal();
+    }
+
+    public void reset(final E value) {
+
+        int ordinal = value.ordinal();
+
+        Arrays.fill(myValues, (byte) ordinal);
+        Arrays.fill(myCounts, 0);
+        myCounts[ordinal] = myValues.length;
     }
 
     public int size() {

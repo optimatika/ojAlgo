@@ -1,423 +1,69 @@
 
 Created SimplexSolver
-countVariables: 51
-countProblemVariables: 17
-countSlackVariables: 34
-countArtificialVariables: 16
-countVariablesTotally: 67
-countConstraints: 39
-countBasisDeficit: 16
+countVariables: 8
+countProblemVariables: 4
+countSlackVariables: 4
+countArtificialVariables: 1
+countVariablesTotally: 9
+countConstraints: 5
+countBasisDeficit: 1
+Tableau Created; Basics: [4, 5, 6, 7, 8]
+       1       0       0       0       1       0       0       0       0       1
+       0       1       0       0       0       1       0       0       0       1
+       0       0       1       0       0       0       1       0       0       1
+       0       0       0       1       0       0       0       1       0       1
+       1       1       1       1       0       0       0       0       1  0.8154
+   0.345   0.412   0.738   1.288       0       0       0       0       0       0
+      -1      -1      -1      -1       0       0       0       0       0 -0.8154
+Initial Tableau; Basics: [4, 5, 6, 7, 8]
+       1       0       0       0       1       0       0       0       0       1
+       0       1       0       0       0       1       0       0       0       1
+       0       0       1       0       0       0       1       0       0       1
+       0       0       0       1       0       0       0       1       0       1
+       1       1       1       1       0       0       0       0       1  0.8154
+   0.345   0.412   0.738   1.288       0       0       0       0       0       0
+      -1      -1      -1      -1       0       0       0       0       0 -0.8154
 
-Needs Another Iteration? Phase=1 Artificials=16 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, -17.9, 9.0, -0.1, -15.9, 9.0, -0.1, -15.899999999999999, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-Col: 2	=>	Reduced Contribution Weight: -17.9.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9, 0.0, 1.0 }
-Ratios={ NaN, NaN, NaN, NaN, -0.0, Infinity, Infinity, Infinity, 72.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 60.0, Infinity, Infinity, Infinity, Infinity, Infinity, 57.0, Infinity, Infinity, Infinity, Infinity, NaN, NaN, 0.0, NaN, 54.0 }
-Row: 8	=>	Ratio: 72.0,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.0,	Artificial: false.
-Row: 23	=>	Ratio: 60.0,	Numerator/RHS: 900.0, 	Denominator/Pivot: 15.0,	Artificial: true.
-Row: 29	=>	Ratio: 57.0,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.0,	Artificial: true.
-Row: 36	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 36,	Exit: 64,	Column/Enter: 2.
-
-Iteration Point <36,2>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=15 Infeasibility=5142.0 Objective=-0.0
+Needs Another Iteration? Phase=1 Artificials=1 Infeasibility=0.8154 Objective=-0.0
 
 findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, -35.78888888888889, 9.0, -0.1, -15.899999999999999, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 19.88888888888889]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 5	=>	Reduced Contribution Weight: -35.78888888888889.
+[-1.0, -1.0, -1.0, -1.0]
+Col: 0	=>	Reduced Contribution Weight: -1.0.
 
 findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, 0.0, -2.0, -2.2222222222222223, 0.0, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 16.666666666666668, 0.0, 0.0, 15.0, 0.0, 0.0, 1.1111111111111112, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.1111111111111112, 0.9, 1.1111111111111112 }
-Ratios={ NaN, NaN, NaN, -0.0, -0.0, Infinity, Infinity, Infinity, 64.8, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 53.99999999999999, Infinity, Infinity, 53.333333333333336, Infinity, Infinity, 51.3, 57.0, Infinity, Infinity, Infinity, NaN, NaN, -0.0, 0.0, 48.599999999999994 }
-Row: 8	=>	Ratio: 64.8,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.1111111111111112,	Artificial: false.
-Row: 23	=>	Ratio: 53.99999999999999,	Numerator/RHS: 900.0, 	Denominator/Pivot: 16.666666666666668,	Artificial: true.
-Row: 26	=>	Ratio: 53.333333333333336,	Numerator/RHS: 800.0, 	Denominator/Pivot: 15.0,	Artificial: true.
-Row: 29	=>	Ratio: 51.3,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.1111111111111112,	Artificial: true.
-Row: 37	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
+Numerators={ 1.0, 1.0, 1.0, 1.0, 0.8154 }
+Denominators={ 1.0, 0.0, 0.0, 0.0, 1.0 }
+Ratios={ 1.0, Infinity, Infinity, Infinity, 0.8154 }
+Row: 0	=>	Ratio: 1.0,	Numerator/RHS: 1.0, 	Denominator/Pivot: 1.0,	Artificial: false.
+Row: 4	=>	Ratio: 0.8154,	Numerator/RHS: 0.8154, 	Denominator/Pivot: 1.0,	Artificial: true.
 
-==>>	Row: 37,	Exit: 65,	Column/Enter: 5.
+==>>	Row: 4,	Exit: 8,	Column/Enter: 0.
 
-Iteration Point <37,5>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
+Iteration Point <4,0>	Pivot: 1.0 => 1.0	RHS: 0.8154 => 0.8154.
+Tableau Iteration; Basics: [4, 5, 6, 7, 0]
+         0        -1        -1        -1         1         0         0         0        -1    0.1846
+         0         1         0         0         0         1         0         0         0         1
+         0         0         1         0         0         0         1         0         0         1
+         0         0         0         1         0         0         0         1         0         1
+         1         1         1         1         0         0         0         0         1    0.8154
+         0     0.067     0.393     0.943         0         0         0         0    -0.345 -0.281313
+         0         0         0         0         0         0         0         0         1         0
 
-Needs Another Iteration? Phase=1 Artificials=14 Infeasibility=5142.0 Objective=-0.0
+Needs Another Iteration? Phase=1 Artificials=0 Infeasibility=-0.0 Objective=0.281313
+
+Switching to Phase2 with 0 artificial variable(s) still in the basis and infeasibility -0.0.
+
 
 findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, -55.665432098765436, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 8	=>	Reduced Contribution Weight: -55.665432098765436.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, -2.0, -2.2222222222222223, -2.469135802469136, 0.0, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.51851851851852, 0.0, 0.0, 16.666666666666668, 15.0, 0.0, 1.234567901234568, 1.1111111111111112, 1.0, 0.0, 0.0, 0.9, 0.0, -1.234567901234568, -1.1111111111111112, 1.234567901234568 }
-Ratios={ NaN, NaN, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 58.31999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 48.6, Infinity, Infinity, 48.0, 66.66666666666667, Infinity, 46.169999999999995, 51.3, 57.0, Infinity, Infinity, 0.0, NaN, -0.0, -0.0, 43.739999999999995 }
-Row: 8	=>	Ratio: 58.31999999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.234567901234568,	Artificial: false.
-Row: 23	=>	Ratio: 48.6,	Numerator/RHS: 900.0, 	Denominator/Pivot: 18.51851851851852,	Artificial: true.
-Row: 26	=>	Ratio: 48.0,	Numerator/RHS: 800.0, 	Denominator/Pivot: 16.666666666666668,	Artificial: true.
-Row: 29	=>	Ratio: 46.169999999999995,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.234567901234568,	Artificial: true.
-Row: 34	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 34,	Exit: 62,	Column/Enter: 8.
-
-Iteration Point <34,8>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=13 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, 70.85048010973938, -0.1, -77.75048010973937, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 61.85048010973937, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 11	=>	Reduced Contribution Weight: -77.75048010973937.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, -2.0, -2.2222222222222223, -2.469135802469136, -2.743484224965707, 0.0, 0.0, 0.0, 1.3717421124828535, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.5761316872428, 15.0, 0.0, 18.51851851851852, 16.666666666666668, 0.0, 1.3717421124828535, 1.234567901234568, 1.1111111111111112, 1.0, 0.0, -1.1111111111111112, 0.9, -1.3717421124828535, -1.234567901234568, 1.3717421124828535 }
-Ratios={ NaN, -0.0, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 52.48799999999999, Infinity, Infinity, 60.74999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, 43.739999999999995, 60.0, Infinity, 43.199999999999996, 59.99999999999999, Infinity, 41.55299999999999, 46.169999999999995, 51.3, 57.0, Infinity, -0.0, 0.0, -0.0, -0.0, 39.36599999999999 }
-Row: 8	=>	Ratio: 52.48799999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.3717421124828535,	Artificial: false.
-Row: 23	=>	Ratio: 43.739999999999995,	Numerator/RHS: 900.0, 	Denominator/Pivot: 20.5761316872428,	Artificial: true.
-Row: 26	=>	Ratio: 43.199999999999996,	Numerator/RHS: 800.0, 	Denominator/Pivot: 18.51851851851852,	Artificial: true.
-Row: 29	=>	Ratio: 41.55299999999999,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.3717421124828535,	Artificial: true.
-Row: 35	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 35,	Exit: 63,	Column/Enter: 11.
-
-Iteration Point <35,11>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=12 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, 70.85048010973938, -0.1, 95.38942234415487, -0.1, -101.38942234415487, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 61.85048010973937, 86.38942234415487, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 14	=>	Reduced Contribution Weight: -101.38942234415487.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ -2.0, -2.2222222222222223, -2.469135802469136, -2.743484224965707, -3.0483158055174524, 0.0, 0.0, 0.0, 1.5241579027587262, 0.0, 0.0, 1.3717421124828535, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 22.86236854138089, 16.666666666666668, 15.0, 20.5761316872428, 18.51851851851852, 0.0, 1.5241579027587262, 1.3717421124828535, 1.234567901234568, 1.1111111111111112, 1.0, -1.234567901234568, -1.1111111111111112, -1.5241579027587262, -1.3717421124828535, 1.5241579027587262 }
-Ratios={ -0.0, -0.0, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 47.23919999999999, Infinity, Infinity, 54.67499999999999, Infinity, Infinity, 60.74999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, 39.366, 53.99999999999999, 80.0, 38.879999999999995, 54.0, Infinity, 37.39769999999999, 41.55299999999999, 46.169999999999995, 51.3, 57.0, -0.0, -0.0, -0.0, -0.0, 35.429399999999994 }
-Row: 8	=>	Ratio: 47.23919999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: false.
-Row: 23	=>	Ratio: 39.366,	Numerator/RHS: 900.0, 	Denominator/Pivot: 22.86236854138089,	Artificial: true.
-Row: 26	=>	Ratio: 38.879999999999995,	Numerator/RHS: 800.0, 	Denominator/Pivot: 20.5761316872428,	Artificial: true.
-Row: 29	=>	Ratio: 37.39769999999999,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: true.
-Row: 38	=>	Ratio: 35.429399999999994,	Numerator/RHS: 54.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: true.
-
-==>>	Row: 38,	Exit: 66,	Column/Enter: 14.
-
-Iteration Point <38,14>	Pivot: 1.5241579027587262 => 1.0	RHS: 54.0 => 35.429399999999994.
-
-Needs Another Iteration? Phase=1 Artificials=11 Infeasibility=1549.8336000000004 Objective=5970.6557999999995
-
-findNextPivotCol (index of most negative value) among these:
-[-66.52159999999999, 0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -29.4, -15.0, -54.024, -42.35999999999999, 66.52159999999999]
-Col: 0	=>	Reduced Contribution Weight: -66.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 70.85879999999999, 78.73199999999999, 87.47999999999999, 97.2, 108.00000000000001, 100.0, 18.0, 12.0, 17.999999999999993, 18.0, 14.4, 26.4, 18.0, 15.0, 31.260000000000005, 18.0, 15.0, 35.63400000000001, 18.0, 15.0, 39.570600000000006, 18.0, 15.0, 90.00000000000011, 309.5100000000001, 668.5590000000001, 71.00000000000011, 343.9000000000001, 3.0, 2.999999999999993, 8.399999999999999, 13.260000000000005, 17.634000000000007, 21.570600000000006, 43.739999999999995, 39.36599999999999, 54.00000000000001, 48.6, 35.429399999999994 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, 1.0, 1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, 10.0, 18.0, Infinity, 17.999999999999993, Infinity, Infinity, 29.333333333333336, Infinity, Infinity, 38.59259259259261, Infinity, Infinity, 48.88065843621402, Infinity, Infinity, 60.311842706904464, Infinity, Infinity, 6.000000000000009, 28.30452674897121, 67.9326322206981, 5.259259259259269, 28.30452674897121, 3.0, 2.999999999999993, 9.333333333333332, 16.37037037037038, 24.18930041152265, 32.87700045724739, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001 }
-Row: 5	=>	Ratio: 10.0,	Numerator/RHS: 100.0, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 6.000000000000009,	Numerator/RHS: 90.00000000000011, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 5.259259259259269,	Numerator/RHS: 71.00000000000011, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-Row: 28	=>	Ratio: 3.0,	Numerator/RHS: 3.0, 	Denominator/Pivot: 1.0,	Artificial: true.
-Row: 29	=>	Ratio: 2.999999999999993,	Numerator/RHS: 2.999999999999993, 	Denominator/Pivot: 1.0,	Artificial: true.
-
-==>>	Row: 29,	Exit: 57,	Column/Enter: 0.
-
-Iteration Point <29,0>	Pivot: 1.0 => 1.0	RHS: 2.999999999999993 => 2.999999999999993.
-
-Needs Another Iteration? Phase=1 Artificials=10 Infeasibility=1350.268800000001 Objective=6347.358899999998
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -65.52159999999999, 1.0, 1.0, 1.0, 1.0, 66.52159999999999, -29.4, -15.0, -54.024, -42.35999999999999, 0.0]
-Col: 3	=>	Reduced Contribution Weight: -45.024.
-Col: 23	=>	Reduced Contribution Weight: -65.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 74.79539999999997, 83.10599999999997, 92.33999999999997, 102.6, 114.0, 70.00000000000007, 15.000000000000007, 12.0, 15.0, 18.0, 14.4, 23.700000000000006, 18.0, 15.0, 28.830000000000013, 18.0, 15.0, 33.44700000000002, 18.0, 15.0, 37.602300000000014, 18.0, 15.0, 45.00000000000023, 276.7050000000002, 639.0345000000002, 30.50000000000022, 307.45000000000016, 7.105427357601002E-15, 2.999999999999993, 5.700000000000005, 10.83000000000001, 15.447000000000013, 19.60230000000001, 46.16999999999999, 41.55299999999998, 57.0, 51.3, 37.397699999999986 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, 1.0, -1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -57.0, -56.99999999999999, -56.99999999999999, -57.0, -57.0, 7.000000000000007, 15.000000000000007, Infinity, 15.0, Infinity, Infinity, 26.333333333333343, Infinity, Infinity, 35.59259259259262, Infinity, Infinity, 45.88065843621403, Infinity, Infinity, 57.31184270690447, Infinity, Infinity, 3.000000000000016, 25.30452674897122, 64.93263222069811, 2.259259259259276, 25.304526748971213, 7.105427357601002E-15, -2.999999999999993, 6.333333333333339, 13.370370370370386, 21.18930041152266, 29.877000457247394, -56.99999999999999, -56.99999999999999, -57.0, -57.0, -57.0 }
-Row: 5	=>	Ratio: 7.000000000000007,	Numerator/RHS: 70.00000000000007, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 3.000000000000016,	Numerator/RHS: 45.00000000000023, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 2.259259259259276,	Numerator/RHS: 30.50000000000022, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-Row: 28	=>	Ratio: 7.105427357601002E-15,	Numerator/RHS: 7.105427357601002E-15, 	Denominator/Pivot: 1.0,	Artificial: true.
-
-==>>	Row: 28,	Exit: 56,	Column/Enter: 23.
-
-Iteration Point <28,23>	Pivot: 1.0 => 1.0	RHS: 7.105427357601002E-15 => 7.105427357601002E-15.
-
-Needs Another Iteration? Phase=1 Artificials=9 Infeasibility=1350.2688000000005 Objective=6347.358899999999
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, -64.52159999999999, 1.0, 1.0, 1.0, 1.0, 65.52159999999999, 1.0, -29.4, -15.0, -54.024, -42.35999999999999, 65.52159999999999]
-Col: 3	=>	Reduced Contribution Weight: -45.024.
-Col: 22	=>	Reduced Contribution Weight: -64.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 74.79539999999999, 83.10599999999998, 92.33999999999999, 102.60000000000001, 114.00000000000001, 70.0, 15.0, 12.0, 14.999999999999993, 18.0, 14.4, 23.7, 18.0, 15.0, 28.830000000000005, 18.0, 15.0, 33.44700000000001, 18.0, 15.0, 37.60230000000001, 18.0, 15.0, 45.00000000000012, 276.70500000000015, 639.0345000000001, 30.500000000000124, 307.45000000000005, 7.105427357601002E-15, 3.0, 5.699999999999998, 10.830000000000005, 15.447000000000008, 19.602300000000007, 46.169999999999995, 41.55299999999999, 57.00000000000001, 51.300000000000004, 37.39769999999999 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, -1.0, -1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, 7.0, 15.0, Infinity, 14.999999999999993, Infinity, Infinity, 26.333333333333336, Infinity, Infinity, 35.59259259259261, Infinity, Infinity, 45.88065843621402, Infinity, Infinity, 57.311842706904464, Infinity, Infinity, 3.000000000000009, 25.304526748971213, 64.9326322206981, 2.259259259259269, 25.304526748971202, -7.105427357601002E-15, -3.0, 6.333333333333332, 13.37037037037038, 21.18930041152265, 29.87700045724739, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001 }
-Row: 5	=>	Ratio: 7.0,	Numerator/RHS: 70.0, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 3.000000000000009,	Numerator/RHS: 45.00000000000012, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 2.259259259259269,	Numerator/RHS: 30.500000000000124, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-
-==>>	Row: 26,	Exit: 54,	Column/Enter: 22.
-
-Iteration Point <26,22>	Pivot: 13.499999999999996 => 1.0	RHS: 30.500000000000124 => 2.259259259259269.
-
-Needs Another Iteration? Phase=1 Artificials=8 Infeasibility=1204.4977777777776 Objective=6631.048888888889
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 26.66666666666667, -0.1, -81.15377777777778, 0.3779377777777778, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, -3.7793777777777784, 1.0, 1.0, 1.0, 1.0, 1.0, 4.779377777777778, 1.0, 1.0, -29.4, -15.0, 17.66666666666667, -42.35999999999999, 1.0]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 6	=>	Reduced Contribution Weight: -81.15377777777778.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 77.75999999999999, 86.39999999999999, 96.0, 106.66666666666669, 118.51851851851855, 47.40740740740731, 12.740740740740732, 12.0, 12.740740740740724, 18.0, 14.4, 21.666666666666657, 18.0, 15.0, 26.999999999999996, 18.0, 15.0, 31.800000000000004, 18.0, 15.0, 36.120000000000005, 18.0, 15.0, 11.111111111111093, 252.00000000000006, 616.8, 2.259259259259269, 279.99999999999994, 2.259259259259276, 5.259259259259268, 3.6666666666666567, 8.999999999999998, 13.8, 18.12, 48.0, 43.199999999999996, 59.259259259259274, 53.33333333333334, 38.879999999999995 }
-Denominators={ -2.5919999999999996, -2.88, -3.2, -1.3333333333333335, -1.4814814814814818, 7.407407407407409, 0.7407407407407409, 0.0, 0.7407407407407409, 0.0, 0.0, 0.6666666666666667, 1.0, 0.0, 1.6, 0.0, 0.0, 1.44, 0.0, 0.0, 1.2959999999999998, 0.0, 0.0, 11.11111111111111, 21.6, 19.439999999999998, -0.7407407407407409, 24.0, -0.7407407407407409, -0.7407407407407409, 0.6666666666666667, 1.6, 1.44, 1.2959999999999998, -1.6, -1.44, -0.7407407407407409, -0.6666666666666667, -1.2959999999999998 }
-Ratios={ -30.0, -29.999999999999996, -30.0, -80.0, -80.0, 6.399999999999985, 17.199999999999985, Infinity, 17.199999999999974, Infinity, Infinity, 32.49999999999998, 18.0, Infinity, 16.874999999999996, Infinity, Infinity, 22.083333333333336, Infinity, Infinity, 27.870370370370377, Infinity, Infinity, 0.9999999999999984, 11.666666666666668, 31.728395061728396, -3.0500000000000123, 11.666666666666664, -3.0500000000000216, -7.10000000000001, 5.499999999999985, 5.624999999999998, 9.583333333333334, 13.981481481481485, -30.0, -29.999999999999996, -80.0, -80.0, -30.0 }
-Row: 5	=>	Ratio: 6.399999999999985,	Numerator/RHS: 47.40740740740731, 	Denominator/Pivot: 7.407407407407409,	Artificial: false.
-Row: 23	=>	Ratio: 0.9999999999999984,	Numerator/RHS: 11.111111111111093, 	Denominator/Pivot: 11.11111111111111,	Artificial: true.
-
-==>>	Row: 23,	Exit: 51,	Column/Enter: 6.
-
-Iteration Point <23,6>	Pivot: 11.11111111111111 => 1.0	RHS: 11.111111111111093 => 0.9999999999999984.
-
-Needs Another Iteration? Phase=1 Artificials=7 Infeasibility=1123.344 Objective=6812.232
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -168.10240000000005, 0.630384, -0.4336, -20.400000000000016, -0.1, -6.0, -0.1, 10.0, -0.1, -6.303839999999999, 1.0, 1.0, 4.336, 1.0, 1.0, 1.0, 1.0, 1.0, 7.303839999999999, -3.3360000000000003, 1.0, 1.0, -29.400000000000023, -15.0, -104.06400000000004, -42.35999999999999, 1.0]
-Col: 3	=>	Reduced Contribution Weight: -168.10240000000005.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 80.35199999999999, 89.27999999999999, 99.19999999999999, 108.00000000000001, 120.00000000000003, 39.999999999999915, 11.999999999999991, 12.0, 11.999999999999984, 18.0, 14.4, 20.999999999999993, 17.0, 15.0, 25.4, 18.0, 15.0, 30.360000000000007, 18.0, 15.0, 34.824000000000005, 18.0, 15.0, 0.9999999999999984, 230.4000000000001, 597.36, 3.000000000000009, 255.99999999999997, 3.000000000000016, 6.000000000000008, 2.999999999999991, 7.4, 12.360000000000003, 16.824, 49.599999999999994, 44.63999999999999, 60.000000000000014, 54.00000000000001, 40.175999999999995 }
-Denominators={ -6.2208, -6.912000000000001, -7.6800000000000015, -3.2, -1.3333333333333344, 6.666666666666671, 0.6666666666666672, 0.0, 0.6666666666666672, 1.0, 0.0, 1.6, 2.4000000000000004, 0.0, 3.8400000000000007, 0.0, 0.0, 3.4560000000000004, 0.0, 0.0, 3.1104, 0.0, 0.0, -2.4000000000000004, 51.84000000000001, 46.656, -0.6666666666666672, 57.60000000000001, -0.6666666666666672, -0.6666666666666672, 1.6, 3.8400000000000007, 3.4560000000000004, 3.1104, -3.8400000000000007, -3.4560000000000004, -0.6666666666666672, -1.6, -3.1104 }
-Ratios={ -12.916666666666666, -12.916666666666663, -12.916666666666663, -33.75, -89.99999999999996, 5.999999999999983, 17.99999999999997, Infinity, 17.99999999999996, 18.0, Infinity, 13.124999999999995, 7.083333333333332, Infinity, 6.614583333333331, Infinity, Infinity, 8.784722222222223, Infinity, Infinity, 11.195987654320989, Infinity, Infinity, -0.41666666666666596, 4.4444444444444455, 12.803497942386832, -4.50000000000001, 4.444444444444443, -4.50000000000002, -9.000000000000005, 1.8749999999999944, 1.927083333333333, 3.5763888888888893, 5.408950617283951, -12.916666666666663, -12.916666666666663, -89.99999999999996, -33.75, -12.916666666666666 }
-Row: 5	=>	Ratio: 5.999999999999983,	Numerator/RHS: 39.999999999999915, 	Denominator/Pivot: 6.666666666666671,	Artificial: false.
-Row: 24	=>	Ratio: 4.4444444444444455,	Numerator/RHS: 230.4000000000001, 	Denominator/Pivot: 51.84000000000001,	Artificial: true.
-Row: 27	=>	Ratio: 4.444444444444443,	Numerator/RHS: 255.99999999999997, 	Denominator/Pivot: 57.60000000000001,	Artificial: true.
-Row: 30	=>	Ratio: 1.8749999999999944,	Numerator/RHS: 2.999999999999991, 	Denominator/Pivot: 1.6,	Artificial: true.
-
-==>>	Row: 30,	Exit: 58,	Column/Enter: 3.
-
-Iteration Point <30,3>	Pivot: 1.6 => 1.0	RHS: 2.999999999999991 => 1.8749999999999944.
-
-Created SimplexSolver
-countVariables: 51
-countProblemVariables: 17
-countSlackVariables: 34
-countArtificialVariables: 16
-countVariablesTotally: 67
-countConstraints: 39
-countBasisDeficit: 16
-
-Needs Another Iteration? Phase=1 Artificials=16 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, -17.9, 9.0, -0.1, -15.9, 9.0, -0.1, -15.899999999999999, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-Col: 2	=>	Reduced Contribution Weight: -17.9.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, 0.0, 0.0, -2.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9, 0.0, 1.0 }
-Ratios={ NaN, NaN, NaN, NaN, -0.0, Infinity, Infinity, Infinity, 72.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 60.0, Infinity, Infinity, Infinity, Infinity, Infinity, 57.0, Infinity, Infinity, Infinity, Infinity, NaN, NaN, 0.0, NaN, 54.0 }
-Row: 8	=>	Ratio: 72.0,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.0,	Artificial: false.
-Row: 23	=>	Ratio: 60.0,	Numerator/RHS: 900.0, 	Denominator/Pivot: 15.0,	Artificial: true.
-Row: 29	=>	Ratio: 57.0,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.0,	Artificial: true.
-Row: 36	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 36,	Exit: 64,	Column/Enter: 2.
-
-Iteration Point <36,2>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=15 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, -35.78888888888889, 9.0, -0.1, -15.899999999999999, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 19.88888888888889]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 5	=>	Reduced Contribution Weight: -35.78888888888889.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, 0.0, -2.0, -2.2222222222222223, 0.0, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 16.666666666666668, 0.0, 0.0, 15.0, 0.0, 0.0, 1.1111111111111112, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.1111111111111112, 0.9, 1.1111111111111112 }
-Ratios={ NaN, NaN, NaN, -0.0, -0.0, Infinity, Infinity, Infinity, 64.8, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 53.99999999999999, Infinity, Infinity, 53.333333333333336, Infinity, Infinity, 51.3, 57.0, Infinity, Infinity, Infinity, NaN, NaN, -0.0, 0.0, 48.599999999999994 }
-Row: 8	=>	Ratio: 64.8,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.1111111111111112,	Artificial: false.
-Row: 23	=>	Ratio: 53.99999999999999,	Numerator/RHS: 900.0, 	Denominator/Pivot: 16.666666666666668,	Artificial: true.
-Row: 26	=>	Ratio: 53.333333333333336,	Numerator/RHS: 800.0, 	Denominator/Pivot: 15.0,	Artificial: true.
-Row: 29	=>	Ratio: 51.3,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.1111111111111112,	Artificial: true.
-Row: 37	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 37,	Exit: 65,	Column/Enter: 5.
-
-Iteration Point <37,5>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=14 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, -55.665432098765436, 9.0, -0.1, -15.9, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 8	=>	Reduced Contribution Weight: -55.665432098765436.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, 0.0, -2.0, -2.2222222222222223, -2.469135802469136, 0.0, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 18.51851851851852, 0.0, 0.0, 16.666666666666668, 15.0, 0.0, 1.234567901234568, 1.1111111111111112, 1.0, 0.0, 0.0, 0.9, 0.0, -1.234567901234568, -1.1111111111111112, 1.234567901234568 }
-Ratios={ NaN, NaN, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 58.31999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, 48.6, Infinity, Infinity, 48.0, 66.66666666666667, Infinity, 46.169999999999995, 51.3, 57.0, Infinity, Infinity, 0.0, NaN, -0.0, -0.0, 43.739999999999995 }
-Row: 8	=>	Ratio: 58.31999999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.234567901234568,	Artificial: false.
-Row: 23	=>	Ratio: 48.6,	Numerator/RHS: 900.0, 	Denominator/Pivot: 18.51851851851852,	Artificial: true.
-Row: 26	=>	Ratio: 48.0,	Numerator/RHS: 800.0, 	Denominator/Pivot: 16.666666666666668,	Artificial: true.
-Row: 29	=>	Ratio: 46.169999999999995,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.234567901234568,	Artificial: true.
-Row: 34	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 34,	Exit: 62,	Column/Enter: 8.
-
-Iteration Point <34,8>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=13 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, 70.85048010973938, -0.1, -77.75048010973937, 9.0, -0.1, -15.0, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 61.85048010973937, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 11	=>	Reduced Contribution Weight: -77.75048010973937.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ 0.0, -2.0, -2.2222222222222223, -2.469135802469136, -2.743484224965707, 0.0, 0.0, 0.0, 1.3717421124828535, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.5761316872428, 15.0, 0.0, 18.51851851851852, 16.666666666666668, 0.0, 1.3717421124828535, 1.234567901234568, 1.1111111111111112, 1.0, 0.0, -1.1111111111111112, 0.9, -1.3717421124828535, -1.234567901234568, 1.3717421124828535 }
-Ratios={ NaN, -0.0, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 52.48799999999999, Infinity, Infinity, 60.74999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, Infinity, Infinity, Infinity, 43.739999999999995, 60.0, Infinity, 43.199999999999996, 59.99999999999999, Infinity, 41.55299999999999, 46.169999999999995, 51.3, 57.0, Infinity, -0.0, 0.0, -0.0, -0.0, 39.36599999999999 }
-Row: 8	=>	Ratio: 52.48799999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.3717421124828535,	Artificial: false.
-Row: 23	=>	Ratio: 43.739999999999995,	Numerator/RHS: 900.0, 	Denominator/Pivot: 20.5761316872428,	Artificial: true.
-Row: 26	=>	Ratio: 43.199999999999996,	Numerator/RHS: 800.0, 	Denominator/Pivot: 18.51851851851852,	Artificial: true.
-Row: 29	=>	Ratio: 41.55299999999999,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.3717421124828535,	Artificial: true.
-Row: 35	=>	Ratio: 0.0,	Numerator/RHS: 0.0, 	Denominator/Pivot: 0.9,	Artificial: true.
-
-==>>	Row: 35,	Exit: 63,	Column/Enter: 11.
-
-Iteration Point <35,11>	Pivot: 0.9 => 1.0	RHS: 0.0 => 0.0.
-
-Needs Another Iteration? Phase=1 Artificials=12 Infeasibility=5142.0 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 0.0, 28.88888888888889, -0.1, 48.76543209876544, -0.1, 70.85048010973938, -0.1, 95.38942234415487, -0.1, -101.38942234415487, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 61.85048010973937, 86.38942234415487, 19.88888888888889, 39.76543209876544]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 14	=>	Reduced Contribution Weight: -101.38942234415487.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 18.0, 12.0, 72.0, 18.0, 14.4, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 75.0, 18.0, 15.0, 900.0, 900.0, 1200.0, 800.0, 1000.0, 3.0, 57.0, 57.0, 57.0, 57.0, 57.0, 0.0, 0.0, 0.0, 0.0, 54.0 }
-Denominators={ -2.0, -2.2222222222222223, -2.469135802469136, -2.743484224965707, -3.0483158055174524, 0.0, 0.0, 0.0, 1.5241579027587262, 0.0, 0.0, 1.3717421124828535, 0.0, 0.0, 1.234567901234568, 0.0, 0.0, 1.1111111111111112, 0.0, 0.0, 1.0, 0.0, 0.0, 22.86236854138089, 16.666666666666668, 15.0, 20.5761316872428, 18.51851851851852, 0.0, 1.5241579027587262, 1.3717421124828535, 1.234567901234568, 1.1111111111111112, 1.0, -1.234567901234568, -1.1111111111111112, -1.5241579027587262, -1.3717421124828535, 1.5241579027587262 }
-Ratios={ -0.0, -0.0, -0.0, -0.0, -0.0, Infinity, Infinity, Infinity, 47.23919999999999, Infinity, Infinity, 54.67499999999999, Infinity, Infinity, 60.74999999999999, Infinity, Infinity, 67.5, Infinity, Infinity, 75.0, Infinity, Infinity, 39.366, 53.99999999999999, 80.0, 38.879999999999995, 54.0, Infinity, 37.39769999999999, 41.55299999999999, 46.169999999999995, 51.3, 57.0, -0.0, -0.0, -0.0, -0.0, 35.429399999999994 }
-Row: 8	=>	Ratio: 47.23919999999999,	Numerator/RHS: 72.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: false.
-Row: 23	=>	Ratio: 39.366,	Numerator/RHS: 900.0, 	Denominator/Pivot: 22.86236854138089,	Artificial: true.
-Row: 26	=>	Ratio: 38.879999999999995,	Numerator/RHS: 800.0, 	Denominator/Pivot: 20.5761316872428,	Artificial: true.
-Row: 29	=>	Ratio: 37.39769999999999,	Numerator/RHS: 57.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: true.
-Row: 38	=>	Ratio: 35.429399999999994,	Numerator/RHS: 54.0, 	Denominator/Pivot: 1.5241579027587262,	Artificial: true.
-
-==>>	Row: 38,	Exit: 66,	Column/Enter: 14.
-
-Iteration Point <38,14>	Pivot: 1.5241579027587262 => 1.0	RHS: 54.0 => 35.429399999999994.
-
-Needs Another Iteration? Phase=1 Artificials=11 Infeasibility=1549.8336000000004 Objective=5970.6557999999995
-
-findNextPivotCol (index of most negative value) among these:
-[-66.52159999999999, 0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -29.4, -15.0, -54.024, -42.35999999999999, 66.52159999999999]
-Col: 0	=>	Reduced Contribution Weight: -66.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 70.85879999999999, 78.73199999999999, 87.47999999999999, 97.2, 108.00000000000001, 100.0, 18.0, 12.0, 17.999999999999993, 18.0, 14.4, 26.4, 18.0, 15.0, 31.260000000000005, 18.0, 15.0, 35.63400000000001, 18.0, 15.0, 39.570600000000006, 18.0, 15.0, 90.00000000000011, 309.5100000000001, 668.5590000000001, 71.00000000000011, 343.9000000000001, 3.0, 2.999999999999993, 8.399999999999999, 13.260000000000005, 17.634000000000007, 21.570600000000006, 43.739999999999995, 39.36599999999999, 54.00000000000001, 48.6, 35.429399999999994 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, 1.0, 1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, 10.0, 18.0, Infinity, 17.999999999999993, Infinity, Infinity, 29.333333333333336, Infinity, Infinity, 38.59259259259261, Infinity, Infinity, 48.88065843621402, Infinity, Infinity, 60.311842706904464, Infinity, Infinity, 6.000000000000009, 28.30452674897121, 67.9326322206981, 5.259259259259269, 28.30452674897121, 3.0, 2.999999999999993, 9.333333333333332, 16.37037037037038, 24.18930041152265, 32.87700045724739, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001, -54.00000000000001 }
-Row: 5	=>	Ratio: 10.0,	Numerator/RHS: 100.0, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 6.000000000000009,	Numerator/RHS: 90.00000000000011, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 5.259259259259269,	Numerator/RHS: 71.00000000000011, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-Row: 28	=>	Ratio: 3.0,	Numerator/RHS: 3.0, 	Denominator/Pivot: 1.0,	Artificial: true.
-Row: 29	=>	Ratio: 2.999999999999993,	Numerator/RHS: 2.999999999999993, 	Denominator/Pivot: 1.0,	Artificial: true.
-
-==>>	Row: 29,	Exit: 57,	Column/Enter: 0.
-
-Iteration Point <29,0>	Pivot: 1.0 => 1.0	RHS: 2.999999999999993 => 2.999999999999993.
-
-Needs Another Iteration? Phase=1 Artificials=10 Infeasibility=1350.268800000001 Objective=6347.358899999998
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -65.52159999999999, 1.0, 1.0, 1.0, 1.0, 66.52159999999999, -29.4, -15.0, -54.024, -42.35999999999999, 0.0]
-Col: 3	=>	Reduced Contribution Weight: -45.024.
-Col: 23	=>	Reduced Contribution Weight: -65.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 74.79539999999997, 83.10599999999997, 92.33999999999997, 102.6, 114.0, 70.00000000000007, 15.000000000000007, 12.0, 15.0, 18.0, 14.4, 23.700000000000006, 18.0, 15.0, 28.830000000000013, 18.0, 15.0, 33.44700000000002, 18.0, 15.0, 37.602300000000014, 18.0, 15.0, 45.00000000000023, 276.7050000000002, 639.0345000000002, 30.50000000000022, 307.45000000000016, 7.105427357601002E-15, 2.999999999999993, 5.700000000000005, 10.83000000000001, 15.447000000000013, 19.60230000000001, 46.16999999999999, 41.55299999999998, 57.0, 51.3, 37.397699999999986 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, 1.0, -1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -57.0, -56.99999999999999, -56.99999999999999, -57.0, -57.0, 7.000000000000007, 15.000000000000007, Infinity, 15.0, Infinity, Infinity, 26.333333333333343, Infinity, Infinity, 35.59259259259262, Infinity, Infinity, 45.88065843621403, Infinity, Infinity, 57.31184270690447, Infinity, Infinity, 3.000000000000016, 25.30452674897122, 64.93263222069811, 2.259259259259276, 25.304526748971213, 7.105427357601002E-15, -2.999999999999993, 6.333333333333339, 13.370370370370386, 21.18930041152266, 29.877000457247394, -56.99999999999999, -56.99999999999999, -57.0, -57.0, -57.0 }
-Row: 5	=>	Ratio: 7.000000000000007,	Numerator/RHS: 70.00000000000007, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 3.000000000000016,	Numerator/RHS: 45.00000000000023, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 2.259259259259276,	Numerator/RHS: 30.50000000000022, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-Row: 28	=>	Ratio: 7.105427357601002E-15,	Numerator/RHS: 7.105427357601002E-15, 	Denominator/Pivot: 1.0,	Artificial: true.
-
-==>>	Row: 28,	Exit: 56,	Column/Enter: 23.
-
-Iteration Point <28,23>	Pivot: 1.0 => 1.0	RHS: 7.105427357601002E-15 => 7.105427357601002E-15.
-
-Needs Another Iteration? Phase=1 Artificials=9 Infeasibility=1350.2688000000005 Objective=6347.358899999999
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -45.024, -0.1, -33.35999999999999, -0.1, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, -64.52159999999999, 1.0, 1.0, 1.0, 1.0, 65.52159999999999, 1.0, -29.4, -15.0, -54.024, -42.35999999999999, 65.52159999999999]
-Col: 3	=>	Reduced Contribution Weight: -45.024.
-Col: 22	=>	Reduced Contribution Weight: -64.52159999999999.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 74.79539999999999, 83.10599999999998, 92.33999999999999, 102.60000000000001, 114.00000000000001, 70.0, 15.0, 12.0, 14.999999999999993, 18.0, 14.4, 23.7, 18.0, 15.0, 28.830000000000005, 18.0, 15.0, 33.44700000000001, 18.0, 15.0, 37.60230000000001, 18.0, 15.0, 45.00000000000012, 276.70500000000015, 639.0345000000001, 30.500000000000124, 307.45000000000005, 7.105427357601002E-15, 3.0, 5.699999999999998, 10.830000000000005, 15.447000000000008, 19.602300000000007, 46.169999999999995, 41.55299999999999, 57.00000000000001, 51.300000000000004, 37.39769999999999 }
-Denominators={ -1.3121999999999996, -1.4579999999999995, -1.6199999999999997, -1.7999999999999998, -2.0, 10.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.8999999999999999, 0.0, 0.0, 0.8099999999999998, 0.0, 0.0, 0.7289999999999998, 0.0, 0.0, 0.6560999999999998, 0.0, 0.0, 14.999999999999996, 10.934999999999997, 9.841499999999996, 13.499999999999996, 12.149999999999997, -1.0, -1.0, 0.8999999999999999, 0.8099999999999998, 0.7289999999999998, 0.6560999999999998, -0.8099999999999998, -0.7289999999999998, -1.0, -0.8999999999999999, -0.6560999999999998 }
-Ratios={ -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, 7.0, 15.0, Infinity, 14.999999999999993, Infinity, Infinity, 26.333333333333336, Infinity, Infinity, 35.59259259259261, Infinity, Infinity, 45.88065843621402, Infinity, Infinity, 57.311842706904464, Infinity, Infinity, 3.000000000000009, 25.304526748971213, 64.9326322206981, 2.259259259259269, 25.304526748971202, -7.105427357601002E-15, -3.0, 6.333333333333332, 13.37037037037038, 21.18930041152265, 29.87700045724739, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001, -57.00000000000001 }
-Row: 5	=>	Ratio: 7.0,	Numerator/RHS: 70.0, 	Denominator/Pivot: 10.0,	Artificial: false.
-Row: 23	=>	Ratio: 3.000000000000009,	Numerator/RHS: 45.00000000000012, 	Denominator/Pivot: 14.999999999999996,	Artificial: true.
-Row: 26	=>	Ratio: 2.259259259259269,	Numerator/RHS: 30.500000000000124, 	Denominator/Pivot: 13.499999999999996,	Artificial: true.
-
-==>>	Row: 26,	Exit: 54,	Column/Enter: 22.
-
-Iteration Point <26,22>	Pivot: 13.499999999999996 => 1.0	RHS: 30.500000000000124 => 2.259259259259269.
-
-Needs Another Iteration? Phase=1 Artificials=8 Infeasibility=1204.4977777777776 Objective=6631.048888888889
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, 26.66666666666667, -0.1, -81.15377777777778, 0.3779377777777778, -20.39999999999999, -0.1, -6.0, -0.1, 10.0, -0.1, 1.0, 1.0, 1.0, -3.7793777777777784, 1.0, 1.0, 1.0, 1.0, 1.0, 4.779377777777778, 1.0, 1.0, -29.4, -15.0, 17.66666666666667, -42.35999999999999, 1.0]
-Col: 4	=>	Reduced Contribution Weight: -0.1.
-Col: 6	=>	Reduced Contribution Weight: -81.15377777777778.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 77.75999999999999, 86.39999999999999, 96.0, 106.66666666666669, 118.51851851851855, 47.40740740740731, 12.740740740740732, 12.0, 12.740740740740724, 18.0, 14.4, 21.666666666666657, 18.0, 15.0, 26.999999999999996, 18.0, 15.0, 31.800000000000004, 18.0, 15.0, 36.120000000000005, 18.0, 15.0, 11.111111111111093, 252.00000000000006, 616.8, 2.259259259259269, 279.99999999999994, 2.259259259259276, 5.259259259259268, 3.6666666666666567, 8.999999999999998, 13.8, 18.12, 48.0, 43.199999999999996, 59.259259259259274, 53.33333333333334, 38.879999999999995 }
-Denominators={ -2.5919999999999996, -2.88, -3.2, -1.3333333333333335, -1.4814814814814818, 7.407407407407409, 0.7407407407407409, 0.0, 0.7407407407407409, 0.0, 0.0, 0.6666666666666667, 1.0, 0.0, 1.6, 0.0, 0.0, 1.44, 0.0, 0.0, 1.2959999999999998, 0.0, 0.0, 11.11111111111111, 21.6, 19.439999999999998, -0.7407407407407409, 24.0, -0.7407407407407409, -0.7407407407407409, 0.6666666666666667, 1.6, 1.44, 1.2959999999999998, -1.6, -1.44, -0.7407407407407409, -0.6666666666666667, -1.2959999999999998 }
-Ratios={ -30.0, -29.999999999999996, -30.0, -80.0, -80.0, 6.399999999999985, 17.199999999999985, Infinity, 17.199999999999974, Infinity, Infinity, 32.49999999999998, 18.0, Infinity, 16.874999999999996, Infinity, Infinity, 22.083333333333336, Infinity, Infinity, 27.870370370370377, Infinity, Infinity, 0.9999999999999984, 11.666666666666668, 31.728395061728396, -3.0500000000000123, 11.666666666666664, -3.0500000000000216, -7.10000000000001, 5.499999999999985, 5.624999999999998, 9.583333333333334, 13.981481481481485, -30.0, -29.999999999999996, -80.0, -80.0, -30.0 }
-Row: 5	=>	Ratio: 6.399999999999985,	Numerator/RHS: 47.40740740740731, 	Denominator/Pivot: 7.407407407407409,	Artificial: false.
-Row: 23	=>	Ratio: 0.9999999999999984,	Numerator/RHS: 11.111111111111093, 	Denominator/Pivot: 11.11111111111111,	Artificial: true.
-
-==>>	Row: 23,	Exit: 51,	Column/Enter: 6.
-
-Iteration Point <23,6>	Pivot: 11.11111111111111 => 1.0	RHS: 11.111111111111093 => 0.9999999999999984.
-
-Needs Another Iteration? Phase=1 Artificials=7 Infeasibility=1123.344 Objective=6812.232
-
-findNextPivotCol (index of most negative value) among these:
-[0.0, -168.10240000000005, 0.630384, -0.4336, -20.400000000000016, -0.1, -6.0, -0.1, 10.0, -0.1, -6.303839999999999, 1.0, 1.0, 4.336, 1.0, 1.0, 1.0, 1.0, 1.0, 7.303839999999999, -3.3360000000000003, 1.0, 1.0, -29.400000000000023, -15.0, -104.06400000000004, -42.35999999999999, 1.0]
-Col: 3	=>	Reduced Contribution Weight: -168.10240000000005.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 80.35199999999999, 89.27999999999999, 99.19999999999999, 108.00000000000001, 120.00000000000003, 39.999999999999915, 11.999999999999991, 12.0, 11.999999999999984, 18.0, 14.4, 20.999999999999993, 17.0, 15.0, 25.4, 18.0, 15.0, 30.360000000000007, 18.0, 15.0, 34.824000000000005, 18.0, 15.0, 0.9999999999999984, 230.4000000000001, 597.36, 3.000000000000009, 255.99999999999997, 3.000000000000016, 6.000000000000008, 2.999999999999991, 7.4, 12.360000000000003, 16.824, 49.599999999999994, 44.63999999999999, 60.000000000000014, 54.00000000000001, 40.175999999999995 }
-Denominators={ -6.2208, -6.912000000000001, -7.6800000000000015, -3.2, -1.3333333333333344, 6.666666666666671, 0.6666666666666672, 0.0, 0.6666666666666672, 1.0, 0.0, 1.6, 2.4000000000000004, 0.0, 3.8400000000000007, 0.0, 0.0, 3.4560000000000004, 0.0, 0.0, 3.1104, 0.0, 0.0, -2.4000000000000004, 51.84000000000001, 46.656, -0.6666666666666672, 57.60000000000001, -0.6666666666666672, -0.6666666666666672, 1.6, 3.8400000000000007, 3.4560000000000004, 3.1104, -3.8400000000000007, -3.4560000000000004, -0.6666666666666672, -1.6, -3.1104 }
-Ratios={ -12.916666666666666, -12.916666666666663, -12.916666666666663, -33.75, -89.99999999999996, 5.999999999999983, 17.99999999999997, Infinity, 17.99999999999996, 18.0, Infinity, 13.124999999999995, 7.083333333333332, Infinity, 6.614583333333331, Infinity, Infinity, 8.784722222222223, Infinity, Infinity, 11.195987654320989, Infinity, Infinity, -0.41666666666666596, 4.4444444444444455, 12.803497942386832, -4.50000000000001, 4.444444444444443, -4.50000000000002, -9.000000000000005, 1.8749999999999944, 1.927083333333333, 3.5763888888888893, 5.408950617283951, -12.916666666666663, -12.916666666666663, -89.99999999999996, -33.75, -12.916666666666666 }
-Row: 5	=>	Ratio: 5.999999999999983,	Numerator/RHS: 39.999999999999915, 	Denominator/Pivot: 6.666666666666671,	Artificial: false.
-Row: 24	=>	Ratio: 4.4444444444444455,	Numerator/RHS: 230.4000000000001, 	Denominator/Pivot: 51.84000000000001,	Artificial: true.
-Row: 27	=>	Ratio: 4.444444444444443,	Numerator/RHS: 255.99999999999997, 	Denominator/Pivot: 57.60000000000001,	Artificial: true.
-Row: 30	=>	Ratio: 1.8749999999999944,	Numerator/RHS: 2.999999999999991, 	Denominator/Pivot: 1.6,	Artificial: true.
-
-==>>	Row: 30,	Exit: 58,	Column/Enter: 3.
-
-Iteration Point <30,3>	Pivot: 1.6 => 1.0	RHS: 2.999999999999991 => 1.8749999999999944.
-
-Branch&Bound Node
-0 (0) -1=NaN NaN [0=3<18, 1=57<72, 2=0<18, 3=57<75, 4=0<18, 5=57<75, 6=0<18, 7=57<75, 8=0<18, 9=57<75, 10=0<18]
-Solutions=0 Nodes/Iterations=0 INVALID Infinity @ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
-Node Result: UNEXPLORED 7568.180999999998 @ { 60.0, 7.250000000000005, 0.0, 61.250000000000014, 1.8749999999999944, 0.0, 57.0, 5.499999999999986, 0.0, 56.799999999999976, 0.0, 0.0, 51.119999999999976, 0.0, 0.0, 46.007999999999974, 0.0, 0.0 }
-Failed to solve node problem - stop this branch!
-Done 1 IntegerSolver iterations in 0.036550792s with NodeStatistics [I=0, E=0, S=0, A=0]
+[0.067, 0.393, 0.9430000000000001, -0.345]
+
+==>>	No more iterations needed/possible.
+
+Final Tableau; Basics: [4, 5, 6, 7, 0]
+         0        -1        -1        -1         1         0         0         0        -1    0.1846
+         0         1         0         0         0         1         0         0         0         1
+         0         0         1         0         0         0         1         0         0         1
+         0         0         0         1         0         0         0         1         0         1
+         1         1         1         1         0         0         0         0         1    0.8154
+         0     0.067     0.393     0.943         0         0         0         0    -0.345 -0.281313
+         0         0         0         0         0         0         0         0         1         0

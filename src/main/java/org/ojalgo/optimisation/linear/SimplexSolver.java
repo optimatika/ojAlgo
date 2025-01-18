@@ -319,13 +319,13 @@ abstract class SimplexSolver extends LinearSolver {
         Set<IntIndex> fixedVariables = model.getFixedVariables();
         List<Variable> freeVariables = model.getFreeVariables();
 
-        List<Expression> equalityConstraints = new ArrayList<>();
+        List<Expression> equalConstraints = new ArrayList<>();
         List<Expression> lowerConstraints = new ArrayList<>();
         List<Expression> upperConstraints = new ArrayList<>();
 
-        model.constraints().map(c -> c.compensate(fixedVariables)).forEach(constraint -> {
+        model.constraints().map(constraint -> constraint.compensate(fixedVariables)).forEach(constraint -> {
             if (constraint.isEqualityConstraint()) {
-                equalityConstraints.add(constraint);
+                equalConstraints.add(constraint);
             } else {
                 if (constraint.isLowerConstraint()) {
                     lowerConstraints.add(constraint);
@@ -340,7 +340,7 @@ abstract class SimplexSolver extends LinearSolver {
 
         int nbUpConstr = upperConstraints.size();
         int nbLoConstr = lowerConstraints.size();
-        int nbEqConstr = equalityConstraints.size();
+        int nbEqConstr = equalConstraints.size();
 
         int nbProbVars = freeVariables.size();
         int nbSlckVars = nbUpConstr + nbLoConstr;
@@ -384,7 +384,7 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         for (int i = 0; i < nbEqConstr; i++) {
-            Expression expression = equalityConstraints.get(i);
+            Expression expression = equalConstraints.get(i);
             for (IntIndex key : expression.getLinearKeySet()) {
                 int column = model.indexOfFreeVariable(key);
                 double factor = expression.doubleValue(key, true);

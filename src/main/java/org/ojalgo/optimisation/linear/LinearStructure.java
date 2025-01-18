@@ -82,6 +82,10 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         nbSlck = varsSlk;
         nbIdty = varsEye;
         nbArti = constrIn + constrEq - varsEye;
+
+        if (this.countConstraints() != this.countVariablesIncluded()) {
+            throw new IllegalStateException();
+        }
     }
 
     LinearStructure(final int nbConstraints, final int nbVariables) {
@@ -124,6 +128,20 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof LinearStructure)) {
+            return false;
+        }
+        LinearStructure other = (LinearStructure) obj;
+        return Objects.equals(constraints, other.constraints) && nbArti == other.nbArti && nbEqus == other.nbEqus && nbIdty == other.nbIdty
+                && nbInes == other.nbInes && nbNegs == other.nbNegs && nbSlck == other.nbSlck && nbVars == other.nbVars
+                && Arrays.equals(negativePartVariables, other.negativePartVariables) && Arrays.equals(positivePartVariables, other.positivePartVariables);
+    }
+
+    @Override
     public EntryPair<ModelEntity<?>, ConstraintType> getConstraint(final int idc) {
         return constraints.getEntry(idc);
     }
@@ -136,6 +154,15 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         } else {
             return this.getConstraint(ids - nbSlck);
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(negativePartVariables);
+        result = prime * result + Arrays.hashCode(positivePartVariables);
+        return prime * result + Objects.hash(constraints, nbArti, nbEqus, nbIdty, nbInes, nbNegs, nbSlck, nbVars);
     }
 
     @Override
@@ -199,6 +226,25 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
         constraints.negated[i] = negated;
     }
 
+    @Override
+    public String toString() {
+        return this.countConstraints() + " x " + this.countVariables();
+    }
+
+    /**
+     * The number of non-basic variables.
+     */
+    int countVariablesExcluded() {
+        return nbVars + nbNegs + nbSlck;
+    }
+
+    /**
+     * The number of basic variables.
+     */
+    int countVariablesIncluded() {
+        return nbIdty + nbArti;
+    }
+
     int countVariablesTotally() {
         return nbVars + nbNegs + nbSlck + nbIdty + nbArti;
     }
@@ -221,35 +267,6 @@ final class LinearStructure implements ExpressionsBasedModel.EntityMap {
 
     void setObjectiveAdjustmentFactor(final double multiplierScale) {
         constraints.setMultiplierScale(multiplierScale);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(negativePartVariables);
-        result = prime * result + Arrays.hashCode(positivePartVariables);
-        result = prime * result + Objects.hash(constraints, nbArti, nbEqus, nbIdty, nbInes, nbNegs, nbSlck, nbVars);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof LinearStructure)) {
-            return false;
-        }
-        LinearStructure other = (LinearStructure) obj;
-        return Objects.equals(constraints, other.constraints) && nbArti == other.nbArti && nbEqus == other.nbEqus && nbIdty == other.nbIdty
-                && nbInes == other.nbInes && nbNegs == other.nbNegs && nbSlck == other.nbSlck && nbVars == other.nbVars
-                && Arrays.equals(negativePartVariables, other.negativePartVariables) && Arrays.equals(positivePartVariables, other.positivePartVariables);
-    }
-
-    @Override
-    public String toString() {
-        return this.countConstraints() + " x " + this.countVariables();
     }
 
 }

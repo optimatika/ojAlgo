@@ -84,7 +84,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        public final LinearFunction<Double> getObjective() {
+        public LinearFunction<Double> getObjective() {
             LinearFunction<Double> retVal = this.getObjective(LinearFunction.class);
             if (retVal == null) {
                 retVal = LinearFunction.factory(this.getFactory()).make(this.countVariables());
@@ -111,7 +111,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
-        public final LinearSolver.Builder lower(final double bound) {
+        public LinearSolver.Builder lower(final double bound) {
             double[] lowerBounds = this.getLowerBounds(ZERO).data;
             Arrays.fill(lowerBounds, bound);
             return this;
@@ -123,12 +123,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
-        public final LinearSolver.Builder objective(final int index, final double value) {
+        public LinearSolver.Builder objective(final int index, final double value) {
             this.getObjective().linear().set(index, value);
             return this;
         }
 
-        public final LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
+        public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
             this.setObjective(LinearSolver.toObjectiveFunction(mtrxC));
             return this;
         }
@@ -229,7 +229,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return this;
         }
 
-        public final LinearSolver.Builder upper(final double bound) {
+        public LinearSolver.Builder upper(final double bound) {
             double[] upperBounds = this.getUpperBounds(POSITIVE_INFINITY).data;
             Arrays.fill(upperBounds, bound);
             return this;
@@ -328,11 +328,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return new SimplexTableauSolver(tableau, options);
         }
 
-        protected final double[] getLowerBounds() {
+        protected double[] getLowerBounds() {
             return super.getLowerBounds(ZERO).data;
         }
 
-        protected final double[] getUpperBounds() {
+        protected double[] getUpperBounds() {
             return super.getUpperBounds(POSITIVE_INFINITY).data;
         }
 
