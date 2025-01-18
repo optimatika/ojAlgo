@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2024 Optimatika
+ * Copyright 1997-2025 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software", to deal
