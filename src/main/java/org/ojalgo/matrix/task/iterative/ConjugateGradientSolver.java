@@ -54,7 +54,12 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         super();
     }
 
+    @Override
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
+
+        if (this.isDebugPrinterSet()) {
+            this.debug(0, NaN, solution);
+        }
 
         int nbEquations = equations.size();
 
@@ -133,13 +138,14 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
                 this.debug(iterations, normErr / normRHS, solution);
             }
 
-        } while ((iterations < limit) && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
+        } while (iterations < limit && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
         // BasicLogger.debug("Done in {} iterations on problem size {}", iterations, solution.count());
 
         return normErr / normRHS;
     }
 
+    @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
@@ -150,7 +156,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     }
 
     private R064Store direction(final Structure1D structure) {
-        if ((myDirection == null) || (myDirection.count() != structure.count())) {
+        if (myDirection == null || myDirection.count() != structure.count()) {
             myDirection = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myDirection.fillAll(ZERO);
@@ -159,7 +165,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     }
 
     private R064Store preconditioned(final Structure1D structure) {
-        if ((myPreconditioned == null) || (myPreconditioned.count() != structure.count())) {
+        if (myPreconditioned == null || myPreconditioned.count() != structure.count()) {
             myPreconditioned = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myPreconditioned.fillAll(ZERO);
@@ -168,7 +174,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     }
 
     private R064Store residual(final Structure1D structure) {
-        if ((myResidual == null) || (myResidual.count() != structure.count())) {
+        if (myResidual == null || myResidual.count() != structure.count()) {
             myResidual = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myResidual.fillAll(ZERO);
@@ -177,7 +183,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     }
 
     private R064Store vector(final Structure1D structure) {
-        if ((myVector == null) || (myVector.count() != structure.count())) {
+        if (myVector == null || myVector.count() != structure.count()) {
             myVector = R064Store.FACTORY.make(structure.count(), 1L);
         } else {
             myVector.fillAll(ZERO);
