@@ -188,7 +188,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * {@link ExpressionsBasedModel.Integration#toModelState(org.ojalgo.optimisation.Optimisation.Result, ExpressionsBasedModel)}.
      * </ol>
      */
-    public static interface EntityMap extends ProblemStructure {
+    public interface EntityMap extends ProblemStructure {
 
         /**
          * The number of variables, in the solver, that directly correspond to a model variable. (Not slack or
@@ -346,7 +346,7 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
      * @see ExpressionsBasedModel.Integration#setSwitch(ExpressionsBasedModel, IntegrationProperty, boolean)
      * @see ExpressionsBasedModel.Integration#isSwitch(ExpressionsBasedModel, IntegrationProperty)
      */
-    public static enum IntegrationProperty {
+    public enum IntegrationProperty {
 
         /**
          * Any integration that can switch between Java and native code solvers.
@@ -478,6 +478,37 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
 
         DefaultIntermediate(final ExpressionsBasedModel model) {
             super(model);
+        }
+
+    }
+
+    static final class IntegrationWrapper extends ExpressionsBasedModel.Integration<Optimisation.Solver> {
+
+        private final Optimisation.Integration<ExpressionsBasedModel, ?> myDelegate;
+
+        IntegrationWrapper(final Optimisation.Integration<ExpressionsBasedModel, ?> delegate) {
+            super();
+            myDelegate = delegate;
+        }
+
+        @Override
+        public Solver build(final ExpressionsBasedModel model) {
+            return myDelegate.build(model);
+        }
+
+        @Override
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return myDelegate.isCapable(model);
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+            return myDelegate.toModelState(solverState, model);
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            return myDelegate.toSolverState(modelState, model);
         }
 
     }
@@ -699,8 +730,12 @@ public final class ExpressionsBasedModel implements Optimisation.Model {
     /**
      * Add an integration for a solver that will be used rather than the built-in solvers
      */
-    public static boolean addIntegration(final Integration<?> integration) {
-        return INTEGRATIONS.add(integration);
+    public static boolean addIntegration(final Optimisation.Integration<ExpressionsBasedModel, ?> integration) {
+        if (integration instanceof ExpressionsBasedModel.Integration<?>) {
+            return INTEGRATIONS.add((ExpressionsBasedModel.Integration<?>) integration);
+        } else {
+            return INTEGRATIONS.add(new IntegrationWrapper(integration));
+        }
     }
 
     public static boolean addPresolver(final Presolver presolver) {
