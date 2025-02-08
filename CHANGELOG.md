@@ -11,6 +11,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [55.1.2] – 2025-02-08
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- Minor change to progress logging of the `ConjugateGradientSolver` – sparse iterative equation system solver.
+
+#### org.ojalgo.optimisation
+
+- Minor change to method signature of `ExpressionsBasedModel#addIntegration`.
+
 ## [55.1.1] – 2025-01-18
 
 ### Added
