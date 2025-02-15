@@ -11,6 +11,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Minor performance refactoring to SimplexSolver.
+
 ## [55.1.2] – 2025-02-08
 
 ### Changed

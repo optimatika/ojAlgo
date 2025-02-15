@@ -394,6 +394,19 @@ public final class ProcessingService {
         }
     }
 
+    public void run(final Runnable task1, final Runnable task2) {
+
+        Future<?> future1 = myExecutor.submit(task1);
+        Future<?> future2 = myExecutor.submit(task2);
+
+        try {
+            future1.get();
+            future2.get();
+        } catch (InterruptedException | ExecutionException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
     /**
      * @see ProcessingService#run(int, Runnable)
      */

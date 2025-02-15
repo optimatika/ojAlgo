@@ -1,69 +1,1137 @@
 
-Created SimplexSolver
-countVariables: 8
-countProblemVariables: 4
-countSlackVariables: 4
-countArtificialVariables: 1
-countVariablesTotally: 9
-countConstraints: 5
-countBasisDeficit: 1
-Tableau Created; Basics: [4, 5, 6, 7, 8]
-       1       0       0       0       1       0       0       0       0       1
-       0       1       0       0       0       1       0       0       0       1
-       0       0       1       0       0       0       1       0       0       1
-       0       0       0       1       0       0       0       1       0       1
-       1       1       1       1       0       0       0       0       1  0.8154
-   0.345   0.412   0.738   1.288       0       0       0       0       0       0
-      -1      -1      -1      -1       0       0       0       0       0 -0.8154
-Initial Tableau; Basics: [4, 5, 6, 7, 8]
-       1       0       0       0       1       0       0       0       0       1
-       0       1       0       0       0       1       0       0       0       1
-       0       0       1       0       0       0       1       0       0       1
-       0       0       0       1       0       0       0       1       0       1
-       1       1       1       1       0       0       0       0       1  0.8154
-   0.345   0.412   0.738   1.288       0       0       0       0       0       0
-      -1      -1      -1      -1       0       0       0       0       0 -0.8154
-
-Needs Another Iteration? Phase=1 Artificials=1 Infeasibility=0.8154 Objective=-0.0
-
-findNextPivotCol (index of most negative value) among these:
-[-1.0, -1.0, -1.0, -1.0]
-Col: 0	=>	Reduced Contribution Weight: -1.0.
-
-findNextPivotRow (smallest positive ratio) among these:
-Numerators={ 1.0, 1.0, 1.0, 1.0, 0.8154 }
-Denominators={ 1.0, 0.0, 0.0, 0.0, 1.0 }
-Ratios={ 1.0, Infinity, Infinity, Infinity, 0.8154 }
-Row: 0	=>	Ratio: 1.0,	Numerator/RHS: 1.0, 	Denominator/Pivot: 1.0,	Artificial: false.
-Row: 4	=>	Ratio: 0.8154,	Numerator/RHS: 0.8154, 	Denominator/Pivot: 1.0,	Artificial: true.
-
-==>>	Row: 4,	Exit: 8,	Column/Enter: 0.
-
-Iteration Point <4,0>	Pivot: 1.0 => 1.0	RHS: 0.8154 => 0.8154.
-Tableau Iteration; Basics: [4, 5, 6, 7, 0]
-         0        -1        -1        -1         1         0         0         0        -1    0.1846
-         0         1         0         0         0         1         0         0         0         1
-         0         0         1         0         0         0         1         0         0         1
-         0         0         0         1         0         0         0         1         0         1
-         1         1         1         1         0         0         0         0         1    0.8154
-         0     0.067     0.393     0.943         0         0         0         0    -0.345 -0.281313
-         0         0         0         0         0         0         0         0         1         0
-
-Needs Another Iteration? Phase=1 Artificials=0 Infeasibility=-0.0 Objective=0.281313
-
-Switching to Phase2 with 0 artificial variable(s) still in the basis and infeasibility -0.0.
+==================================================
+PrimalSimplexSolver-RevisedStore
+==================================================
 
 
-findNextPivotCol (index of most negative value) among these:
-[0.067, 0.393, 0.9430000000000001, -0.345]
+UNEXPLORED iteration 0, partition [B, B, L, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [4.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
 
-==>>	No more iterations needed/possible.
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ LOWER
+		3.0 => 3(1) LOWER INCREASE
+==>> 3(1) LOWER INCREASE
 
-Final Tableau; Basics: [4, 5, 6, 7, 0]
-         0        -1        -1        -1         1         0         0         0        -1    0.1846
-         0         1         0         0         0         1         0         0         0         1
-         0         0         1         0         0         0         1         0         0         1
-         0         0         0         1         0         0         0         1         0         1
-         1         1         1         1         0         0         0         0         1    0.8154
-         0     0.067     0.393     0.943         0         0         0         0    -0.345 -0.281313
-         0         0         0         0         0         0         0         0         1         0
+testPrimalExitRatio
+	1(1) 3.0 / -2.0 = 1.5
+	0(0) 4.0 / 1.0 = 4.0
+Bound switch!
+==>> -1(-1) INCREASE UPPER
+
+Switching bounds: 3(1) LOWER INCREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 1, partition [B, B, L, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [3.0, 3.0, 0.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
+
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ UPPER
+==>> 2(0) LOWER INCREASE
+
+testPrimalExitRatio
+	1(1) 1.0 / -1.0 = 1.0
+		1.0 => 1(1) INCREASE UPPER
+	0(0) 3.0 / 1.0 = 3.0
+==>> 1(1) INCREASE UPPER
+
+Pivoting: 1(1) INCREASE UPPER -> 2(0) LOWER INCREASE
+==>> Row: 1, Exit: 1, Column/Enter: 2.
+Cost=-2.0, Pivot1=-1.0, Pivot2=-1.0, RHS=3.0, Inf=0.0
+Shift Exit: 0.0, Enter: 0.0
+OLD iter: 2(0) INCREASE -> 1(1) INCREASE
+Before recomputation:
+x: { 2.0, 1.0 }
+l: { 0.0, 0.0 }
+y: { 1.0, -1.0 }
+d: { -2.0, -3.0, 0.0, 0.0 }
+After computation:
+x: { 2.0, 1.0 }
+d: { -2.0, 1.0, 0.0, 0.0 }
+
+UNEXPLORED iteration 2, partition [B, U, B, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [2.0, 4.0, 1.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ UPPER
+		1.0 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+testPrimalExitRatio
+	2(1) 4.0 / 2.0 = 2.0
+	0(0) 2.0 / -1.0 = 2.0
+Bound switch!
+==>> -1(-1) DECREASE LOWER
+
+Switching bounds: 3(1) UPPER DECREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ LOWER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+	2(1) 0.0
+	0(0) 0.0
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PrimalSimplexSolver-RevisedStore: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+PrimalSimplexSolver-DenseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [B, B, L, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [4.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
+  1  0  1  1  1  0  4
+  0  1 -1 -2  0  1  1
+  0  0 -2 -3  0  0  0
+
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ LOWER
+		3.0 => 3(1) LOWER INCREASE
+==>> 3(1) LOWER INCREASE
+
+testPrimalExitRatio
+	1(1) 3.0 / -2.0 = 1.5
+	0(0) 4.0 / 1.0 = 4.0
+Bound switch!
+==>> -1(-1) INCREASE UPPER
+
+Switching bounds: 3(1) LOWER INCREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 1, partition [B, B, L, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [3.0, 3.0, 0.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
+  1  0  1  1  1  0  3
+  0  1 -1 -2  0  1  3
+  0  0 -2 -3  0  0  0
+
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ UPPER
+==>> 2(0) LOWER INCREASE
+
+testPrimalExitRatio
+	1(1) 1.0 / -1.0 = 1.0
+		1.0 => 1(1) INCREASE UPPER
+	0(0) 3.0 / 1.0 = 3.0
+==>> 1(1) INCREASE UPPER
+
+Pivoting: 1(1) INCREASE UPPER -> 2(0) LOWER INCREASE
+==>> Row: 1, Exit: 1, Column/Enter: 2.
+Cost=-2.0, Pivot1=-1.0, Pivot2=-1.0, RHS=3.0, Inf=0.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 2, partition [B, U, B, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [2.0, 4.0, 1.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  2
+  0 -1  1  2  0 -1  1
+  0 -2  0  1  0 -2 -6
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ UPPER
+		1.0 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+testPrimalExitRatio
+	2(1) 4.0 / 2.0 = 2.0
+	0(0) 2.0 / -1.0 = 2.0
+Bound switch!
+==>> -1(-1) DECREASE LOWER
+
+Switching bounds: 3(1) UPPER DECREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  1
+  0 -1  1  2  0 -1  3
+  0 -2  0  1  0 -2 -6
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ LOWER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  1
+  0 -1  1  2  0 -1  3
+  0 -2  0  1  0 -2 -6
+	2(1) 0.0
+	0(0) 0.0
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PrimalSimplexSolver-DenseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+PrimalSimplexSolver-SparseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [B, B, L, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [4.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
+  1  0  1  1  1  0  4
+  0  1 -1 -2  0  1  1
+  0  0 -2 -3  0  0  0
+
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ LOWER
+		3.0 => 3(1) LOWER INCREASE
+==>> 3(1) LOWER INCREASE
+
+testPrimalExitRatio
+	1(1) 3.0 / -2.0 = 1.5
+	0(0) 4.0 / 1.0 = 4.0
+Bound switch!
+==>> -1(-1) INCREASE UPPER
+
+Switching bounds: 3(1) LOWER INCREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 1, partition [B, B, L, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [3.0, 3.0, 0.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 1]
+  1  0  1  1  1  0  3
+  0  1 -1 -2  0  1  3
+  0  0 -2 -3  0  0  0
+
+getPrimalEnterCandidate
+	2(0) -2.0 @ LOWER
+		2.0 => 2(0) LOWER INCREASE
+	3(1) -3.0 @ UPPER
+==>> 2(0) LOWER INCREASE
+
+testPrimalExitRatio
+	1(1) 1.0 / -1.0 = 1.0
+		1.0 => 1(1) INCREASE UPPER
+	0(0) 3.0 / 1.0 = 3.0
+==>> 1(1) INCREASE UPPER
+
+Pivoting: 1(1) INCREASE UPPER -> 2(0) LOWER INCREASE
+==>> Row: 1, Exit: 1, Column/Enter: 2.
+Cost=-2.0, Pivot1=-1.0, Pivot2=-1.0, RHS=3.0, Inf=0.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 2, partition [B, U, B, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [2.0, 4.0, 1.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  2
+  0 -1  1  2  0 -1  1
+  0 -2  0  1  0 -2 -6
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ UPPER
+		1.0 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+testPrimalExitRatio
+	2(1) 4.0 / 2.0 = 2.0
+	0(0) 2.0 / -1.0 = 2.0
+Bound switch!
+==>> -1(-1) DECREASE LOWER
+
+Switching bounds: 3(1) UPPER DECREASE
+==>> Column: 3.
+
+UNEXPLORED iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  1
+  0 -1  1  2  0 -1  3
+  0 -2  0  1  0 -2 -6
+
+getPrimalEnterCandidate
+	1(0) -2.0 @ UPPER
+	3(1) 1.0 @ LOWER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 3, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+  1  1  0 -1  1  1  1
+  0 -1  1  2  0 -1  3
+  0 -2  0  1  0 -2 -6
+	2(1) 0.0
+	0(0) 0.0
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PrimalSimplexSolver-SparseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+DualSimplexSolver-RevisedStore
+==================================================
+
+
+UNEXPLORED iteration 0, partition [B, B, U, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [-2.0, 8.0, 5.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 10.0
+!!! 0.0 < 8.0 < 4.0
+[0, 1]
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	0(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(0) -2.0 / -1.0 = 2.0
+		2.0 => 2(0) UPPER DECREASE
+	3(1) -3.0 / -2.0 = 1.5
+		1.5 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(1) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-3.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+OLD iter: 3(1) DECREASE -> 1(1) DECREASE
+Before recomputation:
+x: { 0.0, -2.0 }
+l: { 0.0, 0.0 }
+y: { 1.0, -2.0 }
+d: { -2.0, -3.0, 0.0, 0.0 }
+After computation:
+x: { 0.0, -2.0 }
+d: { -0.5, -1.5, 0.0, 0.0 }
+
+UNEXPLORED iteration 1, partition [B, U, U, B, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[0, 3]
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	0(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(0) -0.5 / 0.5 = 1.0
+		1.0 => 2(0) UPPER DECREASE
+	1(1) -1.5 / -0.5 = 1.7976931348623157E308
+==>> 2(0) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(0) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+OLD iter: 2(0) DECREASE -> 3(1) INCREASE
+Before recomputation:
+x: { 1.0, -2.0 }
+l: { 0.0, 1.5 }
+y: { 0.5, 0.5 }
+d: { -0.5, -1.5, 0.0, 0.0 }
+After computation:
+x: { 1.0, -2.0 }
+d: { 1.0, -2.0, 0.0, 0.0 }
+
+UNEXPLORED iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+	3(0) 1.0 @ LOWER
+	1(1) -2.0 @ UPPER
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+DualSimplexSolver-RevisedStore: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+DualSimplexSolver-DenseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [B, B, U, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [-2.0, 8.0, 5.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 10.0
+!!! 0.0 < 8.0 < 4.0
+[0, 1]
+  1  0  1  1  1  0 -2
+  0  1 -1 -2  0  1  8
+  0  0 -2 -3  0  0  0
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	0(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(0) -2.0 / -1.0 = 2.0
+		2.0 => 2(0) UPPER DECREASE
+	3(1) -3.0 / -2.0 = 1.5
+		1.5 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(1) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-3.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+
+UNEXPLORED iteration 1, partition [B, U, U, B, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[0, 3]
+    1  0.5  0.5    0    1  0.5    0
+    0 -0.5  0.5    1    0 -0.5   -2
+    0 -1.5 -0.5    0    0 -1.5  -12
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	0(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(0) -0.5 / 0.5 = 1.0
+		1.0 => 2(0) UPPER DECREASE
+	1(1) -1.5 / -0.5 = 1.7976931348623157E308
+==>> 2(0) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(0) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+
+UNEXPLORED iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+	3(0) 1.0 @ LOWER
+	1(1) -2.0 @ UPPER
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+DualSimplexSolver-DenseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+DualSimplexSolver-SparseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [B, B, U, U, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [-2.0, 8.0, 5.0, 1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 10.0
+!!! 0.0 < 8.0 < 4.0
+[0, 1]
+  1  0  1  1  1  0 -2
+  0  1 -1 -2  0  1  8
+  0  0 -2 -3  0  0  0
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	0(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(0) -2.0 / -1.0 = 2.0
+		2.0 => 2(0) UPPER DECREASE
+	3(1) -3.0 / -2.0 = 1.5
+		1.5 => 3(1) UPPER DECREASE
+==>> 3(1) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(1) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-3.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+
+UNEXPLORED iteration 1, partition [B, U, U, B, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[0, 3]
+    1  0.5  0.5    0    1  0.5    0
+    0 -0.5  0.5    1    0 -0.5   -2
+    0 -1.5 -0.5    0    0 -1.5  -12
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	0(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(0) -0.5 / 0.5 = 1.0
+		1.0 => 2(0) UPPER DECREASE
+	1(1) -1.5 / -0.5 = 1.7976931348623157E308
+==>> 2(0) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(0) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+
+UNEXPLORED iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 2, partition [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+	3(0) 1.0 @ LOWER
+	1(1) -2.0 @ UPPER
+
+-6.0 OPTIMAL [B, U, B, L, L, L]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+DualSimplexSolver-SparseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+PhasedSimplexSolver-RevisedStore
+==================================================
+
+
+UNEXPLORED iteration 0, partition [L, L, U, U, B, B]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 0.0, 5.0, 1.0, -2.0, 8.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 0.0
+!!! 0.0 < 8.0 < 0.0
+[4, 5]
+
+getDualExitCandidate
+	5(1) 8.0
+		8.0 => 5(1) DECREASE UPPER
+	4(0) -2.0
+==>> 5(1) DECREASE UPPER
+
+testDualEnterRatio
+	1(1) 1.0 / 1.0 = 1.0
+		1.0 => 1(1) LOWER INCREASE
+	2(2) -2.0 / -1.0 = 2.0
+	3(3) -3.0 / -2.0 = 1.5
+==>> 1(1) LOWER INCREASE
+
+Pivoting: 5(1) DECREASE UPPER -> 1(1) LOWER INCREASE
+==>> Row: 1, Exit: 5, Column/Enter: 1.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=8.0, Inf=8.0
+Shift Exit: 0.0, Enter: 0.0
+OLD iter: 1(1) INCREASE -> 5(1) DECREASE
+Before recomputation:
+x: { -2.0, 8.0 }
+l: { 0.0, 0.0 }
+y: { 0.0, 1.0 }
+d: { 1.0, 1.0, -2.0, -3.0 }
+After computation:
+x: { -2.0, 8.0 }
+d: { 1.0, -1.0, -1.0, -1.0 }
+
+UNEXPLORED iteration 1, partition [L, B, U, U, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 8.0, 5.0, 1.0, -2.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 8.0 < 4.0
+!!! 0.0 < -2.0 < 0.0
+[4, 1]
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	4(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(2) -1.0 / -1.0 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	3(3) -1.0 / -2.0 = 0.5
+		0.5 => 3(3) UPPER DECREASE
+==>> 3(3) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(3) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-1.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+OLD iter: 3(3) DECREASE -> 1(1) DECREASE
+Before recomputation:
+x: { 0.0, -2.0 }
+l: { 0.0, 1.0 }
+y: { 1.0, -2.0 }
+d: { 1.0, -1.0, -1.0, -1.0 }
+After computation:
+x: { 0.0, -2.0 }
+d: { 1.0, -1.5, -0.5, -0.5 }
+
+UNEXPLORED iteration 2, partition [L, U, U, B, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[4, 3]
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	4(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(2) -0.5 / 0.5 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	1(3) -0.5 / -0.5 = 1.7976931348623157E308
+==>> 2(2) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(2) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+OLD iter: 2(2) DECREASE -> 3(1) INCREASE
+Before recomputation:
+x: { 1.0, -2.0 }
+l: { 0.0, 1.5 }
+y: { 0.5, 0.5 }
+d: { 1.0, -1.5, -0.5, -0.5 }
+After computation:
+x: { 1.0, -2.0 }
+d: { 1.0, -2.0, 1.0, -1.0 }
+
+UNEXPLORED iteration 3, partition [L, U, B, L, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 3.0, 0.0, 1.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 1.0 < 0.0
+[4, 2]
+
+getDualExitCandidate
+	2(1) 0.0
+	4(0) 1.0
+		1.0 => 4(0) DECREASE UPPER
+==>> 4(0) DECREASE UPPER
+
+testDualEnterRatio
+	0(0) 1.0 / 1.0 = 1.0
+		1.0 => 0(0) LOWER INCREASE
+	3(2) 1.0 / -1.0 = 1.7976931348623157E308
+	1(3) -1.0 / 1.0 = 1.7976931348623157E308
+==>> 0(0) LOWER INCREASE
+
+Pivoting: 4(0) DECREASE UPPER -> 0(0) LOWER INCREASE
+==>> Row: 0, Exit: 4, Column/Enter: 0.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=1.0, Inf=1.0
+Shift Exit: 0.0, Enter: 0.0
+OLD iter: 0(0) INCREASE -> 4(0) DECREASE
+Before recomputation:
+x: { 1.0, -2.0 }
+l: { 0.0, 2.0 }
+y: { 1.0, -0.0 }
+d: { 1.0, -2.0, 1.0, -1.0 }
+After computation:
+x: { 1.0, -2.0 }
+d: { -1.0, -3.0, 2.0, -2.0 }
+
+UNEXPLORED iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+getPrimalEnterCandidate
+	3(2) 1.0 @ LOWER
+	1(3) -2.0 @ UPPER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+
+-6.0 OPTIMAL [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PhasedSimplexSolver-RevisedStore: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+PhasedSimplexSolver-DenseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [L, L, U, U, B, B]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 0.0, 5.0, 1.0, -2.0, 8.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 0.0
+!!! 0.0 < 8.0 < 0.0
+[4, 5]
+  1  0  1  1  1  0 -2
+  0  1 -1 -2  0  1  8
+  0  0 -2 -3  0  0  0
+  1  1 -2 -3  0  0 -5
+
+getDualExitCandidate
+	5(1) 8.0
+		8.0 => 5(1) DECREASE UPPER
+	4(0) -2.0
+==>> 5(1) DECREASE UPPER
+
+testDualEnterRatio
+	1(1) 1.0 / 1.0 = 1.0
+		1.0 => 1(1) LOWER INCREASE
+	2(2) -2.0 / -1.0 = 2.0
+	3(3) -3.0 / -2.0 = 1.5
+==>> 1(1) LOWER INCREASE
+
+Pivoting: 5(1) DECREASE UPPER -> 1(1) LOWER INCREASE
+==>> Row: 1, Exit: 5, Column/Enter: 1.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=8.0, Inf=8.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 1, partition [L, B, U, U, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 8.0, 5.0, 1.0, -2.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 8.0 < 4.0
+!!! 0.0 < -2.0 < 0.0
+[4, 1]
+   1   0   1   1   1   0  -2
+   0   1  -1  -2   0   1   8
+   0   0  -2  -3   0   0   0
+   1   0  -1  -1   0  -1 -13
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	4(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(2) -1.0 / -1.0 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	3(3) -1.0 / -2.0 = 0.5
+		0.5 => 3(3) UPPER DECREASE
+==>> 3(3) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(3) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-1.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+
+UNEXPLORED iteration 2, partition [L, U, U, B, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[4, 3]
+    1  0.5  0.5    0    1  0.5    0
+    0 -0.5  0.5    1    0 -0.5   -2
+    0 -1.5 -0.5    0    0 -1.5  -12
+    1 -0.5 -0.5    0    0 -1.5  -17
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	4(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(2) -0.5 / 0.5 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	1(3) -0.5 / -0.5 = 1.7976931348623157E308
+==>> 2(2) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(2) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+
+UNEXPLORED iteration 3, partition [L, U, B, L, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 3.0, 0.0, 1.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 1.0 < 0.0
+[4, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   1  -1   0   1   0  -2 -19
+
+getDualExitCandidate
+	2(1) 0.0
+	4(0) 1.0
+		1.0 => 4(0) DECREASE UPPER
+==>> 4(0) DECREASE UPPER
+
+testDualEnterRatio
+	0(0) 1.0 / 1.0 = 1.0
+		1.0 => 0(0) LOWER INCREASE
+	3(2) 1.0 / -1.0 = 1.7976931348623157E308
+	1(3) -1.0 / 1.0 = 1.7976931348623157E308
+==>> 0(0) LOWER INCREASE
+
+Pivoting: 4(0) DECREASE UPPER -> 0(0) LOWER INCREASE
+==>> Row: 0, Exit: 4, Column/Enter: 0.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=1.0, Inf=1.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   0  -2   0   2  -1  -3 -20
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   0  -2   0   2  -1  -3 -20
+
+getPrimalEnterCandidate
+	3(2) 1.0 @ LOWER
+	1(3) -2.0 @ UPPER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+
+-6.0 OPTIMAL [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PhasedSimplexSolver-DenseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+
+
+==================================================
+PhasedSimplexSolver-SparseTableau
+==================================================
+
+
+UNEXPLORED iteration 0, partition [L, L, U, U, B, B]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 0.0, 5.0, 1.0, -2.0, 8.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -2.0 < 0.0
+!!! 0.0 < 8.0 < 0.0
+[4, 5]
+  1  0  1  1  1  0 -2
+  0  1 -1 -2  0  1  8
+  0  0 -2 -3  0  0  0
+  1  1 -2 -3  0  0 -5
+
+getDualExitCandidate
+	5(1) 8.0
+		8.0 => 5(1) DECREASE UPPER
+	4(0) -2.0
+==>> 5(1) DECREASE UPPER
+
+testDualEnterRatio
+	1(1) 1.0 / 1.0 = 1.0
+		1.0 => 1(1) LOWER INCREASE
+	2(2) -2.0 / -1.0 = 2.0
+	3(3) -3.0 / -2.0 = 1.5
+==>> 1(1) LOWER INCREASE
+
+Pivoting: 5(1) DECREASE UPPER -> 1(1) LOWER INCREASE
+==>> Row: 1, Exit: 5, Column/Enter: 1.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=8.0, Inf=8.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 1, partition [L, B, U, U, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 8.0, 5.0, 1.0, -2.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 8.0 < 4.0
+!!! 0.0 < -2.0 < 0.0
+[4, 1]
+   1   0   1   1   1   0  -2
+   0   1  -1  -2   0   1   8
+   0   0  -2  -3   0   0   0
+   1   0  -1  -1   0  -1 -13
+
+getDualExitCandidate
+	1(1) 4.0
+		4.0 => 1(1) DECREASE UPPER
+	4(0) -2.0
+==>> 1(1) DECREASE UPPER
+
+testDualEnterRatio
+	2(2) -1.0 / -1.0 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	3(3) -1.0 / -2.0 = 0.5
+		0.5 => 3(3) UPPER DECREASE
+==>> 3(3) UPPER DECREASE
+
+Pivoting: 1(1) DECREASE UPPER -> 3(3) UPPER DECREASE
+==>> Row: 1, Exit: 1, Column/Enter: 3.
+Cost=-1.0, Pivot1=-2.0, Pivot2=-2.0, RHS=8.0, Inf=4.0
+Shift Exit: 0.0, Enter: 1.0
+
+UNEXPLORED iteration 2, partition [L, U, U, B, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 5.0, -1.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < -1.0 < 1.0
+[4, 3]
+    1  0.5  0.5    0    1  0.5    0
+    0 -0.5  0.5    1    0 -0.5   -2
+    0 -1.5 -0.5    0    0 -1.5  -12
+    1 -0.5 -0.5    0    0 -1.5  -17
+
+getDualExitCandidate
+	3(1) -1.0
+		1.0 => 3(1) INCREASE LOWER
+	4(0) 0.0
+==>> 3(1) INCREASE LOWER
+
+testDualEnterRatio
+	2(2) -0.5 / 0.5 = 1.0
+		1.0 => 2(2) UPPER DECREASE
+	1(3) -0.5 / -0.5 = 1.7976931348623157E308
+==>> 2(2) UPPER DECREASE
+
+Pivoting: 3(1) INCREASE LOWER -> 2(2) UPPER DECREASE
+==>> Row: 1, Exit: 3, Column/Enter: 2.
+Cost=-0.5, Pivot1=0.5, Pivot2=0.5, RHS=-2.0, Inf=-1.0
+Shift Exit: 1.0, Enter: 5.0
+
+UNEXPLORED iteration 3, partition [L, U, B, L, B, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [0.0, 4.0, 3.0, 0.0, 1.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+!!! 0.0 < 1.0 < 0.0
+[4, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   1  -1   0   1   0  -2 -19
+
+getDualExitCandidate
+	2(1) 0.0
+	4(0) 1.0
+		1.0 => 4(0) DECREASE UPPER
+==>> 4(0) DECREASE UPPER
+
+testDualEnterRatio
+	0(0) 1.0 / 1.0 = 1.0
+		1.0 => 0(0) LOWER INCREASE
+	3(2) 1.0 / -1.0 = 1.7976931348623157E308
+	1(3) -1.0 / 1.0 = 1.7976931348623157E308
+==>> 0(0) LOWER INCREASE
+
+Pivoting: 4(0) DECREASE UPPER -> 0(0) LOWER INCREASE
+==>> Row: 0, Exit: 4, Column/Enter: 0.
+Cost=1.0, Pivot1=1.0, Pivot2=1.0, RHS=1.0, Inf=1.0
+Shift Exit: 0.0, Enter: 0.0
+
+UNEXPLORED iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   0  -2   0   2  -1  -3 -20
+
+getDualExitCandidate
+	2(1) 0.0
+	0(0) 0.0
+==>> -1(-1) STAY BASIS
+
+FEASIBLE iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+   0  -2   0   2  -1  -3 -20
+
+getPrimalEnterCandidate
+	3(2) 1.0 @ LOWER
+	1(3) -2.0 @ UPPER
+==>> -1(-1) BASIS STAY
+
+OPTIMAL iteration 4, partition [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+[0, 2]
+   1   1   0  -1   1   1   1
+   0  -1   1   2   0  -1  -2
+   0  -2   0   1   0  -2 -14
+
+-6.0 OPTIMAL [B, U, B, L, U, U]
+LB: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ X: [1.0, 4.0, 3.0, 0.0, 0.0, 0.0]
+UB: [10.0, 4.0, 5.0, 1.0, 0.0, 0.0]
+
+PhasedSimplexSolver-SparseTableau: OPTIMAL -6.0 @ { 1.0, 4.0, 3.0, 0.0, 0.0, 0.0 }
+

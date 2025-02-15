@@ -625,6 +625,25 @@ public class RevisedSimplexSolverTest extends OptimisationLinearTests {
         RevisedSimplexSolverTest.doTestPhasedVariants(builder, expected);
     }
 
+    @Test
+    public void testCaseFromChat() {
+
+        Optimisation.Result expected = Optimisation.Result.of(9, Optimisation.State.OPTIMAL, 3, 0);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x1 = model.addVariable("x1").lower(0).weight(3);
+        Variable x2 = model.addVariable("x2").lower(0).weight(2);
+
+        model.addExpression().set(x1, -1).set(x2, 2).upper(4);
+        model.addExpression().set(x1, 2).set(x2, 1).lower(6);
+        model.addExpression().set(x1, 1).set(x2, 1).level(3);
+
+        RevisedSimplexSolverTest.doTestDualVariants(model, expected);
+
+        RevisedSimplexSolverTest.doTestPhasedVariants(model, expected);
+    }
+
     /**
      * Unbounded variables, and optimal solution with negative values
      *

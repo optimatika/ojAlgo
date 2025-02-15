@@ -125,6 +125,13 @@ final class RevisedStore extends SimplexStore {
         }
     }
 
+    private void updateDualVariables() {
+        R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
+        myInvBasis.btran(objective.rows(included), l);
+        this.doExclTranspMult(l, r);
+        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
+    }
+
     @Override
     protected void pivot(final IterDescr iteration) {
 
@@ -151,40 +158,44 @@ final class RevisedStore extends SimplexStore {
     @Override
     void calculateIteration() {
 
-        //        PhysicalStore<Double> x0 = x.copy();
-        //        PhysicalStore<Double> d0 = d.copy();
-
-        // Should be able to do something like
-        // x += y
-        // d += a
-        // ...and then move the setup/prepare/update outside of the loop
-
         R064Store objective = myPhase1Objective != null ? myPhase1Objective : myObjective;
 
         myInvBasis.btran(objective.rows(included), l);
-
-        this.doExclTranspMult(l, r);
-
-        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
-
         myInvBasis.ftran(myConstraintsRHS, x);
 
-        //        BasicLogger.debug();
-        //
-        //        BasicLogger.debug();
-        //        BasicLogger.debug("x before: {}", x0.asList());
-        //        BasicLogger.debug("Ratio primal: {} exit={}", iteration.ratioPrimal, iteration.exit.index);
-        //        BasicLogger.debug("y step: {}", y.asList());
-        //        BasicLogger.debug("z step: {}", z.asList());
-        //        BasicLogger.debug("l step: {}", l.asList());
-        //        BasicLogger.debug("x after: {}", x.asList());
-        //
-        //        BasicLogger.debug();
-        //        BasicLogger.debug("d before: {}", d0.asList());
-        //        BasicLogger.debug("Ratio dual: {} enter={}", iteration.ratioDual, iteration.enter.index);
-        //        BasicLogger.debug("a step: {}", a.asList());
-        //        BasicLogger.debug("r step: {}", r.asList());
-        //        BasicLogger.debug("d after: {}", d.asList());
+        // ProcessingService.INSTANCE.run(() -> myInvBasis.btran(objective.rows(included), l), () -> myInvBasis.ftran(myConstraintsRHS, x));
+
+        this.doExclTranspMult(l, r);
+        d.fillMatching(objective.rows(excluded), SUBTRACT, r);
+    }
+
+    @Override
+    void calculateIteration(final SimplexSolver.IterDescr iteration, final double shift) {
+
+        int exit = iteration.exit.index;
+        int enter = iteration.enter.index;
+
+        if (iteration.isBasisUpdate()) {
+            // For basis updates, we need to update both x and d
+
+            // Update reduced costs
+            double stepD = d.doubleValue(enter) / a.doubleValue(enter);
+            a.axpy(-stepD, d);
+            d.set(enter, -stepD);
+        }
+
+        if (shift == ZERO) {
+
+            double exitX = x.doubleValue(exit);
+            double enterY = y.doubleValue(exit);
+            double stepX = exitX / enterY;
+            y.axpy(-stepX, x);
+            x.set(exit, stepX);
+
+        } else {
+
+            myInvBasis.ftran(myConstraintsRHS, x);
+        }
     }
 
     @Override
@@ -334,6 +345,9 @@ final class RevisedStore extends SimplexStore {
 
     @Override
     Primitive1D sliceDualVariables() {
+
+        this.updateDualVariables(); // Add this line
+
         return new Primitive1D() {
 
             @Override

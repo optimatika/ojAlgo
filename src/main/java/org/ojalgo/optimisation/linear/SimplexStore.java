@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +36,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Options;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
+import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
@@ -183,6 +184,8 @@ abstract class SimplexStore {
     abstract void calculateDualDirection(ExitInfo exit);
 
     abstract void calculateIteration();
+
+    abstract void calculateIteration(IterDescr iteration, double shift);
 
     abstract void calculatePrimalDirection(EnterInfo enter);
 
@@ -398,11 +401,7 @@ abstract class SimplexStore {
     }
 
     final boolean isNegated(final int j) {
-        if (myUpperBounds[j] <= ZERO && myLowerBounds[j] < ZERO) {
-            return true;
-        } else {
-            return false;
-        }
+        return myUpperBounds[j] <= ZERO && myLowerBounds[j] < ZERO;
     }
 
     /**

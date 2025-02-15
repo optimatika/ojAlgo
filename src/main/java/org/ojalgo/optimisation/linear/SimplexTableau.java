@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_LARGEST;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +34,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.EnterInfo;
 import org.ojalgo.optimisation.linear.SimplexSolver.ExitInfo;
+import org.ojalgo.optimisation.linear.SimplexSolver.IterDescr;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
@@ -119,6 +119,11 @@ abstract class SimplexTableau extends SimplexStore implements Access2D<Double>, 
     @Override
     final void calculateIteration() {
         // With a tableau all calculations are continuously done when pivoting
+    }
+
+    @Override
+    void calculateIteration(final IterDescr iteration, final double shift) {
+        //
     }
 
     @Override

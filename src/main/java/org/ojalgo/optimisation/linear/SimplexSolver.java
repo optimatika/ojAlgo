@@ -210,8 +210,6 @@ abstract class SimplexSolver extends LinearSolver {
 
         final EnterInfo enter;
         final ExitInfo exit;
-        double ratioDual = MACHINE_LARGEST;
-        double ratioPrimal = MACHINE_LARGEST;
 
         IterDescr(final SimplexStore simplex) {
             super();
@@ -301,8 +299,6 @@ abstract class SimplexSolver extends LinearSolver {
         void reset() {
             exit.reset();
             enter.reset();
-            ratioPrimal = MACHINE_LARGEST;
-            ratioDual = MACHINE_LARGEST;
         }
 
         int row() {
@@ -685,7 +681,7 @@ abstract class SimplexSolver extends LinearSolver {
         }
     }
 
-    private void shift(final int column, final ColumnState state) {
+    private double shift(final int column, final ColumnState state) {
 
         double shift = ZERO;
         if (state == ColumnState.LOWER) {
@@ -699,6 +695,8 @@ abstract class SimplexSolver extends LinearSolver {
             mySolutionShift[column] += shift;
             myValueShift += mySimplex.getCost(column) * shift;
         }
+
+        return shift;
     }
 
     private Optimisation.Result solveUnconstrained() {
@@ -759,7 +757,7 @@ abstract class SimplexSolver extends LinearSolver {
         double ratio = ZERO;
         double scale = ONE;
 
-        iteration.ratioDual = Double.MAX_VALUE;
+        double iterationRatio = Double.MAX_VALUE;
         double iterationScale = MACHINE_LARGEST;
 
         int n = mySimplex.structure.countVariables();
@@ -804,8 +802,8 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, je, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioDual
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioDual, ratio)) {
+                    if (ratio < iterationRatio
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
 
                         enter.index = je;
                         enter.from = columnState;
@@ -815,7 +813,7 @@ abstract class SimplexSolver extends LinearSolver {
                             this.log(2, "{} => {}", ratio, enter);
                         }
 
-                        iteration.ratioDual = ratio;
+                        iterationRatio = ratio;
                         iterationScale = scale;
                     }
                 }
@@ -849,7 +847,7 @@ abstract class SimplexSolver extends LinearSolver {
         double ratio = ZERO;
         double scale = ONE;
 
-        iteration.ratioPrimal = range;
+        double iterationRatio = range;
         double iterationScale = MACHINE_LARGEST;
 
         int[] included = mySimplex.included;
@@ -878,8 +876,8 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioPrimal
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioPrimal, ratio)) {
+                    if (ratio < iterationRatio
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
 
                         exit.index = ji;
                         if (denom < ZERO) {
@@ -894,7 +892,7 @@ abstract class SimplexSolver extends LinearSolver {
                             this.log(2, "{} => {}", ratio, exit);
                         }
 
-                        iteration.ratioPrimal = ratio;
+                        iterationRatio = ratio;
                         iterationScale = scale;
                     }
 
@@ -915,8 +913,8 @@ abstract class SimplexSolver extends LinearSolver {
                         this.log(1, "{}({}) {} / {} = {}", j, ji, numer, denom, ratio);
                     }
 
-                    if (ratio < iteration.ratioPrimal
-                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iteration.ratioPrimal, ratio)) {
+                    if (ratio < iterationRatio
+                            || scale > iterationScale && PIVOT.isDifferent(iterationScale, scale) && !RATIO.isDifferent(iterationRatio, ratio)) {
 
                         exit.index = ji;
                         if (denom > ZERO) {
@@ -931,7 +929,7 @@ abstract class SimplexSolver extends LinearSolver {
                             this.log(2, "{} => {}", ratio, exit);
                         }
 
-                        iteration.ratioPrimal = ratio;
+                        iterationRatio = ratio;
                         iterationScale = scale;
                     }
 
@@ -942,7 +940,7 @@ abstract class SimplexSolver extends LinearSolver {
             }
         }
 
-        if (iteration.ratioPrimal >= range && Double.isFinite(iteration.ratioPrimal)) {
+        if (iterationRatio >= range && Double.isFinite(iterationRatio)) {
 
             if (this.isLogDebug()) {
                 this.log("Bound switch!");
@@ -972,11 +970,17 @@ abstract class SimplexSolver extends LinearSolver {
                 this.log("Shift Exit: {}, Enter: {}", mySolutionShift[iteration.exit.column()], mySolutionShift[iteration.enter.column()]);
             }
 
+            int exitCol = iteration.exit.column();
+            int enterCol = iteration.enter.column();
+
             mySimplex.pivot(iteration);
 
-            this.shift(iteration.enter.column(), iteration.exit.to);
+            double shift = this.shift(iteration.enter.column(), iteration.exit.to);
 
-            mySimplex.calculateIteration();
+            // mySimplex.calculateIteration();
+
+            // mySimplex.calculateIterationOld(iteration, exitCol, enterCol, shift);
+            mySimplex.calculateIteration(iteration, shift);
 
         } else if (iteration.isBoundSwitch()) {
 
@@ -1001,12 +1005,9 @@ abstract class SimplexSolver extends LinearSolver {
                 throw new IllegalStateException();
             }
 
-        } else {
-
-            if (this.isLogDebug()) {
-                this.log();
-                this.log("No update operation!");
-            }
+        } else if (this.isLogDebug()) {
+            this.log();
+            this.log("No update operation!");
         }
 
     }

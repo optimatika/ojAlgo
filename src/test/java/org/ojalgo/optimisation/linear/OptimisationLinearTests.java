@@ -58,7 +58,7 @@ abstract class OptimisationLinearTests {
                 opt.sparse = Boolean.TRUE;
             }));
 
-    static final List<Function<LinearStructure, SimplexStore>> STORE_FACTORIES = List.of(DenseTableau::new, RevisedStore::new, SparseTableau::new);
+    static final List<Function<LinearStructure, SimplexStore>> STORE_FACTORIES = List.of(RevisedStore::new, DenseTableau::new, SparseTableau::new);
 
     static final List<Function<LinearStructure, SimplexTableau>> TABLEAU_FACTORIES = List.of(DenseTableau::new, SparseTableau::new);
 
