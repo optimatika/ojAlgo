@@ -399,9 +399,21 @@ abstract class SimplexSolver extends LinearSolver {
 
         for (int i = 0; i < nbProbVars; i++) {
             Variable variable = freeVariables.get(i);
-            lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
-            upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
+            double lb = lowerBounds[i] = variable.getLowerLimit(false, NEGATIVE_INFINITY);
+            double ub = upperBounds[i] = variable.getUpperLimit(false, POSITIVE_INFINITY);
             structure.positivePartVariables[i] = model.indexOf(variable);
+
+            if (lb > ub) {
+                throw new IllegalStateException();
+            }
+
+            if (Double.isInfinite(lb) && Double.isInfinite(ub)) {
+                simplex.unbounded(i);
+            } else if (Math.abs(ub) < Math.abs(lb)) {
+                simplex.upper(i);
+            } else {
+                simplex.lower(i);
+            }
         }
 
         structure.setObjectiveAdjustmentFactor(objective.getAdjustmentFactor());
