@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Mutate1D;
 
 /**
@@ -63,37 +64,33 @@ final class PhasedSimplexSolver extends SimplexSolver {
         for (int je = 0, limit = excluded.length; je < limit; je++) {
             int j = excluded[je];
 
+            ColumnState state = simplex.getColumnState(j);
             double rc = simplex.getCost(j);
             double lb = simplex.getLowerBound(j);
             double ub = simplex.getUpperBound(j);
 
-            if (lb > ub) {
-                throw new IllegalStateException();
+            if (state == ColumnState.LOWER) {
+                if (rc > ZERO) {
+                    this.shift(j, lb, rc);
+                    phase1.set(j, rc);
+                } else {
+                    this.shift(j, lb, rc);
+                    phase1.set(j, Math.max(ONE, simplex.getReducedCost(je)));
+                }
+            } else if (state == ColumnState.UPPER) {
+                if (rc < ZERO) {
+                    this.shift(j, ub, rc);
+                    phase1.set(j, rc);
+                } else {
+                    this.shift(j, ub, rc);
+                    phase1.set(j, Math.min(NEG, simplex.getReducedCost(je)));
+                }
+
+            } else {
+
+                phase1.set(j, ZERO);
             }
 
-            if (rc > ZERO && Double.isFinite(lb)) {
-                simplex.lower(j);
-                this.shift(j, lb, rc);
-                phase1.set(j, rc);
-            } else if (rc < ZERO && Double.isFinite(ub)) {
-                simplex.upper(j);
-                this.shift(j, ub, rc);
-                phase1.set(j, rc);
-            } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
-                simplex.unbounded(j);
-                phase1.set(j, ZERO);
-            } else if (Math.abs(lb) <= Math.abs(ub)) {
-                simplex.lower(j);
-                this.shift(j, lb, rc);
-                phase1.set(j, Math.max(ONE, simplex.getReducedCost(je)));
-            } else if (Math.abs(lb) >= Math.abs(ub)) {
-                simplex.upper(j);
-                this.shift(j, ub, rc);
-                phase1.set(j, Math.min(NEG, simplex.getReducedCost(je)));
-            } else {
-                simplex.lower(j);
-                phase1.set(j, ONE);
-            }
         }
     }
 
