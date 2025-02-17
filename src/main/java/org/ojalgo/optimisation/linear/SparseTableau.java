@@ -218,7 +218,7 @@ final class SparseTableau extends SimplexTableau {
         for (int i = 0; i < upper.length; i++) {
             double bound = this.getUpperBound(upper[i]);
             if (bound != ZERO) {
-                retVal += bound * myObjective.doubleValue(lower[i]);
+                retVal += bound * myObjective.doubleValue(upper[i]);
             }
         }
 
