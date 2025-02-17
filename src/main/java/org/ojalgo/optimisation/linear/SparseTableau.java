@@ -184,17 +184,6 @@ final class SparseTableau extends SimplexTableau {
     }
 
     @Override
-    protected void shiftColumn(final int col, final double shift) {
-        super.shiftColumn(col, shift);
-        for (int i = 0; i < m; i++) {
-            double element = myBody[i].doubleValue(col);
-            if (element != ZERO) {
-                myRHS.add(i, -shift * element);
-            }
-        }
-    }
-
-    @Override
     void copyBasicSolution(final double[] solution) {
         for (int i = 0; i < included.length; i++) {
             solution[included[i]] = myRHS.doubleValue(i);

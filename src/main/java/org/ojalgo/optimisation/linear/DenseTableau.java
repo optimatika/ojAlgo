@@ -121,14 +121,6 @@ final class DenseTableau extends SimplexTableau {
     }
 
     @Override
-    protected void shiftColumn(final int col, final double shift) {
-        super.shiftColumn(col, shift);
-        for (int i = 0; i < m; i++) {
-            myTableau[i][n] -= shift * myTableau[i][col];
-        }
-    }
-
-    @Override
     void copyBasicSolution(final double[] solution) {
         for (int i = 0; i < included.length; i++) {
             solution[included[i]] = myTableau[i][n];

@@ -69,18 +69,14 @@ final class DualSimplexSolver extends SimplexSolver {
 
             if (rc > ZERO && Double.isFinite(lb)) {
                 simplex.lower(j);
-                this.shift(j, lb, rc);
             } else if (rc < ZERO && Double.isFinite(ub)) {
                 simplex.upper(j);
-                this.shift(j, ub, rc);
             } else if (!Double.isFinite(lb) && !Double.isFinite(ub)) {
                 simplex.unbounded(j);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
                 simplex.lower(j);
-                this.shift(j, lb, rc);
             } else if (Math.abs(lb) >= Math.abs(ub)) {
                 simplex.upper(j);
-                this.shift(j, ub, rc);
             } else {
                 simplex.lower(j);
             }

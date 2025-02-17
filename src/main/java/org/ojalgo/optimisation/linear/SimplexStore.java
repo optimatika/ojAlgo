@@ -176,11 +176,6 @@ abstract class SimplexStore {
         this.updateBasis(exit.index, exit.to, enter.index);
     }
 
-    protected void shiftColumn(final int col, final double shift) {
-        myLowerBounds[col] -= shift;
-        myUpperBounds[col] -= shift;
-    }
-
     abstract void calculateDualDirection(ExitInfo exit);
 
     abstract void calculateIteration();

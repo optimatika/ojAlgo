@@ -69,10 +69,8 @@ final class PrimalSimplexSolver extends SimplexSolver {
                 simplex.unbounded(j);
             } else if (Math.abs(lb) <= Math.abs(ub)) {
                 simplex.lower(j);
-                this.shift(j, lb, rc);
             } else if (Math.abs(lb) >= Math.abs(ub)) {
                 simplex.upper(j);
-                this.shift(j, ub, rc);
             } else {
                 simplex.lower(j);
             }

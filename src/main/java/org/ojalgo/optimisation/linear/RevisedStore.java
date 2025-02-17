@@ -145,13 +145,6 @@ final class RevisedStore extends SimplexStore {
     }
 
     @Override
-    protected void shiftColumn(final int col, final double shift) {
-        super.shiftColumn(col, shift);
-        myConstraintsBody.column(col).axpy(-shift, myConstraintsRHS);
-        myInvBasis.ftran(myConstraintsRHS, x);
-    }
-
-    @Override
     void calculateDualDirection(final ExitInfo exit) {
         this.doBodyRow(exit.index, a);
     }
