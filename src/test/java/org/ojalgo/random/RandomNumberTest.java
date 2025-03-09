@@ -247,7 +247,8 @@ public class RandomNumberTest extends RandomTests {
 
     @Test
     public void testErlang() {
-        // Erlang is a special case of the gamma where the count is an integer -- verify that this is true for current implementation.
+        // Erlang is a special case of the gamma where the count is an integer -- verify that this is true for
+        // current implementation.
         for (double theta = .01; theta <= 10.0; theta = theta * 10.0) {
             for (int i = 1; i < 10; i++) {
                 Erlang erl = new Erlang(i, theta);
@@ -362,8 +363,10 @@ public class RandomNumberTest extends RandomTests {
 
     @Test
     public void testNorm2() {
-        // Sample means differ from expectation by an amount greater than anticipated given the large samples. May be due to
-        // rounding error. For comparison, matlab's estimates for the mean of the normal for large samples tend to be
+        // Sample means differ from expectation by an amount greater than anticipated given the large samples.
+        // May be due to
+        // rounding error. For comparison, matlab's estimates for the mean of the normal for large samples
+        // tend to be
         // within 2 percent of the mean.
         this.testDist2(new Dist2Norm(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 1500000, .05);
     }
@@ -391,6 +394,7 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testSampledMean() {
 
         RandomNumber[] tmpRndNmbrs = { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(), new Geometric(), new Poisson(),
@@ -410,7 +414,8 @@ public class RandomNumberTest extends RandomTests {
             double tmpExpected = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpDistrValue : ONE;
             double tmpActual = PrimitiveScalar.isSmall(ONE, tmpDistrValue) ? tmpSampledValue : tmpQuotient;
 
-            //            BasicLogger.logDebug("Name={}: Value={} <=> Sampled={} == Quotient={}", tmpDistrName, tmpDistrValue, tmpSampledValue, tmpQuotient);
+            // BasicLogger.logDebug("Name={}: Value={} <=> Sampled={} == Quotient={}", tmpDistrName,
+            // tmpDistrValue, tmpSampledValue, tmpQuotient);
 
             TestUtils.assertEquals(tmpDistrName, tmpExpected, tmpActual, TENTH);
         }
@@ -444,12 +449,13 @@ public class RandomNumberTest extends RandomTests {
         RandomNumberTest.compareDistribution(new TDistribution.Degree5(), new TDistribution(FIVE), NumberContext.of(2));
         RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE), NumberContext.of(1));
 
-        //        RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
-        //        RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
-        //        RandomNumberTest.compareQuantile(new TDistribution.Degree3(), new TDistribution(THREE));
-        //        RandomNumberTest.compareQuantile(new TDistribution.Degree4(), new TDistribution(FOUR));
-        //        RandomNumberTest.compareQuantile(new TDistribution.Degree5(), new TDistribution(FIVE));
-        //        RandomNumberTest.compareQuantile(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+        // RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
+        // RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
+        // RandomNumberTest.compareQuantile(new TDistribution.Degree3(), new TDistribution(THREE));
+        // RandomNumberTest.compareQuantile(new TDistribution.Degree4(), new TDistribution(FOUR));
+        // RandomNumberTest.compareQuantile(new TDistribution.Degree5(), new TDistribution(FIVE));
+        // RandomNumberTest.compareQuantile(new TDistribution.DegreeInfinity(), new
+        // TDistribution(Double.MAX_VALUE));
     }
 
     @Test
@@ -486,7 +492,8 @@ public class RandomNumberTest extends RandomTests {
             for (double j = .01; j <= 100.0; j = j * 10) {
                 Weibull w0 = new Weibull(i, j);
                 Weibull w1 = new Weibull(i, j);
-                // There are analytic solutions available for mean and variance of Weibull, users will probably assume they're being used.
+                // There are analytic solutions available for mean and variance of Weibull, users will
+                // probably assume they're being used.
                 TestUtils.assertEquals("Weibull distribution's mean should be deterministic and precise.", w0.getExpected(), w1.getExpected());
                 TestUtils.assertEquals("Weibull distribution's variance should be deterministic and precise.", w0.getVariance(), w1.getVariance());
             }
@@ -514,13 +521,15 @@ public class RandomNumberTest extends RandomTests {
             for (double p1 = min[1]; p1 <= max[1]; p1 *= mult[1]) {
                 RandomNumber tmpDistribution = dist.getDist(p0, p1);
                 SampleSet tmpSamples = SampleSet.make(tmpDistribution, samples);
-                // Used to estimate an upper bound on how much the sample should deviate from the analytic expected value.
+                // Used to estimate an upper bound on how much the sample should deviate from the analytic
+                // expected value.
                 double stErr = SQRT.invoke(tmpDistribution.getVariance() / samples);
 
                 // Within 4 standard errors of the mean. False failures should be rare under this scheme.
                 TestUtils.assertEquals("Sample mean was " + tmpSamples.getMean() + ", distribution mean was " + tmpDistribution.getExpected() + ".",
                         tmpSamples.getMean(), tmpDistribution.getExpected(), 4.0 * stErr);
-                // Variance of variance is not always available or easy to obtain. accuracyBound is intended as a rough estimate.
+                // Variance of variance is not always available or easy to obtain. accuracyBound is intended
+                // as a rough estimate.
                 TestUtils.assertEquals(ONE, tmpSamples.getVariance() / tmpDistribution.getVariance(), accuracyBound);
             }
         }
