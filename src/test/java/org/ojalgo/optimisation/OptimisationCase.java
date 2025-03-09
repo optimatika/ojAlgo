@@ -3,7 +3,6 @@ package org.ojalgo.optimisation;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.Sense;
-import org.ojalgo.optimisation.linear.LinearSolver;
 
 public final class OptimisationCase {
 
@@ -27,7 +26,7 @@ public final class OptimisationCase {
     public Optimisation.Result assertResult() {
 
         if (DEBUG) {
-            model.options.debug(LinearSolver.class);
+            model.options.debug(Optimisation.Solver.class);
         }
 
         Optimisation.Result actual = sense.solve(model);

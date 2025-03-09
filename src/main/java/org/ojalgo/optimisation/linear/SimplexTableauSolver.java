@@ -249,10 +249,10 @@ final class SimplexTableauSolver extends LinearSolver {
             }
         }
 
-        //        BasicLogger.debug("varsPosLo: {}", varsPosLo);
-        //        BasicLogger.debug("varsPosUp: {}", varsPosUp);
-        //        BasicLogger.debug("varsNegLo: {}", varsNegLo);
-        //        BasicLogger.debug("varsNegUp: {}", varsNegUp);
+        // BasicLogger.debug("varsPosLo: {}", varsPosLo);
+        // BasicLogger.debug("varsPosUp: {}", varsPosUp);
+        // BasicLogger.debug("varsNegLo: {}", varsNegLo);
+        // BasicLogger.debug("varsNegUp: {}", varsNegUp);
 
         List<Expression> constraints = model.constraints().map(c -> c.compensate(fixedVariables)).collect(Collectors.toList());
 
@@ -340,7 +340,7 @@ final class SimplexTableauSolver extends LinearSolver {
             }
         }
 
-        //  BasicLogger.debug("objective", retVal);
+        // BasicLogger.debug("objective", retVal);
 
         int indCnstr = 0;
         int indSlack = baseIdSlackVars;
@@ -362,7 +362,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //  BasicLogger.debug("exprUpPos", retVal);
+        // BasicLogger.debug("exprUpPos", retVal);
 
         for (Expression expression : exprLoNeg) {
 
@@ -381,7 +381,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //  BasicLogger.debug("exprLoNeg", retVal);
+        // BasicLogger.debug("exprLoNeg", retVal);
 
         for (Variable variable : varsPosUp) {
 
@@ -398,7 +398,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //   BasicLogger.debug("varsUpPos", retVal);
+        // BasicLogger.debug("varsUpPos", retVal);
 
         for (Variable variable : varsNegLo) {
 
@@ -415,7 +415,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //   BasicLogger.debug("varsLoNeg", retVal);
+        // BasicLogger.debug("varsLoNeg", retVal);
 
         indSlack = baseSlackVars;
 
@@ -436,7 +436,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //   BasicLogger.debug("exprLoPos", retVal);
+        // BasicLogger.debug("exprLoPos", retVal);
 
         for (Expression expression : exprUpNeg) {
 
@@ -455,7 +455,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //   BasicLogger.debug("exprUpNeg", retVal);
+        // BasicLogger.debug("exprUpNeg", retVal);
 
         for (Variable variable : varsPosLo) {
 
@@ -472,7 +472,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //  BasicLogger.debug("varsLoPos", retVal);
+        // BasicLogger.debug("varsLoPos", retVal);
 
         for (Variable variable : varsNegUp) {
 
@@ -489,7 +489,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indSlack++;
         }
 
-        //  BasicLogger.debug("varsUpNeg", retVal);
+        // BasicLogger.debug("varsUpNeg", retVal);
 
         indSlack = Integer.MAX_VALUE;
 
@@ -508,7 +508,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indCnstr++;
         }
 
-        //  BasicLogger.debug("exprEqPos", retVal);
+        // BasicLogger.debug("exprEqPos", retVal);
 
         for (Expression expression : exprEqNeg) {
 
@@ -525,7 +525,7 @@ final class SimplexTableauSolver extends LinearSolver {
             indCnstr++;
         }
 
-        //   BasicLogger.debug("exprEqNeg", retVal);
+        // BasicLogger.debug("exprEqNeg", retVal);
 
         return retVal;
     }
@@ -1128,7 +1128,8 @@ final class SimplexTableauSolver extends LinearSolver {
         int constraintsCount = myTableau.m;
         for (int i = 0; i < constraintsCount; i++) {
 
-            // Numerator/RHS: Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
+            // Numerator/RHS: Should always be >=0.0, but very small numbers may "accidentally" get a negative
+            // sign.
             numer = Math.abs(myTableau.doubleValue(i, numerCol));
 
             // Denominator/Pivot

@@ -119,6 +119,13 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
         return myBE.doubleValue(row);
     }
 
+    /**
+     * Inequality constraints RHS: [AI][X] <= [BI]
+     */
+    public MatrixStore<N> getBI() {
+        return myBI;
+    }
+
     public double getBI(final int row) {
         return myBI.doubleValue(row);
     }
@@ -192,13 +199,6 @@ public final class ConvexData<N extends Comparable<N>> implements ExpressionsBas
 
     RowsSupplier<N> getAI(final int... rows) {
         return myAI.selectRows(rows);
-    }
-
-    /**
-     * Inequality constraints RHS: [AI][X] <= [BI]
-     */
-    MatrixStore<N> getBI() {
-        return myBI;
     }
 
     ConstraintsMetaData getConstraintsMetaData() {

@@ -96,7 +96,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
             tmpC = R064Store.FACTORY.copy(mtrxC);
         }
 
-        return new ConvexObjectiveFunction(tmpQ, tmpC);
+        return new ConvexObjectiveFunction<>(tmpQ, tmpC);
     }
 
     private final ConvexData<Double> myMatrices;
@@ -359,10 +359,10 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     protected boolean isSolvableQ() {
-        //        double max = Math.max(RELATIVELY_SMALL, mySolverQ.getRankThreshold());
-        //        int countVariables = this.countVariables();
-        //        int countSignificant = mySolverQ.countSignificant(max);
-        //        return countVariables == countSignificant;
+        // double max = Math.max(RELATIVELY_SMALL, mySolverQ.getRankThreshold());
+        // int countVariables = this.countVariables();
+        // int countSignificant = mySolverQ.countSignificant(max);
+        // return countVariables == countSignificant;
         return mySolverQ.isSolvable();
     }
 
@@ -384,13 +384,18 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     /**
-     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}. IF
-     * the LP was solved to optimality but the Q matrix (or the entire objective function) was disregarded
-     * then the returned state will just be {@link State#FEASIBLE}.
+     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}.
+     * IF the LP was solved to optimality but the Q matrix (or the entire objective function) was
+     * disregarded then the returned state will just be {@link State#FEASIBLE}.
      */
     protected Optimisation.Result solveLP() {
 
         Result resultLP = LinearSolver.solve(myMatrices, options, !myZeroQ);
+
+        if (this.isLogDebug()) {
+            this.log("LP solution: {}", resultLP);
+            this.log("LP duals: {}", resultLP.getMultipliers().get());
+        }
 
         if (!myZeroQ && resultLP.getState().isFeasible()) {
             return resultLP.withState(State.FEASIBLE);

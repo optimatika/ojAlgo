@@ -16,6 +16,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Minor performance refactoring to SimplexSolver.
+- Improved feasibility check for the QP `ActiveSetSolver`.
 
 ## [55.1.2] – 2025-02-08
 

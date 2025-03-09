@@ -160,7 +160,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             } else if (this.isLogProgress()) {
                 this.log("Do nothing because step length {} and size {} but add constraint {}", stepLength, normStepX, this.getConstraintToInclude());
             }
-            //  this.setConstraintToInclude(-1);
+            // this.setConstraintToInclude(-1);
 
         } else {
             // Zero solution
@@ -236,7 +236,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         int toExclude = lastIncluded;
         double maxWeight = ZERO;
-        // The weight is the absolute value of the cosine of the angle between the vectors (the constraint rows).
+        // The weight is the absolute value of the cosine of the angle between the vectors (the constraint
+        // rows).
         for (int i = 0; i < incl.length; i++) {
             aggregator.reset();
             SparseArray<Double> inclRow = this.getMatrixAI(incl[i]);
@@ -399,8 +400,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     /**
-     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to potentially
-     * deactivate.
+     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to
+     * potentially deactivate.
      */
     protected int suggestConstraintToExclude() {
 
@@ -467,7 +468,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     /**
      * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
-     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
+     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating
+     * it.
      */
     protected int suggestConstraintToInclude() {
         return this.getConstraintToInclude();
@@ -481,31 +483,40 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         boolean retVal = true;
 
+        MatrixStore<Double> mtrxBE = this.getMatrixBE();
+        MatrixStore<Double> mtrxBI = this.getMatrixBI();
+
         PhysicalStore<Double> slackE = this.getSlackE();
         PhysicalStore<Double> slackI = this.getSlackI();
 
-        if (retVal && slackE.count() > 0) {
+        int nbE = slackE.size();
+        if (retVal && nbE > 0) {
             if (this.isLogDebug()) {
                 this.log("E-slack: {}", slackE.asList());
             }
-            double largestE = slackE.aggregateAll(Aggregator.LARGEST);
-            if (!FEASIBILITY.isZero(largestE)) {
-                retVal = false;
-                if (this.isLogDebug()) {
-                    this.log("Nonzero E-slack! {}", largestE);
+            for (int i = 0; i < nbE; i++) {
+                double slack = slackE.doubleValue(i);
+                if (!FEASIBILITY.isSmall(mtrxBE.doubleValue(i), slack)) {
+                    retVal = false;
+                    if (this.isLogDebug()) {
+                        this.log("Nonzero E-slack! {}", slack);
+                    }
                 }
             }
         }
 
-        if (retVal && slackI.count() > 0) {
+        int nbI = slackI.size();
+        if (retVal && nbI > 0) {
             if (this.isLogDebug()) {
                 this.log("I-slack: {}", slackI.asList());
             }
-            double minimumI = slackI.aggregateAll(Aggregator.MINIMUM);
-            if (minimumI < ZERO && !FEASIBILITY.isZero(minimumI)) {
-                retVal = false;
-                if (this.isLogDebug()) {
-                    this.log("Negative I-slack! {}", minimumI);
+            for (int i = 0; i < nbI; i++) {
+                double slack = slackI.doubleValue(i);
+                if (slack < ZERO && !FEASIBILITY.isSmall(mtrxBI.doubleValue(i), slack)) {
+                    retVal = false;
+                    if (this.isLogDebug()) {
+                        this.log("Negative I-slack! {}", slack);
+                    }
                 }
             }
         }
@@ -567,12 +578,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationC() {
 
-        //          MatrixStore<Double> tmpQ = this.getQ();
-        //          MatrixStore<Double> tmpC = this.getC();
+        // MatrixStore<Double> tmpQ = this.getQ();
+        // MatrixStore<Double> tmpC = this.getC();
         //
-        //          PhysicalStore<Double> tmpX = this.getX();
+        // PhysicalStore<Double> tmpX = this.getX();
         //
-        //        return tmpC.subtract(tmpQ.multiply(tmpX));
+        // return tmpC.subtract(tmpQ.multiply(tmpX));
 
         return this.getMatrixC();
     }

@@ -1032,26 +1032,26 @@ abstract class SimplexSolver extends LinearSolver {
             double ub = mySimplex.getUpperBound(j);
 
             switch (state) {
-                case LOWER:
-                    if (rc < -epsilon) {
-                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                        retVal = false;
-                    }
-                    break;
+            case LOWER:
+                if (rc < -epsilon) {
+                    this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                    retVal = false;
+                }
+                break;
 
-                case UPPER:
-                    if (rc > epsilon) {
-                        this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
-                        retVal = false;
-                    }
-                    break;
+            case UPPER:
+                if (rc > epsilon) {
+                    this.log("!DF {}({}) {}, but {} and [{},{}]", j, je, state, rc, lb, ub);
+                    retVal = false;
+                }
+                break;
 
-                case UNBOUNDED:
-                    // No reduced cost constraints for unbounded variables
-                    break;
+            case UNBOUNDED:
+                // No reduced cost constraints for unbounded variables
+                break;
 
-                default:
-                    throw new IllegalStateException("Unexpected ColumnState for variable " + j + ": " + state);
+            default:
+                throw new IllegalStateException("Unexpected ColumnState for variable " + j + ": " + state);
             }
         }
 
