@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class OptimisationConvexTests {
 
-    static boolean DEBUG = false;
+    static boolean DEBUG = true;
 
     private static void assertDirectAndIterativeEquals(final ConvexData<Double> convexData, final NumberContext accuracy, Optimisation.Options options) {
 

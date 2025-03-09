@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -226,7 +225,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * @see https://github.com/optimatika/ojAlgo/issues/587
      */
     @Test
-    @Disabled
     public void testGitHub587() {
 
         RawStore mtrxQ = RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
@@ -256,6 +254,11 @@ public class ConvexProblems extends OptimisationConvexTests {
         // Convert to model to enable using its presolve and validation methods
         ExpressionsBasedModel model = OptimisationConvexTests.toModel(builder);
 
+        if (DEBUG) {
+            BasicLogger.debug("Original model");
+            BasicLogger.debug(model);
+        }
+
         // Verify that builder and model produce the same data
         ConvexData<Double> builderData = builder.getConvexData(R064Store.FACTORY);
         ConvexData<Double> modelData = ConvexSolver.copy(model, R064Store.FACTORY);
@@ -273,7 +276,11 @@ public class ConvexProblems extends OptimisationConvexTests {
             model.options.debug(Optimisation.Solver.class);
         }
         Optimisation.Result resultModel = model.minimise();
-
+        if (DEBUG) {
+            BasicLogger.debug("Simplified model");
+            BasicLogger.debug(model);
+            BasicLogger.debug(resultModel);
+        }
         // Verify that the current version model solution is valid (feasible)
         model.validate(resultModel, NumberContext.of(13), BasicLogger.DEBUG);
 
@@ -283,11 +290,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         Result resultBuilder = builder.build(model.options).solve();
 
         if (DEBUG) {
-            // Unfortunately this does not work
-            BasicLogger.debug(result53);
-            BasicLogger.debug(resultModel);
             BasicLogger.debug(resultBuilder);
-            // Problem when the LP solver looks for the initial feasible solution
         }
 
         // This is what fails!

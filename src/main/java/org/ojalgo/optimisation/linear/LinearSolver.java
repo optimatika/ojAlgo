@@ -820,7 +820,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {
 
-        boolean store = false;
+        boolean store = true;
 
         if (store) {
 
