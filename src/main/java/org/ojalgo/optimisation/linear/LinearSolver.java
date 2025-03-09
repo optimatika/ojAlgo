@@ -681,13 +681,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return modelVariableValues;
         }
 
-        public SimplexTableauSolver build(final ConvexData convexBuilder, final Optimisation.Options options) {
-
-            SimplexTableau tableau = SimplexTableauSolver.buildPrimal(convexBuilder, options, false);
-
-            return new SimplexTableauSolver(tableau, options);
-        }
-
         @Override
         public SimplexTableauSolver build(final ExpressionsBasedModel model) {
 
@@ -827,11 +820,24 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexData convex, final Optimisation.Options options, final boolean zeroC) {
 
-        int dualSize = SimplexTableauSolver.sizeOfDual(convex);
-        int primSize = SimplexTableauSolver.sizeOfPrimal(convex);
-        boolean dual = dualSize <= primSize;
+        boolean store = false;
 
-        return dual ? SimplexTableauSolver.doSolveDual(convex, options, zeroC) : SimplexTableauSolver.doSolvePrimal(convex, options, zeroC);
+        if (store) {
+
+            int dualSize = SimplexSolver.sizeOfDual(convex);
+            int primSize = SimplexSolver.sizeOfPrimal(convex);
+            boolean dual = dualSize <= primSize;
+
+            return dual ? SimplexSolver.doSolveConvexAsDual(convex, options, zeroC) : SimplexSolver.doSolveConvexAsPrimal(convex, options, zeroC);
+
+        } else {
+
+            int dualSize = SimplexTableauSolver.sizeOfDual(convex);
+            int primSize = SimplexTableauSolver.sizeOfPrimal(convex);
+            boolean dual = dualSize <= primSize;
+
+            return dual ? SimplexTableauSolver.doSolveConvexAsDual(convex, options, zeroC) : SimplexTableauSolver.doSolveConvexAsPrimal(convex, options, zeroC);
+        }
     }
 
     static LinearFunction<Double> toObjectiveFunction(final MatrixStore<Double> mtrxC) {

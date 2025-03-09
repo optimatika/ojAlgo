@@ -104,25 +104,39 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
         ConvexData<Double> convexData = ConvexSolver.copy(model, R064Store.FACTORY);
 
-        Result primResult = SimplexTableauSolver.doSolvePrimal(convexData, model.options, false);
-        Result dualResult = SimplexTableauSolver.doSolveDual(convexData, model.options, false);
+        Result primTablResult = SimplexTableauSolver.doSolveConvexAsPrimal(convexData, model.options, false);
+        Result dualTablResult = SimplexTableauSolver.doSolveConvexAsDual(convexData, model.options, false);
+        Result dualStoreResult = SimplexSolver.doSolveConvexAsDual(convexData, model.options, false);
+        Result primStoreResult = SimplexSolver.doSolveConvexAsPrimal(convexData, model.options, false);
 
         if (DEBUG) {
 
+            BasicLogger.debug();
+            BasicLogger.debug();
+
             BasicLogger.debug(model);
 
-            BasicLogger.debug("Model: {}", modResult);
-            BasicLogger.debug("Primal: {}", primResult);
-            BasicLogger.debug("Dual: {}", dualResult);
+            BasicLogger.debug("Model         : {}", modResult);
+            BasicLogger.debug("Primal Tableau: {}", primTablResult);
+            BasicLogger.debug("Dual   Tableau: {}", dualTablResult);
+            BasicLogger.debug("Primal   Store: {}", primStoreResult);
+            BasicLogger.debug("Dual     Store: {}", dualStoreResult);
 
-            BasicLogger.debug("Primal multipliers: {}", primResult.getMultipliers().get());
-            BasicLogger.debug("Dual multipliers: {}", dualResult.getMultipliers().get());
+            BasicLogger.debug("Primal Tableau multipliers: {}", primTablResult.getMultipliers().get());
+            BasicLogger.debug("Dual   Tableau multipliers: {}", dualTablResult.getMultipliers().get());
+            BasicLogger.debug("Primal   Store multipliers: {}", primStoreResult.getMultipliers().get());
+            BasicLogger.debug("Dual     Store multipliers: {}", dualStoreResult.getMultipliers().get());
         }
 
-        TestUtils.assertStateAndSolution(modResult, primResult);
-        TestUtils.assertStateAndSolution(modResult, dualResult);
+        TestUtils.assertStateAndSolution(modResult, primTablResult);
+        TestUtils.assertStateAndSolution(modResult, dualTablResult);
+        TestUtils.assertStateAndSolution(modResult, primStoreResult);
+        TestUtils.assertStateAndSolution(modResult, dualStoreResult);
 
-        TestUtils.assertResult(primResult, dualResult);
+        TestUtils.assertResult(primTablResult, dualTablResult);
+        TestUtils.assertResult(primStoreResult, dualStoreResult);
+        TestUtils.assertResult(primTablResult, primStoreResult);
+        TestUtils.assertResult(dualTablResult, dualStoreResult);
     }
 
     @AfterEach
@@ -369,6 +383,11 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
         Optimisation.Result primExpected = Optimisation.Result.of(optimalValue, State.OPTIMAL, 0.0, 7.0 / 6.0);
         Optimisation.Result dualExpected = Optimisation.Result.of(optimalValue, State.OPTIMAL, 2.0 / 3.0);
 
+        if (DEBUG) {
+            primModel.options.debug(LinearSolver.class);
+            dualModel.options.debug(LinearSolver.class);
+        }
+
         PrimalDualTest.assertResultAndFullSolution(primModel, Sense.MAX, primExpected, optimalSolution);
 
         PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);
@@ -392,12 +411,6 @@ public class PrimalDualTest extends OptimisationLinearTests implements ModelFile
 
             ExpressionsBasedModel.clearIntegrations();
             ExpressionsBasedModel.addIntegration(integration);
-
-            if (DEBUG) {
-                primModel.options.debug(LinearSolver.class);
-                dualModel.options.debug(LinearSolver.class);
-            }
-
             PrimalDualTest.assertResultAndFullSolution(primModel, Sense.MAX, primExpected, optimalSolution);
 
             PrimalDualTest.assertResultAndFullSolution(dualModel, Sense.MIN, dualExpected, optimalSolution);

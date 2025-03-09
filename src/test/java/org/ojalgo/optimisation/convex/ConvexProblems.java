@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -52,7 +53,6 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -89,7 +89,7 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -0.000012954723060403266, -0.0000070052245518771815, -0.000007477057858706954, 0.00011097998789484925, 0.0000013056146551724419,
                         0.0000005898510775862205, 0.00009143821659482758, 0.00004461044181034483, 0.00006761920797413792 } }));
 
-        //          MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances, BigMath.PI.multiply(BigMath.E));
+        // MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances, BigMath.PI.multiply(BigMath.E));
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
@@ -158,14 +158,15 @@ public class ConvexProblems extends OptimisationConvexTests {
         double expectedValue = partQ.multiply(HALF.doubleValue()).subtract(partC).doubleValue(0);
         Optimisation.Result expectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, expectedValue, expectedSolution);
 
-        ExpressionsBasedModel initialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
+        ExpressionsBasedModel initialisedModel = OptimisationConvexTests.buildModel(matrices, expectedSolution);
         if (DEBUG) {
             initialisedModel.options.debug(ConvexSolver.class);
             initialisedModel.options.validate = false;
         }
 
         TestUtils.assertTrue("Expected solution not ok!", initialisedModel.validate(expectedResult, modelValidationContext));
-        TestUtils.assertTrue("Expected solution not ok!", initialisedModel.validate(modelValidationContext)); // The expected solution is written to the variables
+        // The expected solution is written to the variables
+        TestUtils.assertTrue("Expected solution not ok!", initialisedModel.validate(modelValidationContext));
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(initialisedModel, modelValidationContext);
 
@@ -177,7 +178,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(expectedValue, initialisedModel.objective().evaluate(initialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(expectedValue, initialisedModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
-        ExpressionsBasedModel uninitialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
+        ExpressionsBasedModel uninitialisedModel = OptimisationConvexTests.buildModel(matrices, expectedSolution);
         // Clear initial variable values
         uninitialisedModel.getVariables().forEach(variable -> variable.setValue(null));
         if (DEBUG) {
@@ -209,52 +210,93 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * Build model, and initialise variable values to the expected solution (if not null)
+     * <p>
+     * Quadratic model that fail in package org.ojalgo.matrix.store, ojAlgo, version 54.0
+     * <p>
+     * v53: OPTIMAL -1.4162052484896982E24 @ { 1.406005993853654E-7, -7.895855702762938E-6, 714.3828764355712,
+     * 1.682976677491224E12, -6017.883736346659, 4605.691058549535 }
+     * <p>
+     * v54: INFEASIBLE 0.0 @ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+     * <p>
+     * EBM v55 (ojAlgo): OPTIMAL -1.4162052484896982E24 @ { 1.406006E-7, -0.0000078958557, 714.3828764356003,
+     * 1682976677491.224, -6017.883736346658, 4605.691058549564 }
+     * <p>
+     * EBM v55 (CPLEX): INFEASIBLE
+     *
+     * @see https://github.com/optimatika/ojAlgo/issues/587
      */
-    static ExpressionsBasedModel buildModel(final Access2D<?>[] matrices, final Access1D<?> expectedSolution) {
+    @Test
+    @Disabled
+    public void testGitHub587() {
 
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+        RawStore mtrxQ = RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
-        int tmpNumberOfVariables = matrices[3].size(); // c
+        RawStore mtrxC = RawStore.wrap(new double[][] { { -0.0 }, { -0.017249993519915588 }, { 108459.67947957986 }, { 1.6829766774912231E12 },
+                { 114537.26244584078 }, { 139520.20603565968 } });
 
-        for (int v = 0; v < tmpNumberOfVariables; v++) {
-            Variable tmpVariable = retVal.newVariable("X" + v);
-            if (expectedSolution != null) {
-                tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
-            }
-        }
-        if (matrices[0] != null && matrices[1] != null) {
-            for (int e = 0; e < matrices[0].countRows(); e++) {
-                Expression tmpExpression = retVal.newExpression("E" + e);
-                for (int v = 0; v < tmpNumberOfVariables; v++) {
-                    tmpExpression.set(v, matrices[0].get(e, v));
-                }
-                tmpExpression.level(matrices[1].doubleValue(e));
-            }
-        }
-        if (matrices[4] != null && matrices[5] != null) {
-            for (int i = 0; i < matrices[4].countRows(); i++) {
-                Expression tmpExpression = retVal.newExpression("I" + i);
-                for (int v = 0; v < tmpNumberOfVariables; v++) {
-                    tmpExpression.set(v, matrices[4].get(i, v));
-                }
-                tmpExpression.upper(matrices[5].doubleValue(i));
-            }
-        }
-        Expression tmpObjQ = retVal.newExpression("Q");
-        for (int r = 0; r < tmpNumberOfVariables; r++) {
-            for (int v = 0; v < tmpNumberOfVariables; v++) {
-                tmpObjQ.set(r, v, matrices[2].doubleValue(r, v));
-            }
-        }
-        tmpObjQ.weight(HALF);
-        Expression tmpObjC = retVal.newExpression("C");
-        for (int v = 0; v < tmpNumberOfVariables; v++) {
-            tmpObjC.set(v, matrices[3].doubleValue(v));
-        }
-        tmpObjC.weight(NEG);
+        RawStore mtrxAE = RawStore.wrap(new double[][] { { 1.0, 0.0, 0.0, -5.941854438982693E-13, 0.0, 0.0 },
+                { 0.0, 1.0, 0.0, 1.0244148343231408E-14, 0.0, 0.0 }, { -0.0, -0.0, 1.0, 3.0066278187986717E-9, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, -9.791261189309351E-9, 1.0, 0.0 }, { 0.0, 0.0, 0.0, -1.8266341604461006E-10, 0.0, 1.0 } });
 
-        return retVal;
+        RawStore mtrxBE = RawStore.wrap(
+                new double[][] { { -1.000000103584958 }, { 0.017232766886716062 }, { 5774.467373370047 }, { -22496.347961179275 }, { 4298.272789515592 } });
+
+        RawStore mtrxAI = RawStore.wrap(
+                new double[][] { { -1.0, -0.0, -0.0, -0.0, -0.0, -0.0 }, { -0.0, -1.0, -0.0, -0.0, -0.0, -0.0 }, { -1.0, -1.0, -0.0, -0.0, -0.0, -0.0 } });
+
+        RawStore mtrxBI = RawStore.wrap(new double[][] { { 0.0 }, { 0.017249993519915588 }, { 0.017248993519915587 } });
+
+        ConvexSolver.Builder builder = ConvexSolver.newBuilder().objective(mtrxQ, mtrxC).equalities(mtrxAE, mtrxBE).inequalities(mtrxAI, mtrxBI);
+
+        // Result when using ojAlgo v53
+        Result result53 = Result.parse(
+                "OPTIMAL -1.4162052484896982E24 @ { 1.406005993853654E-7, -7.895855702762938E-6, 714.3828764355712, 1.682976677491224E12, -6017.883736346659, 4605.691058549535 }");
+
+        // Convert to model to enable using its presolve and validation methods
+        ExpressionsBasedModel model = OptimisationConvexTests.toModel(builder);
+
+        // Verify that builder and model produce the same data
+        ConvexData<Double> builderData = builder.getConvexData(R064Store.FACTORY);
+        ConvexData<Double> modelData = ConvexSolver.copy(model, R064Store.FACTORY);
+        TestUtils.assertEquals(builderData.getObjective().quadratic(), modelData.getObjective().quadratic());
+        TestUtils.assertEquals(builderData.getObjective().linear(), modelData.getObjective().linear());
+        TestUtils.assertEquals(builderData.getAE().multiply(10000), modelData.getAE());
+        TestUtils.assertEquals(builderData.getBE().multiply(10000), modelData.getBE());
+        TestUtils.assertEquals(builderData.getAI(), modelData.getAI());
+        TestUtils.assertEquals(builderData.getBI(), modelData.getBI());
+
+        // Verify that the v53 solution is valid (feasible)
+        TestUtils.assertTrue(model.validate(result53, NumberContext.of(15), BasicLogger.DEBUG));
+
+        if (DEBUG) {
+            model.options.debug(Optimisation.Solver.class);
+        }
+        Optimisation.Result resultModel = model.minimise();
+
+        // Verify that the current version model solution is valid (feasible)
+        model.validate(resultModel, NumberContext.of(13), BasicLogger.DEBUG);
+
+        // Verify that the v53 and current version solutions are equal
+        TestUtils.assertStateAndSolution(result53, resultModel);
+
+        Result resultBuilder = builder.build(model.options).solve();
+
+        if (DEBUG) {
+            // Unfortunately this does not work
+            BasicLogger.debug(result53);
+            BasicLogger.debug(resultModel);
+            BasicLogger.debug(resultBuilder);
+            // Problem when the LP solver looks for the initial feasible solution
+        }
+
+        // This is what fails!
+
+        // Verify that the current version builder solution is valid (feasible)
+        model.validate(resultBuilder, NumberContext.of(13), BasicLogger.DEBUG);
+
+        // Verify that the v53 and current version solutions are equal
+        TestUtils.assertStateAndSolution(result53, resultBuilder);
     }
 
     /**
@@ -800,7 +842,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(retVal);
 
-        //   ActiveSetSolver tmpSolver = new ActiveSetSolver(tmpMatrices);
+        // ActiveSetSolver tmpSolver = new ActiveSetSolver(tmpMatrices);
         ConvexSolver tmpSolver = tmpBuilder.build();
 
         // Test that the matrices were input in the right order
@@ -1113,7 +1155,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null, null);
 
-        ExpressionsBasedModel model = ConvexProblems.buildModel(mtrxs, result);
+        ExpressionsBasedModel model = OptimisationConvexTests.buildModel(mtrxs, result);
 
         TestUtils.assertFalse(model.validate(result));
     }
@@ -1354,7 +1396,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // ... and check that the correctly defined problem does solve.
 
-        ConvexSolver correctSolver = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        Builder builder = ConvexSolver.newBuilder().objective(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        ConvexSolver correctSolver = builder.build();
 
         actual = correctSolver.solve();
 
@@ -1381,7 +1424,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null, null);
 
         // Solution obtained by CPLEX (via ojAlgo) 2021-09-04
-        // OPTIMAL 61.51948373172937 @ { -0.40000000035828, 0.12000000009385, -0.01960000190641, -2.45784999791179 }
+        // OPTIMAL 61.51948373172937 @ { -0.40000000035828, 0.12000000009385, -0.01960000190641,
+        // -2.45784999791179 }
 
         // Solution given in the original bug report
         Optimisation.Result expectedResult = Optimisation.Result.of(61.519484, State.OPTIMAL, -0.4, 0.12, -0.0196, -2.45785);
@@ -1396,6 +1440,12 @@ public class ConvexProblems extends OptimisationConvexTests {
         Optimisation.Result solverResult = solver.solve();
 
         TestUtils.assertStateAndSolution(expectedResult, solverResult);
+
+        // Test that converting to model produces the same result
+        ExpressionsBasedModel model = OptimisationConvexTests.toModel(builder);
+        Optimisation.Result modelResult = model.minimise();
+        TestUtils.assertResult(expectedResult, modelResult, NumberContext.of(8));
+        // End
     }
 
     /**
@@ -1423,9 +1473,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         ExpressionsBasedModel model2 = P20150720.buildModel2();
         ExpressionsBasedModel model3 = P20150720.buildModel3();
 
-        //        model1.options.debug(ConvexSolver.class);
-        //        model2.options.debug(ConvexSolver.class);
-        //        model3.options.debug(ConvexSolver.class);
+        // model1.options.debug(ConvexSolver.class);
+        // model2.options.debug(ConvexSolver.class);
+        // model3.options.debug(ConvexSolver.class);
 
         // The problem is with the ConvexSolver, and it is present without integer constraints
         model1.relax(true);
@@ -1522,7 +1572,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(Optimisation.State.UNBOUNDED, result.getState());
 
         solver = P20150809.buildModel(false, true);
-        result = solver.solve(); // Since it is now constrained, the solver should be able find an optimal solution
+        result = solver.solve(); // Since it is now constrained, the solver should be able find an optimal
+                                 // solution
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(boundedSolution, result, precision);
     }
@@ -1551,6 +1602,12 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateAndSolution(tmpExpectedResult, tmpResult);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
+
+        // Test that converting to model produces the same result
+        ExpressionsBasedModel model = OptimisationConvexTests.toModel(tmpBuilder);
+        Optimisation.Result modelResult = model.minimise();
+        TestUtils.assertResult(tmpExpectedResult, modelResult);
+        // End
     }
 
     /**
@@ -1589,7 +1646,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         RawStore AI2 = RawStore.wrap(source1);
         R064Store BI2 = R064Store.FACTORY.column(new double[] { 2 });
-        // Discovered that you got (fixed now) a problem if you modify a builder after it has been used to build a solver
+        // Discovered that you got (fixed now) a problem if you modify a builder after it has been used to
+        // build a solver
         myBuilderI.inequalities(AI2, BI2);
 
         ConvexSolver prob2 = myBuilderI.build();
@@ -1613,6 +1671,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      */
     @Test
     public void testP20200924() {
+
         RawStore C = RawStore.wrap(new double[][] { { -8 }, { -3 }, { -3 } });
         RawStore Q = RawStore.wrap(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
         RawStore AE = RawStore.wrap(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });

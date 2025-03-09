@@ -48,7 +48,6 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.RowView;
-import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Primitive2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -114,97 +113,6 @@ final class SimplexTableauSolver extends LinearSolver {
     private static final NumberContext PIVOT = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext RATIO = NumberContext.of(12, 8).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext WEIGHT = NumberContext.of(8, 10).withMode(RoundingMode.HALF_DOWN);
-
-    private static Optimisation.Result toConvexStateFromDual(final Optimisation.Result result, final ConvexData<Double> convex) {
-
-        int nbEqus = convex.countEqualityConstraints();
-        int nbInes = convex.countInequalityConstraints();
-
-        Access1D<?> multipliers = result.getMultipliers().get();
-
-        State retState = result.getState();
-        if (retState == State.UNBOUNDED) {
-            retState = State.INFEASIBLE;
-        } else if (!retState.isFeasible()) {
-            retState = State.UNBOUNDED;
-        }
-
-        double retValue = -result.getValue();
-
-        Primitive1D retSolution = new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return -multipliers.doubleValue(index);
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new IllegalArgumentException();
-            }
-
-            @Override
-            public int size() {
-                return multipliers.size();
-            }
-
-        };
-
-        Primitive1D retMultipliers = new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                if (index < nbEqus) {
-                    return result.doubleValue(index) - result.doubleValue(nbEqus + index);
-                } else {
-                    return result.doubleValue(nbEqus + index);
-                }
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new IllegalArgumentException();
-            }
-
-            @Override
-            public int size() {
-                return nbEqus + nbInes;
-            }
-
-        };
-
-        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
-
-        retVal.multipliers(retMultipliers);
-
-        return retVal;
-    }
-
-    private static Optimisation.Result toConvexStateFromPrimal(final Optimisation.Result result, final ConvexData<Double> convex) {
-
-        int nbVars = convex.countVariables();
-
-        Primitive1D solution = new Primitive1D() {
-
-            @Override
-            public double doubleValue(final int index) {
-                return result.doubleValue(index) - result.doubleValue(nbVars + index);
-            }
-
-            @Override
-            public void set(final int index, final double value) {
-                throw new IllegalArgumentException();
-            }
-
-            @Override
-            public int size() {
-                return nbVars;
-            }
-
-        };
-
-        return result.withSolution(solution);
-    }
 
     static <T extends SimplexTableau> T build(final ExpressionsBasedModel model, final Function<LinearStructure, T> factory) {
 
@@ -530,146 +438,203 @@ final class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
-    static SimplexTableau buildDual(final ConvexData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
+    static Optimisation.Result doSolveConvexAsDual(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
 
         int nbCvxVars = convex.countVariables();
         int nbCvxEqus = convex.countEqualityConstraints();
         int nbCvxInes = convex.countInequalityConstraints();
 
+        MatrixStore<Double> cvxC = convex.getObjective().getLinearFactors(true);
+        MatrixStore<Double> cvxBE = convex.getBE();
+        MatrixStore<Double> cvxBI = convex.getBI();
+
         LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxEqus + nbCvxInes, 0, 0, 0);
 
-        SimplexTableau retVal = SimplexTableau.newTableauFactory(options).apply(structure);
+        SimplexTableau tableau = SimplexTableau.newTableauFactory(options).apply(structure);
 
-        Primitive2D constraintsBody = retVal.constraintsBody();
-        Primitive1D constraintsRHS = retVal.constraintsRHS();
-        Primitive1D objective = retVal.objective();
-
-        MatrixStore<Double> convexC = convex.getObjective().getLinearFactors(true);
+        Primitive2D constrBody = tableau.constraintsBody();
+        Primitive1D constrRHS = tableau.constraintsRHS();
+        Primitive1D objective = tableau.objective();
 
         for (int i = 0; i < nbCvxVars; i++) {
-            double rhs = checkFeasibility ? ZERO : convexC.doubleValue(i);
+            double rhs = zeroC ? ZERO : cvxC.doubleValue(i);
             boolean neg = structure.negated(i, NumberContext.compare(rhs, ZERO) < 0);
-            constraintsRHS.set(i, neg ? -rhs : rhs);
+            constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        if (nbCvxEqus > 0) {
-            for (RowView<Double> rowAE : convex.getRowsAE()) {
-                int j = Math.toIntExact(rowAE.row());
+        for (RowView<Double> rowAE : convex.getRowsAE()) {
+            int j = Math.toIntExact(rowAE.row());
 
-                for (ElementView1D<Double, ?> element : rowAE.nonzeros()) {
-                    int i = Math.toIntExact(element.index());
+            double cost = cvxBE.doubleValue(j);
+            objective.set(j, cost);
+            objective.set(nbCvxEqus + j, -cost);
 
-                    boolean neg = structure.isConstraintNegated(i);
-
-                    double valE = element.doubleValue();
-                    constraintsBody.set(i, j, neg ? -valE : valE);
-                    constraintsBody.set(i, nbCvxEqus + j, neg ? valE : -valE);
-
-                }
-            }
-        }
-
-        if (nbCvxInes > 0) {
-            for (RowView<Double> rowAI : convex.getRowsAI()) {
-                int j = Math.toIntExact(rowAI.row());
-
-                for (ElementView1D<Double, ?> element : rowAI.nonzeros()) {
-                    int i = Math.toIntExact(element.index());
-
-                    double valI = element.doubleValue();
-                    constraintsBody.set(i, nbCvxEqus + nbCvxEqus + j, structure.isConstraintNegated(i) ? -valI : valI);
-                }
-            }
-        }
-
-        for (int j = 0; j < nbCvxEqus; j++) {
-            double valBE = convex.getBE(j);
-            objective.set(j, valBE);
-            objective.set(nbCvxEqus + j, -valBE);
-        }
-        for (int j = 0; j < nbCvxInes; j++) {
-            double valBI = convex.getBI(j);
-            objective.set(nbCvxEqus + nbCvxEqus + j, valBI);
-        }
-
-        return retVal;
-    }
-
-    static SimplexTableau buildPrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean checkFeasibility) {
-
-        int nbVars = convex.countVariables();
-        int nbEqus = convex.countEqualityConstraints();
-        int nbInes = convex.countInequalityConstraints();
-
-        LinearStructure structure = new LinearStructure(false, nbInes, nbEqus, nbVars + nbVars, 0, nbInes, 0);
-
-        SimplexTableau retVal = SimplexTableau.newTableauFactory(options).apply(structure);
-
-        Primitive2D constraintsBody = retVal.constraintsBody();
-        Primitive1D constraintsRHS = retVal.constraintsRHS();
-        Primitive1D objective = retVal.objective();
-
-        MatrixStore<Double> convexC = checkFeasibility ? R064Store.FACTORY.makeZero(convex.countVariables(), 1) : convex.getObjective().getLinearFactors(true);
-
-        for (int v = 0; v < nbVars; v++) {
-            double valC = convexC.doubleValue(v);
-            objective.set(v, -valC);
-            objective.set(nbVars + v, valC);
-        }
-
-        MatrixStore<Double> convexAE = convex.getAE();
-        MatrixStore<Double> convexBE = convex.getBE();
-
-        for (int i = 0; i < nbEqus; i++) {
-            double rhs = convexBE.doubleValue(i);
-
-            boolean neg = structure.negated(i, NumberContext.compare(rhs, ZERO) < 0);
-
-            for (int j = 0; j < nbVars; j++) {
-                double valA = convexAE.doubleValue(i, j);
-                constraintsBody.set(i, j, neg ? -valA : valA);
-                constraintsBody.set(i, nbVars + j, neg ? valA : -valA);
-            }
-            constraintsRHS.set(i, neg ? -rhs : rhs);
+            rowAE.nonzeros().forEach(nz -> {
+                int i = Math.toIntExact(nz.index());
+                boolean neg = structure.isConstraintNegated(i);
+                double valAE = nz.doubleValue();
+                constrBody.set(i, j, neg ? -valAE : valAE);
+                constrBody.set(i, nbCvxEqus + j, neg ? valAE : -valAE);
+            });
         }
 
         for (RowView<Double> rowAI : convex.getRowsAI()) {
+            int j = Math.toIntExact(rowAI.row());
 
-            int r = Math.toIntExact(rowAI.row());
+            double cost = cvxBI.doubleValue(j);
+            objective.set(nbCvxEqus + nbCvxEqus + j, cost);
 
-            double rhs = convex.getBI(r);
-
-            boolean neg = structure.negated(nbEqus + r, NumberContext.compare(rhs, ZERO) < 0);
-
-            rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            rowAI.nonzeros().forEach(nz -> constraintsBody.set(nbEqus + r, nbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
-            constraintsBody.set(nbEqus + r, nbVars + nbVars + r, neg ? NEG : ONE);
-            constraintsRHS.set(nbEqus + r, neg ? -rhs : rhs);
+            rowAI.nonzeros().forEach(nz -> {
+                int i = Math.toIntExact(nz.index());
+                boolean neg = structure.isConstraintNegated(i);
+                double valAI = nz.doubleValue();
+                constrBody.set(i, nbCvxEqus + nbCvxEqus + j, neg ? -valAI : valAI);
+            });
         }
-
-        return retVal;
-    }
-
-    static Optimisation.Result doSolveDual(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
-
-        SimplexTableau tableau = SimplexTableauSolver.buildDual(convex, options, zeroC);
 
         SimplexTableauSolver solver = new SimplexTableauSolver(tableau, options);
 
         Result result = solver.solve();
+        Access1D<?> multiplierNumbers = result.getMultipliers().get();
 
-        return SimplexTableauSolver.toConvexStateFromDual(result, convex);
+        State retState = result.getState();
+        if (retState == State.UNBOUNDED) {
+            retState = State.INFEASIBLE;
+        } else if (!retState.isFeasible()) {
+            retState = State.UNBOUNDED;
+        }
+
+        double retValue = -result.getValue();
+
+        Primitive1D retSolution = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return -multiplierNumbers.doubleValue(index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return multiplierNumbers.size();
+            }
+
+        };
+
+        Primitive1D retMultipliers = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                if (index < nbCvxEqus) {
+                    return result.doubleValue(index) - result.doubleValue(nbCvxEqus + index);
+                } else {
+                    return result.doubleValue(nbCvxEqus + index);
+                }
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbCvxEqus + nbCvxInes;
+            }
+
+        };
+
+        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
+        retVal.multipliers(retMultipliers);
+        return retVal;
     }
 
-    static Optimisation.Result doSolvePrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
+    static Optimisation.Result doSolveConvexAsPrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
 
-        SimplexTableau tableau = SimplexTableauSolver.buildPrimal(convex, options, zeroC);
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
+
+        MatrixStore<Double> cvxC = convex.getObjective().getLinearFactors(true);
+        MatrixStore<Double> cvxBE = convex.getBE();
+        MatrixStore<Double> cvxBI = convex.getBI();
+
+        LinearStructure structure = new LinearStructure(false, nbCvxInes, nbCvxEqus, nbCvxVars + nbCvxVars, 0, nbCvxInes, 0);
+
+        SimplexTableau tableau = SimplexTableau.newTableauFactory(options).apply(structure);
+
+        Primitive2D constrBody = tableau.constraintsBody();
+        Primitive1D constrRHS = tableau.constraintsRHS();
+        Primitive1D objective = tableau.objective();
+
+        if (!zeroC) {
+            for (int j = 0; j < nbCvxVars; j++) {
+                double cost = cvxC.doubleValue(j);
+                objective.set(j, -cost);
+                objective.set(nbCvxVars + j, cost);
+            }
+        }
+
+        for (RowView<Double> rowAE : convex.getRowsAE()) {
+            int i = Math.toIntExact(rowAE.row());
+
+            double rhs = cvxBE.doubleValue(i);
+            boolean neg = structure.negated(i, NumberContext.compare(rhs, ZERO) < 0);
+
+            rowAE.nonzeros().forEach(nz -> constrBody.set(i, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            rowAE.nonzeros().forEach(nz -> constrBody.set(i, nbCvxVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            constrRHS.set(i, neg ? -rhs : rhs);
+        }
+
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
+            int i = Math.toIntExact(rowAI.row());
+
+            double rhs = cvxBI.doubleValue(i);
+            boolean neg = structure.negated(nbCvxEqus + i, NumberContext.compare(rhs, ZERO) < 0);
+
+            rowAI.nonzeros().forEach(nz -> constrBody.set(nbCvxEqus + i, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(nbCvxEqus + i, nbCvxVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            constrBody.set(nbCvxEqus + i, nbCvxVars + nbCvxVars + i, neg ? NEG : ONE);
+            constrRHS.set(nbCvxEqus + i, neg ? -rhs : rhs);
+        }
 
         LinearSolver solver = new SimplexTableauSolver(tableau, options);
 
         Result result = solver.solve();
+        Access1D<?> multiplierNumbers = result.getMultipliers().get();
 
-        return SimplexTableauSolver.toConvexStateFromPrimal(result, convex);
+        State retState = result.getState();
+
+        double retValue = result.getValue();
+
+        Primitive1D retSolution = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return result.doubleValue(index) - result.doubleValue(nbCvxVars + index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbCvxVars;
+            }
+
+        };
+
+        Access1D<?> retMultipliers = multiplierNumbers;
+
+        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
+        retVal.multipliers(retMultipliers);
+        return retVal;
     }
 
     static void set(final ExpressionsBasedModel model, final Primitive2D constraintsBdy, final int indCnstr, final int basePosVars, final int baseNegVars,

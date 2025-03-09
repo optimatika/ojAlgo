@@ -33,16 +33,20 @@ import java.util.function.Function;
 
 import org.ojalgo.array.operation.IndexOf;
 import org.ojalgo.equation.Equation;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexData;
 import org.ojalgo.optimisation.linear.SimplexStore.ColumnState;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.RowView;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Primitive1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -408,6 +412,238 @@ abstract class SimplexSolver extends LinearSolver {
         }
 
         return simplex;
+    }
+
+    static Optimisation.Result doSolveConvexAsDual(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
+
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
+
+        MatrixStore<Double> cvxC = convex.getObjective().getLinearFactors(true);
+        MatrixStore<Double> cvxBE = convex.getBE();
+        MatrixStore<Double> cvxBI = convex.getBI();
+
+        LinearStructure structure = new LinearStructure(false, 0, nbCvxVars, nbCvxEqus + nbCvxInes, 0, 0, 0);
+
+        SimplexStore store = SimplexStore.newStoreFactory(options).apply(structure);
+
+        double[] lb = store.getLowerBounds();
+        double[] ub = store.getUpperBounds();
+        for (int j = 0; j < nbCvxEqus; j++) {
+            lb[j] = NEGATIVE_INFINITY;
+            ub[j] = POSITIVE_INFINITY;
+        }
+        for (int j = 0; j < nbCvxInes; j++) {
+            lb[nbCvxEqus + j] = ZERO;
+            ub[nbCvxEqus + j] = POSITIVE_INFINITY;
+        }
+
+        Mutate2D constrBody = store.constraintsBody();
+        Mutate1D constrRHS = store.constraintsRHS();
+        Mutate1D objective = store.objective();
+
+        for (int i = 0; i < nbCvxVars; i++) {
+            constrRHS.set(i, zeroC ? ZERO : cvxC.doubleValue(i));
+        }
+
+        for (RowView<Double> rowAE : convex.getRowsAE()) {
+            objective.set(rowAE.row(), cvxBE.doubleValue(rowAE.row()));
+            rowAE.nonzeros().forEach(nz -> constrBody.set(nz.index(), rowAE.row(), nz.doubleValue()));
+        }
+
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
+            objective.set(nbCvxEqus + rowAI.row(), cvxBI.doubleValue(rowAI.row()));
+            rowAI.nonzeros().forEach(nz -> constrBody.set(nz.index(), nbCvxEqus + rowAI.row(), nz.doubleValue()));
+        }
+
+        LinearSolver solver = store.newPhasedSimplexSolver(options);
+
+        Result result = solver.solve();
+        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+
+        State retState = result.getState();
+        if (retState == State.UNBOUNDED) {
+            retState = State.INFEASIBLE;
+        } else if (!retState.isFeasible()) {
+            retState = State.UNBOUNDED;
+        }
+
+        double retValue = -result.getValue();
+
+        Primitive1D retSolution = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return -multiplierNumbers.doubleValue(index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return multiplierNumbers.size();
+            }
+
+        };
+
+        Primitive1D retMultipliers = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+
+                return result.doubleValue(index);
+
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbCvxEqus + nbCvxInes;
+            }
+
+        };
+
+        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
+        retVal.multipliers(retMultipliers);
+        return retVal;
+    }
+
+    static Optimisation.Result doSolveConvexAsPrimal(final ConvexData<Double> convex, final Optimisation.Options options, final boolean zeroC) {
+
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
+
+        MatrixStore<Double> cvxC = convex.getObjective().getLinearFactors(true);
+        MatrixStore<Double> cvxBE = convex.getBE();
+        MatrixStore<Double> cvxBI = convex.getBI();
+
+        LinearStructure structure = new LinearStructure(false, nbCvxInes, nbCvxEqus, nbCvxVars, 0, 0, nbCvxInes);
+
+        SimplexStore store = SimplexStore.newStoreFactory(options).apply(structure);
+
+        double[] lb = store.getLowerBounds();
+        double[] ub = store.getUpperBounds();
+        for (int j = 0; j < nbCvxVars; j++) {
+            lb[j] = NEGATIVE_INFINITY;
+            ub[j] = POSITIVE_INFINITY;
+        }
+        for (int j = 0; j < nbCvxInes; j++) {
+            lb[nbCvxVars + j] = ZERO;
+            ub[nbCvxVars + j] = POSITIVE_INFINITY;
+        }
+        for (int j = 0; j < structure.nbArti; j++) {
+            lb[nbCvxVars + nbCvxInes + j] = ZERO;
+            ub[nbCvxVars + nbCvxInes + j] = ZERO;
+        }
+
+        Mutate2D constrBody = store.constraintsBody();
+        Mutate1D constrRHS = store.constraintsRHS();
+        Mutate1D objective = store.objective();
+
+        if (!zeroC) {
+            for (int j = 0; j < nbCvxVars; j++) {
+                objective.set(j, -cvxC.doubleValue(j));
+            }
+        }
+
+        for (RowView<Double> rowAI : convex.getRowsAI()) {
+            rowAI.nonzeros().forEach(nz -> constrBody.set(rowAI.row(), nz.index(), nz.doubleValue()));
+            constrBody.set(rowAI.row(), nbCvxVars + rowAI.row(), ONE);
+            constrRHS.set(rowAI.row(), cvxBI.doubleValue(rowAI.row()));
+        }
+
+        for (RowView<Double> rowAE : convex.getRowsAE()) {
+            rowAE.nonzeros().forEach(nz -> constrBody.set(nbCvxInes + rowAE.row(), nz.index(), nz.doubleValue()));
+            constrRHS.set(nbCvxInes + rowAE.row(), cvxBE.doubleValue(rowAE.row()));
+        }
+
+        LinearSolver solver = store.newPhasedSimplexSolver(options);
+
+        Result result = solver.solve();
+        Access1D<?> multiplierNumbers = result.getMultipliers().get();
+
+        State retState = result.getState();
+
+        double retValue = result.getValue();
+
+        Primitive1D retSolution = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                return result.doubleValue(index);
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbCvxVars;
+            }
+
+        };
+
+        Primitive1D retMultipliers = new Primitive1D() {
+
+            @Override
+            public double doubleValue(final int index) {
+                if (index < nbCvxEqus) {
+                    return multiplierNumbers.doubleValue(nbCvxInes + index);
+                } else {
+                    return multiplierNumbers.doubleValue(index - nbCvxEqus);
+                }
+            }
+
+            @Override
+            public void set(final int index, final double value) {
+                throw new IllegalArgumentException();
+            }
+
+            @Override
+            public int size() {
+                return nbCvxEqus + nbCvxInes;
+            }
+
+        };
+
+        Optimisation.Result retVal = new Optimisation.Result(retState, retValue, retSolution);
+        retVal.multipliers(retMultipliers);
+        return retVal;
+    }
+
+    static int sizeOfDual(final ConvexData<?> convex) {
+
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
+
+        int nbLinEqus = nbCvxVars;
+        int nbLinVars = nbCvxEqus + nbCvxInes + nbLinEqus;
+
+        return (nbLinEqus + 2) * (nbLinVars + 1);
+    }
+
+    static int sizeOfPrimal(final ConvexData<?> convex) {
+
+        int nbCvxVars = convex.countVariables();
+        int nbCvxEqus = convex.countEqualityConstraints();
+        int nbCvxInes = convex.countInequalityConstraints();
+
+        int nbLinEqus = nbCvxEqus + nbCvxInes;
+        int nbLinVars = nbCvxVars + nbLinEqus;
+
+        return (nbLinEqus + 2) * (nbLinVars + 1);
     }
 
     private final SimplexStore mySimplex;
