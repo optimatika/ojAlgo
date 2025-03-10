@@ -47,10 +47,10 @@ public class CaseLDL extends MatrixDecompositionTests {
         TestUtils.assertEquals(mtrxA, reconstructed);
 
         // TODO Change to new RawLDL() when it's done
-        LDL<Double> rawLDL = new LDLDecomposition.R064();
+        LDL<Double> rawLDL = new DenseLDL.R064();
         rawLDL.decompose(mtrxA);
 
-        LDL<Double> primLDL = new LDLDecomposition.R064();
+        LDL<Double> primLDL = new DenseLDL.R064();
         primLDL.decompose(mtrxA.triangular(false, false));
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -113,7 +113,7 @@ public class CaseLDL extends MatrixDecompositionTests {
     }
 
     private static boolean hasNegativeEigenvalue(MatrixStore<Double> mtrxA) {
-        Eigenvalue<Double> EVD = EigenvalueDecomposition.R064.make(mtrxA);
+        Eigenvalue<Double> EVD = DenseEigenvalue.R064.make(mtrxA);
         EVD.decompose(mtrxA);
         if (!EVD.isHermitian()) {
             //            This test was to sensitive

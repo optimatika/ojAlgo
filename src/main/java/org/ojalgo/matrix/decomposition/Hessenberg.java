@@ -46,15 +46,15 @@ public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition
 
     }
 
-    Factory<ComplexNumber> C128 = typical -> new HessenbergDecomposition.C128();
+    Factory<ComplexNumber> C128 = typical -> new DenseHessenberg.C128();
 
-    Factory<Quaternion> H256 = typical -> new HessenbergDecomposition.H256();
+    Factory<Quaternion> H256 = typical -> new DenseHessenberg.H256();
 
-    Factory<RationalNumber> Q128 = typical -> new HessenbergDecomposition.Q128();
+    Factory<RationalNumber> Q128 = typical -> new DenseHessenberg.Q128();
 
-    Factory<Double> R064 = typical -> new HessenbergDecomposition.R064();
+    Factory<Double> R064 = typical -> new DenseHessenberg.R064();
 
-    Factory<Quadruple> R128 = typical -> new HessenbergDecomposition.R128();
+    Factory<Quadruple> R128 = typical -> new DenseHessenberg.R128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
 

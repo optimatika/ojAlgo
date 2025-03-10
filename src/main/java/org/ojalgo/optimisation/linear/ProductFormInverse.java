@@ -249,7 +249,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         double diagonalElement = myWork.doubleValue(col);
 
         if (Math.abs(diagonalElement) >= myScalingThreshold
-                && Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue() >= myScalingThreshold) {
+                && (Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue()) >= myScalingThreshold) {
             myFactors.add(this.newFactor(myWork, col, diagonalElement));
         } else {
             this.clearFactors();

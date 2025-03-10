@@ -142,8 +142,4 @@ final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N>
         return myRowFirst <= row && myColFirst <= col && row < myRowLimit && col < myColLimit;
     }
 
-    private boolean isCovered(final long row, final long col) {
-        return this.isCovered(Math.toIntExact(row), Math.toIntExact(col));
-    }
-
 }

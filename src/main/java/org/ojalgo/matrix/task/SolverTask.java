@@ -177,22 +177,20 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
                     } else {
                         return positiveDefinite ? Cholesky.R064.make(templateBody) : LU.R064.make(templateBody);
                     }
+                } else if (!vectorRHS) {
+                    return LU.R064.make(templateBody);
+                } else if (nbCols == 1L) {
+                    return AbstractSolver.FULL_1X1;
+                } else if (nbCols == 2L) {
+                    return AbstractSolver.FULL_2X2;
+                } else if (nbCols == 3L) {
+                    return AbstractSolver.FULL_3X3;
+                } else if (nbCols == 4L) {
+                    return AbstractSolver.FULL_4X4;
+                } else if (nbCols == 5L) {
+                    return AbstractSolver.FULL_5X5;
                 } else {
-                    if (!vectorRHS) {
-                        return LU.R064.make(templateBody);
-                    } else if (nbCols == 1L) {
-                        return AbstractSolver.FULL_1X1;
-                    } else if (nbCols == 2L) {
-                        return AbstractSolver.FULL_2X2;
-                    } else if (nbCols == 3L) {
-                        return AbstractSolver.FULL_3X3;
-                    } else if (nbCols == 4L) {
-                        return AbstractSolver.FULL_4X4;
-                    } else if (nbCols == 5L) {
-                        return AbstractSolver.FULL_5X5;
-                    } else {
-                        return LU.R064.make(templateBody);
-                    }
+                    return LU.R064.make(templateBody);
                 }
             } else if (!templateBody.isTall()) {
                 return SingularValue.R064.make(templateBody);
@@ -225,36 +223,7 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
     };
 
-    default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
-
-        Structure2D templateBody = new Structure2D() {
-
-            @Override
-            public int getColDim() {
-                return numberOfVariables;
-            }
-
-            @Override
-            public int getRowDim() {
-                return numberOfEquations;
-            }
-        };
-
-        Structure2D templateRHS = new Structure2D() {
-
-            @Override
-            public int getColDim() {
-                return numberOfSolutions;
-            }
-
-            @Override
-            public int getRowDim() {
-                return numberOfEquations;
-            }
-        };
-
-        return this.preallocate(templateBody, templateRHS);
-    }
+    PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions);
 
     /**
      * <p>
@@ -267,7 +236,18 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
      * typically be either mxb or nxb.
      * </p>
      */
-    PhysicalStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS);
+    default PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+
+        int nbEquations = templateBody.getRowDim();
+        int nbVariables = templateBody.getColDim();
+        int nbSolutions = templateRHS.getColDim();
+
+        if (templateRHS.getRowDim() != nbEquations) {
+            throw new IllegalArgumentException();
+        }
+
+        return this.preallocate(nbEquations, nbVariables, nbSolutions);
+    }
 
     /**
      * [A][X]=[B] or [body][return]=[rhs]
@@ -288,9 +268,10 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
      * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale <code>preallocated</code>.
      * </p>
      *
-     * @param rhs The Right Hand Side, wont be modfied
+     * @param rhs          The Right Hand Side, wont be modfied
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
-     *        assume this is modified, but you cannot assume it will contain the full/ /correct solution.
+     *                     assume this is modified, but you cannot assume it will contain the full/ /correct
+     *                     solution.
      * @return The solution
      */
     MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition;

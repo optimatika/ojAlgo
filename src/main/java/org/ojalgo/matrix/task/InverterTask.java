@@ -211,27 +211,14 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
      * </p>
      *
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
-     *        assume this is modified, but you cannot assume it will contain the full/ /correct solution.
+     *                     assume this is modified, but you cannot assume it will contain the
+     *                     full/final/correct solution.
      * @return The inverse
      * @throws RecoverableCondition TODO
      */
     MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws RecoverableCondition;
 
-    default PhysicalStore<N> preallocate(final int numberOfRows, final int numberOfColumns) {
-        return this.preallocate(new Structure2D() {
-
-            @Override
-            public int getColDim() {
-                return numberOfColumns;
-            }
-
-            @Override
-            public int getRowDim() {
-                return numberOfRows;
-            }
-
-        });
-    }
+    PhysicalStore<N> preallocate(final int nbRows, final int nbCols);
 
     /**
      * <p>
@@ -243,7 +230,9 @@ public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
      * of the time A is square).
      * </p>
      */
-    PhysicalStore<N> preallocate(Structure2D template);
+    default PhysicalStore<N> preallocate(final Structure2D template) {
+        return this.preallocate(template.getRowDim(), template.getColDim());
+    }
 
     default Provider2D.Inverse<Optional<MatrixStore<N>>> toInverseProvider(final ElementsSupplier<N> original,
             final Supplier<MatrixStore<N>> alternativeOriginalSupplier) {

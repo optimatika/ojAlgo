@@ -26,13 +26,13 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
 
-abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> {
+abstract class InPlaceDecomposition<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> {
 
     private int myColDim;
     private DecompositionStore<N> myInPlace;
     private int myRowDim;
 
-    protected InPlaceDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    InPlaceDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
     }
 
@@ -42,7 +42,7 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
     }
 
     public MatrixStore<N> getInverse() {
-        return this.getInverse(this.allocate(this.getRowDim(), this.getRowDim()));
+        return this.getInverse(this.makeZero(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
@@ -55,14 +55,14 @@ abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDeco
         return myRowDim;
     }
 
-    protected DecompositionStore<N> getInPlace() {
+    final DecompositionStore<N> getInPlace() {
         return myInPlace;
     }
 
-    DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
+    final DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
 
-        int tmpRowDim = (int) matrix.countRows();
-        int tmpColDim = (int) matrix.countColumns();
+        int tmpRowDim = matrix.getRowDim();
+        int tmpColDim = matrix.getColDim();
 
         if (myInPlace != null && myRowDim == tmpRowDim && myColDim == tmpColDim) {
 

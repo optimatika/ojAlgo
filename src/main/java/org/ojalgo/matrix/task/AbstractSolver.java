@@ -28,12 +28,12 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_1X1 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.full1X1(body, rhs, preallocated);
             return preallocated;
@@ -43,6 +43,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_2X2 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.full2X2(body, rhs, preallocated);
             return preallocated;
@@ -52,6 +53,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_3X3 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.full3X3(body, rhs, preallocated);
             return preallocated;
@@ -61,6 +63,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_4X4 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.full4X4(body, rhs, preallocated);
             return preallocated;
@@ -70,6 +73,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_5X5 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.full5X5(body, rhs, preallocated);
             return preallocated;
@@ -79,6 +83,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> LEAST_SQUARES = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.leastSquares(body, rhs, preallocated);
             return preallocated;
@@ -88,6 +93,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_2X2 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.symmetric2X2(body, rhs, preallocated);
             return preallocated;
@@ -97,6 +103,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_3X3 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.symmetric3X3(body, rhs, preallocated);
             return preallocated;
@@ -106,6 +113,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_4X4 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.symmetric4X4(body, rhs, preallocated);
             return preallocated;
@@ -115,6 +123,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_5X5 = new AbstractSolver() {
 
+        @Override
         public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractSolver.symmetric5X5(body, rhs, preallocated);
             return preallocated;
@@ -444,23 +453,23 @@ abstract class AbstractSolver implements SolverTask<Double> {
         tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
-            case 1:
-                AbstractSolver.full1X1(tmpBody, tmpRHS, solution);
-                break;
-            case 2:
-                AbstractSolver.symmetric2X2(tmpBody, tmpRHS, solution);
-                break;
-            case 3:
-                AbstractSolver.symmetric3X3(tmpBody, tmpRHS, solution);
-                break;
-            case 4:
-                AbstractSolver.symmetric4X4(tmpBody, tmpRHS, solution);
-                break;
-            case 5:
-                AbstractSolver.symmetric5X5(tmpBody, tmpRHS, solution);
-                break;
-            default:
-                throw new IllegalArgumentException();
+        case 1:
+            AbstractSolver.full1X1(tmpBody, tmpRHS, solution);
+            break;
+        case 2:
+            AbstractSolver.symmetric2X2(tmpBody, tmpRHS, solution);
+            break;
+        case 3:
+            AbstractSolver.symmetric3X3(tmpBody, tmpRHS, solution);
+            break;
+        case 4:
+            AbstractSolver.symmetric4X4(tmpBody, tmpRHS, solution);
+            break;
+        case 5:
+            AbstractSolver.symmetric5X5(tmpBody, tmpRHS, solution);
+            break;
+        default:
+            throw new IllegalArgumentException();
         }
 
     }
@@ -705,8 +714,9 @@ abstract class AbstractSolver implements SolverTask<Double> {
         super();
     }
 
-    public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return R064Store.FACTORY.make(templateBody.countColumns(), 1L);
+    @Override
+    public final PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return R064Store.FACTORY.make(nbVariables, nbSolutions);
     }
 
 }

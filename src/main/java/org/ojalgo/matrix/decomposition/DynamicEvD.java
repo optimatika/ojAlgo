@@ -24,12 +24,12 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
+abstract class DynamicEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
 
     static final class R064 extends DynamicEvD<Double> {
 
@@ -39,9 +39,9 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
 
     }
 
-    private final EigenvalueDecomposition<N> myGeneralDelegate;
+    private final DenseEigenvalue<N> myGeneralDelegate;
     private boolean myHermitian = false;
-    private final EigenvalueDecomposition<N> myHermitianDelegate;
+    private final DenseEigenvalue<N> myHermitianDelegate;
 
     @SuppressWarnings("unused")
     private DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
@@ -51,8 +51,8 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final EigenvalueDecomposition<N> hermitianDelegate,
-            final EigenvalueDecomposition<N> generalDelegate) {
+    protected DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final DenseEigenvalue<N> hermitianDelegate,
+            final DenseEigenvalue<N> generalDelegate) {
 
         super(factory);
 
@@ -60,6 +60,7 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         myGeneralDelegate = generalDelegate;
     }
 
+    @Override
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         return this.decompose(matrix);
     }
@@ -73,6 +74,7 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         }
     }
 
+    @Override
     public ComplexNumber getTrace() {
         if (myHermitian) {
             return myHermitianDelegate.getTrace();
@@ -81,10 +83,12 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         }
     }
 
+    @Override
     public boolean isHermitian() {
         return myHermitian;
     }
 
+    @Override
     public boolean isOrdered() {
         return myHermitian ? myHermitianDelegate.isOrdered() : myGeneralDelegate.isOrdered();
     }
@@ -99,7 +103,7 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly) {
 
         if (matrix instanceof MatrixStore) {
             myHermitian = ((MatrixStore<?>) matrix).isHermitian();

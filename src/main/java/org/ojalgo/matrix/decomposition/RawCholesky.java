@@ -28,9 +28,9 @@ import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
@@ -46,10 +46,12 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         super();
     }
 
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
         this.doSolve(arg);
     }
 
+    @Override
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         double[][] retVal = this.reset(matrix, false);
@@ -59,6 +61,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.getDeterminant();
     }
 
+    @Override
     public boolean checkAndDecompose(final MatrixStore<Double> matrix) {
 
         mySPD = matrix.isHermitian();
@@ -73,6 +76,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.computed(false);
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         double minimum = Math.sqrt(threshold);
@@ -89,7 +93,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
         double[][] retVal = this.reset(matrix, false);
 
@@ -100,6 +105,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.doDecompose(retVal, tmpRawInPlaceStore);
     }
 
+    @Override
     public Double getDeterminant() {
 
         double[][] tmpData = this.getInternalData();
@@ -116,26 +122,19 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return retVal;
     }
 
-    public MatrixStore<Double> getInverse() {
-        int tmpRowDim = this.getRowDim();
-        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
-    }
-
+    @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse(preallocated);
     }
 
+    @Override
     public MatrixStore<Double> getL() {
         return this.getInternalStore().triangular(false, false);
     }
 
+    @Override
     public double getRankThreshold() {
         return TEN * myMaxDiag * this.getDimensionalEpsilon();
-    }
-
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
@@ -164,16 +163,14 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return super.isSolvable();
     }
 
+    @Override
     public boolean isSPD() {
         return mySPD;
     }
 
-    public PhysicalStore<Double> preallocate(final Structure2D template) {
-        return this.allocate(template.countRows(), template.countRows());
-    }
-
-    public PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
+    @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
     @Override

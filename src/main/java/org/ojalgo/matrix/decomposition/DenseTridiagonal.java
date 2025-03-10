@@ -24,15 +24,16 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class TridiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+abstract class DenseTridiagonal<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
 
     private transient MatrixStore<N> myD = null;
     private transient DecompositionStore<N> myQ = null;
 
-    protected TridiagonalDecomposition(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    protected DenseTridiagonal(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
     }
 
+    @Override
     public final MatrixStore<N> getD() {
         if (myD == null) {
             myD = this.makeD();
@@ -40,6 +41,7 @@ abstract class TridiagonalDecomposition<N extends Comparable<N>> extends InPlace
         return myD;
     }
 
+    @Override
     public final MatrixStore<N> getQ() {
         return this.getDecompositionQ();
     }

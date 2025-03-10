@@ -29,6 +29,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Primitive1D;
 
 public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>> extends FactoryStore<N> {
 
@@ -77,6 +78,10 @@ public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>>
 
     public static <N extends Comparable<N>, D extends Access1D<?>> Builder<N, D> builder(final PhysicalStore.Factory<N, ?> factory, final D mainDiagonal) {
         return new Builder<>(factory, mainDiagonal);
+    }
+
+    public static DiagonalStore<Double, Primitive1D> wrap(final double... mainDiagonal) {
+        return DiagonalStore.builder(R064Store.FACTORY, Primitive1D.of(mainDiagonal)).get();
     }
 
     private final D myMainDiagonal;

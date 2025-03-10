@@ -29,12 +29,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_1X1 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.full1X1(original, preallocated);
             return preallocated;
@@ -49,6 +49,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_2X2 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.full2X2(original, preallocated);
             return preallocated;
@@ -63,6 +64,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_3X3 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.full3X3(original, preallocated);
             return preallocated;
@@ -77,6 +79,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_4X4 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.full4X4(original, preallocated);
             return preallocated;
@@ -91,6 +94,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_5X5 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.full5X5(original, preallocated);
             return preallocated;
@@ -105,6 +109,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_2X2 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.symmetric2X2(original, preallocated);
             return preallocated;
@@ -119,6 +124,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_3X3 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.symmetric3X3(original, preallocated);
             return preallocated;
@@ -133,6 +139,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_4X4 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.symmetric4X4(original, preallocated);
             return preallocated;
@@ -147,6 +154,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_5X5 = new AbstractInverter() {
 
+        @Override
         public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
             AbstractInverter.symmetric5X5(original, preallocated);
             return preallocated;
@@ -738,12 +746,14 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         super();
     }
 
+    @Override
     public final MatrixStore<Double> invert(final Access2D<?> original) throws RecoverableCondition {
         return this.invert(original, R064Store.FACTORY.make(this.dim(), this.dim()));
     }
 
-    public final PhysicalStore<Double> preallocate(final Structure2D template) {
-        return R064Store.FACTORY.make(this.dim(), this.dim());
+    @Override
+    public final PhysicalStore<Double> preallocate(final int nbRows, final int nbCols) {
+        return R064Store.FACTORY.make(nbCols, nbRows);
     }
 
     abstract long dim();

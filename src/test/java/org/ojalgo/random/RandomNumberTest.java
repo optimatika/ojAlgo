@@ -246,6 +246,7 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testErlang() {
         // Erlang is a special case of the gamma where the count is an integer -- verify that this is true for
         // current implementation.
@@ -317,6 +318,7 @@ public class RandomNumberTest extends RandomTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testLogNormal() {
 
         RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);

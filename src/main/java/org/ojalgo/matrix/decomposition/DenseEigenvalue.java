@@ -25,12 +25,12 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements Eigenvalue<N> {
+abstract class DenseEigenvalue<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> implements Eigenvalue<N> {
 
     /**
      * Sort eigenvalues and corresponding vectors.
@@ -67,20 +67,23 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
     private MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
 
-    protected EigenvalueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    DenseEigenvalue(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
+    @Override
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
     }
 
-    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.decompose(matrix, true);
     }
 
-    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public final boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.decompose(matrix, false);
     }
 
@@ -89,6 +92,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return mySquareDim;
     }
 
+    @Override
     public final MatrixStore<N> getD() {
 
         if (myD == null && this.isComputed()) {
@@ -102,6 +106,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return myD;
     }
 
+    @Override
     public final Array1D<ComplexNumber> getEigenvalues() {
 
         if (myEigenvalues == null && this.isComputed()) {
@@ -126,6 +131,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return mySquareDim;
     }
 
+    @Override
     public final MatrixStore<N> getV() {
 
         if (myV == null && !myValuesOnly && this.isComputed()) {
@@ -153,7 +159,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         mySquareDim = 0;
     }
 
-    private final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    private final boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly) {
 
         this.reset();
 
@@ -172,7 +178,7 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         return this.computed(retVal);
     }
 
-    protected abstract boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly);
+    protected abstract boolean doDecompose(final Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly);
 
     protected abstract MatrixStore<N> makeD();
 
@@ -192,29 +198,29 @@ abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericD
         myV = newV;
     }
 
-    //    public MatrixStore<N> getExponential() {
+    // public MatrixStore<N> getExponential() {
     //
-    //        final MatrixStore<N> mtrxV = this.getV();
+    // final MatrixStore<N> mtrxV = this.getV();
     //
-    //        final PhysicalStore<N> tmpD = this.getD().copy();
-    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
-    //        final MatrixStore<N> mtrxD = tmpD.diagonal();
+    // final PhysicalStore<N> tmpD = this.getD().copy();
+    // tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    // final MatrixStore<N> mtrxD = tmpD.diagonal();
     //
-    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
-    //    }
+    // return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    // }
     //
-    //    public MatrixStore<N> getPower(final int exponent) {
+    // public MatrixStore<N> getPower(final int exponent) {
     //
-    //        final MatrixStore<N> mtrxV = this.getV();
-    //        final MatrixStore<N> mtrxD = this.getD();
+    // final MatrixStore<N> mtrxV = this.getV();
+    // final MatrixStore<N> mtrxD = this.getD();
     //
-    //        MatrixStore<N> retVal = mtrxV;
-    //        for (int e = 0; e < exponent; e++) {
-    //            retVal = retVal.multiply(mtrxD);
-    //        }
-    //        retVal = retVal.multiply(mtrxV.conjugate());
+    // MatrixStore<N> retVal = mtrxV;
+    // for (int e = 0; e < exponent; e++) {
+    // retVal = retVal.multiply(mtrxD);
+    // }
+    // retVal = retVal.multiply(mtrxV.conjugate());
     //
-    //        return retVal;
-    //    }
+    // return retVal;
+    // }
 
 }

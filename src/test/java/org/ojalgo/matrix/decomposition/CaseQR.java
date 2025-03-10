@@ -199,7 +199,7 @@ public class CaseQR extends MatrixDecompositionTests {
         final int tmpDim = 3;
         final MatrixStore<Double> tmpA = R064Store.FACTORY.makeSPD(tmpDim).below(R064Store.FACTORY.makeIdentity(tmpDim));
 
-        final QR<Double> tmpDenseQR = new QRDecomposition.R064();
+        final QR<Double> tmpDenseQR = new DenseQR.R064();
         final QR<Double> tmpRawQR = new RawQR();
 
         final PhysicalStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);

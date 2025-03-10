@@ -54,21 +54,21 @@ public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecompo
 
     }
 
-    Factory<ComplexNumber> C128 = typical -> new CholeskyDecomposition.C128();
+    Factory<ComplexNumber> C128 = typical -> new DenseCholesky.C128();
 
-    Factory<Quaternion> H256 = typical -> new CholeskyDecomposition.H256();
+    Factory<Quaternion> H256 = typical -> new DenseCholesky.H256();
 
-    Factory<RationalNumber> Q128 = typical -> new CholeskyDecomposition.Q128();
+    Factory<RationalNumber> Q128 = typical -> new DenseCholesky.Q128();
 
     Factory<Double> R064 = typical -> {
         if ((32L < typical.countColumns()) && (typical.count() <= PlainArray.MAX_SIZE)) {
-            return new CholeskyDecomposition.R064();
+            return new DenseCholesky.R064();
         } else {
             return new RawCholesky();
         }
     };
 
-    Factory<Quadruple> R128 = typical -> new CholeskyDecomposition.R128();
+    Factory<Quadruple> R128 = typical -> new DenseCholesky.R128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
 

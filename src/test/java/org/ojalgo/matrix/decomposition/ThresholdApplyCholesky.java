@@ -61,7 +61,7 @@ public class ThresholdApplyCholesky extends AbstractThresholdTuner {
     @Param({ "1", "2" })
     public int z;
 
-    Cholesky<Double> decomposition = new CholeskyDecomposition.R064();
+    Cholesky<Double> decomposition = new DenseCholesky.R064();
 
     R064Store matrix;
 

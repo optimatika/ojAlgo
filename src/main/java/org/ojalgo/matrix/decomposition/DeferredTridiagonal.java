@@ -26,8 +26,8 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access2D;
 /**
  * @author apete
  */
-abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalDecomposition<N> {
+abstract class DeferredTridiagonal<N extends Comparable<N>> extends DenseTridiagonal<N> {
 
     static final class C128 extends DeferredTridiagonal<ComplexNumber> {
 
@@ -54,7 +54,8 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
             Array1D<ComplexNumber> retVal = Array1D.C128.make(offDiagonal.count());
             retVal.fillAll(ComplexNumber.ONE);
 
-            BasicArray<ComplexNumber> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
+            BasicArray<ComplexNumber> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate
+                                                                    // of this but it is set to the same value
 
             ComplexNumber tmpVal = null;
             for (int i = 0; i < tmpSubdiagonal.count(); i++) {
@@ -90,7 +91,8 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
             Array1D<Quaternion> retVal = Array1D.H256.make(offDiagonal.count());
             retVal.fillAll(Quaternion.ONE);
 
-            BasicArray<Quaternion> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
+            BasicArray<Quaternion> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of
+                                                                 // this but it is set to the same value
 
             Quaternion tmpVal = null;
             for (int i = 0; i < tmpSubdiagonal.count(); i++) {
@@ -159,7 +161,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         super(factory);
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
 
         this.reset();
 
@@ -168,7 +170,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
         try {
 
             MatrixStore<N> logicallyTriangularMatrix = this.collect(matrix).triangular(false, false);
-            //TODO Not optimal code here!
+            // TODO Not optimal code here!
             DecompositionStore<N> inPlace = this.setInPlace(logicallyTriangularMatrix);
 
             int size = this.getMinDim();

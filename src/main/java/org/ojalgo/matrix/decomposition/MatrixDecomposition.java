@@ -29,10 +29,12 @@ import org.ojalgo.matrix.Provider2D;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -43,11 +45,11 @@ import org.ojalgo.structure.Structure2D;
  * <li>[A] could be any matrix. (The original matrix to decompose.)</li>
  * <li>[A]<sup>-1</sup> is the inverse of [A].</li>
  * <li>[A]<sup>T</sup> is the transpose of [A].</li>
- * <li>[A]<sup>H</sup> is the conjugate transpose of [A]. [A]<sup>H</sup> is equilvalent to [A]<sup>T</sup> if
+ * <li>[A]<sup>H</sup> is the conjugate transpose of [A]. [A]<sup>H</sup> is equivalent to [A]<sup>T</sup> if
  * the elements are all real.</li>
  * <li>[D] is a diagonal matrix. Possibly bi-, tri- or block-diagonal.</li>
  * <li>[H] is an, upper or lower, Hessenberg matrix.</li>
- * <li>[I] is an identity matrix - obvioulsly orthogonal/unitary.</li>
+ * <li>[I] is an identity matrix - obviously orthogonal/unitary.</li>
  * <li>[L] is a lower (left) triangular matrix.</li>
  * <li>[P] is a permutation matrix - an identity matrix with interchanged rows or columns - and
  * orthogonal/unitary.</li>
@@ -107,7 +109,8 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * Will create a new decomposition instance and directly perform the decomposition.
          */
-        default <N extends Comparable<N>, DN extends MatrixDecomposition<N>> DN decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default <N extends Comparable<N>, DN extends MatrixDecomposition<N>> DN decompose(
+                final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
             DN retVal = (DN) this.make(matrix);
             retVal.decompose(matrix);
             return retVal;
@@ -118,7 +121,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * <p>
          * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
          * method.
-         * 
+         *
          * @return A "decomposer" ready to decompose matrices.
          */
         default D make() {
@@ -130,7 +133,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * <p>
          * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
          * method.
-         * 
+         *
          * @param nbRows The expected number of rows in the matrices to decompose
          * @param nbCols The expected number of columns in the matrices to decompose
          * @return A "decomposer" ready to decompose matrices.
@@ -155,9 +158,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * <p>
          * To calculate the decomposition you then need to call the {@link #decompose(Access2D.Collectable)}
          * method.
-         * 
+         *
          * @param typical A 2D structure of roughly the expected size with which this decomposition will be
-         *        used.
+         *                used.
          * @return A "decomposer" ready to decompose matrices.
          */
         D make(Structure2D typical);
@@ -235,7 +238,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
          * implementation simply calls {@link #decompose(Access2D.Collectable)}.
          */
-        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
             return this.decompose(matrix);
         }
 
@@ -309,12 +312,12 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @param matrix A matrix to decompose
          * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
          */
-        default boolean compute(final Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean compute(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
             return this.decompose(matrix) && this.isSolvable();
         }
 
         @Override
-        default void ftran(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
+        default void ftran(final Access2D.Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> solution) {
             this.getSolution(rhs, solution);
         }
 
@@ -326,7 +329,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * The output must be a "right inverse" and a "generalised inverse".
          */
-        MatrixStore<N> getInverse();
+        default MatrixStore<N> getInverse() {
+            return this.getInverse(this.preallocate(this));
+        }
 
         /**
          * <p>
@@ -341,9 +346,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * </p>
          *
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
-         *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution. Use {@link #preallocate(int, int)} or {@link #preallocate(Structure2D)} to get a
-         *        suitable instance.
+         *                     must assume this is modified, but you cannot assume it will contain the
+         *                     full/final/correct solution. Use {@link #preallocate(int, int)} or
+         *                     {@link #preallocate(Structure2D)} to get a suitable instance.
          * @return The inverse, this is where you get the solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
@@ -352,7 +357,9 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
         /**
          * [A][X]=[B] or [this][return]=[rhs]
          */
-        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs);
+        default MatrixStore<N> getSolution(final Access2D.Collectable<N, ? super PhysicalStore<N>> rhs) {
+            return this.getSolution(rhs, this.preallocate(this, rhs));
+        }
 
         /**
          * <p>
@@ -366,15 +373,15 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * Should produce the same results as calling {@link #getSolution(Collectable)}.
          * </p>
          *
-         * @param rhs The Right Hand Side, wont be modfied
+         * @param rhs          The Right Hand Side, wont be modfied
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
-         *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution. Use {@link #preallocate(int, int, int)} or
-         *        {@link #preallocate(Structure2D, Structure2D)} to get a suitable instance.
+         *                     must assume this is modified, but you cannot assume it will contain the
+         *                     full/final/correct solution. Use {@link #preallocate(int, int, int)} or
+         *                     {@link #preallocate(Structure2D, Structure2D)} to get a suitable instance.
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
+        MatrixStore<N> getSolution(Access2D.Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
         @Override
         default Optional<MatrixStore<N>> invert() {
@@ -395,6 +402,11 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          *         equation system solution (with some degree of numerical stability).
          */
         boolean isSolvable();
+
+        @Override
+        default PhysicalStore<N> preallocate(final int nbRows, final int nbCols) {
+            return this.preallocate(nbRows, nbCols, nbRows);
+        }
 
         @Override
         default Optional<MatrixStore<N>> solve(final Access2D<?> rhs) {
@@ -429,6 +441,36 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
 
     }
 
+    interface Updatable<N extends Comparable<N>> extends MatrixDecomposition<N> {
+
+        /**
+         * Allocates memory (creates a {@link PhysicalStore}) instance suitable to be used with
+         * {@link #updateColumn(int, Access1D, PhysicalStore)}.
+         */
+        PhysicalStore<N> preallocate(final int nbRows);
+
+        /**
+         * First allocates working memory using {@link #preallocate(int)} and then calls
+         * {@link #updateColumn(int, Access1D, PhysicalStore)} to perform the update.
+         *
+         * @see #updateColumn(int, Access1D, PhysicalStore)
+         */
+        default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
+            return this.updateColumn(columnIndex, newColumn, this.preallocate(newColumn.size()));
+        }
+
+        /**
+         * Updates the decomposition when a column in the original matrix is replaced.
+         *
+         * @param columnIndex  The index of the column, in the original matrix, to replace
+         * @param newColumn    The new column values
+         * @param preallocated
+         * @return true if update was successful, false if not.
+         */
+        boolean updateColumn(int columnIndex, Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn, PhysicalStore<N> preallocated);
+
+    }
+
     /**
      * Eigenvalue and Singular Value decompositions can calculate the "values" only.
      *
@@ -441,7 +483,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
          * @return The same as {@link Solver#compute(Collectable)} or {@link #decompose(Collectable)} if the
          *         instance does not implement {@link Solver}.
          */
-        boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
+        boolean computeValuesOnly(Access2D.Collectable<N, ? super TransformableRegion<N>> matrix);
 
     }
 
@@ -463,7 +505,7 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
      * @param matrix A matrix to decompose
      * @return true if decomposition suceeded; false if not
      */
-    boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
+    boolean decompose(Access2D.Collectable<N, ? super TransformableRegion<N>> matrix);
 
     /**
      * @return true if decomposition has been attemped and was successful; false if not.

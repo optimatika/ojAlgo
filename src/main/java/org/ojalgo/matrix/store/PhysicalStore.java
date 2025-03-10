@@ -36,6 +36,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.tensor.TensorFactory1D;
@@ -52,7 +53,7 @@ import org.ojalgo.tensor.TensorFactory2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N> {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, TransformableRegion<N>, Access1D.Collectable<N, Mutate1D> {
 
     public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N> & Factory2D.Builder<I>> extends Factory2D.TwoStep<I, I> {
 
@@ -188,6 +189,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * @return The elements of the physical store as a fixed size (1 dimensional) list. The elements may be
      *         accessed either row or colomn major.
      */
+    @Override
     List<N> asList();
 
     default int indexOfLargestInColumn(final int row, final int col) {

@@ -30,10 +30,11 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
+abstract class GeneralEvD<N extends Comparable<N>> extends DenseEigenvalue<N> {
 
     /**
      * Eigenvalues and eigenvectors of a real matrix.
@@ -60,10 +61,12 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         super(factory);
     }
 
+    @Override
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         return this.decompose(matrix);
     }
 
+    @Override
     public final N getDeterminant() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
@@ -83,6 +86,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         return null;
     }
 
+    @Override
     public final ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -92,10 +96,12 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         return tmpVisitor.get();
     }
 
+    @Override
     public final boolean isHermitian() {
         return false;
     }
 
+    @Override
     public boolean isOrdered() {
         return false;
     }
@@ -106,7 +112,7 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     }
 
     @Override
-    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly) {
 
         final int tmpDiagDim = (int) matrix.countRows();
 
@@ -139,9 +145,9 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         }
         this.setD(tmpD);
 
-        //            BasicLogger.logDebug("Eigenvalues: {}", tmpEigenvalues);
-        //            BasicLogger.logDebug("D", tmpD);
-        //            BasicLogger.logDebug("THIS", tmpMtrxA);
+        // BasicLogger.logDebug("Eigenvalues: {}", tmpEigenvalues);
+        // BasicLogger.logDebug("D", tmpD);
+        // BasicLogger.logDebug("THIS", tmpMtrxA);
 
         // tmpEigenvalues.sortDescending();
 

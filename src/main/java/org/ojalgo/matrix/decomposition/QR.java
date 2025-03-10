@@ -23,10 +23,13 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
@@ -52,7 +55,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+public interface QR<N extends Comparable<N>> extends MatrixDecomposition.Updatable<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
         MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
 
     interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<QR<N>> {
@@ -61,6 +64,7 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
             return this.make(TYPICAL, fullSize);
         }
 
+        @Override
         default QR<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
@@ -69,20 +73,20 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
 
     }
 
-    Factory<ComplexNumber> C128 = (typical, fullSize) -> new QRDecomposition.C128(fullSize);
+    Factory<ComplexNumber> C128 = (typical, fullSize) -> new DenseQR.C128(fullSize);
 
-    Factory<Quaternion> H256 = (typical, fullSize) -> new QRDecomposition.H256(fullSize);
+    Factory<Quaternion> H256 = (typical, fullSize) -> new DenseQR.H256(fullSize);
 
-    Factory<RationalNumber> Q128 = (typical, fullSize) -> new QRDecomposition.Q128(fullSize);
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseQR.Q128(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || typical.isFat() || 64L >= typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new QRDecomposition.R064(fullSize);
+            return new DenseQR.R064(fullSize);
         }
         return new RawQR();
     };
 
-    Factory<Quadruple> R128 = (typical, fullSize) -> new QRDecomposition.R128(fullSize);
+    Factory<Quadruple> R128 = (typical, fullSize) -> new DenseQR.R128(fullSize);
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
 
@@ -98,14 +102,27 @@ public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, Mat
 
     MatrixStore<N> getR();
 
+    @Override
     default boolean isOrdered() {
         return false;
     }
 
+    @Override
+    default PhysicalStore<N> preallocate(final int nbEquations) {
+        return this.preallocate(nbEquations, 1);
+    }
+
+    @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxQ = this.getQ();
         MatrixStore<N> mtrxR = this.getR();
         return mtrxQ.multiply(mtrxR);
+    }
+
+    @Override
+    default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn,
+            final PhysicalStore<N> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
 }

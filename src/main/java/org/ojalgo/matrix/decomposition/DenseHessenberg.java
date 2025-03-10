@@ -25,6 +25,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -33,9 +34,9 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
-abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Hessenberg<N> {
+abstract class DenseHessenberg<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
-    static final class C128 extends HessenbergDecomposition<ComplexNumber> {
+    static final class C128 extends DenseHessenberg<ComplexNumber> {
 
         C128() {
             super(GenericStore.C128);
@@ -43,7 +44,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class H256 extends HessenbergDecomposition<Quaternion> {
+    static final class H256 extends DenseHessenberg<Quaternion> {
 
         H256() {
             super(GenericStore.H256);
@@ -51,7 +52,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class Q128 extends HessenbergDecomposition<RationalNumber> {
+    static final class Q128 extends DenseHessenberg<RationalNumber> {
 
         Q128() {
             super(GenericStore.Q128);
@@ -59,7 +60,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class R064 extends HessenbergDecomposition<Double> {
+    static final class R064 extends DenseHessenberg<Double> {
 
         R064() {
             super(R064Store.FACTORY);
@@ -67,7 +68,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class R128 extends HessenbergDecomposition<Quadruple> {
+    static final class R128 extends DenseHessenberg<Quadruple> {
 
         R128() {
             super(GenericStore.R128);
@@ -79,10 +80,11 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
 
     private boolean myUpper = true;
 
-    protected HessenbergDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    protected DenseHessenberg(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
+    @Override
     public final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean upper) {
 
         this.reset();
@@ -124,14 +126,17 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
         return this.computed(true);
     }
 
-    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public final boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.compute(matrix, true);
     }
 
+    @Override
     public final MatrixStore<N> getH() {
         return this.getInPlace().hessenberg(myUpper);
     }
 
+    @Override
     public final MatrixStore<N> getQ() {
         if (myQ == null) {
             myQ = this.makeQ(this.makeEye(this.getRowDim(), this.getColDim()), myUpper, true);
@@ -139,6 +144,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
         return myQ;
     }
 
+    @Override
     public boolean isUpper() {
         return myUpper;
     }

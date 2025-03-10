@@ -36,6 +36,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Structure2D.Logical;
@@ -65,7 +66,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>> {
+        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Structure2D.Logical<Access2D<N>, MatrixStore<N>>, Access1D.Collectable<N, Mutate1D> {
 
     @Override
     default MatrixStore<N> above(final Access2D<N>... matrices) {
@@ -827,6 +828,13 @@ public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, Matrix
     @Override
     default MatrixStore<N> superimpose(final long row, final long col, final Access2D<N> matrix) {
         return new SuperimposedStore<>(this, row, col, AbstractStore.cast(this.physical(), matrix));
+    }
+
+    @Override
+    default void supplyTo(final Mutate1D receiver) {
+        for (long i = 0L, limit = Math.min(this.count(), receiver.count()); i < limit; i++) {
+            receiver.set(i, this.get(i));
+        }
     }
 
     @Override

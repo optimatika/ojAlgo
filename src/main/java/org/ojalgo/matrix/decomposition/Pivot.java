@@ -21,16 +21,95 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+import java.util.BitSet;
+
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D;
 
 final class Pivot {
 
+    private static int[] doReverse(final int[] original, final int[] inverse) {
+        for (int i = 0; i < original.length; i++) {
+            inverse[original[i]] = i;
+        }
+        return inverse;
+    }
+
+    static int[] reverse(final int[] original) {
+        int[] inverse = new int[original.length];
+        return Pivot.doReverse(original, inverse);
+    }
+
+    private final BitSet myDoneBits = new BitSet();
     private boolean myModified;
     private int[] myOrder;
+    private int[] myReverse;
+    private boolean myReverseNeedsUpdate;
     private int mySign;
 
     Pivot() {
         super();
+    }
+
+    Pivot(final int... order) {
+        super();
+        this.reset(order.length);
+        System.arraycopy(order, 0, myOrder, 0, order.length);
+        myModified = true;
+        myReverseNeedsUpdate = true;
+        // TODO How to set mySign?
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(myOrder) + "/" + Arrays.toString(this.reverseOrder());
+    }
+
+    private <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void followPermutationCycles(final M elements, final int[] order) {
+
+        myDoneBits.clear();
+        int dim = order.length;
+
+        for (int i = 0; i < dim; i++) {
+            if (!myDoneBits.get(i)) {
+                // Follow the cycle starting at i
+                int j = i;
+                double temp = elements.doubleValue(i);
+
+                while (!myDoneBits.get(j)) {
+                    myDoneBits.set(j);
+                    int next = order[j];
+                    if (next != j) {
+                        double val = elements.doubleValue(next);
+                        elements.set(next, temp);
+                        temp = val;
+                        j = next;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Equivalent to selecting the rows (or columns) in the pivot order,
+     * <code>arg.rows(pivot.getOrder())</code>.
+     */
+    <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyPivotOrder(final M arg) {
+        if (this.isModified()) {
+            this.followPermutationCycles(arg, this.reverseOrder());
+        }
+    }
+
+    /**
+     * Equivalent to selecting the rows (or columns) in the reverse order,
+     * <code>arg.rows(pivot.reverseOrder())</code>.
+     */
+    <N extends Comparable<N>, M extends Access2D<N> & Mutate2D> void applyReverseOrder(final M arg) {
+        if (this.isModified()) {
+            this.followPermutationCycles(arg, myOrder);
+        }
     }
 
     void change(final int ind1, final int ind2) {
@@ -44,9 +123,33 @@ final class Pivot {
             mySign = -mySign;
 
             myModified = true;
+            myReverseNeedsUpdate = true;
 
         } else {
             // Why?!
+        }
+    }
+
+    /**
+     * Performs a cycle permutation on the pivot order.
+     * <p>
+     * This method applies a cycle permutation that moves the element at position ind1 to position ind2,
+     * while shifting all elements in between one position to the left.
+     * </p>
+     * <p>
+     * The method only performs the cycle if ind1 is less than ind2. If ind1 is greater than or equal
+     * to ind2, no changes are made to the pivot order.
+     * </p>
+     *
+     * @param ind1 The starting index of the cycle
+     * @param ind2 The ending index of the cycle
+     */
+    void cycle(final int ind1, final int ind2) {
+
+        if (ind1 < ind2) {
+            for (int j = ind1; j < ind2; j++) {
+                this.change(j, j + 1);
+            }
         }
     }
 
@@ -70,14 +173,19 @@ final class Pivot {
 
         myModified = false;
         mySign = 1;
+        myReverseNeedsUpdate = true;
     }
 
     int[] reverseOrder() {
-        int[] inverse = new int[myOrder.length];
-        for (int i = 0; i < myOrder.length; i++) {
-            inverse[myOrder[i]] = i;
+        if (myReverse == null || myReverse.length != myOrder.length) {
+            myReverse = new int[myOrder.length];
+            myReverseNeedsUpdate = true;
         }
-        return inverse;
+        if (myReverseNeedsUpdate) {
+            Pivot.doReverse(myOrder, myReverse);
+            myReverseNeedsUpdate = false;
+        }
+        return myReverse;
     }
 
     int signum() {

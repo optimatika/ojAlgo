@@ -21,18 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -42,14 +32,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class RawDecomposition extends AbstractDecomposition<Double> {
+abstract class RawDecomposition extends AbstractDecomposition<Double, R064Store> {
 
     static RawStore make(final int nbRows, final int nbCols) {
         return RawStore.FACTORY.make(nbRows, nbCols);
-    }
-
-    final static <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
-        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
     }
 
     private int myColDim;
@@ -57,8 +43,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     private RawStore myInternalStore;
     private int myRowDim;
 
-    protected RawDecomposition() {
-        super();
+    RawDecomposition() {
+        super(R064Store.FACTORY);
     }
 
     @Override
@@ -71,12 +57,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRowDim;
     }
 
-    @Override
-    protected R064Store allocate(final long numberOfRows, final long numberOfColumns) {
-        // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
-        return R064Store.FACTORY.make(numberOfRows, numberOfColumns);
-    }
-
     protected boolean checkSymmetry() {
         boolean retVal = myRowDim == myColDim;
         for (int i = 0; retVal && i < myRowDim; i++) {
@@ -87,38 +67,12 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return retVal;
     }
 
-    @SuppressWarnings("unchecked")
-    protected MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
-        // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
-        if (source instanceof MatrixStore) {
-            return (MatrixStore<Double>) source;
-        }
-        if (source instanceof Access2D) {
-            return R064Store.FACTORY.makeWrapper((Access2D<?>) source);
-        }
-        return source.collect(R064Store.FACTORY);
-    }
-
-    @Override
-    protected final FunctionSet<Double> function() {
-        return PrimitiveFunction.getSet();
-    }
-
     protected double[][] getInternalData() {
         return myInternalData;
     }
 
     protected RawStore getInternalStore() {
         return myInternalStore;
-    }
-
-    @Override
-    protected final Scalar.Factory<Double> scalar() {
-        return PrimitiveScalar.FACTORY;
-    }
-
-    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
-        return R064Store.FACTORY.makeWrapper(matrix);
     }
 
     RawStore newRawStore(final int m, final int n) {
@@ -129,11 +83,11 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
         this.reset();
 
-        final int templateRows = template.getRowDim();
-        final int templateCols = template.getColDim();
+        int templateRows = template.getRowDim();
+        int templateCols = template.getColDim();
 
-        final int internalRows = transpose ? templateCols : templateRows;
-        final int internalCols = transpose ? templateRows : templateCols;
+        int internalRows = transpose ? templateCols : templateRows;
+        int internalCols = transpose ? templateRows : templateCols;
 
         if (myInternalData == null || myRowDim != templateRows || myColDim != templateCols) {
 

@@ -63,7 +63,8 @@ public interface Mutate1D extends Structure1D {
          */
         default void fillMatching(final Access1D<?> values) {
             for (long i = 0L, limit = Math.min(this.count(), values.count()); i < limit; i++) {
-                this.set(i, values.get(i));
+                Comparable<?> value = values.get(i);
+                this.set(i, value);
             }
         }
 

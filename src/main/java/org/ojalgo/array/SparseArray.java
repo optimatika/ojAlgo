@@ -184,23 +184,25 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         @Override
         public NonzeroView<N> trySplit() {
 
-            final int remaining = myLastCursor - myCursor;
+            int remaining = myLastCursor - myCursor;
 
             if (remaining > 1) {
 
-                final int split = myCursor + remaining / 2;
+                int split = myCursor + remaining / 2;
 
                 // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor,
                 // myCursor, split, split, myLastCursor);
 
-                final NonzeroView<N> retVal = new NonzeroView<>(myIndices, myValues, myCursor, split);
+                NonzeroView<N> retVal = new NonzeroView<>(myIndices, myValues, myCursor, split);
 
                 myCursor = split;
 
                 return retVal;
 
+            } else {
+
+                return null;
             }
-            return null;
         }
 
     }
@@ -493,14 +495,18 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
         return Math.toIntExact(myCount);
     }
 
-    public void supplyNonZerosTo(final Mutate1D consumer) {
+    /**
+     * Does NOT first reset the receiver! That means the elements in the receiver corresponding to zeros in
+     * this sparse array are not zero:ed or modified in any way.
+     */
+    public void supplyNonZerosTo(final Mutate1D receiver) {
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {
-                consumer.set(myIndices[n], myValues.doubleValue(n));
+                receiver.set(myIndices[n], myValues.doubleValue(n));
             }
         } else {
             for (int n = 0; n < myActualLength; n++) {
-                consumer.set(myIndices[n], myValues.get(n));
+                receiver.set(myIndices[n], myValues.get(n));
             }
         }
     }

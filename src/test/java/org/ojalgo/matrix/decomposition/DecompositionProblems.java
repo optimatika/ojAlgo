@@ -166,7 +166,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             BasicLogger.debugMatrix("Original", m);
         }
 
-        QR<Double> qr1 = new QRDecomposition.R064(false);
+        QR<Double> qr1 = new DenseQR.R064(false);
         qr1.decompose(m);
 
         if (DEBUG) {
@@ -452,7 +452,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         RawStore input = RawStore.wrap(data);
         try {
             //   SingularValue<Double> svd = SingularValue.make(input);
-            SingularValue<Double> svd = new SingularValueDecomposition.R064();
+            SingularValue<Double> svd = new DenseSingularValue.R064();
             svd.invert(input);
         } catch (RecoverableCondition exception) {
             // TODO Auto-generated catch block
