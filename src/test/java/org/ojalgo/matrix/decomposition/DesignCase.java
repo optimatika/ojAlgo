@@ -75,8 +75,8 @@ public class DesignCase extends MatrixDecompositionTests {
         MatrixStore<Double> fat = R064Store.FACTORY.makeFilled(5, 7, new Uniform());
 
         @SuppressWarnings("unchecked")
-        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.R064(true), new QRDecomposition.R064(true),
-                new SingularValueDecomposition.R064(true) };
+        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new DenseBidiagonal.R064(true), new DenseQR.R064(true),
+                new DenseSingularValue.R064(true) };
         for (EconomySize<Double> decomp : all) {
 
             String className = decomp.getClass().getName();
@@ -276,7 +276,7 @@ public class DesignCase extends MatrixDecompositionTests {
                 .wrap(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.R064.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
-        SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.R064();
+        SingularValue<Double> tmpOldDecomp = new DenseSingularValue.R064();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getU();

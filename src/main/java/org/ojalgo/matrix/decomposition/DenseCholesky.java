@@ -31,17 +31,17 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 
-abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
+abstract class DenseCholesky<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
-    static final class C128 extends CholeskyDecomposition<ComplexNumber> {
+    static final class C128 extends DenseCholesky<ComplexNumber> {
 
         C128() {
             super(GenericStore.C128);
@@ -49,7 +49,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
     }
 
-    static final class H256 extends CholeskyDecomposition<Quaternion> {
+    static final class H256 extends DenseCholesky<Quaternion> {
 
         H256() {
             super(GenericStore.H256);
@@ -57,7 +57,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
     }
 
-    static final class Q128 extends CholeskyDecomposition<RationalNumber> {
+    static final class Q128 extends DenseCholesky<RationalNumber> {
 
         Q128() {
             super(GenericStore.Q128);
@@ -65,7 +65,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
     }
 
-    static final class R064 extends CholeskyDecomposition<Double> {
+    static final class R064 extends DenseCholesky<Double> {
 
         R064() {
             super(R064Store.FACTORY);
@@ -73,7 +73,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
 
     }
 
-    static final class R128 extends CholeskyDecomposition<Quadruple> {
+    static final class R128 extends DenseCholesky<Quadruple> {
 
         R128() {
             super(GenericStore.R128);
@@ -85,10 +85,11 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
-    protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    protected DenseCholesky(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
+    @Override
     public final void btran(final PhysicalStore<N> arg) {
 
         DecompositionStore<N> body = this.getInPlace();
@@ -97,15 +98,18 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         arg.substituteBackwards(body, false, true, false);
     }
 
+    @Override
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
     }
 
+    @Override
     public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         return this.compute(matrix, true);
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         double minimum = Math.sqrt(threshold);
@@ -122,10 +126,12 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> aStore) {
         return this.compute(aStore, false);
     }
 
+    @Override
     public N getDeterminant() {
 
         AggregatorFunction<N> tmpAggrFunc = this.aggregator().product2();
@@ -138,24 +144,25 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
+        // No need to reset the contents of preallocated
+
         DecompositionStore<N> body = this.getInPlace();
 
+        // With the last arg true, preallocated is assumed to an identity
         preallocated.substituteForwards(body, false, false, true);
         preallocated.substituteBackwards(body, false, true, true);
 
         return preallocated.hermitian(false);
     }
 
+    @Override
     public MatrixStore<N> getL() {
         return this.getInPlace().triangular(false, false);
     }
 
+    @Override
     public double getRankThreshold() {
         return TEN * myMaxDiag * this.getDimensionalEpsilon();
-    }
-
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -189,24 +196,16 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return preallocated;
     }
 
-    public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
-
-        this.decompose(this.wrap(original));
-
-        if (this.isSolvable()) {
-            return this.getInverse();
-        }
-        throw RecoverableCondition.newMatrixNotInvertible();
-    }
-
+    @Override
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
+        } else {
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
     public boolean isFullSize() {
@@ -218,17 +217,14 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return super.isSolvable();
     }
 
+    @Override
     public boolean isSPD() {
         return mySPD;
     }
 
-    public PhysicalStore<N> preallocate(final Structure2D template) {
-        long tmpCountRows = template.countRows();
-        return this.allocate(tmpCountRows, tmpCountRows);
-    }
-
-    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
+    @Override
+    public PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
     @Override
@@ -239,24 +235,16 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         mySPD = false;
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
-
-        this.decompose(this.wrap(body));
-
-        if (this.isSolvable()) {
-            return this.getSolution(this.wrap(rhs));
-        }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
-    }
-
+    @Override
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
+        } else {
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     @Override

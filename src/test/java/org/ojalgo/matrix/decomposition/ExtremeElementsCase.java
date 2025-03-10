@@ -391,7 +391,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                         1.6929815829013701 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 307)));
 
-        SingularValueDecomposition.R064 tmpAlgorithm = new SingularValueDecomposition.R064();
+        DenseSingularValue.R064 tmpAlgorithm = new DenseSingularValue.R064();
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }
@@ -517,7 +517,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         tmpBody.modifyAll(tmpSecond);
         tmpRHS.modifyAll(tmpSecond);
 
-        SolverTask<Double> tmpAlgorithm = new LUDecomposition.R064();
+        SolverTask<Double> tmpAlgorithm = new DenseLU.R064();
 
         ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, ACCURACY.withoutScale().withPrecision(1));
     }

@@ -45,6 +45,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.math.MathType;
@@ -364,11 +365,6 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     }
 
     @Override
-    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
-        FillCompatible.invoke(data, left, operator, right);
-    }
-
-    @Override
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         int complexity = Math.toIntExact(left.count() / this.countRows());
@@ -390,6 +386,11 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     @Override
     public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
+    }
+
+    @Override
+    public void fillCompatible(final Access2D<Double> left, final BinaryFunction<Double> operator, final Access2D<Double> right) {
+        FillCompatible.invoke(data, left, operator, right);
     }
 
     @Override
@@ -707,6 +708,17 @@ public final class RawStore implements PhysicalStore<Double>, Factory2D.Builder<
     @Override
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
         SubstituteForwards.invoke(data, body, unitDiagonal, conjugated, identity);
+    }
+
+    @Override
+    public void supplyTo(final Mutate1D receiver) {
+        int structure = data.length;
+        for (int i = 0; i < structure; i++) {
+            double[] row = data[i];
+            for (int j = 0; j < myNumberOfColumns; j++) {
+                receiver.set(Structure2D.index(structure, i, j), row[j]);
+            }
+        }
     }
 
     @Override

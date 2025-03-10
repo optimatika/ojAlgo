@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
@@ -47,64 +48,64 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class SingularValueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
+abstract class DenseSingularValue<N extends Comparable<N>> extends AbstractDecomposition<N, DecompositionStore<N>> implements SingularValue<N> {
 
-    static final class C128 extends SingularValueDecomposition<ComplexNumber> {
+    static final class C128 extends DenseSingularValue<ComplexNumber> {
 
         C128() {
             this(false);
         }
 
         C128(final boolean fullSize) {
-            super(GenericStore.C128, new BidiagonalDecomposition.C128(fullSize), fullSize);
+            super(GenericStore.C128, new DenseBidiagonal.C128(fullSize), fullSize);
         }
 
     }
 
-    static final class H256 extends SingularValueDecomposition<Quaternion> {
+    static final class H256 extends DenseSingularValue<Quaternion> {
 
         H256() {
             this(false);
         }
 
         H256(final boolean fullSize) {
-            super(GenericStore.H256, new BidiagonalDecomposition.H256(fullSize), fullSize);
+            super(GenericStore.H256, new DenseBidiagonal.H256(fullSize), fullSize);
         }
 
     }
 
-    static final class Q128 extends SingularValueDecomposition<RationalNumber> {
+    static final class Q128 extends DenseSingularValue<RationalNumber> {
 
         Q128() {
             this(false);
         }
 
         Q128(final boolean fullSize) {
-            super(GenericStore.Q128, new BidiagonalDecomposition.Q128(fullSize), fullSize);
+            super(GenericStore.Q128, new DenseBidiagonal.Q128(fullSize), fullSize);
         }
 
     }
 
-    static final class R064 extends SingularValueDecomposition<Double> {
+    static final class R064 extends DenseSingularValue<Double> {
 
         R064() {
             this(false);
         }
 
         R064(final boolean fullSize) {
-            super(R064Store.FACTORY, new BidiagonalDecomposition.R064(fullSize), fullSize);
+            super(R064Store.FACTORY, new DenseBidiagonal.R064(fullSize), fullSize);
         }
 
     }
 
-    static final class R128 extends SingularValueDecomposition<Quadruple> {
+    static final class R128 extends DenseSingularValue<Quadruple> {
 
         R128() {
             this(false);
         }
 
         R128(final boolean fullSize) {
-            super(GenericStore.R128, new BidiagonalDecomposition.R128(fullSize), fullSize);
+            super(GenericStore.R128, new DenseBidiagonal.R128(fullSize), fullSize);
         }
 
     }
@@ -263,10 +264,10 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
             // This section of the program inspects for negligible elements in the s and e arrays.
             // On completion the variables kase and k are set as follows:
             //
-            // kase = 1     if s[p] and e[k-1] are negligible and k<p                           => deflate negligible s[p]
-            // kase = 2     if s[k] is negligible and k<p                                       => split at negligible s[k]
-            // kase = 3     if e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible    => perform QR-step
-            // kase = 4     if e[p-1] is negligible                                             => convergence
+            // kase = 1 if s[p] and e[k-1] are negligible and k<p => deflate negligible s[p]
+            // kase = 2 if s[k] is negligible and k<p => split at negligible s[k]
+            // kase = 3 if e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible => perform QR-step
+            // kase = 4 if e[p-1] is negligible => convergence
 
             for (k = p - 2; k >= 0; k--) {
                 if (ABS.invoke(e[k]) <= TINY + MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))) {
@@ -298,42 +299,42 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
 
             switch (kase) { // Perform the task indicated by kase.
 
-                // s[p] and e[k-1] are negligible and k<p
-                case 1: // Deflate negligible s[p]
+            // s[p] and e[k-1] are negligible and k<p
+            case 1: // Deflate negligible s[p]
 
-                    SingularValueDecomposition.doCase1(s, e, p, k, q2RotR);
-                    break;
+                DenseSingularValue.doCase1(s, e, p, k, q2RotR);
+                break;
 
-                // s[k] is negligible and k<p
-                case 2: // Split at negligible s[k]
+            // s[k] is negligible and k<p
+            case 2: // Split at negligible s[k]
 
-                    SingularValueDecomposition.doCase2(s, e, p, k, q1RotR);
-                    break;
+                DenseSingularValue.doCase2(s, e, p, k, q1RotR);
+                break;
 
-                // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
-                case 3: // Perform QR-step.
+            // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
+            case 3: // Perform QR-step.
 
-                    SingularValueDecomposition.doCase3(s, e, p, k, q1RotR, q2RotR);
-                    break;
+                DenseSingularValue.doCase3(s, e, p, k, q1RotR, q2RotR);
+                break;
 
-                // e[p-1] is negligible
-                case 4: // Convergence
+            // e[p-1] is negligible
+            case 4: // Convergence
 
-                    SingularValueDecomposition.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
-                    p--;
-                    break;
+                DenseSingularValue.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
+                p--;
+                break;
 
-                // Should never happen
-                default:
+            // Should never happen
+            default:
 
-                    throw new IllegalStateException();
+                throw new IllegalStateException();
 
             } // switch
         } // while
     }
 
     private double[] e = null;
-    private final BidiagonalDecomposition<N> myBidiagonal;
+    private final DenseBidiagonal<N> myBidiagonal;
     private transient MatrixStore<N> myD = null;
     private final boolean myFullSize;
     private final Structure2D myInputStructure = new Structure2D() {
@@ -356,13 +357,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     private boolean myValuesOnly = false;
     private double[] s = null;
 
-    @SuppressWarnings("unused")
-    private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
-        this(factory, null, false);
-    }
-
-    protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory,
-            final BidiagonalDecomposition<N> bidiagonal, final boolean fullSize) {
+    DenseSingularValue(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final DenseBidiagonal<N> bidiagonal,
+            final boolean fullSize) {
 
         super(factory);
 
@@ -376,7 +372,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     @Override
-    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.compute(matrix, true, false);
     }
 
@@ -392,7 +388,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     @Override
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.compute(matrix, false, this.isFullSize());
     }
 
@@ -522,11 +518,6 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
-        return this.getInverse().multiply(this.collect(rhs));
-    }
-
-    @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
@@ -610,13 +601,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
     }
 
     @Override
-    public PhysicalStore<N> preallocate(final Structure2D template) {
-        return this.allocate(template.countColumns(), template.countRows());
-    }
-
-    @Override
-    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countColumns(), templateRHS.countColumns());
+    public PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbVariables, nbSolutions);
     }
 
     @Override
@@ -692,7 +678,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return true;
     }
 
-    protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
+    protected boolean compute(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
         this.reset();
 
@@ -722,11 +708,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return this.computed(computeOK);
     }
 
-    protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean fullSize) {
+    protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean fullSize) {
         return myBidiagonal.decompose(matrix);
     }
 
-    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
         this.computeBidiagonal(matrix, fullSize);
 
@@ -751,7 +737,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         final ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2 : ExchangeColumns.NULL;
         final NegateColumn q2NegCol = tmpQ1 != null ? tmpQ2 : NegateColumn.NULL;
 
-        SingularValueDecomposition.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+        DenseSingularValue.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
     }

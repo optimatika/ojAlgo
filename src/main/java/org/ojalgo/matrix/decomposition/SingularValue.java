@@ -69,21 +69,21 @@ public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposit
 
     }
 
-    Factory<ComplexNumber> C128 = (typical, fullSize) -> new SingularValueDecomposition.C128(fullSize);
+    Factory<ComplexNumber> C128 = (typical, fullSize) -> new DenseSingularValue.C128(fullSize);
 
-    Factory<Quaternion> H256 = (typical, fullSize) -> new SingularValueDecomposition.H256(fullSize);
+    Factory<Quaternion> H256 = (typical, fullSize) -> new DenseSingularValue.H256(fullSize);
 
     Factory<Double> R064 = (typical, fullSize) -> {
         if (fullSize || 1024L < typical.countColumns() && typical.count() <= PlainArray.MAX_SIZE) {
-            return new SingularValueDecomposition.R064(fullSize);
+            return new DenseSingularValue.R064(fullSize);
         } else {
             return new RawSingularValue();
         }
     };
 
-    Factory<RationalNumber> Q128 = (typical, fullSize) -> new SingularValueDecomposition.Q128(fullSize);
+    Factory<RationalNumber> Q128 = (typical, fullSize) -> new DenseSingularValue.Q128(fullSize);
 
-    Factory<Quadruple> R128 = (typical, fullSize) -> new SingularValueDecomposition.R128(fullSize);
+    Factory<Quadruple> R128 = (typical, fullSize) -> new DenseSingularValue.R128(fullSize);
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 

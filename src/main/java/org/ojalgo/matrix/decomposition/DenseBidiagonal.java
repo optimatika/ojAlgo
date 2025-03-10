@@ -28,6 +28,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -37,9 +38,9 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
-abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
+abstract class DenseBidiagonal<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
-    static final class C128 extends BidiagonalDecomposition<ComplexNumber> {
+    static final class C128 extends DenseBidiagonal<ComplexNumber> {
 
         C128() {
             this(false);
@@ -127,7 +128,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class H256 extends BidiagonalDecomposition<Quaternion> {
+    static final class H256 extends DenseBidiagonal<Quaternion> {
 
         H256() {
             this(false);
@@ -145,7 +146,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class Q128 extends BidiagonalDecomposition<RationalNumber> {
+    static final class Q128 extends DenseBidiagonal<RationalNumber> {
 
         Q128() {
             this(false);
@@ -162,7 +163,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class R064 extends BidiagonalDecomposition<Double> {
+    static final class R064 extends DenseBidiagonal<Double> {
 
         R064() {
             this(false);
@@ -179,7 +180,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
 
     }
 
-    static final class R128 extends BidiagonalDecomposition<Quadruple> {
+    static final class R128 extends DenseBidiagonal<Quadruple> {
 
         R128() {
             this(false);
@@ -203,12 +204,13 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
     private transient DecompositionStore<N> myLQ;
     private transient DecompositionStore<N> myRQ;
 
-    protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
+    protected DenseBidiagonal(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
 
         this.reset();
 
@@ -265,6 +267,7 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         return this.computed(true);
     }
 
+    @Override
     public MatrixStore<N> getD() {
         MatrixStore<N> retVal = this.doGetDiagonal();
         if (myFullSize) {
@@ -277,18 +280,22 @@ abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceD
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> getLQ() {
         return this.doGetLQ();
     }
 
+    @Override
     public MatrixStore<N> getRQ() {
         return this.doGetRQ();
     }
 
+    @Override
     public boolean isFullSize() {
         return myFullSize;
     }
 
+    @Override
     public boolean isUpper() {
         return this.isAspectRatioNormal();
     }

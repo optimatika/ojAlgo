@@ -58,13 +58,13 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Bidiagonal<?>[] getAnyBidiagonal() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.C128(), new BidiagonalDecomposition.R064(), new BidiagonalDecomposition.H256(),
-                new BidiagonalDecomposition.Q128(), new BidiagonalDecomposition.R128() };
+        return new Bidiagonal<?>[] { new DenseBidiagonal.C128(), new DenseBidiagonal.R064(), new DenseBidiagonal.H256(), new DenseBidiagonal.Q128(),
+                new DenseBidiagonal.R128() };
     }
 
     public static Cholesky<?>[] getAnyCholesky() {
-        return new Cholesky<?>[] { new CholeskyDecomposition.C128(), new CholeskyDecomposition.R064(), new CholeskyDecomposition.H256(),
-                new CholeskyDecomposition.Q128(), new RawCholesky(), new CholeskyDecomposition.R128() };
+        return new Cholesky<?>[] { new DenseCholesky.C128(), new DenseCholesky.R064(), new DenseCholesky.H256(), new DenseCholesky.Q128(), new RawCholesky(),
+                new DenseCholesky.R128() };
     }
 
     public static List<Eigenvalue<?>> getAnyEigenvalue() {
@@ -91,18 +91,16 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Hessenberg<?>[] getAnyHessenberg() {
-        return new Hessenberg<?>[] { new HessenbergDecomposition.C128(), new HessenbergDecomposition.R064(), new HessenbergDecomposition.H256(),
-                new HessenbergDecomposition.Q128(), new HessenbergDecomposition.R128() };
+        return new Hessenberg<?>[] { new DenseHessenberg.C128(), new DenseHessenberg.R064(), new DenseHessenberg.H256(), new DenseHessenberg.Q128(),
+                new DenseHessenberg.R128() };
     }
 
     public static LDL<?>[] getAnyLDL() {
-        return new LDL<?>[] { new LDLDecomposition.C128(), new LDLDecomposition.R064(), new LDLDecomposition.H256(), new LDLDecomposition.Q128(),
-                new LDLDecomposition.R128() };
+        return new LDL<?>[] { new DenseLDL.C128(), new DenseLDL.R064(), new DenseLDL.H256(), new DenseLDL.Q128(), new DenseLDL.R128() };
     }
 
     public static LU<?>[] getAnyLU() {
-        return new LU<?>[] { new LUDecomposition.C128(), new LUDecomposition.R064(), new LUDecomposition.H256(), new LUDecomposition.Q128(), new RawLU(),
-                new LUDecomposition.R128() };
+        return new LU<?>[] { new DenseLU.C128(), new DenseLU.R064(), new DenseLU.H256(), new DenseLU.Q128(), new RawLU(), new DenseLU.R128(), new SparseLU() };
     }
 
     public static List<MatrixDecomposition.RankRevealing<?>> getAnyMatrixDecompositionRankRevealing() {
@@ -132,13 +130,12 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static QR<?>[] getAnyQR() {
-        return new QR<?>[] { new QRDecomposition.C128(), new QRDecomposition.R064(), new QRDecomposition.H256(), new QRDecomposition.Q128(), new RawQR(),
-                new QRDecomposition.R128() };
+        return new QR<?>[] { new DenseQR.C128(), new DenseQR.R064(), new DenseQR.H256(), new DenseQR.Q128(), new RawQR(), new DenseQR.R128() };
     }
 
     public static SingularValue<?>[] getAnySingularValue() {
-        return new SingularValue<?>[] { new SingularValueDecomposition.C128(), new SingularValueDecomposition.R064(), new SingularValueDecomposition.H256(),
-                new SingularValueDecomposition.Q128(), new RawSingularValue(), new SingularValueDecomposition.R128() };
+        return new SingularValue<?>[] { new DenseSingularValue.C128(), new DenseSingularValue.R064(), new DenseSingularValue.H256(),
+                new DenseSingularValue.Q128(), new RawSingularValue(), new DenseSingularValue.R128() };
     }
 
     public static Tridiagonal<?>[] getAnyTridiagonal() {
@@ -168,11 +165,11 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Bidiagonal<Double>[] getPrimitiveBidiagonal() {
-        return (Bidiagonal<Double>[]) new Bidiagonal<?>[] { new BidiagonalDecomposition.R064() };
+        return (Bidiagonal<Double>[]) new Bidiagonal<?>[] { new DenseBidiagonal.R064() };
     }
 
     public static Cholesky<Double>[] getPrimitiveCholesky() {
-        return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.R064(), new RawCholesky() };
+        return (Cholesky<Double>[]) new Cholesky<?>[] { new DenseCholesky.R064(), new RawCholesky() };
     }
 
     public static List<Eigenvalue<Double>> getPrimitiveEigenvalue() {
@@ -198,15 +195,15 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Hessenberg<Double>[] getPrimitiveHessenberg() {
-        return (Hessenberg<Double>[]) new Hessenberg<?>[] { new HessenbergDecomposition.R064() };
+        return (Hessenberg<Double>[]) new Hessenberg<?>[] { new DenseHessenberg.R064() };
     }
 
     public static LDL<Double>[] getPrimitiveLDL() {
-        return (LDL<Double>[]) new LDL<?>[] { new LDLDecomposition.R064() };
+        return (LDL<Double>[]) new LDL<?>[] { new DenseLDL.R064() };
     }
 
     public static LU<Double>[] getPrimitiveLU() {
-        return (LU<Double>[]) new LU<?>[] { new LUDecomposition.R064(), new RawLU() };
+        return (LU<Double>[]) new LU<?>[] { new DenseLU.R064(), new RawLU(), new SparseLU() };
     }
 
     public static List<MatrixDecomposition.RankRevealing<Double>> getPrimitiveMatrixDecompositionRankRevealing() {
@@ -236,11 +233,11 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static QR<Double>[] getPrimitiveQR() {
-        return (QR<Double>[]) new QR<?>[] { new QRDecomposition.R064(), new RawQR() };
+        return (QR<Double>[]) new QR<?>[] { new DenseQR.R064(), new RawQR() };
     }
 
     public static SingularValue<Double>[] getPrimitiveSingularValue() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new SingularValueDecomposition.R064(), new RawSingularValue() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new DenseSingularValue.R064(), new RawSingularValue() };
     }
 
     public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {

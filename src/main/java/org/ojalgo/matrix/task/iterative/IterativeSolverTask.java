@@ -41,7 +41,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
-import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -189,11 +188,12 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
         return new Configurator(this);
     }
 
-    public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        if (templateRHS.countColumns() != 1L) {
+    @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        if (nbSolutions != 1) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
-        return R064Store.FACTORY.make(templateBody.countColumns(), 1L);
+        return R064Store.FACTORY.make(nbVariables, nbSolutions);
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {

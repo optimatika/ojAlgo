@@ -21,6 +21,7 @@
  */
 package org.ojalgo.structure;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.array.ArrayR064;
@@ -277,20 +278,20 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     static String toString(final Access1D<?> access) {
         int size = access.size();
         switch (size) {
-            case 0:
-                return "{ }";
-            case 1:
-                return "{ " + access.get(0) + " }";
-            default:
-                StringBuilder builder = new StringBuilder();
-                builder.append("{ ");
-                builder.append(access.get(0));
-                for (int i = 1; i < size; i++) {
-                    builder.append(", ");
-                    builder.append(access.get(i));
-                }
-                builder.append(" }");
-                return builder.toString();
+        case 0:
+            return "{ }";
+        case 1:
+            return "{ " + access.get(0) + " }";
+        default:
+            StringBuilder builder = new StringBuilder();
+            builder.append("{ ");
+            builder.append(access.get(0));
+            for (int i = 1; i < size; i++) {
+                builder.append(", ");
+                builder.append(access.get(i));
+            }
+            builder.append(" }");
+            return builder.toString();
         }
     }
 
@@ -361,8 +362,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
             public void supplyTo(final R receiver) {
                 receiver.accept(Access1D.this);
-                //                receiver.reset();
-                //                Access1D.this.nonzeros().forEach(nz -> receiver.set(nz.index(), nz.doubleValue()));
+                // receiver.reset();
+                // Access1D.this.nonzeros().forEach(nz -> receiver.set(nz.index(), nz.doubleValue()));
             }
 
         };
@@ -370,6 +371,15 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     default <K> Keyed1D<K, N> asKeyed1D(final IndexMapper<K> indexMapper) {
         return new Keyed1D<>(this, indexMapper);
+    }
+
+    /**
+     * An (immutable) {@link List} delegating to this {@link Access1D}.
+     *
+     * @see #toList()
+     */
+    default List<N> asList() {
+        return new WrapperList<>(this);
     }
 
     /**
@@ -479,6 +489,15 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         for (int i = 0; i < limit; i++) {
             receiver[i] = this.doubleValue(i);
         }
+    }
+
+    /**
+     * Copy the elements to a new (mutable) {@link List}.
+     *
+     * @see #asList()
+     */
+    default List<N> toList() {
+        return new ArrayList<>(this.asList());
     }
 
     default double[] toRawCopy1D() {

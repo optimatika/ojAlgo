@@ -37,9 +37,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 
 /**
  * <P>
@@ -68,6 +68,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         super();
     }
 
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
 
         R064Store preallocated = (R064Store) arg;
@@ -112,6 +113,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         }
     }
 
+    @Override
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         double[][] retVal = this.reset(matrix, true);
@@ -123,6 +125,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.getDeterminant();
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         int significant = 0;
@@ -141,8 +144,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @param matrix Rectangular matrix
      */
+    @Override
     @SuppressWarnings({ "rawtypes" })
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decompose(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
         double[][] retVal = this.reset(matrix, true);
 
@@ -156,6 +160,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.doDecompose(retVal);
     }
 
+    @Override
     public Double getDeterminant() {
 
         AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().product();
@@ -169,11 +174,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return aggregator.get();
     }
 
-    public MatrixStore<Double> getInverse() {
-        int tmpRowDim = this.getRowDim();
-        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
-    }
-
+    @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse((R064Store) preallocated);
     }
@@ -183,6 +184,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @return Q
      */
+    @Override
     public RawStore getQ() {
 
         int m = this.getRowDim();
@@ -219,6 +221,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @return R
      */
+    @Override
     public MatrixStore<Double> getR() {
 
         int n = this.getColDim();
@@ -241,6 +244,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
+    @Override
     public double getRankThreshold() {
 
         double largest = MACHINE_SMALLEST;
@@ -251,10 +255,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         double epsilon = this.getDimensionalEpsilon();
 
         return largest * epsilon;
-    }
-
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        return this.getSolution(rhs, this.allocate(rhs.countRows(), rhs.countColumns()));
     }
 
     @Override
@@ -280,6 +280,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public boolean isFullSize() {
         return false;
     }
@@ -289,24 +290,12 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return super.isSolvable();
     }
 
-    public PhysicalStore<Double> preallocate(final Structure2D template) {
-        return this.allocate(template.countRows(), template.countRows());
-    }
-
-    public PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
-    }
-
     @Override
     public void reset() {
 
         super.reset();
 
         myNumberOfHouseholderTransformations = 0;
-    }
-
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
-        return this.solve(body, rhs, this.preallocate(body, rhs));
     }
 
     @Override
@@ -427,6 +416,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     @Override
     protected boolean checkSolvability() {
         return this.isAspectRatioNormal() && this.isFullRank();
+    }
+
+    @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
 }

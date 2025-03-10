@@ -29,11 +29,10 @@ import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
@@ -48,13 +47,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         super();
     }
 
-    public void btran(final Collectable<Double, ? super PhysicalStore<Double>> lhs, final PhysicalStore<Double> solution) {
-
-        lhs.supplyTo(solution);
-
-        this.btran(solution);
-    }
-
+    @Override
     public void btran(final PhysicalStore<Double> arg) {
 
         MatrixStore<Double> body = this.getInternalStore();
@@ -63,11 +56,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         arg.substituteBackwards(body, true, true, false);
 
-        if (myPivot.isModified()) {
-            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
-        }
+        this.applyReverseOrder(myPivot, arg);
     }
 
+    @Override
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -79,6 +71,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.getDeterminant();
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         RawStore internal = this.getInternalStore();
@@ -93,55 +86,64 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
-        final double[][] data = this.reset(matrix, false);
+        double[][] data = this.reset(matrix, false);
 
         matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, true);
     }
 
-    public boolean decomposeWithoutPivoting(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    @Override
+    public boolean decomposeWithoutPivoting(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
 
-        final double[][] data = this.reset(matrix, false);
+        double[][] data = this.reset(matrix, false);
 
         matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, false);
     }
 
+    @Override
     public void ftran(final PhysicalStore<Double> arg) {
 
-        PhysicalStore<Double> rhs = myPivot.isModified() ? arg.copy() : arg;
-        PhysicalStore<Double> sol = arg;
+        this.applyPivotOrder(myPivot, arg);
 
-        this.getSolution(rhs, sol);
+        MatrixStore<Double> body = this.getInternalStore();
+
+        arg.substituteForwards(body, true, false, false);
+
+        arg.substituteBackwards(body, false, false, false);
     }
 
+    @Override
     public Double getDeterminant() {
-        final int m = this.getRowDim();
-        final int n = this.getColDim();
+
+        int m = this.getRowDim();
+        int n = this.getColDim();
+
         if (m != n) {
             throw new IllegalArgumentException("RawStore must be square.");
         }
-        final double[][] LU = this.getInternalData();
-        double d = myPivot.signum();
+
+        double[][] internalData = this.getInternalData();
+
+        double retVal = myPivot.signum();
         for (int j = 0; j < n; j++) {
-            d *= LU[j][j];
+            retVal *= internalData[j][j];
         }
-        return d;
+
+        return Double.valueOf(retVal);
     }
 
-    public MatrixStore<Double> getInverse() {
-        final int tmpRowDim = this.getRowDim();
-        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
-    }
-
+    @Override
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse(preallocated);
     }
 
+    @Override
     public MatrixStore<Double> getL() {
         MatrixStore<Double> logical = this.getInternalStore().triangular(false, true);
         int nbRows = this.getRowDim();
@@ -151,35 +153,36 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return logical;
     }
 
+    @Override
     public int[] getPivotOrder() {
         return myPivot.getOrder();
     }
 
+    @Override
     public double getRankThreshold() {
 
-        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
+        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST).doubleValue();
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, largest);
     }
 
+    @Override
     public int[] getReversePivotOrder() {
         return myPivot.reverseOrder();
-    }
-
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
-        this.collect(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
+        rhs.supplyTo(preallocated);
+
+        this.applyPivotOrder(myPivot, preallocated);
 
         return this.doSolve(preallocated);
     }
 
+    @Override
     public MatrixStore<Double> getU() {
         MatrixStore<Double> retVal = this.getInternalStore().triangular(true, false);
         int nbCols = this.getColDim();
@@ -200,10 +203,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
+        } else {
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public boolean isPivoted() {
         return myPivot.isModified();
     }
@@ -213,18 +218,15 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return super.isSolvable();
     }
 
-    public PhysicalStore<Double> preallocate(final Structure2D template) {
-        return this.allocate(template.countRows(), template.countRows());
-    }
-
-    public PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
+    @Override
+    public PhysicalStore<Double> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] tmpData = this.reset(body, false);
+        double[][] tmpData = this.reset(body, false);
 
         this.getInternalStore().fillMatching(body);
 
@@ -232,12 +234,16 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
 
-            R064Store.FACTORY.makeWrapper(rhs).rows(myPivot.getOrder()).supplyTo(preallocated);
+            preallocated.fillMatching(rhs);
+
+            this.applyPivotOrder(myPivot, preallocated);
 
             return this.doSolve(preallocated);
 
+        } else {
+
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final double[][] data, final boolean pivoting) {

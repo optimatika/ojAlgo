@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.MACHINE_SMALLEST;
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
@@ -33,19 +32,19 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
+abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
 
-    static final class C128 extends LUDecomposition<ComplexNumber> {
+    static final class C128 extends DenseLU<ComplexNumber> {
 
         C128() {
             super(GenericStore.C128);
@@ -53,7 +52,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class H256 extends LUDecomposition<Quaternion> {
+    static final class H256 extends DenseLU<Quaternion> {
 
         H256() {
             super(GenericStore.H256);
@@ -61,7 +60,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class Q128 extends LUDecomposition<RationalNumber> {
+    static final class Q128 extends DenseLU<RationalNumber> {
 
         Q128() {
             super(GenericStore.Q128);
@@ -69,7 +68,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class R064 extends LUDecomposition<Double> {
+    static final class R064 extends DenseLU<Double> {
 
         R064() {
             super(R064Store.FACTORY);
@@ -77,7 +76,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class R128 extends LUDecomposition<Quadruple> {
+    static final class R128 extends DenseLU<Quadruple> {
 
         R128() {
             super(GenericStore.R128);
@@ -87,10 +86,11 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     private final Pivot myPivot = new Pivot();
 
-    protected LUDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    protected DenseLU(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
+    @Override
     public void btran(final PhysicalStore<N> arg) {
 
         DecompositionStore<N> body = this.getInPlace();
@@ -99,16 +99,16 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
         arg.substituteBackwards(body, true, true, false);
 
-        if (myPivot.isModified()) {
-            arg.rows(myPivot.reverseOrder()).copy().supplyTo(arg);
-        }
+        this.applyReverseOrder(myPivot, arg);
     }
 
+    @Override
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         DecompositionStore<N> internal = this.getInPlace();
@@ -123,32 +123,40 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public boolean decomposeWithoutPivoting(final Collectable<N, ? super TransformableRegion<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
+    @Override
     public void ftran(final PhysicalStore<N> arg) {
 
-        PhysicalStore<N> rhs = myPivot.isModified() ? arg.copy() : arg;
-        PhysicalStore<N> sol = arg;
+        this.applyPivotOrder(myPivot, arg);
 
-        this.getSolution(rhs, sol);
+        DecompositionStore<N> body = this.getInPlace();
+
+        arg.substituteForwards(body, true, false, false);
+
+        arg.substituteBackwards(body, false, false, false);
     }
 
+    @Override
     public N getDeterminant() {
 
-        AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
+        AggregatorFunction<N> aggrFunc = this.aggregator().product();
 
-        this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
+        this.getInPlace().visitDiagonal(aggrFunc);
 
-        if (myPivot.signum() == -1) {
-            return tmpAggrFunc.toScalar().negate().get();
+        if (myPivot.signum() < 0) {
+            return aggrFunc.toScalar().negate().get();
+        } else {
+            return aggrFunc.get();
         }
-        return tmpAggrFunc.get();
     }
 
     @Override
@@ -172,6 +180,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return preallocated;
     }
 
+    @Override
     public MatrixStore<N> getL() {
         MatrixStore<N> logical = this.getInPlace().triangular(false, true);
         int nbRows = this.getRowDim();
@@ -182,10 +191,12 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
+    @Override
     public int[] getPivotOrder() {
         return myPivot.getOrder();
     }
 
+    @Override
     public double getRankThreshold() {
 
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
@@ -194,12 +205,9 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
+    @Override
     public int[] getReversePivotOrder() {
         return myPivot.reverseOrder();
-    }
-
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -221,7 +229,9 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
-        preallocated.fillMatching(this.collect(rhs).rows(myPivot.getOrder()));
+        rhs.supplyTo(preallocated);
+
+        this.applyPivotOrder(myPivot, preallocated);
 
         DecompositionStore<N> body = this.getInPlace();
 
@@ -232,6 +242,7 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return preallocated;
     }
 
+    @Override
     public MatrixStore<N> getU() {
         MatrixStore<N> retVal = this.getInPlace().triangular(true, false);
         int nbCols = this.getColDim();
@@ -241,26 +252,31 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse();
+        } else {
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
+        } else {
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
-        throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public boolean isPivoted() {
         return myPivot.isModified();
     }
@@ -270,33 +286,21 @@ abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return super.isSolvable();
     }
 
-    public PhysicalStore<N> preallocate(final Structure2D template) {
-        long tmpCountRows = template.countRows();
-        return this.allocate(tmpCountRows, tmpCountRows);
+    @Override
+    public PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
-    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
-    }
-
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
-
-        this.decompose(this.wrap(body));
-
-        if (this.isSolvable()) {
-            return this.getSolution(this.wrap(rhs));
-        }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
-    }
-
+    @Override
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
+        } else {
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {

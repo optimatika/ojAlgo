@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
@@ -203,8 +204,8 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
          *
          * @see #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)
          */
-        default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
-                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+        default boolean computeValuesOnly(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrixA,
+                final Access2D.Collectable<N, ? super TransformableRegion<N>> matrixB) {
             return this.prepare(matrixB) && this.computeValuesOnly(matrixA);
         }
 
@@ -214,12 +215,12 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
          *
          * @see #decompose(org.ojalgo.structure.Access2D.Collectable)
          */
-        default boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
-                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+        default boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrixA,
+                final Access2D.Collectable<N, ? super TransformableRegion<N>> matrixB) {
             return this.prepare(matrixB) && this.decompose(matrixA);
         }
 
-        boolean prepare(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+        boolean prepare(Access2D.Collectable<N, ? super TransformableRegion<N>> matrixB);
 
     }
 
@@ -445,9 +446,9 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
     Array1D<ComplexNumber> getEigenvalues();
 
     /**
-     * @param realParts An array that will receive the real parts of the eigenvalues
+     * @param realParts      An array that will receive the real parts of the eigenvalues
      * @param imaginaryParts An optional array that, if present, will receive the imaginary parts of the
-     *        eigenvalues
+     *                       eigenvalues
      */
     default void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
 
@@ -471,36 +472,36 @@ public interface Eigenvalue<N extends Comparable<N>> extends MatrixDecomposition
         }
     }
 
-    //    /**
-    //     * @return The matrix exponential
-    //     */
-    //    default MatrixStore<N> getExponential() {
+    // /**
+    // * @return The matrix exponential
+    // */
+    // default MatrixStore<N> getExponential() {
     //
-    //        final MatrixStore<N> mtrxV = this.getV();
+    // final MatrixStore<N> mtrxV = this.getV();
     //
-    //        final PhysicalStore<N> tmpD = this.getD().copy();
-    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
-    //        final MatrixStore<N> mtrxD = tmpD.diagonal();
+    // final PhysicalStore<N> tmpD = this.getD().copy();
+    // tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    // final MatrixStore<N> mtrxD = tmpD.diagonal();
     //
-    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
-    //    }
+    // return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    // }
     //
-    //    /**
-    //     * @return The matrix power
-    //     */
-    //    default MatrixStore<N> getPower(final int exponent) {
+    // /**
+    // * @return The matrix power
+    // */
+    // default MatrixStore<N> getPower(final int exponent) {
     //
-    //        final MatrixStore<N> mtrxV = this.getV();
-    //        final MatrixStore<N> mtrxD = this.getD();
+    // final MatrixStore<N> mtrxV = this.getV();
+    // final MatrixStore<N> mtrxD = this.getD();
     //
-    //        MatrixStore<N> retVal = mtrxV;
-    //        for (int e = 0; e < exponent; e++) {
-    //            retVal = retVal.multiply(mtrxD);
-    //        }
-    //        retVal = retVal.multiply(mtrxV.conjugate());
+    // MatrixStore<N> retVal = mtrxV;
+    // for (int e = 0; e < exponent; e++) {
+    // retVal = retVal.multiply(mtrxD);
+    // }
+    // retVal = retVal.multiply(mtrxV.conjugate());
     //
-    //        return retVal;
-    //    }
+    // return retVal;
+    // }
 
     /**
      * @return A complex valued alternative to {@link #getV()}.

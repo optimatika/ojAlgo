@@ -115,7 +115,7 @@ public class PrimitiveOrRawLU extends AbstractPrimitiveOrRaw<LU<Double>> {
 
     @Override
     protected LU<Double> makePrimitive() {
-        return new LUDecomposition.R064();
+        return new DenseLU.R064();
     }
 
     @Override

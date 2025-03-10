@@ -133,7 +133,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
-    private void doPrint(final BidiagonalDecomposition<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
+    private void doPrint(final DenseBidiagonal<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
         BasicLogger.debug();
         BasicLogger.debug();
         BasicLogger.debugMatrix("Original: ", aMatrix);
@@ -145,7 +145,7 @@ public class CaseBidiagonal extends MatrixDecompositionTests {
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
 
-        final BidiagonalDecomposition<Double> tmpDecomposition = (BidiagonalDecomposition<Double>) Bidiagonal.R064.make();
+        final DenseBidiagonal<Double> tmpDecomposition = (DenseBidiagonal<Double>) Bidiagonal.R064.make();
         tmpDecomposition.decompose(aMatrix);
 
         if (!Bidiagonal.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {

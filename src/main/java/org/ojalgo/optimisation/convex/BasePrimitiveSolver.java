@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RowsSupplier;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -167,7 +168,7 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return new Optimisation.Result(state, value, solution);
     }
 
-    protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    protected boolean computeGeneral(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
         return mySolverGeneral.compute(matrix);
     }
 
@@ -194,9 +195,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
         return this.getSolutionX().copy();
     }
 
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT();
+    protected abstract Collectable<Double, ? super TransformableRegion<Double>> getIterationKKT();
 
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS();
+    protected abstract Collectable<Double, ? super TransformableRegion<Double>> getIterationRHS();
 
     protected MatrixStore<Double> getMatrixAE() {
         return myMatrices.getAE();
@@ -384,9 +385,9 @@ abstract class BasePrimitiveSolver extends ConvexSolver implements UpdatableSolv
     }
 
     /**
-     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}.
-     * IF the LP was solved to optimality but the Q matrix (or the entire objective function) was
-     * disregarded then the returned state will just be {@link State#FEASIBLE}.
+     * The LP result with a {@link State} suitable for this solver – most likely {@link State#FEASIBLE}. IF
+     * the LP was solved to optimality but the Q matrix (or the entire objective function) was disregarded
+     * then the returned state will just be {@link State#FEASIBLE}.
      */
     protected Optimisation.Result solveLP() {
 

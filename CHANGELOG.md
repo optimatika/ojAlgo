@@ -23,10 +23,22 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Better implementation of `SparseArray.supplyTo(Mutate1D)`.
 
+#### org.ojalgo.matrix
+
+- General `refactoring` in the decomposition package. Shouldn't be any api-breaking changes.
+- New sparse `MatrixStore` implementations `R064LSC` and `R064LSR` – column/row major R064 elements.
+- New sparse LU decomposition, `SparseLU`.
+- New interface `MatrixDecomposition.Updatable` for partial updates to decompositions. No actual implementations yet. `SparseLU` will be the first.
+
 #### org.ojalgo.optimisation
 
 - Refactoring to SimplexSolver (significant performance improvements with larger/sparse instances).
 - Improved feasibility check for the QP `ActiveSetSolver`.
+- Removed some unnecessary work, and garbage creation, when validation models (contributed by @samuel)
+
+#### org.ojalgo.scalar
+
+- When creating rotation `Quaternion`s the angle is now halved in the factory method as is standard elsewhere. (contributed by @twistedtwin)
 
 ## [55.1.2] – 2025-02-08
 

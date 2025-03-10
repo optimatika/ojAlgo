@@ -58,7 +58,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
-    private void doPrint(final HessenbergDecomposition<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
+    private void doPrint(final DenseHessenberg<Double> aDecomposition, final PhysicalStore<Double> aMatrix) {
         BasicLogger.debug();
         BasicLogger.debug();
         BasicLogger.debugMatrix("Original: ", aMatrix);
@@ -71,7 +71,7 @@ public class CaseHessenberg extends MatrixDecompositionTests {
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
 
-        final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.R064.make();
+        final DenseHessenberg<Double> tmpDecomposition = (DenseHessenberg<Double>) Hessenberg.R064.make();
         tmpDecomposition.decompose(aMatrix);
 
         if (!Hessenberg.equals(aMatrix, tmpDecomposition, NumberContext.of(7, 6))) {

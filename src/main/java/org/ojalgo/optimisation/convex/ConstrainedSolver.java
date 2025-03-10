@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.optimisation.ConstraintsMetaData;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -58,14 +59,14 @@ abstract class ConstrainedSolver extends BasePrimitiveSolver {
     }
 
     @Override
-    protected Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
+    protected Collectable<Double, ? super TransformableRegion<Double>> getIterationKKT() {
         MatrixStore<Double> iterQ = this.getIterationQ();
         MatrixStore<Double> iterA = this.getIterationA();
         return iterQ.right(iterA.transpose()).below(iterA);
     }
 
     @Override
-    protected Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
+    protected Collectable<Double, ? super TransformableRegion<Double>> getIterationRHS() {
         MatrixStore<Double> iterC = this.getIterationC();
         MatrixStore<Double> iterB = this.getIterationB();
         return iterC.below(iterB);

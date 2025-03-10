@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -38,12 +39,11 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.NumberDefinition;
 
-abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
+abstract class DenseQR<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
 
-    static final class C128 extends QRDecomposition<ComplexNumber> {
+    static final class C128 extends DenseQR<ComplexNumber> {
 
         C128() {
             this(false);
@@ -55,7 +55,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class H256 extends QRDecomposition<Quaternion> {
+    static final class H256 extends DenseQR<Quaternion> {
 
         H256() {
             this(false);
@@ -67,7 +67,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class Q128 extends QRDecomposition<RationalNumber> {
+    static final class Q128 extends DenseQR<RationalNumber> {
 
         Q128() {
             this(false);
@@ -79,7 +79,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class R064 extends QRDecomposition<Double> {
+    static final class R064 extends DenseQR<Double> {
 
         R064() {
             this(false);
@@ -91,7 +91,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
 
     }
 
-    static final class R128 extends QRDecomposition<Quadruple> {
+    static final class R128 extends DenseQR<Quadruple> {
 
         R128() {
             this(false);
@@ -106,11 +106,12 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
     private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
+    protected DenseQR(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
     }
 
+    @Override
     public void btran(final PhysicalStore<N> arg) {
 
         DecompositionStore<N> body = this.getInPlace();
@@ -129,11 +130,13 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
     }
 
+    @Override
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
     }
 
+    @Override
     public int countSignificant(final double threshold) {
 
         DecompositionStore<N> internal = this.getInPlace();
@@ -148,7 +151,8 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return significant;
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    @Override
+    public boolean decompose(final Access2D.Collectable<N, ? super TransformableRegion<N>> matrix) {
 
         this.reset();
 
@@ -169,6 +173,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return this.computed(true);
     }
 
+    @Override
     public N getDeterminant() {
 
         AggregatorFunction<N> aggregator = this.aggregator().product();
@@ -187,6 +192,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return this.getSolution(this.makeIdentity(this.getRowDim()), preallocated);
     }
 
+    @Override
     public MatrixStore<N> getQ() {
 
         DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
@@ -205,6 +211,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return retVal;
     }
 
+    @Override
     public MatrixStore<N> getR() {
 
         MatrixStore<N> logical = this.getInPlace().triangular(true, false);
@@ -219,16 +226,13 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return logical;
     }
 
+    @Override
     public double getRankThreshold() {
 
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
         return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
-    }
-
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -270,6 +274,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
     }
 
+    @Override
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
@@ -280,6 +285,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
@@ -290,6 +296,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         throw RecoverableCondition.newMatrixNotInvertible();
     }
 
+    @Override
     public boolean isFullSize() {
         return myFullSize;
     }
@@ -299,13 +306,9 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return super.isSolvable();
     }
 
-    public PhysicalStore<N> preallocate(final Structure2D template) {
-        long tmpCountRows = template.countRows();
-        return this.allocate(tmpCountRows, tmpCountRows);
-    }
-
-    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
+    @Override
+    public PhysicalStore<N> preallocate(final int nbEquations, final int nbVariables, final int nbSolutions) {
+        return this.makeZero(nbEquations, nbSolutions);
     }
 
     @Override
@@ -316,24 +319,16 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         myNumberOfHouseholderTransformations = 0;
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
-
-        this.decompose(this.wrap(body));
-
-        if (this.isSolvable()) {
-            return this.getSolution(this.wrap(rhs));
-        }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
-    }
-
+    @Override
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
+        } else {
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
-        throw RecoverableCondition.newEquationSystemNotSolvable();
     }
 
     @Override

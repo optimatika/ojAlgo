@@ -76,23 +76,23 @@ public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecompositio
 
         public LDL<N> make(final Structure2D typical) {
             LDL<N> retVal = myDelegate.make(typical);
-            if (myThreshold != null && retVal instanceof LDLDecomposition) {
-                ((LDLDecomposition<N>) retVal).setThreshold(myThreshold);
+            if (myThreshold != null && retVal instanceof DenseLDL) {
+                ((DenseLDL<N>) retVal).setThreshold(myThreshold);
             }
             return retVal;
         }
 
     }
 
-    Factory<ComplexNumber> C128 = typical -> new LDLDecomposition.C128();
+    Factory<ComplexNumber> C128 = typical -> new DenseLDL.C128();
 
-    Factory<Quaternion> H256 = typical -> new LDLDecomposition.H256();
+    Factory<Quaternion> H256 = typical -> new DenseLDL.H256();
 
-    Factory<Double> R064 = typical -> new LDLDecomposition.R064();
+    Factory<Double> R064 = typical -> new DenseLDL.R064();
 
-    Factory<Quadruple> R128 = typical -> new LDLDecomposition.R128();
+    Factory<Quadruple> R128 = typical -> new DenseLDL.R128();
 
-    Factory<RationalNumber> Q128 = typical -> new LDLDecomposition.Q128();
+    Factory<RationalNumber> Q128 = typical -> new DenseLDL.Q128();
 
     static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
