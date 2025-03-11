@@ -38,6 +38,7 @@ import org.ojalgo.structure.Structure2D.IntRowColumn;
 abstract class FileFormatEBM {
 
     private static final String TAB = String.valueOf(ASCII.HT);
+    private static final String COMMENT = "*";
 
     private static Expression readExpression(final ExpressionsBasedModel model, final String[] fields) {
 
@@ -176,6 +177,11 @@ abstract class FileFormatEBM {
             while ((line = reader.readLine()) != null) {
 
                 String[] fields = line.split(TAB);
+
+                if (line.isBlank() || line.startsWith(COMMENT)) {
+                    // Skip this line
+                    continue;
+                }
 
                 switch (line.charAt(0)) {
                     case 'V':
