@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath.Prefix;
 import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -106,7 +107,7 @@ final class RevisedStore extends SimplexStore {
         r = RevisedStore.newColumn(n - m);
 
         myBasis = myConstraintsBody.columns(included);
-        myInvBasis = new ProductFormInverse(m, TWO_THIRDS); // TODO The scaling threshold should be much smaller
+        myInvBasis = new ProductFormInverse(m, Prefix.MICRO);
     }
 
     private void doBodyRow(final int i, final PhysicalStore<Double> destination) {
@@ -163,7 +164,8 @@ final class RevisedStore extends SimplexStore {
         myInvBasis.btran(objective.rows(included), l);
         myInvBasis.ftran(myConstraintsRHS, x);
 
-        // ProcessingService.INSTANCE.run(() -> myInvBasis.btran(objective.rows(included), l), () -> myInvBasis.ftran(myConstraintsRHS, x));
+        // ProcessingService.INSTANCE.run(() -> myInvBasis.btran(objective.rows(included), l), () ->
+        // myInvBasis.ftran(myConstraintsRHS, x));
 
         this.doExclTranspMult(l, r);
         d.fillMatching(objective.rows(excluded), SUBTRACT, r);
@@ -325,8 +327,8 @@ final class RevisedStore extends SimplexStore {
             myPhase1Objective.set(j, -sum);
         }
 
-        //        double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
-        //        myAlternativeValue = -sum;
+        // double sum = myConstraintsRHS.aggregateRange(structure.nbIdty, m, Aggregator.SUM).doubleValue();
+        // myAlternativeValue = -sum;
     }
 
     @Override

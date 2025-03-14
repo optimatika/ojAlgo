@@ -30,6 +30,7 @@ import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -218,7 +219,7 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
     /**
      * Update the product form inverse to reflect a replaced column.
      *
-     * @param col The column, of the basis, that was exchanged.
+     * @param col    The column, of the basis, that was exchanged.
      * @param values The (non zero) values of that column.
      */
     void update(final int col, final SparseArray<Double> values) {
@@ -235,20 +236,21 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
     /**
      * Update the inverse to reflect a replaced column in the basis.
      *
-     * @param basis Full basis, with the column already exchanged.
-     * @param index The index, of the column, that was exchanged.
+     * @param basis  Full basis, with the column already exchanged.
+     * @param col    The index, of the column, that was exchanged.
      * @param values The (non zero) values of that column.
      */
-    void update(final MatrixStore<Double> basis, final int index, final SparseArray<Double> values) {
+    void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
 
         values.supplyTo(myWork);
 
         this.ftran(myWork);
 
-        double diagonalElement = myWork.doubleValue(index);
+        double diagonalElement = myWork.doubleValue(col);
 
-        if (Math.abs(diagonalElement) >= myScalingThreshold) {
-            myFactors.add(this.newFactor(myWork, index, diagonalElement));
+        if (Math.abs(diagonalElement) >= myScalingThreshold
+                && Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue() >= myScalingThreshold) {
+            myFactors.add(this.newFactor(myWork, col, diagonalElement));
         } else {
             this.clearFactors();
             myRoot.decompose(basis.transpose());

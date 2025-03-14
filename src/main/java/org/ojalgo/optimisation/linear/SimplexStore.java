@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,7 +83,7 @@ abstract class SimplexStore {
         return structure -> {
 
             if (Boolean.TRUE.equals(options.sparse)
-                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 5_000) {
+                    || !Boolean.FALSE.equals(options.sparse) && Math.max(structure.countModelVariables(), structure.countConstraints()) > 2_000) {
                 return new RevisedStore(structure);
             } else {
                 return new DenseTableau(structure);

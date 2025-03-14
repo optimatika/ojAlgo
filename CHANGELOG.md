@@ -11,11 +11,21 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-### Changed
+### Added
 
 #### org.ojalgo.optimisation
 
-- Minor performance refactoring to SimplexSolver.
+- The EBM file format parser now handles comments and empty lines in the model file (contributed by Magnus Jansson).
+
+### Changed
+
+#### org.ojalgo.array
+
+- Better implementation of `SparseArray.supplyTo(Mutate1D)`.
+
+#### org.ojalgo.optimisation
+
+- Refactoring to SimplexSolver (significant performance improvements with larger/sparse instances).
 - Improved feasibility check for the QP `ActiveSetSolver`.
 
 ## [55.1.2] – 2025-02-08

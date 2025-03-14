@@ -66,7 +66,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     public interface NonzeroReferenceTypeCallback<N extends Comparable<N>> {
 
         /**
-         * @param index Index
+         * @param index  Index
          * @param number Number (nonzero) at that index
          */
         void call(long index, N number);
@@ -190,7 +190,8 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
                 final int split = myCursor + remaining / 2;
 
-                // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor, myCursor, split, split, myLastCursor);
+                // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor,
+                // myCursor, split, split, myLastCursor);
 
                 final NonzeroView<N> retVal = new NonzeroView<>(myIndices, myValues, myCursor, split);
 
@@ -502,6 +503,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                 consumer.set(myIndices[n], myValues.get(n));
             }
         }
+    }
+
+    @Override
+    public void supplyTo(final Mutate1D receiver) {
+
+        receiver.reset();
+
+        this.supplyNonZerosTo(receiver);
     }
 
     @Override
