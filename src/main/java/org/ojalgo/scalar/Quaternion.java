@@ -171,9 +171,32 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     }
 
+    /**
+     * Create a {@link Quaternion} that captures a rotation about the provided axis by the provided
+     * angle.
+     * <p>
+     * The quaternion representation of the rotation may be expressed as:
+     * <pre>q = cos(θ / 2) + sin(θ / 2) * (ub * i + uc * j + ud * k)</pre>
+     * where θ is the angle of rotation and <pre>[ub, uc, ud]</pre> is the axis of rotation.  This
+     * method accepts a single axis, so only a single imaginary component is populated.
+     * <p>
+     * To rotate in multiple axes, multiply multiple quaternions:
+     * <pre>{@code
+     * Quaternion xRotation = Quaternion.makeRotation(RotationAxis.X, Math.toRadians(-3));
+     * Quaternion yRotation = Quaternion.makeRotation(RotationAxis.Y, Math.toRadians(2));
+     * Quaternion zRotation = Quaternion.makeRotation(RotationAxis.Z, Math.toRadians(45));
+     * Quaternion zyxRotation = zRotation.multiply(yRotation).multiply(xRotation);
+     * }</pre>
+     * This creates a rotation in ZYX order.
+     *
+     * @param axis  the axis to rotate about, non-null
+     * @param angle the angle, in radians to rotate about the axis
+     * @return the quaternion
+     */    
     public static Quaternion makeRotation(final RotationAxis axis, final double angle) {
 
-        final double tmpScalar = PrimitiveMath.COS.invoke(angle);
+        final double tmpHalfAngle = PrimitiveMath.DIVIDE.invoke(angle, 2);
+        final double tmpScalar = PrimitiveMath.COS.invoke(tmpHalfAngle);
 
         double tmpI = PrimitiveMath.ZERO;
         double tmpJ = PrimitiveMath.ZERO;
@@ -183,17 +206,17 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             case X:
 
-                tmpI = PrimitiveMath.SIN.invoke(angle);
+                tmpI = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             case Y:
 
-                tmpJ = PrimitiveMath.SIN.invoke(angle);
+                tmpJ = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             case Z:
 
-                tmpK = PrimitiveMath.SIN.invoke(angle);
+                tmpK = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             default:
