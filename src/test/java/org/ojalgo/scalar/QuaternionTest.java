@@ -132,4 +132,35 @@ public class QuaternionTest extends ScalarTests {
 
     }
 
+    @Test
+    public void testMakeRotation() {
+        // from MATLAB:
+        // >> expected = quaternion([0 deg2rad(-20) 0], "rotvec")
+        // expected =
+        //   quaternion
+        //      0.98481 +       0i - 0.17365j +       0k
+
+        double angle = Math.toRadians(-20);
+        double expectedScalar = 0.98481;
+        double expectedImaginary = -0.17365;
+
+        Quaternion actualX = Quaternion.makeRotation(RotationAxis.X, angle);
+        TestUtils.assertEquals(expectedScalar, actualX.scalar(), 1e-5);
+        TestUtils.assertEquals(expectedImaginary, actualX.i, 1e-5);
+        TestUtils.assertEquals(0, actualX.j, 1e-5);
+        TestUtils.assertEquals(0, actualX.k, 1e-5);
+
+        Quaternion actualY = Quaternion.makeRotation(RotationAxis.Y, angle);
+        TestUtils.assertEquals(expectedScalar, actualY.scalar(), 1e-5);
+        TestUtils.assertEquals(0, actualY.i, 1e-5);
+        TestUtils.assertEquals(expectedImaginary, actualY.j, 1e-5);
+        TestUtils.assertEquals(0, actualY.k, 1e-5);
+
+        Quaternion actualZ = Quaternion.makeRotation(RotationAxis.Z, angle);
+        TestUtils.assertEquals(expectedScalar, actualZ.scalar(), 1e-5);
+        TestUtils.assertEquals(0, actualZ.i, 1e-5);
+        TestUtils.assertEquals(0, actualZ.j, 1e-5);
+        TestUtils.assertEquals(expectedImaginary, actualZ.k, 1e-5);
+    }
+    
 }
