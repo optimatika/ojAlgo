@@ -173,7 +173,8 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
     public static Quaternion makeRotation(final RotationAxis axis, final double angle) {
 
-        final double tmpScalar = PrimitiveMath.COS.invoke(angle);
+        final double tmpHalfAngle = PrimitiveMath.DIVIDE.invoke(angle, 2);
+        final double tmpScalar = PrimitiveMath.COS.invoke(tmpHalfAngle);
 
         double tmpI = PrimitiveMath.ZERO;
         double tmpJ = PrimitiveMath.ZERO;
@@ -183,17 +184,17 @@ public final class Quaternion implements SelfDeclaringScalar<Quaternion>, Access
 
             case X:
 
-                tmpI = PrimitiveMath.SIN.invoke(angle);
+                tmpI = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             case Y:
 
-                tmpJ = PrimitiveMath.SIN.invoke(angle);
+                tmpJ = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             case Z:
 
-                tmpK = PrimitiveMath.SIN.invoke(angle);
+                tmpK = PrimitiveMath.SIN.invoke(tmpHalfAngle);
                 break;
 
             default:
