@@ -494,14 +494,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         boolean retVal = true;
 
         if (myLowerLimit != null && myUpperLimit != null && (myLowerLimit.compareTo(myUpperLimit) > 0 || myUpperLimit.compareTo(myLowerLimit) < 0)) {
-            if (appender != null) {
+            if (appender != null && appender != BasicLogger.NULL) {
                 appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
             }
             retVal = false;
         }
 
         if (myContributionWeight != null && myContributionWeight.signum() == 0) {
-            if (appender != null) {
+            if (appender != null && appender != BasicLogger.NULL) {
                 appender.println(this.toString() + " The contribution weight (if it exists) should not be zero!");
             }
             retVal = false;
@@ -518,7 +518,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         if ((tmpLimit = this.getLowerLimit()) != null && value.subtract(tmpLimit).signum() == -1
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
-            if (appender != null) {
+            if (appender != null && appender != BasicLogger.NULL) {
                 appender.println(value + " ! " + this.toString());
             }
             retVal = false;
@@ -526,7 +526,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         if ((tmpLimit = this.getUpperLimit()) != null && value.subtract(tmpLimit).signum() == 1
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
-            if (appender != null) {
+            if (appender != null && appender != BasicLogger.NULL) {
                 appender.println(value + " ! " + this.toString());
             }
             retVal = false;
