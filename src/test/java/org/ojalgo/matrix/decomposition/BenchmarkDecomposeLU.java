@@ -19,31 +19,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo;
+package org.ojalgo.matrix.decomposition;
 
-import java.util.concurrent.TimeUnit;
-
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.runner.Runner;
+import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
 
-public abstract class BenchmarkUtils {
+@State(Scope.Benchmark)
+public class BenchmarkDecomposeLU extends AbstractBenchmarkSparseLU {
 
-    public static ChainedOptionsBuilder options() {
-        return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(7).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
-                .timeout(new TimeValue(1L, TimeUnit.MINUTES)).jvmArgs("-Xmx8g");
+    public static void main(final String[] args) throws RunnerException {
+        BenchmarkUtils.run(BenchmarkDecomposeLU.class);
     }
 
-    public static void run(final ChainedOptionsBuilder options, final Class<?> clazz) throws RunnerException {
-        Runner runner = new Runner(options.include(clazz.getName()).build());
-        runner.run();
+    @Param({ "0.01", "0.02", "0.05" })
+    public double density;
+    @Param({ "500", "1000", "2000" })
+    public int dim;
+
+    MatrixStore<Double> matrix;
+
+    @Benchmark
+    public LU<Double> dense() {
+        dense.decompose(matrix);
+        return dense;
     }
 
-    public static void run(final Class<?> clazz) throws RunnerException {
-        BenchmarkUtils.run(BenchmarkUtils.options(), clazz);
+    @Benchmark
+    public LU<Double> raw() {
+        raw.decompose(matrix);
+        return raw;
     }
 
+    @Setup
+    public void setup() {
+        matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
+    }
+
+    @Benchmark
+    public LU<Double> sparse() {
+        sparse.decompose(matrix);
+        return sparse;
+    }
 }

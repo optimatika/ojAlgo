@@ -151,104 +151,8 @@ public final class R064LSR extends SparseR064 {
     }
 
     @Override
-    public int limitOfRow(final int row) {
-        ElementNode node = myLastInRows[row];
-        if (node != null) {
-            return node.index + 1;
-        } else {
-            return super.limitOfRow(row);
-        }
-    }
+    public ElementNode getNode(final int row, final int col) {
 
-    public void removeAndShift(final int remove, final int insert) {
-
-        if (remove != insert) {
-            for (int i = 0; i < myFirstInRows.length; i++) {
-                this.removeAndShift(i, myFirstInRows[i], remove, insert);
-            }
-        }
-    }
-
-    public void removeShiftAndInsert(final int remove, final int insert, final Access1D<?> column) {
-
-        this.removeAndShift(remove, insert);
-
-        for (ElementView1D<?, ?> element : column.nonzeros()) {
-            this.set(element.index(), insert, element.doubleValue());
-        }
-    }
-
-    @Override
-    public void reset() {
-        Arrays.fill(myFirstInRows, null);
-        Arrays.fill(myLastInRows, null);
-    }
-
-    @Override
-    public void supplyTo(final TransformableRegion<Double> receiver) {
-
-        // First clear the receiver
-        receiver.reset();
-
-        // Iterate through each column
-        for (int row = 0; row < myFirstInRows.length; row++) {
-            // Get first element in this column
-            ElementNode current = myFirstInRows[row];
-
-            // Traverse the linked list for this column
-            while (current != null) {
-                // Set non-zero value in receiver
-                receiver.set(row, current.index, current.value);
-                current = current.next;
-            }
-        }
-    }
-
-    private void remove(final int row, final ElementNode node) {
-
-        // Only node in row
-        if (node.previous == null && node.next == null) {
-            myFirstInRows[row] = null;
-            myLastInRows[row] = null;
-            return;
-        }
-
-        // First node in row
-        if (node.previous == null) {
-            myFirstInRows[row] = node.next;
-            node.next.previous = null;
-            return;
-        }
-
-        // Last node in row
-        if (node.next == null) {
-            myLastInRows[row] = node.previous;
-            node.previous.next = null;
-            return;
-        }
-
-        // Middle node
-        node.previous.next = node.next;
-        node.next.previous = node.previous;
-    }
-
-    private void removeAndShift(final int row, final ElementNode firstInRow, final int remove, final int insert) {
-
-        ElementNode current = firstInRow;
-        while (current != null && current.index <= insert) {
-
-            if (current.index == remove) {
-                this.remove(row, current);
-            } else if (remove < current.index) {
-                --current.index;
-            }
-
-            current = current.next;
-        }
-    }
-
-    @Override
-    ElementNode getNode(final int row, final int col) {
         ElementNode prev = null;
         ElementNode next = null;
 
@@ -305,6 +209,163 @@ public final class R064LSR extends SparseR064 {
         prev.next = node;
         next.previous = node;
         return node;
+    }
+
+    @Override
+    public ElementNode getNodeIfExists(final int row, final int col) {
+
+        ElementNode prev = null;
+        ElementNode next = null;
+
+        // Search from left or right based on split
+        if (row <= mySplit) {
+            next = myFirstInRows[row];
+            while (next != null && next.index < col) {
+                prev = next;
+                next = next.next;
+            }
+            if (next != null && next.index == col) {
+                return next;
+            }
+        } else {
+            prev = myLastInRows[row];
+            while (prev != null && prev.index > col) {
+                next = prev;
+                prev = prev.previous;
+            }
+            if (prev != null && prev.index == col) {
+                return prev;
+            }
+        }
+
+        return null;
+    }
+
+    public ElementNode insertNodeAfter(final ElementNode existingNode, final int col, final double value) {
+        ElementNode newNode = new ElementNode(col, value);
+        newNode.previous = existingNode;
+        newNode.next = existingNode.next;
+        if (existingNode.next != null) {
+            existingNode.next.previous = newNode;
+        } else {
+            myLastInRows[existingNode.index] = newNode;
+        }
+        existingNode.next = newNode;
+        return newNode;
+    }
+
+    public ElementNode insertNodeBefore(final ElementNode existingNode, final int col, final double value) {
+        ElementNode newNode = new ElementNode(col, value);
+        newNode.next = existingNode;
+        newNode.previous = existingNode.previous;
+        if (existingNode.previous != null) {
+            existingNode.previous.next = newNode;
+        } else {
+            myFirstInRows[existingNode.index] = newNode;
+        }
+        existingNode.previous = newNode;
+        return newNode;
+    }
+
+    @Override
+    public int limitOfRow(final int row) {
+        ElementNode node = myLastInRows[row];
+        if (node != null) {
+            return node.index + 1;
+        } else {
+            return super.limitOfRow(row);
+        }
+    }
+
+    public void modifyNodeValue(final ElementNode node, final double newValue) {
+        node.value = newValue;
+    }
+
+    public void remove(final int row, final ElementNode node) {
+
+        // Only node in row
+        if (node.previous == null && node.next == null) {
+            myFirstInRows[row] = null;
+            myLastInRows[row] = null;
+            return;
+        }
+
+        // First node in row
+        if (node.previous == null) {
+            myFirstInRows[row] = node.next;
+            node.next.previous = null;
+            return;
+        }
+
+        // Last node in row
+        if (node.next == null) {
+            myLastInRows[row] = node.previous;
+            node.previous.next = null;
+            return;
+        }
+
+        // Middle node
+        node.previous.next = node.next;
+        node.next.previous = node.previous;
+    }
+
+    public void removeAndShift(final int remove, final int insert) {
+
+        if (remove != insert) {
+            for (int i = 0; i < myFirstInRows.length; i++) {
+                this.removeAndShift(i, myFirstInRows[i], remove, insert);
+            }
+        }
+    }
+
+    public void removeShiftAndInsert(final int remove, final int insert, final Access1D<?> column) {
+
+        this.removeAndShift(remove, insert);
+
+        for (ElementView1D<?, ?> element : column.nonzeros()) {
+            this.set(element.index(), insert, element.doubleValue());
+        }
+    }
+
+    @Override
+    public void reset() {
+        Arrays.fill(myFirstInRows, null);
+        Arrays.fill(myLastInRows, null);
+    }
+
+    @Override
+    public void supplyTo(final TransformableRegion<Double> receiver) {
+
+        // First clear the receiver
+        receiver.reset();
+
+        // Iterate through each column
+        for (int row = 0; row < myFirstInRows.length; row++) {
+            // Get first element in this column
+            ElementNode current = myFirstInRows[row];
+
+            // Traverse the linked list for this column
+            while (current != null) {
+                // Set non-zero value in receiver
+                receiver.set(row, current.index, current.value);
+                current = current.next;
+            }
+        }
+    }
+
+    private void removeAndShift(final int row, final ElementNode firstInRow, final int remove, final int insert) {
+
+        ElementNode current = firstInRow;
+        while (current != null && current.index <= insert) {
+
+            if (current.index == remove) {
+                this.remove(row, current);
+            } else if (remove < current.index) {
+                --current.index;
+            }
+
+            current = current.next;
+        }
     }
 
     @Override

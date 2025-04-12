@@ -150,71 +150,7 @@ public final class R064LSC extends SparseR064 {
     }
 
     @Override
-    public int limitOfColumn(final int col) {
-        ElementNode node = myLastInColumns[col];
-        if (node != null) {
-            return node.index + 1;
-        } else {
-            return super.limitOfColumn(col);
-        }
-    }
-
-    @Override
-    public void reset() {
-        Arrays.fill(myFirstInColumns, null);
-        Arrays.fill(myLastInColumns, null);
-    }
-
-    @Override
-    public void supplyTo(final TransformableRegion<Double> receiver) {
-
-        // First clear the receiver
-        receiver.reset();
-
-        // Iterate through each column
-        for (int col = 0; col < myFirstInColumns.length; col++) {
-            // Get first element in this column
-            ElementNode current = myFirstInColumns[col];
-
-            // Traverse the linked list for this column
-            while (current != null) {
-                // Set non-zero value in receiver
-                receiver.set(current.index, col, current.value);
-                current = current.next;
-            }
-        }
-    }
-
-    private void remove(final int col, final ElementNode node) {
-
-        // Only node in column
-        if (node.previous == null && node.next == null) {
-            myFirstInColumns[col] = null;
-            myLastInColumns[col] = null;
-            return;
-        }
-
-        // First node in column
-        if (node.previous == null) {
-            myFirstInColumns[col] = node.next;
-            node.next.previous = null;
-            return;
-        }
-
-        // Last node in column
-        if (node.next == null) {
-            myLastInColumns[col] = node.previous;
-            node.previous.next = null;
-            return;
-        }
-
-        // Middle node
-        node.previous.next = node.next;
-        node.next.previous = node.previous;
-    }
-
-    @Override
-    ElementNode getNode(final int row, final int col) {
+    public ElementNode getNode(final int row, final int col) {
 
         ElementNode prev = null;
         ElementNode next = null;
@@ -272,6 +208,100 @@ public final class R064LSC extends SparseR064 {
         prev.next = node;
         next.previous = node;
         return node;
+    }
+
+    @Override
+    public ElementNode getNodeIfExists(final int row, final int col) {
+
+        ElementNode prev = null;
+        ElementNode next = null;
+
+        // Search from top or bottom based on split
+        if (col <= mySplit) {
+            next = myFirstInColumns[col];
+            while (next != null && next.index < row) {
+                prev = next;
+                next = next.next;
+            }
+            if (next != null && next.index == row) {
+                return next;
+            }
+        } else {
+            prev = myLastInColumns[col];
+            while (prev != null && prev.index > row) {
+                next = prev;
+                prev = prev.previous;
+            }
+            if (prev != null && prev.index == row) {
+                return prev;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public int limitOfColumn(final int col) {
+        ElementNode node = myLastInColumns[col];
+        if (node != null) {
+            return node.index + 1;
+        } else {
+            return super.limitOfColumn(col);
+        }
+    }
+
+    public void remove(final int col, final ElementNode node) {
+
+        // Only node in column
+        if (node.previous == null && node.next == null) {
+            myFirstInColumns[col] = null;
+            myLastInColumns[col] = null;
+            return;
+        }
+
+        // First node in column
+        if (node.previous == null) {
+            myFirstInColumns[col] = node.next;
+            node.next.previous = null;
+            return;
+        }
+
+        // Last node in column
+        if (node.next == null) {
+            myLastInColumns[col] = node.previous;
+            node.previous.next = null;
+            return;
+        }
+
+        // Middle node
+        node.previous.next = node.next;
+        node.next.previous = node.previous;
+    }
+
+    @Override
+    public void reset() {
+        Arrays.fill(myFirstInColumns, null);
+        Arrays.fill(myLastInColumns, null);
+    }
+
+    @Override
+    public void supplyTo(final TransformableRegion<Double> receiver) {
+
+        // First clear the receiver
+        receiver.reset();
+
+        // Iterate through each column
+        for (int col = 0; col < myFirstInColumns.length; col++) {
+            // Get first element in this column
+            ElementNode current = myFirstInColumns[col];
+
+            // Traverse the linked list for this column
+            while (current != null) {
+                // Set non-zero value in receiver
+                receiver.set(current.index, col, current.value);
+                current = current.next;
+            }
+        }
     }
 
     @Override

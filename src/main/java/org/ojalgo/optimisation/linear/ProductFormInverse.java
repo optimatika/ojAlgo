@@ -38,7 +38,7 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.transformation.InvertibleFactor;
 import org.ojalgo.type.ObjectPool;
 
-final class ProductFormInverse implements InvertibleFactor<Double> {
+final class ProductFormInverse implements BasisRepresentation {
 
     static final class ArrayPool extends ObjectPool<SparseArray<Double>> {
 
@@ -180,6 +180,31 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         return myDim;
     }
 
+    /**
+     * Update the inverse to reflect a replaced column in the basis.
+     *
+     * @param basis  Full basis, with the column already exchanged.
+     * @param col    The index, of the column, that was exchanged.
+     * @param values The (non zero) values of that column.
+     */
+    @Override
+    public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
+
+        values.supplyTo(myWork);
+
+        this.ftran(myWork);
+
+        double diagonalElement = myWork.doubleValue(col);
+
+        if (Math.abs(diagonalElement) >= myScalingThreshold
+                && (Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue()) >= myScalingThreshold) {
+            myFactors.add(this.newFactor(myWork, col, diagonalElement));
+        } else {
+            this.clearFactors();
+            myRoot.decompose(basis.transpose());
+        }
+    }
+
     private void clearFactors() {
         for (ElementaryFactor factor : myFactors) {
             myArrayPool.giveBack(factor.getColumn());
@@ -231,30 +256,6 @@ final class ProductFormInverse implements InvertibleFactor<Double> {
         double diagonalElement = myWork.doubleValue(col);
 
         myFactors.add(this.newFactor(myWork, col, diagonalElement));
-    }
-
-    /**
-     * Update the inverse to reflect a replaced column in the basis.
-     *
-     * @param basis  Full basis, with the column already exchanged.
-     * @param col    The index, of the column, that was exchanged.
-     * @param values The (non zero) values of that column.
-     */
-    void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
-
-        values.supplyTo(myWork);
-
-        this.ftran(myWork);
-
-        double diagonalElement = myWork.doubleValue(col);
-
-        if (Math.abs(diagonalElement) >= myScalingThreshold
-                && (Math.abs(diagonalElement) / myWork.aggregateAll(Aggregator.LARGEST).doubleValue()) >= myScalingThreshold) {
-            myFactors.add(this.newFactor(myWork, col, diagonalElement));
-        } else {
-            this.clearFactors();
-            myRoot.decompose(basis.transpose());
-        }
     }
 
 }

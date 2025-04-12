@@ -4,6 +4,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -436,6 +437,18 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         return new Result(newOrder, newL, newU, COL_ORDER.getOrder());
     }
 
+    private static Result doUsingDecomposition(final MatrixStore<Double> original, final int columnIndex, final MatrixStore<Double> column,
+            final Supplier<LU<Double>> factory) {
+
+        LU<Double> decomposition = factory.get();
+
+        decomposition.decompose(original);
+
+        decomposition.updateColumn(columnIndex, column);
+
+        return new Result(decomposition.getPivotOrder(), decomposition.getL(), decomposition.getU());
+    }
+
     private static MatrixStore<Double> newColumn(final R064Store matrix, final int indexOfLastNonzero) {
 
         int m = matrix.getRowDim();
@@ -488,7 +501,7 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
     static void doOne(final String implName, final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn,
             final PhysicalStore<Double> modifiedMatrix, final int[] pivotOrder, final MatrixStore<Double> mtrxL, final MatrixStore<Double> mtrxU,
-            final Calculator implAlgo) {
+            final Calculator implAlgo, final Supplier<LU<Double>> factory) {
 
         if (DEBUG) {
             BasicLogger.debug();
@@ -498,7 +511,14 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             BasicLogger.debug();
         }
 
-        Result result = implAlgo.calculate(Arrays.copyOf(pivotOrder, pivotOrder.length), mtrxL.copy(), mtrxU.copy(), columnIndex, newColumn.copy());
+        Result result = null;
+        if (factory != null) {
+            result = DecompositionUpdateTest.doUsingDecomposition(originalMatrix.copy(), columnIndex, newColumn.copy(), factory);
+        } else if (implAlgo != null) {
+            result = implAlgo.calculate(Arrays.copyOf(pivotOrder, pivotOrder.length), mtrxL.copy(), mtrxU.copy(), columnIndex, newColumn.copy());
+        } else {
+            throw new IllegalArgumentException();
+        }
 
         int m = originalMatrix.getRowDim();
         int n = originalMatrix.getColDim();
@@ -506,10 +526,12 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
         MatrixStore<Double> resL = result.mtrxL;
         MatrixStore<Double> resU = result.mtrxU;
+
         int[] resRowOrder = result.rowOrder;
         int[] resRowRever = Pivot.reverse(resRowOrder);
+
         int[] resColOrder = result.colOrder;
-        int[] resColRever = Pivot.reverse(resColOrder);
+        int[] resColRever = resColOrder != null ? Pivot.reverse(resColOrder) : null;
 
         if (DEBUG) {
             BasicLogger.debug();
@@ -526,13 +548,19 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             }
         }
 
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < i; j++) {
-                TestUtils.assertEquals("U not triagonal", ZERO, resU.doubleValue(i, j));
+        if (resColOrder != null) {
+            // If null, the columns of U are already reordered so that U is no longer triangular
+            for (int i = 0; i < r; i++) {
+                for (int j = 0; j < i; j++) {
+                    TestUtils.assertEquals("U not triagonal", ZERO, resU.doubleValue(i, j));
+                }
             }
         }
 
-        MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever).columns(resColRever);
+        MatrixStore<Double> reconstructed = resL.multiply(resU).rows(resRowRever);
+        if (resColRever != null) {
+            reconstructed = reconstructed.columns(resColRever);
+        }
         if (DEBUG) {
             BasicLogger.debugMatrix("Reconstructed", reconstructed, PRINT);
         }
@@ -562,7 +590,9 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
                 try {
                     actualSolution = calculationLU.solve(resL, actualSolution);
                     actualSolution = calculationLU.solve(resU, actualSolution);
-                    actualSolution = actualSolution.rows(resColRever);
+                    if (resColRever != null) {
+                        actualSolution = actualSolution.rows(resColRever);
+                    }
                 } catch (RecoverableCondition cause) {
                     TestUtils.fail(cause);
                 }
@@ -614,19 +644,21 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
 
         DecompositionUpdateTest.doOne("The stupid way", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doItTheStupidWay);
+                DecompositionUpdateTest::doItTheStupidWay, null);
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (outline)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthews);
+                DecompositionUpdateTest::doFletcherMatthews, null);
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (sparse)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthewsSparse);
+                DecompositionUpdateTest::doFletcherMatthewsSparse, null);
+
+        DecompositionUpdateTest.doOne("SparseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, SparseLU::new);
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (dense)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthewsDense);
+                DecompositionUpdateTest::doFletcherMatthewsDense, null);
 
         DecompositionUpdateTest.doOne("Fletcher-Matthews (raw)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthewsRaw);
+                DecompositionUpdateTest::doFletcherMatthewsRaw, null);
 
     }
 

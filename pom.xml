@@ -96,6 +96,13 @@
                     <source>${version.java}</source>
                     <target>${version.java}</target>
                     <release>${version.java}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${version.org.openjdk.jmh}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -37,6 +37,202 @@ import org.ojalgo.type.context.NumberContext;
 public class SparseLUTest extends MatrixDecompositionTests {
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
+
+    @Test
+    public void testColumnShiftingInU() {
+
+        // Create a 5x5 matrix with a structure that will require column shifts
+        R064LSC mOriginal = R064LSC.FACTORY.make(5, 5);
+
+        // Set up a matrix that will require column shifts when updated
+        // The structure is designed so that updating column 2 will require shifting columns
+        mOriginal.set(0, 0, 4.0);
+        mOriginal.set(0, 1, 2.0);
+        mOriginal.set(0, 2, 1.0);
+        mOriginal.set(0, 3, 3.0);
+        mOriginal.set(0, 4, 5.0);
+
+        mOriginal.set(1, 0, 2.0);
+        mOriginal.set(1, 1, 3.0);
+        mOriginal.set(1, 2, 2.0);
+        mOriginal.set(1, 3, 4.0);
+        mOriginal.set(1, 4, 6.0);
+
+        mOriginal.set(2, 0, 1.0);
+        mOriginal.set(2, 1, 2.0);
+        mOriginal.set(2, 2, 4.0);
+        mOriginal.set(2, 3, 5.0);
+        mOriginal.set(2, 4, 7.0);
+
+        mOriginal.set(3, 0, 3.0);
+        mOriginal.set(3, 1, 4.0);
+        mOriginal.set(3, 2, 5.0);
+        mOriginal.set(3, 3, 6.0);
+        mOriginal.set(3, 4, 8.0);
+
+        mOriginal.set(4, 0, 5.0);
+        mOriginal.set(4, 1, 6.0);
+        mOriginal.set(4, 2, 7.0);
+        mOriginal.set(4, 3, 8.0);
+        mOriginal.set(4, 4, 9.0);
+
+        // Create a new column to update (column 2)
+        // This column is designed to force column shifts in U
+        R064Store mColumn = R064Store.FACTORY.make(5, 1);
+        mColumn.set(0, 0, 0.0); // Zero at top to force shift
+        mColumn.set(1, 0, 0.0); // Zero at top to force shift
+        mColumn.set(2, 0, 1.0); // Non-zero here to force shift
+        mColumn.set(3, 0, 2.0);
+        mColumn.set(4, 0, 3.0);
+
+        // Create SparseLU decomposition
+        SparseLU decomp = new SparseLU();
+        decomp.decompose(mOriginal);
+        decomp.updateColumn(2, mColumn);
+
+        PhysicalStore<Double> mModified = mOriginal.copy();
+        mModified.fillColumn(2, mColumn);
+
+        // Verify that the decomposition is still valid after the update
+        // PA = LU where P is the permutation matrix
+        PhysicalStore<Double> mP = R064Store.FACTORY.make(5, 5);
+        int[] pivotOrder = decomp.getPivotOrder();
+        for (int i = 0; i < 5; i++) {
+            mP.set(i, pivotOrder[i], ONE);
+        }
+
+        // Verify PA = LU
+        MatrixStore<Double> mPA = mP.multiply(mModified);
+        MatrixStore<Double> mLU = decomp.getL().multiply(decomp.getU());
+        TestUtils.assertEquals(mPA, mLU, ACCURACY);
+
+        // Test ftran: Solve Ax = b
+        PhysicalStore<Double> mB = R064Store.FACTORY.make(5, 1);
+        mB.set(0, 0, 1.0);
+        mB.set(1, 0, 2.0);
+        mB.set(2, 0, 3.0);
+        mB.set(3, 0, 4.0);
+        mB.set(4, 0, 5.0);
+
+        // Make a copy of b for comparison
+        PhysicalStore<Double> mX = mB.copy();
+        // Apply ftran to solve Ax = b
+        decomp.ftran(mX);
+
+        // Verify that x is indeed a solution to Ax = b
+        // Compute Ax and compare with original b
+        TestUtils.assertEquals(mB, mModified.multiply(mX), ACCURACY);
+
+        // Test btran: Solve Aᵀx = b
+        mB.supplyTo(mX);
+        // Apply btran to solve Aᵀx = b
+        decomp.btran(mX);
+
+        // Verify that x is indeed a solution to Aᵀx = b
+        // Compute Aᵀx and compare with original b
+        TestUtils.assertEquals(mB, mModified.transpose().multiply(mX), ACCURACY);
+
+        for (int col = 0; col < pivotOrder.length; col++) {
+
+            PhysicalStore<Double> original = mOriginal.copy();
+            PhysicalStore<Double> column = mColumn.copy();
+
+            PhysicalStore<Double> modified = mOriginal.copy();
+            modified.fillColumn(col, column);
+
+            LU<Double> expDecomp = LU.R064.decompose(modified);
+
+            LU<Double> actDecomp = new SparseLU();
+            actDecomp.decompose(original);
+            actDecomp.updateColumn(col, column);
+
+            TestUtils.assertEquals(modified, actDecomp.reconstruct());
+
+            if (expDecomp.isSolvable()) {
+                MatrixStore<Double> exp = expDecomp.getInverse();
+                MatrixStore<Double> act = actDecomp.getInverse();
+                TestUtils.assertEquals(exp, act);
+            }
+        }
+    }
+
+    @Test
+    public void testFtranBtranAfterUpdate() {
+
+        // Create a 3x3 matrix
+        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        matrix.set(0, 0, 4.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(0, 2, 1.0);
+        matrix.set(1, 0, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 2.0);
+        matrix.set(2, 0, 1.0);
+        matrix.set(2, 1, 2.0);
+        matrix.set(2, 2, 4.0);
+
+        // Create SparseLU decomposition
+        SparseLU decomp = new SparseLU();
+        decomp.decompose(matrix);
+
+        // Create a new column to update
+        R064Store newColumn = R064Store.FACTORY.make(3, 1);
+        newColumn.set(0, 0, 3.0);
+        newColumn.set(1, 0, 4.0);
+        newColumn.set(2, 0, 5.0);
+
+        // Create a work vector for the update
+        PhysicalStore<Double> work = R064Store.FACTORY.make(3, 1);
+
+        // Update column 1
+        decomp.updateColumn(1, newColumn, work);
+
+        // Update the original matrix with the new column
+        matrix.fillColumn(1, newColumn);
+
+        // Test ftran: Solve Ax = b
+        PhysicalStore<Double> b = R064Store.FACTORY.make(3, 1);
+        b.set(0, 0, 1.0);
+        b.set(1, 0, 2.0);
+        b.set(2, 0, 3.0);
+
+        // Make a copy of b for comparison
+        PhysicalStore<Double> bCopy = b.copy();
+
+        // Apply ftran to solve Ax = b
+        decomp.ftran(b);
+
+        // Verify that x is indeed a solution to Ax = b
+        // Compute Ax and compare with original b
+        PhysicalStore<Double> computedB = R064Store.FACTORY.make(3, 1);
+        matrix.multiply(b).supplyTo(computedB);
+        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
+
+        // Test btran: Solve Aᵀx = b
+        b = bCopy.copy();
+
+        // Apply btran to solve Aᵀx = b
+        decomp.btran(b);
+
+        // Verify that x is indeed a solution to Aᵀx = b
+        // Compute Aᵀx and compare with original b
+        computedB = R064Store.FACTORY.make(3, 1);
+        matrix.transpose().multiply(b).supplyTo(computedB);
+        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
+
+        // Verify that the decomposition is still valid after the update
+        // PA = LU where P is the permutation matrix
+        PhysicalStore<Double> P = R064Store.FACTORY.make(3, 3);
+        int[] pivotOrder = decomp.getPivotOrder();
+        for (int i = 0; i < 3; i++) {
+            P.set(i, pivotOrder[i], 1.0);
+        }
+
+        // Verify PA = LU
+        MatrixStore<Double> PA = P.multiply(matrix);
+        MatrixStore<Double> LU = decomp.getL().multiply(decomp.getU());
+        TestUtils.assertEquals(PA, LU, ACCURACY);
+    }
 
     @Test
     public void testRandom5x5() {

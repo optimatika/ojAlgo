@@ -55,7 +55,7 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
          */
         public ElementNode previous;
 
-        ElementNode(final int index, final double value) {
+        public ElementNode(final int index, final double value) {
             this.index = index;
             this.value = value;
         }
@@ -168,6 +168,13 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
         return Double.valueOf(this.doubleValue(row, col));
     }
 
+    /**
+     * Always returns a node, creating one if necessary.
+     */
+    public abstract ElementNode getNode(final int row, final int col);
+
+    public abstract ElementNode getNodeIfExists(final int row, final int col);
+
     @Override
     public final void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
         ElementNode node = this.getNode((int) row, (int) col);
@@ -211,11 +218,6 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
     public final void set(final long row, final long col, final Comparable<?> value) {
         this.set(Math.toIntExact(row), Math.toIntExact(col), Scalar.doubleValue(value));
     }
-
-    /**
-     * Always returns a node, creating one if necessary.
-     */
-    abstract ElementNode getNode(final int row, final int col);
 
     abstract void removeIfZero(final int row, final int col, final ElementNode node);
 
