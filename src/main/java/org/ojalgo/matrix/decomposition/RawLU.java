@@ -31,12 +31,14 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
 
+    private Pivot myColPivot = null;
     private final Pivot myPivot = new Pivot();
 
     /**
@@ -49,6 +51,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public void btran(final PhysicalStore<Double> arg) {
+
+        if (myColPivot != null) {
+            this.applyPivotOrder(myColPivot, arg);
+        }
 
         MatrixStore<Double> body = this.getInternalStore();
 
@@ -116,6 +122,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         arg.substituteForwards(body, true, false, false);
 
         arg.substituteBackwards(body, false, false, false);
+
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, arg);
+        }
     }
 
     @Override
@@ -189,6 +199,9 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         if (this.getRowDim() > nbCols) {
             retVal = retVal.limits(nbCols, nbCols);
         }
+        if (myColPivot != null && myColPivot.isModified()) {
+            retVal = retVal.columns(myColPivot.reverseOrder());
+        }
         return retVal;
     }
 
@@ -244,6 +257,18 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+    }
+
+    @Override
+    public boolean updateColumn(final int columnIndex, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn,
+            final PhysicalStore<Double> preallocated) {
+
+        if (myColPivot == null) {
+            myColPivot = new Pivot();
+            myColPivot.reset(this.getColDim());
+        }
+
+        return FletcherMatthews.update(myPivot, this.getInternalStore(), myColPivot, columnIndex, newColumn, preallocated);
     }
 
     private boolean doDecompose(final double[][] data, final boolean pivoting) {
@@ -312,6 +337,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         preallocated.substituteBackwards(body, false, false, false);
 
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, preallocated);
+        }
+
         return preallocated;
     }
 
@@ -322,6 +351,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         preallocated.substituteForwards(body, true, false, false);
 
         preallocated.substituteBackwards(body, false, false, false);
+
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, preallocated);
+        }
 
         return preallocated;
     }

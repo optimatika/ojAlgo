@@ -37,7 +37,7 @@ public class BenchmarkDecomposeLU extends AbstractBenchmarkSparseLU {
         BenchmarkUtils.run(BenchmarkDecomposeLU.class);
     }
 
-    @Param({ "0.01", "0.02", "0.05" })
+    @Param({ "0.005", "0.01", "0.02", "0.05" })
     public double density;
     @Param({ "500", "1000", "2000" })
     public int dim;

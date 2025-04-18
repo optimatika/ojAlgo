@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.UnaryFunction;
@@ -29,6 +29,7 @@ import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class SparseR064 extends FactoryStore<Double> implements TransformableRegion<Double> {
@@ -127,7 +128,35 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
 
     }
 
+    private static final ObjectPool<ElementNode> POOL = new ObjectPool<>() {
+
+        @Override
+        protected ElementNode newObject() {
+            return new ElementNode(-1, NaN);
+        }
+
+        @Override
+        protected void reset(final ElementNode object) {
+            object.index = -1;
+            object.next = null;
+            object.previous = null;
+            object.value = NaN;
+        }
+
+    };
+
     static final NumberContext PRECISION = NumberContext.of(16);
+
+    public static ElementNode newNode(final int index, final double value) {
+        ElementNode retVal = POOL.borrow();
+        retVal.index = index;
+        retVal.value = value;
+        return retVal;
+    }
+
+    public static void recycle(final ElementNode node) {
+        POOL.giveBack(node);
+    }
 
     private final TransformableRegion.FillByMultiplying<Double> myMultiplier;
 

@@ -84,6 +84,7 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     }
 
+    private Pivot myColPivot = null;
     private final Pivot myPivot = new Pivot();
 
     protected DenseLU(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
@@ -92,6 +93,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
     @Override
     public void btran(final PhysicalStore<N> arg) {
+
+        if (myColPivot != null) {
+            this.applyPivotOrder(myColPivot, arg);
+        }
 
         DecompositionStore<N> body = this.getInPlace();
 
@@ -143,6 +148,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         arg.substituteForwards(body, true, false, false);
 
         arg.substituteBackwards(body, false, false, false);
+
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, arg);
+        }
     }
 
     @Override
@@ -176,6 +185,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
         preallocated.substituteBackwards(body, false, false, false);
+
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, preallocated);
+        }
 
         return preallocated;
     }
@@ -239,6 +252,10 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
 
         preallocated.substituteBackwards(body, false, false, false);
 
+        if (myColPivot != null) {
+            this.applyReverseOrder(myColPivot, preallocated);
+        }
+
         return preallocated;
     }
 
@@ -248,6 +265,9 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         int nbCols = this.getColDim();
         if (this.getRowDim() > nbCols) {
             retVal = retVal.limits(nbCols, nbCols);
+        }
+        if (myColPivot != null && myColPivot.isModified()) {
+            retVal = retVal.columns(myColPivot.reverseOrder());
         }
         return retVal;
     }
@@ -301,6 +321,18 @@ abstract class DenseLU<N extends Comparable<N>> extends InPlaceDecomposition<N> 
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+    }
+
+    @Override
+    public boolean updateColumn(final int columnIndex, final org.ojalgo.structure.Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn,
+            final PhysicalStore<N> preallocated) {
+
+        if (myColPivot == null) {
+            myColPivot = new Pivot();
+            myColPivot.reset(this.getColDim());
+        }
+
+        return FletcherMatthews.update(myPivot, this.getInPlace(), myColPivot, columnIndex, newColumn, preallocated);
     }
 
     private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {

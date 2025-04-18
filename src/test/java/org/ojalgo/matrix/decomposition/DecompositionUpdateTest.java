@@ -9,10 +9,15 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.*;
+import org.ojalgo.matrix.store.DiagonalStore;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064LSC;
+import org.ojalgo.matrix.store.R064LSR;
+import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -194,20 +199,220 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
      */
     private static Result doFletcherMatthewsDense(final int[] pivotOrder, final PhysicalStore<Double> mtrxL, final PhysicalStore<Double> mtrxU,
             final int columnIndex, final MatrixStore<Double> column) {
-        // TODO Not implemented yet
-        return DecompositionUpdateTest.doFletcherMatthews(pivotOrder, mtrxL, mtrxU, columnIndex, column);
+
+        int m = mtrxL.getRowDim();
+        int n = mtrxU.getColDim();
+
+        DecompositionStore<Double> combined = R064Store.FACTORY.make(m, n);
+        for (int j = 0; j < n; j++) {
+            for (int i = j + 1; i < m; i++) {
+                combined.set(i, j, mtrxL.doubleValue(i, j));
+            }
+        }
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                combined.set(i, j, mtrxU.doubleValue(i, j));
+            }
+        }
+
+        Pivot myPivot = new Pivot(pivotOrder);
+        Pivot myColPivot = new Pivot();
+        myColPivot.reset(n);
+
+        FletcherMatthews.update(myPivot, combined, myColPivot, columnIndex, column, R064Store.FACTORY.make(m, 1));
+
+        MatrixStore<Double> tmpL = combined.triangular(false, true);
+        MatrixStore<Double> tmpU = combined.triangular(true, false);
+        return new Result(myPivot.getOrder(), tmpL, tmpU, myColPivot.getOrder());
     }
 
     /**
      * A variant of {@link #doFletcherMatthews(int[], PhysicalStore, PhysicalStore, int, MatrixStore)}
-     * specifically target to be used with (copied to) {@link RawLU}.
+     * specifically target to be used with (copied to) {@link DenseLU}.
      * <p>
-     * {@link DenseLU} stores the L and U factors combined in a single {@link RawStore} instance.
+     * {@link DenseLU} stores the L and U factors combined in a single {@link R064Store} instance.
      */
-    private static Result doFletcherMatthewsRaw(final int[] pivotOrder, final PhysicalStore<Double> mtrxL, final PhysicalStore<Double> mtrxU,
+    private static Result doFletcherMatthewsDenseTooSimple(final int[] pivotOrder, final PhysicalStore<Double> mtrxL, final PhysicalStore<Double> mtrxU,
             final int columnIndex, final MatrixStore<Double> column) {
-        // TODO Not implemented yet
-        return DecompositionUpdateTest.doFletcherMatthews(pivotOrder, mtrxL, mtrxU, columnIndex, column);
+
+        int m = mtrxL.getRowDim();
+        int n = mtrxU.getColDim();
+        int r = mtrxL.getMinDim();
+
+        DecompositionStore<Double> combined = R064Store.FACTORY.make(m, n);
+        for (int j = 0; j < n; j++) {
+            for (int i = j + 1; i < m; i++) {
+                combined.set(i, j, mtrxL.doubleValue(i, j));
+            }
+        }
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                combined.set(i, j, mtrxU.doubleValue(i, j));
+            }
+        }
+
+        PhysicalStore<Double> preallocated = R064Store.FACTORY.make(m, 1);
+
+        Pivot myPivot = new Pivot(pivotOrder);
+        Pivot myColPivot = new Pivot();
+        myColPivot.reset(n);
+
+        if (DEBUG) {
+            BasicLogger.debug("Input");
+            BasicLogger.debug("P: {}", myPivot);
+            BasicLogger.debugMatrix("L", mtrxL);
+            BasicLogger.debugMatrix("U", mtrxU);
+            BasicLogger.debug("Q: {}", myColPivot);
+        }
+
+        // Start here (no changes before this)
+        // This is a copy of what's in
+        // DenseLU.updateColumn(int,Access1D.Collectable,PhysicalStore)
+        // except for the final return statement.
+        {
+
+            if (DEBUG) {
+                BasicLogger.debug("Initial");
+                BasicLogger.debug("P: {}", myPivot);
+                MatrixStore<Double> tmpL = combined.triangular(false, true);
+                MatrixStore<Double> tmpU = combined.triangular(true, false);
+                BasicLogger.debugMatrix("Store", combined);
+                BasicLogger.debugMatrix("L", tmpL);
+                BasicLogger.debugMatrix("U", tmpU);
+                BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                BasicLogger.debug("Q: {}", myColPivot);
+            }
+
+            column.supplyTo(preallocated);
+            myPivot.applyPivotOrder(preallocated);
+            preallocated.substituteForwards(combined, true, false, false);
+
+            // After forward substitution is complete, find the last non-zero row
+            int lastRowNonZero = -1;
+            for (int i = m - 1; i >= 0; i--) {
+                if (!ACCURACY.isZero(preallocated.doubleValue(i))) {
+                    lastRowNonZero = i;
+                    break; // Stop as soon as we find a non-zero value
+                }
+            }
+
+            for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
+
+                if (DEBUG) {
+                    BasicLogger.debug("start: " + ij);
+                    MatrixStore<Double> tmpL = combined.triangular(false, true);
+                    MatrixStore<Double> tmpU = combined.triangular(true, false);
+                    BasicLogger.debugMatrix("Store", combined);
+                    BasicLogger.debugMatrix("L", tmpL);
+                    BasicLogger.debugMatrix("U", tmpU);
+                    BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                }
+
+                combined.exchangeRows(ij, ij + 1);
+                combined.exchangeColumns(ij, ij + 1);
+
+                preallocated.exchangeRows(ij, ij + 1);
+
+                myPivot.change(ij, ij + 1);
+                myColPivot.change(ij, ij + 1);
+
+                double offL = combined.doubleValue(ij, ij + 1);
+                double offU = combined.doubleValue(ij + 1, ij);
+
+                if (DEBUG) {
+                    BasicLogger.debug("exchange");
+                    MatrixStore<Double> tmpL = combined.triangular(false, true);
+                    MatrixStore<Double> tmpU = combined.triangular(true, false);
+                    BasicLogger.debugMatrix("Store", combined);
+                    BasicLogger.debugMatrix("L", tmpL);
+                    BasicLogger.debugMatrix("U", tmpU);
+                    BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                }
+
+                if (!ACCURACY.isZero(offL)) {
+
+                    combined.set(ij, ij + 1, ZERO);
+                    for (int i = ij + 2; i < m; i++) { // L (ij+1)
+                        combined.add(i, ij + 1, -offL * combined.doubleValue(i, ij));
+                    }
+
+                    for (int j = ij; j < n; j++) { // U (ij)
+                        combined.add(ij, j, offL * combined.doubleValue(ij + 1, j));
+                    }
+                    preallocated.add(ij, offL * preallocated.doubleValue(ij + 1));
+
+                    if (DEBUG) {
+                        BasicLogger.debug("offL");
+                        BasicLogger.debug("P: {}", myPivot);
+                        MatrixStore<Double> tmpL = combined.triangular(false, true);
+                        MatrixStore<Double> tmpU = combined.triangular(true, false);
+                        BasicLogger.debugMatrix("Store", combined);
+                        BasicLogger.debugMatrix("L", tmpL);
+                        BasicLogger.debugMatrix("U", tmpU);
+                        BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                        BasicLogger.debug("Q: {}", myColPivot);
+                    }
+
+                } else {
+
+                    // combined.add(ij, ij, offL * combined.doubleValue(ij + 1, ij));
+                }
+
+                if (!ACCURACY.isZero(offU)) {
+
+                    double diag = combined.doubleValue(ij, ij);
+                    double fact = offU / diag;
+
+                    combined.set(ij + 1, ij, ZERO);
+                    for (int j = ij + 2; j < n; j++) { // U (ij+1)
+                        combined.add(ij + 1, j, -fact * combined.doubleValue(ij, j));
+                    }
+                    preallocated.add(ij + 1, -fact * preallocated.doubleValue(ij));
+
+                    combined.set(ij + 1, ij, fact); // L (ij)
+                    for (int i = ij + 2; i < m; i++) {
+                        combined.add(i, ij, fact * combined.doubleValue(i, ij + 1));
+                    }
+
+                    if (DEBUG) {
+                        BasicLogger.debug("offU");
+                        BasicLogger.debug("P: {}", myPivot);
+                        MatrixStore<Double> tmpL = combined.triangular(false, true);
+                        MatrixStore<Double> tmpU = combined.triangular(true, false);
+                        BasicLogger.debugMatrix("Store", combined);
+                        BasicLogger.debugMatrix("L", tmpL);
+                        BasicLogger.debugMatrix("U", tmpU);
+                        BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                        BasicLogger.debug("Q: {}", myColPivot);
+                    }
+
+                } else {
+
+                    // combined.add(ij, ij, offL * combined.doubleValue(ij + 1, ij));
+                }
+            }
+
+            for (int i = 0; i <= lastRowNonZero; i++) {
+                combined.set(i, lastRowNonZero, preallocated.doubleValue(i));
+            }
+
+            if (DEBUG) {
+                BasicLogger.debug("Final");
+                BasicLogger.debug("P: {}", myPivot);
+                MatrixStore<Double> tmpL = combined.triangular(false, true);
+                MatrixStore<Double> tmpU = combined.triangular(true, false);
+                BasicLogger.debugMatrix("Store", combined);
+                BasicLogger.debugMatrix("L", tmpL);
+                BasicLogger.debugMatrix("U", tmpU);
+                BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
+                BasicLogger.debug("Q: {}", myColPivot);
+            }
+        }
+        // Stop here (no changes after this)
+
+        MatrixStore<Double> tmpL = combined.triangular(false, true);
+        MatrixStore<Double> tmpU = combined.triangular(true, false);
+        return new Result(myPivot.getOrder(), tmpL, tmpU, myColPivot.getOrder());
     }
 
     /**
@@ -221,160 +426,32 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             final int columnIndex, final MatrixStore<Double> column) {
 
         int m = mtrxL.getRowDim();
-        int n = mtrxU.getColDim();
         int r = mtrxU.getMinDim();
+        int n = mtrxU.getColDim();
 
-        R064LSC myL = R064LSC.FACTORY.make(mtrxL);
-        myL.fillMatching(mtrxL);
+        R064LSC sparseL = R064LSC.FACTORY.make(mtrxL);
+        sparseL.fillMatching(mtrxL);
 
-        R064LSR myU = R064LSR.FACTORY.make(mtrxU);
-        myU.fillMatching(mtrxU);
+        R064LSR sparseU = R064LSR.FACTORY.make(mtrxU);
+        sparseU.fillMatching(mtrxU);
 
-        double[] myDiagU = new double[r];
+        double[] diagU = new double[r];
         for (int ij = 0; ij < r; ij++) {
-            double diagVal = myU.doubleValue(ij, ij);
-            myDiagU[ij] = diagVal;
-            myU.set(ij, ij, ZERO);
+            double diagVal = sparseU.doubleValue(ij, ij);
+            diagU[ij] = diagVal;
+            sparseU.set(ij, ij, ZERO);
         }
 
-        Pivot myRowPivot = new Pivot(pivotOrder);
-        Pivot myColPivot = new Pivot();
-        myColPivot.reset(n);
+        Pivot rowPivot = new Pivot(pivotOrder);
+        Pivot colPivot = new Pivot(pivotOrder);
+        colPivot.reset(n);
 
-        Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn = column;
+        FletcherMatthews.update(rowPivot, sparseL, diagU, sparseU, colPivot, columnIndex, column, R064Store.FACTORY.make(m, 1));
 
-        PhysicalStore<Double> preallocated = R064Store.FACTORY.make(m, 1);
+        MatrixStore<Double> tmpL = sparseL.triangular(false, true);
+        MatrixStore<Double> tmpU = sparseU.triangular(true, false).superimpose(DiagonalStore.wrap(diagU));
 
-        // Start here (no changes before this)
-        // This is to mimic what will later be in
-        // SparseLU.updateColumn(int,Access1D.Collectable,PhysicalStore)
-        {
-
-            newColumn.supplyTo(preallocated);
-            myRowPivot.applyPivotOrder(preallocated);
-
-            int lastRowNonZero = -1;
-            for (int ij = 0; ij < r; ij++) {
-                double varI = -preallocated.doubleValue(ij);
-                if (!ACCURACY.isZero(varI)) {
-                    lastRowNonZero = ij;
-                    SparseR064.ElementNode colNodeL = myL.getLastInColumn(ij);
-                    while (colNodeL != null && colNodeL.index > ij) {
-                        preallocated.add(colNodeL.index, colNodeL.value * varI);
-                        colNodeL = colNodeL.previous;
-                    }
-                }
-            }
-
-            int insertPoint = lastRowNonZero > columnIndex ? lastRowNonZero - 1 : columnIndex;
-
-            for (int ij = 0; ij < r; ij++) {
-                myU.set(ij, ij, myDiagU[ij]);
-            }
-
-            myColPivot.cycle(columnIndex, insertPoint);
-            myU.removeAndShift(columnIndex, insertPoint);
-            for (int i = 0; i <= lastRowNonZero; i++) {
-                double tmpVal = preallocated.doubleValue(i);
-                if (!ACCURACY.isZero(tmpVal)) {
-                    myU.set(i, insertPoint, tmpVal);
-                }
-            }
-
-            if (DEBUG) {
-                BasicLogger.debug("Updated column, and shiftet columns to create Hessenberg");
-                BasicLogger.debug("P: {}", myRowPivot);
-                BasicLogger.debugMatrix("L", myL);
-                BasicLogger.debugMatrix("U", myU);
-                BasicLogger.debug("Q: {}", myColPivot);
-                BasicLogger.debugMatrix("Recreated", myL.multiply(myU).rows(myRowPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
-            }
-
-            for (int ij = columnIndex, limit = Math.min(insertPoint, m - 2); ij <= limit; ij++) {
-
-                if (Math.abs(myU.doubleValue(ij, ij)) < Math.abs(myU.doubleValue(ij + 1, ij))) {
-
-                    myU.exchangeRows(ij, ij + 1);
-                    myL.exchangeColumns(ij, ij + 1);
-                    myL.exchangeRows(ij, ij + 1);
-                    myRowPivot.change(ij, ij + 1);
-
-                    if (DEBUG) {
-                        BasicLogger.debug("Row exchange U ij={}", ij);
-                        BasicLogger.debug("P: {}", myRowPivot);
-                        BasicLogger.debugMatrix("L", myL);
-                        BasicLogger.debugMatrix("U", myU);
-                        BasicLogger.debug("Q: {}", myColPivot);
-                        BasicLogger.debugMatrix("Recreated", myL.multiply(myU).rows(myRowPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
-                    }
-
-                    double offL = myL.doubleValue(ij, ij + 1);
-
-                    if (!ACCURACY.isZero(offL)) {
-
-                        SparseR064.ElementNode colNodeL = myL.getFirstInColumn(ij);
-                        while (colNodeL != null) {
-                            myL.add(colNodeL.index, ij + 1, -offL * colNodeL.value);
-                            colNodeL = colNodeL.next;
-                        }
-
-                        SparseR064.ElementNode rowNodeR = myU.getFirstInRow(ij + 1);
-                        while (rowNodeR != null) {
-                            myU.add(ij, rowNodeR.index, offL * rowNodeR.value);
-                            rowNodeR = rowNodeR.next;
-                        }
-
-                        if (DEBUG) {
-                            BasicLogger.debug("zero off-L, ij={}", ij);
-                            BasicLogger.debug("P: {}", myRowPivot);
-                            BasicLogger.debugMatrix("L", myL);
-                            BasicLogger.debugMatrix("U", myU);
-                            BasicLogger.debug("Q: {}", myColPivot);
-                            BasicLogger.debugMatrix("Recreated", myL.multiply(myU).rows(myRowPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
-                        }
-                    }
-                }
-
-                double offU = myU.doubleValue(ij + 1, ij);
-                double diag = myU.doubleValue(ij, ij);
-                double fact = offU / diag;
-
-                if (!ACCURACY.isZero(offU)) {
-
-                    SparseR064.ElementNode rowNodeU = myU.getFirstInRow(ij);
-                    while (rowNodeU != null) {
-                        myU.add(ij + 1, rowNodeU.index, -fact * rowNodeU.value);
-                        rowNodeU = rowNodeU.next;
-                    }
-
-                    SparseR064.ElementNode colNodeL = myL.getFirstInColumn(ij + 1);
-                    while (colNodeL != null) {
-                        myL.add(colNodeL.index, ij, fact * colNodeL.value);
-                        colNodeL = colNodeL.next;
-                    }
-
-                    if (DEBUG) {
-                        BasicLogger.debug("zero off-U, ij={}", ij);
-                        BasicLogger.debug("P: {}", myRowPivot);
-                        BasicLogger.debugMatrix("L", myL);
-                        BasicLogger.debugMatrix("U", myU);
-                        BasicLogger.debug("Q: {}", myColPivot);
-                        BasicLogger.debugMatrix("Recreated", myL.multiply(myU).rows(myRowPivot.reverseOrder()).columns(myColPivot.reverseOrder()));
-                    }
-                }
-            }
-
-            for (int ij = 0; ij < r; ij++) {
-                myDiagU[ij] = myU.doubleValue(ij, ij);
-                myU.set(ij, ij, ZERO);
-            }
-
-        }
-        // Stop here (no changes after this)
-
-        MatrixStore<Double> tmpU = myU.triangular(true, false).superimpose(DiagonalStore.wrap(myDiagU));
-
-        return new Result(myRowPivot.getOrder(), myL, tmpU, myColPivot.getOrder());
+        return new Result(rowPivot.getOrder(), tmpL, tmpU, colPivot.getOrder());
     }
 
     /**
@@ -652,13 +729,14 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         DecompositionUpdateTest.doOne("Fletcher-Matthews (sparse)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthewsSparse, null);
 
-        DecompositionUpdateTest.doOne("SparseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, SparseLU::new);
-
         DecompositionUpdateTest.doOne("Fletcher-Matthews (dense)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthewsDense, null);
 
-        DecompositionUpdateTest.doOne("Fletcher-Matthews (raw)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
-                DecompositionUpdateTest::doFletcherMatthewsRaw, null);
+        DecompositionUpdateTest.doOne("SparseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, SparseLU::new);
+
+        DecompositionUpdateTest.doOne("DenseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, DenseLU.R064::new);
+
+        DecompositionUpdateTest.doOne("RawLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, RawLU::new);
 
     }
 
