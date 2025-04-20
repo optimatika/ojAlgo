@@ -38,6 +38,11 @@ final class DecomposedInverse implements BasisRepresentation {
     }
 
     @Override
+    public void reset(final MatrixStore<Double> basis) {
+        myDecomposition.decompose(basis);
+    }
+
+    @Override
     public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
 
         if (!myDecomposition.updateColumn(col, values, myWork)) {

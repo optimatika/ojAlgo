@@ -178,7 +178,7 @@ public final class R064LSR extends SparseR064 {
         }
 
         // Create new node
-        ElementNode node = new ElementNode(col, ZERO);
+        ElementNode node = SparseR064.newNode(col, ZERO);
 
         // Empty row
         if (prev == null && next == null) {
@@ -242,7 +242,7 @@ public final class R064LSR extends SparseR064 {
     }
 
     public ElementNode insertNodeAfter(final ElementNode existingNode, final int col, final double value) {
-        ElementNode newNode = new ElementNode(col, value);
+        ElementNode newNode = SparseR064.newNode(col, value);
         newNode.previous = existingNode;
         newNode.next = existingNode.next;
         if (existingNode.next != null) {
@@ -255,7 +255,7 @@ public final class R064LSR extends SparseR064 {
     }
 
     public ElementNode insertNodeBefore(final ElementNode existingNode, final int col, final double value) {
-        ElementNode newNode = new ElementNode(col, value);
+        ElementNode newNode = SparseR064.newNode(col, value);
         newNode.next = existingNode;
         newNode.previous = existingNode.previous;
         if (existingNode.previous != null) {
@@ -287,6 +287,7 @@ public final class R064LSR extends SparseR064 {
         if (node.previous == null && node.next == null) {
             myFirstInRows[row] = null;
             myLastInRows[row] = null;
+            SparseR064.recycle(node);
             return;
         }
 
@@ -294,6 +295,7 @@ public final class R064LSR extends SparseR064 {
         if (node.previous == null) {
             myFirstInRows[row] = node.next;
             node.next.previous = null;
+            SparseR064.recycle(node);
             return;
         }
 
@@ -301,12 +303,15 @@ public final class R064LSR extends SparseR064 {
         if (node.next == null) {
             myLastInRows[row] = node.previous;
             node.previous.next = null;
+            SparseR064.recycle(node);
             return;
         }
 
         // Middle node
         node.previous.next = node.next;
         node.next.previous = node.previous;
+
+        SparseR064.recycle(node);
     }
 
     public void removeAndShift(final int remove, final int insert) {
@@ -359,12 +364,15 @@ public final class R064LSR extends SparseR064 {
         while (current != null && current.index <= insert) {
 
             if (current.index == remove) {
+                ElementNode next = current.next;
                 this.remove(row, current);
+                current = next;
             } else if (remove < current.index) {
                 --current.index;
+                current = current.next;
+            } else {
+                current = current.next;
             }
-
-            current = current.next;
         }
     }
 

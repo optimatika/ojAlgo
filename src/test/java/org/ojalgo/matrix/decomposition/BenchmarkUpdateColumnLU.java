@@ -57,25 +57,25 @@ public class BenchmarkUpdateColumnLU extends AbstractBenchmarkSparseLU {
         BenchmarkUtils.run(BenchmarkUpdateColumnLU.class);
     }
 
-    // @Param({ "0.005", "0.01", "0.02", "0.05" })
-    @Param({ "0.01" })
+    @Param({ "0.005", "0.01", "0.02", "0.05" })
     public double density;
-    // @Param({ "500", "1000", "2000" })
-    @Param({ "500" })
+    @Param({ "500", "1000", "2000" })
     public int dim;
 
+    int index;
     PhysicalStore<Double> vector;
     PhysicalStore<Double> work;
-    int index;
 
     @Benchmark
-    public void dense() {
+    public LU<Double> dense() {
         dense.updateColumn(index, vector, work);
+        return dense;
     }
 
     @Benchmark
-    public void raw() {
+    public LU<Double> raw() {
         raw.updateColumn(index, vector, work);
+        return raw;
     }
 
     @Setup(Level.Trial)
@@ -93,7 +93,9 @@ public class BenchmarkUpdateColumnLU extends AbstractBenchmarkSparseLU {
     }
 
     @Benchmark
-    public void sparse() {
+    public LU<Double> sparse() {
         sparse.updateColumn(index, vector, work);
+        return sparse;
     }
+
 }

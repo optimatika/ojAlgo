@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064LSR;
 import org.ojalgo.matrix.store.R064Store;
+import org.ojalgo.matrix.store.SparseR064;
 import org.ojalgo.matrix.store.SparseR064.ElementNode;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
@@ -191,7 +192,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                                 // Insert new node in target row
                                 if (lastTargetNode == null) {
                                     // Insert at start of row
-                                    ElementNode newNode = new ElementNode(pivotNode.index, -multiplier * pivotNode.value);
+                                    ElementNode newNode = SparseR064.newNode(pivotNode.index, -multiplier * pivotNode.value);
                                     newNode.next = targetNode;
                                     if (targetNode != null) {
                                         targetNode.previous = newNode;

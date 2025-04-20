@@ -6,6 +6,8 @@ import org.ojalgo.matrix.transformation.InvertibleFactor;
 
 interface BasisRepresentation extends InvertibleFactor<Double> {
 
+    void reset(final MatrixStore<Double> basis);
+
     /**
      * Update the inverse to reflect a replaced column in the basis.
      *

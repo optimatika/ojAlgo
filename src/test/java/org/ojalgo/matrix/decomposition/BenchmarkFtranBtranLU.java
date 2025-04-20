@@ -131,23 +131,27 @@ public class BenchmarkFtranBtranLU extends AbstractBenchmarkSparseLU {
     PhysicalStore<Double> vector;
 
     @Benchmark
-    public void dense_btran() {
+    public PhysicalStore<Double> dense_btran() {
         dense.btran(vector);
+        return vector;
     }
 
     @Benchmark
-    public void dense_ftran() {
+    public PhysicalStore<Double> dense_ftran() {
         dense.ftran(vector);
+        return vector;
     }
 
     @Benchmark
-    public void raw_btran() {
+    public PhysicalStore<Double> raw_btran() {
         raw.btran(vector);
+        return vector;
     }
 
     @Benchmark
-    public void raw_ftran() {
+    public PhysicalStore<Double> raw_ftran() {
         raw.ftran(vector);
+        return vector;
     }
 
     @Setup(Level.Trial)
@@ -163,12 +167,15 @@ public class BenchmarkFtranBtranLU extends AbstractBenchmarkSparseLU {
     }
 
     @Benchmark
-    public void sparse_btran() {
+    public PhysicalStore<Double> sparse_btran() {
         sparse.btran(vector);
+        return vector;
     }
 
     @Benchmark
-    public void sparse_ftran() {
+    public PhysicalStore<Double> sparse_ftran() {
         sparse.ftran(vector);
+        return vector;
     }
+
 }

@@ -1,5 +1,7 @@
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.array.ArrayR064;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
@@ -22,14 +24,20 @@ public abstract class AbstractBenchmarkSparseLU {
 
         LU<Double> sparse = LU.newSparseR064();
 
-        MatrixStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(2_000, 0.02);
+        int dim = 1_000;
 
-        for (int i = 0; i < 10_000; i++) {
-            sparse.decompose(matrix);
+        MatrixStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, 0.01);
+        MatrixStore<Double> vecor = AbstractBenchmarkSparseLU.newDenseVector(dim);
+        PhysicalStore<Double> work = R064Store.FACTORY.make(dim, 1);
+
+        sparse.decompose(matrix);
+
+        for (int i = 0; i < 100_000; i++) {
+            sparse.updateColumn(Uniform.randomInteger(dim), vecor, work);
         }
     }
 
-    static PhysicalStore<Double> newDenseVector(final int dim) {
+    public static PhysicalStore<Double> newDenseVector(final int dim) {
 
         // Create random vector
         R064Store vector = R064Store.FACTORY.make(dim, 1);
@@ -40,7 +48,7 @@ public abstract class AbstractBenchmarkSparseLU {
         return vector;
     }
 
-    static SparseStore<Double> newSparseMatrix(final int dim, final double density) {
+    public static SparseStore<Double> newSparseMatrix(final int dim, final double density) {
 
         // Create sparse matrix with specified density
         Builder<Double> builder = SparseStore.R064.newBuilder(dim, dim);
@@ -57,6 +65,19 @@ public abstract class AbstractBenchmarkSparseLU {
         }
 
         return builder.build();
+    }
+
+    public static SparseArray<Double> newSparseVector(final int dim, final double density) {
+
+        // Create sparse matrix with specified density
+        SparseArray<Double> builder = SparseArray.factory(ArrayR064.FACTORY).make(dim);
+        int nonZeroCount = ((int) (dim * density));
+
+        for (int i = 0; i < nonZeroCount; i++) {
+            builder.set(Uniform.randomInteger(dim), RANDOM.doubleValue());
+        }
+
+        return builder;
     }
 
     final LU<Double> dense = new DenseLU.R064();

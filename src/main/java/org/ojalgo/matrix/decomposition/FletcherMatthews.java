@@ -55,8 +55,8 @@ import org.ojalgo.type.context.NumberContext;
  * <li>Updating both L and U matrices to reflect all changes</li>
  * </ol>
  * <p>
- * This method is particularly effective for maintaining the structure of sparse matrices during updates,
- * as it minimizes fill-in and preserves sparsity patterns.
+ * This method is particularly effective for maintaining the structure of sparse matrices during updates, as
+ * it minimizes fill-in and preserves sparsity patterns.
  */
 abstract class FletcherMatthews {
 
@@ -65,14 +65,14 @@ abstract class FletcherMatthews {
     private static final NumberContext SAFE = NumberContext.of(4);
 
     /**
-     * Updates the LU decomposition when a column is modified in the original matrix.
-     * This version is used when L and U are stored in a combined format.
+     * Updates the LU decomposition when a column is modified in the original matrix. This version is used
+     * when L and U are stored in a combined format.
      *
-     * @param rowOrder Current row permutation vector
-     * @param combined Matrix storing both L and U factors in a combined format
-     * @param colOrder Current column permutation vector
-     * @param col Index of the column being updated
-     * @param column New column values
+     * @param rowOrder     Current row permutation vector
+     * @param combined     Matrix storing both L and U factors in a combined format
+     * @param colOrder     Current column permutation vector
+     * @param col          Index of the column being updated
+     * @param column       New column values
      * @param preallocated Preallocated workspace for calculations
      * @return true if the update was successful, false if the matrix became singular or numerically unstable
      */
@@ -100,7 +100,7 @@ abstract class FletcherMatthews {
 
         if (lastRowNonZero < col) {
 
-            // Think this means the updated matrix is singular
+            // This means the updated matrix is singular
             return false;
 
         } else if (SAFE.isZero(diag)) {
@@ -220,17 +220,16 @@ abstract class FletcherMatthews {
     }
 
     /**
-     * Updates the LU decomposition when a column is modified in the original matrix.
-     * This version is used when L and U are stored separately, with U's diagonal elements
-     * stored in a separate array.
+     * Updates the LU decomposition when a column is modified in the original matrix. This version is used
+     * when L and U are stored separately, with U's diagonal elements stored in a separate array.
      *
-     * @param rowOrder Current row permutation vector
-     * @param mtrxL Lower triangular matrix L
-     * @param myDiagU Diagonal elements of upper triangular matrix U
-     * @param mtrxU Upper triangular matrix U (without diagonal)
-     * @param colOrder Current column permutation vector
-     * @param col Index of the column being updated
-     * @param column New column values
+     * @param rowOrder     Current row permutation vector
+     * @param mtrxL        Lower triangular matrix L
+     * @param myDiagU      Diagonal elements of upper triangular matrix U
+     * @param mtrxU        Upper triangular matrix U (without diagonal)
+     * @param colOrder     Current column permutation vector
+     * @param col          Index of the column being updated
+     * @param column       New column values
      * @param preallocated Preallocated workspace for calculations
      * @return true if the update was successful, false if the matrix became singular or numerically unstable
      */

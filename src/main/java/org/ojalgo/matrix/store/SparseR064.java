@@ -56,7 +56,7 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
          */
         public ElementNode previous;
 
-        public ElementNode(final int index, final double value) {
+        ElementNode(final int index, final double value) {
             this.index = index;
             this.value = value;
         }

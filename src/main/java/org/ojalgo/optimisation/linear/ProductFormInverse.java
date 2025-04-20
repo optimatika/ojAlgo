@@ -181,6 +181,17 @@ final class ProductFormInverse implements BasisRepresentation {
     }
 
     /**
+     * Update the product form inverse to reflect a replaced column.
+     *
+     * @param basis Full basis, with the column already exchanged.
+     */
+    @Override
+    public void reset(final MatrixStore<Double> basis) {
+        this.clearFactors();
+        myRoot.decompose(basis.transpose());
+    }
+
+    /**
      * Update the inverse to reflect a replaced column in the basis.
      *
      * @param basis  Full basis, with the column already exchanged.
@@ -229,16 +240,6 @@ final class ProductFormInverse implements BasisRepresentation {
     void reset() {
         this.clearFactors();
         myRoot.reset();
-    }
-
-    /**
-     * Update the product form inverse to reflect a replaced column.
-     *
-     * @param basis Full basis, with the column already exchanged.
-     */
-    void reset(final MatrixStore<Double> basis) {
-        this.clearFactors();
-        myRoot.decompose(basis.transpose());
     }
 
     /**

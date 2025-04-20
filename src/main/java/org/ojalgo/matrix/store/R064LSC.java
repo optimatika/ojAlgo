@@ -177,7 +177,7 @@ public final class R064LSC extends SparseR064 {
         }
 
         // Create new node
-        ElementNode node = new ElementNode(row, ZERO);
+        ElementNode node = SparseR064.newNode(row, ZERO);
 
         // Empty column
         if (prev == null && next == null) {
@@ -256,6 +256,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null && node.next == null) {
             myFirstInColumns[col] = null;
             myLastInColumns[col] = null;
+            SparseR064.recycle(node);
             return;
         }
 
@@ -263,6 +264,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null) {
             myFirstInColumns[col] = node.next;
             node.next.previous = null;
+            SparseR064.recycle(node);
             return;
         }
 
@@ -270,12 +272,15 @@ public final class R064LSC extends SparseR064 {
         if (node.next == null) {
             myLastInColumns[col] = node.previous;
             node.previous.next = null;
+            SparseR064.recycle(node);
             return;
         }
 
         // Middle node
         node.previous.next = node.next;
         node.next.previous = node.previous;
+
+        SparseR064.recycle(node);
     }
 
     @Override

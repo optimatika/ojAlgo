@@ -66,7 +66,7 @@ final class RevisedStore extends SimplexStore {
     private final ColumnsSupplier<Double> myConstraintsBody;
     private final ColumnsSupplier.SingleView<Double> myConstraintsColumn;
     private final R064Store myConstraintsRHS;
-    private final ProductFormInverse myInvBasis;
+    private final BasisRepresentation myInvBasis;
     private final R064Store myObjective;
     private R064Store myPhase1Objective = null;
     /**
