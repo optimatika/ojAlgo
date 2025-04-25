@@ -25,6 +25,9 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064LSC;
+import org.ojalgo.matrix.store.R064LSR;
+import org.ojalgo.matrix.store.SparseR064;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
@@ -211,6 +214,151 @@ abstract class FletcherMatthews {
                 BasicLogger.debugMatrix("U", tmpU);
                 BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * Updates the LU decomposition when a column is modified in the original matrix. This version is used
+     * when L and U are stored separately, with U's diagonal elements stored in a separate array.
+     *
+     * @param rowOrder     Current row permutation vector
+     * @param mtrxL        Lower triangular matrix L
+     * @param myDiagU      Diagonal elements of upper triangular matrix U
+     * @param mtrxU        Upper triangular matrix U (without diagonal)
+     * @param colOrder     Current column permutation vector
+     * @param col          Index of the column being updated
+     * @param column       New column values
+     * @param preallocated Preallocated workspace for calculations
+     * @return true if the update was successful, false if the matrix became singular or numerically unstable
+     */
+    static boolean update(final Pivot rowOrder, final R064LSC mtrxL, final double[] myDiagU, final R064LSR mtrxU, final Pivot colOrder, final int col,
+            final Access1D.Collectable<Double, ? super TransformableRegion<Double>> column, final PhysicalStore<Double> preallocated) {
+
+        int m = mtrxL.getRowDim();
+        int n = mtrxU.getColDim();
+        int r = mtrxU.getMinDim();
+
+        column.supplyTo(preallocated);
+        rowOrder.applyPivotOrder(preallocated);
+
+        int lastRowNonZero = -1;
+        for (int ij = 0; ij < r; ij++) {
+            double varI = -preallocated.doubleValue(ij);
+            if (!PRECISION.isZero(varI)) {
+                lastRowNonZero = ij;
+                SparseR064.ElementNode colNodeL = mtrxL.getLastInColumn(ij);
+                while (colNodeL != null && colNodeL.index > ij) {
+                    preallocated.add(colNodeL.index, colNodeL.value * varI);
+                    colNodeL = colNodeL.previous;
+                }
+            }
+        }
+
+        int insertPoint = lastRowNonZero > col ? lastRowNonZero - 1 : col;
+
+        for (int ij = 0; ij < r; ij++) {
+            mtrxL.set(ij, ij, ONE);
+            mtrxU.set(ij, ij, myDiagU[ij]);
+        }
+
+        colOrder.cycle(col, insertPoint);
+        mtrxU.removeAndShift(col, insertPoint);
+        for (int i = 0; i <= lastRowNonZero; i++) {
+            double tmpVal = preallocated.doubleValue(i);
+            if (!PRECISION.isZero(tmpVal)) {
+                mtrxU.set(i, insertPoint, tmpVal);
+            }
+        }
+
+        if (DEBUG) {
+            BasicLogger.debug("Updated column, and shiftet columns to create Hessenberg");
+            BasicLogger.debug("P: {}", rowOrder);
+            BasicLogger.debugMatrix("L", mtrxL);
+            BasicLogger.debugMatrix("U", mtrxU);
+            BasicLogger.debug("Q: {}", colOrder);
+            BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(rowOrder.reverseOrder()).columns(colOrder.reverseOrder()));
+        }
+
+        for (int ij = col, limit = Math.min(insertPoint, m - 2); ij <= limit; ij++) {
+
+            if (Math.abs(mtrxU.doubleValue(ij, ij)) < Math.abs(mtrxU.doubleValue(ij + 1, ij))) {
+
+                mtrxU.exchangeRows(ij, ij + 1);
+                mtrxL.exchangeColumns(ij, ij + 1);
+                mtrxL.exchangeRows(ij, ij + 1);
+                rowOrder.change(ij, ij + 1);
+
+                if (DEBUG) {
+                    BasicLogger.debug("Row exchange U ij={}", ij);
+                    BasicLogger.debug("P: {}", rowOrder);
+                    BasicLogger.debugMatrix("L", mtrxL);
+                    BasicLogger.debugMatrix("U", mtrxU);
+                    BasicLogger.debug("Q: {}", colOrder);
+                    BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(rowOrder.reverseOrder()).columns(colOrder.reverseOrder()));
+                }
+
+                double offL = mtrxL.doubleValue(ij, ij + 1);
+
+                if (!PRECISION.isZero(offL)) {
+
+                    SparseR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij);
+                    while (colNodeL != null) {
+                        mtrxL.add(colNodeL.index, ij + 1, -offL * colNodeL.value);
+                        colNodeL = colNodeL.next;
+                    }
+
+                    SparseR064.ElementNode rowNodeR = mtrxU.getFirstInRow(ij + 1);
+                    while (rowNodeR != null) {
+                        mtrxU.add(ij, rowNodeR.index, offL * rowNodeR.value);
+                        rowNodeR = rowNodeR.next;
+                    }
+
+                    if (DEBUG) {
+                        BasicLogger.debug("zero off-L, ij={}", ij);
+                        BasicLogger.debug("P: {}", rowOrder);
+                        BasicLogger.debugMatrix("L", mtrxL);
+                        BasicLogger.debugMatrix("U", mtrxU);
+                        BasicLogger.debug("Q: {}", colOrder);
+                        BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(rowOrder.reverseOrder()).columns(colOrder.reverseOrder()));
+                    }
+                }
+            }
+
+            double offU = mtrxU.doubleValue(ij + 1, ij);
+            double diag = mtrxU.doubleValue(ij, ij);
+            double fact = offU / diag;
+
+            if (!PRECISION.isZero(offU)) {
+
+                SparseR064.ElementNode rowNodeU = mtrxU.getFirstInRow(ij);
+                while (rowNodeU != null) {
+                    mtrxU.add(ij + 1, rowNodeU.index, -fact * rowNodeU.value);
+                    rowNodeU = rowNodeU.next;
+                }
+
+                SparseR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij + 1);
+                while (colNodeL != null) {
+                    mtrxL.add(colNodeL.index, ij, fact * colNodeL.value);
+                    colNodeL = colNodeL.next;
+                }
+
+                if (DEBUG) {
+                    BasicLogger.debug("zero off-U, ij={}", ij);
+                    BasicLogger.debug("P: {}", rowOrder);
+                    BasicLogger.debugMatrix("L", mtrxL);
+                    BasicLogger.debugMatrix("U", mtrxU);
+                    BasicLogger.debug("Q: {}", colOrder);
+                    BasicLogger.debugMatrix("Recreated", mtrxL.multiply(mtrxU).rows(rowOrder.reverseOrder()).columns(colOrder.reverseOrder()));
+                }
+            }
+        }
+
+        for (int ij = 0; ij < r; ij++) {
+            myDiagU[ij] = mtrxU.doubleValue(ij, ij);
+            mtrxU.set(ij, ij, ZERO);
+            mtrxL.set(ij, ij, ZERO);
         }
 
         return true;

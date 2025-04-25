@@ -22,7 +22,7 @@ public abstract class AbstractBenchmarkSparseLU {
 
     public static void main(final String[] args) throws RunnerException {
 
-        LU<Double> sparse = LU.R064.make();
+        LU<Double> sparse = LU.newSparseR064();
 
         int dim = 1_000;
 
@@ -82,5 +82,6 @@ public abstract class AbstractBenchmarkSparseLU {
 
     final LU<Double> dense = new DenseLU.R064();
     final LU<Double> raw = new RawLU();
+    final LU<Double> sparse = new SparseLU();
 
 }

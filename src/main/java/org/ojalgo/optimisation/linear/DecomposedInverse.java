@@ -13,7 +13,7 @@ final class DecomposedInverse implements BasisRepresentation {
 
     DecomposedInverse(final boolean sparse, final int dim) {
         super();
-        myDecomposition = sparse ? null : LU.R064.make(dim, 1);
+        myDecomposition = sparse ? LU.newSparseR064() : LU.R064.make(dim, 1);
         myWork = R064Store.FACTORY.make(dim, 1);
     }
 

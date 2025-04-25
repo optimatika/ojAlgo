@@ -83,12 +83,19 @@ public class BenchmarkUpdateColumnLU extends AbstractBenchmarkSparseLU {
 
         SparseStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
         // Decompose matrices
+        sparse.decompose(matrix);
         dense.decompose(matrix);
         raw.decompose(matrix);
 
         vector = AbstractBenchmarkSparseLU.newDenseVector(dim);
         work = R064Store.FACTORY.make(dim, 1);
         index = Uniform.randomInteger(dim);
+    }
+
+    @Benchmark
+    public LU<Double> sparse() {
+        sparse.updateColumn(index, vector, work);
+        return sparse;
     }
 
 }
