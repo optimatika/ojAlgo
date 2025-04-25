@@ -100,7 +100,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static LU<?>[] getAnyLU() {
-        return new LU<?>[] { new DenseLU.C128(), new DenseLU.R064(), new DenseLU.H256(), new DenseLU.Q128(), new RawLU(), new DenseLU.R128(), new SparseLU() };
+        return new LU<?>[] { new DenseLU.C128(), new DenseLU.R064(), new DenseLU.H256(), new DenseLU.Q128(), new RawLU(), new DenseLU.R128() };
     }
 
     public static List<MatrixDecomposition.RankRevealing<?>> getAnyMatrixDecompositionRankRevealing() {
@@ -203,7 +203,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static LU<Double>[] getPrimitiveLU() {
-        return (LU<Double>[]) new LU<?>[] { new DenseLU.R064(), new RawLU(), new SparseLU() };
+        return (LU<Double>[]) new LU<?>[] { new DenseLU.R064(), new RawLU() };
     }
 
     public static List<MatrixDecomposition.RankRevealing<Double>> getPrimitiveMatrixDecompositionRankRevealing() {

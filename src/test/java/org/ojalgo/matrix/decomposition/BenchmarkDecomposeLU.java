@@ -111,10 +111,4 @@ public class BenchmarkDecomposeLU extends AbstractBenchmarkSparseLU {
         matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
     }
 
-    @Benchmark
-    public LU<Double> sparse() {
-        sparse.decompose(matrix);
-        return sparse;
-    }
-
 }

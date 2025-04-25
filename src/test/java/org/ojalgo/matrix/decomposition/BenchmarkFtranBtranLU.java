@@ -159,23 +159,10 @@ public class BenchmarkFtranBtranLU extends AbstractBenchmarkSparseLU {
 
         SparseStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
         // Decompose matrices
-        sparse.decompose(matrix);
         dense.decompose(matrix);
         raw.decompose(matrix);
 
         vector = AbstractBenchmarkSparseLU.newDenseVector(dim);
-    }
-
-    @Benchmark
-    public PhysicalStore<Double> sparse_btran() {
-        sparse.btran(vector);
-        return vector;
-    }
-
-    @Benchmark
-    public PhysicalStore<Double> sparse_ftran() {
-        sparse.ftran(vector);
-        return vector;
     }
 
 }
