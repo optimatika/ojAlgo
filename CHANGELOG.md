@@ -11,6 +11,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.matrix
+
+- New `MatrixStore`:s compressed sparse column (CSC) and compressed sparse row (CSR) implementations named `R064CSC` and `R064CSR` (primitive double, R064, only).
+- New class `Triplet` used when building, and converting between, various sparse formats.
+
 ## [55.2.0] – 2025-04-25
 
 ### Added
@@ -34,7 +41,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Refactoring to SimplexSolver (significant performance improvements with larger/sparse instances).
 - Improved feasibility check for the QP `ActiveSetSolver`.
-- Removed some unnecessary work, and garbage creation, when validation models (contributed by @samuel)
+- Removed some unnecessary work, and garbage creation, when validation models (contributed by @hallstromsamuel)
 
 #### org.ojalgo.scalar
 

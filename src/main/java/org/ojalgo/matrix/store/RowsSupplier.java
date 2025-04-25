@@ -6,6 +6,7 @@ import java.util.List;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
@@ -16,7 +17,7 @@ import org.ojalgo.structure.Mutate2D;
  *
  * @author apete
  */
-public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D {
+public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D {
 
     public static final class SingleView<N extends Comparable<N>> extends RowView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -103,6 +104,23 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     @Override
     public long countRows() {
         return myRows.size();
+    }
+
+    @Override
+    public double density() {
+
+        double totalElements = this.count();
+
+        if (totalElements == 0) {
+            return PrimitiveMath.ZERO;
+        }
+
+        long nonZeros = 0L;
+        for (SparseArray<N> row : myRows) {
+            nonZeros += row.count();
+        }
+
+        return nonZeros / totalElements;
     }
 
     @Override
@@ -232,6 +250,22 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     @Override
     public String toString() {
         return Access2D.toString(this);
+    }
+
+    @Override
+    public List<Triplet> toTriplets() {
+        List<Triplet> triplets = new ArrayList<>();
+
+        // Iterate through each row
+        for (int row = 0, limit = myRows.size(); row < limit; row++) {
+            SparseArray<N> rowArray = myRows.get(row);
+            // For each non-zero element in this row
+            for (NonzeroView<N> nz : rowArray.nonzeros()) {
+                triplets.add(new Triplet(row, Math.toIntExact(nz.index()), nz.doubleValue()));
+            }
+        }
+
+        return triplets;
     }
 
     SparseArray<N> addRow(final SparseArray<N> rowToAdd) {

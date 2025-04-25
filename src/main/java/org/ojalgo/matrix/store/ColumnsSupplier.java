@@ -6,6 +6,7 @@ import java.util.List;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -17,7 +18,7 @@ import org.ojalgo.structure.Mutate2D;
  *
  * @author apete
  */
-public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D {
+public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixStore<N>, Mutate2D, SparseStructure2D {
 
     public static final class SingleView<N extends Comparable<N>> extends ColumnView<N> implements Access2D.Collectable<N, PhysicalStore<N>> {
 
@@ -166,6 +167,23 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
+    public double density() {
+
+        double totalElements = this.count();
+
+        if (totalElements == 0) {
+            return PrimitiveMath.ZERO;
+        }
+
+        long nonZeros = 0L;
+        for (SparseArray<N> column : myColumns) {
+            nonZeros += column.count();
+        }
+
+        return nonZeros / totalElements;
+    }
+
+    @Override
     public double doubleValue(final int row, final int col) {
         return myColumns.get(col).doubleValue(row);
     }
@@ -234,6 +252,22 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     @Override
     public String toString() {
         return Access2D.toString(this);
+    }
+
+    @Override
+    public List<Triplet> toTriplets() {
+        List<Triplet> triplets = new ArrayList<>();
+
+        // Iterate through each column
+        for (int col = 0, limit = myColumns.size(); col < limit; col++) {
+            SparseArray<N> column = myColumns.get(col);
+            // For each non-zero element in this column
+            for (NonzeroView<N> nz : column.nonzeros()) {
+                triplets.add(new Triplet(Math.toIntExact(nz.index()), col, nz.doubleValue()));
+            }
+        }
+
+        return triplets;
     }
 
     SparseArray<N> addColumn(final SparseArray<N> columnToAdd) {

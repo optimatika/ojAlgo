@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.function.IntSupplier;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -76,6 +77,15 @@ public abstract class TestUtils /* extends Assertions */ {
     private static final NumberContext EQUALS = NumberContext.of(12);
 
     public static void assertArrayEquals(final byte[] expected, final byte[] actual) {
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    public static void assertArrayEquals(final double[] expected, final double[] actual) {
+        Assertions.assertArrayEquals(expected, actual);
+
+    }
+
+    public static void assertArrayEquals(final long[] expected, final long[] actual) {
         Assertions.assertArrayEquals(expected, actual);
     }
 
@@ -557,6 +567,10 @@ public abstract class TestUtils /* extends Assertions */ {
         } else {
             TestUtils.assertEquals((Access1D<?>) expected, (Access1D<?>) actual, EQUALS);
         }
+    }
+
+    public static <T extends Throwable> T assertThrows(final Class<T> expectedType, final Executable executable) {
+        return Assertions.assertThrows(expectedType, executable);
     }
 
     public static void assertTrue(final boolean condition) {

@@ -23,7 +23,9 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntBinaryOperator;
@@ -64,7 +66,7 @@ import org.ojalgo.type.math.MathType;
  * <li>Use the {@link Builder} to build the matrix.
  * </ul>
  */
-public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
+public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N>, SparseStructure2D {
 
     /**
      * May be a preferable way to build a sparse matrix if:
@@ -76,7 +78,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
      * This builder uses separate/additional memory to store the elements before they are copied to the actual
      * sparse matrix. The actual sparse matrix is built when the {@link #build()} method is called.
      */
-    public static final class Builder<N extends Comparable<N>> implements Factory2D.Builder<SparseStore<N>> {
+    public static final class Builder<N extends Comparable<N>> implements Factory2D.Builder<SparseStore<N>>, SparseStructure2D {
 
         private final int myColDim;
         private final Set<KeyedPrimitive<Comparable<?>>> myElements = ConcurrentHashMap.newKeySet();
@@ -104,6 +106,18 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
 
         @Override
+        public double density() {
+
+            double totalElements = this.count();
+
+            if (totalElements == ZERO) {
+                return ZERO;
+            } else {
+                return myElements.size() / totalElements;
+            }
+        }
+
+        @Override
         public int getColDim() {
             return myColDim;
         }
@@ -121,6 +135,22 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         @Override
         public void set(final long row, final long col, final Comparable<?> value) {
             myElements.add(EntryPair.of(value, Structure2D.index(myRowDim, row, col)));
+        }
+
+        @Override
+        public List<Triplet> toTriplets() {
+
+            List<Triplet> triplets = new ArrayList<>(myElements.size());
+
+            for (KeyedPrimitive<Comparable<?>> element : myElements) {
+                long index = element.longValue();
+                int row = Structure2D.row(index, myRowDim);
+                int col = Structure2D.column(index, myRowDim);
+                double value = NumberDefinition.doubleValue(element.getKey());
+                triplets.add(new Triplet(row, col, value));
+            }
+
+            return triplets;
         }
 
     }
@@ -186,6 +216,15 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         @Override
         public SparseStore<N> make(final int nbRows, final int nbCols) {
             return new SparseStore<>(myPhysicalFactory, nbRows, nbCols, myInitial);
+        }
+
+        public SparseStore<N> make(final int nbRows, final int nbCols, final List<Triplet> elements) {
+
+            SparseStore<N> retVal = this.initial((r, c) -> elements.size()).make(nbRows, nbCols);
+
+            elements.stream().sorted().forEach(triplet -> retVal.set(triplet.row, triplet.col, triplet.value));
+
+            return retVal;
         }
 
         @Override
@@ -311,6 +350,18 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     public void add(final long row, final long col, final double addend) {
         myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
+    }
+
+    @Override
+    public double density() {
+
+        double totalElements = this.count();
+
+        if (totalElements == ZERO) {
+            return ZERO;
+        } else {
+            return myElements.count() / totalElements;
+        }
     }
 
     @Override
@@ -652,7 +703,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
@@ -666,7 +716,6 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM && receiver instanceof Mutate1D.Modifiable) {
             if (this.isPrimitive()) {
@@ -729,6 +778,21 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         receiver.reset();
 
         myElements.supplyNonZerosTo(receiver);
+    }
+
+    @Override
+    public List<Triplet> toTriplets() {
+
+        List<Triplet> triplets = new ArrayList<>(myElements.size());
+
+        for (ElementView2D<N, ?> element : this.nonzeros()) {
+            int row = Math.toIntExact(element.row());
+            int column = Math.toIntExact(element.column());
+            double value = element.doubleValue();
+            triplets.add(new Triplet(row, column, value));
+        }
+
+        return triplets;
     }
 
     @Override
