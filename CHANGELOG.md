@@ -11,6 +11,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [55.2.0] – 2025-04-25
+
 ### Added
 
 #### org.ojalgo.optimisation
@@ -26,9 +28,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.matrix
 
 - General `refactoring` in the decomposition package. Shouldn't be any api-breaking changes.
-- New sparse `MatrixStore` implementations `R064LSC` and `R064LSR` – column/row major R064 elements.
-- New sparse LU decomposition, `SparseLU`.
-- New interface `MatrixDecomposition.Updatable` for partial updates to decompositions. No actual implementations yet. `SparseLU` will be the first.
+- New interface `MatrixDecomposition.Updatable` for partial updates to decompositions. The existing LU decomposition implementations implement this.
 
 #### org.ojalgo.optimisation
 
