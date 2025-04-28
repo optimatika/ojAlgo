@@ -35,7 +35,7 @@ import org.ojalgo.type.math.MathType;
 /**
  * R064-Linked-Sparse-Rows (like CSR but rows as linked lists).
  */
-public final class R064LSR extends SparseR064 {
+public final class R064LSR extends LinkedR064 {
 
     public static final class Factory implements Factory2D<R064LSR> {
 
@@ -62,14 +62,14 @@ public final class R064LSR extends SparseR064 {
 
     public static final R064LSR.Factory FACTORY = new R064LSR.Factory();
 
-    private final SparseR064.ElementNode[] myFirstInRows;
-    private final SparseR064.ElementNode[] myLastInRows;
+    private final LinkedR064.ElementNode[] myFirstInRows;
+    private final LinkedR064.ElementNode[] myLastInRows;
     private final int mySplit;
 
     R064LSR(final int nbRows, final int nbCols) {
         super(nbRows, nbCols);
-        myFirstInRows = new SparseR064.ElementNode[nbRows];
-        myLastInRows = new SparseR064.ElementNode[nbRows];
+        myFirstInRows = new LinkedR064.ElementNode[nbRows];
+        myLastInRows = new LinkedR064.ElementNode[nbRows];
         mySplit = nbRows / 2;
     }
 
@@ -178,7 +178,7 @@ public final class R064LSR extends SparseR064 {
         }
 
         // Create new node
-        ElementNode node = SparseR064.newNode(col, ZERO);
+        ElementNode node = LinkedR064.newNode(col, ZERO);
 
         // Empty row
         if (prev == null && next == null) {
@@ -242,7 +242,7 @@ public final class R064LSR extends SparseR064 {
     }
 
     public ElementNode insertNodeAfter(final ElementNode existingNode, final int col, final double value) {
-        ElementNode newNode = SparseR064.newNode(col, value);
+        ElementNode newNode = LinkedR064.newNode(col, value);
         newNode.previous = existingNode;
         newNode.next = existingNode.next;
         if (existingNode.next != null) {
@@ -255,7 +255,7 @@ public final class R064LSR extends SparseR064 {
     }
 
     public ElementNode insertNodeBefore(final ElementNode existingNode, final int col, final double value) {
-        ElementNode newNode = SparseR064.newNode(col, value);
+        ElementNode newNode = LinkedR064.newNode(col, value);
         newNode.next = existingNode;
         newNode.previous = existingNode.previous;
         if (existingNode.previous != null) {
@@ -287,7 +287,7 @@ public final class R064LSR extends SparseR064 {
         if (node.previous == null && node.next == null) {
             myFirstInRows[row] = null;
             myLastInRows[row] = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -295,7 +295,7 @@ public final class R064LSR extends SparseR064 {
         if (node.previous == null) {
             myFirstInRows[row] = node.next;
             node.next.previous = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -303,7 +303,7 @@ public final class R064LSR extends SparseR064 {
         if (node.next == null) {
             myLastInRows[row] = node.previous;
             node.previous.next = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -311,7 +311,7 @@ public final class R064LSR extends SparseR064 {
         node.previous.next = node.next;
         node.next.previous = node.previous;
 
-        SparseR064.recycle(node);
+        LinkedR064.recycle(node);
     }
 
     public void removeAndShift(final int remove, final int insert) {

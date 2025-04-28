@@ -33,7 +33,7 @@ import org.ojalgo.type.math.MathType;
 /**
  * R064-Linked-Sparse-Columns (like CSC but columns as linked lists).
  */
-public final class R064LSC extends SparseR064 {
+public final class R064LSC extends LinkedR064 {
 
     public static final class Factory implements Factory2D<R064LSC> {
 
@@ -60,14 +60,14 @@ public final class R064LSC extends SparseR064 {
 
     public static final R064LSC.Factory FACTORY = new R064LSC.Factory();
 
-    private final SparseR064.ElementNode[] myFirstInColumns;
-    private final SparseR064.ElementNode[] myLastInColumns;
+    private final LinkedR064.ElementNode[] myFirstInColumns;
+    private final LinkedR064.ElementNode[] myLastInColumns;
     private final int mySplit;
 
     R064LSC(final int nbRows, final int nbCols) {
         super(nbRows, nbCols);
-        myFirstInColumns = new SparseR064.ElementNode[nbCols];
-        myLastInColumns = new SparseR064.ElementNode[nbCols];
+        myFirstInColumns = new LinkedR064.ElementNode[nbCols];
+        myLastInColumns = new LinkedR064.ElementNode[nbCols];
         mySplit = nbCols / 2;
     }
 
@@ -177,7 +177,7 @@ public final class R064LSC extends SparseR064 {
         }
 
         // Create new node
-        ElementNode node = SparseR064.newNode(row, ZERO);
+        ElementNode node = LinkedR064.newNode(row, ZERO);
 
         // Empty column
         if (prev == null && next == null) {
@@ -256,7 +256,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null && node.next == null) {
             myFirstInColumns[col] = null;
             myLastInColumns[col] = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -264,7 +264,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null) {
             myFirstInColumns[col] = node.next;
             node.next.previous = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -272,7 +272,7 @@ public final class R064LSC extends SparseR064 {
         if (node.next == null) {
             myLastInColumns[col] = node.previous;
             node.previous.next = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -280,7 +280,7 @@ public final class R064LSC extends SparseR064 {
         node.previous.next = node.next;
         node.next.previous = node.previous;
 
-        SparseR064.recycle(node);
+        LinkedR064.recycle(node);
     }
 
     @Override

@@ -240,6 +240,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements MatrixSto
     }
 
     @Override
+    public SparseArray<N> sliceColumn(final long col) {
+        return this.getColumn(Math.toIntExact(col));
+    }
+
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();

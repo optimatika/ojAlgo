@@ -32,7 +32,7 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.context.NumberContext;
 
-public abstract class SparseR064 extends FactoryStore<Double> implements TransformableRegion<Double> {
+public abstract class LinkedR064 extends FactoryStore<Double> implements TransformableRegion<Double> {
 
     public static final class ElementNode implements ElementView1D<Double, ElementNode> {
 
@@ -160,7 +160,7 @@ public abstract class SparseR064 extends FactoryStore<Double> implements Transfo
 
     private final TransformableRegion.FillByMultiplying<Double> myMultiplier;
 
-    protected SparseR064(final int nbRows, final int nbCols) {
+    protected LinkedR064(final int nbRows, final int nbCols) {
         super(R064Store.FACTORY, nbRows, nbCols);
         myMultiplier = MultiplyBoth.newPrimitive64(nbRows, nbCols);
     }

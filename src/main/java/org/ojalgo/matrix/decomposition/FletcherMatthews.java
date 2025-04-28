@@ -27,7 +27,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064LSR;
-import org.ojalgo.matrix.store.SparseR064;
+import org.ojalgo.matrix.store.LinkedR064;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
@@ -248,7 +248,7 @@ abstract class FletcherMatthews {
             double varI = -preallocated.doubleValue(ij);
             if (!PRECISION.isZero(varI)) {
                 lastRowNonZero = ij;
-                SparseR064.ElementNode colNodeL = mtrxL.getLastInColumn(ij);
+                LinkedR064.ElementNode colNodeL = mtrxL.getLastInColumn(ij);
                 while (colNodeL != null && colNodeL.index > ij) {
                     preallocated.add(colNodeL.index, colNodeL.value * varI);
                     colNodeL = colNodeL.previous;
@@ -303,13 +303,13 @@ abstract class FletcherMatthews {
 
                 if (!PRECISION.isZero(offL)) {
 
-                    SparseR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij);
+                    LinkedR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij);
                     while (colNodeL != null) {
                         mtrxL.add(colNodeL.index, ij + 1, -offL * colNodeL.value);
                         colNodeL = colNodeL.next;
                     }
 
-                    SparseR064.ElementNode rowNodeR = mtrxU.getFirstInRow(ij + 1);
+                    LinkedR064.ElementNode rowNodeR = mtrxU.getFirstInRow(ij + 1);
                     while (rowNodeR != null) {
                         mtrxU.add(ij, rowNodeR.index, offL * rowNodeR.value);
                         rowNodeR = rowNodeR.next;
@@ -332,13 +332,13 @@ abstract class FletcherMatthews {
 
             if (!PRECISION.isZero(offU)) {
 
-                SparseR064.ElementNode rowNodeU = mtrxU.getFirstInRow(ij);
+                LinkedR064.ElementNode rowNodeU = mtrxU.getFirstInRow(ij);
                 while (rowNodeU != null) {
                     mtrxU.add(ij + 1, rowNodeU.index, -fact * rowNodeU.value);
                     rowNodeU = rowNodeU.next;
                 }
 
-                SparseR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij + 1);
+                LinkedR064.ElementNode colNodeL = mtrxL.getFirstInColumn(ij + 1);
                 while (colNodeL != null) {
                     mtrxL.add(colNodeL.index, ij, fact * colNodeL.value);
                     colNodeL = colNodeL.next;

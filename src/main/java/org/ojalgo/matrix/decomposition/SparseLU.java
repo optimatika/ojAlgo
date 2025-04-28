@@ -27,17 +27,19 @@ import java.util.Arrays;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.matrix.store.DiagonalStore;
+import org.ojalgo.matrix.store.LinkedR064;
+import org.ojalgo.matrix.store.LinkedR064.ElementNode;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
 import org.ojalgo.matrix.store.R064LSR;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.SparseR064;
-import org.ojalgo.matrix.store.SparseR064.ElementNode;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Access2D.Sliceable;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -61,6 +63,15 @@ import org.ojalgo.type.context.NumberContext;
  * modifications.
  */
 final class SparseLU extends AbstractDecomposition<Double, R064Store> implements LU<Double> {
+
+    private static Access2D.Sliceable<Double> cast(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+
+        if (matrix instanceof Access2D.Sliceable<?>) {
+            return (Access2D.Sliceable<Double>) matrix;
+        } else {
+            return matrix.collect(R064LSC.FACTORY);
+        }
+    }
 
     private Pivot myColPivot;
     /**
@@ -140,6 +151,78 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
 
         this.reset(matrix);
 
+        Sliceable<Double> columns = SparseLU.cast(matrix);
+
+        int m = matrix.getRowDim();
+        int n = matrix.getColDim();
+        int r = Math.min(m, n);
+
+        R064Store tmpRow = R064Store.FACTORY.make(1, n);
+        double[] wRow = tmpRow.data;
+        R064Store tmpCol = R064Store.FACTORY.make(m, 1);
+        double[] wCol = tmpCol.data;
+
+        for (int j = 0; j < n; j++) {
+
+            columns.sliceColumn(j).supplyTo(wCol);
+
+            // Apply previous transformations.
+            myPivot.applyPivotOrder(tmpCol);
+
+            for (int i = 0; i < m; i++) {
+
+                // Most of the time is spent in the following dot product.
+                int kmax = Math.min(i, j);
+                double sum = ZERO;
+                for (int k = 0; k < kmax; k++) {
+                    sum += myL.doubleValue(i, k) * wCol[k];
+                }
+                wCol[i] -= sum;
+            }
+
+            // Find pivot and exchange if necessary.
+
+            int p = j;
+            for (int i = j + 1; i < m; i++) {
+                if (Math.abs(wCol[i]) > Math.abs(wCol[p])) {
+                    p = i;
+                }
+            }
+            if (p != j) {
+
+                myPivot.change(p, j);
+
+                double tmpVal = wCol[p];
+                wCol[p] = wCol[j];
+                wCol[j] = tmpVal;
+
+                myL.exchangeRows(p, j);
+            }
+
+            // Copy values to U
+            for (int i = 0; i < Math.min(m, j); i++) {
+                myU.set(i, j, wCol[i]);
+            }
+            if (j < r) {
+                myDiagU[j] = wCol[j];
+            }
+
+            // Compute multipliers.
+
+            if (j < m & wCol[j] != 0.0) {
+                for (int i = j + 1; i < m; i++) {
+                    myL.set(i, j, wCol[i] / wCol[j]);
+                }
+            }
+        }
+
+        return this.computed(true);
+    }
+
+    public boolean decompose2(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+
+        this.accept(matrix);
+
         int m = this.getRowDim();
         int n = this.getColDim();
         int r = this.getMinDim();
@@ -192,7 +275,7 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
                                 // Insert new node in target row
                                 if (lastTargetNode == null) {
                                     // Insert at start of row
-                                    ElementNode newNode = SparseR064.newNode(pivotNode.index, -multiplier * pivotNode.value);
+                                    ElementNode newNode = LinkedR064.newNode(pivotNode.index, -multiplier * pivotNode.value);
                                     newNode.next = targetNode;
                                     if (targetNode != null) {
                                         targetNode.previous = newNode;
@@ -444,7 +527,14 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         return this.isSquare() && this.isFullRank();
     }
 
-    void reset(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+    void accept(final Collectable<Double, ? super TransformableRegion<Double>> matrix) {
+
+        this.reset(matrix);
+
+        matrix.supplyTo(myU);
+    }
+
+    void reset(final Structure2D matrix) {
 
         int m = matrix.getRowDim();
         int n = matrix.getColDim();
@@ -470,8 +560,6 @@ final class SparseLU extends AbstractDecomposition<Double, R064Store> implements
         if (myU == null || myU.getRowDim() != m || myU.getColDim() != n) {
             myU = R064LSR.FACTORY.make(m, n);
         }
-
-        matrix.supplyTo(myU);
     }
 
 }
