@@ -26,13 +26,13 @@ import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.SparseR064.ElementNode;
+import org.ojalgo.matrix.store.LinkedR064.ElementNode;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 
 public class SparseR064Test extends MatrixStoreTests {
 
-    private static void assertNodesNotPresent(final SparseR064 store, final int row, final int col) {
+    private static void assertNodesNotPresent(final LinkedR064 store, final int row, final int col) {
         ElementNode node = store.getNode(row, col);
         TestUtils.assertEquals(ZERO, node.value);
     }

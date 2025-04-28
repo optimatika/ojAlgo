@@ -2,11 +2,10 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.ArrayR064;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.matrix.store.ColumnsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.SparseStore;
-import org.ojalgo.matrix.store.SparseStore.Builder;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.runner.RunnerException;
 
@@ -27,13 +26,23 @@ public abstract class AbstractBenchmarkSparseLU {
         int dim = 1_000;
 
         MatrixStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, 0.01);
-        MatrixStore<Double> vecor = AbstractBenchmarkSparseLU.newDenseVector(dim);
-        PhysicalStore<Double> work = R064Store.FACTORY.make(dim, 1);
+        SparseArray<Double> vecor = AbstractBenchmarkSparseLU.newSparseVector(dim, 0.01);
+        PhysicalStore<Double> rhs = AbstractBenchmarkSparseLU.newDenseVector(dim);
 
-        sparse.decompose(matrix);
+        for (int d = 0; d < 1_000_000; d++) {
 
-        for (int i = 0; i < 100_000; i++) {
-            sparse.updateColumn(Uniform.randomInteger(dim), vecor, work);
+            sparse.decompose(matrix);
+
+            vecor = AbstractBenchmarkSparseLU.newSparseVector(dim, 0.01);
+            rhs = AbstractBenchmarkSparseLU.newDenseVector(dim);
+
+            while (sparse.updateColumn(Uniform.randomInteger(dim), vecor)) {
+
+                for (int t = 0; t < 5; t++) {
+                    sparse.ftran(rhs);
+                    sparse.btran(rhs);
+                }
+            }
         }
     }
 
@@ -48,10 +57,12 @@ public abstract class AbstractBenchmarkSparseLU {
         return vector;
     }
 
-    public static SparseStore<Double> newSparseMatrix(final int dim, final double density) {
+    public static MatrixStore<Double> newSparseMatrix(final int dim, final double density) {
 
         // Create sparse matrix with specified density
-        Builder<Double> builder = SparseStore.R064.newBuilder(dim, dim);
+        ColumnsSupplier<Double> builder = R064Store.FACTORY.makeColumnsSupplier(dim);
+        builder.addColumns(dim);
+
         int nonZeroCount = ((int) (dim * dim * density));
 
         int offDiag = nonZeroCount - dim;
@@ -64,7 +75,7 @@ public abstract class AbstractBenchmarkSparseLU {
             builder.set(i, i, RANDOM.doubleValue());
         }
 
-        return builder.build();
+        return builder;
     }
 
     public static SparseArray<Double> newSparseVector(final int dim, final double density) {

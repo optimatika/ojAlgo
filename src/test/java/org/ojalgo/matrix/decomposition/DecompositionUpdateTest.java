@@ -1,8 +1,10 @@
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -18,10 +20,13 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
- * Tests for the updateColumn method in RawLU class.
+ * Tests primarily used for initial work on updatable LU decompositions.
  */
 public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
@@ -48,6 +53,101 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
             mtrxL = second;
             mtrxU = third;
             colOrder = forth;
+        }
+
+    }
+
+    static class UpdateCase implements Structure2D {
+
+        final int columnIndex;
+        final MatrixStore<Double> newColumn;
+        final MatrixStore<Double> originalMatrix;
+
+        UpdateCase(final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn) {
+            super();
+            this.originalMatrix = originalMatrix;
+            this.columnIndex = columnIndex;
+            this.newColumn = newColumn;
+        }
+
+        @Override
+        public int getColDim() {
+            return originalMatrix.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return originalMatrix.getRowDim();
+        }
+
+        MatrixStore<Double> getModifiedMatrix() {
+            PhysicalStore<Double> copy = originalMatrix.copy();
+            copy.fillColumn(columnIndex, newColumn);
+            return copy;
+        }
+
+        MatrixStore<Double> getOriginalColumn(final int col) {
+            return originalMatrix.column(col);
+        }
+
+        MatrixStore<Double> rhs() {
+            return DecompositionUpdateTest.rhs(originalMatrix.getRowDim());
+        }
+
+    }
+
+    static class UpdateSequence implements Structure2D {
+
+        PhysicalStore<Double> matrix;
+
+        List<KeyedPrimitive<MatrixStore<Double>>> updates;
+
+        UpdateSequence(final PhysicalStore<Double> matrix) {
+            this(matrix, new ArrayList<>());
+        }
+
+        UpdateSequence(final PhysicalStore<Double> matrix, final List<KeyedPrimitive<MatrixStore<Double>>> updates) {
+            super();
+            this.matrix = matrix;
+            this.updates = updates;
+        }
+
+        @Override
+        public int getColDim() {
+            return matrix.getColDim();
+        }
+
+        @Override
+        public int getRowDim() {
+            return matrix.getRowDim();
+        }
+
+        void add(final int index, final MatrixStore<Double> column) {
+            updates.add(EntryPair.of(column, index));
+        }
+
+        MatrixStore<Double> rhs() {
+            return DecompositionUpdateTest.rhs(matrix.getRowDim());
+        }
+
+        List<UpdateCase> toIndividualCases() {
+
+            List<UpdateCase> retVal = new ArrayList<>();
+
+            PhysicalStore<Double> originalMatrix = matrix.copy();
+
+            for (KeyedPrimitive<MatrixStore<Double>> update : updates) {
+
+                int columnIndex = update.intValue();
+                MatrixStore<Double> newColumn = update.first();
+
+                retVal.add(new UpdateCase(originalMatrix, columnIndex, newColumn));
+
+                originalMatrix = originalMatrix.copy();
+                originalMatrix.fillColumn(columnIndex, newColumn);
+            }
+
+            return retVal;
         }
 
     }
@@ -228,195 +328,6 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
     /**
      * A variant of {@link #doFletcherMatthews(int[], PhysicalStore, PhysicalStore, int, MatrixStore)}
-     * specifically target to be used with (copied to) {@link DenseLU}.
-     * <p>
-     * {@link DenseLU} stores the L and U factors combined in a single {@link R064Store} instance.
-     */
-    private static Result doFletcherMatthewsDenseTooSimple(final int[] pivotOrder, final PhysicalStore<Double> mtrxL, final PhysicalStore<Double> mtrxU,
-            final int columnIndex, final MatrixStore<Double> column) {
-
-        int m = mtrxL.getRowDim();
-        int n = mtrxU.getColDim();
-        int r = mtrxL.getMinDim();
-
-        DecompositionStore<Double> combined = R064Store.FACTORY.make(m, n);
-        for (int j = 0; j < n; j++) {
-            for (int i = j + 1; i < m; i++) {
-                combined.set(i, j, mtrxL.doubleValue(i, j));
-            }
-        }
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i <= j; i++) {
-                combined.set(i, j, mtrxU.doubleValue(i, j));
-            }
-        }
-
-        PhysicalStore<Double> preallocated = R064Store.FACTORY.make(m, 1);
-
-        Pivot myPivot = new Pivot(pivotOrder);
-        Pivot myColPivot = new Pivot();
-        myColPivot.reset(n);
-
-        if (DEBUG) {
-            BasicLogger.debug("Input");
-            BasicLogger.debug("P: {}", myPivot);
-            BasicLogger.debugMatrix("L", mtrxL);
-            BasicLogger.debugMatrix("U", mtrxU);
-            BasicLogger.debug("Q: {}", myColPivot);
-        }
-
-        // Start here (no changes before this)
-        // This is a copy of what's in
-        // DenseLU.updateColumn(int,Access1D.Collectable,PhysicalStore)
-        // except for the final return statement.
-        {
-
-            if (DEBUG) {
-                BasicLogger.debug("Initial");
-                BasicLogger.debug("P: {}", myPivot);
-                MatrixStore<Double> tmpL = combined.triangular(false, true);
-                MatrixStore<Double> tmpU = combined.triangular(true, false);
-                BasicLogger.debugMatrix("Store", combined);
-                BasicLogger.debugMatrix("L", tmpL);
-                BasicLogger.debugMatrix("U", tmpU);
-                BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                BasicLogger.debug("Q: {}", myColPivot);
-            }
-
-            column.supplyTo(preallocated);
-            myPivot.applyPivotOrder(preallocated);
-            preallocated.substituteForwards(combined, true, false, false);
-
-            // After forward substitution is complete, find the last non-zero row
-            int lastRowNonZero = -1;
-            for (int i = m - 1; i >= 0; i--) {
-                if (!ACCURACY.isZero(preallocated.doubleValue(i))) {
-                    lastRowNonZero = i;
-                    break; // Stop as soon as we find a non-zero value
-                }
-            }
-
-            for (int ij = columnIndex; ij < lastRowNonZero; ij++) {
-
-                if (DEBUG) {
-                    BasicLogger.debug("start: " + ij);
-                    MatrixStore<Double> tmpL = combined.triangular(false, true);
-                    MatrixStore<Double> tmpU = combined.triangular(true, false);
-                    BasicLogger.debugMatrix("Store", combined);
-                    BasicLogger.debugMatrix("L", tmpL);
-                    BasicLogger.debugMatrix("U", tmpU);
-                    BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                }
-
-                combined.exchangeRows(ij, ij + 1);
-                combined.exchangeColumns(ij, ij + 1);
-
-                preallocated.exchangeRows(ij, ij + 1);
-
-                myPivot.change(ij, ij + 1);
-                myColPivot.change(ij, ij + 1);
-
-                double offL = combined.doubleValue(ij, ij + 1);
-                double offU = combined.doubleValue(ij + 1, ij);
-
-                if (DEBUG) {
-                    BasicLogger.debug("exchange");
-                    MatrixStore<Double> tmpL = combined.triangular(false, true);
-                    MatrixStore<Double> tmpU = combined.triangular(true, false);
-                    BasicLogger.debugMatrix("Store", combined);
-                    BasicLogger.debugMatrix("L", tmpL);
-                    BasicLogger.debugMatrix("U", tmpU);
-                    BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                }
-
-                if (!ACCURACY.isZero(offL)) {
-
-                    combined.set(ij, ij + 1, ZERO);
-                    for (int i = ij + 2; i < m; i++) { // L (ij+1)
-                        combined.add(i, ij + 1, -offL * combined.doubleValue(i, ij));
-                    }
-
-                    for (int j = ij; j < n; j++) { // U (ij)
-                        combined.add(ij, j, offL * combined.doubleValue(ij + 1, j));
-                    }
-                    preallocated.add(ij, offL * preallocated.doubleValue(ij + 1));
-
-                    if (DEBUG) {
-                        BasicLogger.debug("offL");
-                        BasicLogger.debug("P: {}", myPivot);
-                        MatrixStore<Double> tmpL = combined.triangular(false, true);
-                        MatrixStore<Double> tmpU = combined.triangular(true, false);
-                        BasicLogger.debugMatrix("Store", combined);
-                        BasicLogger.debugMatrix("L", tmpL);
-                        BasicLogger.debugMatrix("U", tmpU);
-                        BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                        BasicLogger.debug("Q: {}", myColPivot);
-                    }
-
-                } else {
-
-                    // combined.add(ij, ij, offL * combined.doubleValue(ij + 1, ij));
-                }
-
-                if (!ACCURACY.isZero(offU)) {
-
-                    double diag = combined.doubleValue(ij, ij);
-                    double fact = offU / diag;
-
-                    combined.set(ij + 1, ij, ZERO);
-                    for (int j = ij + 2; j < n; j++) { // U (ij+1)
-                        combined.add(ij + 1, j, -fact * combined.doubleValue(ij, j));
-                    }
-                    preallocated.add(ij + 1, -fact * preallocated.doubleValue(ij));
-
-                    combined.set(ij + 1, ij, fact); // L (ij)
-                    for (int i = ij + 2; i < m; i++) {
-                        combined.add(i, ij, fact * combined.doubleValue(i, ij + 1));
-                    }
-
-                    if (DEBUG) {
-                        BasicLogger.debug("offU");
-                        BasicLogger.debug("P: {}", myPivot);
-                        MatrixStore<Double> tmpL = combined.triangular(false, true);
-                        MatrixStore<Double> tmpU = combined.triangular(true, false);
-                        BasicLogger.debugMatrix("Store", combined);
-                        BasicLogger.debugMatrix("L", tmpL);
-                        BasicLogger.debugMatrix("U", tmpU);
-                        BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                        BasicLogger.debug("Q: {}", myColPivot);
-                    }
-
-                } else {
-
-                    // combined.add(ij, ij, offL * combined.doubleValue(ij + 1, ij));
-                }
-            }
-
-            for (int i = 0; i <= lastRowNonZero; i++) {
-                combined.set(i, lastRowNonZero, preallocated.doubleValue(i));
-            }
-
-            if (DEBUG) {
-                BasicLogger.debug("Final");
-                BasicLogger.debug("P: {}", myPivot);
-                MatrixStore<Double> tmpL = combined.triangular(false, true);
-                MatrixStore<Double> tmpU = combined.triangular(true, false);
-                BasicLogger.debugMatrix("Store", combined);
-                BasicLogger.debugMatrix("L", tmpL);
-                BasicLogger.debugMatrix("U", tmpU);
-                BasicLogger.debugMatrix("LU", tmpL.multiply(tmpU));
-                BasicLogger.debug("Q: {}", myColPivot);
-            }
-        }
-        // Stop here (no changes after this)
-
-        MatrixStore<Double> tmpL = combined.triangular(false, true);
-        MatrixStore<Double> tmpU = combined.triangular(true, false);
-        return new Result(myPivot.getOrder(), tmpL, tmpU, myColPivot.getOrder());
-    }
-
-    /**
-     * A variant of {@link #doFletcherMatthews(int[], PhysicalStore, PhysicalStore, int, MatrixStore)}
      * specifically target to be used with (copied to) {@link SparseLU}.
      * <p>
      * {@link SparseLU} stores the L and U factors separately in {@link R064LSC} (L) and {@link R064LSR} (U)
@@ -443,7 +354,7 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
 
         Pivot rowPivot = new Pivot(pivotOrder);
-        Pivot colPivot = new Pivot(pivotOrder);
+        Pivot colPivot = new Pivot();
         colPivot.reset(n);
 
         FletcherMatthews.update(rowPivot, sparseL, diagU, sparseU, colPivot, columnIndex, column, R064Store.FACTORY.make(m, 1));
@@ -683,7 +594,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
     }
 
-    static void doTest(final MatrixStore<Double> originalMatrix, final int columnIndex, final MatrixStore<Double> newColumn) {
+    static void doTest(final UpdateCase updateCase) {
+
+        MatrixStore<Double> originalMatrix = updateCase.originalMatrix;
+        int columnIndex = updateCase.columnIndex;
+        MatrixStore<Double> newColumn = updateCase.newColumn;
 
         PhysicalStore<Double> modifiedMatrix = originalMatrix.copy();
         modifiedMatrix.fillColumn(columnIndex, newColumn);
@@ -732,16 +647,38 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         DecompositionUpdateTest.doOne("Fletcher-Matthews (dense)", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU,
                 DecompositionUpdateTest::doFletcherMatthewsDense, null);
 
-        DecompositionUpdateTest.doOne("SparseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, SparseLU::new);
-
         DecompositionUpdateTest.doOne("DenseLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, DenseLU.R064::new);
 
         DecompositionUpdateTest.doOne("RawLU", originalMatrix, columnIndex, newColumn, modifiedMatrix, pivotOrder, mtrxL, mtrxU, null, RawLU::new);
-
     }
 
-    @Test
-    public void test3x3NoPivotingOrSpikes() {
+    static void doTestTran(final MatrixStore<Double> body, final LU<Double> decomposition, final MatrixStore<Double> rhs) {
+
+        LU<Double> dense = LU.R064.decompose(body);
+
+        if (dense.isSolvable()) {
+
+            PhysicalStore<Double> fDense = rhs.copy();
+            PhysicalStore<Double> fSparse = rhs.copy();
+            dense.ftran(fDense);
+            decomposition.ftran(fSparse);
+
+            TestUtils.assertEquals(rhs, body.multiply(fDense));
+            TestUtils.assertEquals(fDense, fSparse);
+            TestUtils.assertEquals(rhs, body.multiply(fSparse));
+
+            PhysicalStore<Double> bDense = rhs.copy();
+            PhysicalStore<Double> bSparse = rhs.copy();
+            dense.btran(bDense);
+            decomposition.btran(bSparse);
+
+            TestUtils.assertEquals(rhs, body.transpose().multiply(bDense));
+            TestUtils.assertEquals(bDense, bSparse);
+            TestUtils.assertEquals(rhs, body.transpose().multiply(bSparse));
+        }
+    }
+
+    static UpdateCase make3x3NoPivotingOrSpikes() {
 
         // Create a simple 3x3 matrix that we know works well
         // Initial matrix with a clear structure
@@ -757,21 +694,15 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         matrix.set(2, 2, 2.0);
 
         // Create new column to replace column 1 (index 1)
-        R064Store newColumn = DecompositionUpdateTest.newEmpty(3, 1);
-        newColumn.set(0, 0, 1.0);
-        newColumn.set(1, 0, 4.0);
-        newColumn.set(2, 0, 2.0);
+        R064Store column = DecompositionUpdateTest.newEmpty(3, 1);
+        column.set(0, 0, 1.0);
+        column.set(1, 0, 4.0);
+        column.set(2, 0, 2.0);
 
-        int columnIndex = 1;
-
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        return new UpdateCase(matrix, 1, column);
     }
 
-    /**
-     * Tests updateColumn on a small matrix with a known pattern.
-     */
-    @Test
-    public void test3x3SmallMatrixUpdate() {
+    static UpdateCase make3x3SmallMatrixUpdate() {
 
         // Create simple 3x3 matrix
         R064Store matrix = DecompositionUpdateTest.newEmpty(3, 3);
@@ -792,16 +723,10 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(2, 0, 9.0);
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, 1, newColumn);
+        return new UpdateCase(matrix, 1, newColumn);
     }
 
-    /**
-     * Test method that demonstrates the high-level Forrest-Tomlin update algorithm.
-     * <P>
-     * Testing with a case that creates a spike:
-     */
-    @Test
-    public void test4x4withSpikes() {
+    static UpdateCase make4x4withSpikes() {
 
         // Create a 4x4 matrix
         R064Store matrixWithSpike = DecompositionUpdateTest.newEmpty(4, 4);
@@ -834,18 +759,10 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumnWithSpike.set(2, 0, 3.0); // Diagonal element
         newColumnWithSpike.set(3, 0, 8.0); // Spike - larger than diagonal
 
-        int columnIndex = 2;
-
-        DecompositionUpdateTest.doTest(matrixWithSpike, columnIndex, newColumnWithSpike);
+        return new UpdateCase(matrixWithSpike, 2, newColumnWithSpike);
     }
 
-    /**
-     * Tests a simple column update that doesn't require spike handling. This test uses a carefully
-     * constructed 5x5 matrix and updates column 2 with values that maintain the triangular structure without
-     * creating spikes.
-     */
-    @Test
-    public void test5x5WithoutSpike() {
+    static UpdateCase make5x5WithoutSpike() {
 
         // Create a 5x5 matrix with a specific structure
         R064Store matrix = DecompositionUpdateTest.newEmpty(5, 5);
@@ -888,17 +805,19 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(1, 0, 2.0); // Value for row 1
         newColumn.set(2, 0, 8.0); // Value for row 2 (diagonal element, larger than others)
         newColumn.set(3, 0, 3.0); // Value for row 3
-        newColumn.set(4, 0, 2.0); // Value for row 4
+        newColumn.set(4, 0, 2.0);
+
+        // Value for row 4
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, 2, newColumn);
+        return new UpdateCase(matrix, 2, newColumn);
     }
 
-    @Test
-    public void test7x7WithZeros() {
+    static List<UpdateCase> make7x7WithZeros() {
 
         // Create a 7x7 matrix with about half zeros and structure that forces pivoting
         R064Store matrix = DecompositionUpdateTest.newEmpty(7, 7);
+        List<UpdateCase> retVal = new ArrayList<>();
 
         // Pattern that ensures full rank and forces pivoting (small element in first position)
         matrix.set(0, 0, 0.1);
@@ -923,38 +842,15 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
 
         for (int columnIndex = 0; columnIndex < 7; columnIndex++) {
             for (int lastRowNonZero = columnIndex; lastRowNonZero < 7; lastRowNonZero++) {
-
-                if (DEBUG) {
-                    BasicLogger.debug("Case: {}, {}", columnIndex, lastRowNonZero);
-                }
-
                 MatrixStore<Double> newColumn = DecompositionUpdateTest.newColumn(matrix, lastRowNonZero);
-
-                R064Store copy = matrix.copy();
-                copy.fillColumn(columnIndex, newColumn);
-
-                LU<Double> decompose = LU.R064.decompose(copy);
-
-                if (DEBUG) {
-                    if (!decompose.isSolvable()) {
-                        BasicLogger.debug("isSolvable: {}", decompose.isSolvable());
-                    }
-                }
-                // Test the update
-                DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+                retVal.add(new UpdateCase(matrix, columnIndex, newColumn));
             }
-
         }
 
+        return retVal;
     }
 
-    /**
-     * This test case is specifically designed to have no spikes according to the Bartels-Golub-Reid
-     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
-     * all elements below the diagonal in the column being updated are exactly zero.
-     */
-    @Test
-    public void testBGRNoSpikes() {
+    static UpdateCase makeBGRNoSpikes() {
 
         // Create a 3x3 matrix
         R064Store matrix = DecompositionUpdateTest.newEmpty(3, 3);
@@ -983,7 +879,6 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         }
 
         // We want to update column 1 (index 1)
-        int columnIndex = 1;
 
         // Create a new column that will result in no spikes after forward substitution
         // For this, we need to carefully choose values so that:
@@ -1012,18 +907,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         if (DEBUG) {
             BasicLogger.debug("Calculated new column: [{}, {}, {}]", newCol0, newCol1, newCol2);
         }
-
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        return new UpdateCase(matrix, 1, newColumn);
     }
 
-    /**
-     * This test case is specifically designed to have exactly one spike according to the Bartels-Golub-Reid
-     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
-     * there is exactly one non-zero element below the diagonal in the column being updated.
-     */
-    @Test
-    public void testBGRWithExactlyOneSpike() {
+    static UpdateCase makeBGRWithExactlyOneSpike() {
 
         // Create a 3x3 matrix - using the same matrix as in testBGRNoSpikes
         R064Store matrix = DecompositionUpdateTest.newEmpty(3, 3);
@@ -1083,13 +971,16 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         if (DEBUG) {
             BasicLogger.debug("Calculated new column: [{}, {}, {}]", newCol0, newCol1, newCol2);
         }
+        final MatrixStore<Double> originalMatrix = matrix;
+        final int columnIndex1 = columnIndex;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test the update
-        DecompositionUpdateTest.doTest(matrix, columnIndex, newColumn);
+        UpdateCase updateCase = new UpdateCase(originalMatrix, columnIndex1, newColumn1);
+        return updateCase;
     }
 
-    @Test
-    public void testCaseGPT() {
+    static UpdateCase makeCaseGPT() {
 
         RawStore mtrxA = RawStore.wrap(new double[][] { { 2.0, 3.0, 4.0 }, { 1.0, 3.0, 4.5 }, { 1.0, 0.75, 1.75 } });
 
@@ -1105,17 +996,13 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(pivotOrder, tmpLU.getPivotOrder());
         tmpLU.reset();
 
-        int colIndex = 1;
-        MatrixStore<Double> colElements = RawStore.wrap(3.0, 1.0, 2.0).transpose();
+        MatrixStore<Double> transpose = RawStore.wrap(3.0, 1.0, 2.0).transpose();
 
-        DecompositionUpdateTest.doTest(mtrxA, colIndex, colElements);
+        UpdateCase updateCase = new UpdateCase(mtrxA, 1, transpose);
+        return updateCase;
     }
 
-    /**
-     * Tests updateColumn with ill-conditioned matrices.
-     */
-    @Test
-    public void testIllConditionedMatrix() {
+    static UpdateCase makeIllConditionedMatrix() {
 
         // Create an ill-conditioned matrix
         R064Store matrix = DecompositionUpdateTest.newEmpty(5, 5);
@@ -1152,25 +1039,227 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
         newColumn.set(2, 0, 4.0);
         newColumn.set(3, 0, 5.0);
         newColumn.set(4, 0, 6.0);
+        final MatrixStore<Double> originalMatrix = matrix;
+        final MatrixStore<Double> newColumn1 = newColumn;
 
         // Test column update on an ill-conditioned matrix
-        DecompositionUpdateTest.doTest(matrix, 2, newColumn);
+        return new UpdateCase(originalMatrix, 2, newColumn1);
     }
 
-    @Test
-    public void testRandomMatrixUpdate() {
+    static UpdateSequence makeRandomMatrixUpdate() {
 
         int dim = 7;
 
         // Create random square matrix
         R064Store matrix = DecompositionUpdateTest.newRandom(dim, dim);
+        UpdateSequence retVal = new UpdateSequence(matrix);
 
         // Test updating each column
         for (int col = 0; col < dim; col++) {
             R064Store newColumn = DecompositionUpdateTest.newRandom(dim, 1);
-            DecompositionUpdateTest.doTest(matrix, col, newColumn);
+            retVal.add(col, newColumn);
         }
 
+        return retVal;
+    }
+
+    static UpdateSequence makeRepeatedUpdatesWithPivoting() {
+
+        // Create initial 4x4 matrix
+        R064Store matrix = R064Store.FACTORY.make(4, 4);
+        matrix.fillAll(ONE);
+        matrix.set(0, 0, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(2, 2, 4.0);
+        matrix.set(3, 3, 5.0);
+
+        UpdateSequence sequence = new UpdateSequence(matrix);
+
+        // Create new columns to update
+        R064Store newColumn1 = R064Store.FACTORY.make(4, 1);
+        newColumn1.fillAll(ONE);
+        newColumn1.set(0, 0, 6.0); // Large value to force pivot
+
+        R064Store newColumn2 = R064Store.FACTORY.make(4, 1);
+        newColumn2.fillAll(ONE);
+        newColumn2.set(1, 0, 7.0); // Large value to force pivot
+
+        R064Store newColumn3 = R064Store.FACTORY.make(4, 1);
+        newColumn3.fillAll(ONE);
+        newColumn3.set(2, 0, 8.0); // Large value to force pivot
+
+        sequence.add(0, newColumn1);
+        sequence.add(1, newColumn2);
+        sequence.add(2, newColumn3);
+
+        return sequence;
+    }
+
+    static UpdateSequence makeSequentialUpdates() {
+
+        int dim = 10;
+
+        R064Store matrix = DecompositionUpdateTest.newRandom(dim, dim);
+        UpdateSequence retVal = new UpdateSequence(matrix);
+
+        for (int col = 0; col < dim; col += 2) {
+            R064Store newColumn = DecompositionUpdateTest.newRandom(dim, 1);
+            retVal.add(col, newColumn);
+        }
+
+        return retVal;
+    }
+
+    static UpdateCase makeUpdatesWithSmallDiagonal() {
+
+        // Create initial 3x3 matrix with small diagonal elements
+        R064Store original = R064Store.FACTORY.make(3, 3);
+        original.fillAll(ONE);
+        original.set(0, 0, 1.0E-10);
+        original.set(1, 1, 1.0E-10);
+        original.set(2, 2, 1.0E-10);
+
+        // Create new column to update
+        R064Store newColumn = R064Store.FACTORY.make(3, 1);
+        newColumn.fillAll(ONE);
+        newColumn.set(0, 0, 1.0E+10); // Large value to force pivot
+
+        return new UpdateCase(original, 0, newColumn);
+    }
+
+    static UpdateCase makeUpdatesWithZeroDiagonal() {
+        // Create initial 3x3 matrix with zero diagonal
+        R064Store original = R064Store.FACTORY.make(3, 3);
+        original.fillAll(ONE);
+        original.set(0, 0, 0.0); // Zero diagonal element
+
+        // Create new column to update
+        R064Store newColumn = R064Store.FACTORY.make(3, 1);
+        newColumn.fillAll(ONE);
+        newColumn.set(1, 0, 5.0); // Large value to force pivot
+
+        UpdateCase updateCase = new UpdateCase(original, 0, newColumn);
+        return updateCase;
+    }
+
+    static MatrixStore<Double> rhs(final int nbRows) {
+
+        PhysicalStore<Double> rhs = R064Store.FACTORY.make(nbRows, 1);
+        for (int i = 0; i < nbRows; i++) {
+            rhs.set(i, 0, i + ONE);
+        }
+
+        return rhs;
+    }
+
+    @Test
+    public void test3x3NoPivotingOrSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    /**
+     * Tests updateColumn on a small matrix with a known pattern.
+     */
+    @Test
+    public void test3x3SmallMatrixUpdate() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3SmallMatrixUpdate();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    /**
+     * Test method that demonstrates the high-level Forrest-Tomlin update algorithm.
+     * <P>
+     * Testing with a case that creates a spike:
+     */
+    @Test
+    public void test4x4withSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make4x4withSpikes();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    /**
+     * Tests a simple column update that doesn't require spike handling. This test uses a carefully
+     * constructed 5x5 matrix and updates column 2 with values that maintain the triangular structure without
+     * creating spikes.
+     */
+    @Test
+    public void test5x5WithoutSpike() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make5x5WithoutSpike();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    @Test
+    public void test7x7WithZeros() {
+
+        List<UpdateCase> updateCases = DecompositionUpdateTest.make7x7WithZeros();
+
+        for (UpdateCase updateCase : updateCases) {
+            DecompositionUpdateTest.doTest(updateCase);
+        }
+    }
+
+    /**
+     * This test case is specifically designed to have no spikes according to the Bartels-Golub-Reid
+     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
+     * all elements below the diagonal in the column being updated are exactly zero.
+     */
+    @Test
+    public void testBGRNoSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.makeBGRNoSpikes();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    /**
+     * This test case is specifically designed to have exactly one spike according to the Bartels-Golub-Reid
+     * algorithm. The matrix and update column are carefully constructed so that after forward substitution,
+     * there is exactly one non-zero element below the diagonal in the column being updated.
+     */
+    @Test
+    public void testBGRWithExactlyOneSpike() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.makeBGRWithExactlyOneSpike();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    @Test
+    public void testCaseGPT() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.makeCaseGPT();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    /**
+     * Tests updateColumn with ill-conditioned matrices.
+     */
+    @Test
+    public void testIllConditionedMatrix() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.makeIllConditionedMatrix();
+
+        DecompositionUpdateTest.doTest(updateCase);
+    }
+
+    @Test
+    public void testRandomMatrixUpdate() {
+
+        List<UpdateCase> updateCases = DecompositionUpdateTest.makeRandomMatrixUpdate().toIndividualCases();
+
+        for (UpdateCase updateCase : updateCases) {
+            DecompositionUpdateTest.doTest(updateCase);
+        }
     }
 
     /**
@@ -1179,24 +1268,11 @@ public class DecompositionUpdateTest extends MatrixDecompositionTests {
     @Test
     public void testSequentialUpdates() {
 
-        int dim = 10;
-        R064Store matrix = DecompositionUpdateTest.newRandom(dim, dim);
+        List<UpdateCase> updateCases = DecompositionUpdateTest.makeSequentialUpdates().toIndividualCases();
 
-        // Make a copy for full decomposition at the end
-        R064Store updatedMatrix = matrix.copy();
-
-        // Create a new LU decomposition
-        RawLU lu = new RawLU();
-        lu.decompose(matrix);
-
-        // Update multiple columns in sequence
-        for (int col = 0; col < dim; col += 2) {
-            R064Store newColumn = DecompositionUpdateTest.newRandom(dim, 1);
-
-            DecompositionUpdateTest.doTest(matrix, col, newColumn);
-
-            updatedMatrix.fillColumn(col, newColumn);
-
+        for (UpdateCase updateCase : updateCases) {
+            DecompositionUpdateTest.doTest(updateCase);
         }
     }
+
 }

@@ -22,9 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -36,7 +35,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 /**
  * <pre>
-# Run complete. Total time: 00:09:48
+# Run complete. Total time: 00:05:04
 
 REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
 why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
@@ -44,10 +43,10 @@ experiments, perform baseline and negative tests that provide experimental contr
 the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
 Do not assume the numbers tell you what you want them to tell.
 
-Benchmark                       (density)  (dim)   Mode  Cnt     Score     Error  Units
-BenchmarkUpdateColumnLU.dense        0.01    500  thrpt    3  5312.442 ± 916.871  ops/s
-BenchmarkUpdateColumnLU.raw          0.01    500  thrpt    3  8358.566 ± 657.719  ops/s
-BenchmarkUpdateColumnLU.sparse       0.01    500  thrpt    3     0.014 ±   0.125  ops/s
+Benchmark                       (density)  (dim)   Mode  Cnt     Score    Error  Units
+BenchmarkUpdateColumnLU.dense        0.01   1000  thrpt    3  1289.091 ± 16.253  ops/s
+BenchmarkUpdateColumnLU.raw          0.01   1000  thrpt    3  1950.952 ± 85.844  ops/s
+BenchmarkUpdateColumnLU.sparse       0.01   1000  thrpt    3   693.128 ± 21.783  ops/s
  * </pre>
  */
 @State(Scope.Benchmark)
@@ -64,37 +63,35 @@ public class BenchmarkUpdateColumnLU extends AbstractBenchmarkSparseLU {
 
     int index;
     PhysicalStore<Double> vector;
-    PhysicalStore<Double> work;
 
     @Benchmark
     public LU<Double> dense() {
-        dense.updateColumn(index, vector, work);
+        dense.updateColumn(index, vector);
         return dense;
     }
 
     @Benchmark
     public LU<Double> raw() {
-        raw.updateColumn(index, vector, work);
+        raw.updateColumn(index, vector);
         return raw;
     }
 
     @Setup(Level.Trial)
     public void setup() {
 
-        SparseStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
+        MatrixStore<Double> matrix = AbstractBenchmarkSparseLU.newSparseMatrix(dim, density);
         // Decompose matrices
         sparse.decompose(matrix);
         dense.decompose(matrix);
         raw.decompose(matrix);
 
         vector = AbstractBenchmarkSparseLU.newDenseVector(dim);
-        work = R064Store.FACTORY.make(dim, 1);
         index = Uniform.randomInteger(dim);
     }
 
     @Benchmark
     public LU<Double> sparse() {
-        sparse.updateColumn(index, vector, work);
+        sparse.updateColumn(index, vector);
         return sparse;
     }
 

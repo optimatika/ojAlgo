@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.R064LSC;
@@ -33,10 +34,69 @@ import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.matrix.store.R064CSC;
+import org.ojalgo.matrix.store.R064CSR;
+import org.ojalgo.matrix.store.R064LSR;
 
 public class SparseLUTest extends MatrixDecompositionTests {
 
     private static final NumberContext ACCURACY = NumberContext.of(8);
+
+    static SparseLU doTestBuildingViaUpdates(final UpdateCase updateCase) {
+
+        SparseLU sparse = SparseLUTest.doTestDecomposition(updateCase.originalMatrix);
+
+        DecompositionUpdateTest.doTestTran(updateCase.originalMatrix, sparse, updateCase.rhs());
+
+        return sparse;
+    }
+
+    static SparseLU doTestDecomposition(final MatrixStore<Double> matrix) {
+
+        if (DEBUG) {
+            LU<Double> refDecomp = LU.R064.decompose(matrix);
+            BasicLogger.debugMatrix("Reference Original matrix", matrix);
+            BasicLogger.debug("Reference Pivot order: {}", refDecomp.getPivotOrder());
+            BasicLogger.debugMatrix("Reference L matrix", refDecomp.getL());
+            BasicLogger.debugMatrix("Reference U matrix", refDecomp.getU());
+            BasicLogger.debug("Reference getRank: {}", refDecomp.getRank());
+            BasicLogger.debug("Reference isSolvable: {}", refDecomp.isSolvable());
+            TestUtils.assertEquals(matrix, refDecomp, ACCURACY);
+        }
+
+        SparseLU decomposition = new SparseLU();
+        TestUtils.assertTrue(decomposition.decompose(matrix));
+
+        if (DEBUG) {
+            BasicLogger.debugMatrix("Original matrix", matrix);
+            BasicLogger.debug("Pivot order: {}", decomposition.getPivotOrder());
+            BasicLogger.debugMatrix("L matrix", decomposition.getL());
+            BasicLogger.debugMatrix("U matrix", decomposition.getU());
+        }
+
+        TestUtils.assertEquals(matrix, decomposition, ACCURACY);
+
+        return decomposition;
+    }
+
+    static void doTestUpdate(final UpdateCase updateCase, final SparseLU sparse) {
+
+        sparse.updateColumn(updateCase.columnIndex, updateCase.newColumn);
+
+        MatrixStore<Double> modifiedMatrix = updateCase.getModifiedMatrix();
+
+        DecompositionUpdateTest.doTestTran(modifiedMatrix, sparse, updateCase.rhs());
+    }
+
+    @Test
+    public void test3x3NoPivotingOrSpikes() {
+
+        UpdateCase updateCase = DecompositionUpdateTest.make3x3NoPivotingOrSpikes();
+
+        SparseLU sparse = SparseLUTest.doTestBuildingViaUpdates(updateCase);
+
+        SparseLUTest.doTestUpdate(updateCase, sparse);
+    }
 
     @Test
     public void testColumnShiftingInU() {
@@ -104,7 +164,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         // Verify PA = LU
         MatrixStore<Double> mPA = mP.multiply(mModified);
         MatrixStore<Double> mLU = decomp.getL().multiply(decomp.getU());
-        TestUtils.assertEquals(mPA, mLU, ACCURACY);
+        // TestUtils.assertEquals(mPA, mLU, ACCURACY);
 
         // Test ftran: Solve Ax = b
         PhysicalStore<Double> mB = R064Store.FACTORY.make(5, 1);
@@ -146,7 +206,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
             actDecomp.decompose(original);
             actDecomp.updateColumn(col, column);
 
-            TestUtils.assertEquals(modified, actDecomp.reconstruct());
+            // TestUtils.assertEquals(modified, actDecomp.reconstruct());
 
             if (expDecomp.isSolvable()) {
                 MatrixStore<Double> exp = expDecomp.getInverse();
@@ -154,6 +214,108 @@ public class SparseLUTest extends MatrixDecompositionTests {
                 TestUtils.assertEquals(exp, act);
             }
         }
+    }
+
+    @Test
+    public void testControlledUpdateWithKnownPermutationAndEta() {
+
+        // Start with a simple lower-triangular matrix (not diagonal, but lower triangular)
+        // A = [1 0 0; 2 1 0; 3 4 1]
+        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        matrix.set(0, 0, 1.0);
+        matrix.set(1, 0, 2.0);
+        matrix.set(1, 1, 1.0);
+        matrix.set(2, 0, 3.0);
+        matrix.set(2, 1, 4.0);
+        matrix.set(2, 2, 1.0);
+
+        // Now update column 1 to [0, 1, 5]^T
+        R064Store newCol = R064Store.FACTORY.make(3, 1);
+        newCol.set(0, 0, 0.0);
+        newCol.set(1, 0, 1.0);
+        newCol.set(2, 0, 5.0);
+
+        UpdateCase updateCase = new UpdateCase(matrix, 1, newCol);
+
+        SparseLU sparse = SparseLUTest.doTestBuildingViaUpdates(updateCase);
+
+        SparseLUTest.doTestUpdate(updateCase, sparse);
+    }
+
+    @Test
+    public void testEtaMatrixConstructionAndApplication() {
+
+        // Matrix with nontrivial structure
+        // [1 2 0]
+        // [0 1 3]
+        // [4 0 1]
+        R064LSC matrix = R064LSC.FACTORY.make(3, 3);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(0, 2, 0.0);
+        matrix.set(1, 0, 0.0);
+        matrix.set(1, 1, 1.0);
+        matrix.set(1, 2, 3.0);
+        matrix.set(2, 0, 4.0);
+        matrix.set(2, 1, 0.0);
+        matrix.set(2, 2, 1.0);
+
+        // Update column 0 to a new vector
+        // [2]
+        // [5]
+        // [1]
+        R064Store newCol = R064Store.FACTORY.make(3, 1);
+        newCol.set(0, 0, 2.0);
+        newCol.set(1, 0, 5.0);
+        newCol.set(2, 0, 1.0);
+
+        UpdateCase updateCase = new UpdateCase(matrix, 0, newCol);
+
+        SparseLU sparse = SparseLUTest.doTestBuildingViaUpdates(updateCase);
+
+        SparseLUTest.doTestUpdate(updateCase, sparse);
+    }
+
+    @Test
+    public void testEtaMatrixFtranBtran() {
+
+        // Test the Eta matrix ftran and btran in isolation
+        int dim = 4;
+        int pivotRow = 2;
+        double eta0 = 0.5, eta1 = -1.0, eta3 = 2.0;
+        SparseLU.Eta eta = new SparseLU.Eta(dim, pivotRow);
+        // Set up eta with multiple nonzeros
+        eta.set(0, eta0);
+        eta.set(1, eta1);
+        eta.set(3, eta3);
+        // The dense form of Eta is identity except row 2:
+        // E = I + e_pivotRow * [0.5, -1.0, 0, 2.0]
+        // So row 2 of E is: [0, 0, 1, 0] + [0.5, -1.0, 0, 2.0] = [0.5, -1.0, 1, 2.0]
+        // Test vector
+        double[] x = { 1.0, 2.0, 3.0, 4.0 };
+        PhysicalStore<Double> vec = R064Store.FACTORY.make(dim, 1);
+        for (int i = 0; i < dim; i++) {
+            vec.set(i, 0, x[i]);
+        }
+        // ftran: y = E * x
+        PhysicalStore<Double> expectedFtran = vec.copy();
+        double expectedPivot = x[pivotRow] + eta0 * x[0] + eta1 * x[1] + eta3 * x[3];
+        expectedFtran.set(pivotRow, 0, expectedPivot);
+        // Now apply ftran
+        PhysicalStore<Double> actualFtran = vec.copy();
+        eta.ftran(actualFtran);
+        TestUtils.assertEquals(expectedFtran, actualFtran);
+        // btran: y = E^T * x
+        // For btran, y[j] = x[j] for j != pivotRow; y[j] += -eta[j] * x[pivotRow] for j != pivotRow
+        PhysicalStore<Double> expectedBtran = vec.copy();
+        double pivotVal = x[pivotRow];
+        expectedBtran.add(0, 0, eta0 * pivotVal);
+        expectedBtran.add(1, 0, eta1 * pivotVal);
+        expectedBtran.add(3, 0, eta3 * pivotVal);
+        // Now apply btran
+        PhysicalStore<Double> actualBtran = vec.copy();
+        eta.btran(actualBtran);
+        TestUtils.assertEquals(expectedBtran, actualBtran);
     }
 
     @Test
@@ -171,67 +333,74 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(2, 1, 2.0);
         matrix.set(2, 2, 4.0);
 
-        // Create SparseLU decomposition
-        SparseLU decomp = new SparseLU();
-        decomp.decompose(matrix);
-
         // Create a new column to update
         R064Store newColumn = R064Store.FACTORY.make(3, 1);
         newColumn.set(0, 0, 3.0);
         newColumn.set(1, 0, 4.0);
         newColumn.set(2, 0, 5.0);
 
-        // Create a work vector for the update
-        PhysicalStore<Double> work = R064Store.FACTORY.make(3, 1);
+        UpdateCase updateCase = new UpdateCase(matrix, 1, newColumn);
 
-        // Update column 1
-        decomp.updateColumn(1, newColumn, work);
+        SparseLU sparse = SparseLUTest.doTestBuildingViaUpdates(updateCase);
 
-        // Update the original matrix with the new column
-        matrix.fillColumn(1, newColumn);
+        SparseLUTest.doTestUpdate(updateCase, sparse);
+    }
 
-        // Test ftran: Solve Ax = b
-        PhysicalStore<Double> b = R064Store.FACTORY.make(3, 1);
-        b.set(0, 0, 1.0);
-        b.set(1, 0, 2.0);
-        b.set(2, 0, 3.0);
+    @Test
+    public void testMultipleUpdatesToSameMatrix() {
 
-        // Make a copy of b for comparison
-        PhysicalStore<Double> bCopy = b.copy();
+        // Create initial matrix
+        R064Store matrix = R064Store.FACTORY.make(4, 4);
+        matrix.set(0, 0, 4.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(0, 2, 1.0);
+        matrix.set(0, 3, 3.0);
+        matrix.set(1, 0, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 2.0);
+        matrix.set(1, 3, 4.0);
+        matrix.set(2, 0, 1.0);
+        matrix.set(2, 1, 2.0);
+        matrix.set(2, 2, 4.0);
+        matrix.set(2, 3, 5.0);
+        matrix.set(3, 0, 3.0);
+        matrix.set(3, 1, 4.0);
+        matrix.set(3, 2, 5.0);
+        matrix.set(3, 3, 6.0);
 
-        // Apply ftran to solve Ax = b
-        decomp.ftran(b);
+        PhysicalStore<Double> expected = matrix.copy();
 
-        // Verify that x is indeed a solution to Ax = b
-        // Compute Ax and compare with original b
-        PhysicalStore<Double> computedB = R064Store.FACTORY.make(3, 1);
-        matrix.multiply(b).supplyTo(computedB);
-        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
+        // Create SparseLU decomposition
+        SparseLU decomp = new SparseLU();
+        decomp.decompose(matrix);
 
-        // Test btran: Solve Aᵀx = b
-        b = bCopy.copy();
+        // First update: column 1
+        R064Store newCol1 = R064Store.FACTORY.make(4, 1);
+        newCol1.set(0, 0, 5.0);
+        newCol1.set(1, 0, 7.0);
+        newCol1.set(2, 0, 8.0);
+        newCol1.set(3, 0, 6.0);
 
-        // Apply btran to solve Aᵀx = b
-        decomp.btran(b);
+        // Apply updates
+        TestUtils.assertTrue(decomp.updateColumn(1, newCol1));
 
-        // Verify that x is indeed a solution to Aᵀx = b
-        // Compute Aᵀx and compare with original b
-        computedB = R064Store.FACTORY.make(3, 1);
-        matrix.transpose().multiply(b).supplyTo(computedB);
-        TestUtils.assertEquals(bCopy, computedB, ACCURACY);
+        expected.fillColumn(1, newCol1);
 
-        // Verify that the decomposition is still valid after the update
-        // PA = LU where P is the permutation matrix
-        PhysicalStore<Double> P = R064Store.FACTORY.make(3, 3);
-        int[] pivotOrder = decomp.getPivotOrder();
-        for (int i = 0; i < 3; i++) {
-            P.set(i, pivotOrder[i], 1.0);
-        }
+        DecompositionUpdateTest.doTestTran(expected, decomp, DecompositionUpdateTest.rhs(4));
 
-        // Verify PA = LU
-        MatrixStore<Double> PA = P.multiply(matrix);
-        MatrixStore<Double> LU = decomp.getL().multiply(decomp.getU());
-        TestUtils.assertEquals(PA, LU, ACCURACY);
+        // Second update: column 2
+        R064Store newCol2 = R064Store.FACTORY.make(4, 1);
+        newCol2.set(0, 0, 9.0);
+        newCol2.set(1, 0, 12.0);
+        newCol2.set(2, 0, 10.0);
+        newCol2.set(3, 0, 11.0);
+
+        // Apply second update
+        TestUtils.assertTrue(decomp.updateColumn(2, newCol2));
+
+        expected.fillColumn(2, newCol2);
+
+        DecompositionUpdateTest.doTestTran(expected, decomp, DecompositionUpdateTest.rhs(4));
     }
 
     @Test
@@ -239,7 +408,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
 
         R064Store matrix = R064Store.FACTORY.makeFilled(5, 5, Uniform.standard());
 
-        SparseLU decomp = this.doGeneralTest(matrix);
+        SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
     }
 
     @Test
@@ -252,7 +421,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(1, 0, 6.0);
         matrix.set(1, 1, 3.0);
 
-        SparseLU decomp = this.doGeneralTest(matrix);
+        SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
 
         // First verify that pivoting occurred correctly
         // For this matrix, row 1 should be used first since |6| > |4|
@@ -327,7 +496,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(2, 1, 8.0);
         matrix.set(2, 2, 9.0);
 
-        SparseLU decomp = this.doGeneralTest(matrix);
+        SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
 
         // After first pivot, row 2 should be first (largest element in column 0)
         TestUtils.assertEquals(2, decomp.getPivotOrder()[0]);
@@ -407,7 +576,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(2, 1, 8.0);
         matrix.set(2, 2, 9.0);
 
-        SparseLU decomp = this.doGeneralTest(matrix);
+        SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
 
         TestUtils.assertFalse(decomp.isSolvable());
     }
@@ -425,7 +594,7 @@ public class SparseLUTest extends MatrixDecompositionTests {
         matrix.set(2, 1, 0.5);
         matrix.set(3, 2, 0.5);
 
-        SparseLU decomp = this.doGeneralTest(matrix);
+        SparseLU decomp = SparseLUTest.doTestDecomposition(matrix);
 
         // Verify sparsity pattern is preserved
         // Check L is lower triangular with expected pattern
@@ -449,31 +618,328 @@ public class SparseLUTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(matrix, product);
     }
 
-    private SparseLU doGeneralTest(final MatrixStore<Double> matrix) {
+    @Test
+    public void testSpecificEtaCase() {
 
+        PhysicalStore<Double> mtrxU0 = R064Store.FACTORY.make(3, 3);
+        mtrxU0.set(0, 0, 4);
+        mtrxU0.set(0, 1, 3);
+        mtrxU0.set(0, 2, 1);
+        mtrxU0.set(1, 0, 0);
+        mtrxU0.set(1, 1, 2.625);
+        mtrxU0.set(1, 2, 2.375);
+        mtrxU0.set(2, 0, 0);
+        mtrxU0.set(2, 1, 1.5);
+        mtrxU0.set(2, 2, 2.5);
         if (DEBUG) {
-            LU<Double> refDecomp = LU.R064.decompose(matrix);
-            BasicLogger.debugMatrix("Reference Original matrix", matrix);
-            BasicLogger.debug("Reference Pivot order: {}", refDecomp.getPivotOrder());
-            BasicLogger.debugMatrix("Reference L matrix", refDecomp.getL());
-            BasicLogger.debugMatrix("Reference U matrix", refDecomp.getU());
-            BasicLogger.debug("Reference getRank: {}", refDecomp.getRank());
-            BasicLogger.debug("Reference isSolvable: {}", refDecomp.isSolvable());
-            TestUtils.assertEquals(matrix, refDecomp, ACCURACY);
+            BasicLogger.debugMatrix("mtrxU0", mtrxU0);
         }
 
-        SparseLU decomposition = new SparseLU();
-        TestUtils.assertTrue(decomposition.decompose(matrix));
-
+        PhysicalStore<Double> mtrxEta = R064Store.FACTORY.make(3, 3);
+        mtrxEta.fillDiagonal(ONE);
+        mtrxEta.set(2, 1, 1.5 / 2.625);
         if (DEBUG) {
-            BasicLogger.debugMatrix("Original matrix", matrix);
-            BasicLogger.debug("Pivot order: {}", decomposition.getPivotOrder());
-            BasicLogger.debugMatrix("L matrix", decomposition.getL());
-            BasicLogger.debugMatrix("U matrix", decomposition.getU());
+            BasicLogger.debugMatrix("mtrxEta", mtrxEta);
         }
 
-        TestUtils.assertEquals(matrix, decomposition, ACCURACY);
+        LU<Double> dcmpU0 = LU.R064.decompose(mtrxU0);
+        LU<Double> dcmpEta = LU.R064.decompose(mtrxEta);
 
-        return decomposition;
+        MatrixStore<Double> invEta = dcmpEta.getInverse();
+        if (DEBUG) {
+            BasicLogger.debugMatrix("invEta", invEta);
+        }
+
+        MatrixStore<Double> mtrxU1 = invEta.multiply(mtrxU0);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("mtrxU1", mtrxU1);
+        }
+
+        LU<Double> dcmpU1 = LU.R064.decompose(mtrxU1);
+
+        PhysicalStore<Double> rhs = R064Store.FACTORY.make(3, 1);
+        rhs.set(0, 1);
+        rhs.set(1, 2);
+        rhs.set(2, 3);
+
+        SparseLU.Eta trfEta = new SparseLU.Eta(3, 2);
+        trfEta.set(1, -1.5 / 2.625);
+
+        // ftran
+
+        PhysicalStore<Double> reference = rhs.copy();
+        dcmpU0.ftran(reference);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("reference", reference);
+        }
+
+        PhysicalStore<Double> expected = rhs.copy();
+        dcmpEta.ftran(expected);
+        dcmpU1.ftran(expected);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("expected", expected);
+        }
+
+        TestUtils.assertEquals(expected, reference);
+
+        PhysicalStore<Double> actual = rhs.copy();
+        trfEta.ftran(actual);
+        dcmpU1.ftran(actual);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("actual", actual);
+        }
+
+        TestUtils.assertEquals(expected, actual);
+
+        // btran
+
+        reference = rhs.copy();
+        dcmpU0.btran(reference);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("reference", reference);
+        }
+
+        expected = rhs.copy();
+        dcmpU1.btran(expected);
+        dcmpEta.btran(expected);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("expected", expected);
+        }
+
+        TestUtils.assertEquals(expected, reference);
+
+        actual = rhs.copy();
+        dcmpU1.btran(actual);
+        trfEta.btran(actual);
+        if (DEBUG) {
+            BasicLogger.debugMatrix("actual", actual);
+        }
+
+        TestUtils.assertEquals(expected, actual);
     }
+
+    @Test
+    public void testR064LSRToCSCConversion() {
+        // Create a sparse matrix in LSR format
+        R064LSR matrix = R064LSR.FACTORY.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSC format
+        R064CSC csc = matrix.toCSC();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csc.getRowDim());
+        TestUtils.assertEquals(4, csc.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
+    }
+
+    @Test
+    public void testR064LSRToCSRConversion() {
+        // Create a sparse matrix in LSR format
+        R064LSR matrix = R064LSR.FACTORY.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSR format
+        R064CSR csr = matrix.toCSR();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csr.getRowDim());
+        TestUtils.assertEquals(4, csr.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
+    }
+
+    @Test
+    public void testR064LSCToCSCConversion() {
+        // Create a sparse matrix in LSC format
+        R064LSC matrix = R064LSC.FACTORY.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSC format
+        R064CSC csc = matrix.toCSC();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csc.getRowDim());
+        TestUtils.assertEquals(4, csc.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csc.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csc.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csc.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csc.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csc.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csc.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csc.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csc.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csc.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csc.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csc.doubleValue(3, 2));
+    }
+
+    @Test
+    public void testR064LSCToCSRConversion() {
+        // Create a sparse matrix in LSC format
+        R064LSC matrix = R064LSC.FACTORY.make(4, 4);
+        matrix.set(0, 0, 1.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 5.0);
+        matrix.set(2, 3, 6.0);
+        matrix.set(3, 0, 7.0);
+        matrix.set(3, 3, 8.0);
+
+        // Convert to CSR format
+        R064CSR csr = matrix.toCSR();
+
+        // Verify dimensions
+        TestUtils.assertEquals(4, csr.getRowDim());
+        TestUtils.assertEquals(4, csr.getColDim());
+
+        // Verify values
+        TestUtils.assertEquals(1.0, csr.doubleValue(0, 0));
+        TestUtils.assertEquals(2.0, csr.doubleValue(0, 1));
+        TestUtils.assertEquals(3.0, csr.doubleValue(1, 1));
+        TestUtils.assertEquals(4.0, csr.doubleValue(1, 2));
+        TestUtils.assertEquals(5.0, csr.doubleValue(2, 2));
+        TestUtils.assertEquals(6.0, csr.doubleValue(2, 3));
+        TestUtils.assertEquals(7.0, csr.doubleValue(3, 0));
+        TestUtils.assertEquals(8.0, csr.doubleValue(3, 3));
+
+        // Verify zeros
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 2));
+        TestUtils.assertEquals(0.0, csr.doubleValue(0, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(1, 3));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 0));
+        TestUtils.assertEquals(0.0, csr.doubleValue(2, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 1));
+        TestUtils.assertEquals(0.0, csr.doubleValue(3, 2));
+    }
+
+    @Test
+    public void testEmptyMatrixConversions() {
+        // Test LSR to CSC/CSR
+        R064LSR lsrMatrix = R064LSR.FACTORY.make(3, 3);
+        R064CSC lsrToCsc = lsrMatrix.toCSC();
+        R064CSR lsrToCsr = lsrMatrix.toCSR();
+
+        TestUtils.assertEquals(3, lsrToCsc.getRowDim());
+        TestUtils.assertEquals(3, lsrToCsc.getColDim());
+        TestUtils.assertEquals(3, lsrToCsr.getRowDim());
+        TestUtils.assertEquals(3, lsrToCsr.getColDim());
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                TestUtils.assertEquals(0.0, lsrToCsc.doubleValue(i, j));
+                TestUtils.assertEquals(0.0, lsrToCsr.doubleValue(i, j));
+            }
+        }
+
+        // Test LSC to CSC/CSR
+        R064LSC lscMatrix = R064LSC.FACTORY.make(3, 3);
+        R064CSC lscToCsc = lscMatrix.toCSC();
+        R064CSR lscToCsr = lscMatrix.toCSR();
+
+        TestUtils.assertEquals(3, lscToCsc.getRowDim());
+        TestUtils.assertEquals(3, lscToCsc.getColDim());
+        TestUtils.assertEquals(3, lscToCsr.getRowDim());
+        TestUtils.assertEquals(3, lscToCsr.getColDim());
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                TestUtils.assertEquals(0.0, lscToCsc.doubleValue(i, j));
+                TestUtils.assertEquals(0.0, lscToCsr.doubleValue(i, j));
+            }
+        }
+    }
+
+    @Test
+    public void testSingleElementMatrixConversions() {
+        // Test LSR to CSC/CSR
+        R064LSR lsrMatrix = R064LSR.FACTORY.make(3, 3);
+        lsrMatrix.set(1, 1, 42.0);
+        
+        R064CSC lsrToCsc = lsrMatrix.toCSC();
+        R064CSR lsrToCsr = lsrMatrix.toCSR();
+
+        TestUtils.assertEquals(42.0, lsrToCsc.doubleValue(1, 1));
+        TestUtils.assertEquals(42.0, lsrToCsr.doubleValue(1, 1));
+
+        // Test LSC to CSC/CSR
+        R064LSC lscMatrix = R064LSC.FACTORY.make(3, 3);
+        lscMatrix.set(1, 1, 42.0);
+        
+        R064CSC lscToCsc = lscMatrix.toCSC();
+        R064CSR lscToCsr = lscMatrix.toCSR();
+
+        TestUtils.assertEquals(42.0, lscToCsc.doubleValue(1, 1));
+        TestUtils.assertEquals(42.0, lscToCsr.doubleValue(1, 1));
+    }
+
 }

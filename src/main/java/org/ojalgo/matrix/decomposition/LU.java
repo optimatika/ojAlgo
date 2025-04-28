@@ -24,12 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.PlainArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quadruple;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.context.NumberContext;
@@ -111,22 +109,11 @@ public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition
     MatrixStore<N> getU();
 
     @Override
-    default PhysicalStore<N> preallocate(final int nbEquations) {
-        return this.preallocate(nbEquations, 1);
-    }
-
-    @Override
     default MatrixStore<N> reconstruct() {
         MatrixStore<N> mtrxL = this.getL();
         MatrixStore<N> mtrxU = this.getU();
         int[] reversePivotOrder = this.getReversePivotOrder();
         return mtrxL.multiply(mtrxU).rows(reversePivotOrder);
-    }
-
-    @Override
-    default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn,
-            final PhysicalStore<N> preallocated) {
-        throw new UnsupportedOperationException();
     }
 
 }

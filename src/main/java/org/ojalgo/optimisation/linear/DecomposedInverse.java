@@ -4,17 +4,14 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.R064Store;
 
 final class DecomposedInverse implements BasisRepresentation {
 
     private final LU<Double> myDecomposition;
-    private final R064Store myWork;
 
     DecomposedInverse(final boolean sparse, final int dim) {
         super();
         myDecomposition = sparse ? LU.newSparseR064() : LU.R064.make(dim, 1);
-        myWork = R064Store.FACTORY.make(dim, 1);
     }
 
     @Override
@@ -45,7 +42,7 @@ final class DecomposedInverse implements BasisRepresentation {
     @Override
     public void update(final MatrixStore<Double> basis, final int col, final SparseArray<Double> values) {
 
-        if (!myDecomposition.updateColumn(col, values, myWork)) {
+        if (!myDecomposition.updateColumn(col, values)) {
             myDecomposition.decompose(basis);
         }
     }

@@ -21,25 +21,20 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.ONE;
-
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateCase;
+import org.ojalgo.matrix.decomposition.DecompositionUpdateTest.UpdateSequence;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.R064Store;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.type.keyvalue.EntryPair.KeyedPrimitive;
 
 /**
  * Tests for the Fletcher-Matthews LU update algorithm.
  * <p>
  * Focuses on testing repeated updates and column pivoting behavior.
  */
-@Disabled
 public class FletcherMatthewsTest extends MatrixDecompositionTests {
-
-    private static final NumberContext ACCURACY = NumberContext.of(12);
-    private static final NumberContext PRINT = NumberContext.of(6);
 
     /**
      * Tests repeated updates with column pivoting. Creates a matrix, performs initial decomposition, then
@@ -49,62 +44,27 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
     @Test
     public void testRepeatedUpdatesWithPivoting() {
 
-        // Create initial 4x4 matrix
-        R064Store original = R064Store.FACTORY.make(4, 4);
-        original.fillAll(ONE);
-        original.set(0, 0, 2.0);
-        original.set(1, 1, 3.0);
-        original.set(2, 2, 4.0);
-        original.set(3, 3, 5.0);
+        UpdateSequence sequence = DecompositionUpdateTest.makeRepeatedUpdatesWithPivoting();
 
         // Perform initial LU decomposition
-        LU<Double> decomposition = LU.R064.make();
-        decomposition.decompose(original);
+        PhysicalStore<Double> matrix = sequence.matrix;
+        LU<Double> decomposition = LU.R064.decompose(matrix);
 
-        // Create new columns to update
-        R064Store newColumn1 = R064Store.FACTORY.make(4, 1);
-        newColumn1.fillAll(ONE);
-        newColumn1.set(0, 0, 6.0); // Large value to force pivot
+        MatrixStore<Double> rhs = sequence.rhs();
 
-        R064Store newColumn2 = R064Store.FACTORY.make(4, 1);
-        newColumn2.fillAll(ONE);
-        newColumn2.set(1, 0, 7.0); // Large value to force pivot
+        DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
 
-        R064Store newColumn3 = R064Store.FACTORY.make(4, 1);
-        newColumn3.fillAll(ONE);
-        newColumn3.set(2, 0, 8.0); // Large value to force pivot
+        for (KeyedPrimitive<MatrixStore<Double>> update : sequence.updates) {
 
-        // Update first column
-        boolean success1 = decomposition.updateColumn(0, newColumn1);
-        Assertions.assertTrue(success1, "First update failed");
+            int columnIndex = update.intValue();
+            MatrixStore<Double> newColumn = update.left();
 
-        // Verify structure after first update
-        MatrixStore<Double> l1 = decomposition.getL();
-        MatrixStore<Double> u1 = decomposition.getU();
-        this.verifyTriangularStructure(l1, u1);
+            matrix.fillColumn(columnIndex, newColumn);
 
-        // Update second column
-        boolean success2 = decomposition.updateColumn(1, newColumn2);
-        Assertions.assertTrue(success2, "Second update failed");
+            decomposition.updateColumn(columnIndex, newColumn);
 
-        // Verify structure after second update
-        MatrixStore<Double> l2 = decomposition.getL();
-        MatrixStore<Double> u2 = decomposition.getU();
-        this.verifyTriangularStructure(l2, u2);
-
-        // Update third column
-        boolean success3 = decomposition.updateColumn(2, newColumn3);
-        Assertions.assertTrue(success3, "Third update failed");
-
-        // Verify structure after third update
-        MatrixStore<Double> l3 = decomposition.getL();
-        MatrixStore<Double> u3 = decomposition.getU();
-        this.verifyTriangularStructure(l3, u3);
-
-        // Verify that column pivots were applied correctly
-        int[] pivotOrder = decomposition.getPivotOrder();
-        Assertions.assertNotNull(pivotOrder, "Pivot order should not be null");
-        Assertions.assertEquals(4, pivotOrder.length, "Pivot order should have length 4");
+            DecompositionUpdateTest.doTestTran(matrix, decomposition, rhs);
+        }
     }
 
     /**
@@ -114,30 +74,14 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
     @Test
     public void testUpdatesWithSmallDiagonal() {
 
-        // Create initial 3x3 matrix with small diagonal elements
-        R064Store original = R064Store.FACTORY.make(3, 3);
-        original.fillAll(ONE);
-        original.set(0, 0, 1.0E-10);
-        original.set(1, 1, 1.0E-10);
-        original.set(2, 2, 1.0E-10);
+        UpdateCase updateCase = DecompositionUpdateTest.makeUpdatesWithSmallDiagonal();
 
         // Perform initial LU decomposition
         LU<Double> decomposition = LU.R064.make();
-        decomposition.decompose(original);
-
-        // Create new column to update
-        R064Store newColumn = R064Store.FACTORY.make(3, 1);
-        newColumn.fillAll(ONE);
-        newColumn.set(0, 0, 1.0E+10); // Large value to force pivot
-
+        decomposition.decompose(updateCase.originalMatrix);
         // Update first column
-        boolean success = decomposition.updateColumn(0, newColumn);
+        boolean success = decomposition.updateColumn(updateCase.columnIndex, updateCase.newColumn);
         Assertions.assertTrue(success, "Update failed");
-
-        // Verify structure after update
-        MatrixStore<Double> l = decomposition.getL();
-        MatrixStore<Double> u = decomposition.getU();
-        this.verifyTriangularStructure(l, u);
 
         // Verify that column pivots were applied to maintain numerical stability
         int[] pivotOrder = decomposition.getPivotOrder();
@@ -152,28 +96,19 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
     @Test
     public void testUpdatesWithZeroDiagonal() {
 
-        // Create initial 3x3 matrix with zero diagonal
-        R064Store original = R064Store.FACTORY.make(3, 3);
-        original.fillAll(ONE);
-        original.set(0, 0, 0.0); // Zero diagonal element
+        UpdateCase updateCase = DecompositionUpdateTest.makeUpdatesWithZeroDiagonal();
 
         // Perform initial LU decomposition
         LU<Double> decomposition = LU.R064.make();
-        decomposition.decompose(original);
-
-        // Create new column to update
-        R064Store newColumn = R064Store.FACTORY.make(3, 1);
-        newColumn.fillAll(ONE);
-        newColumn.set(1, 0, 5.0); // Large value to force pivot
+        decomposition.decompose(updateCase.originalMatrix);
 
         // Update first column
-        boolean success = decomposition.updateColumn(0, newColumn);
+        boolean success = decomposition.updateColumn(updateCase.columnIndex, updateCase.newColumn);
         Assertions.assertTrue(success, "Update failed");
 
         // Verify structure after update
         MatrixStore<Double> l = decomposition.getL();
         MatrixStore<Double> u = decomposition.getU();
-        this.verifyTriangularStructure(l, u);
 
         // Verify that column pivots were applied to handle zero diagonal
         int[] pivotOrder = decomposition.getPivotOrder();
@@ -181,25 +116,4 @@ public class FletcherMatthewsTest extends MatrixDecompositionTests {
         Assertions.assertEquals(3, pivotOrder.length, "Pivot order should have length 3");
     }
 
-    private void verifyTriangularStructure(final MatrixStore<Double> l, final MatrixStore<Double> u) {
-        // Verify L is lower triangular with unit diagonal
-        for (int i = 0; i < l.getRowDim(); i++) {
-            for (int j = 0; j < l.getColDim(); j++) {
-                if (i < j) {
-                    Assertions.assertEquals(0.0, l.doubleValue(i, j), ACCURACY.getPrecision(), "L should be lower triangular");
-                } else if (i == j) {
-                    Assertions.assertEquals(1.0, l.doubleValue(i, j), ACCURACY.getPrecision(), "L should have unit diagonal");
-                }
-            }
-        }
-
-        // Verify U is upper triangular
-        for (int i = 0; i < u.getRowDim(); i++) {
-            for (int j = 0; j < u.getColDim(); j++) {
-                if (i > j) {
-                    Assertions.assertEquals(0.0, u.doubleValue(i, j), ACCURACY.getPrecision(), "U should be upper triangular");
-                }
-            }
-        }
-    }
 }

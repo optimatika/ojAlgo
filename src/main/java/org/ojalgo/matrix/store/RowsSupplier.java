@@ -238,6 +238,11 @@ public final class RowsSupplier<N extends Comparable<N>> implements MatrixStore<
     }
 
     @Override
+    public SparseArray<N> sliceRow(final long row) {
+        return this.getRow(Math.toIntExact(row));
+    }
+
+    @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();

@@ -23,7 +23,9 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.function.constant.PrimitiveMath.ZERO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.scalar.Scalar;
@@ -33,7 +35,7 @@ import org.ojalgo.type.math.MathType;
 /**
  * R064-Linked-Sparse-Columns (like CSC but columns as linked lists).
  */
-public final class R064LSC extends SparseR064 {
+public final class R064LSC extends LinkedR064 {
 
     public static final class Factory implements Factory2D<R064LSC> {
 
@@ -60,15 +62,28 @@ public final class R064LSC extends SparseR064 {
 
     public static final R064LSC.Factory FACTORY = new R064LSC.Factory();
 
-    private final SparseR064.ElementNode[] myFirstInColumns;
-    private final SparseR064.ElementNode[] myLastInColumns;
+    private final LinkedR064.ElementNode[] myFirstInColumns;
+    private final LinkedR064.ElementNode[] myLastInColumns;
     private final int mySplit;
 
     R064LSC(final int nbRows, final int nbCols) {
         super(nbRows, nbCols);
-        myFirstInColumns = new SparseR064.ElementNode[nbCols];
-        myLastInColumns = new SparseR064.ElementNode[nbCols];
+        myFirstInColumns = new LinkedR064.ElementNode[nbCols];
+        myLastInColumns = new LinkedR064.ElementNode[nbCols];
         mySplit = nbCols / 2;
+    }
+
+    @Override
+    public double density() {
+        int nonZeroCount = 0;
+        for (int col = 0; col < myFirstInColumns.length; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                nonZeroCount++;
+                current = current.next;
+            }
+        }
+        return ((double) nonZeroCount) / this.count();
     }
 
     @Override
@@ -177,7 +192,7 @@ public final class R064LSC extends SparseR064 {
         }
 
         // Create new node
-        ElementNode node = SparseR064.newNode(row, ZERO);
+        ElementNode node = LinkedR064.newNode(row, ZERO);
 
         // Empty column
         if (prev == null && next == null) {
@@ -256,7 +271,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null && node.next == null) {
             myFirstInColumns[col] = null;
             myLastInColumns[col] = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -264,7 +279,7 @@ public final class R064LSC extends SparseR064 {
         if (node.previous == null) {
             myFirstInColumns[col] = node.next;
             node.next.previous = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -272,7 +287,7 @@ public final class R064LSC extends SparseR064 {
         if (node.next == null) {
             myLastInColumns[col] = node.previous;
             node.previous.next = null;
-            SparseR064.recycle(node);
+            LinkedR064.recycle(node);
             return;
         }
 
@@ -280,13 +295,61 @@ public final class R064LSC extends SparseR064 {
         node.previous.next = node.next;
         node.next.previous = node.previous;
 
-        SparseR064.recycle(node);
+        LinkedR064.recycle(node);
     }
 
     @Override
     public void reset() {
         Arrays.fill(myFirstInColumns, null);
         Arrays.fill(myLastInColumns, null);
+    }
+
+    @Override
+    public void setFirst(final int row, final int col, final double value) {
+
+        if (!PRECISION.isZero(value)) {
+
+            ElementNode next = myFirstInColumns[col];
+            ElementNode previous = LinkedR064.newNode(row, value);
+
+            if (next != null) {
+
+                next.previous = previous;
+                previous.next = next;
+
+            } else {
+
+                myLastInColumns[col] = previous;
+            }
+
+            myFirstInColumns[col] = previous;
+        }
+    }
+
+    /**
+     * If/when you know you're creating a new last non-zero in the specified column this is much faster than
+     * the usual {@link #set(int, int, double)}.
+     */
+    @Override
+    public void setLast(final int row, final int col, final double value) {
+
+        if (!PRECISION.isZero(value)) {
+
+            ElementNode previous = myLastInColumns[col];
+            ElementNode next = LinkedR064.newNode(row, value);
+
+            if (previous != null) {
+
+                previous.next = next;
+                next.previous = previous;
+
+            } else {
+
+                myFirstInColumns[col] = next;
+            }
+
+            myLastInColumns[col] = next;
+        }
     }
 
     @Override
@@ -307,6 +370,103 @@ public final class R064LSC extends SparseR064 {
                 current = current.next;
             }
         }
+    }
+
+    @Override
+    public R064CSC toCSC() {
+
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+
+        // Count non-zeros and calculate column pointers in one pass
+        int[] colPointers = new int[nbCols + 1];
+        int nnz = 0;
+        for (int col = 0; col < nbCols; col++) {
+            colPointers[col] = nnz;
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                nnz++;
+                current = current.next;
+            }
+        }
+        colPointers[nbCols] = nnz;
+
+        // Create arrays for row indices and values
+        int[] rowIndices = new int[nnz];
+        double[] values = new double[nnz];
+
+        // Fill arrays
+        int pos = 0;
+        for (int col = 0; col < nbCols; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                rowIndices[pos] = current.index;
+                values[pos] = current.value;
+                pos++;
+                current = current.next;
+            }
+        }
+
+        return new R064CSC(nbRows, nbCols, values, rowIndices, colPointers);
+    }
+
+    @Override
+    public R064CSR toCSR() {
+
+        int nbRows = this.getRowDim();
+        int nbCols = this.getColDim();
+
+        // Count non-zeros per row
+        int[] rowCounts = new int[nbRows];
+        for (int col = 0; col < nbCols; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                rowCounts[current.index]++;
+                current = current.next;
+            }
+        }
+
+        // Calculate row pointers
+        int[] rowPointers = new int[nbRows + 1];
+        int nnz = 0;
+        for (int row = 0; row < nbRows; row++) {
+            rowPointers[row] = nnz;
+            nnz += rowCounts[row];
+        }
+        rowPointers[nbRows] = nnz;
+
+        // Create arrays for column indices and values
+        int[] colIndices = new int[nnz];
+        double[] values = new double[nnz];
+
+        // Fill arrays
+        int[] rowPositions = new int[nbRows]; // Track current position in each row
+        for (int col = 0; col < nbCols; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                int row = current.index;
+                int pos = rowPointers[row] + rowPositions[row];
+                colIndices[pos] = col;
+                values[pos] = current.value;
+                rowPositions[row]++;
+                current = current.next;
+            }
+        }
+
+        return new R064CSR(nbRows, nbCols, values, colIndices, rowPointers);
+    }
+
+    @Override
+    public List<Triplet> toTriplets() {
+        List<Triplet> retVal = new ArrayList<>();
+        for (int col = 0; col < myFirstInColumns.length; col++) {
+            ElementNode current = myFirstInColumns[col];
+            while (current != null) {
+                retVal.add(new Triplet(current.index, col, current.value));
+                current = current.next;
+            }
+        }
+        return retVal;
     }
 
     @Override

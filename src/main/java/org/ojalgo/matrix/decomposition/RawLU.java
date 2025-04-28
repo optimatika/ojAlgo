@@ -29,6 +29,7 @@ import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.R064Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
@@ -40,6 +41,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private Pivot myColPivot = null;
     private final Pivot myPivot = new Pivot();
+    private transient R064Store myWorkerColumn = null;
+    private transient R064Store myWorkerRow = null;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -260,15 +263,14 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public boolean updateColumn(final int columnIndex, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn,
-            final PhysicalStore<Double> preallocated) {
+    public boolean updateColumn(final int columnIndex, final Access1D.Collectable<Double, ? super TransformableRegion<Double>> newColumn) {
 
         if (myColPivot == null) {
             myColPivot = new Pivot();
             myColPivot.reset(this.getColDim());
         }
 
-        return FletcherMatthews.update(myPivot, this.getInternalStore(), myColPivot, columnIndex, newColumn, preallocated);
+        return FletcherMatthews.update(myPivot, this.getInternalStore(), myColPivot, columnIndex, newColumn, this.getWorkerColumn(this.getRowDim()));
     }
 
     private boolean doDecompose(final double[][] data, final boolean pivoting) {
@@ -362,6 +364,20 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     protected boolean checkSolvability() {
         return this.isSquare() && this.isFullRank();
+    }
+
+    R064Store getWorkerColumn(final int nbRows) {
+        if (myWorkerColumn == null || myWorkerColumn.getRowDim() != nbRows) {
+            myWorkerColumn = R064Store.FACTORY.make(nbRows, 1);
+        }
+        return myWorkerColumn;
+    }
+
+    R064Store getWorkerRow(final int nbCols) {
+        if (myWorkerRow == null || myWorkerRow.getColDim() != nbCols) {
+            myWorkerRow = R064Store.FACTORY.make(1, nbCols);
+        }
+        return myWorkerRow;
     }
 
 }

@@ -499,6 +499,16 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
      * Does NOT first reset the receiver! That means the elements in the receiver corresponding to zeros in
      * this sparse array are not zero:ed or modified in any way.
      */
+    public void supplyNonZerosTo(final double[] receiver) {
+        for (int n = 0; n < myActualLength; n++) {
+            receiver[(int) myIndices[n]] = myValues.doubleValue(n);
+        }
+    }
+
+    /**
+     * Does NOT first reset the receiver! That means the elements in the receiver corresponding to zeros in
+     * this sparse array are not zero:ed or modified in any way.
+     */
     public void supplyNonZerosTo(final Mutate1D receiver) {
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {
@@ -509,6 +519,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                 receiver.set(myIndices[n], myValues.get(n));
             }
         }
+    }
+
+    @Override
+    public void supplyTo(final double[] receiver) {
+
+        Arrays.fill(receiver, PrimitiveMath.ZERO);
+
+        this.supplyNonZerosTo(receiver);
     }
 
     @Override

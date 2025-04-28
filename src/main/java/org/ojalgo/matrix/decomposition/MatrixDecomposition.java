@@ -444,30 +444,13 @@ public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2
     interface Updatable<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
-         * Allocates memory (creates a {@link PhysicalStore}) instance suitable to be used with
-         * {@link #updateColumn(int, Access1D, PhysicalStore)}.
-         */
-        PhysicalStore<N> preallocate(final int nbRows);
-
-        /**
-         * First allocates working memory using {@link #preallocate(int)} and then calls
-         * {@link #updateColumn(int, Access1D, PhysicalStore)} to perform the update.
-         *
-         * @see #updateColumn(int, Access1D, PhysicalStore)
-         */
-        default boolean updateColumn(final int columnIndex, final Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn) {
-            return this.updateColumn(columnIndex, newColumn, this.preallocate(newColumn.size()));
-        }
-
-        /**
          * Updates the decomposition when a column in the original matrix is replaced.
          *
-         * @param columnIndex  The index of the column, in the original matrix, to replace
-         * @param newColumn    The new column values
-         * @param preallocated
+         * @param columnIndex The index of the column, in the original matrix, to replace
+         * @param newColumn   The new column values
          * @return true if update was successful, false if not.
          */
-        boolean updateColumn(int columnIndex, Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn, PhysicalStore<N> preallocated);
+        boolean updateColumn(int columnIndex, Access1D.Collectable<N, ? super TransformableRegion<N>> newColumn);
 
     }
 
